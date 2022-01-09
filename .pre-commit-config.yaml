@@ -1,0 +1,39 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black-conda
+        name: black-conda
+        entry: black
+        language: conda
+        require_serial: true
+        types_or: [python, pyi]
+
+      - id: flake8-conda
+        name: flake8-conda
+        entry: flake8
+        language: conda
+        require_serial: true
+        types_or: [python, pyi]
+        args: ["--max-line-length=88", "--max-complexity=18"]
+
+      - id: isort-conda
+        name: isort-conda
+        entry: isort
+        language: conda
+        require_serial: true
+        types_or: [python, pyi]
+        args: ["--filter-files"]
+
+      - id: mypy-conda
+        name: mypy-conda
+        entry: mypy
+        language: conda
+        require_serial: true
+        types_or: [python, pyi]
+
+      - id: pyupgrade-conda
+        name: pyupgrade-conda
+        entry: pyupgrade
+        language: conda
+        require_serial: true
+        types_or: [python, pyi]
