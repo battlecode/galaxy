@@ -7,6 +7,8 @@ dependencies:
   - django
   - django-stubs
   - flake8
+  - google-api-python-client
+  - google-cloud-pubsub
   - isort
   - mypy
   - openssl
