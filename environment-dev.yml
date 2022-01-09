@@ -1,0 +1,15 @@
+name: siarnaq
+channels:
+  - conda-forge
+dependencies:
+  - black
+  - ca-certificates
+  - django
+  - django-stubs
+  - flake8
+  - isort
+  - mypy
+  - openssl
+  - pre_commit
+  - python=3.10
+  - pyupgrade

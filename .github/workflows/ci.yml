@@ -1,0 +1,21 @@
+name: CI
+on: push
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+  lint:
+    name: Linter (pre-commit)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v2.4.0
+      - name: Setup miniconda
+        uses: conda-incubator/setup-miniconda@v2.1.1
+        with:
+          environment-file: environment-dev.yml
+      - name: Run linter
+        run: |
+          pre-commit install
+          pre-commit run -a
