@@ -110,19 +110,19 @@ class Team(models.Model):
 
     def is_staff(self):
         """Check whether this is a team with staff privileges."""
-        raise NotImplementedError
+        return self.status in {TeamStatus.STAFF, TeamStatus.INVISIBLE}
 
     def can_participate_tournament(self):
         """Check whether this team status can participate in a tournament."""
-        raise NotImplementedError
+        return self.status == TeamStatus.REGULAR
 
     def has_active_submission(self):
         """Return whether this team has an active submission."""
-        raise NotImplementedError
+        return self.submissions.filter(accepted=True).exists()
 
     def get_active_submission(self):
         """Return the current active submission belonging to the team."""
-        raise NotImplementedError
+        return self.submissions.filter(accepted=True).order_by("-created").first()
 
     def get_first_unfinalized_match(self, locked):
         """Return the earliest match of this team whose ratings are not finalized."""

@@ -155,13 +155,15 @@ class MatchParticipant(models.Model):
         Get the old rating of this participant, or else the participant's current rating
         if it is not yet known.
         """
-        raise NotImplementedError
+        if self.rating_old is None:
+            return self.team.profile.rating
+        return self.rating_old
 
     def get_rating_new(self):
         """
         Get the new rating of this participant, or else None if it is not yet known.
         """
-        raise NotImplementedError
+        return self.rating_new
 
     def get_rating_delta(self):
         """
@@ -233,15 +235,40 @@ class Match(SaturnInvocation):
 
     def can_see_teams(self, user):
         """Check whether a user is allowed to view the participants in this match."""
-        raise NotImplementedError
+        if user.is_staff:
+            # Staff members can see everything
+            return True
+        if self.tournament_round is not None:
+            # Tournament matches are only available after release
+            return self.tournament_round.is_released
+        # Regular matches are public knowledge
+        return True
 
     def can_see_outcome(self, user):
         """Check whether a user is allowed to view the outcome of this match."""
-        raise NotImplementedError
+        if user.is_staff:
+            # Staff members can see everything
+            return True
+        if self.tournament_round is not None:
+            # Tournament matches are only available after release
+            return self.tournament_round.is_released
+        if user.is_authenticated:
+            if user.teams.filter(pk__in={self.red.team, self.blue.team}).exists():
+                # Team members can see outcomes of their own regular matches
+                return True
+        if self.red.team.is_staff() or self.blue.team.is_staff():
+            # Matches with staff teams could expose student grades
+            return False
+        # Regular matches are public knowledge
+        return True
 
     def get_opponent(self, team):
         """Return the opponent of a participant in this match."""
-        raise NotImplementedError
+        if self.red.team.pk == team.pk:
+            return self.blue.team
+        if self.blue.team.pk == team.pk:
+            return self.red.team
+        raise ValueError("team is not a participant in this match")
 
     def finalize_ratings(self):
         """Populate the ratings for this match idempotently."""
