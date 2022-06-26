@@ -6,6 +6,7 @@ dependencies:
   - ca-certificates
   - django
   - django-stubs
+  - djangorestframework
   - flake8
   - google-api-python-client
   - google-cloud-pubsub

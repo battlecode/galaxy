@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
     "siarnaq.api.accounts",
     "siarnaq.api.compete",
     "siarnaq.api.episodes",
