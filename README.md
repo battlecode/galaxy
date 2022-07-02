@@ -12,8 +12,8 @@ Install Conda and Python (what versions? @jerry)
 
 Run `conda env create -n siarnaq -f environment-dev.yml` to set up the Conda environment.
 
-Run `pre-commit install` to set up checks that run before each commit. 
+Run `pre-commit install` to set up checks that run before each git commit. 
 
 ### Development
 
-Run `conda activate siarnaq` to activate the environment before beginning development (is this how it works @jerry)
+Run `conda activate siarnaq` to activate the environment before beginning development.
