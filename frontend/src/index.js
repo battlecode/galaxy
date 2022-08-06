@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 // import ReactDOM from "react-dom";
-import { createRoot } from 'react-dom/client';
+import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Switch, Route } from "react-router";
 
@@ -42,17 +42,19 @@ class App extends Component {
     Api.loginCheck((logged_in) => {
       this.setState({ logged_in });
 
-      Api.getUserProfile(
-        function (u) {
-          this.setState({ user: u });
-        }.bind(this)
-      );
+      if (logged_in) {
+        Api.getUserProfile(
+          function (u) {
+            this.setState({ user: u });
+          }.bind(this)
+        );
 
-      Api.getLeague(
-        function (l) {
-          this.setState({ league: l });
-        }.bind(this)
-      );
+        Api.getLeague(
+          function (l) {
+            this.setState({ league: l });
+          }.bind(this)
+        );
+      }
     });
   }
 
@@ -181,62 +183,10 @@ class App extends Component {
   }
 }
 
-class BeforeLoginApp extends Component {
-  constructor() {
-    super();
-    this.state = { logged_in: null };
-  }
-
-  componentDidMount() {
-    Api.loginCheck((logged_in) => {
-      this.setState({ logged_in });
-    });
-  }
-
-  render() {
-    if (this.state.logged_in) {
-      return <App />;
-    }
-    if (this.state.logged_in === false) {
-      return (
-        <Switch>
-          <Route
-            path={`${process.env.PUBLIC_URL}/password_forgot`}
-            component={PasswordForgot}
-          />
-          <Route
-            path={`${process.env.PUBLIC_URL}/password_change`}
-            component={PasswordChange}
-          />
-          <Route
-            path={`${process.env.PUBLIC_URL}/login`}
-            component={LoginRegister}
-          />
-          <Route
-            path={`${process.env.PUBLIC_URL}/register`}
-            component={Register}
-          />
-          <Route
-            path={`${process.env.PUBLIC_URL}/team`}
-            component={LoginRegister}
-          />
-          ,
-          <Route
-            path={`${process.env.PUBLIC_URL}/account`}
-            component={LoginRegister}
-          />
-          <Route path="*" component={App} />
-        </Switch>
-      );
-    }
-    return <div />;
-  }
-}
-
-const container = document.getElementById('root');
+const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(
   <BrowserRouter>
-    <BeforeLoginApp />
+    <App />
   </BrowserRouter>
 );
