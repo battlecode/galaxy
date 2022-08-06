@@ -64,7 +64,6 @@ class YesTeam extends Component {
   }
 
   updateTeam() {
-    console.log(this.state.team);
     this.setState({ up: '<i class="fa fa-circle-o-notch fa-spin"></i>' });
     Api.updateTeam(
       this.state.team,
@@ -266,7 +265,6 @@ class NoTeam extends Component {
   }
 
   createCallback = (success) => {
-    console.log(success);
     this.setState({ createTeamError: !success });
     if (success) {
       window.location.reload();
@@ -373,8 +371,6 @@ class ResumeStatus extends Component {
     var unverified_users = this.props.team.users.filter(
       (el) => !this.props.team.verified_users.includes(el)
     );
-
-    console.log(this.props.team);
 
     if (
       this.props.team.verified_users.length === this.props.team.users.length
