@@ -44,10 +44,11 @@ class App extends Component {
     });
   }
 
-  // Defines what routes a user may access / what routes exist to a user.
-  // Does _NOT_ actually render a clickable link to that route.
-
   render() {
+    // Note that `Route`s define what routes a user may access / what routes exist to a user.
+    // Does _NOT_ actually render a clickable link to that route.
+    // That is done in navbar.js, sidebar.js, footer.js, etc
+
     // direct to home page, should always be visible
     let homeElems = [
       <Route exact path={`${process.env.PUBLIC_URL}/`} component={Home} />,
@@ -143,6 +144,12 @@ class App extends Component {
         <Route path={`${process.env.PUBLIC_URL}/staff`} component={Staff} />,
       ];
     }
+
+    // Note that the `Switch` element only contains routes.
+    // So just like the routes, the `Switch`
+    // only defines what routes a user may access / what routes exist to a user.
+    // Does _NOT_ actually render a clickable link to that route.
+    // That is done in navbar.js, sidebar.js, footer.js, etc
 
     return (
       <div className="wrapper">
