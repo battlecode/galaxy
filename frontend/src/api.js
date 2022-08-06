@@ -38,7 +38,6 @@ class Api {
     $.post(`${URL}/api/${LEAGUE}/submission/`)
       .done((data, status) => {
         // Upload to the bucket
-        console.log("got URL");
         Cookies.set("submission_id", data["submission_id"]);
         $.ajax({
           url: data["upload_url"],
@@ -50,7 +49,6 @@ class Api {
           .done((data, status) => {
             // After upload is done, need to queue for compilation.
             // See corresponding method of backend/api/views.py for more explanation.
-            console.log(data, status);
             $.post(
               `${URL}/api/${LEAGUE}/submission/` +
                 Cookies.get("submission_id") +
@@ -708,7 +706,6 @@ class Api {
       delete $.ajaxSettings.headers.Authorization;
     } // we should not require valid login for this.
     $.get(`${URL}/api/${LEAGUE}/tournament/`).done((data, status) => {
-      console.log(data);
       callback(data.results);
     });
 
@@ -811,10 +808,6 @@ class Api {
     if ($.ajaxSettings && $.ajaxSettings.headers) {
       delete $.ajaxSettings.headers.Authorization;
     }
-
-    // console.log("calling api/password_reset/reset_password/confirm");
-    console.log("calling api/password_reset/confirm");
-    // console.log("with pass", password, "token", token);
 
     var req = {
       password: password,
