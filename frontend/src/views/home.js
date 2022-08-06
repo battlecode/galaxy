@@ -51,7 +51,6 @@ class DateCard extends UpdateCard {
       function (dates) {
         this.setState({ dates: dates.length > 5 ? dates.slice(0, 5) : dates });
         if (dates[0]) {
-          console.log(dates[0].dateObj);
           this.setState({ update_date: dates[0].dateObj });
         }
       }.bind(this)

@@ -21,10 +21,6 @@ class RankCard extends Component {
     this.setState({ ranking: ranking_data.ranking });
   };
 
-  hi = (data) => {
-    console.log(data);
-  };
-
   render() {
     const { ranking } = this.state;
     const rankStr = ranking || "-";
