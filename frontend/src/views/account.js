@@ -41,7 +41,6 @@ class Account extends Component {
   }
 
   fileChangeHandler = (event) => {
-    console.log(event.target.files[0]);
     this.setState({
       selectedFile: event.target.files[0],
       loaded: 0,
@@ -78,7 +77,6 @@ class Account extends Component {
   componentDidMount() {
     Api.getUserProfile(
       function (u) {
-        console.log(u);
         this.setState({ user: u });
       }.bind(this)
     );
