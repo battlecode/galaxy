@@ -50,7 +50,6 @@ class App extends Component {
 
       Api.getLeague(
         function (l) {
-          console.log(l);
           this.setState({ league: l });
         }.bind(this)
       );
