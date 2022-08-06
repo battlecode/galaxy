@@ -131,33 +131,31 @@ class LinksCard extends Component {
           <h4 className="title">Useful Links</h4>
         </div>
         <div className="content">
-          <p>
-            <ul>
-              <li>
-                <a href="https://discordapp.com/channels/386965718572466197/650084292982079539">
-                  Discord
-                </a>{" "}
-                (<a href="https://discord.gg/N86mxkH">invite</a>)
-              </li>
-              <li>
-                <a href="https://github.com/battlecode/battlecode21">GitHub</a>
-              </li>
-              <li>
-                <a href="https://twitch.tv/mitbattlecode">Twitch</a>
-              </li>
-              <li>
-                <a href="https://battlecode.org">Battlecode.org</a>
-                <ul>
-                  <li>
-                    <a href="https://battlecode.org#faq">FAQs</a>
-                  </li>
-                  <li>
-                    <a href="https://battlecode.org#about">Eligibility</a>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </p>
+          <ul>
+            <li>
+              <a href="https://discordapp.com/channels/386965718572466197/650084292982079539">
+                Discord
+              </a>{" "}
+              (<a href="https://discord.gg/N86mxkH">invite</a>)
+            </li>
+            <li>
+              <a href="https://github.com/battlecode/battlecode21">GitHub</a>
+            </li>
+            <li>
+              <a href="https://twitch.tv/mitbattlecode">Twitch</a>
+            </li>
+            <li>
+              <a href="https://battlecode.org">Battlecode.org</a>
+              <ul>
+                <li>
+                  <a href="https://battlecode.org#faq">FAQs</a>
+                </li>
+                <li>
+                  <a href="https://battlecode.org#about">Eligibility</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
         </div>
       </div>
     );
