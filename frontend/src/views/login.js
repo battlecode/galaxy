@@ -29,7 +29,6 @@ class LoginRegister extends Component {
   };
 
   formSubmit = (e) => {
-    console.log("HI!");
     e.preventDefault();
     this.submitLogin();
   };
