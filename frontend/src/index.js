@@ -36,58 +36,15 @@ class App extends Component {
   constructor() {
     super();
     this.state = { logged_in: null };
-  }
 
-  componentDidMount() {
-    Api.loginCheck((logged_in) => {
-      this.setState({ logged_in });
-    });
-  }
-
-  render() {
     // Note that `Route`s define what routes a user may access / what routes exist to a user.
     // Does _NOT_ actually render a clickable link to that route.
     // That is done in navbar.js, sidebar.js, footer.js, etc
 
-    // direct to home page, should always be visible
-    let homeElems = [
+    // should always be viewable, even when not logged in
+    this.nonLoggedInElems = [
       <Route exact path={`${process.env.PUBLIC_URL}/`} component={Home} />,
       <Route path={`${process.env.PUBLIC_URL}/home`} component={Home} />,
-    ];
-
-    // should only be visible to logged in users
-    // If user is not logged-in, should 404 and not even render
-    let loggedInElems = [];
-    if (this.state.logged_in) {
-      loggedInElems = [
-        <Route path={`${process.env.PUBLIC_URL}/team`} component={Team} />,
-        <Route
-          path={`${process.env.PUBLIC_URL}/account`}
-          component={Account}
-        />,
-        <Route
-          path={`${process.env.PUBLIC_URL}/password_forgot`}
-          component={PasswordForgot}
-        />,
-        <Route
-          path={`${process.env.PUBLIC_URL}/password_change`}
-          component={PasswordChange}
-        />,
-        // Note that this allows users to go to /scrimmaging or /submissions
-        // by typing that in their URL bar, even if not clickable in the sidebar/navbar.
-        <Route
-          path={`${process.env.PUBLIC_URL}/scrimmaging`}
-          component={Scrimmaging}
-        />,
-        <Route
-          path={`${process.env.PUBLIC_URL}/submissions`}
-          component={Submissions}
-        />,
-      ];
-    }
-
-    // should be visible to all users
-    let nonLoggedInElems = [
       <Route
         path={`${process.env.PUBLIC_URL}/login`}
         component={LoginRegister}
@@ -130,20 +87,41 @@ class App extends Component {
         path={`${process.env.PUBLIC_URL}/rankings`}
         component={Rankings}
       />,
-      <Route path="*" component={NotFound} />,
-    ];
-
-    let staffElems = [];
-    if (true) {
       // Note that this route is visible to any user, even not logged in
       // This is fine for now since the staff page doesn't do anything
       // For access control without bloat, would be better to have a login check in the staff _component_,
       // _and an auth check in the backend for any methods that this page hits_
       // (this part is absolutely necessary regardless of frontend setup)
-      staffElems = [
-        <Route path={`${process.env.PUBLIC_URL}/staff`} component={Staff} />,
-      ];
-    }
+      <Route path={`${process.env.PUBLIC_URL}/staff`} component={Staff} />,
+      <Route path="*" component={NotFound} />,
+    ];
+
+    // should only be visible to logged in users
+    // If user is not logged-in, should 404 and not even render
+    this.loggedInElems = [
+      <Route path={`${process.env.PUBLIC_URL}/team`} component={Team} />,
+      <Route path={`${process.env.PUBLIC_URL}/account`} component={Account} />,
+      <Route
+        path={`${process.env.PUBLIC_URL}/password_forgot`}
+        component={PasswordForgot}
+      />,
+      <Route
+        path={`${process.env.PUBLIC_URL}/password_change`}
+        component={PasswordChange}
+      />,
+      // Note that this allows users to go to /scrimmaging or /submissions
+      // by typing that in their URL bar, even if not clickable in the sidebar/navbar.
+      // TODO test that this is ok -- that the /scrimmaging and /submissions sites
+      // still would not have functionality.
+      <Route
+        path={`${process.env.PUBLIC_URL}/scrimmaging`}
+        component={Scrimmaging}
+      />,
+      <Route
+        path={`${process.env.PUBLIC_URL}/submissions`}
+        component={Submissions}
+      />,
+    ];
 
     // Note that the `Switch` element only contains routes.
     // So just like the routes, the `Switch`
@@ -157,10 +135,8 @@ class App extends Component {
         <div className="main-panel">
           <NavBar />
           <Switch>
-            {homeElems}
-            {staffElems}
-            {loggedInElems}
-            {nonLoggedInElems}
+            {this.nonLoggedInElems}
+            {loggedInElemsToRender}
           </Switch>
           <Footer />
         </div>
