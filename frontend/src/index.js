@@ -41,20 +41,7 @@ class App extends Component {
   componentDidMount() {
     Api.loginCheck((logged_in) => {
       this.setState({ logged_in });
-
-      // Needed for determining whether the staff page route is visible
-      if (logged_in) {
-        Api.getUserProfile(
-          function (u) {
-            this.setState({ user: u });
-          }.bind(this)
-        );
-      }
     });
-  }
-
-  userIsStaff() {
-    return this.state.user.is_staff === true;
   }
 
   // Defines what routes a user may access / what routes exist to a user.
@@ -68,6 +55,7 @@ class App extends Component {
     ];
 
     // should only be visible to logged in users
+    // If user is not logged-in, should 404 and not even render
     let loggedInElems = [];
     if (this.state.logged_in) {
       loggedInElems = [
@@ -145,7 +133,12 @@ class App extends Component {
     ];
 
     let staffElems = [];
-    if (this.userIsStaff()) {
+    if (true) {
+      // Note that this route is visible to any user, even not logged in
+      // This is fine for now since the staff page doesn't do anything
+      // For access control without bloat, would be better to have a login check in the staff _component_,
+      // _and an auth check in the backend for any methods that this page hits_
+      // (this part is absolutely necessary regardless of frontend setup)
       staffElems = [
         <Route path={`${process.env.PUBLIC_URL}/staff`} component={Staff} />,
       ];
