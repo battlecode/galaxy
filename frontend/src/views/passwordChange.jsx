@@ -26,8 +26,6 @@ class PasswordChange extends Component {
       this.props.location.search && this.props.location.search.split("=");
     token = token.length > 1 && token[1];
 
-    console.log(token);
-
     Api.doResetPassword(state.password, token, this.onApiReturn);
   };
 
