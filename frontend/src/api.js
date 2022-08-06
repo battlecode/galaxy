@@ -28,8 +28,7 @@ class Api {
   static newSubmission(submissionfile, callback) {
     // First check if the user is part of a team
     if (Cookies.get("team_id") === null) {
-      console.log("File cannot be submitted without a team.");
-      Cookies.set("upload_status_cookie", 12);
+      alert("File cannot be submitted without a team. (If you think you're on a team, check that your cookies are enabled.");
       return;
     }
 
@@ -102,8 +101,12 @@ class Api {
           });
       })
       .fail((xhr, status, error) => {
-        console.log(error);
-        callback("there was an error", false);
+        console.log(
+          "Error in downloading submission: ",
+          xhr,
+          status,
+          error
+        );
       });
   }
 
@@ -241,7 +244,7 @@ class Api {
           callback(data);
         })
         .fail((xhr, status, error) => {
-          console.log(error);
+          console.log("Error in getting league: ", xhr, status, error);
         });
     });
   }
@@ -455,7 +458,7 @@ class Api {
           callback(data);
         })
         .fail((xhr, status, error) => {
-          console.log(error);
+          console.log("Error in setting user URL: ", xhr, status, error);
         });
     };
   }
@@ -470,7 +473,7 @@ class Api {
         callback(data);
       })
       .fail((xhr, status, error) => {
-        console.log(error);
+        console.log("Error in getting profile for user: ", username, xhr, status, error);
       });
 
     $.ajaxSetup({
@@ -770,7 +773,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        console.log(xhr);
+        console.log("Error in logging in: ", xhr, status, error);
         // if responseJSON is undefined, it is probably because the API is not configured
         // check that the API is indeed running on URL (localhost:8000 if local development)
         callback(xhr.responseJSON.detail, false);
@@ -817,7 +820,7 @@ class Api {
     $.post(`${URL}/api/password_reset/confirm/`, req, (data, success) => {
       callback(data, success);
     }).fail((xhr, status, error) => {
-      console.log("call to api/password_reset/reset_password/confirm failed");
+      console.log("Error in API call for resetting password: ", xhr, status, error);
     });
   }
 
