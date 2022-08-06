@@ -72,6 +72,9 @@ class App extends Component {
     return this.state.user.is_staff === true;
   }
 
+  // Defines what routes a user may access / what routes exist to a user.
+  // Does _NOT_ actually render a clickable link to that route.
+
   render() {
     // direct to home page, should always be visible
     let homeElems = [
@@ -90,13 +93,12 @@ class App extends Component {
         />,
         <Route
           path={`${process.env.PUBLIC_URL}/password_forgot`}
-          component={Home}
+          component={PasswordForgot}
         />,
         <Route
           path={`${process.env.PUBLIC_URL}/password_change`}
-          component={Home}
+          component={PasswordChange}
         />,
-        <Route path={`${process.env.PUBLIC_URL}/login`} component={Home} />,
         <Route
           path={`${process.env.PUBLIC_URL}/scrimmaging`}
           component={Scrimmaging}
@@ -105,12 +107,19 @@ class App extends Component {
           path={`${process.env.PUBLIC_URL}/submissions`}
           component={Submissions}
         />,
-        <Route path={`${process.env.PUBLIC_URL}/register`} component={Home} />,
       ];
     }
 
     // should be visible to all users
     let nonLoggedInElems = [
+      <Route
+        path={`${process.env.PUBLIC_URL}/login`}
+        component={LoginRegister}
+      />,
+      <Route
+        path={`${process.env.PUBLIC_URL}/register`}
+        component={Register}
+      />,
       <Route path={`${process.env.PUBLIC_URL}/updates`} component={Updates} />,
       <Route path={`${process.env.PUBLIC_URL}/search`} component={Search} />,
       <Route
