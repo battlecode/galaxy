@@ -1,0 +1,14 @@
+terraform-automation-key.json
+battlecode22-deploy-key.json
+# secret files are in json format, conservatively ignore all of jsons to prevent accidental pushes
+*.json 
+
+# Terraform files
+.terraform
+# note: .terraform.lock.hcl should be committed. not ignored.
+# we ignore tfstate because we don't want someone accidentally committing it. we want to use gcs state
+*.tfstate.*
+
+*.tfvars
+# gitignore the secret twice for good measure
+secret.tfvars
