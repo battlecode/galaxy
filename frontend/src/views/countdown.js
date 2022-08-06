@@ -19,22 +19,7 @@ class Countdown extends Component {
 
   componentDidMount() {
     Api.getNextTournament((tournament_info) => {
-      console.log(
-        Date.parse(new Date()) -
-          -60 * 60 * 1000 +
-          1000 * tournament_info["seconds_until"]
-      );
       const d = new Date();
-      console.log(tournament_info["seconds_until"]);
-      console.log(
-        "deadline: " +
-          new Date(
-            Date.parse(new Date()) -
-              0 * 60 * 1000 +
-              1000 * tournament_info["seconds_until"]
-          )
-      );
-      console.log(d.getTimezoneOffset());
       this.setState({
         end_date: new Date(
           Date.parse(new Date()) -
