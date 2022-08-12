@@ -685,7 +685,7 @@ class Api {
 
   static getNextTournament(callback) {
     // These dates are for submission deadlines, not tournaments!
-    // TODO: actually use real API for this
+    // Will be made dynamic and better, see #75
     callback({
       est_date_str: "7 PM ET on January 27, 2022",
       seconds_until:
