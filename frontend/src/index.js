@@ -44,76 +44,40 @@ class App extends Component {
 
     // should always be viewable, even when not logged in
     this.nonLoggedInElems = [
-      <Route exact path={`${process.env.PUBLIC_URL}/`} component={Home} />,
-      <Route path={`${process.env.PUBLIC_URL}/home`} component={Home} />,
-      <Route path={`${process.env.PUBLIC_URL}/updates`} component={Updates} />,
-      <Route path={`${process.env.PUBLIC_URL}/search`} component={Search} />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/tournaments`}
-        component={Tournaments}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/:year/getting-started`}
-        component={GettingStarted}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/common-issues`}
-        component={Issues}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/debugging`}
-        component={Debugging}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/codeofconduct`}
-        component={CodeOfConduct}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/resources`}
-        component={Resources}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/rankings/:team_id`}
-        component={TeamInfo}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/rankings`}
-        component={Rankings}
-      />,
+      <Route exact path={`/`} component={Home} />,
+      <Route path={`/home`} component={Home} />,
+      <Route path={`/updates`} component={Updates} />,
+      <Route path={`/search`} component={Search} />,
+      <Route path={`/tournaments`} component={Tournaments} />,
+      <Route path={`/:year/getting-started`} component={GettingStarted} />,
+      <Route path={`/common-issues`} component={Issues} />,
+      <Route path={`/debugging`} component={Debugging} />,
+      <Route path={`/codeofconduct`} component={CodeOfConduct} />,
+      <Route path={`/resources`} component={Resources} />,
+      <Route path={`/rankings/:team_id`} component={TeamInfo} />,
+      <Route path={`/rankings`} component={Rankings} />,
     ];
 
     // should only be visible to logged in users
     // If user is not logged-in, should 404 and not even render
     this.loggedInElems = [
-      <Route path={`${process.env.PUBLIC_URL}/team`} component={Team} />,
-      <Route path={`${process.env.PUBLIC_URL}/account`} component={Account} />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/password_forgot`}
-        component={PasswordForgot}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/password_change`}
-        component={PasswordChange}
-      />,
-      <Route path={`${process.env.PUBLIC_URL}/logout`} component={LogOut} />,
+      <Route path={`/team`} component={Team} />,
+      <Route path={`/account`} component={Account} />,
+      <Route path={`/password_forgot`} component={PasswordForgot} />,
+      <Route path={`/password_change`} component={PasswordChange} />,
+      <Route path={`/logout`} component={LogOut} />,
     ];
 
     // Should only be visible and renderable to users on a team
     this.onTeamElems = [
-      <Route
-        path={`${process.env.PUBLIC_URL}/scrimmaging`}
-        component={Scrimmaging}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/submissions`}
-        component={Submissions}
-      />,
+      <Route path={`/scrimmaging`} component={Scrimmaging} />,
+      <Route path={`/submissions`} component={Submissions} />,
     ];
 
     this.staffElems = [
       // Make sure to have an auth check in the backend for any methods that this page hits_
       // (this part is absolutely necessary regardless of frontend setup)
-      <Route path={`${process.env.PUBLIC_URL}/staff`} component={Staff} />,
+      <Route path={`/staff`} component={Staff} />,
     ];
 
     // When in the list of routes, this route must be last.
@@ -160,16 +124,9 @@ class App extends Component {
       <Switch>
         {/* Login and Register pages should not render with sidebar, navbar, etc */}
         {/* All other pages should (and so all other routes should allow this) */}
-        <Route
-          path={`${process.env.PUBLIC_URL}/login`}
-          component={LoginRegister}
-        />
+        <Route path={`/login`} component={LoginRegister} />
         ,
-        <Route
-          path={`${process.env.PUBLIC_URL}/register`}
-          component={Register}
-        />
-        ,
+        <Route path={`/register`} component={Register} />,
         <Route>
           <div className="wrapper">
             <SideBar />
