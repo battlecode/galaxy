@@ -7,10 +7,18 @@ class NLink extends Component {
   render() {
     return (
       <li>
-        <NavLink
-          {...this.props}
-          activeStyle={{ opacity: 1, fontWeight: 800 }}
-        />
+        <NavLink {...this.props} activeStyle={{ opacity: 1, fontWeight: 800 }}>
+          <p
+            style={{
+              fontWeight: "inherit",
+              textTransform: "none",
+              fontSize: "inherit",
+            }}
+          >
+            <i className={this.props.icon} pe-fw />
+            {this.props.label}
+          </p>
+        </NavLink>
       </li>
     );
   }
@@ -86,117 +94,42 @@ class SideBar extends Component {
           <ul className="nav nav-pills nav-stacked">
             {/* This invisible element is needed for proper spacing */}
             <NLink to={`#`} style={{ visibility: "hidden" }}></NLink>
-            <NLink to={`${process.env.PUBLIC_URL}/home`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-home pe-fw" />
-                Home
-              </p>
-            </NLink>
-            <NLink to={`${process.env.PUBLIC_URL}/getting-started`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-sun pe-fw" />
-                Getting Started
-              </p>
-            </NLink>
-            <NLink to={`${process.env.PUBLIC_URL}/resources`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-note2 pe-fw" />
-                Resources
-              </p>
-            </NLink>
-            <NLink to={`${process.env.PUBLIC_URL}/updates`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-bell pe-fw" />
-                Updates
-              </p>
-            </NLink>
+            <NLink to={`/home`} icon={"pe-7s-home"} label="Home" />
+            <NLink
+              to={`/getting-started`}
+              icon={"pe-7s-sun"}
+              label="Getting Started"
+            />
+            <NLink to={`/resources`} icon={"pe-7s-note2"} label="Resources" />
+            <NLink to={`/updates`} icon={"pe-7s-bell"} label="Updates" />
 
             <br />
 
-            <NLink to={`${process.env.PUBLIC_URL}/tournaments`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-medal pe-fw" />
-                Tournaments
-              </p>
-            </NLink>
-            <NLink to={`${process.env.PUBLIC_URL}/rankings`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-graph1 pe-fw" />
-                Rankings
-              </p>
-            </NLink>
-            {/* search bar link, unused since Search is broken */}
-            {/* Commented in case someone wants to bring it back in the future */}
-            {/* <NLink to={`${process.env.PUBLIC_URL}/search`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-search pe-fw" />Search</p></NLink> */}
+            <NLink
+              to={`/tournaments`}
+              icon={"pe-7s-medal"}
+              label="Tournaments"
+            />
+            <NLink to={`/rankings`} icon={"pe-7s-graph1"} label="Rankings" />
+            {/* search bar link, unused since Search is broken
+            Commented in case someone wants to bring it back in the future
+            You'd have to refactor the code to match the other NLink's */}
+            {/* <NLink to={`/search`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-search pe-fw" />Search</p></NLink> */}
 
             <br />
 
             {/* Only visible when logged in */}
             {this.state.logged_in && (
-              <NLink to={`${process.env.PUBLIC_URL}/team`}>
-                <p
-                  style={{
-                    fontWeight: "inherit",
-                    textTransform: "none",
-                    fontSize: "inherit",
-                  }}
-                >
-                  <i className="pe-7s-users pe-fw" />
-                  Team
-                </p>
-              </NLink>
+              <NLink to={`/team`} icon={"pe-7s-users"} label="Team" />
             )}
 
             {/* Only visible when on a team AND submissions are enabled */}
             {this.state.on_team && this.isSubmissionEnabled() && (
-              <NLink to={`${process.env.PUBLIC_URL}/submissions`}>
-                <p
-                  style={{
-                    fontWeight: "inherit",
-                    textTransform: "none",
-                    fontSize: "inherit",
-                  }}
-                >
-                  <i className="pe-7s-up-arrow pe-fw" />
-                  Submissions
-                </p>
-              </NLink>
+              <NLink
+                to={`/submissions`}
+                icon={"pe-7s-up-arrow "}
+                label="Submissions"
+              />
             )}
 
             {/* Only visible when on a team AND submissions are enabled
@@ -205,36 +138,18 @@ class SideBar extends Component {
             Do at your own risk
             - Nathan */}
             {this.state.on_team && this.isSubmissionEnabled() && (
-              <NLink to={`${process.env.PUBLIC_URL}/scrimmaging`}>
-                <p
-                  style={{
-                    fontWeight: "inherit",
-                    textTransform: "none",
-                    fontSize: "inherit",
-                  }}
-                >
-                  <i className="pe-7s-joy pe-fw" />
-                  Scrimmaging
-                </p>
-              </NLink>
+              <NLink
+                to={`/scrimmaging`}
+                icon={"pe-7s-joy "}
+                label="Scrimmaging"
+              />
             )}
 
             <br />
 
             {/* Only visible if a staff user */}
             {this.state.user.is_staff && (
-              <NLink to={`${process.env.PUBLIC_URL}/staff`}>
-                <p
-                  style={{
-                    fontWeight: "inherit",
-                    textTransform: "none",
-                    fontSize: "inherit",
-                  }}
-                >
-                  <i className="pe-7s-tools pe-fw" />
-                  Staff
-                </p>
-              </NLink>
+              <NLink to={`/staff`} icon={"pe-7s-tools "} label="Staff" />
             )}
 
             <br />
