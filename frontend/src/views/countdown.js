@@ -100,7 +100,7 @@ class Countdown extends Component {
     if (this.state.tournament_name == "START") {
       title = "Game Specs are now released!";
     }
-    // TODO choosing which one to display should really be dynamic
+    // Needs to be cleaned, see issue #16 for tracking this and discussion
     let explanatoryText = (
       <div>
         The submission deadline for the <b>{this.state.tournament_name}</b> is
