@@ -46,6 +46,7 @@ class NavBarAccount extends Component {
     this.state = { logged_in: null };
   }
   componentDidMount() {
+    // duped in various places, see sidebar.js
     Api.loginCheck((logged_in) => {
       this.setState({ logged_in });
     });
