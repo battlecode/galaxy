@@ -476,7 +476,8 @@ class Submissions extends Component {
                   "Code uploaded, but not yet queued for compilation... If this persists, try re-submitting your code.";
                 break;
               case COMPILATION_STATUS.QUEUED:
-                // TODO a dedicated refresh button, that refreshes only these tables, would be cool
+                // A dedicated refresh button, that refreshes only these tables, would be cool
+                // See #35 for tracking
                 status_str =
                   "Code queued for compilation -- check back and refresh for updates.";
                 break;
