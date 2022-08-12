@@ -44,45 +44,67 @@ class App extends Component {
 
     // should always be viewable, even when not logged in
     this.nonLoggedInElems = [
-      <Route exact path={`/`} component={Home} />,
-      <Route path={`/home`} component={Home} />,
-      <Route path={`/updates`} component={Updates} />,
-      <Route path={`/search`} component={Search} />,
-      <Route path={`/tournaments`} component={Tournaments} />,
-      <Route path={`/:year/getting-started`} component={GettingStarted} />,
-      <Route path={`/common-issues`} component={Issues} />,
-      <Route path={`/debugging`} component={Debugging} />,
-      <Route path={`/codeofconduct`} component={CodeOfConduct} />,
-      <Route path={`/resources`} component={Resources} />,
-      <Route path={`/rankings/:team_id`} component={TeamInfo} />,
-      <Route path={`/rankings`} component={Rankings} />,
+      <Route exact path={`/`} component={Home} key="home-blank" />,
+      <Route path={`/home`} component={Home} key="home" />,
+      <Route path={`/updates`} component={Updates} key="updates" />,
+      <Route path={`/search`} component={Search} key="search" />,
+      <Route path={`/tournaments`} component={Tournaments} key="tournaments" />,
+      <Route
+        path={`/:year/getting-started`}
+        component={GettingStarted}
+        key="getting-started"
+      />,
+      <Route path={`/common-issues`} component={Issues} key="issues" />,
+      <Route path={`/debugging`} component={Debugging} key="debugging" />,
+      <Route
+        path={`/codeofconduct`}
+        component={CodeOfConduct}
+        key="codeofconduct"
+      />,
+      <Route path={`/resources`} component={Resources} key="resources" />,
+      <Route
+        path={`/rankings/:team_id`}
+        component={TeamInfo}
+        key="rankings-team"
+      />,
+      <Route path={`/rankings`} component={Rankings} key="rankings" />,
     ];
 
     // should only be visible to logged in users
     // If user is not logged-in, should 404 and not even render
     this.loggedInElems = [
-      <Route path={`/team`} component={Team} />,
-      <Route path={`/account`} component={Account} />,
-      <Route path={`/password_forgot`} component={PasswordForgot} />,
-      <Route path={`/password_change`} component={PasswordChange} />,
-      <Route path={`/logout`} component={LogOut} />,
+      <Route path={`/team`} component={Team} key="team" />,
+      <Route path={`/account`} component={Account} key="account" />,
+      <Route
+        path={`/password_forgot`}
+        component={PasswordForgot}
+        key="password-forgot"
+      />,
+      <Route
+        path={`/password_change`}
+        component={PasswordChange}
+        key="password-change"
+      />,
+      <Route path={`/logout`} component={LogOut} key="logout" />,
     ];
 
     // Should only be visible and renderable to users on a team
     this.onTeamElems = [
-      <Route path={`/scrimmaging`} component={Scrimmaging} />,
-      <Route path={`/submissions`} component={Submissions} />,
+      <Route path={`/scrimmaging`} component={Scrimmaging} key="scrimmaging" />,
+      <Route path={`/submissions`} component={Submissions} key="submissions" />,
     ];
 
     this.staffElems = [
       // Make sure to have an auth check in the backend for any methods that this page hits_
       // (this part is absolutely necessary regardless of frontend setup)
-      <Route path={`/staff`} component={Staff} />,
+      <Route path={`/staff`} component={Staff} key="staff" />,
     ];
 
     // When in the list of routes, this route must be last.
     // (for wildcard to work properly)
-    this.notFoundElems = [<Route path="*" component={NotFound} />];
+    this.notFoundElems = [
+      <Route path="*" component={NotFound} key="notfound" />,
+    ];
   }
 
   componentDidMount() {
