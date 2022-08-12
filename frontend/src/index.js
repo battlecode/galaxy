@@ -35,37 +35,22 @@ import Api from "./api";
 class App extends Component {
   constructor() {
     super();
-    this.state = { logged_in: null, user: {}, league: {} };
+    this.state = { logged_in: null };
   }
 
   componentDidMount() {
     Api.loginCheck((logged_in) => {
       this.setState({ logged_in });
 
+      // Needed for determining whether the staff page route is visible
       if (logged_in) {
         Api.getUserProfile(
           function (u) {
             this.setState({ user: u });
           }.bind(this)
         );
-
-        Api.getLeague(
-          function (l) {
-            this.setState({ league: l });
-          }.bind(this)
-        );
       }
     });
-  }
-
-  isSubmissionEnabled() {
-    if (this.state.user.is_staff === true) {
-      return true;
-    }
-    if (this.state.league.game_released === true) {
-      return true;
-    }
-    return false;
   }
 
   userIsStaff() {
@@ -99,6 +84,8 @@ class App extends Component {
           path={`${process.env.PUBLIC_URL}/password_change`}
           component={PasswordChange}
         />,
+        // Note that this allows users to go to /scrimmaging or /submissions
+        // by typing that in their URL bar, even if not clickable in the sidebar/navbar.
         <Route
           path={`${process.env.PUBLIC_URL}/scrimmaging`}
           component={Scrimmaging}
@@ -164,15 +151,6 @@ class App extends Component {
       ];
     }
 
-    // should only be visible if user is staff or submissions are enabled
-    // let gameElems = []
-    // if (this.isSubmissionEnabled()) {
-    //   gameElems = [
-    //     <Route path={`${process.env.PUBLIC_URL}/scrimmaging`} component={Scrimmaging} />,
-    //     <Route path={`${process.env.PUBLIC_URL}/submissions`} component={Submissions} />
-    //   ]
-    // }
-
     return (
       <div className="wrapper">
         <SideBar />
@@ -180,7 +158,6 @@ class App extends Component {
           <NavBar />
           <Switch>
             {homeElems}
-            {/* { gameElems } */}
             {staffElems}
             {loggedInElems}
             {nonLoggedInElems}
