@@ -45,14 +45,6 @@ class App extends Component {
     this.nonLoggedInElems = [
       <Route exact path={`${process.env.PUBLIC_URL}/`} component={Home} />,
       <Route path={`${process.env.PUBLIC_URL}/home`} component={Home} />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/login`}
-        component={LoginRegister}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/register`}
-        component={Register}
-      />,
       <Route path={`${process.env.PUBLIC_URL}/updates`} component={Updates} />,
       <Route path={`${process.env.PUBLIC_URL}/search`} component={Search} />,
       <Route
@@ -149,7 +141,21 @@ class App extends Component {
     // That is done in navbar.js, sidebar.js, footer.js, etc
 
     return (
-      <div className="wrapper">
+      <Switch>
+        {/* Login and Register pages should not render with sidebar, navbar, etc */}
+        {/* All other pages should (and so all other routes should allow this) */}
+        <Route
+          path={`${process.env.PUBLIC_URL}/login`}
+          component={LoginRegister}
+        />
+        ,
+        <Route
+          path={`${process.env.PUBLIC_URL}/register`}
+          component={Register}
+        />
+        ,
+        <Route>
+          <div className="wrapper">
             <SideBar />
             <div className="main-panel">
               <NavBar />
@@ -157,6 +163,8 @@ class App extends Component {
               <Footer />
             </div>
           </div>
+        </Route>
+      </Switch>
     );
   }
 }
