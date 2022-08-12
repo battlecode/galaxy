@@ -12,6 +12,7 @@ class NavBar extends Component {
       <nav className="navbar navbar-default navbar-fixed">
         <div className="container-fluid">
           <div className="navbar-header">
+            {/* The hamburger button used on small screens */}
             <button
               type="button"
               onClick={this.toggleNavigation}
