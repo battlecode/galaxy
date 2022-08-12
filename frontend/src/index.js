@@ -135,6 +135,13 @@ class App extends Component {
 
   render() {
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
+
+    let elemsToRender = this.nonLoggedInElems.concat(
+      loggedInElemsToRender,
+      // notFoundElems must be last to work properly
+      this.notFoundElems
+    );
+
     // Note that the `Switch` element only contains routes.
     // So just like the routes, the `Switch`
     // only defines what routes a user may access / what routes exist to a user.
@@ -143,18 +150,13 @@ class App extends Component {
 
     return (
       <div className="wrapper">
-        <SideBar />
-        <div className="main-panel">
-          <NavBar />
-          <Switch>
-            {this.nonLoggedInElems}
-            {loggedInElemsToRender}
-            {/* notFoundElems must be last to work properly */}
-            {this.notFoundElems}
-          </Switch>
-          <Footer />
-        </div>
-      </div>
+            <SideBar />
+            <div className="main-panel">
+              <NavBar />
+              <Switch>{elemsToRender}</Switch>
+              <Footer />
+            </div>
+          </div>
     );
   }
 }
