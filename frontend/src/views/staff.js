@@ -12,6 +12,12 @@ class AddCard extends Component {
   }
 }
 
+// NOTE: THIS PAGE IS VISIBLE TO ANY USER!!
+// If you start using this page,
+// MAKE SURE TO EITHER CHANGE THIS (via the routes in index.js)
+// or, check if user is staff from within _this component_.
+// ALSO ENSURE THAT THE BACKEND HAS A IS-STAFF CHECK FOR ALL METHODS CALLED VIA API, TOO!!!
+
 class Staff extends Component {
   render() {
     return (
