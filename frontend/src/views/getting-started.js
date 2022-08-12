@@ -289,7 +289,7 @@ class GettingStarted extends Component {
                     </b>
                     , and if that doesn't help, ask on the Discord.
                   </p>{" "}
-                  <h6 class="installation-steps">Step 1: Install Java</h6>
+                  <h6 className="installation-steps">Step 1: Install Java</h6>
                   <p>
                     You'll need a Java Development Kit (JDK) version 8.
                     Unfortunately, higher versions will not work.{" "}
@@ -333,7 +333,7 @@ class GettingStarted extends Component {
                     (pay attention to <code>PATH</code> and{" "}
                     <code>CLASSPATH</code>).
                   </p>
-                  <h6 class="installation-steps">
+                  <h6 className="installation-steps">
                     Step 2: Download Battlecode
                   </h6>
                   <p>
@@ -381,7 +381,7 @@ class GettingStarted extends Component {
                                         Open a terminal in the scaffold you just downloaded. Run the commands <code>./gradlew update</code> and <code>./gradlew build</code>.
                                         The client won't appear until you've run these two commands.
                                     </p> */}
-                  <h6 class="installation-steps">Step 3: Local Setup</h6>
+                  <h6 className="installation-steps">Step 3: Local Setup</h6>
                   <p>
                     We recommend using an IDE like IntelliJ IDEA or Eclipse to
                     work on Battlecode, but you can also use your favorite text
@@ -393,27 +393,27 @@ class GettingStarted extends Component {
                   <p>
                     View instructions for:
                     <div
-                      class="btn-group"
+                      className="btn-group"
                       role="group"
                       style={{ marginLeft: "10px" }}
                     >
                       <button
                         type="button"
-                        class={this.getSelectionButtons("intellij")}
+                        className={this.getSelectionButtons("intellij")}
                         onClick={this.intellijButton}
                       >
                         IntelliJ IDEA
                       </button>
                       <button
                         type="button"
-                        class={this.getSelectionButtons("eclipse")}
+                        className={this.getSelectionButtons("eclipse")}
                         onClick={this.eclipseButton}
                       >
                         Eclipse
                       </button>
                       <button
                         type="button"
-                        class={this.getSelectionButtons("terminal")}
+                        className={this.getSelectionButtons("terminal")}
                         onClick={this.terminalButton}
                       >
                         Terminal
@@ -432,13 +432,13 @@ class GettingStarted extends Component {
                     <code>./battlecode-visualizer</code>
                     to launch the client.
                   </p>
-                  <h6 class="installation-steps">Developing your Bot</h6>
+                  <h6 className="installation-steps">Developing your Bot</h6>
                   <p>
                     Place each version of your robot in a new subfolder in the{" "}
                     <code>src</code> folder. Make sure every version has a{" "}
                     <code>RobotPlayer.java</code>.
                   </p>
-                  <h6 class="installation-steps">
+                  <h6 className="installation-steps">
                     Running Battlecode from the Client
                   </h6>
                   <p>
@@ -447,7 +447,7 @@ class GettingStarted extends Component {
                     Game! Finally, click the play/pause button to view the
                     replay.
                   </p>
-                  <h6 class="installation-steps">
+                  <h6 className="installation-steps">
                     Running Battlecode from the terminal or IDE
                   </h6>
                   <p>
