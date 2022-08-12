@@ -25,10 +25,7 @@ class NavBar extends Component {
               <span className="icon-bar" />
               <span className="icon-bar" />
             </button>
-            <NavLink
-              className="navbar-brand"
-              to={`${process.env.PUBLIC_URL}/home`}
-            >
+            <NavLink className="navbar-brand" to={`/home`}>
               Battlecode 2022
             </NavLink>
           </div>
@@ -58,10 +55,10 @@ class NavBarAccount extends Component {
       return (
         <ul className="nav navbar-nav navbar-right">
           <li>
-            <NavLink to={`${process.env.PUBLIC_URL}/account`}>Account</NavLink>
+            <NavLink to={`/account`}>Account</NavLink>
           </li>
           <li>
-            <NavLink to={`${process.env.PUBLIC_URL}/logout`}>Log out</NavLink>
+            <NavLink to={`/logout`}>Log out</NavLink>
           </li>
         </ul>
       );
@@ -70,12 +67,10 @@ class NavBarAccount extends Component {
       return (
         <ul className="nav navbar-nav navbar-right">
           <li>
-            <NavLink to={`${process.env.PUBLIC_URL}/register`}>
-              Register
-            </NavLink>
+            <NavLink to={`/register`}>Register</NavLink>
           </li>
           <li>
-            <NavLink to={`${process.env.PUBLIC_URL}/login`}>Log in</NavLink>
+            <NavLink to={`/login`}>Log in</NavLink>
           </li>
         </ul>
       );
