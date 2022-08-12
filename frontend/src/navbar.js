@@ -52,11 +52,7 @@ class NavBarAccount extends Component {
       this.setState({ logged_in });
     });
   }
-  logout() {
-    Api.logout(function (e) {
-      window.location.reload();
-    });
-  }
+
   render() {
     if (this.state.logged_in) {
       return (
@@ -65,7 +61,7 @@ class NavBarAccount extends Component {
             <NavLink to={`${process.env.PUBLIC_URL}/account`}>Account</NavLink>
           </li>
           <li>
-            <a onClick={this.logout}>Log out</a>
+            <NavLink to={`${process.env.PUBLIC_URL}/logout`}>Log out</NavLink>
           </li>
         </ul>
       );
