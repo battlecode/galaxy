@@ -1,11 +1,8 @@
 import $ from "jquery";
 import * as Cookies from "js-cookie";
 
-//const URL = 'https://bh2020.battlecode.org';
-//const URL = 'http://localhost:8000'; // DEVELOPMENT
 // do not change URL here!! rather, for development, change it in ../.env.development
 const URL = process.env.REACT_APP_BACKEND_URL;
-const DONOTREQUIRELOGIN = false; // set to true for DEVELOPMENT
 const LEAGUE = 0;
 const PAGE_LIMIT = 10;
 const SCRIMMAGE_STATUS = {
@@ -724,10 +721,6 @@ class Api {
   }
 
   static loginCheck(callback) {
-    if (DONOTREQUIRELOGIN) {
-      callback(true);
-      return;
-    }
     $.ajaxSetup({
       headers: { Authorization: `Bearer ${Cookies.get("token")}` },
     });
