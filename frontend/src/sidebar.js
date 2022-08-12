@@ -15,7 +15,7 @@ class NLink extends Component {
               fontSize: "inherit",
             }}
           >
-            <i className={this.props.icon} pe-fw />
+            <i className={`${this.props.icon} pe-fw`} />
             {this.props.label}
           </p>
         </NavLink>
