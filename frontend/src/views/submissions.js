@@ -221,6 +221,8 @@ class Submissions extends Component {
 
   //----PERMISSIONS----
   // enable iff game active or user is staff
+  // Note that this duplicates a method in submissions.js;
+  // this will be cleaned up. See #74
   isSubmissionEnabled() {
     if (this.state.user.is_staff == true) {
       return true;
@@ -333,8 +335,8 @@ class Submissions extends Component {
               RobotPlayer.java and any other code you have written, for example:
               <pre>
                 <code>
-                  submission.zip --{">"} examplefuncsplayer --{">"} RobotPlayer.java,
-                  FooBar.java
+                  submission.zip --{">"} examplefuncsplayer --{">"}{" "}
+                  RobotPlayer.java, FooBar.java
                 </code>
               </pre>
             </p>
