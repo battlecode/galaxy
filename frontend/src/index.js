@@ -111,8 +111,7 @@ class App extends Component {
       />,
       // Note that this allows users to go to /scrimmaging or /submissions
       // by typing that in their URL bar, even if not clickable in the sidebar/navbar.
-      // TODO test that this is ok -- that the /scrimmaging and /submissions sites
-      // still would not have functionality.
+      // See #6, #13, #69 for issues where we make sure this is okay.
       <Route
         path={`${process.env.PUBLIC_URL}/scrimmaging`}
         component={Scrimmaging}
