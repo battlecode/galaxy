@@ -93,7 +93,6 @@ class App extends Component {
       // _and an auth check in the backend for any methods that this page hits_
       // (this part is absolutely necessary regardless of frontend setup)
       <Route path={`${process.env.PUBLIC_URL}/staff`} component={Staff} />,
-      <Route path="*" component={NotFound} />,
     ];
 
     // should only be visible to logged in users
@@ -121,6 +120,10 @@ class App extends Component {
         component={Submissions}
       />,
     ];
+
+    // When in the list of routes, this route must be last.
+    // (for wildcard to work properly)
+    this.notFoundElems = [<Route path="*" component={NotFound} />];
   }
 
   componentDidMount() {
@@ -146,6 +149,8 @@ class App extends Component {
           <Switch>
             {this.nonLoggedInElems}
             {loggedInElemsToRender}
+            {/* notFoundElems must be last to work properly */}
+            {this.notFoundElems}
           </Switch>
           <Footer />
         </div>
