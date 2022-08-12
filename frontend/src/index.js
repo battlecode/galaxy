@@ -79,12 +79,6 @@ class App extends Component {
         path={`${process.env.PUBLIC_URL}/rankings`}
         component={Rankings}
       />,
-      // Note that this route is visible to any user, even not logged in
-      // This is fine for now since the staff page doesn't do anything
-      // For access control without bloat, would be better to have a login check in the staff _component_,
-      // _and an auth check in the backend for any methods that this page hits_
-      // (this part is absolutely necessary regardless of frontend setup)
-      <Route path={`${process.env.PUBLIC_URL}/staff`} component={Staff} />,
     ];
 
     // should only be visible to logged in users
@@ -114,6 +108,12 @@ class App extends Component {
       />,
     ];
 
+    this.staffElems = [
+      // Make sure to have an auth check in the backend for any methods that this page hits_
+      // (this part is absolutely necessary regardless of frontend setup)
+      <Route path={`${process.env.PUBLIC_URL}/staff`} component={Staff} />,
+    ];
+
     // When in the list of routes, this route must be last.
     // (for wildcard to work properly)
     this.notFoundElems = [<Route path="*" component={NotFound} />];
@@ -125,6 +125,10 @@ class App extends Component {
       this.setState({ logged_in });
     });
 
+    Api.getUserProfile((user_profile) => {
+      this.setState({ user: user_profile });
+    });
+
     Api.getUserTeam((user_team_data) => {
       this.setState({ on_team: user_team_data !== null });
     });
@@ -133,10 +137,13 @@ class App extends Component {
   render() {
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
     let onTeamElemsToRender = this.state.on_team ? this.onTeamElems : [];
+    let staffElemsToRender =
+      this.state.user && this.state.user.is_staff ? this.staffElems : [];
 
     let elemsToRender = this.nonLoggedInElems.concat(
       loggedInElemsToRender,
       onTeamElemsToRender,
+      staffElemsToRender,
       // notFoundElems must be last to work properly
       this.notFoundElems
     );
