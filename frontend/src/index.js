@@ -122,7 +122,17 @@ class App extends Component {
         component={Submissions}
       />,
     ];
+  }
 
+  componentDidMount() {
+    // duped in various places, see sidebar.js
+    Api.loginCheck((logged_in) => {
+      this.setState({ logged_in });
+    });
+  }
+
+  render() {
+    let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
     // Note that the `Switch` element only contains routes.
     // So just like the routes, the `Switch`
     // only defines what routes a user may access / what routes exist to a user.
