@@ -25,6 +25,7 @@ import Register from "./views/register";
 // import VerifyUser from "./views/VerifyUser";
 import PasswordForgot from "./views/passwordForgot";
 import PasswordChange from "./views/passwordChange";
+import LogOut from "./views/logOut";
 import Submissions from "./views/submissions";
 import TeamInfo from "./views/teamInfo";
 import Footer from "./footer";
@@ -94,6 +95,7 @@ class App extends Component {
         path={`${process.env.PUBLIC_URL}/password_change`}
         component={PasswordChange}
       />,
+      <Route path={`${process.env.PUBLIC_URL}/logout`} component={LogOut} />,
     ];
 
     // Should only be visible and renderable to users on a team
