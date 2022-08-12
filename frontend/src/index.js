@@ -100,9 +100,10 @@ class App extends Component {
         path={`${process.env.PUBLIC_URL}/password_change`}
         component={PasswordChange}
       />,
-      // Note that this allows users to go to /scrimmaging or /submissions
-      // by typing that in their URL bar, even if not clickable in the sidebar/navbar.
-      // See #6, #13, #69 for issues where we make sure this is okay.
+    ];
+
+    // Should only be visible and renderable to users on a team
+    this.onTeamElems = [
       <Route
         path={`${process.env.PUBLIC_URL}/scrimmaging`}
         component={Scrimmaging}
@@ -123,13 +124,19 @@ class App extends Component {
     Api.loginCheck((logged_in) => {
       this.setState({ logged_in });
     });
+
+    Api.getUserTeam((user_team_data) => {
+      this.setState({ on_team: user_team_data !== null });
+    });
   }
 
   render() {
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
+    let onTeamElemsToRender = this.state.on_team ? this.onTeamElems : [];
 
     let elemsToRender = this.nonLoggedInElems.concat(
       loggedInElemsToRender,
+      onTeamElemsToRender,
       // notFoundElems must be last to work properly
       this.notFoundElems
     );
