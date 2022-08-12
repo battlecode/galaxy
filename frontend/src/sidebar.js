@@ -79,7 +79,12 @@ class SideBar extends Component {
             </a>
             <p>Battlecode 2022</p>
           </div>
+          {/* NOTE: this only controls what appears in the sidebars.
+          Independent of this, users can still go to the links by typing it in their browser, etc.
+          MAKE SURE THAT THE LINKED PAGES THEMSELVES ARE SECURE,
+          ESPECIALLY THAT THEY DON'T ALLOW ACCESS/FUNCTIONALITY WHEN THEY SHOULDN'T */}
           <ul className="nav nav-pills nav-stacked">
+            {/* This invisible element is needed for proper spacing */}
             <NLink to={`#`} style={{ visibility: "hidden" }}></NLink>
             <NLink to={`${process.env.PUBLIC_URL}/home`}>
               <p
@@ -156,10 +161,13 @@ class SideBar extends Component {
                 Rankings
               </p>
             </NLink>
-            {/*<NLink to={`${process.env.PUBLIC_URL}/search`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-search pe-fw" />Search</p></NLink>*/}
+            {/* search bar link, unused since Search is broken */}
+            {/* Commented in case someone wants to bring it back in the future */}
+            {/* <NLink to={`${process.env.PUBLIC_URL}/search`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-search pe-fw" />Search</p></NLink> */}
 
             <br />
 
+            {/* Only visible when logged in */}
             {this.state.logged_in && (
               <NLink to={`${process.env.PUBLIC_URL}/team`}>
                 <p
@@ -189,6 +197,11 @@ class SideBar extends Component {
               </NLink>
             )}
             {/*{ this.state.on_team && <NLink to={`${process.env.PUBLIC_URL}/ide`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-pen pe-fw" />IDE</p></NLink> }*/}
+            {/* Only visible when on a team AND submissions are enabled
+            Tried to de-dupe, but expressions must return only one JSX element,
+            and I couldn't get both NLinks to be in the same element while still looking ok
+            Do at your own risk
+            - Nathan */}
             {this.state.on_team && this.isSubmissionEnabled() && (
               <NLink to={`${process.env.PUBLIC_URL}/scrimmaging`}>
                 <p
@@ -207,6 +220,7 @@ class SideBar extends Component {
 
             <br />
 
+            {/* Only visible if a staff user */}
             {this.state.user.is_staff && (
               <NLink to={`${process.env.PUBLIC_URL}/staff`}>
                 <p
