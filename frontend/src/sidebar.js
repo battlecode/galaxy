@@ -63,6 +63,8 @@ class SideBar extends Component {
     });
   }
 
+  // Note that this duplicates a method in submissions.js;
+  // this will be cleaned up. See #74
   isSubmissionEnabled() {
     if (this.state.user.is_staff == true) {
       return true;
