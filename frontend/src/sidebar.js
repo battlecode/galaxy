@@ -182,7 +182,9 @@ class SideBar extends Component {
                 </p>
               </NLink>
             )}
-            {this.state.on_team && (
+
+            {/* Only visible when on a team AND submissions are enabled */}
+            {this.state.on_team && this.isSubmissionEnabled() && (
               <NLink to={`${process.env.PUBLIC_URL}/submissions`}>
                 <p
                   style={{
