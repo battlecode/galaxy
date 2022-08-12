@@ -23,29 +23,36 @@ class SideBar extends Component {
   }
 
   componentDidMount() {
+    // Yes, the method surrounding loginCheck is duped across index, sidebar, and navbar.
+    // But, it's just one method and one identical bit of code.
+    // And, I did try to dedupe, but it didn't work out easily.
+    // (Issues arise from callbacks, async-ness, etc...)
+    // Try at your own risk, and if you dupe,
+    // _make sure to keep the methods as small as possible, and keep these notes (about duping) around_
+    // -Nathan
     Api.loginCheck((logged_in) => {
       this.setState({ logged_in });
-      Api.getUserProfile(
-        function (u) {
-          this.setState({ user: u });
-        }.bind(this)
-      );
     });
 
-    Api.getUserTeam(
-      function (e) {
-        this.setState({ on_team: e !== null });
-        $(document).ready(function () {
-          window.init_right_menu();
-        });
-      }.bind(this)
-    );
+    Api.getUserProfile((user_profile) => {
+      this.setState({ user: user_profile });
+    });
 
-    Api.getLeague(
-      function (l) {
-        this.setState({ league: l });
-      }.bind(this)
-    );
+    Api.getUserTeam((user_team_data) => {
+      this.setState({ on_team: user_team_data !== null });
+      // This function, for mobile devices, moves the navbar into the sidebar and then
+      // collapses the sidebar. Better responsive display
+      // (Only call it when the entire DOM has fully loaded, since otherwise,
+      // the _incomplete_ navbar gets moved and is stuck there.)
+      // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
+      $(document).ready(function () {
+        window.init_right_menu();
+      });
+    });
+
+    Api.getLeague((league) => {
+      this.setState({ league });
+    });
   }
 
   isSubmissionEnabled() {
