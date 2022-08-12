@@ -196,7 +196,7 @@ class SideBar extends Component {
                 </p>
               </NLink>
             )}
-            {/*{ this.state.on_team && <NLink to={`${process.env.PUBLIC_URL}/ide`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-pen pe-fw" />IDE</p></NLink> }*/}
+
             {/* Only visible when on a team AND submissions are enabled
             Tried to de-dupe, but expressions must return only one JSX element,
             and I couldn't get both NLinks to be in the same element while still looking ok
@@ -216,7 +216,6 @@ class SideBar extends Component {
                 </p>
               </NLink>
             )}
-            {/*<NLink to={`${process.env.PUBLIC_URL}/replay`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-monitor pe-fw" />Replay</p></NLink>*/}
 
             <br />
 
