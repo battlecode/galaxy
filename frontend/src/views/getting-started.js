@@ -392,7 +392,7 @@ class GettingStarted extends Component {
                   </p>
                   <p>
                     View instructions for:
-                    <div
+                    <span
                       className="btn-group"
                       role="group"
                       style={{ marginLeft: "10px" }}
@@ -418,7 +418,7 @@ class GettingStarted extends Component {
                       >
                         Terminal
                       </button>
-                    </div>
+                    </span>
                   </p>
                   {this.getIDEInstallation()}
                   <p>
