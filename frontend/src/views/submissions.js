@@ -305,12 +305,15 @@ class Submissions extends Component {
             <h4 className="title">Submit Code</h4>
           </div>
           <div className="content">
-            {/* TODO could this paragraph be dynamically filled? that'd be amazing */}
+            {/* This passage will be dynamically filled, and handle two tours happening w same time 
+            See #16 */}
             <p>
               <b>
                 The submission deadline for the Sprint Tournament 1 is 7 pm ET
                 on Monday 1/10.
               </b>{" "}
+              {/* Render if tour name contains "final" or "qual" caps-insensitive. Or something along those lines
+              See #16 /}
               {/* Make sure to have indicated your eligibility on your Team Profile
               page. Also make sure to have all members upload a resume, at your
               personal profile page.
@@ -473,7 +476,8 @@ class Submissions extends Component {
                   "Code uploaded, but not yet queued for compilation... If this persists, try re-submitting your code.";
                 break;
               case COMPILATION_STATUS.QUEUED:
-                // TODO a dedicated refresh button, that refreshes only these tables, would be cool
+                // A dedicated refresh button, that refreshes only these tables, would be cool
+                // See #35 for tracking
                 status_str =
                   "Code queued for compilation -- check back and refresh for updates.";
                 break;
