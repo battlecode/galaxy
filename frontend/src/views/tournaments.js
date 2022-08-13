@@ -72,52 +72,51 @@ class Tournaments extends Component {
                     Battlecode 2022 will consist of seven tournaments throughout
                     the month! We stream and commentate all tournaments online.
                   </p>
+                  <ul>
+                    <li>
+                      <b>Sprint Tournament 1: 1/11.</b> One week after spec
+                      release, you're given a chance to win small prizes in this
+                      tournament. The goal is to get an idea of the meta-game,
+                      and a chance to test your bot prototypes.
+                    </li>
+                    <li>
+                      <b>Sprint Tournament 2: 1/18.</b> One week after the
+                      Sprint Tournament 1, you're given another chance to win
+                      small prizes, test the metagame, and make changes.
+                    </li>
+                    <li>
+                      <b>International Qualifying Tournament: 1/23.</b> This
+                      tournament determines the <i>4 international teams</i>{" "}
+                      that will qualify for the Final Tournament.
+                    </li>
+                    <li>
+                      <b>US Qualifying Tournament: 1/25.</b>
+                      This tournament determines the <i>
+                        12 US-based teams
+                      </i>{" "}
+                      that will qualify for the Final Tournament.
+                    </li>
+                    <li>
+                      <b>Newbie Tournament: 1/27.</b> The top newbie teams
+                      compete for a smaller prize pool. The final match between
+                      the top 2 teams will be run at the Final Tournament.
+                    </li>
+                    <li>
+                      <b>High School Tournament: 1/27.</b> The top high school
+                      teams compete for a smaller prize pool. Like the Newbie
+                      Tournament, the final match will be run at the Final
+                      Tournament.
+                    </li>
+                    <li>
+                      <b>Final Tournament: 2/5. (Note the change!)</b> The top
+                      16 teams, as determined by the qualifying tournaments,
+                      compete for glory, fame and a big prize pool. The
+                      tournament will take place live, at 7 pm, at MIT in 32-123
+                      (and will of course be streamed online).{" "}
+                      <b>All finalist teams will be invited to MIT.</b>
+                    </li>
+                  </ul>
                   <p>
-                    <ul>
-                      <li>
-                        <b>Sprint Tournament 1: 1/11.</b> One week after spec
-                        release, you're given a chance to win small prizes in
-                        this tournament. The goal is to get an idea of the
-                        meta-game, and a chance to test your bot prototypes.
-                      </li>
-                      <li>
-                        <b>Sprint Tournament 2: 1/18.</b> One week after the
-                        Sprint Tournament 1, you're given another chance to win
-                        small prizes, test the metagame, and make changes.
-                      </li>
-                      <li>
-                        <b>International Qualifying Tournament: 1/23.</b> This
-                        tournament determines the <i>4 international teams</i>{" "}
-                        that will qualify for the Final Tournament.
-                      </li>
-                      <li>
-                        <b>US Qualifying Tournament: 1/25.</b>
-                        This tournament determines the <i>
-                          12 US-based teams
-                        </i>{" "}
-                        that will qualify for the Final Tournament.
-                      </li>
-                      <li>
-                        <b>Newbie Tournament: 1/27.</b> The top newbie teams
-                        compete for a smaller prize pool. The final match
-                        between the top 2 teams will be run at the Final
-                        Tournament.
-                      </li>
-                      <li>
-                        <b>High School Tournament: 1/27.</b> The top high school
-                        teams compete for a smaller prize pool. Like the Newbie
-                        Tournament, the final match will be run at the Final
-                        Tournament.
-                      </li>
-                      <li>
-                        <b>Final Tournament: 2/5. (Note the change!)</b> The top
-                        16 teams, as determined by the qualifying tournaments,
-                        compete for glory, fame and a big prize pool. The
-                        tournament will take place live, at 7 pm, at MIT in
-                        32-123 (and will of course be streamed online).{" "}
-                        <b>All finalist teams will be invited to MIT.</b>
-                      </li>
-                    </ul>
                     <b>
                       The deadline to submit code for each non-final tournament
                       is 7 pm EST <i>the day before</i> the tournament.
@@ -176,29 +175,27 @@ class Tournaments extends Component {
                   <h4 className="title">Prizes</h4>
                 </div>
                 <div className="content">
-                  <p>
-                    <ul>
-                      <li>
-                        <b>Final Tournament prizes:</b> Our top 16 finalist
-                        teams will battle it out for the top prizes.
-                      </li>
-                      <li>
-                        Smaller prizes for top placers in other non-final
-                        (newbie, US high school, sprint) tournaments.
-                      </li>
-                      <li>
-                        <b>Bonus prizes, to be announced</b> 👀
-                        <ul>
-                          <li>
-                            Historically, we have given out prizes for creative
-                            strategies, major bugs found, and other
-                            game-specific topics. Have fun with your strategies,
-                            write-ups, and overall participation in Battlecode!
-                          </li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </p>
+                  <ul>
+                    <li>
+                      <b>Final Tournament prizes:</b> Our top 16 finalist teams
+                      will battle it out for the top prizes.
+                    </li>
+                    <li>
+                      Smaller prizes for top placers in other non-final (newbie,
+                      US high school, sprint) tournaments.
+                    </li>
+                    <li>
+                      <b>Bonus prizes, to be announced</b> 👀
+                      <ul>
+                        <li>
+                          Historically, we have given out prizes for creative
+                          strategies, major bugs found, and other game-specific
+                          topics. Have fun with your strategies, write-ups, and
+                          overall participation in Battlecode!
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
                 </div>
               </div>
 
@@ -216,51 +213,48 @@ class Tournaments extends Component {
                     Your team must meet <b>all three conditions</b> to be
                     eligible for the Qualifying and Final tournaments by the
                     submission deadline:
-                    <ol>
-                      <li>Have uploaded a bot</li>
-                      <li>
-                        Have indicated your eligibility on your Team Profile
-                        page
-                      </li>
-                      <li>
-                        Have all members upload a resume, at your personal
-                        profile page.
-                      </li>
-                    </ol>
                   </p>
-                  <p>
-                    As a reminder, the tournament divisions are:
-                    <ul>
-                      <li>
-                        <b>Full-time US teams</b>, consisting entirely of US
-                        college students studying full-time, or in a transition
-                        phase. We may ask for some documentation to verify your
-                        student status if you advance to the finals. The{" "}
-                        <b>top 12 teams</b> in this division will earn a place
-                        out of 16 final tournament spots.
-                      </li>
-                      <li>
-                        <b>Full-time international teams</b>, consisting
-                        entirely of college students studying full-time, or in a
-                        transition phase, where at least one team member is not
-                        a US student. We may ask for some documentation to
-                        verify your student status if you advance to the finals.
-                        The <b>top 4 teams</b> in this division will earn a
-                        place out of 16 final tournament spots.
-                      </li>
-                      <li>
-                        <b>High-school teams</b>, consisting entirely of high
-                        school students. The <b>top 2 teams</b> will have the
-                        final match played during the final tournament.
-                      </li>
-                      <li>
-                        <b>Newbie teams</b>, consisting entirely of MIT students
-                        who have never competed in Battlecode before.{" "}
-                        <b>The top 2 teams</b> will have their final match
-                        played during the final tournament.
-                      </li>
-                    </ul>
-                  </p>
+                  <ol>
+                    <li>Have uploaded a bot</li>
+                    <li>
+                      Have indicated your eligibility on your Team Profile page
+                    </li>
+                    <li>
+                      Have all members upload a resume, at your personal profile
+                      page.
+                    </li>
+                  </ol>
+                  <p>As a reminder, the tournament divisions are:</p>
+                  <ul>
+                    <li>
+                      <b>Full-time US teams</b>, consisting entirely of US
+                      college students studying full-time, or in a transition
+                      phase. We may ask for some documentation to verify your
+                      student status if you advance to the finals. The{" "}
+                      <b>top 12 teams</b> in this division will earn a place out
+                      of 16 final tournament spots.
+                    </li>
+                    <li>
+                      <b>Full-time international teams</b>, consisting entirely
+                      of college students studying full-time, or in a transition
+                      phase, where at least one team member is not a US student.
+                      We may ask for some documentation to verify your student
+                      status if you advance to the finals. The{" "}
+                      <b>top 4 teams</b> in this division will earn a place out
+                      of 16 final tournament spots.
+                    </li>
+                    <li>
+                      <b>High-school teams</b>, consisting entirely of high
+                      school students. The <b>top 2 teams</b> will have the
+                      final match played during the final tournament.
+                    </li>
+                    <li>
+                      <b>Newbie teams</b>, consisting entirely of MIT students
+                      who have never competed in Battlecode before.{" "}
+                      <b>The top 2 teams</b> will have their final match played
+                      during the final tournament.
+                    </li>
+                  </ul>
 
                   <p>
                     More eligibility details can be found{" "}
