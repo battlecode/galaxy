@@ -20,9 +20,18 @@ class TeamCard extends Component {
       dummyArr.push({ username: user });
     });
 
-    this.state = {
-      users: dummyArr,
-    };
+    // If the "state" variable is already initialized,
+    // be careful not to re-assign it again.
+    // If it hasn't been initialized then we need to initialize it.
+    if (this.state) {
+      this.setState({
+        users: dummyArr,
+      });
+    } else {
+      this.state = {
+        users: dummyArr,
+      };
+    }
   }
 
   getUserData() {
