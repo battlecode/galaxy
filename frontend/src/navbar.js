@@ -12,6 +12,7 @@ class NavBar extends Component {
       <nav className="navbar navbar-default navbar-fixed">
         <div className="container-fluid">
           <div className="navbar-header">
+            {/* The hamburger button used on small screens */}
             <button
               type="button"
               onClick={this.toggleNavigation}
@@ -24,10 +25,7 @@ class NavBar extends Component {
               <span className="icon-bar" />
               <span className="icon-bar" />
             </button>
-            <NavLink
-              className="navbar-brand"
-              to={`${process.env.PUBLIC_URL}/home`}
-            >
+            <NavLink className="navbar-brand" to={`/home`}>
               Battlecode 2022
             </NavLink>
           </div>
@@ -46,24 +44,21 @@ class NavBarAccount extends Component {
     this.state = { logged_in: null };
   }
   componentDidMount() {
+    // duped in various places, see sidebar.js
     Api.loginCheck((logged_in) => {
       this.setState({ logged_in });
     });
   }
-  logout() {
-    Api.logout(function (e) {
-      window.location.reload();
-    });
-  }
+
   render() {
     if (this.state.logged_in) {
       return (
         <ul className="nav navbar-nav navbar-right">
           <li>
-            <NavLink to={`${process.env.PUBLIC_URL}/account`}>Account</NavLink>
+            <NavLink to={`/account`}>Account</NavLink>
           </li>
           <li>
-            <a onClick={this.logout}>Log out</a>
+            <NavLink to={`/logout`}>Log out</NavLink>
           </li>
         </ul>
       );
@@ -72,12 +67,10 @@ class NavBarAccount extends Component {
       return (
         <ul className="nav navbar-nav navbar-right">
           <li>
-            <NavLink to={`${process.env.PUBLIC_URL}/register`}>
-              Register
-            </NavLink>
+            <NavLink to={`/register`}>Register</NavLink>
           </li>
           <li>
-            <NavLink to={`${process.env.PUBLIC_URL}/login`}>Log in</NavLink>
+            <NavLink to={`/login`}>Log in</NavLink>
           </li>
         </ul>
       );

@@ -7,10 +7,18 @@ class NLink extends Component {
   render() {
     return (
       <li>
-        <NavLink
-          {...this.props}
-          activeStyle={{ opacity: 1, fontWeight: 800 }}
-        />
+        <NavLink {...this.props} activeStyle={{ opacity: 1, fontWeight: 800 }}>
+          <p
+            style={{
+              fontWeight: "inherit",
+              textTransform: "none",
+              fontSize: "inherit",
+            }}
+          >
+            <i className={this.props.icon} pe-fw />
+            {this.props.label}
+          </p>
+        </NavLink>
       </li>
     );
   }
@@ -23,31 +31,40 @@ class SideBar extends Component {
   }
 
   componentDidMount() {
+    // Yes, the method surrounding loginCheck is duped across index, sidebar, and navbar.
+    // But, it's just one method and one identical bit of code.
+    // And, I did try to dedupe, but it didn't work out easily.
+    // (Issues arise from callbacks, async-ness, etc...)
+    // Try at your own risk, and if you dupe,
+    // _make sure to keep the methods as small as possible, and keep these notes (about duping) around_
+    // -Nathan
     Api.loginCheck((logged_in) => {
       this.setState({ logged_in });
-      Api.getUserProfile(
-        function (u) {
-          this.setState({ user: u });
-        }.bind(this)
-      );
     });
 
-    Api.getUserTeam(
-      function (e) {
-        this.setState({ on_team: e !== null });
-        $(document).ready(function () {
-          window.init_right_menu();
-        });
-      }.bind(this)
-    );
+    Api.getUserProfile((user_profile) => {
+      this.setState({ user: user_profile });
+    });
 
-    Api.getLeague(
-      function (l) {
-        this.setState({ league: l });
-      }.bind(this)
-    );
+    Api.getUserTeam((user_team_data) => {
+      this.setState({ on_team: user_team_data !== null });
+      // This function, for mobile devices, moves the navbar into the sidebar and then
+      // collapses the sidebar. Better responsive display
+      // (Only call it when the entire DOM has fully loaded, since otherwise,
+      // the _incomplete_ navbar gets moved and is stuck there.)
+      // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
+      $(document).ready(function () {
+        window.init_right_menu();
+      });
+    });
+
+    Api.getLeague((league) => {
+      this.setState({ league });
+    });
   }
 
+  // Note that this duplicates a method in submissions.js;
+  // this will be cleaned up. See #74
   isSubmissionEnabled() {
     if (this.state.user.is_staff == true) {
       return true;
@@ -72,147 +89,69 @@ class SideBar extends Component {
             </a>
             <p>Battlecode 2022</p>
           </div>
+          {/* NOTE: this only controls what appears in the sidebars.
+          Independent of this, users can still go to the links by typing it in their browser, etc.
+          MAKE SURE THAT THE LINKED PAGES THEMSELVES ARE SECURE,
+          ESPECIALLY THAT THEY DON'T ALLOW ACCESS/FUNCTIONALITY WHEN THEY SHOULDN'T */}
           <ul className="nav nav-pills nav-stacked">
+            {/* This invisible element is needed for proper spacing */}
             <NLink to={`#`} style={{ visibility: "hidden" }}></NLink>
-            <NLink to={`${process.env.PUBLIC_URL}/home`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-home pe-fw" />
-                Home
-              </p>
-            </NLink>
-            <NLink to={`${process.env.PUBLIC_URL}/getting-started`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-sun pe-fw" />
-                Getting Started
-              </p>
-            </NLink>
-            <NLink to={`${process.env.PUBLIC_URL}/resources`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-note2 pe-fw" />
-                Resources
-              </p>
-            </NLink>
-            <NLink to={`${process.env.PUBLIC_URL}/updates`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-bell pe-fw" />
-                Updates
-              </p>
-            </NLink>
+            <NLink to={`/home`} icon={"pe-7s-home"} label="Home" />
+            <NLink
+              to={`/getting-started`}
+              icon={"pe-7s-sun"}
+              label="Getting Started"
+            />
+            <NLink to={`/resources`} icon={"pe-7s-note2"} label="Resources" />
+            <NLink to={`/updates`} icon={"pe-7s-bell"} label="Updates" />
 
             <br />
 
-            <NLink to={`${process.env.PUBLIC_URL}/tournaments`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-medal pe-fw" />
-                Tournaments
-              </p>
-            </NLink>
-            <NLink to={`${process.env.PUBLIC_URL}/rankings`}>
-              <p
-                style={{
-                  fontWeight: "inherit",
-                  textTransform: "none",
-                  fontSize: "inherit",
-                }}
-              >
-                <i className="pe-7s-graph1 pe-fw" />
-                Rankings
-              </p>
-            </NLink>
-            {/*<NLink to={`${process.env.PUBLIC_URL}/search`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-search pe-fw" />Search</p></NLink>*/}
+            <NLink
+              to={`/tournaments`}
+              icon={"pe-7s-medal"}
+              label="Tournaments"
+            />
+            <NLink to={`/rankings`} icon={"pe-7s-graph1"} label="Rankings" />
+            {/* search bar link, unused since Search is broken
+            Commented in case someone wants to bring it back in the future
+            You'd have to refactor the code to match the other NLink's */}
+            {/* <NLink to={`/search`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-search pe-fw" />Search</p></NLink> */}
 
             <br />
 
+            {/* Only visible when logged in */}
             {this.state.logged_in && (
-              <NLink to={`${process.env.PUBLIC_URL}/team`}>
-                <p
-                  style={{
-                    fontWeight: "inherit",
-                    textTransform: "none",
-                    fontSize: "inherit",
-                  }}
-                >
-                  <i className="pe-7s-users pe-fw" />
-                  Team
-                </p>
-              </NLink>
+              <NLink to={`/team`} icon={"pe-7s-users"} label="Team" />
             )}
-            {this.state.on_team && (
-              <NLink to={`${process.env.PUBLIC_URL}/submissions`}>
-                <p
-                  style={{
-                    fontWeight: "inherit",
-                    textTransform: "none",
-                    fontSize: "inherit",
-                  }}
-                >
-                  <i className="pe-7s-up-arrow pe-fw" />
-                  Submissions
-                </p>
-              </NLink>
-            )}
-            {/*{ this.state.on_team && <NLink to={`${process.env.PUBLIC_URL}/ide`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-pen pe-fw" />IDE</p></NLink> }*/}
+
+            {/* Only visible when on a team AND submissions are enabled */}
             {this.state.on_team && this.isSubmissionEnabled() && (
-              <NLink to={`${process.env.PUBLIC_URL}/scrimmaging`}>
-                <p
-                  style={{
-                    fontWeight: "inherit",
-                    textTransform: "none",
-                    fontSize: "inherit",
-                  }}
-                >
-                  <i className="pe-7s-joy pe-fw" />
-                  Scrimmaging
-                </p>
-              </NLink>
+              <NLink
+                to={`/submissions`}
+                icon={"pe-7s-up-arrow "}
+                label="Submissions"
+              />
             )}
-            {/*<NLink to={`${process.env.PUBLIC_URL}/replay`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-monitor pe-fw" />Replay</p></NLink>*/}
+
+            {/* Only visible when on a team AND submissions are enabled
+            Tried to de-dupe, but expressions must return only one JSX element,
+            and I couldn't get both NLinks to be in the same element while still looking ok
+            Do at your own risk
+            - Nathan */}
+            {this.state.on_team && this.isSubmissionEnabled() && (
+              <NLink
+                to={`/scrimmaging`}
+                icon={"pe-7s-joy "}
+                label="Scrimmaging"
+              />
+            )}
 
             <br />
 
+            {/* Only visible if a staff user */}
             {this.state.user.is_staff && (
-              <NLink to={`${process.env.PUBLIC_URL}/staff`}>
-                <p
-                  style={{
-                    fontWeight: "inherit",
-                    textTransform: "none",
-                    fontSize: "inherit",
-                  }}
-                >
-                  <i className="pe-7s-tools pe-fw" />
-                  Staff
-                </p>
-              </NLink>
+              <NLink to={`/staff`} icon={"pe-7s-tools "} label="Staff" />
             )}
 
             <br />

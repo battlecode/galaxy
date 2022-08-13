@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 // import ReactDOM from "react-dom";
-import { createRoot } from 'react-dom/client';
+import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Switch, Route } from "react-router";
 
@@ -25,6 +25,7 @@ import Register from "./views/register";
 // import VerifyUser from "./views/VerifyUser";
 import PasswordForgot from "./views/passwordForgot";
 import PasswordChange from "./views/passwordChange";
+import LogOut from "./views/logOut";
 import Submissions from "./views/submissions";
 import TeamInfo from "./views/teamInfo";
 import Footer from "./footer";
@@ -35,208 +36,115 @@ import Api from "./api";
 class App extends Component {
   constructor() {
     super();
-    this.state = { logged_in: null, user: {}, league: {} };
-  }
+    this.state = { logged_in: null };
 
-  componentDidMount() {
-    Api.loginCheck((logged_in) => {
-      this.setState({ logged_in });
+    // Note that `Route`s define what routes a user may access / what routes exist to a user.
+    // Does _NOT_ actually render a clickable link to that route.
+    // That is done in navbar.js, sidebar.js, footer.js, etc
 
-      Api.getUserProfile(
-        function (u) {
-          this.setState({ user: u });
-        }.bind(this)
-      );
-
-      Api.getLeague(
-        function (l) {
-          this.setState({ league: l });
-        }.bind(this)
-      );
-    });
-  }
-
-  isSubmissionEnabled() {
-    if (this.state.user.is_staff === true) {
-      return true;
-    }
-    if (this.state.league.game_released === true) {
-      return true;
-    }
-    return false;
-  }
-
-  userIsStaff() {
-    return this.state.user.is_staff === true;
-  }
-
-  render() {
-    // direct to home page, should always be visible
-    let homeElems = [
-      <Route exact path={`${process.env.PUBLIC_URL}/`} component={Home} />,
-      <Route path={`${process.env.PUBLIC_URL}/home`} component={Home} />,
+    // should always be viewable, even when not logged in
+    this.nonLoggedInElems = [
+      <Route exact path={`/`} component={Home} />,
+      <Route path={`/home`} component={Home} />,
+      <Route path={`/updates`} component={Updates} />,
+      <Route path={`/search`} component={Search} />,
+      <Route path={`/tournaments`} component={Tournaments} />,
+      <Route path={`/:year/getting-started`} component={GettingStarted} />,
+      <Route path={`/common-issues`} component={Issues} />,
+      <Route path={`/debugging`} component={Debugging} />,
+      <Route path={`/codeofconduct`} component={CodeOfConduct} />,
+      <Route path={`/resources`} component={Resources} />,
+      <Route path={`/rankings/:team_id`} component={TeamInfo} />,
+      <Route path={`/rankings`} component={Rankings} />,
     ];
 
     // should only be visible to logged in users
-    let loggedInElems = [];
-    if (this.state.logged_in) {
-      loggedInElems = [
-        <Route path={`${process.env.PUBLIC_URL}/team`} component={Team} />,
-        <Route
-          path={`${process.env.PUBLIC_URL}/account`}
-          component={Account}
-        />,
-        <Route
-          path={`${process.env.PUBLIC_URL}/password_forgot`}
-          component={Home}
-        />,
-        <Route
-          path={`${process.env.PUBLIC_URL}/password_change`}
-          component={Home}
-        />,
-        <Route path={`${process.env.PUBLIC_URL}/login`} component={Home} />,
-        <Route
-          path={`${process.env.PUBLIC_URL}/scrimmaging`}
-          component={Scrimmaging}
-        />,
-        <Route
-          path={`${process.env.PUBLIC_URL}/submissions`}
-          component={Submissions}
-        />,
-        <Route path={`${process.env.PUBLIC_URL}/register`} component={Home} />,
-      ];
-    }
-
-    // should be visible to all users
-    let nonLoggedInElems = [
-      <Route path={`${process.env.PUBLIC_URL}/updates`} component={Updates} />,
-      <Route path={`${process.env.PUBLIC_URL}/search`} component={Search} />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/tournaments`}
-        component={Tournaments}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/:year/getting-started`}
-        component={GettingStarted}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/common-issues`}
-        component={Issues}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/debugging`}
-        component={Debugging}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/codeofconduct`}
-        component={CodeOfConduct}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/resources`}
-        component={Resources}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/rankings/:team_id`}
-        component={TeamInfo}
-      />,
-      <Route
-        path={`${process.env.PUBLIC_URL}/rankings`}
-        component={Rankings}
-      />,
-      <Route path="*" component={NotFound} />,
+    // If user is not logged-in, should 404 and not even render
+    this.loggedInElems = [
+      <Route path={`/team`} component={Team} />,
+      <Route path={`/account`} component={Account} />,
+      <Route path={`/password_forgot`} component={PasswordForgot} />,
+      <Route path={`/password_change`} component={PasswordChange} />,
+      <Route path={`/logout`} component={LogOut} />,
     ];
 
-    let staffElems = [];
-    if (this.userIsStaff()) {
-      staffElems = [
-        <Route path={`${process.env.PUBLIC_URL}/staff`} component={Staff} />,
-      ];
-    }
+    // Should only be visible and renderable to users on a team
+    this.onTeamElems = [
+      <Route path={`/scrimmaging`} component={Scrimmaging} />,
+      <Route path={`/submissions`} component={Submissions} />,
+    ];
 
-    // should only be visible if user is staff or submissions are enabled
-    // let gameElems = []
-    // if (this.isSubmissionEnabled()) {
-    //   gameElems = [
-    //     <Route path={`${process.env.PUBLIC_URL}/scrimmaging`} component={Scrimmaging} />,
-    //     <Route path={`${process.env.PUBLIC_URL}/submissions`} component={Submissions} />
-    //   ]
-    // }
+    this.staffElems = [
+      // Make sure to have an auth check in the backend for any methods that this page hits_
+      // (this part is absolutely necessary regardless of frontend setup)
+      <Route path={`/staff`} component={Staff} />,
+    ];
+
+    // When in the list of routes, this route must be last.
+    // (for wildcard to work properly)
+    this.notFoundElems = [<Route path="*" component={NotFound} />];
+  }
+
+  componentDidMount() {
+    // duped in various places, see sidebar.js
+    Api.loginCheck((logged_in) => {
+      this.setState({ logged_in });
+    });
+
+    Api.getUserProfile((user_profile) => {
+      this.setState({ user: user_profile });
+    });
+
+    Api.getUserTeam((user_team_data) => {
+      this.setState({ on_team: user_team_data !== null });
+    });
+  }
+
+  render() {
+    let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
+    let onTeamElemsToRender = this.state.on_team ? this.onTeamElems : [];
+    let staffElemsToRender =
+      this.state.user && this.state.user.is_staff ? this.staffElems : [];
+
+    let elemsToRender = this.nonLoggedInElems.concat(
+      loggedInElemsToRender,
+      onTeamElemsToRender,
+      staffElemsToRender,
+      // notFoundElems must be last to work properly
+      this.notFoundElems
+    );
+
+    // Note that the `Switch` element only contains routes.
+    // So just like the routes, the `Switch`
+    // only defines what routes a user may access / what routes exist to a user.
+    // Does _NOT_ actually render a clickable link to that route.
+    // That is done in navbar.js, sidebar.js, footer.js, etc
 
     return (
-      <div className="wrapper">
-        <SideBar />
-        <div className="main-panel">
-          <NavBar />
-          <Switch>
-            {homeElems}
-            {/* { gameElems } */}
-            {staffElems}
-            {loggedInElems}
-            {nonLoggedInElems}
-          </Switch>
-          <Footer />
-        </div>
-      </div>
+      <Switch>
+        {/* Login and Register pages should not render with sidebar, navbar, etc */}
+        {/* All other pages should (and so all other routes should allow this) */}
+        <Route path={`/login`} component={LoginRegister} />,
+        <Route path={`/register`} component={Register} />,
+        <Route>
+          <div className="wrapper">
+            <SideBar />
+            <div className="main-panel">
+              <NavBar />
+              <Switch>{elemsToRender}</Switch>
+              <Footer />
+            </div>
+          </div>
+        </Route>
+      </Switch>
     );
   }
 }
 
-class BeforeLoginApp extends Component {
-  constructor() {
-    super();
-    this.state = { logged_in: null };
-  }
-
-  componentDidMount() {
-    Api.loginCheck((logged_in) => {
-      this.setState({ logged_in });
-    });
-  }
-
-  render() {
-    if (this.state.logged_in) {
-      return <App />;
-    }
-    if (this.state.logged_in === false) {
-      return (
-        <Switch>
-          <Route
-            path={`${process.env.PUBLIC_URL}/password_forgot`}
-            component={PasswordForgot}
-          />
-          <Route
-            path={`${process.env.PUBLIC_URL}/password_change`}
-            component={PasswordChange}
-          />
-          <Route
-            path={`${process.env.PUBLIC_URL}/login`}
-            component={LoginRegister}
-          />
-          <Route
-            path={`${process.env.PUBLIC_URL}/register`}
-            component={Register}
-          />
-          <Route
-            path={`${process.env.PUBLIC_URL}/team`}
-            component={LoginRegister}
-          />
-          ,
-          <Route
-            path={`${process.env.PUBLIC_URL}/account`}
-            component={LoginRegister}
-          />
-          <Route path="*" component={App} />
-        </Switch>
-      );
-    }
-    return <div />;
-  }
-}
-
-const container = document.getElementById('root');
+const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(
   <BrowserRouter>
-    <BeforeLoginApp />
+    <App />
   </BrowserRouter>
 );
