@@ -124,8 +124,7 @@ class App extends Component {
       <Switch>
         {/* Login and Register pages should not render with sidebar, navbar, etc */}
         {/* All other pages should (and so all other routes should allow this) */}
-        <Route path={`/login`} component={LoginRegister} />
-        ,
+        <Route path={`/login`} component={LoginRegister} />,
         <Route path={`/register`} component={Register} />,
         <Route>
           <div className="wrapper">
