@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import $ from "jquery";
 import Api from "../api";
-import Countdown from "./countdown";
+import Countdown from "../components/countdown";
 import UpdateCard from "../components/updateCard";
 
 class StatCard extends UpdateCard {
