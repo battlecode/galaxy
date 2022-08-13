@@ -124,6 +124,14 @@ h5 {
   margin: 0px !important;
 }
 
+ul:not(.nav), ol {
+  /* Styled the same as <p/> from Bootstrap
+  Allows our ul and ol to look like p, 
+  without having to be nested in a p (which is illegal) */
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 @media (min-width: 992px) {
   .col-2-row {
     flex-direction: column;
