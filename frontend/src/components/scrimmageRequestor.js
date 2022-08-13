@@ -72,7 +72,7 @@ class ScrimmageRequestor extends Component {
               <form className="input-group" onSubmit={this.onSearch}>
                 <input
                   type="text"
-                  list={hasAutocompleteOptions && "team-options"}
+                  list={"team-options"}
                   id="team-search"
                   className="form-control"
                   onChange={this.handleInput}
