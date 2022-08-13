@@ -21,6 +21,8 @@ Please follow these steps carefully to ensure your development environment is in
 
 ## Development workflow
 
+**Note**: frontend development uses a slightly different workflow and practices. See the `README.md` in the `frontend` folder for those.
+
 Develop new features on branches and use pull-requests to request code-review.
 The `main` branch is protected and pushes to `main` will be rejected.
 
