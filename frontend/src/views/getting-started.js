@@ -420,7 +420,7 @@ class GettingStarted extends Component {
                       </button>
                     </div>
                   </p>
-                  <p>{this.getIDEInstallation()}</p>
+                  {this.getIDEInstallation()}
                   <p>
                     There should now be a folder called <code>client</code> in
                     your scaffold folder; if you go in there, and double click
