@@ -124,6 +124,13 @@ h5 {
   margin: 0px !important;
 }
 
+::selection {
+  /* Match the color in our sidebar, for aesthetic */
+  background: #cfe1b9;
+  /* color: white */
+  /* Toggle text color depending on whether background is light or dark */
+}
+
 ul:not(.nav), ol {
   /* Styled the same as <p/> from Bootstrap
   Allows our ul and ol to look like p, 
