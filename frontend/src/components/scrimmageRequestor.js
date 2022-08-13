@@ -59,7 +59,7 @@ class ScrimmageRequestor extends Component {
     const dataOptions = hasAutocompleteOptions && (
       <datalist id="team-options">
         {state.autocompleteOptions.map((option) => {
-          return <option value={option.name} />;
+          return <option key={option.id} value={option.name} />;
         })}
       </datalist>
     );
