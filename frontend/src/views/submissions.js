@@ -431,7 +431,7 @@ class Submissions extends Component {
         (submission, index) => {
           if (Object.keys(submission).length === 0) {
             return (
-              <tr>
+              <tr key="current">
                 <td>
                   {" "}
                   <div className="btn btn-xs" style={{ visibility: "hidden" }}>
@@ -482,7 +482,7 @@ class Submissions extends Component {
                 break;
             }
             return (
-              <tr key={submission.id}>
+              <tr key={submission.id + "-current"}>
                 <td>{new Date(submission.submitted_at).toLocaleString()}</td>
                 <td>
                   {status_str + " "}
@@ -554,7 +554,7 @@ class Submissions extends Component {
         (submission, index) => {
           if (Object.keys(submission).length === 0) {
             return (
-              <tr>
+              <tr key={"loading-last-" + index}>
                 <td>
                   {" "}
                   <div className="btn btn-xs" style={{ visibility: "hidden" }}>
@@ -566,7 +566,7 @@ class Submissions extends Component {
             );
           } else {
             return (
-              <tr key={submission.id}>
+              <tr key={submission.id + "-last"}>
                 <td>{new Date(submission.submitted_at).toLocaleString()}</td>
                 <td>
                   {" "}
@@ -615,10 +615,10 @@ class Submissions extends Component {
         </p>
       );
     } else {
-      let tourRows = this.state.tourSubmissions.map((submission) => {
+      let tourRows = this.state.tourSubmissions.map((submission, index) => {
         if (submission.length === 0) {
           return (
-            <tr>
+            <tr key={index + "-tour-loading"}>
               <td>
                 {" "}
                 <div className="btn btn-xs" style={{ visibility: "hidden" }}>
@@ -631,7 +631,7 @@ class Submissions extends Component {
           );
         } else {
           return (
-            <tr key={submission[1].id}>
+            <tr key={submission[1].id + "-tour-" + submission[0]}>
               <td>{submission[0]}</td>
               <td>{new Date(submission[1].submitted_at).toLocaleString()}</td>
               <td>
