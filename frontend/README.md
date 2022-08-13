@@ -4,13 +4,9 @@ Fully static frontend in React, based on `battlecode19/app`, using modified temp
 
 ![](screenshot.png)
 
-## Local Development
+## Local Development Instructions
 
-**It's easiest to run the frontend through Node. To do so, follow the instructions in the rest of this section.**
-
-(Alternatively, you could run the frontend through Docker: run `docker-compose up --build frontend` from the repo's root directory. However, running through Node gives you benefits, such as automatic change detection and rebuilding.)
-
-### First-Time Setup
+### One-Time Setup
 
 First, make sure you have [Node](https://nodejs.org/en/download/) installed. (Also, on Windows, [Cygwin](https://www.cygwin.com/) is recommended to use as your terminal environment.) Then, in this directory, run:
 
@@ -20,7 +16,7 @@ npm install
 
 ### Running
 
-Make sure that the backend in `../backend` is running at `localhost:8000`.
+Make sure that the backend is running. (You can hook up to a deployed backend, or run it locally. Then make sure `.env.development` points to that backend.)
 
 In **this directory**, run:
 
@@ -34,15 +30,7 @@ This automatically reloads the page on changes. To run the same thing without au
 
 When installing a new Node package, always `npm install --save <package>` or `npm install --save-dev <package>`, and commit `package.json` and `package-lock.json`. This should work even if we run it from Docker. If you don't have `npm` installed on your computer, you can `docker exec -it battlecode20_frontend_1 sh` and then run the commands above.
 
-Our local processes (including our dockerfile) use `npm start` and/or `npm run start`. These commands automatically use `.env.development`, and not `.env.production`. See here for more information: https://create-react-app.dev/docs/adding-custom-environment-variables/#what-other-env-files-can-be-used
-
-## Deployment
-
-For production, build with `npm run build` for the full thing, and `npm run buildnogame` to build the site without any game specific information. This is handled automatically by calling `./deploy.sh deploy` or `./deploy.sh deploynogame` using Bash, respectively. Note that the former should ONLY be called after the release of the game, since it makes the game specs and the visualizer public.
-
-### NPM Package Versions
-
-Many of our packages are out of date. These were once attempted to be fixed [here](url), but **this broke production builds**. One day it would be great to update these. **Make sure to test production builds!**
+Our local processes use `npm start` and/or `npm run start`. These commands automatically use `.env.development`, and not `.env.production`. See here for more information: https://create-react-app.dev/docs/adding-custom-environment-variables/#what-other-env-files-can-be-used.
 
 ### NPM 17 sadness
 
@@ -56,11 +44,7 @@ Our issues would be resolved if we could use new versions of webpack but)
 
 During deployment, you'll need an up-to-date version of `frontend/public/access.txt`. This file is needed by game runners to run matches, and by competitors because it grants them access to downloading the GitHub package containing the engine. It's is really difficult to deploy; our solution is to have it deployed with the rest of the frontend code and onto our website, but have it never pushed to GitHub. Make sure you have an up-to-date copy! If you don't have one, check with the infra devs.
 
-### Assorted notes
-
-Notably, the servers that serve the deployed frontend never run npm (through Docker or otherwise). Instead, our deploy script runs npm locally to build the frontend, and then sends this compiled version to Google Cloud.
-
-Deployed code automatically builds using `.env.production`, since we call it with `npm run build`. See here for more information: https://create-react-app.dev/docs/adding-custom-environment-variables/#what-other-env-files-can-be-used
+## Deployment
 
 ### One-time setup
 
@@ -102,4 +86,10 @@ This sets up the bucket. Finally, we need to set up the load balancer to point t
 8. Click "Update".
 9. Wait for like 10 minutes!
 
-Now, you should be able to follow the deployment instructions above (`npm run build` and `./deploy.sh deploy`) to deploy the website and see it live on your new subdomain! **Don't forget to actually deploy!**
+Now, you should be able to follow the deployment instructions above (`npm run build` and `./deploy.sh deploy`) to deploy the website and see it live on your new subdomain! **Don't forget to actually deploy! See the "Continuous Deployment" section.**
+
+### Continuous Deployment
+
+Run`./deploy.sh deploy` using Bash. This script calls `npm run build` to build a static copy of the website, and then uploads it to Google Cloud. (The dpeloy setup should have already been done.) Note that this automatically uses `.env.production`.
+
+The servers that serve the deployed frontend never run npm (through Docker or otherwise). Instead, our deploy script runs npm locally to build the frontend, and then sends this compiled version to Google Cloud.
