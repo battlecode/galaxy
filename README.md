@@ -24,6 +24,8 @@ If the Conda specifications are updated upstream, you can refresh your local env
 
 ## Development workflow
 
+**Note**: frontend development uses a slightly different workflow and practices. See the `README.md` in the `frontend` folder for those.
+
 Develop new features on branches and use pull-requests to request code-review.
 The `main` branch is protected and pushes to `main` will be rejected.
 
