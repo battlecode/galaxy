@@ -336,13 +336,13 @@ class Submissions extends Component {
               below. The submission format should be a zip file containing a
               single folder (which is your package name), which should contain
               RobotPlayer.java and any other code you have written, for example:
-              <pre>
-                <code>
-                  submission.zip --{">"} examplefuncsplayer --{">"}{" "}
-                  RobotPlayer.java, FooBar.java
-                </code>
-              </pre>
             </p>
+            <pre>
+              <code>
+                submission.zip --{">"} examplefuncsplayer --{">"}{" "}
+                RobotPlayer.java, FooBar.java
+              </code>
+            </pre>
             <p>
               Please{" "}
               <b>
@@ -675,26 +675,24 @@ class Submissions extends Component {
           <h4 className="title">Compiling Tips</h4>
         </div>
         <div className="content">
-          <p>
-            <ul>
-              <li>
-                Submission format: Check that your zip contains exactly one
-                directory, and your code is inside that directory.
-              </li>
-              <li>
-                Non-ASCII characters: Ensure your code is completely ASCII. In
-                the past we have had compile errors due to comments containing
-                diacritic characters (áéíóú).
-              </li>
-              <li>
-                Make sure you only import from your own bot, and from java.
-                packages. In particular, do not use javax, javafx, and watch out
-                for importing from other versions of your bot (which may work
-                locally, but will not work on our servers as you can only submit
-                one folder).
-              </li>
-            </ul>
-          </p>
+          <ul>
+            <li>
+              Submission format: Check that your zip contains exactly one
+              directory, and your code is inside that directory.
+            </li>
+            <li>
+              Non-ASCII characters: Ensure your code is completely ASCII. In the
+              past we have had compile errors due to comments containing
+              diacritic characters (áéíóú).
+            </li>
+            <li>
+              Make sure you only import from your own bot, and from java.
+              packages. In particular, do not use javax, javafx, and watch out
+              for importing from other versions of your bot (which may work
+              locally, but will not work on our servers as you can only submit
+              one folder).
+            </li>
+          </ul>
         </div>
       </div>
     );
