@@ -233,15 +233,18 @@ class Match(SaturnInvocation):
 
     def get_replay_path(self):
         """Return the path to the replay file."""
-        raise NotImplementedError
+        # TODO: can we avoid dealing with extension
+        # TODO: is the fact that path begins with "replays" going to hold
+        #       for all episodes. and should it be included here anyway
+        return f"replays/{self.replay}.{self.episode.name_short}"
 
     def enqueue_options(self):
         """Return the options to be submitted to the execution queue."""
         return {
             "id": self.pk,
             "episode": self.episode_id,
-            "replay-path": ...,
-            "map": ...,
+            "replay-path": self.get_replay_path(),
+            "map": ",".join(map.name for map in self.maps), # TODO: correct format?
         }
 
     def can_see_teams(self, user):
@@ -403,5 +406,6 @@ class ScrimmageRequest(models.Model):
                      maps=self.maps,
                      alternate_color=self.is_alternating_color(),
                      is_ranked=self.is_ranked)
-        m.save()        
+        m.save()
+        Match.objects.filter(id=m.id).enqueue()     
         

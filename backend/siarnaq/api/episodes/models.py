@@ -18,7 +18,7 @@ class Episode(models.Model):
     """
 
     name_short = models.SlugField(max_length=16, primary_key=True)
-    """Short unique identifying tag for the episode."""
+    """Short unique identifying tag for the episode, e.g. bc22"""
 
     name_long = models.CharField(max_length=128)
     """Full-form name for the episode."""
