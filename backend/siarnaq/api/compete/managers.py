@@ -6,7 +6,7 @@ from google.cloud import pubsub_v1
 
 
 class SaturnInvokableQuerySet(models.QuerySet):
-    _publish_client = pubsub_v1.PublisherClient(
+    _publish_client = pubsub_v1.PublisherClient( # no credentials?
         publisher_options=pubsub_v1.types.PublisherOptions(
             enable_message_ordering=True,
         ),

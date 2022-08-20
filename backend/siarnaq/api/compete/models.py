@@ -111,9 +111,11 @@ class Submission(SaturnInvocation):
         return {
             "id": self.pk,
             "episode": self.episode_id,
-            "source": ...,  # TODO
+            "source-path": f"",  # TODO
             "binary": ...,
         }
+
+    # TODO: a method here, or on the query set, for compiling a submission
 
 
 class MatchParticipant(models.Model):
@@ -243,6 +245,7 @@ class Match(SaturnInvocation):
         return {
             "id": self.pk,
             "episode": self.episode_id,
+            # TODO: players
             "replay-path": self.get_replay_path(),
             "map": ",".join(map.name for map in self.maps), # TODO: correct format?
         }
@@ -390,8 +393,7 @@ class ScrimmageRequest(models.Model):
         TODO: maybe should be a member function of Team
         """
         submission = team.get_active_submission()
-        participant = MatchParticipant(team=team,
-                                            submission=submission) # TODO: rating      
+        participant = MatchParticipant(team=team, submission=submission) # TODO: rating      
         return participant
 
     def create_match(self):
@@ -400,7 +402,7 @@ class ScrimmageRequest(models.Model):
         blue = self.create_participant(self.requested_to)
         if not self.is_requester_red_first():
             red, blue = blue, red
-        m = Match(epsiode=self.episode,
+        m = Match(episode=self.episode,
                      red=red,
                      blue=blue,
                      maps=self.maps,

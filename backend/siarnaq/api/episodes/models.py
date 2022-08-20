@@ -71,6 +71,11 @@ class Episode(models.Model):
     pass the Battlecode class.
     """
 
+    # match_file_extension = models.CharField(max_length = 8)
+    # """
+    # The file extension of match files for this episode, e.g. "bc22".
+    # """
+
 
 class Map(models.Model):
     """
