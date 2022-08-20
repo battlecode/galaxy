@@ -20,6 +20,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/user/", include("siarnaq.api.accounts.urls")),
     # path("api/compete/", include("siarnaq.api.compete.urls")),
-    # path("api/episode/", include("siarnaq.api.episodes.urls")),
+    path("api/episode/", include("siarnaq.api.episodes.urls")),
     # path("api/team/", include("siarnaq.api.teams.urls")),
 ]
