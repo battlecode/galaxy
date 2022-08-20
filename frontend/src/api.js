@@ -438,6 +438,8 @@ class Api {
       });
   }
 
+  // This process will be touched up in #86
+  // note that this is blocked by the new backend -- hold off for now
   static getUserProfile(callback) {
     Api.getProfileByUser(Cookies.get("username"), Api.setUserUrl(callback));
   }
@@ -723,6 +725,7 @@ class Api {
     callback();
   }
 
+  // This process is very confusing; #90 will clean it up.
   static loginCheck(callback) {
     $.ajaxSetup({
       headers: { Authorization: `Bearer ${Cookies.get("token")}` },
@@ -752,6 +755,7 @@ class Api {
     );
   }
 
+  // This process is very confusing; #90 will clean it up.
   static login(username, password, callback) {
     $.post(`${URL}/auth/token/`, {
       username,
