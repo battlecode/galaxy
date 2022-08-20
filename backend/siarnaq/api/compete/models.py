@@ -1,4 +1,5 @@
 import uuid
+import random
 
 from django.db import models
 
@@ -363,15 +364,44 @@ class ScrimmageRequest(models.Model):
 
     def is_alternating_color(self):
         """Determine whether the requested color alternates between games."""
-        raise NotImplementedError
+        return self.color in [PlayerColor.ALTERNATE_RED,
+                              PlayerColor.ALTERNATE_BLUE,
+                              PlayerColor.ALTERNATE_RANDOM]
 
     def is_requester_red_first(self):
         """
         Determine whether the requester will be red in the first game.
         Not guaranteed to behave deterministcally for random selections.
         """
-        raise NotImplementedError
+        if self.color[1] == "R":
+            return True
+        elif self.color[1] == "B":
+            return False
+        else:
+            return bool(random.randgetbits(1))
+
+    def create_participant(self, team):
+        """
+        Create a match participant object for a team using
+        the team's active submission.
+        TODO: maybe should be a member function of Team
+        """
+        submission = team.get_active_submission()
+        participant = MatchParticipant(team=team,
+                                            submission=submission) # TODO: rating      
+        return participant
 
     def create_match(self):
         """Create and save a match object from this scrimmage request."""
-        raise NotImplementedError
+        red = self.create_participant(self.requested_by)
+        blue = self.create_participant(self.requested_to)
+        if not self.is_requester_red_first():
+            red, blue = blue, red
+        m = Match(epsiode=self.episode,
+                     red=red,
+                     blue=blue,
+                     maps=self.maps,
+                     alternate_color=self.is_alternating_color(),
+                     is_ranked=self.is_ranked)
+        m.save()        
+        
