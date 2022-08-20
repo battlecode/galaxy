@@ -51,7 +51,7 @@ class UserProfile(models.Model):
     kerberos = models.SlugField(max_length=16, blank=True)
     """The kerberos username of the user, if an MIT student."""
 
-    has_avatar = models.BooleanField(default=False)
+    has_avatar = models.BooleanField(default=False) # what about the avatar file name?
     """Whether the user has an uploaded avatar."""
 
     has_resume = models.BooleanField(default=False)
