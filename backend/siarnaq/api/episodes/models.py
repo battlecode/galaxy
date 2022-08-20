@@ -1,4 +1,6 @@
+from django.apps import apps
 from django.db import models
+from django.db.models import Count, Q
 
 import siarnaq.api.refs as refs
 
@@ -182,7 +184,33 @@ class Tournament(models.Model):
         Seed the tournament with eligible teamsn in order of decreasing rating, and
         populate the Challonge brackets.
         """
-        raise NotImplementedError
+        teams = (
+            apps.get_model("teams", "Team")
+            .objects.annotate(
+                includes_met=Count(
+                    "profile__eligible_for",
+                    filter=Q(profile__eligible_for__in=self.eligibility_includes),
+                ),
+                excludes_met=Count(
+                    "profile__eligible_for",
+                    filter=Q(profile__eligible_for__in=self.eligibility_excludes),
+                ),
+            )
+            .filter(
+                episode=self.episode,
+                includes_met=self.eligibility.count(),
+                excludes_met=0,
+            )
+        )
+        if self.require_resume:
+            teams = teams.annotate(
+                members_without_resume=Count(
+                    "members__profile__has_resume",
+                    filter=Q(members__profile__has_resume=False),
+                )
+            ).filter(members_without_resume=0)
+        teams = [team for team in teams if team.can_participate_tournament()]
+        # TODO: send to challonge
 
     def start_progress(self):
         """Start or resume the tournament."""
