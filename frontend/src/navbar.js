@@ -41,6 +41,7 @@ class NavBar extends Component {
 class NavBarAccount extends Component {
   constructor() {
     super();
+    // This is odd, see #93 for explanation
     this.state = { logged_in: null };
   }
   componentDidMount() {
@@ -51,6 +52,7 @@ class NavBarAccount extends Component {
   }
 
   render() {
+    // This is odd, see #93 for explanation
     if (this.state.logged_in) {
       return (
         <ul className="nav navbar-nav navbar-right">
@@ -75,6 +77,7 @@ class NavBarAccount extends Component {
         </ul>
       );
     }
+    // This is odd, see #93 for explanation
     return <ul />;
   }
 }
