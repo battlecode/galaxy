@@ -107,7 +107,12 @@ class Submission(SaturnInvocation):
 
     def enqueue_options(self):
         """Return the options to be submitted to the compilation queue."""
-        raise NotImplementedError
+        return {
+            "id": self.pk,
+            "episode": self.episode_id,
+            "source": ...,  # TODO
+            "binary": ...,
+        }
 
 
 class MatchParticipant(models.Model):
@@ -231,7 +236,12 @@ class Match(SaturnInvocation):
 
     def enqueue_options(self):
         """Return the options to be submitted to the execution queue."""
-        raise NotImplementedError
+        return {
+            "id": self.pk,
+            "episode": self.episode_id,
+            "replay-path": ...,
+            "map": ...,
+        }
 
     def can_see_teams(self, user):
         """Check whether a user is allowed to view the participants in this match."""
