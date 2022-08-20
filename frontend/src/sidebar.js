@@ -73,7 +73,7 @@ class SideBar extends Component {
 
   // Note that this duplicates a method in submissions.js;
   // this will be cleaned up. See #74
-  isSubmissionEnabled() {
+  isGameReleasedForUser() {
     if (this.state.user.is_staff == true) {
       return true;
     }
@@ -153,8 +153,9 @@ class SideBar extends Component {
               />
             )}
 
-            {/* Only visible when on a team AND submissions are enabled */}
-            {this.state.on_team && this.isSubmissionEnabled() && (
+            {/* #74 considers combining these two checks and &&, into one*/}
+            {/* Only visible when on a team AND game is released */}
+            {this.state.on_team && this.isGameReleasedForUser() && (
               <NLink
                 to={`/${this.state.episode}/submissions`}
                 icon={"pe-7s-up-arrow"}
@@ -162,12 +163,12 @@ class SideBar extends Component {
               />
             )}
 
-            {/* Only visible when on a team AND submissions are enabled
+            {/* Only visible when on a team AND game is released
             Tried to de-dupe, but expressions must return only one JSX element,
             and I couldn't get both NLinks to be in the same element while still looking ok
             Do at your own risk
             - Nathan */}
-            {this.state.on_team && this.isSubmissionEnabled() && (
+            {this.state.on_team && this.isGameReleasedForUser() && (
               <NLink
                 to={`/${this.state.episode}/scrimmaging`}
                 icon={"pe-7s-joy"}
