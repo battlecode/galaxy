@@ -30,6 +30,7 @@ class SideBar extends Component {
     this.state = { on_team: null, logged_in: null, user: {}, league: {} };
   }
 
+  // This is messy, will clean in #91
   componentDidMount() {
     // Yes, the method surrounding loginCheck is duped across index, sidebar, and navbar.
     // But, it's just one method and one identical bit of code.
