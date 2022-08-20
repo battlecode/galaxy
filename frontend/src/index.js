@@ -109,6 +109,7 @@ class App extends Component {
 
   componentDidMount() {
     // duped in various places, see sidebar.js
+    // This is messy and hard to understand, it will be cleaned in #91.
     Api.loginCheck((logged_in) => {
       this.setState({ logged_in });
     });
@@ -118,6 +119,7 @@ class App extends Component {
     });
 
     Api.getUserTeam((user_team_data) => {
+      // This should be cleaned up in #91
       this.setState({ on_team: user_team_data !== null });
     });
   }
