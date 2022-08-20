@@ -64,6 +64,16 @@ _An important caveat:_ Don't merge terrible-quality work, of course. The effort 
 
 Feel free to adjust those minute values as you see fit, especially given the ebbs and flows of team workload and team size/bandwidth/resources/time. The general practices still hold and would still be useful.
 
+### Engineering Principles
+
+Write **well-written code**. In particular, prefer code that's **ETU**, SFB, and RFC (thanks 6.031!). Especially here, _simplicity is good_, especially given lack of working resources.
+
+From that, modularity is also good, since this makes code much more easy to reason with and understand. This modularity can be found in many pairs of components: between back and frontend, _and between each part of frontend (e.g. between api and other things_), and finally within the same component too.
+
+Another practice that keep things simple is only deriving/manipulating each piece of data in one place, and then passing it down as-is in other places, as much as possible. This especially helps you reason with data being communicated back and forth.
+
+(While code that is performant or cool has its merits, such merits aren't as valuable in the fast-moving development of Battlecode)
+
 ## Local Development Instructions
 
 ### One-Time Setup
