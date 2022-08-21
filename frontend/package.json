@@ -7,6 +7,7 @@
     "jquery": "^3.6.0",
     "js-cookie": "^2.2.1",
     "moment": "^2.29.4",
+    "prettier": "2.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-floater": "^0.8.2",
