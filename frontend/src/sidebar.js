@@ -85,7 +85,7 @@ class SideBar extends Component {
         <div className="sidebar-wrapper">
           <div className="logo">
             <a href="/home">
-              <img src="../assets/img/logo.png" />
+              <img src="../bc/img/logo.png" />
             </a>
             <p>Battlecode 2022</p>
           </div>
