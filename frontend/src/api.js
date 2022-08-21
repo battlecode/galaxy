@@ -16,6 +16,14 @@ const SCRIMMAGE_STATUS = {
   CANCELLED: 7,
 };
 
+// NOTE: CHANGE THESE FOR EVERY UPCOMING DEADLINE
+// Note the UTC timezone, change for daylight savings, etc, as necessary
+// (UTC-5 is the usual timezone for Cambridge in January)
+const NEXT_TOUR_SUBMISSION_DEADLINE = new Date(
+  "January 27, 2022 19:00:00-5:00"
+);
+const NEXT_TOUR_NAME = "Final Tournaments";
+
 class Api {
   static testSetOutcome() {}
 
@@ -690,13 +698,14 @@ class Api {
   static getNextTournament(callback) {
     // These dates are for submission deadlines, not tournaments!
     // Will be made dynamic and better, see #75
+
     callback({
-      est_date_str: "7 PM ET on January 27, 2022",
+      date: NEXT_TOUR_SUBMISSION_DEADLINE,
       seconds_until:
         (Date.parse(new Date("January 27, 2022 19:00:00-5:00")) -
           Date.parse(new Date())) /
         1000,
-      tournament_name: "Final Tournaments",
+      tournament_name: NEXT_TOUR_NAME,
     });
   }
 

@@ -18,22 +18,43 @@ class Countdown extends Component {
 
   componentDidMount() {
     Api.getNextTournament((tournament_info) => {
-      const d = new Date();
-      this.setState({
-        end_date: new Date(
-          Date.parse(new Date()) -
-            0 * 60 * 1000 +
-            1000 * tournament_info["seconds_until"]
-        ),
-        tournament_name: tournament_info["tournament_name"],
-        est_date: tournament_info["est_date_str"],
+      // Note that state updates asynchronously,
+      // but we need it immediately for computation
+      // so we can't directly set state here
+      // Instead work around that, and still hold references,
+      // by using other component vars
+      this.date = tournament_info.date;
+
+      // Use US localization for standardization in date format
+      const est_string = this.date.toLocaleString("en-US", {
+        timeZone: "EST",
       });
+      // need to pass weekday here, since weekday isn't shown by default
+      const est_day_of_week = this.date.toLocaleString("en-US", {
+        timeZone: "EST",
+        weekday: "short",
+      });
+      this.setState({
+        est_date_str: `${est_day_of_week}, ${est_string} Eastern Time`,
+      });
+
+      // Allow for localization here
+      const locale_string = this.date.toLocaleString();
+      const locale_day_of_week = this.date.toLocaleString([], {
+        weekday: "short",
+      });
+      this.setState({
+        local_date_str: `${locale_day_of_week}, ${locale_string} in your locale and time zone`,
+      });
+
       const date = this.calculateCountdown(this.state.end_date);
       date ? this.setState(date) : this.stop();
       this.interval = setInterval(() => {
         const date = this.calculateCountdown(this.state.end_date);
         date ? this.setState(date) : this.stop();
       }, 1000);
+
+      this.setState({ tournament_name: tournament_info.tournament_name });
     });
   }
 
@@ -103,7 +124,8 @@ class Countdown extends Component {
     let explanatoryText = (
       <div>
         The submission deadline for the <b>{this.state.tournament_name}</b> is
-        at <b>{this.state.est_date}</b>.
+        at {this.state.est_date_str}, which is{" "}
+        <b>{this.state.local_date_str}</b>.
       </div>
     );
     // let explanatoryText = <div>The submission deadline has not been set yet.</div>;
