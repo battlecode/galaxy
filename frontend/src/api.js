@@ -25,7 +25,9 @@ class Api {
   static newSubmission(submissionfile, callback) {
     // First check if the user is part of a team
     if (Cookies.get("team_id") === null) {
-      alert("File cannot be submitted without a team. (If you think you're on a team, check that your cookies are enabled.");
+      alert(
+        "File cannot be submitted without a team. (If you think you're on a team, check that your cookies are enabled."
+      );
       return;
     }
 
@@ -98,12 +100,7 @@ class Api {
           });
       })
       .fail((xhr, status, error) => {
-        console.log(
-          "Error in downloading submission: ",
-          xhr,
-          status,
-          error
-        );
+        console.log("Error in downloading submission: ", xhr, status, error);
       });
   }
 
@@ -470,7 +467,13 @@ class Api {
         callback(data);
       })
       .fail((xhr, status, error) => {
-        console.log("Error in getting profile for user: ", username, xhr, status, error);
+        console.log(
+          "Error in getting profile for user: ",
+          username,
+          xhr,
+          status,
+          error
+        );
       });
 
     $.ajaxSetup({
@@ -813,7 +816,12 @@ class Api {
     $.post(`${URL}/api/password_reset/confirm/`, req, (data, success) => {
       callback(data, success);
     }).fail((xhr, status, error) => {
-      console.log("Error in API call for resetting password: ", xhr, status, error);
+      console.log(
+        "Error in API call for resetting password: ",
+        xhr,
+        status,
+        error
+      );
     });
   }
 
