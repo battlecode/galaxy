@@ -18,7 +18,7 @@ class GettingStarted extends Component {
     super(props);
     this.state = {
       ide: "intellij",
-      year :  this.props.match.params.year
+      year: this.props.match.params.year,
     };
   }
 
@@ -70,7 +70,9 @@ class GettingStarted extends Component {
               <code>File {">"} Settings</code> (
               <code>IntelliJ IDEA {">"} Preferences</code> on Mac) or{" "}
               <code>ctrl+alt+s</code>. Navigate to{" "}
-              <code>Build, Execution, Deployment {">"} Build Tools {">"} Gradle</code>{" "}
+              <code>
+                Build, Execution, Deployment {">"} Build Tools {">"} Gradle
+              </code>{" "}
               and change <code>Gradle JVM</code> to 1.8
             </li>
 
@@ -78,10 +80,13 @@ class GettingStarted extends Component {
               Time for a first build! On the right side of the screen, click the
               small button that says gradle and has a picture of an elephant.
               Navigate to
-              <code>battlecode22-scaffold {">"} Tasks {">"} battlecode</code> and double
-              click on <code>update</code> and then <code>build</code>. This
-              will run tests to verify that everything is working correctly, as
-              well as download the client and other resources.
+              <code>
+                battlecode22-scaffold {">"} Tasks {">"} battlecode
+              </code>{" "}
+              and double click on <code>update</code> and then{" "}
+              <code>build</code>. This will run tests to verify that everything
+              is working correctly, as well as download the client and other
+              resources.
             </li>
 
             <li>If you haven't seen any errors, you should be good to go.</li>
@@ -243,10 +248,10 @@ class GettingStarted extends Component {
                 </div>
                 <div className="content">
                   <p>
-                    This is the Battlecode {this.state.year} contest website, which will be
-                    your main hub for all Battlecode-related things for the
-                    duration of the contest. For a general overview of what
-                    Battlecode is, visit{" "}
+                    This is the Battlecode {this.state.year} contest website,
+                    which will be your main hub for all Battlecode-related
+                    things for the duration of the contest. For a general
+                    overview of what Battlecode is, visit{" "}
                     <a href="https://battlecode.org">our landing page</a>.
                   </p>
                   <p>
