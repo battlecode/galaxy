@@ -31,10 +31,9 @@ class Resources extends Component {
                     >
                       Specifications for 2022!
                     </a>
-
                   </p>
                   <p className="text-center">
-                  <a
+                    <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
                       href="https://play.battlecode.org/javadocs/2022/index.html"
