@@ -140,7 +140,8 @@ h5 {
   /* Toggle text color depending on whether background is light or dark */
 }
 
-ul:not(.nav), ol {
+ul:not(.nav),
+ol {
   /* Styled the same as <p/> from Bootstrap
   Allows our ul and ol to look like p, 
   without having to be nested in a p (which is illegal) */
@@ -190,4 +191,3 @@ ul:not(.nav), ol {
 .countdown-container {
   text-align: center;
 }
-

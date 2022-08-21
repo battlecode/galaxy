@@ -133,7 +133,8 @@ class Issues extends Component {
                       <li>
                         You can enable auto-updates in IntelliJ by navigating to{" "}
                         <code>
-                          settings {">"} build, execution, deployment {">"} Gradle
+                          settings {">"} build, execution, deployment {">"}{" "}
+                          Gradle
                         </code>{" "}
                         and checking{" "}
                         <code>
