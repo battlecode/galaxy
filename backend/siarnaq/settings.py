@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework_simplejwt",
     "siarnaq.api.accounts",
     "siarnaq.api.compete",
     "siarnaq.api.episodes",
@@ -114,6 +115,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Authentication with simple JWT
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
