@@ -13,6 +13,9 @@ dependencies:
   - isort
   - mypy
   - openssl
+  - pip
   - pre_commit
   - python=3.10
   - pyupgrade
+  - pip:
+    - djangorestframework-simplejwt
