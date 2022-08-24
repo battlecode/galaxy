@@ -4,6 +4,7 @@
 
 Galaxy is the framework that powers the infrastructure for MIT Battlecode.
 The galaxy consists of two main parts:
+
 - Saturn, the compute cluster that compiles competitor bots and runs matches.
 - Siarnaq, the competitor dashboard that interfaces with our data storage.
 
@@ -26,7 +27,7 @@ The `main` branch is protected and pushes to `main` will be rejected.
 
 We will be using the [Projects](https://github.com/battlecode/galaxy/projects/1) feature to track our todo list. Issues should only be used for bugs.
 
-To start a feature, *claim* it on the Projects page by moving it to the "In Progress" column and adding your name to it. Then you can work on it on a git branch.
+To start a feature, _claim_ it on the Projects page by moving it to the "In Progress" column and adding your name to it. Then you can work on it on a git branch.
 
 In places where it makes sense, it could be good to write test cases, although a lot of the functionality might not be very testable.
 

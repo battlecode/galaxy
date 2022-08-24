@@ -1,5 +1,5 @@
 # this is for managing terraform state, which we store in the following bucket
-# Note: if you're making a new project, you (probably) have to create this bucket first manually, 
+# Note: if you're making a new project, you (probably) have to create this bucket first manually,
 # before the rest of Terraform can work.
 
 # Create a GCS Bucket

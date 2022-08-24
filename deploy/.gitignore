@@ -1,7 +1,7 @@
 terraform-automation-key.json
 battlecode22-deploy-key.json
 # secret files are in json format, conservatively ignore all of jsons to prevent accidental pushes
-*.json 
+*.json
 
 # Terraform files
 .terraform
