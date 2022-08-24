@@ -4,6 +4,7 @@ channels:
 dependencies:
   - black
   - ca-certificates
+  - click<8.1.0
   - django
   - django-stubs
   - djangorestframework
