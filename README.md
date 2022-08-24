@@ -24,8 +24,8 @@ Please follow these steps carefully to ensure your development environment is in
 Develop new features on branches and use pull-requests to request code-review.
 The `main` branch is protected and pushes to `main` will be rejected.
 
-We will be using the [Projects](https://github.com/battlecode/galaxy/projects/1) feature to track our todo list.
-Entries in the "todo" column are allowed to simply be items created in the project board, but once the entry moves to one of the other columns (e.g. "in progress"), please convert the entry into an issue for easier discussion and reference in PRs.
+We will be using the [Projects](https://github.com/battlecode/galaxy/projects?type=classic) feature to track our todo list.
+Entries in the "To do" column are allowed to simply be items created in the project board, but once the entry moves to one of the other columns (e.g. "In progress"), please convert the entry into an issue for easier discussion and reference in PRs.
 
 To start a feature, *claim* it on the Projects page by moving it to the "In Progress" column and adding your name to it. Then you can work on it on a git branch.
 
