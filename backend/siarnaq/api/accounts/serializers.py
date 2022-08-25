@@ -12,13 +12,4 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = [
-            "user",
-            "gender",
-            "gender_details",
-            "school",
-            "biography",
-            "kerberos",
-            "has_avatar",
-            "has_resume",
-        ]
+        fields = ["user", "school", "biography", "has_avatar"]
