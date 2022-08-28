@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
-    "siarnaq.api.accounts",
+    "siarnaq.api.user",
     "siarnaq.api.compete",
     "siarnaq.api.episodes",
     "siarnaq.api.teams",
@@ -95,7 +95,7 @@ DATABASES = {
 # Custom user model
 # https://docs.djangoproject.com/en/4.0/topics/auth/customizing
 
-AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "user.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

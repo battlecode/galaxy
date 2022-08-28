@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from siarnaq.api.accounts.models import User, UserProfile
+from siarnaq.api.user.models import User, UserProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,3 +12,4 @@ class UserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
+        fields = ["user", "school", "biography", "has_avatar"]
