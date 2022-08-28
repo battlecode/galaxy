@@ -2,8 +2,8 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 
-from siarnaq.api.accounts.models import UserProfile
-from siarnaq.api.accounts.serializers import UserProfileSerializer
+from siarnaq.api.user.models import UserProfile
+from siarnaq.api.user.serializers import UserProfileSerializer
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):

@@ -1,7 +1,7 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from siarnaq.api.accounts import views
+from siarnaq.api.user import views
 
 router = DefaultRouter()
 router.register("profile", views.UserProfileViewSet, basename="profile")
