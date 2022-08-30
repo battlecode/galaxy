@@ -10,7 +10,8 @@ import GettingStarted from "./views/getting-started";
 import Scrimmaging from "./views/scrimmaging";
 import Tournaments from "./views/tournaments";
 import Updates from "./views/updates";
-import Search from "./views/search";
+// commented but kept since we might use this later
+// import Search from "./views/search";
 import Team from "./views/team";
 import Issues from "./views/issues";
 import Debugging from "./views/debugging";
@@ -47,7 +48,8 @@ class App extends Component {
       <Route exact path={`/`} component={Home} key="home-blank" />,
       <Route path={`/home`} component={Home} key="home" />,
       <Route path={`/updates`} component={Updates} key="updates" />,
-      <Route path={`/search`} component={Search} key="search" />,
+      // commented but kept since we might use this later
+      // <Route path={`/search`} component={Search} key="search" />,
       <Route path={`/tournaments`} component={Tournaments} key="tournaments" />,
       <Route
         path={`/:year/getting-started`}
