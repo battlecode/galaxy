@@ -1,4 +1,4 @@
-﻿import React, { Component } from "react";
+import React, { Component } from "react";
 import styled from "styled-components";
 
 const He = styled.h5`
@@ -39,6 +39,31 @@ class Resources extends Component {
                       href="https://play.battlecode.org/javadocs/2022/index.html"
                     >
                       Javadocs for 2022!
+                    </a>
+                  </p>
+                </div>
+              </div>
+              <div className="card">
+                <div className="header">
+                  <h4 className="title">Coding Resources</h4>
+                </div>
+                <div className="content">
+                  <p className="text-center">
+                    <a
+                      type="button"
+                      className="btn btn-info btn-fill text-center"
+                      href="/2022/getting-started"
+                    >
+                      Getting Started
+                    </a>
+                  </p>
+                  <p className="text-center">
+                    <a
+                      type="button"
+                      className="btn btn-info btn-fill text-center"
+                      href="/debugging"
+                    >
+                      Debugging Tips
                     </a>
                   </p>
                 </div>
