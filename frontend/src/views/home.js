@@ -59,7 +59,7 @@ class DateCard extends UpdateCard {
 
   render() {
     return (
-      <div className="card ">
+      <div className="card">
         <div className="header">
           <h4 className="title">Recent Updates</h4>
           <p className="category">
@@ -98,7 +98,7 @@ class InstrCard extends UpdateCard {
 
   render() {
     return (
-      <div className="card ">
+      <div className="card">
         <div className="header">
           <h4 className="title">Welcome to Battlecode 2022!</h4>
         </div>
@@ -126,7 +126,7 @@ class LinksCard extends Component {
 
   render() {
     return (
-      <div className="card ">
+      <div className="card">
         <div className="header">
           <h4 className="title">Useful Links</h4>
         </div>
