@@ -19,6 +19,7 @@ const SCRIMMAGE_STATUS = {
 // NOTE: CHANGE THESE FOR EVERY UPCOMING DEADLINE
 // Note the UTC timezone, change for daylight savings, etc, as necessary
 // (UTC-5 is the usual timezone for Cambridge in January)
+const HAS_NEXT_TOUR = false;
 const NEXT_TOUR_SUBMISSION_DEADLINE = new Date(
   "January 27, 2022 19:00:00-5:00"
 );
@@ -700,7 +701,11 @@ class Api {
     // Will be made dynamic and better, see #75
 
     callback({
-      date: NEXT_TOUR_SUBMISSION_DEADLINE,
+      has_next_tournament: HAS_NEXT_TOUR,
+      // TODO API spec design notes: ^ should return false if there is no tour deadline in DB,
+      // or if the latest tour (/ all tour) deadlines have passed.
+      // Return true otherwise.
+      submission_deadline: NEXT_TOUR_SUBMISSION_DEADLINE,
       seconds_until:
         (Date.parse(new Date("January 27, 2022 19:00:00-5:00")) -
           Date.parse(new Date())) /
