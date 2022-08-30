@@ -6,6 +6,8 @@ class Countdown extends Component {
     super();
 
     this.state = {
+      submission_deadline: undefined,
+      text_submission_deadline: undefined,
       days: 0,
       hours: 0,
       min: 0,
@@ -38,6 +40,9 @@ class Countdown extends Component {
       }, 1000);
 
       this.setState({ tournament_name: tournament_info.tournament_name });
+      this.setState({
+        has_next_tournament: tournament_info.has_next_tournament,
+      });
     });
   }
 
@@ -65,13 +70,25 @@ class Countdown extends Component {
 
   refreshCountdown() {
     const countdownResult = this.calculateCountdown(this.submission_deadline);
-    countdownResult ? this.setState(countdownResult) : this.stop();
+    if (countdownResult !== false) {
+      this.setState(countdownResult);
+      this.setState({
+        did_submission_deadline_pass: false,
+      });
+    } else {
+      this.stop();
+      this.setState({
+        did_submission_deadline_pass: true,
+      });
+    }
   }
 
   componentWillUnmount() {
     this.stop();
   }
 
+  // If endDate is in the future: returns a dict of {years:, ..., sec:} representing the time left
+  // If not: returns false
   calculateCountdown(endDate) {
     let diff = (Date.parse(new Date(endDate)) - Date.parse(new Date())) / 1000;
 
@@ -126,21 +143,24 @@ class Countdown extends Component {
 
   render() {
     const countDown = this.state;
-    let title = "Submission Deadline in";
-    if (this.state.tournament_name == "START") {
-      title = "Game Specs are now released!";
-    }
+    let title = "Submission Deadline";
+    let tense_verb = this.state.did_submission_deadline_pass ? "was" : "is";
+
     // Needs to be cleaned, see issue #16 for tracking this and discussion
-    let explanatoryText = (
+    let explanatoryText = this.state.has_next_tournament ? (
       <div>
-        The submission deadline for the <b>{this.state.tournament_name}</b> is
-        at {this.state.est_date_str}, which is{" "}
-        <b>{this.state.local_date_str}</b>.
+        The submission deadline for the <b>{this.state.tournament_name}</b>{" "}
+        {tense_verb} at {this.state.text_submission_deadline.est_date_str},
+        which {tense_verb}{" "}
+        <b>{this.state.text_submission_deadline.local_date_str}</b>.
+      </div>
+    ) : (
+      <div>
+        The submission deadline for the next tournament has not been set yet.
       </div>
     );
-    // let explanatoryText = <div>The submission deadline has not been set yet.</div>;
 
-    let countdown = (
+    let countdown = this.state.has_next_tournament ? (
       <div className="countdown-container">
         <div className="Countdown">
           <span className="Countdown-col">
@@ -172,18 +192,8 @@ class Countdown extends Component {
           </span>
         </div>
       </div>
-    );
+    ) : undefined;
 
-    if (this.state.tournament_name == "START") {
-      explanatoryText = (
-        <div>
-          Specifications are avaliable in the resources tab. Be sure to look at
-          the getting started section for information on how to get the game and
-          your first bot running!{" "}
-        </div>
-      );
-      countdown = null;
-    }
     return (
       <div className="card">
         <div className="header">
