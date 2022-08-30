@@ -264,34 +264,33 @@ class Api {
 
   //----SEARCHING----
 
-  static search(query, callback) {
-    const encodedQuery = encodeURIComponent(query);
-    const teamUrl = `${URL}/api/${LEAGUE}/team/?search=${encodedQuery}&page=1`;
-    const userUrl = `${URL}/api/user/profile/?search=${encodedQuery}&page=1`;
-    $.get(teamUrl, (teamData) => {
-      $.get(userUrl, (userData) => {
-        const teamLimit =
-          parseInt(teamData.count / PAGE_LIMIT, 10) +
-          !!(teamData.count % PAGE_LIMIT);
-        const userLimit =
-          parseInt(userData.count / PAGE_LIMIT, 10) +
-          !!(userData.count % PAGE_LIMIT);
-        callback({
-          users: userData.results,
-          userLimit,
-          userPage: 1,
-          teams: teamData.results,
-          teamLimit,
-          teamPage: 1,
-        });
-      });
-    });
-  }
-  static searchTeamRanking(query, page, callback) {
-    Api.searchRanking(`${URL}/api/${LEAGUE}/team`, query, page, callback);
-  }
+  // Unused and deprecated.
+  // Kept in case we want to use it again; might require updates to code
+  // static search(query, callback) {
+  //   const encodedQuery = encodeURIComponent(query);
+  //   const teamUrl = `${URL}/api/${LEAGUE}/team/?search=${encodedQuery}&page=1`;
+  //   const userUrl = `${URL}/api/user/profile/?search=${encodedQuery}&page=1`;
+  //   $.get(teamUrl, (teamData) => {
+  //     $.get(userUrl, (userData) => {
+  //       const teamLimit =
+  //         parseInt(teamData.count / PAGE_LIMIT, 10) +
+  //         !!(teamData.count % PAGE_LIMIT);
+  //       const userLimit =
+  //         parseInt(userData.count / PAGE_LIMIT, 10) +
+  //         !!(userData.count % PAGE_LIMIT);
+  //       callback({
+  //         users: userData.results,
+  //         userLimit,
+  //         userPage: 1,
+  //         teams: teamData.results,
+  //         teamLimit,
+  //         teamPage: 1,
+  //       });
+  //     });
+  //   });
+  // }
 
-  static searchStaffOnlyRanking(query, page, callback) {
+  static searchTeamRanking(query, page, callback) {
     Api.searchRanking(`${URL}/api/${LEAGUE}/team`, query, page, callback);
   }
 
