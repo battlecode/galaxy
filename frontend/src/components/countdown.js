@@ -22,40 +22,50 @@ class Countdown extends Component {
       // but we need it immediately for computation
       // so we can't directly set state here
       // Instead work around that, and still hold references,
-      // by using other component vars
-      this.date = tournament_info.date;
+      // by using other component vars.
+      // Also note that this.date doesn't get rendered directly; variables derived from it do.
+      // So any changes to this.date will still have to require refreshes,
+      // regardless of whether this.data is part of state or not.
+      this.submission_deadline = tournament_info.submission_deadline;
+      const text_submission_deadline = this.getDateTimeText(
+        this.submission_deadline
+      );
+      console.log(text_submission_deadline);
+      this.setState({ text_submission_deadline });
 
-      // Use US localization for standardization in date format
-      const est_string = this.date.toLocaleString("en-US", {
-        timeZone: "EST",
-      });
-      // need to pass weekday here, since weekday isn't shown by default
-      const est_day_of_week = this.date.toLocaleString("en-US", {
-        timeZone: "EST",
-        weekday: "short",
-      });
-      this.setState({
-        est_date_str: `${est_day_of_week}, ${est_string} Eastern Time`,
-      });
-
-      // Allow for localization here
-      const locale_string = this.date.toLocaleString();
-      const locale_day_of_week = this.date.toLocaleString([], {
-        weekday: "short",
-      });
-      this.setState({
-        local_date_str: `${locale_day_of_week}, ${locale_string} in your locale and time zone`,
-      });
-
-      const date = this.calculateCountdown(this.state.end_date);
-      date ? this.setState(date) : this.stop();
       this.interval = setInterval(() => {
-        const date = this.calculateCountdown(this.state.end_date);
-        date ? this.setState(date) : this.stop();
+        this.refreshCountdown();
       }, 1000);
 
       this.setState({ tournament_name: tournament_info.tournament_name });
     });
+  }
+
+  getDateTimeText(date) {
+    // Use US localization for standardization in date format
+    const est_string = date.toLocaleString("en-US", {
+      timeZone: "EST",
+    });
+    // need to pass weekday here, since weekday isn't shown by default
+    const est_day_of_week = date.toLocaleString("en-US", {
+      timeZone: "EST",
+      weekday: "short",
+    });
+    const est_date_str = `${est_day_of_week}, ${est_string} Eastern Time`;
+
+    // Allow for localization here
+    const locale_string = date.toLocaleString();
+    const locale_day_of_week = date.toLocaleString([], {
+      weekday: "short",
+    });
+    const local_date_str = `${locale_day_of_week}, ${locale_string} in your locale and time zone`;
+
+    return { est_date_str: est_date_str, local_date_str: local_date_str };
+  }
+
+  refreshCountdown() {
+    const countdownResult = this.calculateCountdown(this.submission_deadline);
+    countdownResult ? this.setState(countdownResult) : this.stop();
   }
 
   componentWillUnmount() {
