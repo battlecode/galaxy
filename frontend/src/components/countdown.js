@@ -175,7 +175,7 @@ class Countdown extends Component {
       countdown = null;
     }
     return (
-      <div className="card ">
+      <div className="card">
         <div className="header">
           <h4 className="title">{title}</h4>
         </div>
