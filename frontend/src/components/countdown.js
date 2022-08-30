@@ -5,36 +5,28 @@ class Countdown extends Component {
   constructor() {
     super();
 
+    // Initialize defaults to render before API call finishes
+    // Make sure this is as minimal as possible
     this.state = {
-      submission_deadline: undefined,
-      text_submission_deadline: undefined,
       days: 0,
       hours: 0,
       min: 0,
       sec: 0,
-      end_date: null,
-      tournament_name: "",
-      est_date: "",
     };
   }
 
   componentDidMount() {
     Api.getNextTournament((tournament_info) => {
-      // Note that state updates asynchronously,
-      // but we need it immediately for computation
-      // so we can't directly set state here
-      // Instead work around that, and still hold references,
-      // by using other component vars.
-      // Also note that this.date doesn't get rendered directly; variables derived from it do.
-      // So any changes to this.date will still have to require refreshes,
-      // regardless of whether this.data is part of state or not.
+      // Note that state updates asynchronously, but we need it immediately for computation.
+      // So we can't only set state here
       this.submission_deadline = tournament_info.submission_deadline;
+      this.setState({ submission_deadline: this.submission_deadline });
       const text_submission_deadline = this.getDateTimeText(
         this.submission_deadline
       );
-      console.log(text_submission_deadline);
       this.setState({ text_submission_deadline });
 
+      this.refreshCountdown();
       this.interval = setInterval(() => {
         this.refreshCountdown();
       }, 1000);
@@ -101,7 +93,6 @@ class Countdown extends Component {
       hours: 0,
       min: 0,
       sec: 0,
-      millisec: 0,
     };
 
     // calculate time difference between now and expected date
@@ -134,6 +125,7 @@ class Countdown extends Component {
   }
 
   addLeadingZeros(value) {
+    // TODO consider a npm package for this. Just use leftpad etc
     value = String(value);
     while (value.length < 2) {
       value = "0" + value;
