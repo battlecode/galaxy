@@ -706,10 +706,6 @@ class Api {
       // or if the latest tour (/ all tour) deadlines have passed.
       // Return true otherwise.
       submission_deadline: NEXT_TOUR_SUBMISSION_DEADLINE,
-      seconds_until:
-        (Date.parse(new Date("January 27, 2022 19:00:00-5:00")) -
-          Date.parse(new Date())) /
-        1000,
       tournament_name: NEXT_TOUR_NAME,
     });
   }
