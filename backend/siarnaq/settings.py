@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 import google.auth
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     "siarnaq.api.compete",
     "siarnaq.api.episodes",
     "siarnaq.api.teams",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -121,8 +123,28 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+# Templates
+# https://docs.djangoproject.com/en/4.1/topics/templates/
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "siarnaq/templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
