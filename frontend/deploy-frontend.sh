@@ -24,5 +24,3 @@ cd ..
 gsutil -m setmeta -h "Cache-Control:no-cache" gs://$BUCKET_NAME/**
 # Set home-page; see readme for info
 gsutil web set -m index.html -e index.html gs://$BUCKET_NAME
-
-
