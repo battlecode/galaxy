@@ -3,7 +3,7 @@ import React, { Component } from "react";
 class UpdateCard extends Component {
   /*
     a card that displays the time when its content was last updated
-    default is to just show "time when it loaded" which is not automatically 
+    default is to just show "time when it loaded" which is not automatically
     updated/so not really ideal
     */
 
