@@ -59,6 +59,8 @@ Move code into a Manager if it makes implementation easier.
    You shouldn't commit this either.
 1. Run `./manage.py runserver` to turn on the server!
 
+While developing, you may find the `api/specs/swagger-ui` endpoint userful for viewing and querying the avaiable API.
+
 If you ever get your database into a really broken state, just delete `db.sqlite3` and all the migration files, and start again.
 
 ## How to contribute
