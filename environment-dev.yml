@@ -8,6 +8,7 @@ dependencies:
   - django
   - django-stubs
   - djangorestframework
+  - drf-spectacular
   - flake8
   - google-api-python-client
   - google-cloud-pubsub
