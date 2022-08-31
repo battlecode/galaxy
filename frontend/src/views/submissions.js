@@ -305,7 +305,7 @@ class Submissions extends Component {
             <h4 className="title">Submit Code</h4>
           </div>
           <div className="content">
-            {/* This passage will be dynamically filled, and handle two tours happening w same time 
+            {/* This passage will be dynamically filled, and handle two tours happening w same time
             See #16 */}
             <p>
               <b>
