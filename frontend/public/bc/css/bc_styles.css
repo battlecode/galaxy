@@ -1,9 +1,9 @@
 /* Food for thought:
 You could consider splitting these up into css files for each file.
 For example, the countdown-specific css could go in `countdown.css`.
-This would make the CSS more easy to understand. 
+This would make the CSS more easy to understand.
 But it's not really beneficial in the long run,
-unless the CSS is being heavily edited 
+unless the CSS is being heavily edited
 (eg in a redesign)
 See #79 */
 
@@ -109,8 +109,8 @@ h5 {
   padding-bottom: 4px !important;
 }
 
-/* a container that displays its children as a centered column in desktop site 
-   and as a single row in mobile site 
+/* a container that displays its children as a centered column in desktop site
+   and as a single row in mobile site
    margins need to be important because otherwise bootstrap will override */
 .col-2-row {
   display: flex;
@@ -143,7 +143,7 @@ h5 {
 ul:not(.nav),
 ol {
   /* Styled the same as <p/> from Bootstrap
-  Allows our ul and ol to look like p, 
+  Allows our ul and ol to look like p,
   without having to be nested in a p (which is illegal) */
   font-size: 15px;
   line-height: 1.5;
