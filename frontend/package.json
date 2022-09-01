@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://play.battlecode.org",
   "dependencies": {
+    "duration": "^0.2.2",
     "jquery": "^3.6.0",
     "js-cookie": "^2.2.1",
     "moment": "^2.29.4",
