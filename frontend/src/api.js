@@ -696,6 +696,28 @@ class Api {
 
   //----TOURNAMENTS----
 
+  static getDateTimeText(date) {
+    // Use US localization for standardization in date format
+    const est_string = date.toLocaleString("en-US", {
+      timeZone: "EST",
+    });
+    // need to pass weekday here, since weekday isn't shown by default
+    const est_day_of_week = date.toLocaleString("en-US", {
+      timeZone: "EST",
+      weekday: "short",
+    });
+    const est_date_str = `${est_day_of_week}, ${est_string} Eastern Time`;
+
+    // Allow for localization here
+    const locale_string = date.toLocaleString();
+    const locale_day_of_week = date.toLocaleString([], {
+      weekday: "short",
+    });
+    const local_date_str = `${locale_day_of_week}, ${locale_string} in your locale and time zone`;
+
+    return { est_date_str: est_date_str, local_date_str: local_date_str };
+  }
+
   static getNextTournament(callback) {
     // These dates are for submission deadlines, not tournaments!
     // Will be made dynamic and better, see #75
@@ -706,24 +728,20 @@ class Api {
       // or if the latest tour (/ all tour) deadlines have passed.
       // Return true otherwise.
       submission_deadline: NEXT_TOUR_SUBMISSION_DEADLINE,
+      submission_deadline_strs: this.getDateTimeText(
+        NEXT_TOUR_SUBMISSION_DEADLINE
+      ),
       tournament_name: NEXT_TOUR_NAME,
     });
   }
 
   static getTournaments(callback) {
-    // const tournaments = [
-    //   { name: 'sprint', challonge: 'bc20_sprint', blurb: 'Congrats to <a href="rankings/1158">Bruteforcer</a> for winning the Sprint tournament!'},
-    //   { name: 'seeding', challonge: 'bc20_seeding', blurb: 'Join us on <a href="https://twitch.tv/mitbattlecode">Twitch</a> starting at 3 pm for a livestream starting from the winners round of 32!'},
-    // ];
-
     if ($.ajaxSettings && $.ajaxSettings.headers) {
       delete $.ajaxSettings.headers.Authorization;
     } // we should not require valid login for this.
     $.get(`${URL}/api/${LEAGUE}/tournament/`).done((data, status) => {
       callback(data.results);
     });
-
-    // callback(tournaments);
   }
 
   //----AUTHENTICATION----
