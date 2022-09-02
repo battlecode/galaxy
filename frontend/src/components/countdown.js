@@ -105,16 +105,10 @@ class Countdown extends Component {
   }
 
   addLeadingZeros(value) {
-    // TODO consider a npm package for this. Just use leftpad etc
-    value = String(value);
-    while (value.length < 2) {
-      value = "0" + value;
-    }
-    return value;
+    return String(value).padStart(2, "0");
   }
 
   render() {
-    const countDown = this.state;
     let title = "Submission Deadline";
     let tense_verb = this.state.did_submission_deadline_pass ? "was" : "is";
 
@@ -137,28 +131,28 @@ class Countdown extends Component {
         <div className="Countdown">
           <span className="Countdown-col">
             <span className="Countdown-col-element">
-              <strong>{this.addLeadingZeros(countDown.days)}</strong>
-              <span>{countDown.days === 1 ? "Day" : "Days"}</span>
+              <strong>{this.addLeadingZeros(this.state.days)}</strong>
+              <span>{this.state.days === 1 ? "Day" : "Days"}</span>
             </span>
           </span>
 
           <span className="Countdown-col">
             <span className="Countdown-col-element">
-              <strong>{this.addLeadingZeros(countDown.hours)}</strong>
-              <span>{countDown.hours === 1 ? "Hour" : "Hours"}</span>
+              <strong>{this.addLeadingZeros(this.state.hours)}</strong>
+              <span>{this.state.hours === 1 ? "Hour" : "Hours"}</span>
             </span>
           </span>
 
           <span className="Countdown-col">
             <span className="Countdown-col-element">
-              <strong>{this.addLeadingZeros(countDown.min)}</strong>
+              <strong>{this.addLeadingZeros(this.state.min)}</strong>
               <span>Min</span>
             </span>
           </span>
 
           <span className="Countdown-col">
             <span className="Countdown-col-element">
-              <strong>{this.addLeadingZeros(countDown.sec)}</strong>
+              <strong>{this.addLeadingZeros(this.state.sec)}</strong>
               <span>Sec</span>
             </span>
           </span>
