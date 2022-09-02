@@ -42,6 +42,11 @@ class Submissions extends Component {
         this.setState({ league: l });
       }.bind(this)
     );
+
+    // Set up submission deadline text
+    Api.getNextTournament((tournamentInfo) => {
+      this.setState({ tournamentInfo });
+    });
   }
 
   componentWillUnmount() {
@@ -305,12 +310,22 @@ class Submissions extends Component {
             <h4 className="title">Submit Code</h4>
           </div>
           <div className="content">
-            {/* This passage will be dynamically filled, and handle two tours happening w same time
-            See #16 */}
             <p>
               <b>
-                The submission deadline for the Sprint Tournament 1 is 7 pm ET
-                on Monday 1/10.
+                The submission deadline for the{" "}
+                {this.state.tournamentInfo.tournament_name} is{" "}
+                {
+                  this.state.tournamentInfo.submission_deadline_strs
+                    .est_date_str
+                }
+                , which is{" "}
+                <b>
+                  {
+                    this.state.tournamentInfo.submission_deadline_strs
+                      .local_date_str
+                  }
+                </b>
+                .
               </b>{" "}
               {/* Render if tour name contains "final" or "qual" caps-insensitive. Or something along those lines
               See #16 /}
