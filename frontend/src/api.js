@@ -16,13 +16,16 @@ const SCRIMMAGE_STATUS = {
   CANCELLED: 7,
 };
 
-// NOTE: CHANGE THESE FOR EVERY UPCOMING DEADLINE
+// NOTE: CHANGE THESE FOR EVERY UPCOMING TOURNAMENT AND DEADLINE
 // Note the UTC timezone, change for daylight savings, etc, as necessary
 // (UTC-5 is the usual timezone for Cambridge in January)
 const HAS_NEXT_TOUR = false;
 const NEXT_TOUR_SUBMISSION_DEADLINE = new Date(
   "January 27, 2022 19:00:00-5:00"
 );
+// If there are two tournaments with the same deadline,
+// then on frontend, treat them as one tournament w a plural name, eg "Final Tournaments".
+// (This should get accounted for in #75)
 const NEXT_TOUR_NAME = "Final Tournaments";
 const DOES_TOUR_REQUIRE_RESUME = true;
 
