@@ -24,6 +24,7 @@ const NEXT_TOUR_SUBMISSION_DEADLINE = new Date(
   "January 27, 2022 19:00:00-5:00"
 );
 const NEXT_TOUR_NAME = "Final Tournaments";
+const DOES_TOUR_REQUIRE_RESUME = true;
 
 class Api {
   static testSetOutcome() {}
@@ -724,7 +725,7 @@ class Api {
 
     callback({
       has_next_tournament: HAS_NEXT_TOUR,
-      // TODO API spec design notes: ^ should return false if there is no tour deadline in DB,
+      // for #75: API spec design notes: ^ should return false if there is no tour deadline in DB,
       // or if the latest tour (/ all tour) deadlines have passed.
       // Return true otherwise.
       submission_deadline: NEXT_TOUR_SUBMISSION_DEADLINE,
@@ -732,6 +733,8 @@ class Api {
         NEXT_TOUR_SUBMISSION_DEADLINE
       ),
       tournament_name: NEXT_TOUR_NAME,
+      does_tour_require_resume: DOES_TOUR_REQUIRE_RESUME,
+      // This should be included in the real API response, for #75
     });
   }
 
