@@ -88,7 +88,6 @@ class Countdown extends Component {
     let title = "Submission Deadline";
     let tense_verb = this.state.did_submission_deadline_pass ? "was" : "is";
 
-    // Needs to be cleaned, see issue #16 for tracking this and discussion
     let explanatoryText = this.state.has_next_tournament ? (
       <div>
         The submission deadline for the <b>{this.state.tournament_name}</b>{" "}
