@@ -327,16 +327,18 @@ class Submissions extends Component {
                 </b>
                 .
               </b>{" "}
-              {/* Render if tour name contains "final" or "qual" caps-insensitive. Or something along those lines
-              See #16 /}
-              {/* Make sure to have indicated your eligibility on your Team Profile
-              page. Also make sure to have all members upload a resume, at your
-              personal profile page.
-              <b>
-                **See the Eligibility Rules in the Tournaments page for more
-                info**
-              </b> */}
             </p>
+            {this.state.tournamentInfo.does_tour_require_resume && (
+              <p>
+                Make sure to have indicated your eligibility on your Team
+                Profile page. Also make sure to have all members upload a
+                resume, at your personal profile page.{" "}
+                <b>
+                  **See the Eligibility Rules in the Tournaments page for more
+                  info**
+                </b>
+              </p>
+            )}
             <p>
               Submit your code using the button below. For peace of mind, submit
               15 minutes before and make sure it compiles and shows up under
