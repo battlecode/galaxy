@@ -285,14 +285,14 @@ class GettingStarted extends Component {
                 </div>
                 <div className="content">
                   <p>
-                    If you experience problems with the instructions below,
-                    check{" "}
                     <b>
+                      Check{" "}
                       <NavLink to="common-issues" style={{ fontWeight: 700 }}>
                         common issues
-                      </NavLink>
+                      </NavLink>{" "}
+                      if you experience problems with the instructions below,
+                      and if that doesn't help, ask on the Discord.
                     </b>
-                    , and if that doesn't help, ask on the Discord.
                   </p>{" "}
                   <h6 className="installation-steps">Step 1: Install Java</h6>
                   <p>
@@ -442,6 +442,14 @@ class GettingStarted extends Component {
                     Place each version of your robot in a new subfolder in the{" "}
                     <code>src</code> folder. Make sure every version has a{" "}
                     <code>RobotPlayer.java</code>.
+                  </p>
+                  <p>
+                    Check{" "}
+                    <NavLink to="debugging-tips" style={{ fontWeight: 700 }}>
+                      debugging tips
+                    </NavLink>{" "}
+                    if you experience problems while developing, or ask on the
+                    Discord.
                   </p>
                   <h6 className="installation-steps">
                     Running Battlecode from the Client
