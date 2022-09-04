@@ -61,6 +61,15 @@ class Resources extends Component {
                     <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
+                      href="/common-issues"
+                    >
+                      Common Issues
+                    </a>
+                  </p>
+                  <p className="text-center">
+                    <a
+                      type="button"
+                      className="btn btn-info btn-fill text-center"
                       href="/debugging"
                     >
                       Debugging Tips
