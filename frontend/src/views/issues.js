@@ -113,6 +113,34 @@ class Issues extends Component {
 
               <div className="card">
                 <div className="header">
+                  <h4 className="title">Client Issues</h4>
+                </div>
+                <div className="content">
+                  <p>
+                    If you're experiencing memory problems with the client,
+                    please try:
+                  </p>
+                  <ul style={{ marginLeft: "-15px" }}>
+                    <li>
+                      Making .bc22 files with the engine directly and uploading
+                      them to the client's match queue, rather than using the
+                      client's runner. With this method, once the web version of
+                      the visualizer is live, you can just use the web version
+                      at{" "}
+                      <a
+                        href="https://play.battlecode.org/clients/2022/visualizer.html"
+                        style={{ fontWeight: 700 }}
+                      >
+                        https://play.battlecode.org/clients/2022/visualizer.html
+                      </a>{" "}
+                      rather than the desktop application.{" "}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="header">
                   <h4 className="title">Other Issues</h4>
                 </div>
                 <div className="content">
