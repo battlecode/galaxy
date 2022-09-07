@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 
 const He = styled.h5`
@@ -48,15 +49,17 @@ class Resources extends Component {
                   <h4 className="title">Coding Resources</h4>
                 </div>
                 <div className="content">
-                  <p className="text-center">
-                    <a
-                      type="button"
-                      className="btn btn-info btn-fill text-center"
-                      href="/2022/getting-started"
+                  <p>
+                    If you're just starting out, check out the{" "}
+                    <NavLink
+                      to="/2022/getting-started"
+                      style={{ fontWeight: 700 }}
                     >
-                      Getting Started
-                    </a>
+                      getting started
+                    </NavLink>{" "}
+                    page!
                   </p>
+                  <p>For more helpful resources while coding, see:</p>
                   <p className="text-center">
                     <a
                       type="button"
