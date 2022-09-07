@@ -480,6 +480,21 @@ class GettingStarted extends Component {
 
               <div className="card">
                 <div className="header">
+                  <h4 className="title">Resources</h4>
+                </div>
+                <div className="content">
+                  <p>
+                    Once you're all set up, make sure to check out the{" "}
+                    <NavLink to="/resources" style={{ fontWeight: 700 }}>
+                      resources
+                    </NavLink>{" "}
+                    page!
+                  </p>
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="header">
                   <h4 className="title">Join the Community!</h4>
                 </div>
                 <div className="content">
