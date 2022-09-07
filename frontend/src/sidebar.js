@@ -98,6 +98,11 @@ class SideBar extends Component {
             {/* This invisible element is needed for proper spacing */}
             <NLink to={`#`} style={{ visibility: "hidden" }}></NLink>
             <NLink to={`/home`} icon={"pe-7s-home"} label="Home" />
+            <NLink
+              to={`/2022/getting-started`}
+              icon={"pe-7s-sun"}
+              label="Getting Started"
+            />
             <NLink to={`/resources`} icon={"pe-7s-note2"} label="Resources" />
             <NLink to={`/updates`} icon={"pe-7s-bell"} label="Updates" />
 
