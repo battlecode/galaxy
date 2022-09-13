@@ -2,16 +2,6 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
-const He = styled.h5`
-  font-weight: bold;
-  font-size: 1.3em;
-`;
-
-const Hee = styled.h5`
-  text-decoration: underline;
-  font-size: 1.2em;
-`;
-
 class Issues extends Component {
   render() {
     return (
