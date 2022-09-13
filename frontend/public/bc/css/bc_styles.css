@@ -149,6 +149,17 @@ ol {
   line-height: 1.5;
 }
 
+/* Styled h5's. Legacy code not in use anymore, kept around cuz it might be handy. */
+/* .h5-bold {
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+.h5-ul {
+  text-decoration: underline;
+  font-size: 1.2em;
+} */
+
 @media (min-width: 992px) {
   .col-2-row {
     flex-direction: column;
