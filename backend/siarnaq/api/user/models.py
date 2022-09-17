@@ -36,11 +36,17 @@ class UserProfile(models.Model):
     )
     """The user being augmented by this profile."""
 
+    email = models.EmailField(unique=True)
+    """The email of the user."""
+
     gender = models.CharField(max_length=1, choices=Gender.choices)
     """The gender that describes the user."""
 
     gender_details = models.CharField(max_length=32, blank=True)
     """Any customized gender information that better describes the user."""
+
+    date_of_birth = models.DateField()
+    """The date of birth of the user."""
 
     school = models.CharField(max_length=128, blank=True)
     """The school that this user attends, if provided."""
@@ -56,3 +62,5 @@ class UserProfile(models.Model):
 
     has_resume = models.BooleanField(default=False)
     """Whether the user has an uploaded resume."""
+
+    REQUIRED_FIELDS = ["email", "first_name", "last_name", "gender", "data_of_birth"]

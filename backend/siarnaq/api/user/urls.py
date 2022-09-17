@@ -4,7 +4,8 @@ from rest_framework.routers import DefaultRouter
 from siarnaq.api.user import views
 
 router = DefaultRouter()
-router.register("profile", views.UserProfileViewSet, basename="profile")
+router.register("all", views.UserProfileViewSet, basename="all")
+router.register("public", views.PublicUserProfileViewSet, basename="public")
 
 urlpatterns = [
     path("", include(router.urls)),
