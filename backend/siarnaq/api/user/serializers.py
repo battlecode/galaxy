@@ -6,7 +6,8 @@ from siarnaq.api.user.models import User, UserProfile
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username"]
+        fields = ["id", "username", "password"]
+        extra_kwargs = {"password": {"write_only": True}}
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -16,6 +17,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = [
             "user",
+            "password",
             "email",
             "gender",
             "gender_details",
@@ -30,7 +32,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Create user
         user_data = validated_data.pop("user")
-        user = User.objects.create(**user_data)
+        user = User.objects.create_user(**user_data)
         # Create associated user profile
         user_profile = UserProfile.objects.create(user=user, **validated_data)
         return user_profile
