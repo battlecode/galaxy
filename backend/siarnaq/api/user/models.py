@@ -36,9 +36,6 @@ class UserProfile(models.Model):
     )
     """The user being augmented by this profile."""
 
-    email = models.EmailField(unique=True)
-    """The email of the user."""
-
     gender = models.CharField(max_length=1, choices=Gender.choices)
     """The gender that describes the user."""
 
