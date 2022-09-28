@@ -45,37 +45,56 @@ class App extends Component {
 
     // should always be viewable, even when not logged in
     this.nonLoggedInElems = [
-      <Route exact path={`/`} component={Home} key="home-blank" />,
-      <Route path={`/home`} component={Home} key="home" />,
-      <Route path={`/updates`} component={Updates} key="updates" />,
+      // <Route exact path={`/:episode/`} component={Home} key="home-blank" />,
+      // TODO get some sort of default path working.
+      // Ideally - /2022 should redir to home. /2022/ should prob redir to home.
+      // What should / do? Probably redirect to the homepage of the stored current episode?
+      <Route path={`/:episode/home`} component={Home} key="home" />,
+      <Route path={`/:episode/updates`} component={Updates} key="updates" />,
       // commented but kept since we might use this later
       // <Route path={`/search`} component={Search} key="search" />,
-      <Route path={`/tournaments`} component={Tournaments} key="tournaments" />,
       <Route
-        path={`/:year/getting-started`}
+        path={`/:episode/tournaments`}
+        component={Tournaments}
+        key="tournaments"
+      />,
+      <Route
+        path={`/:episode/getting-started`}
         component={GettingStarted}
         key="getting-started"
       />,
-      <Route path={`/common-issues`} component={Issues} key="issues" />,
-      <Route path={`/debugging`} component={Debugging} key="debugging" />,
       <Route
-        path={`/codeofconduct`}
+        path={`/:episode/common-issues`}
+        component={Issues}
+        key="issues"
+      />,
+      <Route
+        path={`/:episode/debugging`}
+        component={Debugging}
+        key="debugging"
+      />,
+      <Route
+        path={`/:episode/codeofconduct`}
         component={CodeOfConduct}
         key="codeofconduct"
       />,
-      <Route path={`/resources`} component={Resources} key="resources" />,
       <Route
-        path={`/rankings/:team_id`}
+        path={`/:episode/resources`}
+        component={Resources}
+        key="resources"
+      />,
+      <Route
+        path={`/:episode/rankings/:team_id`}
         component={TeamInfo}
         key="rankings-team"
       />,
-      <Route path={`/rankings`} component={Rankings} key="rankings" />,
+      <Route path={`/:episode/rankings`} component={Rankings} key="rankings" />,
     ];
 
     // should only be visible to logged in users
     // If user is not logged-in, should 404 and not even render
     this.loggedInElems = [
-      <Route path={`/team`} component={Team} key="team" />,
+      <Route path={`/:episode/team`} component={Team} key="team" />,
       <Route path={`/account`} component={Account} key="account" />,
       <Route
         path={`/password_forgot`}
@@ -92,14 +111,22 @@ class App extends Component {
 
     // Should only be visible and renderable to users on a team
     this.onTeamElems = [
-      <Route path={`/scrimmaging`} component={Scrimmaging} key="scrimmaging" />,
-      <Route path={`/submissions`} component={Submissions} key="submissions" />,
+      <Route
+        path={`/:episode/scrimmaging`}
+        component={Scrimmaging}
+        key="scrimmaging"
+      />,
+      <Route
+        path={`/:episode/submissions`}
+        component={Submissions}
+        key="submissions"
+      />,
     ];
 
     this.staffElems = [
       // Make sure to have an auth check in the backend for any methods that this page hits_
       // (this part is absolutely necessary regardless of frontend setup)
-      <Route path={`/staff`} component={Staff} key="staff" />,
+      <Route path={`/:episode/staff`} component={Staff} key="staff" />,
     ];
 
     // When in the list of routes, this route must be last.
