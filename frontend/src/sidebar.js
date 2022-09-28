@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import Api from "./api";
 import $ from "jquery";
+import MultiEpisode from "./views/multi-episode";
 
 class NLink extends Component {
   render() {
@@ -25,9 +26,15 @@ class NLink extends Component {
 }
 
 class SideBar extends Component {
-  constructor() {
-    super();
-    this.state = { on_team: null, logged_in: null, user: {}, league: {} };
+  constructor(props) {
+    super(props);
+    this.state = {
+      on_team: null,
+      logged_in: null,
+      user: {},
+      league: {},
+      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+    };
   }
 
   // This is messy, will clean in #91
