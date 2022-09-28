@@ -1,7 +1,15 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
+import MultiEpisode from "./multi-episode";
 
 class Resources extends Component {
+  constructor(params) {
+    super(params);
+    this.state = {
+      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+    };
+  }
+
   render() {
     return (
       <div className="content">
