@@ -212,7 +212,7 @@ class ScrimmageHistory extends Component {
                         <td>
                           {/* domain is hardcoded, since visualizer and replays are only hosted on deployed site, not locally */}
                           <a
-                            href={`https://play.battlecode.org/clients/2022/visualizer.html?https://play.battlecode.org/replays/${s.replay}.bc22`}
+                            href={`https://play.battlecode.org/clients/${this.state.episode}/visualizer.html?https://play.battlecode.org/replays/${s.replay}.bc22`}
                             target="_blank"
                           >
                             Watch
