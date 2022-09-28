@@ -34,7 +34,7 @@ class NavBar extends Component {
               <span className="icon-bar" />
             </button>
             <NavLink className="navbar-brand" to={`/home`}>
-              Battlecode 2022
+              Battlecode {this.state.episode}
             </NavLink>
           </div>
           <div className="collapse navbar-collapse">
