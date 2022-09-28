@@ -104,23 +104,39 @@ class SideBar extends Component {
           <ul className="nav nav-pills nav-stacked">
             {/* This invisible element is needed for proper spacing */}
             <NLink to={`#`} style={{ visibility: "hidden" }}></NLink>
-            <NLink to={`/home`} icon={"pe-7s-home"} label="Home" />
             <NLink
-              to={`/2022/getting-started`}
+              to={`/${this.state.episode}/home`}
+              icon={"pe-7s-home"}
+              label="Home"
+            />
+            <NLink
+              to={`/${this.state.episode}/getting-started`}
               icon={"pe-7s-sun"}
               label="Getting Started"
             />
-            <NLink to={`/resources`} icon={"pe-7s-note2"} label="Resources" />
-            <NLink to={`/updates`} icon={"pe-7s-bell"} label="Updates" />
+            <NLink
+              to={`/${this.state.episode}/resources`}
+              icon={"pe-7s-note2"}
+              label="Resources"
+            />
+            <NLink
+              to={`/${this.state.episode}/updates`}
+              icon={"pe-7s-bell"}
+              label="Updates"
+            />
 
             <br />
 
             <NLink
-              to={`/tournaments`}
+              to={`/${this.state.episode}/tournaments`}
               icon={"pe-7s-medal"}
               label="Tournaments"
             />
-            <NLink to={`/rankings`} icon={"pe-7s-graph1"} label="Rankings" />
+            <NLink
+              to={`/${this.state.episode}/rankings`}
+              icon={"pe-7s-graph1"}
+              label="Rankings"
+            />
             {/* search bar link, unused since Search is broken
             Commented in case someone wants to bring it back in the future
             You'd have to refactor the code to match the other NLink's */}
@@ -130,14 +146,18 @@ class SideBar extends Component {
 
             {/* Only visible when logged in */}
             {this.state.logged_in && (
-              <NLink to={`/team`} icon={"pe-7s-users"} label="Team" />
+              <NLink
+                to={`/${this.state.episode}/team`}
+                icon={"pe-7s-users"}
+                label="Team"
+              />
             )}
 
             {/* Only visible when on a team AND submissions are enabled */}
             {this.state.on_team && this.isSubmissionEnabled() && (
               <NLink
-                to={`/submissions`}
-                icon={"pe-7s-up-arrow "}
+                to={`/${this.state.episode}/submissions`}
+                icon={"pe-7s-up-arrow"}
                 label="Submissions"
               />
             )}
@@ -149,8 +169,8 @@ class SideBar extends Component {
             - Nathan */}
             {this.state.on_team && this.isSubmissionEnabled() && (
               <NLink
-                to={`/scrimmaging`}
-                icon={"pe-7s-joy "}
+                to={`/${this.state.episode}/scrimmaging`}
+                icon={"pe-7s-joy"}
                 label="Scrimmaging"
               />
             )}
@@ -159,7 +179,11 @@ class SideBar extends Component {
 
             {/* Only visible if a staff user */}
             {this.state.user.is_staff && (
-              <NLink to={`/staff`} icon={"pe-7s-tools "} label="Staff" />
+              <NLink
+                to={`/${this.state.episode}/staff`}
+                icon={"pe-7s-tools"}
+                label="Staff"
+              />
             )}
 
             <br />
