@@ -27,6 +27,7 @@ import Register from "./views/register";
 import PasswordForgot from "./views/passwordForgot";
 import PasswordChange from "./views/passwordChange";
 import LogOut from "./views/logOut";
+import MultiEpisode from "./views/multi-episode";
 import Submissions from "./views/submissions";
 import TeamInfo from "./views/teamInfo";
 import Footer from "./footer";
@@ -179,6 +180,7 @@ class App extends Component {
         {/* All other pages should (and so all other routes should allow this) */}
         <Route path={`/login`} component={LoginRegister} />,
         <Route path={`/register`} component={Register} />,
+        <Route path={`/multi-episode`} component={MultiEpisode} />,
         <Route>
           <div className="wrapper">
             <SideBar />
