@@ -238,7 +238,7 @@ class GettingStarted extends Component {
                 </div>
                 <div className="content">
                   <p>
-                    This is the Battlecode {this.state.year} contest website,
+                    This is the Battlecode {this.state.episode} contest website,
                     which will be your main hub for all Battlecode-related
                     things for the duration of the contest. For a general
                     overview of what Battlecode is, visit{" "}
@@ -246,8 +246,8 @@ class GettingStarted extends Component {
                   </p>
                   <p>
                     While the opportunity to compete in tournaments is over,
-                    Battlecode 2022 is still running! See below for instructions
-                    on getting started.
+                    Battlecode {this.state.episode} is still running! See below
+                    for instructions on getting started.
                   </p>
                 </div>
               </div>
@@ -338,7 +338,7 @@ class GettingStarted extends Component {
                         href="https://github.com/battlecode/battlecode22-scaffold"
                         style={{ fontWeight: 700 }}
                       >
-                        Battlecode 2022 scaffold
+                        Battlecode {this.state.episode} scaffold
                       </a>
                     </b>
                     . To get up and running quickly, you can click "Clone or
@@ -380,8 +380,9 @@ class GettingStarted extends Component {
                   <p>
                     We recommend using an IDE like IntelliJ IDEA or Eclipse to
                     work on Battlecode, but you can also use your favorite text
-                    editor combined with a terminal. Battlecode 2022 uses Gradle
-                    to run tasks like <code>run</code>, <code>debug</code> and{" "}
+                    editor combined with a terminal. Battlecode{" "}
+                    {this.state.episode} uses Gradle to run tasks like{" "}
+                    <code>run</code>, <code>debug</code> and{" "}
                     <code>jarForUpload</code> (but don't worry about that — you
                     don't need to install it).
                   </p>

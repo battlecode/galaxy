@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+﻿import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import MultiEpisode from "./multi-episode";
 
@@ -125,10 +125,11 @@ class Issues extends Component {
                       the visualizer is live, you can just use the web version
                       at{" "}
                       <a
-                        href="https://play.battlecode.org/clients/2022/visualizer.html"
+                        href={`https://play.battlecode.org/clients/${this.state.episode}/visualizer.html`}
                         style={{ fontWeight: 700 }}
                       >
-                        https://play.battlecode.org/clients/2022/visualizer.html
+                        https://play.battlecode.org/clients/{this.state.episode}
+                        /visualizer.html
                       </a>{" "}
                       rather than the desktop application.{" "}
                     </li>
