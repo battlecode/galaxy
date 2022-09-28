@@ -1,5 +1,5 @@
 import $ from "jquery";
-import * as Cookies from "js-cookie";
+import Cookies from "js-cookie";
 
 // do not change URL here!! rather, for development, change it in ../.env.development
 const URL = process.env.REACT_APP_BACKEND_URL;
