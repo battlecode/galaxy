@@ -1,10 +1,14 @@
 import React, { Component } from "react";
 import Api from "../api";
+import MultiEpisode from "./multi-episode";
 
 class Tournaments extends Component {
   constructor() {
     super();
-    this.state = { tournaments: [] };
+    this.state = {
+      tournaments: [],
+      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+    };
   }
 
   componentDidMount() {

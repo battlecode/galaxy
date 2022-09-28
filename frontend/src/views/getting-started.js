@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import Floater from "react-floater";
+import MultiEpisode from "./multi-episode";
 
 class GettingStarted extends Component {
   constructor(props) {
     super(props);
     this.state = {
       ide: "intellij",
-      year: this.props.match.params.year,
+      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
     };
   }
 

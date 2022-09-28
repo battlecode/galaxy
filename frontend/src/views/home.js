@@ -3,6 +3,7 @@ import $ from "jquery";
 import Api from "../api";
 import Countdown from "../components/countdown";
 import UpdateCard from "../components/updateCard";
+import MultiEpisode from "./multi-episode";
 
 class StatCard extends UpdateCard {
   componentDidMount() {
@@ -89,7 +90,10 @@ class DateCard extends UpdateCard {
 class InstrCard extends UpdateCard {
   constructor() {
     super();
-    this.state.dates = [];
+    this.state = {
+      dates: [],
+      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+    };
   }
 
   componentDidMount() {
