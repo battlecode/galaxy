@@ -138,7 +138,7 @@ class Register extends Component {
             color: "white",
           }}
         >
-          Battlecode 2022
+          Battlecode
         </h1>
         <p
           style={{
@@ -147,7 +147,8 @@ class Register extends Component {
             color: "white",
           }}
         >
-          Register below to participate in Battlecode 2022!
+          {/* Note that this page does not change depending on episode */}
+          Register below to participate in Battlecode!
         </p>
         {errorDiv}
         {successDiv}
