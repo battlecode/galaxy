@@ -123,7 +123,7 @@ class LoginRegister extends Component {
             color: "white",
           }}
         >
-          Battlecode 2022
+          Battlecode
         </h1>
         <p
           style={{
@@ -132,7 +132,8 @@ class LoginRegister extends Component {
             color: "white",
           }}
         >
-          Log in below to participate in Battlecode 2022!
+          {/* Note that this page does not change depending on episode */}
+          Log in below to participate in Battlecode!
         </p>
         {errorDiv}
         {successDiv}
