@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Api from "../api";
 import Floater from "react-floater";
+import MultiEpisode from "./multi-episode";
 
 import ScrimmageRequestor from "../components/scrimmageRequestor";
 import PaginationControl from "../components/paginationControl";
@@ -108,6 +109,7 @@ class ScrimmageHistory extends Component {
     scrimPage: 1,
     scrimLimit: 0,
     scrimmages: [],
+    episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
   };
 
   refresh = (page) => {
