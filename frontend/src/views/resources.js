@@ -25,18 +25,18 @@ class Resources extends Component {
                     <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
-                      href="https://play.battlecode.org/specs/2022/specs.md.html"
+                      href={`https://play.battlecode.org/specs/${this.state.episode}/specs.md.html`}
                     >
-                      Specifications for 2022!
+                      Specifications for {this.state.episode}!
                     </a>
                   </p>
                   <p className="text-center">
                     <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
-                      href="https://play.battlecode.org/javadocs/2022/index.html"
+                      href={`https://play.battlecode.org/javadocs/${this.state.episode}/index.html`}
                     >
-                      Javadocs for 2022!
+                      Javadocs for {this.state.episode}!
                     </a>
                   </p>
                 </div>
@@ -49,7 +49,7 @@ class Resources extends Component {
                   <p>
                     If you're just starting out, check out the{" "}
                     <NavLink
-                      to="/2022/getting-started"
+                      to={`/${this.state.episode}/getting-started`}
                       style={{ fontWeight: 700 }}
                     >
                       getting started
@@ -107,11 +107,11 @@ class Resources extends Component {
                 </div>
                 <div className="content">
                   <p>
-                    Battlecode 2022 will be holding lectures, where a dev will
-                    be going over possible strategy, coding up an example
-                    player, answering questions, etc. Lectures are streamed on
-                    Twitch every weekday the first two weeks of IAP 7-10 PM
-                    Eastern Time.
+                    Battlecode {this.state.episode} will be holding lectures,
+                    where a dev will be going over possible strategy, coding up
+                    an example player, answering questions, etc. Lectures are
+                    streamed on Twitch every weekday the first two weeks of IAP
+                    7-10 PM Eastern Time.
                   </p>
                   <p>
                     All lectures are streamed live on{" "}

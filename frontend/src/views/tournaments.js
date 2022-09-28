@@ -27,12 +27,15 @@ class Tournaments extends Component {
             <div className="col-md-12">
               <div className="card">
                 <div className="header">
-                  <h4 className="title">2022 Tournament Schedule</h4>
+                  <h4 className="title">
+                    {this.state.episode} Tournament Schedule
+                  </h4>
                 </div>
                 <div className="content">
                   <p>
-                    Battlecode 2022 will consist of seven tournaments throughout
-                    the month! We stream and commentate all tournaments online.
+                    Battlecode {this.state.episode} will consist of seven
+                    tournaments throughout the month! We stream and commentate
+                    all tournaments online.
                   </p>
                   <ul>
                     <li>
