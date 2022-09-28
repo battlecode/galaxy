@@ -95,7 +95,7 @@ class SideBar extends Component {
             <a href="/home">
               <img src="../bc/img/logo.png" />
             </a>
-            <p>Battlecode 2022</p>
+            <p>Battlecode {this.state.episode}</p>
           </div>
           {/* NOTE: this only controls what appears in the sidebars.
           Independent of this, users can still go to the links by typing it in their browser, etc.
