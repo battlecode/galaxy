@@ -6,6 +6,7 @@ dependencies:
   - ca-certificates
   - click<8.1.0
   - django
+  - django-cors-headers
   - django-stubs
   - djangorestframework
   - drf-spectacular
