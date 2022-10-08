@@ -69,7 +69,7 @@ If you're new to Django, it's fancy.
 It's complex, but can be easy to learn if you start with the easy parts.
 To get started understanding the codebase:
 
-- Read and understand `accounts/models.py`.
+- Read and understand `user/models.py`.
 - A little bit more complex is `teams/models.py`.
   Read this one next.
   Notice that there are functions that act on single objects.
