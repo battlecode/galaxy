@@ -6,9 +6,14 @@ import MultiEpisode from "./multi-episode";
 class GettingStarted extends Component {
   constructor(props) {
     super(props);
+    const episode = MultiEpisode.getEpisodeFromPathname(
+      window.location.pathname
+    );
+
     this.state = {
       ide: "intellij",
-      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+      episode: episode,
+      scaffold_name: MultiEpisode.getScaffoldName(episode),
     };
   }
 
@@ -71,7 +76,7 @@ class GettingStarted extends Component {
               small button that says gradle and has a picture of an elephant.
               Navigate to
               <code>
-                battlecode22-scaffold {">"} Tasks {">"} battlecode
+                {this.state.scaffold_name} {">"} Tasks {">"} battlecode
               </code>{" "}
               and double click on <code>update</code> and then{" "}
               <code>build</code>. This will run tests to verify that everything
