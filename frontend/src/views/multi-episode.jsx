@@ -8,7 +8,11 @@ const EPISODES = ["2022", "2023"];
 // The formatter will convert them as such,
 // and the code will treat them the same way
 const EPISODE_TO_EXTENSION = { 2022: "bc22", 2023: "bc23" };
-const EPISODE_TO_SCAFFOLD = { 2022: "bc22", 2023: "bc23" };
+const EPISODE_TO_SCAFFOLD_LINK = { 2022: "bc22", 2023: "bc23" };
+const EPISODE_TO_SCAFFOLD_NAME = {
+  2022: "battlecode22-scaffold",
+  2023: "battlecode23-scaffold",
+};
 
 class MultiEpisode extends Component {
   // TODO have two methods: getEpisodeCurrent(), and getEpisodeFromPathname(pathname)
@@ -33,6 +37,10 @@ class MultiEpisode extends Component {
       // TODO redirect here, (not on the caller checking the result)
       return null;
     }
+  }
+
+  static getScaffoldName(episode) {
+    return EPISODE_TO_SCAFFOLD_NAME[episode];
   }
 
   // TODO methods to derive file extension and scaffold link
