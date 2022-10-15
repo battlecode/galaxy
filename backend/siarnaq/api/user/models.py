@@ -11,6 +11,9 @@ class User(AbstractUser):
     pass
 
 
+# empty PRs not allowed? :()
+
+
 class Gender(models.TextChoices):
     """
     An immutable type enumerating the available gender selections.
