@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 import google.auth
@@ -43,11 +44,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "rest_framework",
-    "siarnaq.api.accounts",
+    "rest_framework_simplejwt",
+    "siarnaq.api.user",
     "siarnaq.api.compete",
     "siarnaq.api.episodes",
     "siarnaq.api.teams",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -58,7 +62,11 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "siarnaq.urls"
 
@@ -94,7 +102,7 @@ DATABASES = {
 # Custom user model
 # https://docs.djangoproject.com/en/4.0/topics/auth/customizing
 
-AUTH_USER_MODEL = "accounts.User"
+AUTH_USER_MODEL = "user.User"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -114,6 +122,34 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Authentication with simple JWT
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# Templates
+# https://docs.djangoproject.com/en/4.1/topics/templates/
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "siarnaq/templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/

@@ -4,6 +4,7 @@
 
 Galaxy is the framework that powers the infrastructure for MIT Battlecode.
 The galaxy consists of two main parts:
+
 - Saturn, the compute cluster that compiles competitor bots and runs matches.
 - Siarnaq, the competitor dashboard that interfaces with our data storage.
 
@@ -24,9 +25,10 @@ Please follow these steps carefully to ensure your development environment is in
 Develop new features on branches and use pull-requests to request code-review.
 The `main` branch is protected and pushes to `main` will be rejected.
 
-We will be using the [Projects](https://github.com/battlecode/galaxy/projects/1) feature to track our todo list. Issues should only be used for bugs.
+We will be using the [Projects](https://github.com/battlecode/galaxy/projects?type=classic) feature to track our todo list.
+Entries in the "To do" column are allowed to simply be items created in the project board, but once the entry moves to one of the other columns (e.g. "In progress"), please convert the entry into an issue for easier discussion and reference in PRs.
 
-To start a feature, *claim* it on the Projects page by moving it to the "In Progress" column and adding your name to it. Then you can work on it on a git branch.
+To start a feature, _claim_ it on the Projects page by moving it to the "In Progress" column and adding your name to it. Then you can work on it on a git branch.
 
 In places where it makes sense, it could be good to write test cases, although a lot of the functionality might not be very testable.
 
@@ -57,6 +59,8 @@ Move code into a Manager if it makes implementation easier.
    You shouldn't commit this either.
 1. Run `./manage.py runserver` to turn on the server!
 
+While developing, you may find the `api/specs/swagger-ui` endpoint userful for viewing and querying the avaiable API.
+
 If you ever get your database into a really broken state, just delete `db.sqlite3` and all the migration files, and start again.
 
 ## How to contribute
@@ -65,7 +69,7 @@ If you're new to Django, it's fancy.
 It's complex, but can be easy to learn if you start with the easy parts.
 To get started understanding the codebase:
 
-- Read and understand `accounts/models.py`.
+- Read and understand `user/models.py`.
 - A little bit more complex is `teams/models.py`.
   Read this one next.
   Notice that there are functions that act on single objects.

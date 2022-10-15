@@ -4,15 +4,21 @@ channels:
 dependencies:
   - black
   - ca-certificates
+  - click<8.1.0
   - django
+  - django-cors-headers
   - django-stubs
   - djangorestframework
+  - drf-spectacular
   - flake8
   - google-api-python-client
   - google-cloud-pubsub
   - isort
   - mypy
   - openssl
+  - pip
   - pre_commit
   - python=3.10
   - pyupgrade
+  - pip:
+    - djangorestframework-simplejwt
