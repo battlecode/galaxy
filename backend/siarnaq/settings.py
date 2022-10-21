@@ -175,3 +175,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 _, GOOGLE_CLOUD_PROJECT_ID = google.auth.default()
+
+# Penalized Elo configuration
+
+TEAMS_ELO_INITIAL = 1500.0
+TEAMS_ELO_K = 24.0
+TEAMS_ELO_SCALE = 400.0
+TEAMS_ELO_PENALTY = 0.85

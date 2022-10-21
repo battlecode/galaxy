@@ -126,29 +126,29 @@ class MatchParticipant(models.Model):
         Submission,
         on_delete=models.PROTECT,
         related_name="participations",
+        blank=True,
     )
     """The active submission that was used by the team in this match."""
 
     score = models.PositiveSmallIntegerField(null=True, blank=True)
     """The team's score in the match, or null if the match has not been completed."""
 
-    rating_old = models.OneToOneField(
+    rating = models.ForeignKey(
         refs.RATING_MODEL,
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        related_name="succeeding_participation",
     )
-    """The team's pre-match rating, or null if it depends on incomplete matches."""
+    """The team's rating after the match, or null if it is not yet known."""
 
-    rating_new = models.OneToOneField(
-        refs.RATING_MODEL,
+    previous_participation = models.OneToOneField(
+        "self",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        related_name="preceding_participation",
+        related_name="next_participation",
     )
-    """The team's post-match rating, or null if the match is rated and incomplete."""
+    """The team's previous participation, or null if there is none."""
 
     def get_rating_old(self):
         """

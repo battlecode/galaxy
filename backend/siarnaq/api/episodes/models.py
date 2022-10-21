@@ -59,13 +59,13 @@ class Episode(models.Model):
     release_version = models.SlugField(max_length=32, blank=True)
     """The most up-to-date version of the episode code release."""
 
-    pass_requirement_win = models.PositiveSmallIntegerField(blank=True)
+    pass_requirement_win = models.PositiveSmallIntegerField(null=True, blank=True)
     """
     The minimum number of matches to be won within a specified window in order to pass
     the Battlecode class.
     """
 
-    pass_requirement_out_of = models.PositiveSmallIntegerField(blank=True)
+    pass_requirement_out_of = models.PositiveSmallIntegerField(null=True, blank=True)
     """
     The size of the window in which a minimum number of matches must be won in order to
     pass the Battlecode class.
