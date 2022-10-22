@@ -16,37 +16,7 @@ See [docs/local-setup.md](docs/local-setup.md) to set up a working frontend on y
 
 ## Codebase Intro
 
-(TODO note that even if you're working on backend and just need a "working knowledge of frontend dev" hit here)
-
-GDoc or markdown? gdoc allows for more formatting but markdown-in-repo is here for consistency, etc....
-gonna try md in repo
-screenshots / code snippets are gonna be hecka tiring
-
-TODO some codebase intro, both about react and about our code in particular
-
-React "intro" -- discuss core principles of react and the useful bits
-components
-api
-state and refresh
-
-End-user guide: what does frontend even do?
-
-Talk about our own pages. what is it? what's the end result / what does it do? And then, the technical detail of howwww
-index first, and expand that,
-then routes too.
-components
-the third-party stuff.
-Then hit API
-API !!
-how does backend link?
-ajax? jquery? at least links
-
-Discuss technical parts w enough to get people started or reduce confusion
-like just enough intro to get new devs started
-not too much detail (for now) -- I can add more as it comes. or maybe a laundry list later (or more pages or etc)
-
-Motivate enough to give people an idea of what use cases are like, for support for backend/infra/etc
-separate formatting for separate audiences? separate formatting for technical detail
+See [docs/onboard.md](docs/onboard.md) for an introduction to the frontend codebase, in order to make changes. **If you just need a working knowledge of frontend features / development / etc, start here!** (for example, if you're a backend dev but need to know some desired features for frontend)
 
 ## Deployment
 
