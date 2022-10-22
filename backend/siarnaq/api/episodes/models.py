@@ -50,8 +50,8 @@ class Episode(models.Model):
     If true, only teams with staff privileges can make submisssions.
     """
 
-    autoscrim_schedule = models.CharField(max_length=64, blank=True)
-    """A cron specification for the autoscrim schedule."""
+    autoscrim_schedule = models.CharField(max_length=64, null=True, blank=True)
+    """A cron specification for the autoscrim schedule, or null if disabled."""
 
     language = models.CharField(max_length=8, choices=Language.choices)
     """The implementation language supported for this episode."""

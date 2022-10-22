@@ -175,6 +175,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 _, GOOGLE_CLOUD_PROJECT_ID = google.auth.default()
+GOOGLE_CLOUD_LOCATION = "us-east1"
 
 # Penalized Elo configuration
 
