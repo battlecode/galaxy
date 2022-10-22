@@ -1,4 +1,3 @@
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -16,14 +15,3 @@ def connect_linked_list(instance, created, **kwargs):
         .first()
     )
     instance.save()
-
-
-@receiver(post_save, sender=MatchParticipant)
-def try_finalize_another_rating(instance, **kwargs):
-    """Update the ratings for the teams involved when a match is finalized."""
-    if instance.rating is not None:
-        # Finalize next in linked list
-        try:
-            instance.next_participation.try_finalize_rating()
-        except ObjectDoesNotExist:
-            pass  # No more participations to do

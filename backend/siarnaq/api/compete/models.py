@@ -204,11 +204,6 @@ class MatchParticipant(models.Model):
         finalized if the team's previous participation is already finalized, and if the
         match is either complete or unranked. After the update, any newly-finalizable
         participations are also finalized.
-
-        See Also
-        --------
-        siarnaq.api.compete.signals.try_finalize_another_rating :
-            The linked list traversal that finds more ratings to update
         """
         if self.rating is not None:
             return  # Done already!
@@ -220,22 +215,29 @@ class MatchParticipant(models.Model):
         # Treat these states as if they were unranked
         inconclusive = {SaturnStatus.ERRORED, SaturnStatus.CANCELLED}
         match = self.get_match()
+        opponent = match.get_opponent(self)
 
         if not match.is_ranked or match.status in inconclusive:
             if old_rating._state.adding:
                 old_rating.save()
             self.rating = old_rating
         elif match.is_finalized():
-            opponent = match.get_opponent(self)
             opponent_rating = opponent.get_old_rating()
             if opponent_rating is not None:
                 self.rating = self.get_old_rating().step(
                     opponent_rating, self.score / (self.score + opponent.score)
                 )
-                opponent.try_finalize_rating()
 
         if self.rating is not None:
             self.save()
+            # Finalize ratings for any participations that could now be ready
+            opponent.try_finalize_rating()
+            try:
+                p = self.next_participation
+            except ObjectDoesNotExist:
+                pass  # No more participations to do
+            else:
+                p.try_finalize_rating()
 
 
 class Match(SaturnInvocation):
