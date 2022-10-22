@@ -161,10 +161,10 @@ class TeamProfile(models.Model):
     rating = models.OneToOneField(Rating, on_delete=models.PROTECT)
     """The current rating of the team."""
 
-    auto_accept_ranked = models.BooleanField()
+    auto_accept_ranked = models.BooleanField(default=True)
     """Whether the team automatically accepts ranked match requests."""
 
-    auto_accept_unranked = models.BooleanField()
+    auto_accept_unranked = models.BooleanField(default=True)
     """Whether the team automatically accepts unranked match requests."""
 
     eligible_for = models.ManyToManyField(EligibilityCriterion, related_name="teams")

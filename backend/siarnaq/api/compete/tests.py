@@ -21,12 +21,7 @@ class MatchParticipantTestCase(TestCase):
         )
         for name in ["team1", "team2", "team3"]:
             t = Team.objects.create(episode=e1, name=name)
-            TeamProfile.objects.create(
-                team=t,
-                rating=Rating.objects.create(),
-                auto_accept_ranked=True,
-                auto_accept_unranked=True,
-            )
+            TeamProfile.objects.create(team=t, rating=Rating.objects.create())
             Submission.objects.create(
                 episode=e1,
                 team=t,
