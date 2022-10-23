@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from siarnaq.api.compete.models import MatchParticipant
+from siarnaq.api.compete.models import Match, MatchParticipant
 
 
 @receiver(post_save, sender=MatchParticipant)
@@ -15,3 +15,10 @@ def connect_linked_list(instance, created, **kwargs):
         .first()
     )
     instance.save()
+
+
+@receiver(post_save, sender=Match)
+def update_match_ratings(instance, **kwargs):
+    """Try to finalize ratings for participations whenever a match is updated."""
+    instance.red.try_finalize_rating()
+    instance.blue.try_finalize_rating()
