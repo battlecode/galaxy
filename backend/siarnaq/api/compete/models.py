@@ -134,7 +134,10 @@ class MatchParticipant(models.Model):
         related_name="participations",
         blank=True,
     )
-    """The active submission that was used by the team in this match."""
+    """
+    The active submission that was used by the team in this match. Will be auto-filled
+    upon save if left blank.
+    """
 
     score = models.PositiveSmallIntegerField(null=True, blank=True)
     """The team's score in the match, or null if the match has not been completed."""
@@ -212,12 +215,16 @@ class MatchParticipant(models.Model):
         if old_rating is None:
             return  # Not ready
 
-        # Treat these states as if they were unranked
-        inconclusive = {SaturnStatus.ERRORED, SaturnStatus.CANCELLED}
         match = self.get_match()
         opponent = match.get_opponent(self)
 
-        if not match.is_ranked or match.status in inconclusive:
+        # Matches are unranked if they were supposed to be unranked, or if they ended
+        # unsuccessfully.
+        is_unranked = (not match.is_ranked) or (
+            match.is_finalized() and match.status != SaturnStatus.COMPLETED
+        )
+
+        if is_unranked:
             if old_rating._state.adding:
                 old_rating.save()
             self.rating = old_rating
