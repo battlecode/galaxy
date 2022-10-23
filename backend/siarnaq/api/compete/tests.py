@@ -94,7 +94,6 @@ class MatchParticipantTestCase(TestCase):
             is_ranked=True,
             status=SaturnStatus.COMPLETED,
         )
-        m2.red.try_finalize_rating()
         # Expect rating increase after win
         self.assertIsNotNone(m2.red.rating)
         self.assertGreater(m2.red.rating.mean, m2.red.get_old_rating().mean)
@@ -108,11 +107,11 @@ class MatchParticipantTestCase(TestCase):
         t3 = Team.objects.get(name="team3")
         Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t2, score=0),
+            red=MatchParticipant.objects.create(team=t1),
+            blue=MatchParticipant.objects.create(team=t2),
             alternate_color=True,
-            is_ranked=False,
-            status=SaturnStatus.COMPLETED,
+            is_ranked=True,
+            status=SaturnStatus.RUNNING,
         )
         m2 = Match.objects.create(
             episode=e1,
@@ -122,7 +121,6 @@ class MatchParticipantTestCase(TestCase):
             is_ranked=True,
             status=SaturnStatus.COMPLETED,
         )
-        m2.red.try_finalize_rating()
         # Expect no rating because previous not ready
         self.assertIsNone(m2.red.rating)
 
@@ -138,7 +136,6 @@ class MatchParticipantTestCase(TestCase):
             is_ranked=True,
             status=SaturnStatus.COMPLETED,
         )
-        m1.red.try_finalize_rating()
         # Expect rating increase after win
         self.assertIsNotNone(m1.red.rating)
         self.assertGreater(m1.red.rating.mean, m1.red.get_old_rating().mean)
@@ -162,13 +159,12 @@ class MatchParticipantTestCase(TestCase):
         )
         m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t3, score=0),
+            red=MatchParticipant.objects.create(team=t1),
+            blue=MatchParticipant.objects.create(team=t3),
             alternate_color=True,
             is_ranked=True,
             status=SaturnStatus.ERRORED,
         )
-        m2.red.try_finalize_rating()
         # Expect no change because no result
         self.assertEqual(m2.red.rating, m1.red.rating)
 
@@ -179,21 +175,20 @@ class MatchParticipantTestCase(TestCase):
         t3 = Team.objects.get(name="team3")
         Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t2, score=0),
+            red=MatchParticipant.objects.create(team=t1),
+            blue=MatchParticipant.objects.create(team=t2),
             alternate_color=True,
-            is_ranked=False,
-            status=SaturnStatus.COMPLETED,
+            is_ranked=True,
+            status=SaturnStatus.RUNNING,
         )
         m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t3, score=0),
+            red=MatchParticipant.objects.create(team=t1),
+            blue=MatchParticipant.objects.create(team=t3),
             alternate_color=True,
             is_ranked=True,
             status=SaturnStatus.ERRORED,
         )
-        m2.red.try_finalize_rating()
         # Expect no rating because previous not ready
         self.assertIsNone(m2.red.rating)
 
@@ -214,13 +209,12 @@ class MatchParticipantTestCase(TestCase):
         )
         m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t3, score=0),
+            red=MatchParticipant.objects.create(team=t1),
+            blue=MatchParticipant.objects.create(team=t3),
             alternate_color=True,
             is_ranked=True,
             status=SaturnStatus.RUNNING,
         )
-        m2.red.try_finalize_rating()
         # Expect no rating because no result
         self.assertIsNone(m2.red.rating)
 
@@ -247,7 +241,6 @@ class MatchParticipantTestCase(TestCase):
             is_ranked=False,
             status=SaturnStatus.COMPLETED,
         )
-        m2.red.try_finalize_rating()
         # Expect no change because unranked
         self.assertEqual(m2.red.rating, m1.red.rating)
         self.assertEqual(t1.profile.rating, m2.red.rating)
@@ -259,11 +252,11 @@ class MatchParticipantTestCase(TestCase):
         t3 = Team.objects.get(name="team3")
         Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t2, score=0),
+            red=MatchParticipant.objects.create(team=t1),
+            blue=MatchParticipant.objects.create(team=t2),
             alternate_color=True,
-            is_ranked=False,
-            status=SaturnStatus.COMPLETED,
+            is_ranked=True,
+            status=SaturnStatus.RUNNING,
         )
         m2 = Match.objects.create(
             episode=e1,
@@ -273,7 +266,6 @@ class MatchParticipantTestCase(TestCase):
             is_ranked=False,
             status=SaturnStatus.COMPLETED,
         )
-        m2.red.try_finalize_rating()
         # Expect no rating because previous not ready
         self.assertIsNone(m2.red.rating)
 
@@ -289,7 +281,6 @@ class MatchParticipantTestCase(TestCase):
             is_ranked=False,
             status=SaturnStatus.COMPLETED,
         )
-        m1.red.try_finalize_rating()
         # Expect no change because unranked
         self.assertIsNotNone(m1.red.rating)
         self.assertEqual(m1.red.rating.to_value(), m1.red.get_old_rating().to_value())
@@ -307,18 +298,18 @@ class MatchParticipantTestCase(TestCase):
         t3 = Team.objects.get(name="team3")
         m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t2, score=0),
+            red=MatchParticipant.objects.create(team=t1),
+            blue=MatchParticipant.objects.create(team=t2),
             alternate_color=True,
             is_ranked=True,
-            status=SaturnStatus.COMPLETED,
+            status=SaturnStatus.RUNNING,
         )
         Match.objects.create(
             episode=e1,
             red=MatchParticipant.objects.create(team=t2),
             blue=MatchParticipant.objects.create(team=t3),
             alternate_color=True,
-            is_ranked=False,
+            is_ranked=True,
             status=SaturnStatus.RUNNING,
         )
         m3 = Match.objects.create(
@@ -329,7 +320,8 @@ class MatchParticipantTestCase(TestCase):
             is_ranked=True,
             status=SaturnStatus.COMPLETED,
         )
-        m1.red.try_finalize_rating()
+        m1.status, m1.red.score, m1.blue.score = SaturnStatus.COMPLETED, 1, 0
+        m1.save()
         # Expect m3 red to not be finalized yet, because t3 is not finalized
         self.assertIsNotNone(m1.red.rating)
         self.assertGreater(m1.red.rating.mean, m1.red.get_old_rating().mean)
@@ -347,18 +339,18 @@ class MatchParticipantTestCase(TestCase):
         r2 = Rating.objects.create(n=20)
         m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t2, score=0),
+            red=MatchParticipant.objects.create(team=t1),
+            blue=MatchParticipant.objects.create(team=t2),
             alternate_color=True,
             is_ranked=True,
-            status=SaturnStatus.COMPLETED,
+            status=SaturnStatus.RUNNING,
         )
         Match.objects.create(
             episode=e1,
             red=MatchParticipant.objects.create(team=t2, score=1, rating=r1),
             blue=MatchParticipant.objects.create(team=t3, score=0, rating=r2),
             alternate_color=True,
-            is_ranked=False,
+            is_ranked=True,
             status=SaturnStatus.COMPLETED,
         )
         m3 = Match.objects.create(
@@ -369,7 +361,8 @@ class MatchParticipantTestCase(TestCase):
             is_ranked=True,
             status=SaturnStatus.COMPLETED,
         )
-        m1.red.try_finalize_rating()
+        m1.status, m1.red.score, m1.blue.score = SaturnStatus.COMPLETED, 1, 0
+        m1.save()
         # Expect m3 red and blue to be both finalized
         m3.refresh_from_db()
         self.assertIsNotNone(m3.red.rating)
