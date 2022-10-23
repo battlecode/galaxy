@@ -1,7 +1,6 @@
 import uuid
 
 from django.apps import apps
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 import siarnaq.api.refs as refs
@@ -185,10 +184,10 @@ class MatchParticipant(models.Model):
         """Retrieve the match that contains this participation."""
         try:
             return self.red_match
-        except ObjectDoesNotExist:
+        except Match.DoesNotExist:
             try:
                 return self.blue_match
-            except ObjectDoesNotExist:
+            except Match.DoesNotExist:
                 raise RuntimeError("MatchParticipant missing match") from None
 
     def try_finalize_rating(self):
@@ -241,7 +240,7 @@ class MatchParticipant(models.Model):
             opponent.try_finalize_rating()
             try:
                 p = self.next_participation
-            except ObjectDoesNotExist:
+            except MatchParticipant.DoesNotExist:
                 pass  # No more participations to do
             else:
                 p.try_finalize_rating()
