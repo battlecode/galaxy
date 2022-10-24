@@ -321,6 +321,8 @@ class MatchParticipantTestCase(TestCase):
             status=SaturnStatus.COMPLETED,
         )
         m1.status, m1.red.score, m1.blue.score = SaturnStatus.COMPLETED, 1, 0
+        m1.red.save()
+        m1.blue.save()
         m1.save()
         # Expect m3 red to not be finalized yet, because t3 is not finalized
         self.assertIsNotNone(m1.red.rating)
@@ -362,6 +364,8 @@ class MatchParticipantTestCase(TestCase):
             status=SaturnStatus.COMPLETED,
         )
         m1.status, m1.red.score, m1.blue.score = SaturnStatus.COMPLETED, 1, 0
+        m1.red.save()
+        m1.blue.save()
         m1.save()
         # Expect m3 red and blue to be both finalized
         m3.refresh_from_db()

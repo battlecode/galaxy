@@ -2,6 +2,7 @@ import uuid
 
 from django.apps import apps
 from django.db import models
+from django.db.models import Q
 
 import siarnaq.api.refs as refs
 from siarnaq.api.compete.managers import (
@@ -161,13 +162,16 @@ class MatchParticipant(models.Model):
     def save(self, *args, **kwargs):
         """Pull the active submission and save to database."""
         if self._state.adding:
-            self.submission = self.team.get_active_submission()
+            self.submission_id = self.team.get_active_submission_id()
         super().save(*args, **kwargs)
 
     def get_old_rating(self):
         """Retrieve the team's rating prior to this participation."""
-        if self.previous_participation is not None:
-            return self.previous_participation.rating
+        if self.previous_participation_id is not None:
+            if self.previous_participation.rating_id is not None:
+                return self.previous_participation.rating
+            else:
+                return None
         else:
             return apps.get_model("teams", "Rating")()
 
@@ -176,19 +180,13 @@ class MatchParticipant(models.Model):
         Get the change in the rating mean of this participant, or null if it is not yet
         known.
         """
-        if self.rating is None:
+        if self.rating_id is None:
             return None
         return self.rating.to_value() - self.get_old_rating().to_value()
 
     def get_match(self):
         """Retrieve the match that contains this participation."""
-        try:
-            return self.red_match
-        except Match.DoesNotExist:
-            try:
-                return self.blue_match
-            except Match.DoesNotExist:
-                raise RuntimeError("MatchParticipant missing match") from None
+        return Match.objects.get(Q(red=self) | Q(blue=self))
 
     def try_finalize_rating(self):
         """
@@ -207,7 +205,7 @@ class MatchParticipant(models.Model):
         match is either complete or unranked. After the update, any newly-finalizable
         participations are also finalized.
         """
-        if self.rating is not None:
+        if self.rating_id is not None:
             return  # Done already!
 
         old_rating = self.get_old_rating()
@@ -235,7 +233,7 @@ class MatchParticipant(models.Model):
                 )
 
         if self.rating is not None:
-            self.save()
+            self.save(update_fields=["rating"])
             # Finalize ratings for any participations that could now be ready
             opponent.try_finalize_rating()
             try:
@@ -337,9 +335,9 @@ class Match(SaturnInvocation):
 
     def get_opponent(self, team):
         """Return the opponent participation of a given participation."""
-        if self.red == team:
+        if self.red_id == team.id:
             return self.blue
-        if self.blue == team:
+        if self.blue_id == team.id:
             return self.red
         raise ValueError("team is not a participant in this match")
 
