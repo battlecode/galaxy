@@ -161,19 +161,22 @@ class MatchParticipant(models.Model):
 
     def save(self, *args, **kwargs):
         """Pull the active submission and save to database."""
-        if self._state.adding:
+        if self._state.adding and self.submission_id is None:
             self.submission_id = self.team.get_active_submission_id()
         super().save(*args, **kwargs)
 
     def get_old_rating(self):
-        """Retrieve the team's rating prior to this participation."""
+        """
+        Retrieve the team's rating immediately prior to this participation, or None if
+        unknown.
+        """
         if self.previous_participation_id is not None:
             if self.previous_participation.rating_id is not None:
-                return self.previous_participation.rating
+                return self.previous_participation.rating  # Previous rating known
             else:
-                return None
+                return None  # Previous rating not yet finalized
         else:
-            return apps.get_model("teams", "Rating")()
+            return apps.get_model("teams", "Rating")()  # Default for first ever match
 
     def get_rating_delta(self):
         """
@@ -188,7 +191,7 @@ class MatchParticipant(models.Model):
         """Retrieve the match that contains this participation."""
         return Match.objects.get(Q(red=self) | Q(blue=self))
 
-    def try_finalize_rating(self):
+    def try_finalize_rating(self, *, match, opponent):
         """
         Attempt to finalize the rating for this participation if ready.
 
@@ -201,9 +204,21 @@ class MatchParticipant(models.Model):
 
         Therefore, we backlog rating updates when they come out of order, and finalize
         as many ratings as we can each time. A participation can have its rating
-        finalized if the team's previous participation is already finalized, and if the
-        match is either complete or unranked. After the update, any newly-finalizable
-        participations are also finalized.
+        finalized if the team's previous participation (if any) is already finalized,
+        and if the match is either complete or unranked. After the update, any
+        newly-finalizable participations are also finalized.
+
+        Note that teams with no prior participations are assumed to have the
+        default-constructed rating.
+
+        Parameters
+        ----------
+        match : Match
+            The match to which this participation belongs. Should be the return value of
+            self.get_match()
+        opponent : MatchParticipant
+            The opponent of this participation. Should be the return value of
+            match.get_opponent(self)
         """
         if self.rating_id is not None:
             return  # Done already!
@@ -211,9 +226,6 @@ class MatchParticipant(models.Model):
         old_rating = self.get_old_rating()
         if old_rating is None:
             return  # Not ready
-
-        match = self.get_match()
-        opponent = match.get_opponent(self)
 
         # Matches are unranked if they were supposed to be unranked, or if they ended
         # unsuccessfully.
@@ -223,6 +235,8 @@ class MatchParticipant(models.Model):
 
         if is_unranked:
             if old_rating._state.adding:
+                # If this is a default-constructed rating, save it to the database.
+                # Occurs when this is the team's first-ever match.
                 old_rating.save()
             self.rating = old_rating
         elif match.is_finalized():
@@ -234,14 +248,16 @@ class MatchParticipant(models.Model):
 
         if self.rating is not None:
             self.save(update_fields=["rating"])
-            # Finalize ratings for any participations that could now be ready
-            opponent.try_finalize_rating()
+            # Finalize ratings for any matches that could now be ready
             try:
-                p = self.next_participation
-            except MatchParticipant.DoesNotExist:
-                pass  # No more participations to do
+                next_match = Match.objects.get(
+                    Q(red__previous_participation=self)
+                    | Q(blue__previous_participation=self)
+                )
+            except Match.DoesNotExist:
+                pass  # No more matches to do
             else:
-                p.try_finalize_rating()
+                next_match.try_finalize_ratings()
 
 
 class Match(SaturnInvocation):
@@ -340,6 +356,13 @@ class Match(SaturnInvocation):
         if self.blue_id == team.id:
             return self.red
         raise ValueError("team is not a participant in this match")
+
+    def try_finalize_ratings(self):
+        """Try to finalize the ratings of the participations if possible."""
+        if self.is_ranked and not self.is_finalized():
+            return  # Not ready yet
+        self.red.try_finalize_rating(match=self, opponent=self.blue)
+        self.blue.try_finalize_rating(match=self, opponent=self.red)
 
 
 class ScrimmageRequestStatus(models.TextChoices):
