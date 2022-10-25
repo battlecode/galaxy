@@ -36,7 +36,9 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
         http_target=scheduler.HttpTarget(
             uri=reverse(...),  # TODO get the uri
             http_method=scheduler.HttpMethod.POST,
-            oidc_token=scheduler.OidcToken(service_account_email=...),
+            oidc_token=scheduler.OidcToken(
+                service_account_email=settings.USER_GCLOUD_ADMIN_EMAIL,
+            ),
         ),
         schedule=new_schedule,
         time_zone=settings.TIME_ZONE,
