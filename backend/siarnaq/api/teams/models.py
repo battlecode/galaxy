@@ -131,14 +131,9 @@ class Team(models.Model):
         """Return whether this team has an active submission."""
         return self.submissions.filter(accepted=True).exists()
 
-    def get_active_submission_id(self):
+    def get_active_submission(self):
         """Return the current active submission belonging to the team."""
-        return (
-            self.submissions.filter(accepted=True)
-            .order_by("-created")
-            .values_list("pk", flat=True)
-            .first()
-        )
+        return self.submissions.filter(accepted=True).order_by("-created").first()
 
 
 class TeamProfile(models.Model):

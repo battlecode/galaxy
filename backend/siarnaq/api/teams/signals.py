@@ -13,7 +13,7 @@ def copy_rating_to_profile(instance, update_fields, **kwargs):
     """
     if update_fields is not None and "rating" not in list(update_fields):
         return  # No new rating
-    if instance.rating_id is not None:
+    if instance.rating is not None:
         TeamProfile.objects.filter(
             team=instance.team_id, rating__n__lt=instance.rating.n
         ).update(rating=instance.rating)

@@ -10,10 +10,9 @@ def connect_linked_list(instance, created, **kwargs):
     if not created:
         return
 
-    instance.previous_participation_id = (
+    instance.previous_participation = (
         MatchParticipant.objects.filter(team=instance.team, pk__lt=instance.pk)
         .order_by("-pk")
-        .values_list("pk", flat=True)
         .first()
     )
     instance.save(update_fields=["previous_participation"])

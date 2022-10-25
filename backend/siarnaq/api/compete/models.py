@@ -162,7 +162,7 @@ class MatchParticipant(models.Model):
     def save(self, *args, **kwargs):
         """Pull the active submission and save to database."""
         if self._state.adding and self.submission_id is None:
-            self.submission_id = self.team.get_active_submission_id()
+            self.submission = self.team.get_active_submission()
         super().save(*args, **kwargs)
 
     def get_old_rating(self):
@@ -170,11 +170,8 @@ class MatchParticipant(models.Model):
         Retrieve the team's rating immediately prior to this participation, or None if
         unknown.
         """
-        if self.previous_participation_id is not None:
-            if self.previous_participation.rating_id is not None:
-                return self.previous_participation.rating  # Previous rating known
-            else:
-                return None  # Previous rating not yet finalized
+        if self.previous_participation is not None:
+            return self.previous_participation.rating  # Previous rating, if known
         else:
             return apps.get_model("teams", "Rating")()  # Default for first ever match
 
@@ -183,7 +180,7 @@ class MatchParticipant(models.Model):
         Get the change in the rating mean of this participant, or null if it is not yet
         known.
         """
-        if self.rating_id is None:
+        if self.rating is None:
             return None
         return self.rating.to_value() - self.get_old_rating().to_value()
 
@@ -220,7 +217,7 @@ class MatchParticipant(models.Model):
             The opponent of this participation. Should be the return value of
             match.get_opponent(self)
         """
-        if self.rating_id is not None:
+        if self.rating is not None:
             return  # Done already!
 
         old_rating = self.get_old_rating()
@@ -250,7 +247,12 @@ class MatchParticipant(models.Model):
             self.save(update_fields=["rating"])
             # Finalize ratings for any matches that could now be ready
             try:
-                next_match = Match.objects.get(
+                next_match = Match.objects.select_related(
+                    "red__previous_participation__rating",
+                    "blue__previous_participation__rating",
+                    "red__rating",
+                    "blue__rating",
+                ).get(
                     Q(red__previous_participation=self)
                     | Q(blue__previous_participation=self)
                 )
@@ -348,14 +350,6 @@ class Match(SaturnInvocation):
             return False
         # Regular matches are public knowledge
         return True
-
-    def get_opponent(self, team):
-        """Return the opponent participation of a given participation."""
-        if self.red_id == team.id:
-            return self.blue
-        if self.blue_id == team.id:
-            return self.red
-        raise ValueError("team is not a participant in this match")
 
     def try_finalize_ratings(self):
         """Try to finalize the ratings of the participations if possible."""
