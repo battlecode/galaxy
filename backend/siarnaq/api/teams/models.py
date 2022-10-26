@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 import siarnaq.api.refs as refs
+from siarnaq.api.teams.managers import TeamQuerySet
 
 
 class EligibilityCriterion(models.Model):
@@ -110,6 +111,8 @@ class Team(models.Model):
         default=TeamStatus.REGULAR,
     )
     """The type of the team."""
+
+    objects = TeamQuerySet.as_manager()
 
     class Meta:
         constraints = [
