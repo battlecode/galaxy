@@ -20,6 +20,14 @@ jobs:
           create_credentials_file: true
           workload_identity_provider: projects/830784087321/locations/global/workloadIdentityPools/galaxy-ci/providers/github-ci-main
           service_account: github-ci-agent@mitbattlecode.iam.gserviceaccount.com
+      - name: Cache conda
+        uses: actions/cache@v3.0.11
+        env:
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
       - name: Setup miniconda
         uses: conda-incubator/setup-miniconda@v2.1.1
         with:
@@ -43,13 +51,21 @@ jobs:
           create_credentials_file: true
           workload_identity_provider: projects/830784087321/locations/global/workloadIdentityPools/galaxy-ci/providers/github-ci-main
           service_account: github-ci-agent@mitbattlecode.iam.gserviceaccount.com
+      - name: Cache conda
+        uses: actions/cache@v3.0.11
+        env:
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
       - name: Setup miniconda
         uses: conda-incubator/setup-miniconda@v2.1.1
         with:
           environment-file: environment-dev.yml
       - name: Initialize migrations
-        run: ./manage.py makemigrations && ./manage.py migrate
+        run: ./manage.py makemigrations
         working-directory: ./backend
       - name: Run tests
-        run: find * -type f -name tests.py | sed "s/\.py$//g" | sed "s/\//./g" | xargs ./manage.py test
+        run: find * -type f -name tests.py | sed "s/\.py$//g" | sed "s/\//./g" | xargs ./manage.py test -v=2
         working-directory: ./backend
