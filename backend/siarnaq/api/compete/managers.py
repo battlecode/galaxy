@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.db import models
-from google.cloud import pubsub_v1
+from google.cloud import pubsub
 
 
 class SaturnInvokableQuerySet(models.QuerySet):
-    _publish_client = pubsub_v1.PublisherClient(
-        publisher_options=pubsub_v1.types.PublisherOptions(
+    _publish_client = pubsub.PublisherClient(
+        publisher_options=pubsub.types.PublisherOptions(
             enable_message_ordering=True,
         ),
         client_options={
