@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import OuterRef, Subquery
 from google.cloud import pubsub
 
 
@@ -36,6 +37,35 @@ class SubmissionQuerySet(SaturnInvokableQuerySet):
     @property
     def _publish_ordering_key(self):
         return settings.COMPETE_SATURN_COMPILE_ORDER
+
+
+class MatchParticipantManager(models.Manager):
+    def bulk_create(self, objs, **kwargs):
+        """
+        Create a collection of match participations in bulk, and set up the linked list
+        connections for participations in all teams involved. It is required that these
+        objects have the `submission` field set.
+
+        Note that signals are not sent by bulk creation.
+
+        See Also
+        --------
+        siarnaq.api.compete.signals.connect_linked_list :
+            A post_save signal that performs the equivalent linked-list insertion
+            performed by this method.
+        """
+        objs = list(objs)
+        if any(obj.submission_id is None for obj in objs):
+            raise ValueError("Must set MatchParticipant.submission to use bulk_create")
+        objs = super().bulk_create(objs, **kwargs)
+        self.model.objects.filter(pk__in=[obj.pk for obj in objs]).update(
+            previous_participation=Subquery(
+                self.model.objects.filter(team=OuterRef("team"), pk__lt=OuterRef("pk"))
+                .order_by("-pk")
+                .values("pk")[:1]
+            )
+        )
+        return objs
 
 
 class MatchQuerySet(SaturnInvokableQuerySet):
