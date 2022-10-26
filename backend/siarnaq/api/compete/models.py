@@ -1,6 +1,8 @@
 import uuid
 
+from django.apps import apps
 from django.db import models
+from django.db.models import Q
 
 import siarnaq.api.refs as refs
 from siarnaq.api.compete.managers import (
@@ -57,7 +59,11 @@ class SaturnInvocation(models.Model):
 
     def is_finalized(self):
         """Return whether this invocation is finalized."""
-        pass
+        return self.status in {
+            SaturnStatus.COMPLETED,
+            SaturnStatus.ERRORED,
+            SaturnStatus.CANCELLED,
+        }
 
     def enqueue_options(self):
         """Return the options to be submitted to the saturn invocation queue."""
@@ -126,51 +132,134 @@ class MatchParticipant(models.Model):
         Submission,
         on_delete=models.PROTECT,
         related_name="participations",
+        blank=True,
     )
-    """The active submission that was used by the team in this match."""
+    """
+    The active submission that was used by the team in this match. Will be auto-filled
+    upon save if left blank.
+    """
 
     score = models.PositiveSmallIntegerField(null=True, blank=True)
     """The team's score in the match, or null if the match has not been completed."""
 
-    rating_old = models.OneToOneField(
+    rating = models.ForeignKey(
         refs.RATING_MODEL,
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        related_name="succeeding_participation",
     )
-    """The team's pre-match rating, or null if it depends on incomplete matches."""
+    """The team's rating after the match, or null if it is not yet known."""
 
-    rating_new = models.OneToOneField(
-        refs.RATING_MODEL,
+    previous_participation = models.OneToOneField(
+        "self",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
-        related_name="preceding_participation",
+        related_name="next_participation",
     )
-    """The team's post-match rating, or null if the match is rated and incomplete."""
+    """The team's previous participation, or null if there is none."""
 
-    def get_rating_old(self):
-        """
-        Get the old rating of this participant, or else the participant's current rating
-        if it is not yet known.
-        """
-        if self.rating_old is None:
-            return self.team.profile.rating
-        return self.rating_old
+    def save(self, *args, **kwargs):
+        """Pull the active submission and save to database."""
+        if self._state.adding and self.submission_id is None:
+            self.submission = self.team.get_active_submission()
+        super().save(*args, **kwargs)
 
-    def get_rating_new(self):
+    def get_old_rating(self):
         """
-        Get the new rating of this participant, or else None if it is not yet known.
+        Retrieve the team's rating immediately prior to this participation, or None if
+        unknown.
         """
-        return self.rating_new
+        if self.previous_participation is not None:
+            return self.previous_participation.rating  # Previous rating, if known
+        else:
+            return apps.get_model("teams", "Rating")()  # Default for first ever match
 
     def get_rating_delta(self):
         """
         Get the change in the rating mean of this participant, or null if it is not yet
         known.
         """
-        raise NotImplementedError
+        if self.rating is None:
+            return None
+        return self.rating.to_value() - self.get_old_rating().to_value()
+
+    def get_match(self):
+        """Retrieve the match that contains this participation."""
+        return Match.objects.get(Q(red=self) | Q(blue=self))
+
+    def try_finalize_rating(self, *, match, opponent):
+        """
+        Attempt to finalize the rating for this participation if ready.
+
+        Ratings are a complex affair. Ideally, we would like to update ratings as soon
+        as we find out the result of a match. However, for user experience reasons,
+        matches should have their ratings applied in the order they are listed to the
+        client, which is in order of match creation (this ensures that matches do not
+        spontaneously shuffle). This is usually different to the order of match
+        completion.
+
+        Therefore, we backlog rating updates when they come out of order, and finalize
+        as many ratings as we can each time. A participation can have its rating
+        finalized if the team's previous participation (if any) is already finalized,
+        and if the match is either complete or unranked. After the update, any
+        newly-finalizable participations are also finalized.
+
+        Note that teams with no prior participations are assumed to have the
+        default-constructed rating.
+
+        Parameters
+        ----------
+        match : Match
+            The match to which this participation belongs. Should be the return value of
+            self.get_match()
+        opponent : MatchParticipant
+            The opponent of this participation. Should be the return value of
+            match.get_opponent(self)
+        """
+        if self.rating is not None:
+            return  # Done already!
+
+        old_rating = self.get_old_rating()
+        if old_rating is None:
+            return  # Not ready
+
+        # Matches are unranked if they were supposed to be unranked, or if they ended
+        # unsuccessfully.
+        is_unranked = (not match.is_ranked) or (
+            match.is_finalized() and match.status != SaturnStatus.COMPLETED
+        )
+
+        if is_unranked:
+            if old_rating._state.adding:
+                # If this is a default-constructed rating, save it to the database.
+                # Occurs when this is the team's first-ever match.
+                old_rating.save()
+            self.rating = old_rating
+        elif match.is_finalized():
+            opponent_rating = opponent.get_old_rating()
+            if opponent_rating is not None:
+                self.rating = self.get_old_rating().step(
+                    opponent_rating, self.score / (self.score + opponent.score)
+                )
+
+        if self.rating is not None:
+            self.save(update_fields=["rating"])
+            # Finalize ratings for any matches that could now be ready
+            try:
+                next_match = Match.objects.select_related(
+                    "red__previous_participation__rating",
+                    "blue__previous_participation__rating",
+                    "red__rating",
+                    "blue__rating",
+                ).get(
+                    Q(red__previous_participation=self)
+                    | Q(blue__previous_participation=self)
+                )
+            except Match.DoesNotExist:
+                pass  # No more matches to do
+            else:
+                next_match.try_finalize_ratings()
 
 
 class Match(SaturnInvocation):
@@ -262,17 +351,12 @@ class Match(SaturnInvocation):
         # Regular matches are public knowledge
         return True
 
-    def get_opponent(self, team):
-        """Return the opponent of a participant in this match."""
-        if self.red.team.pk == team.pk:
-            return self.blue.team
-        if self.blue.team.pk == team.pk:
-            return self.red.team
-        raise ValueError("team is not a participant in this match")
-
-    def finalize_ratings(self):
-        """Populate the ratings for this match idempotently."""
-        raise NotImplementedError
+    def try_finalize_ratings(self):
+        """Try to finalize the ratings of the participations if possible."""
+        if self.is_ranked and not self.is_finalized():
+            return  # Not ready yet
+        self.red.try_finalize_rating(match=self, opponent=self.blue)
+        self.blue.try_finalize_rating(match=self, opponent=self.red)
 
 
 class ScrimmageRequestStatus(models.TextChoices):

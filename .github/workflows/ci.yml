@@ -28,3 +28,28 @@ jobs:
         run: |
           pre-commit install
           pre-commit run -a
+  unit-test:
+    name: Unit tests (django)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v2.4.0
+      - name: Authenticate to GCP
+        uses: google-github-actions/auth@v0.8.0
+        with:
+          create_credentials_file: true
+          workload_identity_provider: projects/830784087321/locations/global/workloadIdentityPools/galaxy-ci/providers/github-ci-main
+          service_account: github-ci-agent@mitbattlecode.iam.gserviceaccount.com
+      - name: Setup miniconda
+        uses: conda-incubator/setup-miniconda@v2.1.1
+        with:
+          environment-file: environment-dev.yml
+      - name: Initialize migrations
+        run: ./manage.py makemigrations && ./manage.py migrate
+        working-directory: ./backend
+      - name: Run tests
+        run: find * -type f -name tests.py | sed "s/\.py$//g" | sed "s/\//./g" | xargs ./manage.py test
+        working-directory: ./backend
