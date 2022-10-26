@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.urls import reverse
@@ -25,17 +26,26 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
     if old_schedule == new_schedule:
         return
 
+    # Autoscrims are always best of 3. Future devs are welcome to change this if they
+    # wish, perhaps by adding `best_of` as a column in the Episode model.
+    best_of = 3
+
     parent = (
         f"projects/{settings.GOOGLE_CLOUD_PROJECT_ID}/"
         f"locations/{settings.GOOGLE_CLOUD_LOCATION}"
     )
     job_name = f"{parent}/jobs/autoscrim_{instance.name_short}"
+    url = "https://{}{}".format(
+        Site.objects.get_current().domain,
+        reverse("episode-autoscrim", kwargs={"pk": instance.pk}),
+    )
     job = scheduler.Job(
         name=job_name,
         description=f"Autoscrims for {instance.name_short} ({instance.name_long})",
         http_target=scheduler.HttpTarget(
-            uri=reverse(...),  # TODO get the uri
+            uri=url,
             http_method=scheduler.HttpMethod.POST,
+            body=f"best_of={best_of}".encode(),
             oidc_token=scheduler.OidcToken(
                 service_account_email=settings.USER_GCLOUD_ADMIN_EMAIL,
             ),
