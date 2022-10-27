@@ -13,6 +13,7 @@ const EPISODE_TO_SCAFFOLD_NAME = {
   2022: "battlecode22-scaffold",
   2023: "battlecode23-scaffold",
 };
+const DEFAULT_EPISODE = "2022";
 
 class MultiEpisode extends Component {
   // TODO have two methods: getEpisodeCurrent(), and getEpisodeFromPathname(pathname)
@@ -43,7 +44,9 @@ class MultiEpisode extends Component {
     return EPISODE_TO_SCAFFOLD_NAME[episode];
   }
 
-  // TODO methods to derive file extension and scaffold link
+  static getDefaultEpisode() {
+    return DEFAULT_EPISODE;
+  }
 
   constructor(params) {
     super(params);
