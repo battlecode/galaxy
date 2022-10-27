@@ -15,9 +15,6 @@ const EPISODE_TO_SCAFFOLD_NAME = {
 const DEFAULT_EPISODE = "2022";
 
 class MultiEpisode extends Component {
-  // TODO have two methods: getEpisodeCurrent(), and getEpisodeFromPathname(pathname)
-  // to still have both convenience and flexibility
-
   // Given the window.location.pathname of a page (e.g. /2022/getting-started)
   // derives the episode from it.
   // (We use pathname as input, because JS's pathname does some useful work for us,
@@ -45,6 +42,18 @@ class MultiEpisode extends Component {
       window.location.replace("/");
     }
   }
+
+  // Gets the episode based on the currently navigated URL.
+  static getEpisodeCurrent() {
+    return this.getEpisodeFromPathname(window.location.pathname);
+  }
+
+  static getExtension(episode) {
+    return EPISODE_TO_EXTENSION[episode];
+  }
+
+  static getScaffoldLink(episode) {
+    return EPISODE_TO_SCAFFOLD_LINK[episode];
   }
 
   static getScaffoldName(episode) {
