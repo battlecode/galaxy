@@ -2,7 +2,7 @@ import React, { Component } from "react";
 // import ReactDOM from "react-dom";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { Switch, Route } from "react-router";
+import { Switch, Route, Redirect } from "react-router";
 
 import Home from "./views/home";
 import NotFound from "./views/not_found";
@@ -46,10 +46,13 @@ class App extends Component {
 
     // should always be viewable, even when not logged in
     this.nonLoggedInElems = [
-      // <Route exact path={`/:episode/`} component={Home} key="home-blank" />,
-      // TODO get some sort of default path working.
-      // Ideally - /2022 should redir to home. /2022/ should prob redir to home.
-      // What should / do? Probably redirect to the homepage of the stored current episode?
+      // Redirect empty path to the default episode's home page
+      // NOTE: this path needs a slash, it can't be the empty string. Unsure why.
+      <Route exact path="/">
+        {<Redirect to={`${MultiEpisode.getDefaultEpisode()}/home`} />}
+      </Route>,
+
+      <Route exact path={`/:episode`} component={Home} key="home-blank" />,
       <Route path={`/:episode/home`} component={Home} key="home" />,
       <Route path={`/:episode/updates`} component={Updates} key="updates" />,
       // commented but kept since we might use this later
