@@ -2,23 +2,23 @@ name: siarnaq
 channels:
   - conda-forge
 dependencies:
-  - black
-  - ca-certificates
+  - black=22.10.0
+  - ca-certificates=2022.9.24
   - click<8.1.0
-  - django
-  - django-cors-headers
-  - django-stubs
-  - djangorestframework
-  - drf-spectacular
-  - flake8
-  - google-api-python-client
-  - google-cloud-pubsub
-  - isort
-  - mypy
-  - openssl
-  - pip
-  - pre_commit
+  - django=4.1.2
+  - django-cors-headers=3.13.0
+  - django-stubs=1.12.0
+  - djangorestframework=3.14.0
+  - drf-spectacular=0.24.2
+  - flake8=5.0.4
+  - google-auth=2.13.0
+  - google-cloud-pubsub=2.13.10
+  - isort=5.10.1
+  - mypy=0.942
+  - openssl=3.0.5
+  - pip=22.3
+  - pre_commit=2.20.0
   - python=3.10
-  - pyupgrade
+  - pyupgrade=3.1.0
   - pip:
-    - djangorestframework-simplejwt
+    - djangorestframework-simplejwt==5.2.2
