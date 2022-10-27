@@ -1,7 +1,7 @@
+import google.cloud.pubsub as pubsub
 from django.conf import settings
 from django.db import models
 from django.db.models import OuterRef, Subquery
-from google.cloud import pubsub
 
 
 class SaturnInvokableQuerySet(models.QuerySet):

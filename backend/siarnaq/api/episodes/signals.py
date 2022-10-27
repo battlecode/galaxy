@@ -1,9 +1,9 @@
+import google.cloud.scheduler as scheduler
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.urls import reverse
-from google.cloud import scheduler
 
 from siarnaq.api.episodes.models import Episode
 
