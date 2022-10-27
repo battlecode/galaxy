@@ -25,6 +25,11 @@ class MultiEpisode extends Component {
   // NOTE: Assumes that when episodes are in URLs, the episode is the first part of the URL.
   // This is what we have done elsewhere, but is subject to change and this code would suddenly break.
   static getEpisodeFromPathname(pathname) {
+    // Special case:
+    if (pathname == "" || pathname == "/") {
+      return DEFAULT_EPISODE;
+    }
+
     const parts = pathname.split("/");
     // Note that, if pathname begins with a /, parts[0] will be the empty string
     // (since split allows for empty strings as parts)
@@ -34,9 +39,12 @@ class MultiEpisode extends Component {
     if (EPISODES.includes(episodeInPathName)) {
       return episodeInPathName;
     } else {
-      // TODO redirect here, (not on the caller checking the result)
-      return null;
+      alert(
+        "Episode does not exist. Redirecting to home page.\n(Due to technical limitations, this alert may show several times. Please be patient)"
+      );
+      window.location.replace("/");
     }
+  }
   }
 
   static getScaffoldName(episode) {
