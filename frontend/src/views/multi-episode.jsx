@@ -1,5 +1,4 @@
 import { Component } from "react";
-import Cookies from "js-cookie";
 
 // NOTE: Save extensions as strings, not numbers, since episodes could be strings too (eg Battlehack)
 const EPISODES = ["2022", "2023"];
@@ -52,41 +51,17 @@ class MultiEpisode extends Component {
     super(params);
   }
 
-  // TODO remove cookie based approach; use the above static methods
   render() {
     let input = prompt(
-      "Please enter episode to change to, e.g. '2022'",
-      "2022"
+      `Please enter episode to change to, e.g. ${DEFAULT_EPISODE}`,
+      DEFAULT_EPISODE
     );
-    // this.EPISODES is an array; use "includes" or "of"
-    if (this.EPISODES.includes(input)) {
-      const episode = input;
-      // these are dicts/JS objects; use "in" to query keys
-      if (
-        !(
-          episode in this.EPISODE_TO_EXTENSION &&
-          episode in this.EPISODE_TO_SCAFFOLD
-        )
-      ) {
-        // To make sure we don't have glitchy file extensions or scaffold links.
-        // If someone complains about this error message, fix those above dictionaries.
-        alert("Episode not configured properly, contact Teh Devs");
-      } else {
-        Cookies.set("episode", episode);
-        const extension = this.EPISODE_TO_EXTENSION[episode];
-        const scaffold_link = this.EPISODE_TO_SCAFFOLD[episode];
-        Cookies.set("episode-extension", extension);
-        Cookies.set("episode-scaffold-link", scaffold_link);
-      }
+    if (EPISODES.includes(input)) {
+      window.location.replace(`/${input}`);
     } else {
       alert("Episode does not exist");
+      history.back();
     }
-
-    // Redirect to home page.
-    // This is annoying for user experience quality of life, if they came from a different page...
-    // but from a coding standpoint I can't think of how to do this easily.
-    // Save URL in cookies?
-    window.location.replace("/");
   }
 }
 
