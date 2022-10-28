@@ -7,7 +7,7 @@ class Tournaments extends Component {
     super();
     this.state = {
       tournaments: [],
-      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
     };
   }
 
