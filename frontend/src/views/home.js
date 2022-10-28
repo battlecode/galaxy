@@ -143,7 +143,7 @@ class LinksCard extends Component {
               (<a href="https://discord.gg/N86mxkH">invite</a>)
             </li>
             <li>
-              <a href="https://github.com/battlecode/battlecode21">GitHub</a>
+              <a href="https://github.com/battlecode">GitHub</a>
             </li>
             <li>
               <a href="https://twitch.tv/mitbattlecode">Twitch</a>
