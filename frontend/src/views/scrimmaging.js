@@ -109,7 +109,7 @@ class ScrimmageHistory extends Component {
     scrimPage: 1,
     scrimLimit: 0,
     scrimmages: [],
-    episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+    episode: MultiEpisode.getEpisodeFromCurrentPathname(),
   };
 
   refresh = (page) => {
