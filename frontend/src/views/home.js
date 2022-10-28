@@ -92,7 +92,7 @@ class InstrCard extends UpdateCard {
     super();
     this.state = {
       dates: [],
-      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
     };
   }
 
