@@ -1,11 +1,15 @@
 ﻿import React, { Component } from "react";
+import MultiEpisode from "./multi-episode";
 
 class Debugging extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
 
     this.state = {
       ide: "intellij",
+      episode: episode,
+      scaffoldName: MultiEpisode.getScaffoldName(episode),
     };
   }
 
@@ -485,7 +489,7 @@ class Debugging extends Component {
                       <li>
                         Next to the <code>gradle project</code> field, click the
                         folder icon and select{" "}
-                        <code>battlecode20-scaffold</code>
+                        <code>{this.state.scaffoldName}</code>
                       </li>
                       <li>
                         In the <code>Tasks</code> field, type <code>run</code>
