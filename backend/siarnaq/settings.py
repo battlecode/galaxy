@@ -185,6 +185,10 @@ GOOGLE_CLOUD_LOCATION = "us-east1"
 USER_GCLOUD_ADMIN_EMAIL = GOOGLE_CLOUD_CREDENTIALS.service_account_email
 USER_GCLOUD_ADMIN_USERNAME = "galaxy-admin"
 
+# Do not inadvertently interact with cloud resources while testing locally.
+# Change this in production and while running system integration tests.
+GCLOUD_DISABLE_ALL_ACTIONS = True
+
 # Penalized Elo configuration
 
 TEAMS_ELO_INITIAL = 1500.0

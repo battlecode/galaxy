@@ -14,6 +14,8 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
     Update the Google Cloud Scheduler resource for automatic scrimmage scheduling
     whenever the specification is changed, raising an exception if the operation fails.
     """
+    if settings.GCLOUD_DISABLE_ALL_ACTIONS:
+        return
     if update_fields is not None and "autoscrim_schedule" not in update_fields:
         return  # No new schedule
     try:
