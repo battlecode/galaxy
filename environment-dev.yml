@@ -13,6 +13,7 @@ dependencies:
   - flake8=5.0.4
   - google-auth=2.13.0
   - google-cloud-pubsub=2.13.10
+  - google-cloud-storage=2.5.0
   - isort=5.10.1
   - mypy=0.942
   - openssl=3.0.5

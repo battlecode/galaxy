@@ -1,4 +1,3 @@
-from django.utils import timezone
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -18,12 +17,7 @@ class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        user = self.request.user
-        queryset = Episode.objects.all()
-        if not user.is_staff:
-            # Episodes that have not been released are not visible to non-admin users
-            queryset = queryset.filter(registration__lte=timezone.now())
-        return queryset
+        return Episode.objects.user_visible(is_staff=self.request.user.is_staff)
 
     @extend_schema(responses={204: OpenApiResponse(description="Created successfully")})
     @action(

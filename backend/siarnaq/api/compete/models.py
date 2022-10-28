@@ -1,3 +1,4 @@
+import posixpath
 import uuid
 
 from django.apps import apps
@@ -111,6 +112,16 @@ class Submission(SaturnInvocation):
     """A human-readable message describing the submission."""
 
     objects = SubmissionQuerySet.as_manager()
+
+    def get_source_path(self):
+        """Return the path of the source code on Google cloud storage."""
+        return posixpath.join(
+            self.episode.name_short,
+            "submission",
+            self.created.strftime("%Y%b%d"),
+            str(self.pk),
+            "source.zip",
+        )
 
     def enqueue_options(self):
         """Return the options to be submitted to the compilation queue."""
