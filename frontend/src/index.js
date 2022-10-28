@@ -48,7 +48,7 @@ class App extends Component {
     this.nonLoggedInElems = [
       // Redirect empty path to the default episode's home page
       // NOTE: this path needs a slash, it can't be the empty string. Unsure why.
-      <Route exact path="/">
+      <Route exact path="/" key="empty-route">
         {<Redirect to={`${MultiEpisode.getDefaultEpisode()}/home`} />}
       </Route>,
 
