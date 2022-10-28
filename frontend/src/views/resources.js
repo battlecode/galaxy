@@ -61,7 +61,7 @@ class Resources extends Component {
                     <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
-                      href="/common-issues"
+                      href={`/${this.state.episode}/common-issues`}
                     >
                       Common Issues
                     </a>
@@ -70,7 +70,7 @@ class Resources extends Component {
                     <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
-                      href="/debugging"
+                      href={`/${this.state.episode}/debugging`}
                     >
                       Debugging Tips
                     </a>

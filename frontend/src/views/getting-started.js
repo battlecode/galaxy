@@ -12,6 +12,7 @@ class GettingStarted extends Component {
       ide: "intellij",
       episode: episode,
       scaffold_name: MultiEpisode.getScaffoldName(episode),
+      scaffold_link: MultiEpisode.getScaffoldLink(episode),
     };
   }
 
@@ -105,7 +106,7 @@ class GettingStarted extends Component {
 
             <li>
               Create a new Eclipse workspace. The workspace should NOT contain
-              the <code>battlecode22-scaffold</code> folder.
+              the <code>{this.state.scaffold_name}</code> folder.
             </li>
 
             <li>
@@ -131,7 +132,8 @@ class GettingStarted extends Component {
             <li>
               Next to <code>Project root directory</code> field, press{" "}
               <code>Browse...</code> and navigate to{" "}
-              <code>battlecode22-scaffold</code>. Finish importing the project.
+              <code>{this.state.scaffold_name}</code>. Finish importing the
+              project.
             </li>
 
             <li>
@@ -143,7 +145,7 @@ class GettingStarted extends Component {
             <li>
               In the <code>Gradle Tasks</code> window, you should now see a list
               of available Gradle tasks. Open the{" "}
-              <code>battlecode22-scaffold</code> folder and navigate to the
+              <code>{this.state.scaffold_name}</code> folder and navigate to the
               <code>battlecode</code> group, and then double-click{" "}
               <code>update</code> and <code>build</code>. This will run tests to
               verify that everything is working correctly, as well as download
@@ -209,7 +211,7 @@ class GettingStarted extends Component {
 
             <li>
               Navigate to the root directory of your{" "}
-              <code>battlecode22-scaffold</code>, and run{" "}
+              <code>{this.state.scaffold_name}</code>, and run{" "}
               <code>./gradlew update</code> and then{" "}
               <code>./gradlew build</code>
               (or <code>gradlew build</code> on Windows). This will run tests to
@@ -338,7 +340,7 @@ class GettingStarted extends Component {
                     Next, you should download the{" "}
                     <b>
                       <a
-                        href="https://github.com/battlecode/battlecode22-scaffold"
+                        href={this.state.scaffold_link}
                         style={{ fontWeight: 700 }}
                       >
                         Battlecode {this.state.episode} scaffold
@@ -362,7 +364,7 @@ class GettingStarted extends Component {
                     (or wait for our lecture covering it). On the{" "}
                     <b>
                       <a
-                        href="https://github.com/battlecode/battlecode22-scaffold"
+                        href={this.state.scaffold_link}
                         style={{ fontWeight: 700 }}
                       >
                         scaffold page
@@ -479,7 +481,10 @@ class GettingStarted extends Component {
                 <div className="content">
                   <p>
                     Once you're all set up, make sure to check out the{" "}
-                    <NavLink to="/resources" style={{ fontWeight: 700 }}>
+                    <NavLink
+                      to={`/${this.state.episode}/resources`}
+                      style={{ fontWeight: 700 }}
+                    >
                       resources
                     </NavLink>{" "}
                     page!
