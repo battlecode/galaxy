@@ -33,7 +33,7 @@ class SideBar extends Component {
       logged_in: null,
       user: {},
       league: {},
-      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
     };
   }
 

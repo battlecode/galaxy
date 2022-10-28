@@ -6,7 +6,7 @@ class Resources extends Component {
   constructor(params) {
     super(params);
     this.state = {
-      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
     };
   }
 
