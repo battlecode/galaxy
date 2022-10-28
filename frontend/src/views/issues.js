@@ -5,8 +5,12 @@ import MultiEpisode from "./multi-episode";
 class Issues extends Component {
   constructor(props) {
     super(props);
+    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
     this.state = {
-      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+      episode: episode,
+      extension: MultiEpisode.getExtension(episode),
+      scaffoldName: MultiEpisode.getScaffoldName(episode),
+      scaffoldLink: MultiEpisode.getScaffoldLink(episode),
     };
   }
 
@@ -119,11 +123,11 @@ class Issues extends Component {
                   </p>
                   <ul style={{ marginLeft: "-15px" }}>
                     <li>
-                      Making .bc22 files with the engine directly and uploading
-                      them to the client's match queue, rather than using the
-                      client's runner. With this method, once the web version of
-                      the visualizer is live, you can just use the web version
-                      at{" "}
+                      Making {this.state.extension} files with the engine
+                      directly and uploading them to the client's match queue,
+                      rather than using the client's runner. With this method,
+                      once the web version of the visualizer is live, you can
+                      just use the web version at{" "}
                       <a
                         href={`https://play.battlecode.org/clients/${this.state.episode}/visualizer.html`}
                         style={{ fontWeight: 700 }}
@@ -151,8 +155,8 @@ class Issues extends Component {
                         </i>{" "}
                         You need to refresh dependencies. Right-click on the
                         project name (most likely{" "}
-                        <code>battlecode20-scaffold</code>) in the Gradle Tool
-                        Window (the right-hand sidebar), and click{" "}
+                        <code>{this.state.scaffoldName}</code>) in the Gradle
+                        Tool Window (the right-hand sidebar), and click{" "}
                         <code>Refresh Gradle Dependencies</code>. It is good to
                         do this after every update.
                       </li>
@@ -229,7 +233,7 @@ class Issues extends Component {
                         Redownload{" "}
                         <b>
                           <a
-                            href="https://github.com/battlecode/battlecode21-scaffold"
+                            href={this.state.scaffoldLink}
                             style={{ fontWeight: 700 }}
                           >
                             the scaffold
