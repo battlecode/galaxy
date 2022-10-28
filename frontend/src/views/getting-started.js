@@ -6,9 +6,7 @@ import MultiEpisode from "./multi-episode";
 class GettingStarted extends Component {
   constructor(props) {
     super(props);
-    const episode = MultiEpisode.getEpisodeFromPathname(
-      window.location.pathname
-    );
+    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
 
     this.state = {
       ide: "intellij",

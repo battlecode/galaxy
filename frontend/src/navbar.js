@@ -7,7 +7,7 @@ class NavBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      episode: MultiEpisode.getEpisodeFromPathname(window.location.pathname),
+      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
     };
   }
 
