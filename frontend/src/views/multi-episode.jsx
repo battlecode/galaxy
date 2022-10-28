@@ -47,7 +47,7 @@ class MultiEpisode extends Component {
   }
 
   // Gets the episode based on the currently navigated URL.
-  static getEpisodeCurrent() {
+  static getEpisodeFromCurrentPathname() {
     return this.getEpisodeFromPathname(window.location.pathname);
   }
 
