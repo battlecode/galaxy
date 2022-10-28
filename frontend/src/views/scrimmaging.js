@@ -53,9 +53,16 @@ class ScrimmageRequest extends Component {
 }
 
 class ScrimmageRequests extends Component {
-  state = {
-    requests: [],
-  };
+  constructor(props) {
+    super(props);
+    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
+
+    this.state = {
+      requests: [],
+      episode: episode,
+      extension: MultiEpisode.getExtension(episode),
+    };
+  }
 
   refresh = () => {
     Api.getScrimmageRequests(
@@ -212,7 +219,7 @@ class ScrimmageHistory extends Component {
                         <td>
                           {/* domain is hardcoded, since visualizer and replays are only hosted on deployed site, not locally */}
                           <a
-                            href={`https://play.battlecode.org/clients/${this.state.episode}/visualizer.html?https://play.battlecode.org/replays/${s.replay}.bc22`}
+                            href={`https://play.battlecode.org/clients/${this.state.episode}/visualizer.html?https://play.battlecode.org/replays/${s.replay}${this.state.extension}`}
                             target="_blank"
                           >
                             Watch
