@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Api from "../api";
 
 import TeamCard from "../components/teamCard";
+import MultiEpisode from "./multi-episode";
 import Floater from "react-floater";
 
 class YesTeam extends Component {
@@ -402,6 +403,15 @@ class ResumeStatus extends Component {
 // pass change handler in props.change and team in props.team
 // NOTE: If you are ever working with teams' eligility (for example, to pull teams for the newbie tournament), please see backend/docs/ELIGIBILITY.md before you do anything! The variable names here are poorly named (because columns in the database are poorly named).
 class EligibiltyOptions extends Component {
+  constructor(props) {
+    super(props);
+    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
+    this.state = {
+      episode: episode,
+      extension: MultiEpisode.getExtension(episode),
+    };
+  }
+
   render() {
     return (
       <div className="row" style={{ marginTop: "1em" }}>
@@ -416,7 +426,7 @@ class EligibiltyOptions extends Component {
                     college students to be eligible for prizes. If you are
                     unsure about whether you are an active student, read more
                     about eligibilty under{" "}
-                    <a href="http://2020.battlecode.org/tournaments">
+                    <a href={`/${this.state.episode}/tournaments`}>
                       tournaments
                     </a>{" "}
                     or reach out to one of Teh Devs on Discord or over email.
