@@ -3,14 +3,29 @@ import React from "react";
 import TeamList from "./teamList";
 import PaginationControl from "./paginationControl";
 
+import MultiEpisode from "../views/multi-episode";
+
 const SUCCESS_TIMEOUT = 2000;
 
 class RankingTeamList extends TeamList {
+  constructor(props) {
+    super(props);
+    // Note that this is not state.
+    // I tried making it state, but strange bugs occur due to
+    // `const { props, state } = this`
+    // which overwrites state.
+    // It's not a big deal, because this variable doesn't need the good things of state
+    // (eg rerendering etc)
+    this.episode = MultiEpisode.getEpisodeFromCurrentPathname();
+  }
+
   showTeamPage = (teamID) => {
     //this.props.history.push(`${process.env.PUBLIC_URL}/rankings/${teamID}`)
     //this.setState({showTeamID: teamID});
     if (!this.props.canRequest) {
-      this.props.history.push(`${process.env.PUBLIC_URL}/rankings/${teamID}`);
+      this.props.history.push(
+        `${process.env.PUBLIC_URL}/${this.episode}/rankings/${teamID}`
+      );
     }
     //this.router.transitionTo('/')
   };
