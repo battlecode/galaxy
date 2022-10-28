@@ -6,8 +6,11 @@ const EPISODES = ["2022", "2023"];
 // NOTE: dictionary keys that are strings-of-numbers can just be numbers.
 // The formatter will convert them as such,
 // and the code will treat them the same way
-const EPISODE_TO_EXTENSION = { 2022: "bc22", 2023: "bc23" };
-const EPISODE_TO_SCAFFOLD_LINK = { 2022: "bc22", 2023: "bc23" };
+const EPISODE_TO_EXTENSION = { 2022: ".bc22", 2023: ".bc23" };
+const EPISODE_TO_SCAFFOLD_LINK = {
+  2022: "https://github.com/battlecode/battlecode22-scaffold",
+  2023: "https://github.com/battlecode/battlecode23-scaffold",
+};
 const EPISODE_TO_SCAFFOLD_NAME = {
   2022: "battlecode22-scaffold",
   2023: "battlecode23-scaffold",
