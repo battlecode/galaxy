@@ -56,14 +56,11 @@ class GoogleCloudAuthentication(authentication.BaseAuthentication):
         if idinfo.get("email") != settings.USER_GCLOUD_ADMIN_EMAIL:
             raise AuthenticationFailed("Unauthorized client")
 
-        try:
-            user = User.objects.get(username=settings.USER_GCLOUD_ADMIN_USERNAME)
-        except User.DoesNotExist:
-            user = User.objects.create_user(
-                username=settings.USER_GCLOUD_ADMIN_USERNAME,
-                email=settings.USER_GCLOUD_ADMIN_EMAIL,
-                is_staff=True,
-            )
+        user, _ = User.objects.get_or_create(
+            username=settings.USER_GCLOUD_ADMIN_USERNAME,
+            email=settings.USER_GCLOUD_ADMIN_EMAIL,
+            is_staff=True,
+        )
         return (user, None)
 
     def authenticate_header(self, request):
