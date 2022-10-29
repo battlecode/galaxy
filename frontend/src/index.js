@@ -100,11 +100,6 @@ class App extends Component {
       <Route path={`/:episode/team`} component={Team} key="team" />,
       <Route path={`/account`} component={Account} key="account" />,
       <Route
-        path={`/password_forgot`}
-        component={PasswordForgot}
-        key="password-forgot"
-      />,
-      <Route
         path={`/password_change`}
         component={PasswordChange}
         key="password-change"
@@ -183,6 +178,7 @@ class App extends Component {
         <Route path={`/login`} component={LoginRegister} />,
         <Route path={`/register`} component={Register} />,
         <Route path={`/multi-episode`} component={MultiEpisode} />,
+        <Route path={`/password_forgot`} component={PasswordForgot} />,
         <Route>
           <div className="wrapper">
             <SideBar />
