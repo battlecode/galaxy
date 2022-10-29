@@ -146,10 +146,10 @@ class TeamProfile(models.Model):
     )
     """The team being augmented by this profile."""
 
-    quote = models.CharField(max_length=80, blank=True)
+    quote = models.CharField(max_length=80, blank=True, default="")
     """The short quote written by the team, if any."""
 
-    biography = models.TextField(max_length=1024, blank=True)
+    biography = models.TextField(max_length=1024, blank=True, default="")
     """The biography provided by the team, if any."""
 
     has_avatar = models.BooleanField(default=False)
@@ -158,11 +158,13 @@ class TeamProfile(models.Model):
     rating = models.OneToOneField(Rating, on_delete=models.PROTECT)
     """The current rating of the team."""
 
-    auto_accept_ranked = models.BooleanField()
+    auto_accept_ranked = models.BooleanField(default=True)
     """Whether the team automatically accepts ranked match requests."""
 
-    auto_accept_unranked = models.BooleanField()
+    auto_accept_unranked = models.BooleanField(default=True)
     """Whether the team automatically accepts unranked match requests."""
 
-    eligible_for = models.ManyToManyField(EligibilityCriterion, related_name="teams")
+    eligible_for = models.ManyToManyField(
+        EligibilityCriterion, related_name="teams", blank=True
+    )
     """The eligibility criteria that this team satisfies."""

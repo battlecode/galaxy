@@ -1,6 +1,6 @@
 # from django.shortcuts import render
 from rest_framework import mixins, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 
 from siarnaq.api.user.models import UserProfile
 from siarnaq.api.user.permissions import IsAuthenticatedAsRequestedUser
@@ -22,7 +22,7 @@ class UserProfileViewSet(
     """
 
     serializer_class = UserProfileSerializer
-    permission_classes = (IsAuthenticatedAsRequestedUser,)
+    permission_classes = (IsAuthenticatedAsRequestedUser, IsAdminUser)
 
     def get_queryset(self):
         return UserProfile.objects.all()

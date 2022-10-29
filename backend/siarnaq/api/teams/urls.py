@@ -6,6 +6,4 @@ from siarnaq.api.teams import views
 router = DefaultRouter()
 router.register("all", views.TeamViewSet, basename="all")
 
-urlpatterns = [
-    path("", include(router.urls))
-]
+urlpatterns = [path("", include(router.urls))]

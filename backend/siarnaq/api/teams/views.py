@@ -1,11 +1,16 @@
-from rest_framework import permissions, status, mixins, viewsets, filters
-from siarnaq.api.teams.models import (
-    TeamStatus,
-    TeamProfile
-    )
+from rest_framework import filters, mixins, permissions, status, viewsets
+
+from siarnaq.api.teams.models import TeamProfile, TeamStatus
 from siarnaq.api.teams.serializers import TeamProfileSerializer
 
-class TeamViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
+
+class TeamViewSet(
+    viewsets.GenericViewSet,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+):
     serializer_class = TeamProfileSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 

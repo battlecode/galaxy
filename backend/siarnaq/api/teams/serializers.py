@@ -68,16 +68,19 @@ from siarnaq.api.teams.models import (
 #     def update(self, instance, validated_data):
 #         pass
 
+
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ["episode", "name", "members", "status"]
+        read_only_fields = ["members"]
 
     def create(self, validated_data):
-        members_data = validated_data.pop("members")
         team_obj = Team.objects.create(**validated_data)
         # add members separately bc we can't initialize a ManyToManyField on obj creation
-        team_obj.members.add(*members_data)
+        request = self.context.get("request", None)
+        print(request.user)
+        team_obj.members.add(request.user)
         team_obj.save()
         return team_obj
 
@@ -90,8 +93,10 @@ class TeamSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
 class TeamProfileSerializer(serializers.ModelSerializer):
     team = TeamSerializer(required=True)
+
     class Meta:
         model = TeamProfile
         fields = [
@@ -105,7 +110,9 @@ class TeamProfileSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        eligible_for_data = validated_data.pop("eligible_for")
+        eligible_for_exists = "eligible_for" in validated_data
+        if eligible_for_exists:
+            eligible_for_data = validated_data.pop("eligible_for")
         team_data = validated_data.pop("team")
         # set rating to default rating
         rating_obj = Rating.objects.create()
@@ -114,8 +121,15 @@ class TeamProfileSerializer(serializers.ModelSerializer):
             team=team_obj, rating=rating_obj, **validated_data
         )
         # add eligibility separately
-        profile_obj.eligible_for.add(*eligible_for_data)
+        if eligible_for_exists:
+            profile_obj.eligible_for.add(*eligible_for_data)
         profile_obj.save()
+        # add data to team
+        request = self.context.get("request", None)
+        print(request.user)
+        team_obj.members.add(request.user)
+        team_obj.save()
+
         return profile_obj
 
     def update(self, instance, validated_data):
