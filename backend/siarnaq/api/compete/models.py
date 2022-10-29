@@ -6,6 +6,7 @@ from django.db.models import Q
 
 import siarnaq.api.refs as refs
 from siarnaq.api.compete.managers import (
+    MatchParticipantManager,
     MatchQuerySet,
     ScrimmageRequestQuerySet,
     SubmissionQuerySet,
@@ -158,6 +159,8 @@ class MatchParticipant(models.Model):
         related_name="next_participation",
     )
     """The team's previous participation, or null if there is none."""
+
+    objects = MatchParticipantManager()
 
     def save(self, *args, **kwargs):
         """Pull the active submission and save to database."""

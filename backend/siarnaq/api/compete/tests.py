@@ -7,8 +7,8 @@ from siarnaq.api.teams.models import Rating, Team, TeamProfile
 from siarnaq.api.user.models import User
 
 
-class MatchParticipantTestCase(TestCase):
-    """Test suite for the MatchParticipant model."""
+class MatchParticipantLinkedListTestCase(TestCase):
+    """Test suite for the linked list structure of the MatchParticipant model."""
 
     def setUp(self):
         """Initialize the episode and teams available in the test suite."""
@@ -29,11 +29,11 @@ class MatchParticipantTestCase(TestCase):
                 accepted=True,
             )
 
-    # Partitions for: creation. Testing linked list of participations for a single team.
+    # Partitions for: single creation.
     # - team only has 1 participation
     # - team has more than 1 participation
 
-    def test_linked_list_single_element(self):
+    def test_individual_create_single_element(self):
         t1 = Team.objects.get(name="team1")
         t2 = Team.objects.get(name="team2")
         t3 = Team.objects.get(name="team3")
@@ -44,7 +44,7 @@ class MatchParticipantTestCase(TestCase):
             self.assertIsNone(p.previous_participation)
             self.assertFalse(hasattr(p, "next_participation"))
 
-    def test_linked_list_multiple_element(self):
+    def test_individual_create_multiple_element(self):
         t1 = Team.objects.get(name="team1")
         t2 = Team.objects.get(name="team2")
         p1 = MatchParticipant.objects.create(team=t1)
@@ -58,18 +58,81 @@ class MatchParticipantTestCase(TestCase):
         self.assertEqual(p3.previous_participation, p1)
         self.assertFalse(hasattr(p3, "next_participation"))
 
+    # Partitions for: bulk creation.
+    # - team bulk-created participations: single, multiple
+    # - team existing participations: exists, does not exist
+
+    def test_bulk_create_participation_single_previous_none(self):
+        t1 = Team.objects.get(name="team1")
+        t2 = Team.objects.get(name="team2")
+        t3 = Team.objects.get(name="team3")
+        s1 = Submission.objects.get(team=t1)
+        s2 = Submission.objects.get(team=t2)
+        s3 = Submission.objects.get(team=t3)
+        MatchParticipant.objects.bulk_create(
+            [
+                MatchParticipant(team=t1, submission=s1),
+                MatchParticipant(team=t2, submission=s2),
+                MatchParticipant(team=t3, submission=s3),
+            ]
+        )
+        self.assertFalse(
+            MatchParticipant.objects.filter(
+                previous_participation__isnull=False
+            ).exists()
+        )
+
+    def test_bulk_create_participation_multiple_previous_exists(self):
+        t1 = Team.objects.get(name="team1")
+        t2 = Team.objects.get(name="team2")
+        t3 = Team.objects.get(name="team3")
+        s1 = Submission.objects.get(team=t1)
+        s2 = Submission.objects.get(team=t2)
+        s3 = Submission.objects.get(team=t3)
+        MatchParticipant.objects.bulk_create(
+            [
+                MatchParticipant(team=t1, submission=s1),
+                MatchParticipant(team=t2, submission=s2),
+                MatchParticipant(team=t3, submission=s3),
+            ]
+        )
+        objs = MatchParticipant.objects.bulk_create(
+            [
+                MatchParticipant(team=t1, submission=s1),
+                MatchParticipant(team=t2, submission=s2),
+                MatchParticipant(team=t3, submission=s3),
+            ]
+        )
+        for obj in objs:
+            obj.refresh_from_db()
+            self.assertEqual(obj.team, obj.previous_participation.team)
+            self.assertIsNone(obj.previous_participation.previous_participation)
+
+
+class MatchParticipantRatingFinalizationTestCase(TestCase):
+    def setUp(self):
+        """Initialize the episode and teams available in the test suite."""
+        e1 = Episode.objects.create(
+            name_short="e1",
+            registration=timezone.now(),
+            game_release=timezone.now(),
+            game_archive=timezone.now(),
+            language=Language.JAVA_8,
+        )
+        for name in ["team1", "team2", "team3"]:
+            t = Team.objects.create(episode=e1, name=name)
+            TeamProfile.objects.create(team=t, rating=Rating.objects.create())
+            Submission.objects.create(
+                episode=e1,
+                team=t,
+                user=User.objects.create_user(username=name + "_user", password=name),
+                accepted=True,
+            )
+
     # Partitions for: rating. Testing finalizations occur iff prerequisites are met.
-    # - match type:
-    #   - ranked
-    #   - unranked
-    # - match status:
-    #   - completed successfully
-    #   - failed
-    #   - in progress
-    # - previous participation status:
-    #   - finalized
-    #   - not finalized
-    #   - does not exist
+    # - match type: ranked, unranked
+    # - match status: completed successfully, failed, in progress
+    # - previous participation status: finalized, not finalized, does not exist
 
     def test_finalize_ranked_completed_previous_ready(self):
         e1 = Episode.objects.get(name_short="e1")

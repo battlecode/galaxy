@@ -1,3 +1,6 @@
-# from django.contrib import admin
+from django.contrib import admin
 
-# Register your models here.
+from siarnaq.api.episodes.models import Episode, Map
+
+admin.site.register(Episode)
+admin.site.register(Map)

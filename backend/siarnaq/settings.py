@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
+    "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
@@ -69,6 +70,8 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "siarnaq.urls"
+
+SITE_ID = 1
 
 TEMPLATES = [
     {
@@ -127,6 +130,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        "siarnaq.api.user.authentication.GoogleCloudAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -174,7 +178,16 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-_, GOOGLE_CLOUD_PROJECT_ID = google.auth.default()
+# Google Cloud Platform configuration
+
+GOOGLE_CLOUD_CREDENTIALS, GOOGLE_CLOUD_PROJECT_ID = google.auth.default()
+GOOGLE_CLOUD_LOCATION = "us-east1"
+USER_GCLOUD_ADMIN_EMAIL = GOOGLE_CLOUD_CREDENTIALS.service_account_email
+USER_GCLOUD_ADMIN_USERNAME = "galaxy-admin"
+
+# Do not inadvertently interact with cloud resources while testing locally.
+# Change this in production and while running system integration tests.
+GCLOUD_DISABLE_ALL_ACTIONS = True
 
 # Penalized Elo configuration
 
