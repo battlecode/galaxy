@@ -52,7 +52,6 @@ class App extends Component {
         {<Redirect to={`${MultiEpisode.getDefaultEpisode()}/home`} />}
       </Route>,
 
-      <Route exact path={`/:episode`} component={Home} key="home-blank" />,
       <Route path={`/:episode/home`} component={Home} key="home" />,
       <Route path={`/:episode/updates`} component={Updates} key="updates" />,
       // commented but kept since we might use this later
