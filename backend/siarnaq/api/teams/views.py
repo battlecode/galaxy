@@ -1,6 +1,6 @@
-from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework import mixins, permissions, viewsets
 
-from siarnaq.api.teams.models import TeamProfile, TeamStatus
+from siarnaq.api.teams.models import TeamProfile
 from siarnaq.api.teams.serializers import TeamProfileSerializer
 
 
@@ -15,5 +15,4 @@ class TeamViewSet(
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        # return Team.objects.filter(episode_id=self.request.episode, team_status=TeamStatus.REGULAR).all()
         return TeamProfile.objects.all()
