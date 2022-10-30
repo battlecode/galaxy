@@ -1,13 +1,19 @@
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
-from siarnaq.api.teams.models import Team
-from django.utils.crypto import get_random_string
 
-@receiver(pre_save, sender=Team)
-def gen_team_key(sender, instance, raw, update_fields, **kwargs):
+from siarnaq.api.compete.models import MatchParticipant
+from siarnaq.api.teams.models import TeamProfile
+
+
+@receiver(post_save, sender=MatchParticipant)
+def copy_rating_to_profile(instance, update_fields, **kwargs):
     """
-    Generate a new team key.
+    Ensure that the profile's ratings is up to date whenever a newer match rating is
+    reported.
     """
-    if not raw and instance._state.adding:
-        print('setting new join_key')
-        instance.join_key = get_random_string(24)
+    if update_fields is not None and "rating" not in list(update_fields):
+        return  # No new rating
+    if instance.rating is not None:
+        TeamProfile.objects.filter(
+            team=instance.team_id, rating__n__lt=instance.rating.n
+        ).update(rating=instance.rating)

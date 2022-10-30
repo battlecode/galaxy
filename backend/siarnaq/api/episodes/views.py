@@ -1,3 +1,41 @@
-# from django.shortcuts import render
+from django.utils import timezone
+from drf_spectacular.utils import OpenApiResponse, extend_schema
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.response import Response
 
-# Create your views here.
+from siarnaq.api.episodes.models import Episode
+from siarnaq.api.episodes.serializers import AutoscrimSerializer, EpisodeSerializer
+
+
+class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A viewset for retrieving Episodes.
+    """
+
+    serializer_class = EpisodeSerializer
+    permission_classes = (AllowAny,)
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Episode.objects.all()
+        if not user.is_staff:
+            # Episodes that have not been released are not visible to non-admin users
+            queryset = queryset.filter(registration__lte=timezone.now())
+        return queryset
+
+    @extend_schema(responses={204: OpenApiResponse(description="Created successfully")})
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(IsAdminUser,),
+        serializer_class=AutoscrimSerializer,
+    )
+    def autoscrim(self, request, pk=None):
+        """Trigger a round of autoscrimmages."""
+        episode = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        episode.autoscrim(serializer.validated_data["best_of"])
+        return Response(status.HTTP_204_NO_CONTENT)

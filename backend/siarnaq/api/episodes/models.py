@@ -1,4 +1,6 @@
+from django.apps import apps
 from django.db import models
+from django.utils import timezone
 
 import siarnaq.api.refs as refs
 
@@ -50,8 +52,8 @@ class Episode(models.Model):
     If true, only teams with staff privileges can make submisssions.
     """
 
-    autoscrim_schedule = models.CharField(max_length=64, blank=True)
-    """A cron specification for the autoscrim schedule."""
+    autoscrim_schedule = models.CharField(max_length=64, null=True, blank=True)
+    """A cron specification for the autoscrim schedule, or null if disabled."""
 
     language = models.CharField(max_length=8, choices=Language.choices)
     """The implementation language supported for this episode."""
@@ -59,17 +61,42 @@ class Episode(models.Model):
     release_version = models.SlugField(max_length=32, blank=True)
     """The most up-to-date version of the episode code release."""
 
-    pass_requirement_win = models.PositiveSmallIntegerField(blank=True)
+    pass_requirement_win = models.PositiveSmallIntegerField(null=True, blank=True)
     """
     The minimum number of matches to be won within a specified window in order to pass
     the Battlecode class.
     """
 
-    pass_requirement_out_of = models.PositiveSmallIntegerField(blank=True)
+    pass_requirement_out_of = models.PositiveSmallIntegerField(null=True, blank=True)
     """
     The size of the window in which a minimum number of matches must be won in order to
     pass the Battlecode class.
     """
+
+    def frozen(self):
+        """Return whether the episode is currently frozen to submissions."""
+        if self.submission_frozen:
+            return True
+        now = timezone.now()
+        return Tournament.objects.filter(
+            episode=self, submission_freeze__lte=now, submission_unfreeze__gt=now
+        ).exists()
+
+    def autoscrim(self, best_of):
+        """
+        Trigger a round of automatically-generated ranked scrimmages for all teams in
+        this episode with an accepted submission, unless the episode is archived or
+        frozen.
+
+        Parameters
+        ----------
+        best_of : int
+            The number of maps to be played in each match, must be no greater than the
+            number of maps available for the episode.
+        """
+        if self.frozen() or timezone.now() > self.game_archive:
+            return
+        apps.get_model("teams", "Team").objects.autoscrim(episode=self, best_of=best_of)
 
 
 class Map(models.Model):

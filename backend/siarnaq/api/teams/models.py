@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 import siarnaq.api.refs as refs
+from siarnaq.api.teams.managers import TeamQuerySet
 
 
 class EligibilityCriterion(models.Model):
@@ -25,24 +26,35 @@ class EligibilityCriterion(models.Model):
 
 class Rating(models.Model):
     """
-    An immutable database model for a Glicko2 rating.
+    An immutable database model for a Penalized Elo rating.
     """
 
-    mean = models.FloatField(default=0.0)
-    """The Glicko2 rating mean, known as r."""
+    mean = models.FloatField(default=settings.TEAMS_ELO_INITIAL)
+    """The Elo rating mean."""
 
-    deviation = models.FloatField(default=2.0)
-    """The Glicko2 rating deviation, known as RD."""
+    n = models.PositiveIntegerField(default=0)
+    """The number of rated games played before this rating."""
 
-    volatility = models.FloatField(default=0.06)
-    """The Glicko2 rating volatility, known as sigma."""
-
-    updated = models.DateTimeField(null=True, blank=True)
-    """The time that this rating was established."""
-
-    def step(self, match_time, opponent_rating, score):
+    def step(self, opponent_rating, score):
         """Produce the new rating after a specific match is played."""
-        raise NotImplementedError
+        e_self = self.win_probability(opponent_rating)
+        new_mean = self.mean + settings.TEAMS_ELO_K * (score - e_self)
+        return Rating.objects.create(
+            mean=new_mean,
+            n=self.n + 1,
+        )
+
+    def win_probability(self, opponent_rating):
+        """Return the probability of winning against a given opponent."""
+        diff = self.mean - opponent_rating.mean
+        return 1 / (1 + 10 ** (-diff / settings.TEAMS_ELO_SCALE))
+
+    def to_value(self):
+        """Return the penalized version of this Elo rating."""
+        return (
+            self.mean
+            - settings.TEAMS_ELO_INITIAL * settings.TEAMS_ELO_PENALTY**self.n
+        )
 
 
 class TeamStatus(models.TextChoices):
@@ -100,6 +112,8 @@ class Team(models.Model):
     )
     """The type of the team."""
 
+    objects = TeamQuerySet.as_manager()
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -123,14 +137,6 @@ class Team(models.Model):
     def get_active_submission(self):
         """Return the current active submission belonging to the team."""
         return self.submissions.filter(accepted=True).order_by("-created").first()
-
-    def get_first_unfinalized_match(self, locked):
-        """Return the earliest match of this team whose ratings are not finalized."""
-        raise NotImplementedError
-
-    def try_finalize_rating(self):
-        """Find and finalize the ratings for a match belonging to this team."""
-        raise NotImplementedError
 
 
 class TeamProfile(models.Model):
