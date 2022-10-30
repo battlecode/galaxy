@@ -77,7 +77,7 @@ class MultiEpisode extends Component {
       DEFAULT_EPISODE
     );
     if (EPISODES.includes(input)) {
-      window.location.replace(`/${input}`);
+      window.location.replace(`/${input}/home`);
     } else {
       alert("Episode does not exist");
       history.back();
