@@ -50,7 +50,10 @@ class NavBarAccount extends Component {
   constructor() {
     super();
     // This is odd, see #93 for explanation
-    this.state = { logged_in: null };
+    this.state = {
+      logged_in: null,
+      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
+    };
   }
   componentDidMount() {
     // duped in various places, see sidebar.js
@@ -68,7 +71,7 @@ class NavBarAccount extends Component {
             <NavLink to={`/multi-episode`}>Change Episode</NavLink>
           </li>
           <li>
-            <NavLink to={`/account`}>Account</NavLink>
+            <NavLink to={`/${this.state.episode}/account`}>Account</NavLink>
           </li>
           <li>
             <NavLink to={`/logout`}>Log out</NavLink>
