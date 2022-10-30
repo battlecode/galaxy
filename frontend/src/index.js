@@ -98,7 +98,7 @@ class App extends Component {
     // If user is not logged-in, should 404 and not even render
     this.loggedInElems = [
       <Route path={`/:episode/team`} component={Team} key="team" />,
-      <Route path={`/account`} component={Account} key="account" />,
+      <Route path={`/:episode/account`} component={Account} key="account" />,
       <Route
         path={`/password_change`}
         component={PasswordChange}
