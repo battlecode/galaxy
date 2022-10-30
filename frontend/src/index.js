@@ -179,6 +179,8 @@ class App extends Component {
         <Route path={`/register`} component={Register} />,
         <Route path={`/multi-episode`} component={MultiEpisode} />,
         <Route path={`/password_forgot`} component={PasswordForgot} />,
+        {/* NOTE: Every page with navbar and sidebar should have an inherent episode.
+        Handling otherwise is incredibly tricky, and is not worth the special case. */}
         <Route>
           <div className="wrapper">
             <SideBar />
