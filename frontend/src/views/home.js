@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import $ from "jquery";
+import { PieChart } from "chartist";
+
 import Api from "../api";
 import Countdown from "../components/countdown";
 import UpdateCard from "../components/updateCard";
@@ -9,7 +11,7 @@ class StatCard extends UpdateCard {
   componentDidMount() {
     $().ready(function () {
       Api.getTeamWinStats(function (stats) {
-        window.Chartist.Pie("#stat_chart", {
+        return new PieChart("#stat_chart", {
           labels: stats,
           series: stats,
         });

@@ -1,6 +1,8 @@
 import React from "react";
 import $ from "jquery";
 import moment from "moment";
+import { LineChart, FixedScaleAxis } from "chartist";
+
 import Api from "../api";
 import UpdateCard from "./updateCard";
 
@@ -33,7 +35,7 @@ class PerfCard extends UpdateCard {
           }
         });
 
-        window.Chartist.Line(
+        return new LineChart(
           "#mu_chart",
           {
             series: [
@@ -47,7 +49,7 @@ class PerfCard extends UpdateCard {
             height: "245px",
             axisX: {
               showGrid: false,
-              type: window.Chartist.FixedScaleAxis,
+              type: FixedScaleAxis,
               divisor: 5,
               labelInterpolationFnc: (v) => moment(v).format("MMM D"),
             },
