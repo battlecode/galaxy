@@ -147,6 +147,10 @@ class Account extends Component {
                       Make sure to press the "Update Info" button, and wait for
                       confirmation!
                     </h5>
+                    <h5>
+                      Your info here is <u>used for all episodes</u> and{" "}
+                      <u>changed for all episodes!</u>
+                    </h5>
                     <div className="row">
                       <div className="col-md-6">
                         <div className="form-group">
