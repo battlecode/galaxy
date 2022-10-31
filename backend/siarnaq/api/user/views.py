@@ -24,7 +24,7 @@ class UserProfileViewSet(
     permission_classes = (IsAuthenticatedAsRequestedUser,)
 
     def get_queryset(self):
-        return UserProfile.objects.all()
+        return UserProfile.objects.select_related("user").all()
 
 
 class PublicUserProfileViewSet(viewsets.ReadOnlyModelViewSet):
