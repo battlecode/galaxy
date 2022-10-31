@@ -3,14 +3,23 @@ import random
 from datetime import timedelta
 from unittest.mock import mock_open, patch
 
+from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from siarnaq.api.compete.models import SaturnStatus, Submission
-from siarnaq.api.episodes.models import Episode, Language
-from siarnaq.api.teams.models import Team
+from siarnaq.api.compete.models import Match, MatchParticipant, SaturnStatus, Submission
+from siarnaq.api.compete.serializers import MatchSerializer
+from siarnaq.api.episodes.models import (
+    Episode,
+    Language,
+    Map,
+    Tournament,
+    TournamentRound,
+    TournamentStyle,
+)
+from siarnaq.api.teams.models import Rating, Team, TeamStatus
 from siarnaq.api.user.models import User
 
 
@@ -266,3 +275,436 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertEqual(s.status, SaturnStatus.RUNNING)
         self.assertEqual(s.logs, "abc")
         self.assertFalse(s.accepted)
+
+
+class MatchSerializerTestCase(TestCase):
+    """Test suite for the Match serializer."""
+
+    def setUp(self):
+        self.e1 = Episode.objects.create(
+            name_short="e1",
+            registration=timezone.now(),
+            game_release=timezone.now(),
+            game_archive=timezone.now(),
+            language=Language.JAVA_8,
+        )
+        self.map = Map.objects.create(episode=self.e1, name="map")
+        tournament = Tournament.objects.create(
+            name_short="t",
+            episode=self.e1,
+            style=TournamentStyle.DOUBLE_ELIMINATION,
+            require_resume=False,
+            is_public=True,
+            submission_freeze=timezone.now(),
+            submission_unfreeze=timezone.now(),
+        )
+        self.r_released = TournamentRound.objects.create(
+            tournament=tournament, is_released=True
+        )
+        self.r_unreleased = TournamentRound.objects.create(
+            tournament=tournament, is_released=False
+        )
+
+        self.users, self.teams, self.submissions = [], [], []
+        for i in range(4):
+            u = User.objects.create(username=f"user{i}")
+            t = Team.objects.create(episode=self.e1, name=f"team{i}")
+            t.members.add(u)
+            self.submissions.append(
+                Submission.objects.create(
+                    episode=self.e1, team=t, user=u, accepted=True
+                )
+            )
+            self.users.append(u)
+            self.teams.append(t)
+        self.teams[-1].status = TeamStatus.STAFF
+        self.teams[-1].save()
+        self.staff = User.objects.create(username="staff", is_staff=True)
+
+    # Partitions:
+    # user: admin, not admin
+    # match: includes self, without self
+    # match: includes staff team, without staff team
+    # match tournament round: released, not released, none
+
+    def test_admin_has_staff_team_tournament_not_released(self):
+        serializer = MatchSerializer(
+            context={
+                "episode_id": self.e1.pk,
+                "team_id": None,
+                "user_id": self.staff.pk,
+                "is_staff": True,
+            }
+        )
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=self.r_unreleased,
+            red=MatchParticipant.objects.create(
+                team=self.teams[0],
+                submission=self.submissions[0],
+                score=0,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[1],
+                submission=self.submissions[1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=True,
+        )
+        match.maps.add(self.map)
+        data = serializer.to_representation(match)
+        self.assertEqual(
+            data,
+            {
+                "id": match.pk,
+                "status": str(match.status),
+                "logs": match.logs,
+                "episode": match.episode.pk,
+                "red": {
+                    "team": match.red.team.pk,
+                    "submission": match.red.submission.pk,
+                    "score": match.red.score,
+                    "rating": match.red.rating.pk,
+                },
+                "blue": {
+                    "team": match.blue.team.pk,
+                    "submission": match.blue.submission.pk,
+                    "score": match.blue.score,
+                    "rating": match.blue.rating.pk,
+                },
+                "maps": [self.map.pk],
+                "alternate_color": match.alternate_color,
+                "created": match.created.isoformat().replace("+00:00", "Z"),
+                "is_ranked": match.is_ranked,
+                "replay": str(match.replay),
+            },
+        )
+
+    def test_not_admin_has_self_has_staff_team(self):
+        serializer = MatchSerializer(
+            context={
+                "episode_id": self.e1.pk,
+                "team_id": self.teams[0],
+                "user_id": self.users[0].pk,
+                "is_staff": False,
+            }
+        )
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=None,
+            red=MatchParticipant.objects.create(
+                team=self.teams[0],
+                submission=self.submissions[0],
+                score=0,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[-1],
+                submission=self.submissions[-1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        data = serializer.to_representation(match)
+        self.assertEqual(
+            data,
+            {
+                "id": match.pk,
+                "status": str(match.status),
+                "logs": match.logs,
+                "episode": match.episode.pk,
+                "red": {
+                    "team": match.red.team.pk,
+                    "submission": match.red.submission.pk,
+                    "score": match.red.score,
+                    "rating": match.red.rating.pk,
+                },
+                "blue": {
+                    "team": match.blue.team.pk,
+                    "submission": None,
+                    "score": match.blue.score,
+                    "rating": match.blue.rating.pk,
+                },
+                "maps": [self.map.pk],
+                "alternate_color": match.alternate_color,
+                "created": match.created.isoformat().replace("+00:00", "Z"),
+                "is_ranked": match.is_ranked,
+                "replay": str(match.replay),
+            },
+        )
+
+    def test_not_admin_has_self_no_staff_team_tournament_released(self):
+        serializer = MatchSerializer(
+            context={
+                "episode_id": self.e1.pk,
+                "team_id": self.teams[0],
+                "user_id": self.users[0].pk,
+                "is_staff": False,
+            }
+        )
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=self.r_released,
+            red=MatchParticipant.objects.create(
+                team=self.teams[0],
+                submission=self.submissions[0],
+                score=0,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[1],
+                submission=self.submissions[1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        data = serializer.to_representation(match)
+        self.assertEqual(
+            data,
+            {
+                "id": match.pk,
+                "status": str(match.status),
+                "logs": match.logs,
+                "episode": match.episode.pk,
+                "red": {
+                    "team": match.red.team.pk,
+                    "submission": match.red.submission.pk,
+                    "score": match.red.score,
+                    "rating": match.red.rating.pk,
+                },
+                "blue": {
+                    "team": match.blue.team.pk,
+                    "submission": None,
+                    "score": match.blue.score,
+                    "rating": match.blue.rating.pk,
+                },
+                "maps": [self.map.pk],
+                "alternate_color": match.alternate_color,
+                "created": match.created.isoformat().replace("+00:00", "Z"),
+                "is_ranked": match.is_ranked,
+                "replay": str(match.replay),
+            },
+        )
+
+    def test_not_admin_has_self_no_staff_team_tournament_not_released(self):
+        serializer = MatchSerializer(
+            context={
+                "episode_id": self.e1.pk,
+                "team_id": self.teams[0],
+                "user_id": self.users[0].pk,
+                "is_staff": False,
+            }
+        )
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=self.r_unreleased,
+            red=MatchParticipant.objects.create(
+                team=self.teams[0],
+                submission=self.submissions[0],
+                score=0,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[1],
+                submission=self.submissions[1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        data = serializer.to_representation(match)
+        self.assertEqual(
+            data,
+            {
+                "id": match.pk,
+                "status": str(match.status),
+                "logs": "",
+                "episode": match.episode.pk,
+                "red": None,
+                "blue": None,
+                "maps": None,
+                "alternate_color": match.alternate_color,
+                "created": match.created.isoformat().replace("+00:00", "Z"),
+                "is_ranked": match.is_ranked,
+                "replay": None,
+            },
+        )
+
+    def test_not_admin_has_self_no_staff_team_tournament_none(self):
+        serializer = MatchSerializer(
+            context={
+                "episode_id": self.e1.pk,
+                "team_id": self.teams[0],
+                "user_id": self.users[0].pk,
+                "is_staff": False,
+            }
+        )
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=None,
+            red=MatchParticipant.objects.create(
+                team=self.teams[0],
+                submission=self.submissions[0],
+                score=0,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[1],
+                submission=self.submissions[1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        data = serializer.to_representation(match)
+        self.assertEqual(
+            data,
+            {
+                "id": match.pk,
+                "status": str(match.status),
+                "logs": match.logs,
+                "episode": match.episode.pk,
+                "red": {
+                    "team": match.red.team.pk,
+                    "submission": match.red.submission.pk,
+                    "score": match.red.score,
+                    "rating": match.red.rating.pk,
+                },
+                "blue": {
+                    "team": match.blue.team.pk,
+                    "submission": None,
+                    "score": match.blue.score,
+                    "rating": match.blue.rating.pk,
+                },
+                "maps": [self.map.pk],
+                "alternate_color": match.alternate_color,
+                "created": match.created.isoformat().replace("+00:00", "Z"),
+                "is_ranked": match.is_ranked,
+                "replay": str(match.replay),
+            },
+        )
+
+    def test_not_admin_no_self_has_staff_team(self):
+        serializer = MatchSerializer(
+            context={
+                "episode_id": self.e1.pk,
+                "team_id": self.teams[0],
+                "user_id": self.users[0].pk,
+                "is_staff": False,
+            }
+        )
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=None,
+            red=MatchParticipant.objects.create(
+                team=self.teams[1],
+                submission=self.submissions[1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[-1],
+                submission=self.submissions[-1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        data = serializer.to_representation(match)
+        self.assertEqual(
+            data,
+            {
+                "id": match.pk,
+                "status": str(match.status),
+                "logs": "",
+                "episode": match.episode.pk,
+                "red": {
+                    "team": match.red.team.pk,
+                    "submission": None,
+                    "score": None,
+                    "rating": match.red.rating.pk,
+                },
+                "blue": {
+                    "team": match.blue.team.pk,
+                    "submission": None,
+                    "score": None,
+                    "rating": match.blue.rating.pk,
+                },
+                "maps": [self.map.pk],
+                "alternate_color": match.alternate_color,
+                "created": match.created.isoformat().replace("+00:00", "Z"),
+                "is_ranked": match.is_ranked,
+                "replay": None,
+            },
+        )
+
+    def test_not_admin_no_self_no_staff_team(self):
+        serializer = MatchSerializer(
+            context={
+                "episode_id": self.e1.pk,
+                "team_id": self.teams[0],
+                "user_id": self.users[0].pk,
+                "is_staff": False,
+            }
+        )
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=None,
+            red=MatchParticipant.objects.create(
+                team=self.teams[1],
+                submission=self.submissions[1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[2],
+                submission=self.submissions[2],
+                score=2,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        data = serializer.to_representation(match)
+        self.assertEqual(
+            data,
+            {
+                "id": match.pk,
+                "status": str(match.status),
+                "logs": match.logs,
+                "episode": match.episode.pk,
+                "red": {
+                    "team": match.red.team.pk,
+                    "submission": None,
+                    "score": match.red.score,
+                    "rating": match.red.rating.pk,
+                },
+                "blue": {
+                    "team": match.blue.team.pk,
+                    "submission": None,
+                    "score": match.blue.score,
+                    "rating": match.blue.rating.pk,
+                },
+                "maps": [self.map.pk],
+                "alternate_color": match.alternate_color,
+                "created": match.created.isoformat().replace("+00:00", "Z"),
+                "is_ranked": match.is_ranked,
+                "replay": None,
+            },
+        )
