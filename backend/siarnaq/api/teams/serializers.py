@@ -7,7 +7,7 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ["episode", "name", "members", "status"]
-        read_only_fields = ["members"]
+        # read_only_fields = ["members"]
 
     def create(self, validated_data):
         team_obj = Team.objects.create(**validated_data)
@@ -65,8 +65,18 @@ class TeamProfileSerializer(serializers.ModelSerializer):
         return profile_obj
 
     def update(self, instance, validated_data):
-        # update all data in instance
-        instance.team = validated_data.get("team", instance.team)
+        # get all data in instance
+        team_data = validated_data.get("team", instance.team)
+        # set data from team obj
+        instance.team.episode = team_data.get("episode")
+        instance.team.name = team_data.get("name")
+        # update team members
+        if team_data.get("members") is not None:
+            instance.team.members.set(team_data.get("members"))
+        else:
+            instance.team.members.set([])
+        instance.team.status = team_data.get("status")
+
         instance.quote = validated_data.get("quote", instance.quote)
         instance.biography = validated_data.get("biography", instance.biography)
         instance.has_avatar = validated_data.get("has_avatar", instance.has_avatar)
@@ -76,8 +86,8 @@ class TeamProfileSerializer(serializers.ModelSerializer):
         instance.auto_accept_unranked = validated_data.get(
             "auto_accept_unranked", instance.auto_accept_unranked
         )
-        instance.eligible_for = validated_data.get(
-            "eligible_for", instance.eligible_for
+        instance.eligible_for.set(
+            validated_data.get("eligible_for", instance.eligible_for).all()
         )
         instance.save()
         return instance
