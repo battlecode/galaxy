@@ -15,7 +15,6 @@ class UserProfileViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin,
 ):
     """
     A viewset for retrieving and updating all user info.
