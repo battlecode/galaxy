@@ -58,7 +58,9 @@ class SubmissionViewSet(
     permission_classes = (IsAuthenticated, IsAdminUserOrEpisodeAvailable, IsOnTeam)
 
     def get_queryset(self):
-        queryset = Submission.objects.filter(episode=self.kwargs["episode_id"])
+        queryset = Submission.objects.filter(
+            episode=self.kwargs["episode_id"]
+        ).select_related("team", "user")
         if self.action != "report":
             queryset = queryset.filter(team__members=self.request.user)
         return queryset
@@ -154,7 +156,17 @@ class MatchViewSet(
     permission_classes = (IsAdminUserOrEpisodeAvailable,)
 
     def get_queryset(self):
-        return Match.objects.filter(episode=self.kwargs["episode_id"])
+        return (
+            Match.objects.filter(episode=self.kwargs["episode_id"])
+            .select_related(
+                "red__previous_participation__rating",
+                "blue__previous_participation__rating",
+                "red__rating",
+                "blue__rating",
+                "tournament_round",
+            )
+            .prefetch_related("red__team__members", "blue__team__members", "maps")
+        )
 
     @extend_schema(responses={status.HTTP_200_OK: MatchSerializer(many=True)})
     @action(

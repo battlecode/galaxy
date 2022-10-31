@@ -1,7 +1,10 @@
 from django.db import transaction
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from siarnaq.api.compete.models import Match, MatchParticipant, SaturnStatus, Submission
+from siarnaq.api.teams.serializers import RatingField
 
 
 class SaturnInvocationSerializer(serializers.Serializer):
@@ -10,6 +13,8 @@ class SaturnInvocationSerializer(serializers.Serializer):
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
+    teamname = serializers.CharField(source="team.name", read_only=True)
+    username = serializers.CharField(source="user.username", read_only=True)
     source_code = serializers.FileField(write_only=True)
 
     class Meta:
@@ -20,7 +25,9 @@ class SubmissionSerializer(serializers.ModelSerializer):
             "logs",
             "episode",
             "team",
+            "teamname",
             "user",
+            "username",
             "created",
             "accepted",
             "package",
@@ -33,7 +40,9 @@ class SubmissionSerializer(serializers.ModelSerializer):
             "logs",
             "episode",
             "team",
+            "teamname",
             "user",
+            "username",
             "created",
             "accepted",
         ]
@@ -67,10 +76,28 @@ class SubmissionReportSerializer(serializers.Serializer):
 
 
 class MatchParticipantSerializer(serializers.ModelSerializer):
+    teamname = serializers.CharField(source="team.name", read_only=True)
+    rating = RatingField(read_only=True)
+    old_rating = serializers.SerializerMethodField()
+
     class Meta:
         model = MatchParticipant
-        fields = ["team", "submission", "score", "rating"]
+        fields = ["team", "teamname", "submission", "score", "rating", "old_rating"]
         read_only_fields = fields
+
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_teamname(self, obj):
+        return obj.team.name
+
+    @extend_schema_field(OpenApiTypes.DOUBLE)
+    def get_old_rating(self, obj):
+        rating = obj.get_old_rating()
+        if rating is None:
+            # If unknown, use the team's current rating. The outside world just wants to
+            # know our best estimate for the strength of their opponent. They don't want
+            # a lecture about our deferred rating evaluation algorithm.
+            rating = obj.team.rating
+        return RatingField().to_representation(rating)
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -90,13 +117,13 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
 class MatchSerializer(serializers.ModelSerializer):
     red = MatchParticipantSerializer()
     blue = MatchParticipantSerializer()
+    maps = serializers.SerializerMethodField()
 
     class Meta:
         model = Match
         fields = [
             "id",
             "status",
-            "logs",
             "episode",
             "red",
             "blue",
@@ -107,6 +134,10 @@ class MatchSerializer(serializers.ModelSerializer):
             "replay",
         ]
         read_only_fields = fields
+
+    @extend_schema_field({"type": "array", "items": {"type": "string"}})
+    def get_maps(self, obj):
+        return [m.name for m in obj.maps.all()]
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -119,7 +150,6 @@ class MatchSerializer(serializers.ModelSerializer):
             and not instance.tournament_round.is_released
         ):
             # Unreleased tournament matches are fully redacted
-            data["logs"] = ""
             data["red"] = None
             data["blue"] = None
             data["replay"] = None
@@ -136,7 +166,6 @@ class MatchSerializer(serializers.ModelSerializer):
         elif instance.red.team.is_staff() or instance.blue.team.is_staff():
             # Matches with staff teams have scores redacted because they could be for
             # official grading purposes. We redact all of them just in case.
-            data["logs"] = ""
             data["red"]["score"] = None
             data["blue"]["score"] = None
             data["replay"] = None
