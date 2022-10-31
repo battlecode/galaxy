@@ -110,6 +110,8 @@ class MatchParticipantLinkedListTestCase(TestCase):
 
 
 class MatchParticipantRatingFinalizationTestCase(TestCase):
+    """Test suite for the delayed rating finalization algorithm."""
+
     def setUp(self):
         """Initialize the episode and teams available in the test suite."""
         e1 = Episode.objects.create(
