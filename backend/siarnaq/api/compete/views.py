@@ -1,6 +1,7 @@
 import google.cloud.storage as storage
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Q
 from django.http import FileResponse
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
@@ -8,16 +9,42 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from siarnaq.api.compete.models import Submission
+from siarnaq.api.compete.models import Match, Submission
 from siarnaq.api.compete.permissions import IsAdminUserOrEpisodeAvailable, IsOnTeam
 from siarnaq.api.compete.serializers import (
+    MatchSerializer,
     SubmissionReportSerializer,
     SubmissionSerializer,
 )
 from siarnaq.api.teams.models import Team
 
 
+class EpisodeContextMixin:
+    """Add the current episode, team and user to the serializer context."""
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update(
+            episode_id=self.kwargs["episode_id"],
+            user_id=self.request.user.pk,
+            team_id=None,
+            is_staff=self.request.user.is_staff,
+        )
+        if self.request.user.is_authenticated:
+            try:
+                context.update(
+                    team_id=Team.objects.get(
+                        episode=self.kwargs["episode_id"],
+                        members=self.request.user,
+                    ).pk
+                )
+            except Team.DoesNotExist:
+                pass  # User is not on a team
+        return context
+
+
 class SubmissionViewSet(
+    EpisodeContextMixin,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -35,20 +62,6 @@ class SubmissionViewSet(
         if self.action != "report":
             queryset = queryset.filter(team__members=self.request.user)
         return queryset
-
-    def get_serializer_context(self):
-        """Inform serializers of the current episode, team and user."""
-        context = super().get_serializer_context()
-        context.update(episode_id=self.kwargs["episode_id"])
-        if self.action != "report":
-            context.update(
-                team_id=Team.objects.get(
-                    episode=self.kwargs["episode_id"],
-                    members=self.request.user,
-                ).pk,
-                user_id=self.request.user.pk,
-            )
-        return context
 
     def create(self, request, *, episode_id):
         """
@@ -127,3 +140,37 @@ class SubmissionViewSet(
             serializer.is_valid(raise_exception=True)
             serializer.save()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
+class MatchViewSet(
+    EpisodeContextMixin,
+    viewsets.ReadOnlyModelViewSet,
+):
+    """
+    A viewset for viewing and retrieving Matches.
+    """
+
+    serializer_class = MatchSerializer
+    permission_classes = (IsAdminUserOrEpisodeAvailable,)
+
+    def get_queryset(self):
+        return Match.objects.filter(episode=self.kwargs["episode_id"])
+
+    @extend_schema(responses={status.HTTP_200_OK: MatchSerializer(many=True)})
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=(IsAuthenticated, IsAdminUserOrEpisodeAvailable, IsOnTeam),
+    )
+    def my(self, request, *, episode_id):
+        """List all scrimmages that the authenticated team participated in."""
+        # It is extremely important that this method does not return any matches in
+        # unreleased tournaments, to not expose results prematurely. On top of this, it
+        # is a design choice not to return any tournament matches at all, because it
+        # seems logical that they are not part of a scrimmage listing.
+        queryset = self.get_queryset().filter(
+            Q(red__team__members=request.user) | Q(blue__team__members=request.user),
+            tournament_round__isnull=True,
+        )
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

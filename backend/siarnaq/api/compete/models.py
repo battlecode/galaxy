@@ -336,35 +336,6 @@ class Match(SaturnInvocation):
         """Return the options to be submitted to the execution queue."""
         raise NotImplementedError
 
-    def can_see_teams(self, user):
-        """Check whether a user is allowed to view the participants in this match."""
-        if user.is_staff:
-            # Staff members can see everything
-            return True
-        if self.tournament_round is not None:
-            # Tournament matches are only available after release
-            return self.tournament_round.is_released
-        # Regular matches are public knowledge
-        return True
-
-    def can_see_outcome(self, user):
-        """Check whether a user is allowed to view the outcome of this match."""
-        if user.is_staff:
-            # Staff members can see everything
-            return True
-        if self.tournament_round is not None:
-            # Tournament matches are only available after release
-            return self.tournament_round.is_released
-        if user.is_authenticated:
-            if user.teams.filter(pk__in={self.red.team, self.blue.team}).exists():
-                # Team members can see outcomes of their own regular matches
-                return True
-        if self.red.team.is_staff() or self.blue.team.is_staff():
-            # Matches with staff teams could expose student grades
-            return False
-        # Regular matches are public knowledge
-        return True
-
     def try_finalize_ratings(self):
         """Try to finalize the ratings of the participations if possible."""
         if self.is_ranked and not self.is_finalized():

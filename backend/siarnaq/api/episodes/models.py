@@ -201,10 +201,10 @@ class Tournament(models.Model):
     in_progress = models.BooleanField(default=False)
     """Whether the tournament is currently being run on the Saturn compute cluster."""
 
-    challonge_private = models.URLField()
+    challonge_private = models.URLField(null=True, blank=True)
     """A private Challonge bracket showing matches in progress as they are run."""
 
-    challonge_public = models.URLField()
+    challonge_public = models.URLField(null=True, blank=True)
     """A public Challonge bracket showing match results as they are released."""
 
     def seed_by_scrimmage(self):
@@ -240,7 +240,7 @@ class TournamentRound(models.Model):
     )
     """The tournament to which this round belongs."""
 
-    challonge_id = models.SmallIntegerField()
+    challonge_id = models.SmallIntegerField(null=True, blank=True)
     """The ID of this round as referenced by Challonge."""
 
     name = models.CharField(max_length=64)

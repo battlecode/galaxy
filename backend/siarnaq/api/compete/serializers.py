@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework import serializers
 
-from siarnaq.api.compete.models import SaturnStatus, Submission
+from siarnaq.api.compete.models import Match, MatchParticipant, SaturnStatus, Submission
 
 
 class SaturnInvocationSerializer(serializers.Serializer):
@@ -64,3 +64,83 @@ class SubmissionReportSerializer(serializers.Serializer):
             self.instance.accepted = self.validated_data["accepted"]
         self.instance.save(update_fields=["status", "logs", "accepted"])
         return self.instance
+
+
+class MatchParticipantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MatchParticipant
+        fields = ["team", "submission", "score", "rating"]
+        read_only_fields = fields
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Redact participation details depending on client identity
+        if self.context["is_staff"]:
+            # Staff can see everything
+            pass
+        elif all(
+            member.pk != self.context["user_id"]
+            for member in instance.team.members.all()
+        ):
+            # Non-staff users cannot see the active submission used by other teams
+            data["submission"] = None
+        return data
+
+
+class MatchSerializer(serializers.ModelSerializer):
+    red = MatchParticipantSerializer()
+    blue = MatchParticipantSerializer()
+
+    class Meta:
+        model = Match
+        fields = [
+            "id",
+            "status",
+            "logs",
+            "episode",
+            "red",
+            "blue",
+            "maps",
+            "alternate_color",
+            "created",
+            "is_ranked",
+            "replay",
+        ]
+        read_only_fields = fields
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Redact match details depending on client identity
+        if self.context["is_staff"]:
+            # Staff can see everything
+            pass
+        elif (
+            instance.tournament_round is not None
+            and not instance.tournament_round.is_released
+        ):
+            # Unreleased tournament matches are fully redacted
+            data["logs"] = ""
+            data["red"] = None
+            data["blue"] = None
+            data["replay"] = None
+            data["maps"] = None
+        elif any(
+            member.pk == self.context["user_id"]
+            for member in instance.red.team.members.all()
+        ) or any(
+            member.pk == self.context["user_id"]
+            for member in instance.blue.team.members.all()
+        ):
+            # Clients can see everything about their own games
+            pass
+        elif instance.red.team.is_staff() or instance.blue.team.is_staff():
+            # Matches with staff teams have scores redacted because they could be for
+            # official grading purposes. We redact all of them just in case.
+            data["logs"] = ""
+            data["red"]["score"] = None
+            data["blue"]["score"] = None
+            data["replay"] = None
+        else:
+            # Replay links are private, but scores are ok to be released.
+            data["replay"] = None
+        return data
