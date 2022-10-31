@@ -173,3 +173,29 @@ class MatchSerializer(serializers.ModelSerializer):
             # Replay links are private, but scores are ok to be released.
             data["replay"] = None
         return data
+
+
+class MatchReportSerializer(serializers.Serializer):
+    invocation = SaturnInvocationSerializer()
+    red_score = serializers.IntegerField(min_value=0)
+    blue_score = serializers.IntegerField(min_value=0)
+
+    def validate(self, data):
+        has_red = data.get("red_score", None) is None
+        has_blue = data.get("blue_score", None) is None
+        if has_red + has_blue == 1:
+            raise serializers.ValidationError("must provide either no or all scores")
+        return data
+
+    @transaction.atomic
+    def save(self):
+        self.instance.status = self.validated_data["invocation"]["status"]
+        self.instance.logs += self.validated_data["invocation"]["logs"]
+        if self.validated_data.get("red_score", None) is not None:
+            self.instance.red.score = self.validated_data["red_score"]
+            self.instance.red.save(update_fields=["score"])
+        if self.validated_data.get("blue_score", None) is not None:
+            self.instance.blue.score = self.validated_data["blue_score"]
+            self.instance.blue.save(update_fields=["score"])
+        self.instance.save(update_fields=["status", "logs"])
+        return self.instance

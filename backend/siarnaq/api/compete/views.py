@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from siarnaq.api.compete.models import Match, Submission
 from siarnaq.api.compete.permissions import IsAdminUserOrEpisodeAvailable, IsOnTeam
 from siarnaq.api.compete.serializers import (
+    MatchReportSerializer,
     MatchSerializer,
     SubmissionReportSerializer,
     SubmissionSerializer,
@@ -186,3 +187,28 @@ class MatchViewSet(
         )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    @extend_schema(
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="Report has been received"
+            )
+        }
+    )
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(IsAdminUser,),
+        serializer_class=MatchReportSerializer,
+    )
+    def report(self, request, pk=None, *, episode_id):
+        """
+        Report the outcome of this match on Saturn. Reports on already-finalized
+        invocations are silently ignored.
+        """
+        instance = self.get_object()
+        if not instance.is_finalized():
+            serializer = self.get_serializer(instance, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
