@@ -790,15 +790,18 @@ class Api {
 
   // This process is very confusing; #90 will clean it up.
   static login(username, password, callback) {
-    $.post(`${URL}/auth/token/`, {
+    $.post(`${URL}/api/token/`, {
       username,
       password,
     })
       .done((data, status) => {
         Cookies.set("access", data.access);
         Cookies.set("refresh", data.refresh);
+        // Don't set username cookie once redesign done; see #167
         Cookies.set("username", username);
 
+        // Save this as header, see
+        // https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
         $.ajaxSetup({
           headers: { Authorization: `Bearer ${Cookies.get("access")}` },
         });
