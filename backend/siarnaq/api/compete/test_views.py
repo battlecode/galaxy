@@ -9,7 +9,15 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from siarnaq.api.compete.models import Match, MatchParticipant, SaturnStatus, Submission
+from siarnaq.api.compete.models import (
+    Match,
+    MatchParticipant,
+    PlayerColor,
+    SaturnStatus,
+    ScrimmageRequest,
+    ScrimmageRequestStatus,
+    Submission,
+)
 from siarnaq.api.compete.serializers import MatchSerializer
 from siarnaq.api.episodes.models import (
     Episode,
@@ -19,7 +27,7 @@ from siarnaq.api.episodes.models import (
     TournamentRound,
     TournamentStyle,
 )
-from siarnaq.api.teams.models import Rating, Team, TeamStatus
+from siarnaq.api.teams.models import Rating, Team, TeamProfile, TeamStatus
 from siarnaq.api.user.models import User
 
 
@@ -725,3 +733,274 @@ class MatchSerializerTestCase(TestCase):
                 "replay": None,
             },
         )
+
+
+class ScrimmageRequestViewSetTestCase(APITestCase):
+    """Test suite for the Scrimmage Requests API."""
+
+    def setUp(self):
+        self.e1 = Episode.objects.create(
+            name_short="e1",
+            registration=timezone.now(),
+            game_release=timezone.now(),
+            game_archive=timezone.now(),
+            submission_frozen=False,
+            language=Language.JAVA_8,
+        )
+        self.e2 = Episode.objects.create(
+            name_short="e2",
+            registration=timezone.now(),
+            game_release=timezone.now(),
+            game_archive=timezone.now(),
+            submission_frozen=False,
+            language=Language.JAVA_8,
+        )
+        self.maps = []
+        for i in range(5):
+            self.maps.append(
+                Map.objects.create(
+                    episode=self.e1 if i < 4 else self.e2,
+                    name=f"map{i}",
+                    is_public=i != 3,
+                )
+            )
+        self.users, self.teams, self.submissions = [], [], []
+        for i in range(3):
+            u = User.objects.create(username=f"user{i}")
+            t = Team.objects.create(
+                episode=self.e1 if i < 2 else self.e2, name=f"team{i}"
+            )
+            t.members.add(u)
+            TeamProfile.objects.create(
+                team=t,
+                rating=Rating.objects.create(),
+                auto_accept_ranked=False,
+                auto_accept_unranked=False,
+            )
+            self.submissions.append(
+                Submission.objects.create(
+                    episode=self.e1, team=t, user=u, accepted=True
+                )
+            )
+            self.users.append(u)
+            self.teams.append(t)
+
+    # Partitions for: create.
+    # user team submission: accepted, not accepted
+    # opponent submission: accepted, not accepted
+    # episode: frozen, not frozen, hidden, mismatched
+    # maps: valid, hidden, mismatched
+
+    def test_create_accepted_accepted_episode_not_frozen_maps_valid(self):
+        self.client.force_authenticate(self.users[0])
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[1].pk,
+                "color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map2"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        r = ScrimmageRequest.objects.get()
+        self.assertEqual(r.episode, self.e1)
+        self.assertEqual(r.status, ScrimmageRequestStatus.PENDING)
+        self.assertEqual(r.is_ranked, True)
+        self.assertEqual(r.requested_by, self.teams[0])
+        self.assertEqual(r.requested_to, self.teams[1])
+        self.assertEqual(r.color, PlayerColor.ALWAYS_RED)
+        self.assertEqual(r.maps.count(), 3)
+
+    def test_create_accepted_notaccepted(self):
+        self.client.force_authenticate(self.users[0])
+        self.submissions[1].accepted = False
+        self.submissions[1].save()
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[1].pk,
+                "color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map2"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(ScrimmageRequest.objects.exists())
+
+    def test_create_notaccepted_accepted(self):
+        self.client.force_authenticate(self.users[0])
+        self.submissions[0].accepted = False
+        self.submissions[0].save()
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[1].pk,
+                "color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map2"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(ScrimmageRequest.objects.exists())
+
+    def test_create_episode_frozen(self):
+        self.client.force_authenticate(self.users[0])
+        self.e1.submission_frozen = True
+        self.e1.save()
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[1].pk,
+                "color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map2"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(ScrimmageRequest.objects.exists())
+
+    def test_create_episode_hidden(self):
+        self.client.force_authenticate(self.users[0])
+        self.e1.registration += timedelta(days=1)
+        self.e1.game_release += timedelta(days=1)
+        self.e1.game_archive += timedelta(days=1)
+        self.e1.save()
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[1].pk,
+                "color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map2"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(ScrimmageRequest.objects.exists())
+
+    def test_create_episode_mismatched(self):
+        self.client.force_authenticate(self.users[0])
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[2].pk,
+                "color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map2"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(ScrimmageRequest.objects.exists())
+
+    def test_create_maps_hidden(self):
+        self.client.force_authenticate(self.users[0])
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[1].pk,
+                "color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map3"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(ScrimmageRequest.objects.exists())
+
+    def test_create_maps_mismatched(self):
+        self.client.force_authenticate(self.users[0])
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[1].pk,
+                "color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map4"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(ScrimmageRequest.objects.exists())
+
+    # Partitions for: accept.
+    # team: valid, invalid
+    # status: pending, not pending
+
+    @patch(
+        "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
+    )
+    def test_team_valid_accept_pending(self, enqueue):
+        self.client.force_authenticate(self.users[1])
+        r = ScrimmageRequest.objects.create(
+            episode=self.e1,
+            is_ranked=True,
+            requested_by=self.teams[0],
+            requested_to=self.teams[1],
+            color=PlayerColor.ALWAYS_RED,
+        )
+        r.maps.add(*self.maps[:3])
+        response = self.client.post(
+            reverse("request-accept", kwargs={"episode_id": "e1", "pk": r.pk}),
+            {},
+            format="json",
+        )
+        self.assertTrue(status.is_success(response.status_code))
+        m = Match.objects.get()
+        self.assertEqual(m.episode, self.e1)
+        self.assertEqual(m.tournament_round, None)
+        self.assertEqual(m.red.team, self.teams[0])
+        self.assertEqual(m.red.submission, self.submissions[0])
+        self.assertEqual(m.red.score, None)
+        self.assertEqual(m.red.rating, None)
+        self.assertEqual(m.blue.team, self.teams[1])
+        self.assertEqual(m.blue.submission, self.submissions[1])
+        self.assertEqual(m.blue.score, None)
+        self.assertEqual(m.blue.rating, None)
+        self.assertEqual(m.maps.count(), 3)
+        self.assertEqual(m.alternate_color, False)
+        self.assertEqual(m.is_ranked, True)
+        enqueue.assert_called()
+
+    def test_team_valid_accept_not_pending(self):
+        self.client.force_authenticate(self.users[1])
+        r = ScrimmageRequest.objects.create(
+            episode=self.e1,
+            status=ScrimmageRequestStatus.ACCEPTED,
+            is_ranked=True,
+            requested_by=self.teams[0],
+            requested_to=self.teams[1],
+            color=PlayerColor.ALWAYS_RED,
+        )
+        r.maps.add(*self.maps[:3])
+        response = self.client.post(
+            reverse("request-accept", kwargs={"episode_id": "e1", "pk": r.pk}),
+            {},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(Match.objects.exists())
+
+    def test_team_invalid(self):
+        self.client.force_authenticate(self.users[0])
+        r = ScrimmageRequest.objects.create(
+            episode=self.e1,
+            status=ScrimmageRequestStatus.ACCEPTED,
+            is_ranked=True,
+            requested_by=self.teams[0],
+            requested_to=self.teams[1],
+            color=PlayerColor.ALWAYS_RED,
+        )
+        r.maps.add(*self.maps[:3])
+        response = self.client.post(
+            reverse("request-accept", kwargs={"episode_id": "e1", "pk": r.pk}),
+            {},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(Match.objects.exists())
