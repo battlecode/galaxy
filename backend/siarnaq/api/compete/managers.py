@@ -114,7 +114,7 @@ class ScrimmageRequestQuerySet(models.QuerySet):
                 for request in requests
                 for team_id in (
                     [request.requested_by_id, request.requested_to_id]
-                    if request.is_requester_red_first()
+                    if request.determine_is_requester_red_first()
                     else [request.requested_to_id, request.requested_by_id]
                 )
             )

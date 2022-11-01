@@ -14,7 +14,7 @@ class IsAdminUserOrEpisodeAvailable(permissions.BasePermission):
 
     def has_permission(self, request, view):
         episode = get_object_or_404(
-            Episode.objects.user_visible(is_staff=request.user.is_staff),
+            Episode.objects.visible_to_user(is_staff=request.user.is_staff),
             pk=view.kwargs["episode_id"],
         )
         return (

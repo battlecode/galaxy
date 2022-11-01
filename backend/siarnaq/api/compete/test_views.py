@@ -804,7 +804,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "color": PlayerColor.ALWAYS_RED,
+                "requester_color": PlayerColor.ALWAYS_RED,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -823,7 +823,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "color": PlayerColor.ALWAYS_RED,
+                "requester_color": PlayerColor.ALWAYS_RED,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -835,7 +835,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         self.assertEqual(r.is_ranked, True)
         self.assertEqual(r.requested_by, self.teams[0])
         self.assertEqual(r.requested_to, self.teams[1])
-        self.assertEqual(r.color, PlayerColor.ALWAYS_RED)
+        self.assertEqual(r.requester_color, PlayerColor.ALWAYS_RED)
         self.assertEqual(r.maps.count(), 3)
         self.assertFalse(Match.objects.exists())
 
@@ -848,7 +848,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "color": PlayerColor.ALWAYS_RED,
+                "requester_color": PlayerColor.ALWAYS_RED,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -865,7 +865,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "color": PlayerColor.ALWAYS_RED,
+                "requester_color": PlayerColor.ALWAYS_RED,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -882,7 +882,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "color": PlayerColor.ALWAYS_RED,
+                "requester_color": PlayerColor.ALWAYS_RED,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -901,7 +901,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "color": PlayerColor.ALWAYS_RED,
+                "requester_color": PlayerColor.ALWAYS_RED,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -916,7 +916,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[2].pk,
-                "color": PlayerColor.ALWAYS_RED,
+                "requester_color": PlayerColor.ALWAYS_RED,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -931,7 +931,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "color": PlayerColor.ALWAYS_RED,
+                "requester_color": PlayerColor.ALWAYS_RED,
                 "map_names": ["map0", "map1", "map3"],
             },
             format="json",
@@ -946,7 +946,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "color": PlayerColor.ALWAYS_RED,
+                "requester_color": PlayerColor.ALWAYS_RED,
                 "map_names": ["map0", "map1", "map4"],
             },
             format="json",
@@ -968,7 +968,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             is_ranked=True,
             requested_by=self.teams[0],
             requested_to=self.teams[1],
-            color=PlayerColor.ALWAYS_RED,
+            requester_color=PlayerColor.ALWAYS_RED,
         )
         r.maps.add(*self.maps[:3])
         response = self.client.post(
@@ -1001,7 +1001,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             is_ranked=True,
             requested_by=self.teams[0],
             requested_to=self.teams[1],
-            color=PlayerColor.ALWAYS_RED,
+            requester_color=PlayerColor.ALWAYS_RED,
         )
         r.maps.add(*self.maps[:3])
         response = self.client.post(
@@ -1020,7 +1020,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             is_ranked=True,
             requested_by=self.teams[0],
             requested_to=self.teams[1],
-            color=PlayerColor.ALWAYS_RED,
+            requester_color=PlayerColor.ALWAYS_RED,
         )
         r.maps.add(*self.maps[:3])
         response = self.client.post(

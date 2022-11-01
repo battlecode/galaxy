@@ -3,7 +3,7 @@ from django.utils import timezone
 
 
 class EpisodeQuerySet(models.QuerySet):
-    def user_visible(self, is_staff):
+    def visible_to_user(self, *, is_staff):
         """Filter the queryset for only episodes that are visible to the user."""
         if is_staff:
             # Staff can see everything

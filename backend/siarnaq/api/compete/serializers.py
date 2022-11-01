@@ -93,10 +93,6 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
         fields = ["team", "teamname", "submission", "score", "rating", "old_rating"]
         read_only_fields = fields
 
-    @extend_schema_field(OpenApiTypes.STR)
-    def get_teamname(self, obj):
-        return obj.team.name
-
     @extend_schema_field(OpenApiTypes.DOUBLE)
     def get_old_rating(self, obj):
         rating = obj.get_old_rating()
@@ -239,7 +235,7 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
             "requested_to",
             "requested_to_name",
             "requested_to_rating",
-            "color",
+            "requester_color",
             "maps",
             "map_names",
         ]

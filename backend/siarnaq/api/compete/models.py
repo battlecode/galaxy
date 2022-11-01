@@ -411,7 +411,7 @@ class ScrimmageRequest(models.Model):
     )
     """The opponent who is receiving this match request."""
 
-    color = models.CharField(max_length=3, choices=PlayerColor.choices)
+    requester_color = models.CharField(max_length=3, choices=PlayerColor.choices)
     """
     The color requested by the sender.
     Note that the opponent will have the opposite color.
@@ -424,18 +424,18 @@ class ScrimmageRequest(models.Model):
 
     def is_alternating_color(self):
         """Determine whether the requested color alternates between games."""
-        return self.color in {
+        return self.requester_color in {
             PlayerColor.ALTERNATE_RED,
             PlayerColor.ALTERNATE_BLUE,
             PlayerColor.ALTERNATE_RANDOM,
         }
 
-    def is_requester_red_first(self):
+    def determine_is_requester_red_first(self):
         """
         Determine whether the requester will be red in the first game.
         Not guaranteed to behave deterministcally for random selections.
         """
-        match self.color:
+        match self.requester_color:
             case PlayerColor.ALWAYS_RED | PlayerColor.ALTERNATE_RED:
                 return True
             case PlayerColor.ALWAYS_BLUE | PlayerColor.ALTERNATE_BLUE:

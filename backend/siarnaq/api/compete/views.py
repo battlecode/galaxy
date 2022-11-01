@@ -31,7 +31,7 @@ from siarnaq.api.compete.serializers import (
 from siarnaq.api.teams.models import Team
 
 
-class EpisodeContextMixin:
+class EpisodeTeamUserContextMixin:
     """Add the current episode, team and user to the serializer context."""
 
     def get_serializer_context(self):
@@ -56,7 +56,7 @@ class EpisodeContextMixin:
 
 
 class SubmissionViewSet(
-    EpisodeContextMixin,
+    EpisodeTeamUserContextMixin,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -157,7 +157,7 @@ class SubmissionViewSet(
 
 
 class MatchViewSet(
-    EpisodeContextMixin,
+    EpisodeTeamUserContextMixin,
     viewsets.ReadOnlyModelViewSet,
 ):
     """
@@ -228,7 +228,7 @@ class MatchViewSet(
 
 
 class ScrimmageRequestViewSet(
-    EpisodeContextMixin,
+    EpisodeTeamUserContextMixin,
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -272,6 +272,8 @@ class ScrimmageRequestViewSet(
                 permissions.append(HasTeamSubmission())
             case "reject" | "destroy":
                 # Episode can be frozen, but use permission to ensure episode visible
+                # AllowAny will allow all access, and we just use the permission to
+                # raise a 404 if the user shouldn't know that the episode exists
                 permissions.append((IsAdminUserOrEpisodeAvailable | AllowAny)())
                 permissions.append(IsScrimmageRequestActor("requested_by"))
             case _:
