@@ -132,6 +132,10 @@ class App extends Component {
     this.notFoundElems = [
       <Route path="*" component={NotFound} key="notfound" />,
     ];
+
+    // Sets the login header based on currently held cookies, before any
+    // requests are run.
+    Api.setLoginHeader();
   }
 
   componentDidMount() {
