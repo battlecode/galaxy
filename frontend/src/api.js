@@ -702,11 +702,9 @@ class Api {
   //----AUTHENTICATION----
 
   static logout(callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    }
     Cookies.set("access", "");
     Cookies.set("refresh", "");
+    Api.setLoginHeader();
     callback();
   }
 
