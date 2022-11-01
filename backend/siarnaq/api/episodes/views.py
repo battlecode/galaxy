@@ -19,7 +19,13 @@ class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         return Episode.objects.user_visible(is_staff=self.request.user.is_staff)
 
-    @extend_schema(responses={204: OpenApiResponse(description="Created successfully")})
+    @extend_schema(
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="Created successfully"
+            )
+        }
+    )
     @action(
         detail=True,
         methods=["post"],
@@ -32,4 +38,4 @@ class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         episode.autoscrim(serializer.validated_data["best_of"])
-        return Response(status.HTTP_204_NO_CONTENT)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
