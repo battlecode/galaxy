@@ -786,12 +786,36 @@ class ScrimmageRequestViewSetTestCase(APITestCase):
             self.teams.append(t)
 
     # Partitions for: create.
+    # team auto accept: on, off
     # user team submission: accepted, not accepted
     # opponent submission: accepted, not accepted
     # episode: frozen, not frozen, hidden, mismatched
     # maps: valid, hidden, mismatched
 
-    def test_create_accepted_accepted_episode_not_frozen_maps_valid(self):
+    @patch(
+        "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
+    )
+    def test_create_autoaccept(self, enqueue):
+        self.client.force_authenticate(self.users[0])
+        self.teams[1].profile.auto_accept_ranked = True
+        self.teams[1].profile.save()
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[1].pk,
+                "color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map2"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        r = ScrimmageRequest.objects.get()
+        self.assertEqual(r.status, ScrimmageRequestStatus.ACCEPTED)
+        self.assertTrue(Match.objects.exists())
+        enqueue.assert_called()
+
+    def test_create_noauto_accepted_accepted_episode_not_frozen_maps_valid(self):
         self.client.force_authenticate(self.users[0])
         response = self.client.post(
             reverse("request-list", kwargs={"episode_id": "e1"}),
@@ -812,6 +836,7 @@ class ScrimmageRequestViewSetTestCase(APITestCase):
         self.assertEqual(r.requested_to, self.teams[1])
         self.assertEqual(r.color, PlayerColor.ALWAYS_RED)
         self.assertEqual(r.maps.count(), 3)
+        self.assertFalse(Match.objects.exists())
 
     def test_create_accepted_notaccepted(self):
         self.client.force_authenticate(self.users[0])
