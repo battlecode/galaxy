@@ -176,10 +176,6 @@ class Api {
   }
 
   static getTeamMuHistory(team, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
-
     $.get(`${URL}/api/${LEAGUE}/team/${team}/history/`).done((data, status) => {
       callback(data);
     });
@@ -207,10 +203,6 @@ class Api {
 
   //get data for team with team_id
   static getTeamById(team_id, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
-
     $.get(`${URL}/api/${LEAGUE}/team/${team_id}/`).done((data, status) => {
       callback(data);
     });
@@ -219,10 +211,6 @@ class Api {
   //calculates rank of given team, with tied teams receiving the same rank
   //i.e. if mu is 10,10,1 the ranks would be 1,1,3
   static getTeamRanking(team_id, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
-
     const requestUrl = `${URL}/api/${LEAGUE}/team/${team_id}/ranking/`;
     $.get(requestUrl).done((data, status) => {
       callback(data);
@@ -245,9 +233,6 @@ class Api {
   }
 
   static getUpdates(callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
     $.get(`${URL}/api/league/${LEAGUE}/`, (data, success) => {
       for (let i = 0; i < data.updates.length; i++) {
         const d = new Date(data.updates[i].time);
@@ -295,9 +280,6 @@ class Api {
   static searchRanking(apiURL, query, page, callback) {
     const encQuery = encodeURIComponent(query);
     const teamUrl = `${apiURL}/?ordering=-score,name&search=${encQuery}&page=${page}`;
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
     $.get(teamUrl, (teamData) => {
       const teamLimit =
         parseInt(teamData.count / PAGE_LIMIT, 10) +
@@ -454,10 +436,6 @@ class Api {
   }
 
   static getProfileByUser(username, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
-
     $.get(`${URL}/api/user/profile/${username}/`)
       .done((data, status) => {
         callback(data);
@@ -716,9 +694,6 @@ class Api {
   }
 
   static getTournaments(callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
     $.get(`${URL}/api/${LEAGUE}/tournament/`).done((data, status) => {
       callback(data.results);
     });
@@ -727,9 +702,20 @@ class Api {
   //----AUTHENTICATION----
 
   static logout(callback) {
+    if ($.ajaxSettings && $.ajaxSettings.headers) {
+      delete $.ajaxSettings.headers.Authorization;
+    }
     Cookies.set("access", "");
     Cookies.set("refresh", "");
     callback();
+  }
+
+  static setLoginHeader() {
+    // Save stored JWT as header, see
+    // https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+    $.ajaxSetup({
+      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
+    });
   }
 
   // Checks whether the currently held JWT access token is still valid (by posting it to the verify endpoint),
@@ -742,6 +728,7 @@ class Api {
       token: Cookies.get("access"),
     })
       .done((data, status) => {
+        // Set authorization header for all other requests
         callback(true);
       })
       .fail((xhr, status, error) => {
@@ -774,12 +761,6 @@ class Api {
         // Don't set username cookie once redesign done; see #167
         Cookies.set("username", username);
 
-        // Save this as header, see
-        // https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
-        $.ajaxSetup({
-          headers: { Authorization: `Bearer ${Cookies.get("access")}` },
-        });
-
         callback(data, true);
       })
       .fail((xhr, status, error) => {
@@ -791,10 +772,6 @@ class Api {
   }
 
   static register(email, username, password, first, last, dob, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    }
-
     $.post(`${URL}/api/user/`, {
       email,
       username,
@@ -818,10 +795,6 @@ class Api {
   }
 
   static doResetPassword(password, token, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    }
-
     var req = {
       password: password,
       token: token,
@@ -835,9 +808,6 @@ class Api {
   }
 
   static forgotPassword(email, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    }
     $.post(`${URL}/api/password_reset/`, {
       email,
     })

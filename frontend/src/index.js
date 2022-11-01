@@ -135,6 +135,10 @@ class App extends Component {
         {<Redirect to={`/not-found`} />}
       </Route>,
     ];
+
+    // Sets the login header based on currently held cookies, before any
+    // requests are run.
+    Api.setLoginHeader();
   }
 
   componentDidMount() {
