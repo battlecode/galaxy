@@ -3,7 +3,15 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from siarnaq.api.compete.models import Match, MatchParticipant, SaturnStatus, Submission
+from siarnaq.api.compete.models import (
+    Match,
+    MatchParticipant,
+    SaturnStatus,
+    ScrimmageRequest,
+    Submission,
+)
+from siarnaq.api.episodes.models import Map
+from siarnaq.api.teams.models import Team
 from siarnaq.api.teams.serializers import RatingField
 
 
@@ -199,3 +207,87 @@ class MatchReportSerializer(serializers.Serializer):
             self.instance.blue.save(update_fields=["score"])
         self.instance.save(update_fields=["status", "logs"])
         return self.instance
+
+
+class ScrimmageRequestSerializer(serializers.ModelSerializer):
+    requested_by_name = serializers.CharField(
+        source="requested_by.name", read_only=True
+    )
+    requested_by_rating = RatingField(source="requested_by.rating", read_only=True)
+    requested_to_name = serializers.CharField(
+        source="requested_to.name", read_only=True
+    )
+    requested_to_rating = RatingField(source="requested_to.rating", read_only=True)
+    maps = serializers.SerializerMethodField()
+    map_names = serializers.ListField(child=serializers.CharField(), write_only=True)
+
+    class Meta:
+        model = ScrimmageRequest
+        fields = [
+            "id",
+            "episode",
+            "created",
+            "status",
+            "is_ranked",
+            "requested_by",
+            "requested_by_name",
+            "requested_by_rating",
+            "requested_to",
+            "requested_to_name",
+            "requested_to_rating",
+            "color",
+            "maps",
+            "map_names",
+        ]
+        read_only_fields = [
+            "id",
+            "episode",
+            "created",
+            "status",
+            "requested_by",
+            "requested_by_name",
+            "requested_to_name",
+            "maps",
+        ]
+
+    @extend_schema_field({"type": "array", "items": {"type": "string"}})
+    def get_maps(self, obj):
+        return [m.name for m in obj.maps.all()]
+
+    def validate_requested_to(self, value):
+        if (
+            not Team.objects.filter(episode=self.context["episode_id"], pk=value.pk)
+            .with_active_submission()
+            .exists()
+        ):
+            raise serializers.ValidationError("No valid opponent found")
+        return value
+
+    def to_internal_value(self, data):
+        ret = super().to_internal_value(data)
+        maps = dict(
+            Map.objects.filter(
+                episode=self.context["episode_id"],
+                is_public=True,
+                name__in=data["map_names"],
+            )
+            .values_list("name", "pk")
+            .all()
+        )
+        try:
+            map_ids = [maps[name] for name in data["map_names"]]
+        except KeyError:
+            raise serializers.ValidationError(
+                {
+                    "The following maps were invalid": [
+                        name for name in data["map_names"] if name not in maps
+                    ]
+                }
+            )
+        ret.update(
+            episode_id=self.context["episode_id"],
+            requested_by_id=self.context["team_id"],
+            maps=map_ids,
+        )
+        ret.pop("map_names", None)
+        return ret

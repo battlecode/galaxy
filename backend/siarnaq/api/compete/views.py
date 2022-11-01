@@ -6,14 +6,25 @@ from django.http import FileResponse
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
-from siarnaq.api.compete.models import Match, Submission
-from siarnaq.api.compete.permissions import IsAdminUserOrEpisodeAvailable, IsOnTeam
+from siarnaq.api.compete.models import (
+    Match,
+    ScrimmageRequest,
+    ScrimmageRequestStatus,
+    Submission,
+)
+from siarnaq.api.compete.permissions import (
+    HasTeamSubmission,
+    IsAdminUserOrEpisodeAvailable,
+    IsOnTeam,
+    IsScrimmageRequestActor,
+)
 from siarnaq.api.compete.serializers import (
     MatchReportSerializer,
     MatchSerializer,
+    ScrimmageRequestSerializer,
     SubmissionReportSerializer,
     SubmissionSerializer,
 )
@@ -212,3 +223,129 @@ class MatchViewSet(
             serializer.is_valid(raise_exception=True)
             serializer.save()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
+class ScrimmageRequestViewSet(
+    EpisodeContextMixin,
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+    """
+    A viewset for creating and responding to Scrimmage Requests.
+    """
+
+    serializer_class = ScrimmageRequestSerializer
+
+    def get_queryset(self):
+        queryset = ScrimmageRequest.objects.filter(
+            Q(requested_to__members=self.request.user)
+            | Q(requested_by__members=self.request.user),
+            episode=self.kwargs["episode_id"],
+        ).prefetch_related("requested_to__members", "requested_by__members")
+        if self.action in ("accept", "reject", "destroy"):
+            # Mutator operations require locks to prevent races
+            queryset = queryset.select_for_update(of=("self"))
+        return queryset
+
+    def get_permissions(self):
+        permissions = [IsAuthenticated()]
+        match self.action:
+            case "create":
+                # Episode must not be frozen in order to create new requests
+                permissions.append(IsAdminUserOrEpisodeAvailable())
+                permissions.append(HasTeamSubmission())
+            case "accept":
+                # Episode must not be frozen in order to allow new matches
+                permissions.append(IsAdminUserOrEpisodeAvailable())
+                permissions.append(IsScrimmageRequestActor("requested_to"))
+                permissions.append(HasTeamSubmission())
+            case "reject" | "destroy":
+                # Episode can be frozen, but use permission to ensure episode visible
+                permissions.append((IsAdminUserOrEpisodeAvailable | AllowAny)())
+                permissions.append(IsScrimmageRequestActor("requested_by"))
+            case _:
+                permissions.append(IsAdminUserOrEpisodeAvailable())
+                permissions.append(IsOnTeam())
+        return permissions
+
+    def create(self, request, *, episode_id):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        # Generate the Location header, as supplied by CreateModelMixin
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
+
+    @extend_schema(
+        responses={status.HTTP_200_OK: ScrimmageRequestSerializer(many=True)}
+    )
+    @action(detail=False, methods=["get"])
+    def inbox(self, request, *, episode_id):
+        """Get all pending scrimmage requests received."""
+        serializer = self.get_serializer(
+            self.get_queryset().filter(
+                Q(requested_to__members=request.user),
+                status=ScrimmageRequestStatus.PENDING,
+            ),
+            many=True,
+        )
+        return Response(serializer.data)
+
+    @extend_schema(
+        responses={status.HTTP_200_OK: ScrimmageRequestSerializer(many=True)}
+    )
+    @action(detail=False, methods=["get"])
+    def outbox(self, request, *, episode_id):
+        """Get all pending scrimmage requests sent."""
+        serializer = self.get_serializer(
+            self.get_queryset().filter(
+                Q(requested_by__members=request.user),
+                status=ScrimmageRequestStatus.PENDING,
+            ),
+            many=True,
+        )
+        return Response(serializer.data)
+
+    @extend_schema(
+        request=None,
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="Scrimmage request has been accepted"
+            )
+        },
+    )
+    @action(detail=True, methods=["post"])
+    @transaction.atomic
+    def accept(self, request, pk=None, *, episode_id):
+        """Accept a scrimmage request."""
+        self.get_object()  # Asserts permission
+        self.get_queryset().filter(pk=pk).accept()
+        return Response(None, status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(
+        request=None,
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="Scrimmage request has been rejected"
+            )
+        },
+    )
+    @action(detail=True, methods=["post"])
+    @transaction.atomic
+    def reject(self, request, pk=None, *, episode_id):
+        """Reject a scrimmage request."""
+        self.get_object()  # Asserts permission
+        self.get_queryset().filter(pk=pk).reject()
+        return Response(None, status.HTTP_204_NO_CONTENT)
+
+    @transaction.atomic
+    def destroy(self, request, pk=None, *, episode_id):
+        """Cancel a scrimmage request."""
+        return super().destroy(request, pk=pk, episode_id=episode_id)

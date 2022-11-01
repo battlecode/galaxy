@@ -1,4 +1,5 @@
 import posixpath
+import random
 import uuid
 
 from django.apps import apps
@@ -358,9 +359,6 @@ class ScrimmageRequestStatus(models.TextChoices):
     REJECTED = "N"
     """The request was denied by the opponent."""
 
-    CANCELLED = "X"
-    """The request was cancelled by the sender."""
-
 
 class PlayerColor(models.TextChoices):
     """
@@ -389,7 +387,11 @@ class ScrimmageRequest(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     """The time at which this request was sent."""
 
-    status = models.CharField(max_length=1, choices=ScrimmageRequestStatus.choices)
+    status = models.CharField(
+        max_length=1,
+        choices=ScrimmageRequestStatus.choices,
+        default=ScrimmageRequestStatus.PENDING,
+    )
     """The status of this request."""
 
     is_ranked = models.BooleanField()
@@ -422,15 +424,23 @@ class ScrimmageRequest(models.Model):
 
     def is_alternating_color(self):
         """Determine whether the requested color alternates between games."""
-        raise NotImplementedError
+        return self.color in {
+            PlayerColor.ALTERNATE_RED,
+            PlayerColor.ALTERNATE_BLUE,
+            PlayerColor.ALTERNATE_RANDOM,
+        }
 
     def is_requester_red_first(self):
         """
         Determine whether the requester will be red in the first game.
         Not guaranteed to behave deterministcally for random selections.
         """
-        raise NotImplementedError
-
-    def create_match(self):
-        """Create and save a match object from this scrimmage request."""
-        raise NotImplementedError
+        match self.color:
+            case PlayerColor.ALWAYS_RED | PlayerColor.ALTERNATE_RED:
+                return True
+            case PlayerColor.ALWAYS_BLUE | PlayerColor.ALTERNATE_BLUE:
+                return False
+            case PlayerColor.ALTERNATE_RANDOM:
+                return bool(random.getrandbits(1))
+            case _:
+                raise ValueError("Unknown color")

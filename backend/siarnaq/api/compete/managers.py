@@ -1,6 +1,6 @@
 import google.cloud.pubsub as pubsub
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.db.models import OuterRef, Subquery
 
 
@@ -79,27 +79,68 @@ class MatchQuerySet(SaturnInvokableQuerySet):
 
 
 class ScrimmageRequestQuerySet(models.QuerySet):
-    def pending(self):
-        """Filter for all scrimmage requests that are in a pending state."""
-        raise NotImplementedError
-
     def accept(self):
-        """
-        Accept all pending scrimmage requests in this queryset.
-        Returns the number of accepted requests.
-        """
-        raise NotImplementedError
+        """Accept all pending scrimmage requests in this queryset."""
+        from siarnaq.api.compete.models import (
+            Match,
+            MatchParticipant,
+            ScrimmageRequestStatus,
+        )
+        from siarnaq.api.teams.models import Team
+
+        with transaction.atomic():
+            requests = list(
+                self.filter(status=ScrimmageRequestStatus.PENDING).select_for_update()
+            )
+            self.filter(pk__in=[request.pk for request in requests]).update(
+                status=ScrimmageRequestStatus.ACCEPTED
+            )
+            team_submissions = dict(
+                Team.objects.with_active_submission()
+                .filter(
+                    pk__in={request.requested_by.pk for request in requests}
+                    | {request.requested_to.pk for request in requests}
+                )
+                .values_list("pk", "active_submission")
+                .all()
+            )
+            participations = MatchParticipant.objects.bulk_create(
+                MatchParticipant(
+                    team=team,
+                    submission_id=team_submissions[team.pk],
+                )
+                for request in requests
+                for team in (
+                    [request.requested_by, request.requested_to]
+                    if request.is_requester_red_first()
+                    else [request.requested_to, request.requested_by]
+                )
+            )
+            matches = Match.objects.bulk_create(
+                Match(
+                    episode=request.episode,
+                    red=red,
+                    blue=blue,
+                    alternate_color=request.is_alternating_color(),
+                    is_ranked=request.is_ranked,
+                )
+                for red, blue, request in zip(
+                    participations[0::2], participations[1::2], requests
+                )
+            )
+            Match.maps.through.objects.bulk_create(
+                Match.maps.through(match=match, map=map_obj)
+                for match, request in zip(matches, requests)
+                for map_obj in request.maps.all()
+            )
+
+        # Send them to Saturn
+        Match.objects.filter(pk__in=[match.pk for match in matches]).enqueue()
 
     def reject(self):
-        """
-        Reject all pending scrimmage requests in this queryset.
-        Returns the number of rejected requests.
-        """
-        raise NotImplementedError
+        """Reject all pending scrimmage requests in this queryset."""
+        from siarnaq.api.compete.models import ScrimmageRequestStatus
 
-    def cancel(self):
-        """
-        Cancel all pending scrimmage requests in this queryset.
-        Returns the number of cancelled requests.
-        """
-        raise NotImplementedError
+        self.filter(status=ScrimmageRequestStatus.PENDING).update(
+            status=ScrimmageRequestStatus.REJECTED
+        )

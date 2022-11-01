@@ -94,6 +94,15 @@ class TeamQuerySet(models.QuerySet):
 
         return self.filter(status=TeamStatus.REGULAR)
 
+    def with_active_submission(self):
+        """Annotate and filter for teams with an active submission."""
+        return self.annotate(
+            active_submission=apps.get_model("compete", "Submission")
+            .objects.filter(team=OuterRef("pk"), accepted=True)
+            .order_by("-pk")
+            .values("pk")[:1]
+        ).filter(active_submission__isnull=False)
+
     def autoscrim(self, *, episode, best_of):
         """
         Generate ranked best-of-k scrimmages in a specified episode for all teams with
@@ -123,13 +132,8 @@ class TeamQuerySet(models.QuerySet):
         # any new teams with extremely low penalized scores. We like high entropy!
         teams = (
             self.regular()
-            .annotate(
-                active_submission=apps.get_model("compete", "Submission")
-                .objects.filter(team=OuterRef("pk"), accepted=True)
-                .order_by("-pk")
-                .values("pk")[:1]
-            )
-            .filter(episode=episode, active_submission__isnull=False)
+            .with_active_submission()
+            .filter(episode=episode)
             .order_by("-profile__rating__mean")
             .values("pk", "active_submission")
             .all()
