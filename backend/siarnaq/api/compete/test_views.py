@@ -735,6 +735,129 @@ class MatchSerializerTestCase(TestCase):
         )
 
 
+class MatchViewSetTestCase(APITestCase):
+    """Test suite for the Matches API."""
+
+    def setUp(self):
+        self.e1 = Episode.objects.create(
+            name_short="e1",
+            registration=timezone.now(),
+            game_release=timezone.now(),
+            game_archive=timezone.now(),
+            language=Language.JAVA_8,
+        )
+        self.map = Map.objects.create(episode=self.e1, name="map")
+        tournament = Tournament.objects.create(
+            name_short="t",
+            episode=self.e1,
+            style=TournamentStyle.DOUBLE_ELIMINATION,
+            require_resume=False,
+            is_public=True,
+            submission_freeze=timezone.now(),
+            submission_unfreeze=timezone.now(),
+        )
+        self.r_released = TournamentRound.objects.create(
+            tournament=tournament, is_released=True
+        )
+        self.r_unreleased = TournamentRound.objects.create(
+            tournament=tournament, is_released=False
+        )
+
+        self.users, self.teams, self.submissions = [], [], []
+        for i in range(2):
+            u = User.objects.create(username=f"user{i}")
+            t = Team.objects.create(episode=self.e1, name=f"team{i}")
+            t.members.add(u)
+            self.submissions.append(
+                Submission.objects.create(
+                    episode=self.e1, team=t, user=u, accepted=True
+                )
+            )
+            self.users.append(u)
+            self.teams.append(t)
+
+    # Partitions for: my.
+    # match tournament round: released, not released, none
+
+    def test_my_released(self):
+        self.client.force_authenticate(self.users[0])
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=self.r_released,
+            red=MatchParticipant.objects.create(
+                team=self.teams[0],
+                submission=self.submissions[0],
+                score=0,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[1],
+                submission=self.submissions[1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        response = self.client.get(reverse("match-my", kwargs={"episode_id": "e1"}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # We define scrimmaages to be non-tournament matches, so we don't expect them
+        # here. This is purely a design choice.
+        self.assertEqual(len(response.json()["results"]), 0)
+
+    def test_my_not_released(self):
+        self.client.force_authenticate(self.users[0])
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=self.r_unreleased,
+            red=MatchParticipant.objects.create(
+                team=self.teams[0],
+                submission=self.submissions[0],
+                score=0,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[1],
+                submission=self.submissions[1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        response = self.client.get(reverse("match-my", kwargs={"episode_id": "e1"}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # It is important that unreleased tournament matches don't get exposed here.
+        self.assertEqual(len(response.json()["results"]), 0)
+
+    def test_my_none(self):
+        self.client.force_authenticate(self.users[0])
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=None,
+            red=MatchParticipant.objects.create(
+                team=self.teams[0],
+                submission=self.submissions[0],
+                score=0,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[1],
+                submission=self.submissions[1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        response = self.client.get(reverse("match-my", kwargs={"episode_id": "e1"}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()["results"]), 1)
+
+
 class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     """Test suite for the Scrimmage Requests API."""
 

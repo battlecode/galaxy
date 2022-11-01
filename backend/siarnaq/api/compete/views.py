@@ -198,8 +198,9 @@ class MatchViewSet(
             Q(red__team__members=request.user) | Q(blue__team__members=request.user),
             tournament_round__isnull=True,
         )
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @extend_schema(
         responses={
@@ -299,14 +300,13 @@ class ScrimmageRequestViewSet(
     @action(detail=False, methods=["get"])
     def inbox(self, request, *, episode_id):
         """Get all pending scrimmage requests received."""
-        serializer = self.get_serializer(
-            self.get_queryset().filter(
-                Q(requested_to__members=request.user),
-                status=ScrimmageRequestStatus.PENDING,
-            ),
-            many=True,
+        queryset = self.get_queryset().filter(
+            Q(requested_to__members=request.user),
+            status=ScrimmageRequestStatus.PENDING,
         )
-        return Response(serializer.data)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @extend_schema(
         responses={status.HTTP_200_OK: ScrimmageRequestSerializer(many=True)}
@@ -314,14 +314,13 @@ class ScrimmageRequestViewSet(
     @action(detail=False, methods=["get"])
     def outbox(self, request, *, episode_id):
         """Get all pending scrimmage requests sent."""
-        serializer = self.get_serializer(
-            self.get_queryset().filter(
-                Q(requested_by__members=request.user),
-                status=ScrimmageRequestStatus.PENDING,
-            ),
-            many=True,
+        queryset = self.get_queryset().filter(
+            Q(requested_by__members=request.user),
+            status=ScrimmageRequestStatus.PENDING,
         )
-        return Response(serializer.data)
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
 
     @extend_schema(
         request=None,
