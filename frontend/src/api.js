@@ -701,11 +701,11 @@ class Api {
 
   //----AUTHENTICATION----
 
-  static logout(callback) {
+  static logout() {
     Cookies.set("access", "");
     Cookies.set("refresh", "");
     Api.setLoginHeader();
-    callback();
+    window.location.replace("/");
   }
 
   static setLoginHeader() {
