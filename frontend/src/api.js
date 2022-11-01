@@ -764,7 +764,7 @@ class Api {
       headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     });
 
-    $.post(`${URL}/auth/token/verify/`, {
+    $.post(`${URL}/api/token/verify/`, {
       token: Cookies.get("access"),
     })
       .done((data, status) => {
