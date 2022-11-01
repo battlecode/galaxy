@@ -701,6 +701,17 @@ class Api {
 
   //----AUTHENTICATION----
 
+  // NOTE: The backend currently uses JWT, so we use that too.
+  // Similar to OAuth2, JWT by default has 2 tokens, access and refresh
+  // ! Currently, the frontend only uses a subset of JWT's features!
+  // It only utilizes the access token, not the refresh token.
+  // It also does not rely on timestamps to determine token expiry.
+  // If the access token is invalid (eg expired), then render the page as logged-out,
+  // and have the user enter their username and password to get a new access token.
+  // (To enable this, the access token lasts for a long time. See the backend JWT setup)
+
+  // For issues to track improving our token flow, see #168 and #169
+
   static logout() {
     Cookies.set("access", "");
     Cookies.set("refresh", "");
@@ -747,7 +758,8 @@ class Api {
     );
   }
 
-  // This process is very confusing; #90 will clean it up.
+  // Our login (and token) flow currently uses a subset of JWT features
+  // see the comment block under the "AUTHORIZATION" comment header
   static login(username, password, callback) {
     $.post(`${URL}/api/token/`, {
       username,
