@@ -719,9 +719,10 @@ class Api {
     window.location.replace("/");
   }
 
+  // Set authorization header based on the current cookie state, which is provided by
+  // default for all subsequent requests. The header is a JWT token: see
+  // https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
   static setLoginHeader() {
-    // Save stored JWT as header, see
-    // https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
     $.ajaxSetup({
       headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     });
