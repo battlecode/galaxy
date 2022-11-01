@@ -119,7 +119,6 @@ class Submission(SaturnInvocation):
         return posixpath.join(
             self.episode.name_short,
             "submission",
-            self.created.strftime("%Y%b%d"),
             str(self.pk),
             "source.zip",
         )

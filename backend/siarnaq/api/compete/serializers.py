@@ -185,8 +185,8 @@ class MatchReportSerializer(serializers.Serializer):
     blue_score = serializers.IntegerField(min_value=0)
 
     def validate(self, data):
-        has_red = data.get("red_score", None) is None
-        has_blue = data.get("blue_score", None) is None
+        has_red = data.get("red_score", None) is not None
+        has_blue = data.get("blue_score", None) is not None
         if has_red + has_blue == 1:
             raise serializers.ValidationError("must provide either no or all scores")
         return data
