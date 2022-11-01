@@ -90,7 +90,9 @@ class ScrimmageRequestQuerySet(models.QuerySet):
 
         with transaction.atomic():
             requests = list(
-                self.filter(status=ScrimmageRequestStatus.PENDING).select_for_update()
+                self.filter(status=ScrimmageRequestStatus.PENDING)
+                .prefetch_related("maps")
+                .select_for_update(of=("self"))
             )
             self.filter(pk__in=[request.pk for request in requests]).update(
                 status=ScrimmageRequestStatus.ACCEPTED
@@ -98,27 +100,27 @@ class ScrimmageRequestQuerySet(models.QuerySet):
             team_submissions = dict(
                 Team.objects.with_active_submission()
                 .filter(
-                    pk__in={request.requested_by.pk for request in requests}
-                    | {request.requested_to.pk for request in requests}
+                    pk__in={request.requested_by_id for request in requests}
+                    | {request.requested_to_id for request in requests}
                 )
                 .values_list("pk", "active_submission")
                 .all()
             )
             participations = MatchParticipant.objects.bulk_create(
                 MatchParticipant(
-                    team=team,
-                    submission_id=team_submissions[team.pk],
+                    team_id=team_id,
+                    submission_id=team_submissions[team_id],
                 )
                 for request in requests
-                for team in (
-                    [request.requested_by, request.requested_to]
+                for team_id in (
+                    [request.requested_by_id, request.requested_to_id]
                     if request.is_requester_red_first()
-                    else [request.requested_to, request.requested_by]
+                    else [request.requested_to_id, request.requested_by_id]
                 )
             )
             matches = Match.objects.bulk_create(
                 Match(
-                    episode=request.episode,
+                    episode_id=request.episode_id,
                     red=red,
                     blue=blue,
                     alternate_color=request.is_alternating_color(),

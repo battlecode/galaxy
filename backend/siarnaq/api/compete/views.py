@@ -175,6 +175,8 @@ class MatchViewSet(
                 "blue__previous_participation__rating",
                 "red__rating",
                 "blue__rating",
+                "red__team__profile__rating",
+                "blue__team__profile__rating",
                 "tournament_round",
             )
             .prefetch_related("red__team__members", "blue__team__members", "maps")
@@ -240,11 +242,17 @@ class ScrimmageRequestViewSet(
     serializer_class = ScrimmageRequestSerializer
 
     def get_queryset(self):
-        queryset = ScrimmageRequest.objects.filter(
-            Q(requested_to__members=self.request.user)
-            | Q(requested_by__members=self.request.user),
-            episode=self.kwargs["episode_id"],
-        ).prefetch_related("requested_to__members", "requested_by__members")
+        queryset = (
+            ScrimmageRequest.objects.filter(
+                Q(requested_to__members=self.request.user)
+                | Q(requested_by__members=self.request.user),
+                episode=self.kwargs["episode_id"],
+            )
+            .select_related(
+                "requested_to__profile__rating", "requested_by__profile__rating"
+            )
+            .prefetch_related("requested_to__members", "requested_by__members", "maps")
+        )
         if self.action in ("accept", "reject", "destroy"):
             # Mutator operations require locks to prevent races
             queryset = queryset.select_for_update(of=("self"))

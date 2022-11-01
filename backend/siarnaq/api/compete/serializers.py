@@ -104,7 +104,7 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
             # If unknown, use the team's current rating. The outside world just wants to
             # know our best estimate for the strength of their opponent. They don't want
             # a lecture about our deferred rating evaluation algorithm.
-            rating = obj.team.rating
+            rating = obj.team.profile.rating
         return RatingField().to_representation(rating)
 
     def to_representation(self, instance):
@@ -213,11 +213,15 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
     requested_by_name = serializers.CharField(
         source="requested_by.name", read_only=True
     )
-    requested_by_rating = RatingField(source="requested_by.rating", read_only=True)
+    requested_by_rating = RatingField(
+        source="requested_by.profile.rating", read_only=True
+    )
     requested_to_name = serializers.CharField(
         source="requested_to.name", read_only=True
     )
-    requested_to_rating = RatingField(source="requested_to.rating", read_only=True)
+    requested_to_rating = RatingField(
+        source="requested_to.profile.rating", read_only=True
+    )
     maps = serializers.SerializerMethodField()
     map_names = serializers.ListField(child=serializers.CharField(), write_only=True)
 
