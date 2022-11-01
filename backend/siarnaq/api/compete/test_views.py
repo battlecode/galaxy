@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APITransactionTestCase
 
 from siarnaq.api.compete.models import (
     Match,
@@ -735,7 +735,7 @@ class MatchSerializerTestCase(TestCase):
         )
 
 
-class ScrimmageRequestViewSetTestCase(APITestCase):
+class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     """Test suite for the Scrimmage Requests API."""
 
     def setUp(self):
@@ -813,6 +813,7 @@ class ScrimmageRequestViewSetTestCase(APITestCase):
         r = ScrimmageRequest.objects.get()
         self.assertEqual(r.status, ScrimmageRequestStatus.ACCEPTED)
         self.assertTrue(Match.objects.exists())
+        self.assertEqual(Match.objects.get().maps.count(), 3)
         enqueue.assert_called()
 
     def test_create_noauto_accepted_accepted_episode_not_frozen_maps_valid(self):

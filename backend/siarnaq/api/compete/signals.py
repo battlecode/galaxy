@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -32,4 +33,6 @@ def auto_accept_scrimmage(instance, created, **kwargs):
     if (instance.is_ranked and instance.requested_to.profile.auto_accept_ranked) or (
         not instance.is_ranked and instance.requested_to.profile.auto_accept_unranked
     ):
-        ScrimmageRequest.objects.filter(pk=instance.pk).accept()
+        transaction.on_commit(
+            lambda: ScrimmageRequest.objects.filter(pk=instance.pk).accept()
+        )
