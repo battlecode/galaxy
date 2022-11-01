@@ -183,10 +183,6 @@ class Api {
     $.get(`${URL}/api/${LEAGUE}/team/${team}/history/`).done((data, status) => {
       callback(data);
     });
-
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
-    });
   }
 
   static getTeamWinStats(callback) {
@@ -218,10 +214,6 @@ class Api {
     $.get(`${URL}/api/${LEAGUE}/team/${team_id}/`).done((data, status) => {
       callback(data);
     });
-
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
-    });
   }
 
   //calculates rank of given team, with tied teams receiving the same rank
@@ -234,10 +226,6 @@ class Api {
     const requestUrl = `${URL}/api/${LEAGUE}/team/${team_id}/ranking/`;
     $.get(requestUrl).done((data, status) => {
       callback(data);
-    });
-
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     });
   }
 
@@ -269,9 +257,6 @@ class Api {
       }
 
       callback(data.updates);
-    });
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     });
   }
 
@@ -324,9 +309,6 @@ class Api {
         teamPage: page,
       });
     });
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
-    }); // re-add the authorization info
   }
 
   static searchTeam(query, page, callback) {
@@ -489,10 +471,6 @@ class Api {
           error
         );
       });
-
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
-    });
   }
 
   static updateUser(profile, callback) {
@@ -690,10 +668,6 @@ class Api {
     }
 
     $.get(url, (replay, super_sucess) => {
-      $.ajaxSetup({
-        headers: { Authorization: `Bearer ${Cookies.get("access")}` },
-      });
-
       callback(replay);
     });
   }
@@ -760,10 +734,6 @@ class Api {
 
   // This process is very confusing; #90 will clean it up.
   static loginCheck(callback) {
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
-    });
-
     $.post(`${URL}/api/token/verify/`, {
       token: Cookies.get("access"),
     })
