@@ -732,7 +732,11 @@ class Api {
     callback();
   }
 
-  // This process is very confusing; #90 will clean it up.
+  // Checks whether the currently held JWT access token is still valid (by posting it to the verify endpoint),
+  // hence whether or not the frontend still has logged-in access.
+  // "Returns" true or false, via callback.
+  // Callers of this method should check this, before rendering their logged-in or un-logged-in versions.
+  // If not logged in, then api calls will give 403s, and the website will tell you to log in anyways.
   static loginCheck(callback) {
     $.post(`${URL}/api/token/verify/`, {
       token: Cookies.get("access"),
