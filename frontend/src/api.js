@@ -185,7 +185,7 @@ class Api {
     });
 
     $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     });
   }
 
@@ -220,7 +220,7 @@ class Api {
     });
 
     $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     });
   }
 
@@ -237,7 +237,7 @@ class Api {
     });
 
     $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     });
   }
 
@@ -271,7 +271,7 @@ class Api {
       callback(data.updates);
     });
     $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     });
   }
 
@@ -325,7 +325,7 @@ class Api {
       });
     });
     $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     }); // re-add the authorization info
   }
 
@@ -491,7 +491,7 @@ class Api {
       });
 
     $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     });
   }
 
@@ -691,7 +691,7 @@ class Api {
 
     $.get(url, (replay, super_sucess) => {
       $.ajaxSetup({
-        headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+        headers: { Authorization: `Bearer ${Cookies.get("access")}` },
       });
 
       callback(replay);
@@ -753,7 +753,7 @@ class Api {
   //----AUTHENTICATION----
 
   static logout(callback) {
-    Cookies.set("token", "");
+    Cookies.set("access", "");
     Cookies.set("refresh", "");
     callback();
   }
@@ -761,11 +761,11 @@ class Api {
   // This process is very confusing; #90 will clean it up.
   static loginCheck(callback) {
     $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
     });
 
     $.post(`${URL}/auth/token/verify/`, {
-      token: Cookies.get("token"),
+      token: Cookies.get("access"),
     })
       .done((data, status) => {
         callback(true);
@@ -795,12 +795,12 @@ class Api {
       password,
     })
       .done((data, status) => {
-        Cookies.set("token", data.access);
+        Cookies.set("access", data.access);
         Cookies.set("refresh", data.refresh);
         Cookies.set("username", username);
 
         $.ajaxSetup({
-          headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+          headers: { Authorization: `Bearer ${Cookies.get("access")}` },
         });
 
         callback(data, true);
