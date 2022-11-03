@@ -73,9 +73,11 @@ class SubmissionViewSet(
     permission_classes = (IsAuthenticated, IsAdminUserOrEpisodeAvailable, IsOnTeam)
 
     def get_queryset(self):
-        queryset = Submission.objects.filter(
-            episode=self.kwargs["episode_id"]
-        ).select_related("team", "user")
+        queryset = (
+            Submission.objects.filter(episode=self.kwargs["episode_id"])
+            .select_related("team", "user")
+            .order_by("-pk")
+        )
         if self.action != "report":
             queryset = queryset.filter(team__members=self.request.user)
         return queryset
@@ -183,6 +185,7 @@ class MatchViewSet(
                 "tournament_round",
             )
             .prefetch_related("red__team__members", "blue__team__members", "maps")
+            .order_by("-pk")
         )
 
     @extend_schema(responses={status.HTTP_200_OK: MatchSerializer(many=True)})
@@ -256,6 +259,7 @@ class ScrimmageRequestViewSet(
                 "requested_to__profile__rating", "requested_by__profile__rating"
             )
             .prefetch_related("requested_to__members", "requested_by__members", "maps")
+            .order_by("-pk")
         )
         if self.action in ("accept", "reject", "destroy"):
             # Mutator operations require locks to prevent races

@@ -17,7 +17,9 @@ class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        return Episode.objects.visible_to_user(is_staff=self.request.user.is_staff)
+        return Episode.objects.visible_to_user(
+            is_staff=self.request.user.is_staff
+        ).order_by("-registration")
 
     @extend_schema(
         responses={
