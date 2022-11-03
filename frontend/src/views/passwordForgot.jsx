@@ -4,7 +4,7 @@ import Api from "../api";
 class PasswordForgot extends Component {
   state = {
     success: false,
-    error: "",
+    error: false,
     email: "",
   };
 
@@ -21,9 +21,13 @@ class PasswordForgot extends Component {
       this.setState({
         success:
           "Email sent! Please wait a few minutes to receive. Don't forget to check your spam folder.",
+        error: false,
       });
     } else {
-      this.setState({ error: "Email not found" });
+      this.setState({
+        error: "Email not found.",
+        success: false,
+      });
     }
   };
 
@@ -56,7 +60,7 @@ class PasswordForgot extends Component {
               fontSize: "1.1em",
             }}
           >
-            <b>Error.</b>
+            <b>Error. </b>
             {error}
           </div>
         )}
@@ -72,7 +76,8 @@ class PasswordForgot extends Component {
               fontSize: "1.1em",
             }}
           >
-            <b>Success.</b> {success}
+            <b>Success. </b>
+            {success}
           </div>
         )}
 
@@ -80,7 +85,7 @@ class PasswordForgot extends Component {
           className="card"
           style={{
             width: "350px",
-            margin: error ? "20px auto" : "100px auto",
+            margin: success || error ? "20px auto" : "100px auto",
           }}
         >
           <div className="content">
