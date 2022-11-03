@@ -1,8 +1,17 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.utils import timezone
 
-from siarnaq.api.compete.models import Match, MatchParticipant, SaturnStatus, Submission
-from siarnaq.api.episodes.models import Episode, Language
+from siarnaq.api.compete.models import (
+    Match,
+    MatchParticipant,
+    PlayerColor,
+    SaturnStatus,
+    ScrimmageRequest,
+    Submission,
+)
+from siarnaq.api.episodes.models import Episode, Language, Map
 from siarnaq.api.teams.models import Rating, Team, TeamProfile
 from siarnaq.api.user.models import User
 
@@ -440,3 +449,89 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         self.assertIsNotNone(m3.blue.rating)
         self.assertLess(m3.blue.rating.mean, m3.blue.get_old_rating().mean)
         self.assertEqual(m3.blue.rating.n, r2.n + 1)
+
+
+class ScrimmageRequestQuerySetTestCase(TestCase):
+    """Test suite for handling sets of scrimmage requests."""
+
+    def setUp(self):
+        e1 = Episode.objects.create(
+            name_short="e1",
+            registration=timezone.now(),
+            game_release=timezone.now(),
+            game_archive=timezone.now(),
+            language=Language.JAVA_8,
+        )
+        self.m = Map.objects.create(episode=e1, name="m", is_public=True)
+        self.teams = []
+        for name in ["team1", "team2"]:
+            t = Team.objects.create(episode=e1, name=name)
+            TeamProfile.objects.create(team=t, rating=Rating.objects.create())
+            Submission.objects.create(
+                episode=e1,
+                team=t,
+                user=User.objects.create_user(username=name + "_user", password=name),
+                accepted=True,
+            )
+            self.teams.append(t)
+        self.n = 100
+        for i in range(self.n):
+            r = ScrimmageRequest.objects.create(
+                episode=e1,
+                is_ranked=True,
+                requested_by=self.teams[0],
+                requested_to=self.teams[1],
+                requester_color=PlayerColor.ALTERNATE_RANDOM,
+            )
+            r.maps.add(self.m)
+
+    # Partitions for: accept
+    # requester color: red first, blue first, random
+
+    @patch(
+        "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
+    )
+    def test_accept_red_first(self, enqueue):
+        ScrimmageRequest.objects.update(requester_color=PlayerColor.ALWAYS_RED)
+        ScrimmageRequest.objects.accept()
+        self.assertEqual(Match.objects.count(), self.n)
+        self.assertEqual(Map.objects.get().scrimmage_requests.count(), self.n)
+        self.assertEqual(
+            Match.objects.filter(
+                red__team=self.teams[0], blue__team=self.teams[1], alternate_color=False
+            ).count(),
+            self.n,
+        )
+
+    @patch(
+        "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
+    )
+    def test_accept_blue_first(self, enqueue):
+        ScrimmageRequest.objects.update(requester_color=PlayerColor.ALWAYS_BLUE)
+        ScrimmageRequest.objects.accept()
+        self.assertEqual(Match.objects.count(), self.n)
+        self.assertEqual(Map.objects.get().scrimmage_requests.count(), self.n)
+        self.assertEqual(
+            Match.objects.filter(
+                red__team=self.teams[1], blue__team=self.teams[0], alternate_color=False
+            ).count(),
+            self.n,
+        )
+
+    @patch(
+        "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
+    )
+    def test_accept_alternate_random(self, enqueue):
+        ScrimmageRequest.objects.update(requester_color=PlayerColor.ALTERNATE_RANDOM)
+        ScrimmageRequest.objects.accept()
+        self.assertEqual(Match.objects.count(), self.n)
+        self.assertEqual(Map.objects.get().scrimmage_requests.count(), self.n)
+        q1 = Match.objects.filter(
+            red__team=self.teams[0], blue__team=self.teams[1], alternate_color=True
+        )
+        q2 = Match.objects.filter(
+            red__team=self.teams[1], blue__team=self.teams[0], alternate_color=True
+        )
+        self.assertTrue(q1.exists())
+        self.assertTrue(q2.exists())
+        self.assertEqual(q1.count() + q2.count(), self.n)
