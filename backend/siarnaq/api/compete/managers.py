@@ -58,7 +58,7 @@ class MatchParticipantManager(models.Manager):
         if any(obj.submission_id is None for obj in objs):
             raise ValueError("Must set MatchParticipant.submission to use bulk_create")
         objs = super().bulk_create(objs, **kwargs)
-        self.model.objects.filter(pk__in=[obj.pk for obj in objs]).update(
+        self.model.objects.filter(pk__in={obj.pk for obj in objs}).update(
             previous_participation=Subquery(
                 self.model.objects.filter(team=OuterRef("team"), pk__lt=OuterRef("pk"))
                 .order_by("-pk")
@@ -94,7 +94,7 @@ class ScrimmageRequestQuerySet(models.QuerySet):
                 .prefetch_related("maps")
                 .select_for_update(of=("self"))
             )
-            self.filter(pk__in=[request.pk for request in requests]).update(
+            self.filter(pk__in={request.pk for request in requests}).update(
                 status=ScrimmageRequestStatus.ACCEPTED
             )
             team_submissions = dict(
@@ -137,7 +137,7 @@ class ScrimmageRequestQuerySet(models.QuerySet):
             )
 
         # Send them to Saturn
-        Match.objects.filter(pk__in=[match.pk for match in matches]).enqueue()
+        Match.objects.filter(pk__in={match.pk for match in matches}).enqueue()
 
     def reject(self):
         """Reject all pending scrimmage requests in this queryset."""

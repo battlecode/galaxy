@@ -1235,6 +1235,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     # Partitions for: accept.
     # team: valid, invalid
     # status: pending, not pending
+    # episode: frozen, not frozen
 
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
@@ -1308,3 +1309,50 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(Match.objects.exists())
+
+    def test_accept_episode_frozen(self):
+        self.client.force_authenticate(self.users[1])
+        self.e1.submission_frozen = True
+        self.e1.save()
+        r = ScrimmageRequest.objects.create(
+            episode=self.e1,
+            status=ScrimmageRequestStatus.ACCEPTED,
+            is_ranked=True,
+            requested_by=self.teams[0],
+            requested_to=self.teams[1],
+            requester_color=PlayerColor.ALWAYS_RED,
+        )
+        r.maps.add(*self.maps[:3])
+        response = self.client.post(
+            reverse("request-accept", kwargs={"episode_id": "e1", "pk": r.pk}),
+            {},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(Match.objects.exists())
+
+    # Partitions for: destroy.
+    # episode: frozen, not frozen
+
+    def test_destroy_ignores_freeze(self):
+        for frozen in [False, True]:
+            with self.subTest(frozen=frozen):
+                self.client.force_authenticate(self.users[0])
+                self.e1.submission_frozen = frozen
+                self.e1.save()
+                r = ScrimmageRequest.objects.create(
+                    episode=self.e1,
+                    status=ScrimmageRequestStatus.ACCEPTED,
+                    is_ranked=True,
+                    requested_by=self.teams[0],
+                    requested_to=self.teams[1],
+                    requester_color=PlayerColor.ALWAYS_RED,
+                )
+                r.maps.add(*self.maps[:3])
+                response = self.client.delete(
+                    reverse("request-detail", kwargs={"episode_id": "e1", "pk": r.pk}),
+                    {},
+                    format="json",
+                )
+                self.assertTrue(status.is_success(response.status_code))
+                self.assertFalse(ScrimmageRequest.objects.exists())

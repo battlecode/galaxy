@@ -6,21 +6,30 @@ from siarnaq.api.episodes.models import Episode
 from siarnaq.api.teams.models import Team
 
 
-class IsAdminUserOrEpisodeAvailable(permissions.BasePermission):
+class IsEpisodeAvailable(permissions.BasePermission):
     """
-    Allows readonly access to visible episodes, and mutation only if the episode is not
-    frozen. Episodes that are not visible will raise a 404.
+    Allows readonly access to visible episodes, and restricts mutation if configured to
+    check for frozen episodes. Episodes that are not visible will raise a 404.
     """
+
+    def __init__(self, *, allow_frozen=False):
+        """
+        Initializes the permission.
+
+        Parameters
+        ----------
+        allow_frozen : bool
+            Whether to allow mutation to frozen episodes.
+        """
+        self._allow_frozen = allow_frozen
 
     def has_permission(self, request, view):
         episode = get_object_or_404(
             Episode.objects.visible_to_user(is_staff=request.user.is_staff),
             pk=view.kwargs["episode_id"],
         )
-        return (
-            request.user.is_staff
-            or request.method in permissions.SAFE_METHODS
-            or not episode.frozen()
+        return request.method in permissions.SAFE_METHODS or (
+            self._allow_frozen or not episode.frozen()
         )
 
 
