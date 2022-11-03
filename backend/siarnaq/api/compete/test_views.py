@@ -332,7 +332,7 @@ class MatchSerializerTestCase(TestCase):
     # Partitions:
     # user: admin, not admin
     # match: includes self, without self
-    # match: includes staff team, without staff team
+    # match: includes regular staff team, includes invisible team, without staff team
     # match tournament round: released, not released, none
 
     def test_admin_has_staff_team_tournament_not_released(self):
@@ -341,7 +341,8 @@ class MatchSerializerTestCase(TestCase):
                 "episode_id": self.e1.pk,
                 "team_id": None,
                 "user_id": self.staff.pk,
-                "is_staff": True,
+                "user_is_staff": True,
+                "team_is_staff": False,
             }
         )
         match = Match.objects.create(
@@ -400,7 +401,8 @@ class MatchSerializerTestCase(TestCase):
                 "episode_id": self.e1.pk,
                 "team_id": self.teams[0],
                 "user_id": self.users[0].pk,
-                "is_staff": False,
+                "user_is_staff": False,
+                "team_is_staff": False,
             }
         )
         match = Match.objects.create(
@@ -459,7 +461,8 @@ class MatchSerializerTestCase(TestCase):
                 "episode_id": self.e1.pk,
                 "team_id": self.teams[0],
                 "user_id": self.users[0].pk,
-                "is_staff": False,
+                "user_is_staff": False,
+                "team_is_staff": False,
             }
         )
         match = Match.objects.create(
@@ -518,7 +521,8 @@ class MatchSerializerTestCase(TestCase):
                 "episode_id": self.e1.pk,
                 "team_id": self.teams[0],
                 "user_id": self.users[0].pk,
-                "is_staff": False,
+                "user_is_staff": False,
+                "team_is_staff": False,
             }
         )
         match = Match.objects.create(
@@ -563,7 +567,8 @@ class MatchSerializerTestCase(TestCase):
                 "episode_id": self.e1.pk,
                 "team_id": self.teams[0],
                 "user_id": self.users[0].pk,
-                "is_staff": False,
+                "user_is_staff": False,
+                "team_is_staff": False,
             }
         )
         match = Match.objects.create(
@@ -622,7 +627,8 @@ class MatchSerializerTestCase(TestCase):
                 "episode_id": self.e1.pk,
                 "team_id": self.teams[0],
                 "user_id": self.users[0].pk,
-                "is_staff": False,
+                "user_is_staff": False,
+                "team_is_staff": False,
             }
         )
         match = Match.objects.create(
@@ -675,13 +681,62 @@ class MatchSerializerTestCase(TestCase):
             },
         )
 
+    def test_not_admin_no_self_has_invisible_team(self):
+        self.teams[-1].status = TeamStatus.INVISIBLE
+        self.teams[-1].save()
+        serializer = MatchSerializer(
+            context={
+                "episode_id": self.e1.pk,
+                "team_id": self.teams[0],
+                "user_id": self.users[0].pk,
+                "user_is_staff": False,
+                "team_is_staff": False,
+            }
+        )
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=None,
+            red=MatchParticipant.objects.create(
+                team=self.teams[1],
+                submission=self.submissions[1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            blue=MatchParticipant.objects.create(
+                team=self.teams[-1],
+                submission=self.submissions[-1],
+                score=1,
+                rating=Rating.objects.create(),
+            ),
+            alternate_color=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        data = serializer.to_representation(match)
+        self.assertEqual(
+            data,
+            {
+                "id": match.pk,
+                "status": str(match.status),
+                "episode": match.episode.pk,
+                "red": None,
+                "blue": None,
+                "maps": None,
+                "alternate_color": match.alternate_color,
+                "created": match.created.isoformat().replace("+00:00", "Z"),
+                "is_ranked": match.is_ranked,
+                "replay": None,
+            },
+        )
+
     def test_not_admin_no_self_no_staff_team(self):
         serializer = MatchSerializer(
             context={
                 "episode_id": self.e1.pk,
                 "team_id": self.teams[0],
                 "user_id": self.users[0].pk,
-                "is_staff": False,
+                "user_is_staff": False,
+                "team_is_staff": False,
             }
         )
         match = Match.objects.create(
@@ -910,10 +965,13 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
 
     # Partitions for: create.
     # team auto accept: on, off
+    # user team: is staff, not staff
     # user team submission: accepted, not accepted
+    # opponent team: is valid regular, is hidden, is self
     # opponent submission: accepted, not accepted
     # episode: frozen, not frozen, hidden, mismatched
     # maps: valid, hidden, mismatched
+    # (ranked, staff) combination: is legal, is illegal
 
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
@@ -994,6 +1052,57 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(ScrimmageRequest.objects.exists())
+
+    def test_create_self_staff_opponent_hidden(self):
+        self.client.force_authenticate(self.users[0])
+        self.teams[0].status = TeamStatus.STAFF
+        self.teams[0].save()
+        self.teams[1].status = TeamStatus.INVISIBLE
+        self.teams[1].save()
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": False,
+                "requested_to": self.teams[1].pk,
+                "requester_color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map2"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(ScrimmageRequest.objects.exists())
+
+    def test_create_self_not_staff_opponent_hidden(self):
+        self.client.force_authenticate(self.users[0])
+        self.teams[1].status = TeamStatus.INACTIVE
+        self.teams[1].save()
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[1].pk,
+                "requester_color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map2"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(ScrimmageRequest.objects.exists())
+
+    def test_create_opponent_self(self):
+        self.client.force_authenticate(self.users[0])
+        response = self.client.post(
+            reverse("request-list", kwargs={"episode_id": "e1"}),
+            {
+                "is_ranked": True,
+                "requested_to": self.teams[0].pk,
+                "requester_color": PlayerColor.ALWAYS_RED,
+                "map_names": ["map0", "map1", "map2"],
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(ScrimmageRequest.objects.exists())
 
     def test_create_episode_frozen(self):
@@ -1077,6 +1186,52 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(ScrimmageRequest.objects.exists())
 
+    def test_create_rankedtest_selfregular_opponentstaff(self):
+        self.teams[1].status = TeamStatus.STAFF
+        self.teams[1].save()
+        for is_ranked, success in [(True, False), (False, True)]:
+            with self.subTest(is_ranked=is_ranked, success=success):
+                self.client.force_authenticate(self.users[0])
+                response = self.client.post(
+                    reverse("request-list", kwargs={"episode_id": "e1"}),
+                    {
+                        "is_ranked": is_ranked,
+                        "requested_to": self.teams[1].pk,
+                        "requester_color": PlayerColor.ALWAYS_RED,
+                        "map_names": ["map0", "map1", "map2"],
+                    },
+                    format="json",
+                )
+                if success:
+                    self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+                    self.assertTrue(ScrimmageRequest.objects.exists())
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                    self.assertFalse(ScrimmageRequest.objects.exists())
+
+    def test_create_rankedtest_selfstaff_opponentregular(self):
+        self.teams[1].status = TeamStatus.STAFF
+        self.teams[1].save()
+        for is_ranked, success in [(True, False), (False, True)]:
+            with self.subTest(is_ranked=is_ranked, success=success):
+                self.client.force_authenticate(self.users[0])
+                response = self.client.post(
+                    reverse("request-list", kwargs={"episode_id": "e1"}),
+                    {
+                        "is_ranked": is_ranked,
+                        "requested_to": self.teams[1].pk,
+                        "requester_color": PlayerColor.ALWAYS_RED,
+                        "map_names": ["map0", "map1", "map2"],
+                    },
+                    format="json",
+                )
+                if success:
+                    self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+                    self.assertTrue(ScrimmageRequest.objects.exists())
+                else:
+                    self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                    self.assertFalse(ScrimmageRequest.objects.exists())
+
     # Partitions for: accept.
     # team: valid, invalid
     # status: pending, not pending
@@ -1084,7 +1239,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
-    def test_team_valid_accept_pending(self, enqueue):
+    def test_accept_team_valid_pending(self, enqueue):
         self.client.force_authenticate(self.users[1])
         r = ScrimmageRequest.objects.create(
             episode=self.e1,
@@ -1116,7 +1271,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         self.assertEqual(m.is_ranked, True)
         enqueue.assert_called()
 
-    def test_team_valid_accept_not_pending(self):
+    def test_accept_team_valid_not_pending(self):
         self.client.force_authenticate(self.users[1])
         r = ScrimmageRequest.objects.create(
             episode=self.e1,
@@ -1135,7 +1290,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(Match.objects.exists())
 
-    def test_team_invalid(self):
+    def test_accept_team_invalid(self):
         self.client.force_authenticate(self.users[0])
         r = ScrimmageRequest.objects.create(
             episode=self.e1,

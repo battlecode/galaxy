@@ -40,18 +40,21 @@ class EpisodeTeamUserContextMixin:
             episode_id=self.kwargs["episode_id"],
             user_id=self.request.user.pk,
             team_id=None,
-            is_staff=self.request.user.is_staff,
+            user_is_staff=self.request.user.is_staff,
         )
         if self.request.user.is_authenticated:
             try:
-                context.update(
-                    team_id=Team.objects.get(
-                        episode=self.kwargs["episode_id"],
-                        members=self.request.user,
-                    ).pk
+                team = Team.objects.get(
+                    episode=self.kwargs["episode_id"],
+                    members=self.request.user,
                 )
             except Team.DoesNotExist:
                 pass  # User is not on a team
+            else:
+                context.update(
+                    team_id=team.pk,
+                    team_is_staff=team.is_staff(),
+                )
         return context
 
 

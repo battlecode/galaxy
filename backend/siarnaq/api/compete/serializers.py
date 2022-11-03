@@ -11,7 +11,7 @@ from siarnaq.api.compete.models import (
     Submission,
 )
 from siarnaq.api.episodes.models import Map
-from siarnaq.api.teams.models import Team
+from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.serializers import RatingField
 
 
@@ -106,7 +106,7 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         # Redact participation details depending on client identity
-        if self.context["is_staff"]:
+        if self.context["user_is_staff"]:
             # Staff can see everything
             pass
         elif all(
@@ -146,7 +146,7 @@ class MatchSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         # Redact match details depending on client identity
-        if self.context["is_staff"]:
+        if self.context["user_is_staff"]:
             # Staff can see everything
             pass
         elif (
@@ -154,10 +154,7 @@ class MatchSerializer(serializers.ModelSerializer):
             and not instance.tournament_round.is_released
         ):
             # Unreleased tournament matches are fully redacted
-            data["red"] = None
-            data["blue"] = None
-            data["replay"] = None
-            data["maps"] = None
+            data["red"] = data["blue"] = data["replay"] = data["maps"] = None
         elif any(
             member.pk == self.context["user_id"]
             for member in instance.red.team.members.all()
@@ -167,12 +164,17 @@ class MatchSerializer(serializers.ModelSerializer):
         ):
             # Clients can see everything about their own games
             pass
+        elif (
+            instance.red.team.status == TeamStatus.INVISIBLE
+            or instance.blue.team.status == TeamStatus.INVISIBLE
+        ):
+            # Matches with invisible teams are fully redacted, because they are, by
+            # definition, invisible
+            data["red"] = data["blue"] = data["replay"] = data["maps"] = None
         elif instance.red.team.is_staff() or instance.blue.team.is_staff():
             # Matches with staff teams have scores redacted because they could be for
             # official grading purposes. We redact all of them just in case.
-            data["red"]["score"] = None
-            data["blue"]["score"] = None
-            data["replay"] = None
+            data["red"]["score"] = data["blue"]["score"] = data["replay"] = None
         else:
             # Replay links are private, but scores are ok to be released.
             data["replay"] = None
@@ -254,12 +256,25 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
     def get_maps(self, obj):
         return [m.name for m in obj.maps.all()]
 
+    def validate(self, data):
+        if data["is_ranked"] and self.context["team_is_staff"]:
+            raise serializers.ValidationError("Staff can only have unranked matches")
+        if data["is_ranked"] and data["requested_to"].is_staff():
+            raise serializers.ValidationError("Matches against staff must be unranked")
+        return data
+
     def validate_requested_to(self, value):
-        if (
-            not Team.objects.filter(episode=self.context["episode_id"], pk=value.pk)
-            .with_active_submission()
-            .exists()
-        ):
+        if value.pk == self.context["team_id"]:
+            raise serializers.ValidationError(
+                "Cannot request scrimmage against yourself"
+            )
+        # Check opponent team is valid
+        team_queryset = Team.objects.with_active_submission().filter(
+            episode=self.context["episode_id"], pk=value.pk
+        )
+        if not self.context["team_is_staff"]:
+            team_queryset = team_queryset.visible()
+        if not team_queryset.exists():
             raise serializers.ValidationError("No valid opponent found")
         return value
 

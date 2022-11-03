@@ -94,6 +94,12 @@ class TeamQuerySet(models.QuerySet):
 
         return self.filter(status=TeamStatus.REGULAR)
 
+    def visible(self):
+        """Filter for teams that are usually visible."""
+        from siarnaq.api.teams.models import TeamStatus
+
+        return self.filter(status__in=[TeamStatus.REGULAR, TeamStatus.STAFF])
+
     def with_active_submission(self):
         """Annotate and filter for teams with an active submission."""
         return self.annotate(
