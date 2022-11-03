@@ -866,15 +866,15 @@ class Api {
     if ($.ajaxSettings && $.ajaxSettings.headers) {
       delete $.ajaxSettings.headers.Authorization;
     }
-    $.post(
-      `${URL}/api/password_reset/`,
-      {
-        email,
-      },
-      (data, success) => {
+    $.post(`${URL}/api/password_reset/`, {
+      email,
+    })
+      .done((data, success) => {
         callback(data, success);
-      }
-    );
+      })
+      .fail((xhr, status, error) => {
+        callback(xhr.responseJSON.email, false);
+      });
   }
 
   static pushTeamCode(code, callback) {
