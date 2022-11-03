@@ -1210,8 +1210,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
                     self.assertFalse(ScrimmageRequest.objects.exists())
 
     def test_create_rankedtest_selfstaff_opponentregular(self):
-        self.teams[1].status = TeamStatus.STAFF
-        self.teams[1].save()
+        self.teams[0].status = TeamStatus.STAFF
+        self.teams[0].save()
         for is_ranked, success in [(True, False), (False, True)]:
             with self.subTest(is_ranked=is_ranked, success=success):
                 self.client.force_authenticate(self.users[0])
