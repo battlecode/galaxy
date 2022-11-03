@@ -1295,7 +1295,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         self.client.force_authenticate(self.users[0])
         r = ScrimmageRequest.objects.create(
             episode=self.e1,
-            status=ScrimmageRequestStatus.ACCEPTED,
+            status=ScrimmageRequestStatus.PENDING,
             is_ranked=True,
             requested_by=self.teams[0],
             requested_to=self.teams[1],
@@ -1316,7 +1316,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         self.e1.save()
         r = ScrimmageRequest.objects.create(
             episode=self.e1,
-            status=ScrimmageRequestStatus.ACCEPTED,
+            status=ScrimmageRequestStatus.PENDING,
             is_ranked=True,
             requested_by=self.teams[0],
             requested_to=self.teams[1],
@@ -1342,7 +1342,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
                 self.e1.save()
                 r = ScrimmageRequest.objects.create(
                     episode=self.e1,
-                    status=ScrimmageRequestStatus.ACCEPTED,
+                    status=ScrimmageRequestStatus.PENDING,
                     is_ranked=True,
                     requested_by=self.teams[0],
                     requested_to=self.teams[1],
