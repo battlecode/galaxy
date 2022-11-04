@@ -1,3 +1,5 @@
+import posixpath
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -61,3 +63,7 @@ class UserProfile(models.Model):
     """Whether the user has an uploaded resume."""
 
     REQUIRED_FIELDS = ["email", "first_name", "last_name", "gender", "data_of_birth"]
+
+    def get_resume_path(self):
+        """Return the path of the resume on Google cloud storage."""
+        return posixpath.join("user", str(self.pk), "resume.pdf")

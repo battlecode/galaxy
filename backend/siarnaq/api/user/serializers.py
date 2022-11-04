@@ -36,6 +36,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return user_profile
 
 
+class UserResumeSerializer(serializers.Serializer):
+    resume = serializers.FileField(write_only=True)
+
+
 class PublicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
