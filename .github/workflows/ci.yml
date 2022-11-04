@@ -67,5 +67,5 @@ jobs:
         run: ./manage.py makemigrations
         working-directory: ./backend
       - name: Run tests
-        run: find * -type f -name tests.py | sed "s/\.py$//g" | sed "s/\//./g" | xargs ./manage.py test -v=2
+        run: find * -type f -name "test*.py" | sed "s/\.py$//g" | sed "s/\//./g" | xargs ./manage.py test -v=2
         working-directory: ./backend

@@ -135,6 +135,8 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
 }
 
 # Templates
@@ -191,6 +193,9 @@ GOOGLE_CLOUD_CREDENTIALS, GOOGLE_CLOUD_PROJECT_ID = google.auth.default()
 GOOGLE_CLOUD_LOCATION = "us-east1"
 USER_GCLOUD_ADMIN_EMAIL = GOOGLE_CLOUD_CREDENTIALS.service_account_email
 USER_GCLOUD_ADMIN_USERNAME = "galaxy-admin"
+
+# Bucket for storing all files whose access is protected by authentication
+GCLOUD_SECURED_BUCKET = "battle-secure-upload"
 
 # Do not inadvertently interact with cloud resources while testing locally.
 # Change this in production and while running system integration tests.

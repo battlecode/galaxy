@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 
 import siarnaq.api.refs as refs
+from siarnaq.api.episodes.managers import EpisodeQuerySet
 
 
 class Language(models.TextChoices):
@@ -73,11 +74,13 @@ class Episode(models.Model):
     pass the Battlecode class.
     """
 
+    objects = EpisodeQuerySet.as_manager()
+
     def frozen(self):
         """Return whether the episode is currently frozen to submissions."""
-        if self.submission_frozen:
-            return True
         now = timezone.now()
+        if self.submission_frozen or now < self.game_release:
+            return True
         return Tournament.objects.filter(
             episode=self, submission_freeze__lte=now, submission_unfreeze__gt=now
         ).exists()
@@ -198,10 +201,10 @@ class Tournament(models.Model):
     in_progress = models.BooleanField(default=False)
     """Whether the tournament is currently being run on the Saturn compute cluster."""
 
-    challonge_private = models.URLField()
+    challonge_private = models.URLField(null=True, blank=True)
     """A private Challonge bracket showing matches in progress as they are run."""
 
-    challonge_public = models.URLField()
+    challonge_public = models.URLField(null=True, blank=True)
     """A public Challonge bracket showing match results as they are released."""
 
     def seed_by_scrimmage(self):
@@ -237,7 +240,7 @@ class TournamentRound(models.Model):
     )
     """The tournament to which this round belongs."""
 
-    challonge_id = models.SmallIntegerField()
+    challonge_id = models.SmallIntegerField(null=True, blank=True)
     """The ID of this round as referenced by Challonge."""
 
     name = models.CharField(max_length=64)
