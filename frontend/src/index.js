@@ -128,7 +128,12 @@ class App extends Component {
     // When in the list of routes, this route must be last.
     // (for wildcard to work properly)
     this.notFoundElems = [
-      <Route path="*" component={NotFound} key="notfound" />,
+      <Route path="*" key="notfound">
+        {/* Simply adding the NotFound component to the route will still have a sidebar, etc,
+        which is odd since the sidebar needs an episode but the not-found page doesn't necessarily have one
+        So, instead, redirect to a dedicated not-found route with just its own component */}
+        {<Redirect to={`/not-found`} />}
+      </Route>,
     ];
   }
 
@@ -182,6 +187,8 @@ class App extends Component {
         <Route path={`/multi-episode`} component={MultiEpisode} />,
         <Route path={`/password_forgot`} component={PasswordForgot} />,
         <Route path={`/password_change`} component={PasswordChange} />,
+        {/* To be able to render NotFound without a sidebar, etc */}
+        <Route path={`/not-found`} component={NotFound} />,
         <Route>
           <div className="wrapper">
             <SideBar />
