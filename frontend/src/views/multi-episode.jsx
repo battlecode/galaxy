@@ -39,10 +39,7 @@ class MultiEpisode extends Component {
     if (EPISODES.includes(episodeInPathName)) {
       return episodeInPathName;
     } else {
-      alert(
-        "Episode does not exist. Redirecting to home page.\n(Due to technical limitations, this alert may show several times. Please be patient)"
-      );
-      window.location.replace("/");
+      window.location.replace("/not-found");
     }
   }
 
