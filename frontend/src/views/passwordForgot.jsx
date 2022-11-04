@@ -25,7 +25,7 @@ class PasswordForgot extends Component {
       });
     } else {
       this.setState({
-        error: "Email not found.",
+        error: data,
         success: false,
       });
     }
@@ -85,7 +85,7 @@ class PasswordForgot extends Component {
           className="card"
           style={{
             width: "350px",
-            margin: success || error ? "20px auto" : "100px auto",
+            margin: error ? "20px auto" : "100px auto",
           }}
         >
           <div className="content">
