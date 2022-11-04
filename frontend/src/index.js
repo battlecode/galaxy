@@ -44,6 +44,10 @@ class App extends Component {
     // Does _NOT_ actually render a clickable link to that route.
     // That is done in navbar.js, sidebar.js, footer.js, etc
 
+    // NOTE: Every page in the following lists
+    // should render with navbar and sidebar, and should have an inherent episode.
+    // Handling otherwise is incredibly tricky, and is not worth the special case.
+
     // should always be viewable, even when not logged in
     this.nonLoggedInElems = [
       // Redirect empty path to the default episode's home page
@@ -99,12 +103,6 @@ class App extends Component {
     this.loggedInElems = [
       <Route path={`/:episode/team`} component={Team} key="team" />,
       <Route path={`/:episode/account`} component={Account} key="account" />,
-      <Route
-        path={`/password_change`}
-        component={PasswordChange}
-        key="password-change"
-      />,
-      <Route path={`/logout`} component={LogOut} key="logout" />,
     ];
 
     // Should only be visible and renderable to users on a team
@@ -173,14 +171,17 @@ class App extends Component {
 
     return (
       <Switch>
-        {/* Login and Register pages should not render with sidebar, navbar, etc */}
-        {/* All other pages should (and so all other routes should allow this) */}
+        {/* Some pages, eg login and register, should not render alongside sidebar, navbar, etc
+        So they have their own routes, and so only their own component will be rendered
+        All other pages should render alongside sidebar, navbar, etc
+        (and so their corresponding routes are all in the fallback route's switch,
+        and this fallback route includes a sidebar, etc) */}
         <Route path={`/login`} component={LoginRegister} />,
+        <Route path={`/logout`} component={LogOut} />,
         <Route path={`/register`} component={Register} />,
         <Route path={`/multi-episode`} component={MultiEpisode} />,
         <Route path={`/password_forgot`} component={PasswordForgot} />,
-        {/* NOTE: Every page with navbar and sidebar should have an inherent episode.
-        Handling otherwise is incredibly tricky, and is not worth the special case. */}
+        <Route path={`/password_change`} component={PasswordChange} />,
         <Route>
           <div className="wrapper">
             <SideBar />
