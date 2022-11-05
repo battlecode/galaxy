@@ -49,22 +49,20 @@ class TeamProfileSerializer(serializers.ModelSerializer):
         return profile_obj
 
     def update(self, instance, validated_data):
-        # Get all data in instance
-        instance.team = validated_data.get("team", instance.team)
-        instance.quote = validated_data.get("quote", instance.quote)
-        instance.biography = validated_data.get("biography", instance.biography)
-        instance.has_avatar = validated_data.get("has_avatar", instance.has_avatar)
-        instance.auto_accept_ranked = validated_data.get(
-            "auto_accept_ranked", instance.auto_accept_ranked
-        )
-        instance.auto_accept_unranked = validated_data.get(
-            "auto_accept_unranked", instance.auto_accept_unranked
-        )
-        instance.eligible_for.set(
-            validated_data.get("eligible_for", instance.eligible_for).all()
-        )
-        instance.save()
-        return instance
+        if "team" in validated_data:
+            nested_serializer = self.fields["team"]
+            nested_instance = instance.team
+            nested_data = validated_data.pop("team")
+            # Run team update serializer
+            nested_serializer.update(nested_instance, nested_data)
+
+        if "eligible_for" in validated_data:
+            instance.eligible_for.set(
+                validated_data.pop("eligible_for", instance.eligible_for).all()
+            )
+        # Runs the original parent update(), since the nested fields were
+        # "popped" out of the data
+        return super().update(instance, validated_data)
 
 
 @extend_schema_field(OpenApiTypes.DOUBLE)

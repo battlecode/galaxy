@@ -152,10 +152,10 @@ class TeamProfile(models.Model):
     )
     """The team being augmented by this profile."""
 
-    quote = models.CharField(max_length=80, blank=True, default="")
+    quote = models.CharField(max_length=80, blank=True)
     """The short quote written by the team, if any."""
 
-    biography = models.TextField(max_length=1024, blank=True, default="")
+    biography = models.TextField(max_length=1024, blank=True)
     """The biography provided by the team, if any."""
 
     has_avatar = models.BooleanField(default=False)

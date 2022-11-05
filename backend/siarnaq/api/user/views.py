@@ -21,7 +21,7 @@ class UserProfileViewSet(
     """
 
     serializer_class = UserProfileSerializer
-    permission_classes = (IsAuthenticatedAsRequestedUser, IsAdminUser)
+    permission_classes = (IsAuthenticatedAsRequestedUser | IsAdminUser,)
 
     def get_queryset(self):
         return UserProfile.objects.select_related("user").all()
