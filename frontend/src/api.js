@@ -784,6 +784,12 @@ class Api {
 
   static register(email, username, password, first, last, dob, callback) {
     $.post(`${URL}/api/user/`, {
+      // TODO generate the JSON in the register page, see there
+      // TODO change all variable names to exactly match the fields that backend expects
+      // so that we can use JSON.stringify
+      // (see account.js for a good example)
+      // It'd be better to generally pick one way of doing things,
+      // and stringify is generally better
       email,
       username,
       password,
