@@ -3,6 +3,7 @@ import posixpath
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
@@ -10,7 +11,12 @@ class User(AbstractUser):
     A database model for the basic information about a user account.
     """
 
-    pass
+    # Override AbstractUser fields to make them required.
+    # See https://stackoverflow.com/questions/49134831/django-make-user-email-required
+    # and https://github.com/django/django/blob/main/django/contrib/auth/models.py
+    first_name = models.CharField(_("first name"), max_length=30, blank=False)
+    last_name = models.CharField(_("last name"), max_length=30, blank=False)
+    email = models.EmailField(_("email address"), blank=False)
 
 
 class Gender(models.TextChoices):
