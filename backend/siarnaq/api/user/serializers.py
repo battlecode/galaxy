@@ -39,9 +39,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         # If updated user data provided, create updated user and put it in
         # validated data field. See https://stackoverflow.com/a/65972405
         if "user" in validated_data:
+            user_serializer = self.fields["user"]
+            user_instance = instance.user
             user_data = validated_data.pop("user")
-            user_serializer = UserSerializer(data=user_data)
-            user_serializer.update(instance=instance.user)
+            user_serializer.update(user_instance, user_data)
 
         return super().update(instance, validated_data)
 
