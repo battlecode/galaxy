@@ -8,15 +8,28 @@ import UpdateCard from "../components/updateCard";
 import MultiEpisode from "./multi-episode";
 
 class StatCard extends UpdateCard {
+  constructor(props) {
+    super(props);
+    this.state = {
+      matchesplayed: false,
+    };
+  }
+
   componentDidMount() {
-    $().ready(function () {
-      Api.getTeamWinStats(function (stats) {
-        return new PieChart("#stat_chart", {
-          labels: stats,
-          series: stats,
-        });
-      });
-    });
+    Api.getTeamWinStats(
+      function (stats) {
+        if (stats[0] == 0 && stats[1] == 0) {
+          this.setState({ matchesplayed: false });
+        } else {
+          this.setState({ matchesplayed: true }, function () {
+            return new PieChart("#stat_chart", {
+              labels: stats,
+              series: stats,
+            });
+          });
+        }
+      }.bind(this)
+    );
   }
 
   render() {
@@ -26,18 +39,25 @@ class StatCard extends UpdateCard {
           <h4 className="title">Match Statistics</h4>
           <p className="category">Wins and losses.</p>
         </div>
-        <div className="content">
-          <div id="stat_chart" className="ct-chart ct-perfect-fourth" />
-          <div className="footer">
-            <div className="legend">
-              <i className="fa fa-circle text-info" /> Win
-              <span style={{ marginLeft: "10px" }}> </span>
-              <i className="fa fa-circle text-danger" /> Loss
+        {!this.state.matchesplayed && (
+          <p className="content">
+            Match statistics will appear here after your first match!
+          </p>
+        )}
+        {this.state.matchesplayed && (
+          <div className="content">
+            <div id="stat_chart" className="ct-chart ct-perfect-fourth" />
+            <div className="footer">
+              <div className="legend">
+                <i className="fa fa-circle text-info" /> Win
+                <span style={{ marginLeft: "10px" }}> </span>
+                <i className="fa fa-circle text-danger" /> Loss
+              </div>
+              <hr />
+              {this.getFooter()}
             </div>
-            <hr />
-            {this.getFooter()}
           </div>
-        </div>
+        )}
       </div>
     );
   }
