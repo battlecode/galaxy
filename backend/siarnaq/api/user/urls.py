@@ -5,7 +5,7 @@ from siarnaq.api.user import views
 
 router = DefaultRouter()
 router.register("detail", views.UserProfileViewSet, basename="user-detail")
-router.register("public", views.PublicUserProfileViewSet, basename="public")
+router.register("public", views.PublicUserProfileViewSet, basename="user-public")
 
 urlpatterns = [
     path("", include(router.urls)),
