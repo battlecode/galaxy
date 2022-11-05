@@ -34,6 +34,15 @@ module "galaxy_artifact" {
   gcp_zone    = var.gcp_zone
 }
 
+module "releases_maven" {
+  source = "./maven"
+
+  name        = "releases-maven"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+}
+
 module "siarnaq" {
   source = "./siarnaq"
 
