@@ -56,6 +56,8 @@ INSTALLED_APPS = [
     "siarnaq.api.episodes",
     "siarnaq.api.teams",
     "drf_spectacular",
+    "django_rest_passwordreset",
+    "anymail",
 ]
 
 MIDDLEWARE = [
@@ -232,3 +234,12 @@ TEAMS_MAX_TEAM_SIZE = 4
 # User avatar settings
 
 USER_MAX_AVATAR_SIZE = (512, 512)
+
+# Email config
+
+EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+EMAIL_HOST_USER = "battlecode@mit.edu"
+ANYMAIL = {
+    "MAILJET_API_KEY": "redacted todo create env",
+    "MAILJET_SECRET_KEY": "redacted todo create env",
+}
