@@ -117,6 +117,7 @@ class Submission(SaturnInvocation):
     def get_source_path(self):
         """Return the path of the source code on Google cloud storage."""
         return posixpath.join(
+            "episode",
             self.episode.name_short,
             "submission",
             str(self.pk),
