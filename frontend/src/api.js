@@ -853,12 +853,7 @@ class Api {
     $.post(`${URL}/api/password_reset/confirm/`, req, (data, success) => {
       callback(data, success);
     }).fail((xhr, status, error) => {
-      console.log(
-        "Error in API call for resetting password: ",
-        xhr,
-        status,
-        error
-      );
+      callback(xhr.responseJSON, false);
     });
   }
 
