@@ -25,6 +25,15 @@ resource "google_compute_network" "this" {
   routing_mode            = "REGIONAL"
 }
 
+module "galaxy_artifact" {
+  source = "./artifact"
+
+  name        = "galaxy"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+}
+
 module "siarnaq" {
   source = "./siarnaq"
 
@@ -32,8 +41,7 @@ module "siarnaq" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
-
-  image        = "us-east1-docker.pkg.dev/mitbattlecode/galaxy/siarnaq"  # TODO make automatic
+  image       = module.galaxy_artifact.artifact_siarnaq_image
 
   database_name = "battlecode"
   database_user = "siarnaq"
@@ -58,7 +66,7 @@ module "saturn_compile" {
   subnetwork_ip_cidr = "172.16.0.0/16"
 
   machine_type = "e2-medium"
-  image        = "us-east1-docker.pkg.dev/mitbattlecode/galaxy/saturn"  # TODO make automatic
+  image        = module.galaxy_artifact.artifact_saturn_image
   command      = "compile"
 
   max_instances = 10
