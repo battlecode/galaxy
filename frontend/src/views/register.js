@@ -56,9 +56,12 @@ class Register extends Component {
       this.setState({ error: "Must provide DOB in YYYY-MM-DD form." });
     else if (password.length < 6)
       this.setState({ error: "Password must be at least 6 characters." });
-    // TODO validate gender
+    // TODO validate gender. Make sure that "gender" entry isn't empty, place error msg if not, etc
     else {
       // TODO pass gender in here
+      // TODO it'd be great to create a json here, rather than in api.js,
+      // since passing in 7 flattened arguments in a specified order (rather than as a dict)
+      // gets really confusing and doesn't scale well
       Api.register(email, username, password, first, last, dob, this.callback);
     }
   };
@@ -243,6 +246,9 @@ class Register extends Component {
                       onChange={this.changeHandler}
                     >
                       <option value=""></option>
+                      {/* TODO expand this to more options.
+                      It's fine to hard-code them according to backend
+                      (enough of our frontend is hardcoded-but-from-backend anyways) */}
                       <option value="An option">An option</option>
                     </select>
                   </div>
