@@ -9,6 +9,8 @@ class Register extends Component {
     first: "",
     last: "",
     dob: "",
+    gender: "",
+
     register: false,
     error: "",
     success: "",
@@ -39,7 +41,7 @@ class Register extends Component {
   };
 
   submitRegister = () => {
-    const { username, register, email, first, last, dob, password } =
+    const { username, register, email, first, last, dob, password, gender } =
       this.state;
     // ensure that all fields are correct
     if (username.length < 4)
@@ -54,7 +56,9 @@ class Register extends Component {
       this.setState({ error: "Must provide DOB in YYYY-MM-DD form." });
     else if (password.length < 6)
       this.setState({ error: "Password must be at least 6 characters." });
+    // TODO validate gender
     else {
+      // TODO pass gender in here
       Api.register(email, username, password, first, last, dob, this.callback);
     }
   };
@@ -172,7 +176,29 @@ class Register extends Component {
                       onChange={this.changeHandler}
                     />
                   </div>
-                  <div class="clearfix"></div>
+                </div>
+                <div className="col-md-12">
+                  <div className="form-group">
+                    <label>Password</label>
+                    <input
+                      type="password"
+                      id="password"
+                      className="form-control"
+                      onChange={this.changeHandler}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-12">
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      id="email"
+                      className="form-control"
+                      onChange={this.changeHandler}
+                    />
+                  </div>
+                  <div className="clearfix"></div>
                 </div>
                 <div className="col-xs-6">
                   <div className="form-group">
@@ -198,17 +224,6 @@ class Register extends Component {
                 </div>
                 <div className="col-xs-6">
                   <div className="form-group">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      className="form-control"
-                      onChange={this.changeHandler}
-                    />
-                  </div>
-                </div>
-                <div className="col-xs-6">
-                  <div className="form-group">
                     <label>Date of Birth</label>
                     <input
                       type="text"
@@ -219,22 +234,21 @@ class Register extends Component {
                     />
                   </div>
                 </div>
-                <div class="clearfix"></div>
-                <div className="col-md-12">
+                <div className="col-xs-6">
                   <div className="form-group">
-                    <label>Password</label>
-                    <input
-                      type="password"
-                      id="password"
+                    <label>Gender</label>
+                    <select
                       className="form-control"
+                      id="gender"
                       onChange={this.changeHandler}
-                    />
+                    >
+                      <option value=""></option>
+                      <option value="An option">An option</option>
+                    </select>
                   </div>
                 </div>
               </div>
               {buttons}
-
-              <div className="clearfix" />
             </div>
           </div>
         </form>
