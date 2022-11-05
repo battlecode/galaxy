@@ -63,7 +63,7 @@ class UserProfileViewSet(
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
 
 
-class PublicUserProfileViewSet(viewsets.ReadOnlyModelViewSet):
+class PublicUserProfileViewSet(viewsets.ReadOnlyModelViewSet, mixins.ListModelMixin):
     """
     A viewset for retrieving public user info.
     """
