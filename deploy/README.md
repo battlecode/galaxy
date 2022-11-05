@@ -14,11 +14,8 @@ if the bucket referenced in `state.tf` doesn't exist in the Google Cloud project
 
 These steps need to be run only once for each local machine / installation.
 
-**if your machine doesn't have a `terraform-automation-key.json` file:** from the directory that this README is in (that same level!), generate a service account key, necessary for terraform to work:
-
-```
-gcloud iam service-accounts keys create terraform-automation-key.json --iam-account=terraform@mitbattlecode.iam.gserviceaccount.com
-```
+**DO NOT GENERATE KEYS FOR ANY SERVICE ACCOUNT.** Keys may be revoked summarily without consulting you, because they are a security risk.
+Instead, you should ensure your Google Cloud SDK is authenticated _as you_, and this Terraform setup has been configured to automatically impersonate (convert to) the Terraform service account.
 
 **if you have not run this step on your machine yet**, configure docker to push to our container registry:
 

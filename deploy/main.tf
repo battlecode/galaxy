@@ -1,0 +1,91 @@
+resource "google_storage_bucket" "public" {
+  name = "mitbattlecode-public"
+
+  location      = "US"
+  storage_class = "STANDARD"
+}
+
+resource "google_storage_bucket" "secure" {
+  name = "mitbattlecode-secure"
+
+  location      = "US"
+  storage_class = "STANDARD"
+}
+
+resource "google_storage_bucket_access_control" "public" {
+  bucket = google_storage_bucket.public.name
+  role   = "READER"
+  entity = "allUsers"
+}
+
+resource "google_compute_network" "this" {
+  name = "galaxy"
+
+  auto_create_subnetworks = false
+  routing_mode            = "REGIONAL"
+}
+
+module "siarnaq" {
+  source = "./siarnaq"
+
+  name        = "siarnaq"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+
+  image        = "us-east1-docker.pkg.dev/mitbattlecode/galaxy/siarnaq"  # TODO make automatic
+
+  database_name = "battlecode"
+  database_user = "siarnaq"
+
+  storage_public_name = google_storage_bucket.public.name
+  storage_secure_name = google_storage_bucket.secure.name
+}
+
+module "saturn_compile" {
+  source = "./saturn"
+
+  name        = "saturn-compile"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+
+  pubsub_topic_name   = module.siarnaq.topic_compile_name
+  storage_public_name = google_storage_bucket.public.name
+  storage_secure_name = google_storage_bucket.secure.name
+
+  network_vpc_id = google_compute_network.this.id
+  subnetwork_ip_cidr = "172.16.0.0/16"
+
+  machine_type = "e2-medium"
+  image        = "us-east1-docker.pkg.dev/mitbattlecode/galaxy/saturn"  # TODO make automatic
+  command      = "compile"
+
+  max_instances = 10
+  min_instances = 0
+  load_ratio    = 25
+}
+
+module "saturn_execute" {
+  source = "./saturn"
+
+  name        = "saturn-execute"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+
+  pubsub_topic_name   = module.siarnaq.topic_execute_name
+  storage_public_name = google_storage_bucket.public.name
+  storage_secure_name = google_storage_bucket.secure.name
+
+  network_vpc_id = google_compute_network.this.id
+  subnetwork_ip_cidr = "172.17.0.0/16"
+
+  machine_type = "e2-highmem-2"
+  image        = "us-east1-docker.pkg.dev/mitbattlecode/galaxy/saturn"  # TODO make automatic
+  command      = "execute"
+
+  max_instances = 40
+  min_instances = 0
+  load_ratio    = 10
+}

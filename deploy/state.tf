@@ -1,17 +1,18 @@
-# this is for managing terraform state, which we store in the following bucket
-# Note: if you're making a new project, you (probably) have to create this bucket first manually,
-# before the rest of Terraform can work.
+resource "google_storage_bucket" "tf_bucket" {
+  name = "mitbattlecode-terraform-state"
 
-# Create a GCS Bucket
-resource "google_storage_bucket" "tf-bucket" {
-  provider = google
+  location      = "US"
+  storage_class = "STANDARD"
+  force_destroy = false
 
-  project       = var.gcp_project
-  name          = "terraform-state-mitbattlecode"
-  location      = var.gcp_region
-  force_destroy = true
-  storage_class = "REGIONAL"
   versioning {
     enabled = true
+  }
+}
+
+terraform {
+  backend "gcs" {
+    bucket = "mitbattlecode-terraform-state"
+    prefix = "prod"
   }
 }
