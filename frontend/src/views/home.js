@@ -16,22 +16,18 @@ class StatCard extends UpdateCard {
   }
 
   componentDidMount() {
-    $().ready(
-      function () {
-        Api.getTeamWinStats(
-          function (stats) {
-            if (stats[0] == 0 && stats[1] == 0) {
-              this.setState({ matchesplayed: false });
-            } else {
-              this.setState({ matchesplayed: true });
-              return new PieChart("#stat_chart", {
-                labels: stats,
-                series: stats,
-              });
-            }
-            // TODO idk if you need both binds??
-          }.bind(this)
-        );
+    Api.getTeamWinStats(
+      function (stats) {
+        if (stats[0] == 0 && stats[1] == 0) {
+          this.setState({ matchesplayed: false });
+        } else {
+          this.setState({ matchesplayed: true }, function () {
+            return new PieChart("#stat_chart", {
+              labels: stats,
+              series: stats,
+            });
+          });
+        }
       }.bind(this)
     );
   }
