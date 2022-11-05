@@ -62,8 +62,6 @@ class UserProfile(models.Model):
     has_resume = models.BooleanField(default=False)
     """Whether the user has an uploaded resume."""
 
-    REQUIRED_FIELDS = ["email", "first_name", "last_name", "gender", "data_of_birth"]
-
     def get_resume_path(self):
         """Return the path of the resume on Google cloud storage."""
         return posixpath.join("user", str(self.pk), "resume.pdf")

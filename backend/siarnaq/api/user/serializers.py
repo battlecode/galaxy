@@ -35,6 +35,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
         user_profile = UserProfile.objects.create(user=user, **validated_data)
         return user_profile
 
+    def update(self, instance, validated_data):
+        # If updated user data provided, create updated user and put it in
+        # validated data field. See https://stackoverflow.com/a/65972405
+        if "user" in validated_data:
+            user_data = validated_data.pop("user")
+            user_serializer = UserSerializer(data=user_data)
+            user_serializer.update(instance=instance.user)
+
+        return super().update(instance, validated_data)
+
 
 class UserResumeSerializer(serializers.Serializer):
     resume = serializers.FileField(write_only=True)
