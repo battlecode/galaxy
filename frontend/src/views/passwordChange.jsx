@@ -6,7 +6,7 @@ class PasswordChange extends Component {
     password: "",
     passwordVerify: "",
     success: false,
-    error: "",
+    error: false,
   };
 
   changePassword = (e) => {
