@@ -15,7 +15,6 @@ class UserProfileViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
-    mixins.DestroyModelMixin,
 ):
     """
     A viewset for retrieving and updating all user info.
@@ -25,7 +24,7 @@ class UserProfileViewSet(
     permission_classes = (IsAuthenticatedAsRequestedUser, IsAdminUser)
 
     def get_queryset(self):
-        return UserProfile.objects.all()
+        return UserProfile.objects.select_related("user").all()
 
 
 class PublicUserProfileViewSet(viewsets.ReadOnlyModelViewSet):

@@ -1,3 +1,5 @@
+import posixpath
+import random
 import uuid
 
 from django.apps import apps
@@ -111,6 +113,15 @@ class Submission(SaturnInvocation):
     """A human-readable message describing the submission."""
 
     objects = SubmissionQuerySet.as_manager()
+
+    def get_source_path(self):
+        """Return the path of the source code on Google cloud storage."""
+        return posixpath.join(
+            self.episode.name_short,
+            "submission",
+            str(self.pk),
+            "source.zip",
+        )
 
     def enqueue_options(self):
         """Return the options to be submitted to the compilation queue."""
@@ -325,35 +336,6 @@ class Match(SaturnInvocation):
         """Return the options to be submitted to the execution queue."""
         raise NotImplementedError
 
-    def can_see_teams(self, user):
-        """Check whether a user is allowed to view the participants in this match."""
-        if user.is_staff:
-            # Staff members can see everything
-            return True
-        if self.tournament_round is not None:
-            # Tournament matches are only available after release
-            return self.tournament_round.is_released
-        # Regular matches are public knowledge
-        return True
-
-    def can_see_outcome(self, user):
-        """Check whether a user is allowed to view the outcome of this match."""
-        if user.is_staff:
-            # Staff members can see everything
-            return True
-        if self.tournament_round is not None:
-            # Tournament matches are only available after release
-            return self.tournament_round.is_released
-        if user.is_authenticated:
-            if user.teams.filter(pk__in={self.red.team, self.blue.team}).exists():
-                # Team members can see outcomes of their own regular matches
-                return True
-        if self.red.team.is_staff() or self.blue.team.is_staff():
-            # Matches with staff teams could expose student grades
-            return False
-        # Regular matches are public knowledge
-        return True
-
     def try_finalize_ratings(self):
         """Try to finalize the ratings of the participations if possible."""
         if self.is_ranked and not self.is_finalized():
@@ -375,9 +357,6 @@ class ScrimmageRequestStatus(models.TextChoices):
 
     REJECTED = "N"
     """The request was denied by the opponent."""
-
-    CANCELLED = "X"
-    """The request was cancelled by the sender."""
 
 
 class PlayerColor(models.TextChoices):
@@ -407,7 +386,11 @@ class ScrimmageRequest(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     """The time at which this request was sent."""
 
-    status = models.CharField(max_length=1, choices=ScrimmageRequestStatus.choices)
+    status = models.CharField(
+        max_length=1,
+        choices=ScrimmageRequestStatus.choices,
+        default=ScrimmageRequestStatus.PENDING,
+    )
     """The status of this request."""
 
     is_ranked = models.BooleanField()
@@ -427,7 +410,7 @@ class ScrimmageRequest(models.Model):
     )
     """The opponent who is receiving this match request."""
 
-    color = models.CharField(max_length=3, choices=PlayerColor.choices)
+    requester_color = models.CharField(max_length=3, choices=PlayerColor.choices)
     """
     The color requested by the sender.
     Note that the opponent will have the opposite color.
@@ -440,15 +423,23 @@ class ScrimmageRequest(models.Model):
 
     def is_alternating_color(self):
         """Determine whether the requested color alternates between games."""
-        raise NotImplementedError
+        return self.requester_color in {
+            PlayerColor.ALTERNATE_RED,
+            PlayerColor.ALTERNATE_BLUE,
+            PlayerColor.ALTERNATE_RANDOM,
+        }
 
-    def is_requester_red_first(self):
+    def determine_is_requester_red_first(self):
         """
         Determine whether the requester will be red in the first game.
         Not guaranteed to behave deterministcally for random selections.
         """
-        raise NotImplementedError
-
-    def create_match(self):
-        """Create and save a match object from this scrimmage request."""
-        raise NotImplementedError
+        match self.requester_color:
+            case PlayerColor.ALWAYS_RED | PlayerColor.ALTERNATE_RED:
+                return True
+            case PlayerColor.ALWAYS_BLUE | PlayerColor.ALTERNATE_BLUE:
+                return False
+            case PlayerColor.ALTERNATE_RANDOM:
+                return bool(random.getrandbits(1))
+            case _:
+                raise ValueError("Unknown color")

@@ -21,7 +21,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/user/", include("siarnaq.api.user.urls")),
-    # path("api/compete/", include("siarnaq.api.compete.urls")),
+    path("api/compete/", include("siarnaq.api.compete.urls")),
     path("api/episode/", include("siarnaq.api.episodes.urls")),
     path("api/team/", include("siarnaq.api.teams.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
