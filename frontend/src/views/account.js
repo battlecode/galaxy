@@ -9,18 +9,20 @@ class Account extends Component {
     super();
 
     this.state = {
-      user: {
-        username: "",
-        email: "",
-        first_name: "",
-        last_name: "",
+      profile: {
+        user: {
+          id: "",
+          username: "",
+          email: "",
+        },
+        gender: "",
+        gender_details: "",
         date_of_birth: "",
-        bio: "",
-        avatar: "",
-        country: "",
-        is_staff: "",
-        id: "",
-        verified: "",
+        school: "",
+        biography: "",
+        kerberos: "",
+        has_avatar: false,
+        has_resume: false,
       },
       up: "Update Info",
       selectedFile: null,
@@ -77,7 +79,7 @@ class Account extends Component {
   componentDidMount() {
     Api.getUserProfile(
       function (u) {
-        this.setState({ user: u });
+        this.setState({ profile: u });
       }.bind(this)
     );
   }
