@@ -24,6 +24,7 @@ class UserProfileViewSet(
 ):
     """
     A viewset for retrieving and updating all user info.
+    When "current" is provided for the ID, return info for the current logged in user.
     """
 
     serializer_class = UserProfileSerializer
@@ -31,6 +32,18 @@ class UserProfileViewSet(
 
     def get_queryset(self):
         return UserProfile.objects.select_related("user").all()
+
+    # See https://stackoverflow.com/a/36626403.
+    def get_object(self):
+        pk = self.kwargs.get("pk")
+
+        if pk == "current":
+            if self.request.user.is_authenticated:
+                return self.request.user
+            else:
+                raise Http404
+
+        return super().get_object()
 
     @action(detail=True, methods=["get", "put"], serializer_class=UserResumeSerializer)
     def resume(self, request, pk=None):
