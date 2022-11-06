@@ -2,6 +2,7 @@ import google.cloud.storage as storage
 from django.conf import settings
 from django.db import transaction
 from django.http import FileResponse, Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -38,10 +39,9 @@ class UserProfileViewSet(
         pk = self.kwargs.get("pk")
 
         if pk == "current":
-            if self.request.user.is_authenticated:
-                return self.request.user
-            else:
-                raise Http404
+            return get_object_or_404(
+                self.get_queryset().filter(pk=self.request.user.pk)
+            )
 
         return super().get_object()
 
