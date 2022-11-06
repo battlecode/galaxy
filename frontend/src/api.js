@@ -417,37 +417,12 @@ class Api {
   // This process will be touched up in #86
   // note that this is blocked by the new backend -- hold off for now
   static getUserProfile(callback) {
-    Api.getProfileByUser(Cookies.get("username"), Api.setUserUrl(callback));
-  }
-
-  // essentially like python decorator, wraps
-  // sets user url before making call to that endpoint and passing on to callback
-  static setUserUrl(callback) {
-    return function (data) {
-      Cookies.set("user_url", data.url);
-      $.get(data.url)
-        .done((data, success) => {
-          callback(data);
-        })
-        .fail((xhr, status, error) => {
-          console.log("Error in setting user URL: ", xhr, status, error);
-        });
-    };
-  }
-
-  static getProfileByUser(username, callback) {
-    $.get(`${URL}/api/user/profile/${username}/`)
+    $.get(`${URL}/api/user/detail/current/`)
       .done((data, status) => {
         callback(data);
       })
       .fail((xhr, status, error) => {
-        console.log(
-          "Error in getting profile for user: ",
-          username,
-          xhr,
-          status,
-          error
-        );
+        console.log("Error in getting profile for user", xhr, status, error);
       });
   }
 
@@ -769,8 +744,6 @@ class Api {
       .done((data, status) => {
         Cookies.set("access", data.access);
         Cookies.set("refresh", data.refresh);
-        // Don't set username cookie once redesign done; see #167
-        Cookies.set("username", username);
 
         callback(data, true);
       })
