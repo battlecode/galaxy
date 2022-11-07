@@ -38,7 +38,7 @@ class Account extends Component {
     var val = e.target.value;
     if (id.startsWith("user")) {
       this.setState(function (prevState, props) {
-        user_field = id.split("-")[2];
+        var user_field = id.split("-")[1];
         prevState.user_profile.user[user_field] = val;
         return prevState;
       });
@@ -169,8 +169,7 @@ class Account extends Component {
                           <input
                             type="text"
                             className="form-control"
-                            readOnly
-                            id="username"
+                            id="user-username"
                             onChange={this.changeHandler}
                             value={this.state.user_profile.user.username}
                           />
@@ -182,7 +181,7 @@ class Account extends Component {
                           <input
                             type="email"
                             className="form-control"
-                            id="email"
+                            id="user-email"
                             onChange={this.changeHandler}
                             value={this.state.user_profile.user.email}
                           />
@@ -196,7 +195,7 @@ class Account extends Component {
                           <input
                             type="text"
                             className="form-control"
-                            id="first_name"
+                            id="user-first_name"
                             onChange={this.changeHandler}
                             value={this.state.user_profile.user.first_name}
                           />
@@ -208,7 +207,7 @@ class Account extends Component {
                           <input
                             type="text"
                             className="form-control"
-                            id="last_name"
+                            id="user-last_name"
                             onChange={this.changeHandler}
                             value={this.state.user_profile.user.last_name}
                           />
