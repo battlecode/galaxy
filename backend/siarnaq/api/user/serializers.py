@@ -12,8 +12,8 @@ class UserSerializer(serializers.ModelSerializer):
             "username": {"validators": []},
         }
 
-    # Handle password hashes in update, which is important since this function
-    # is called from the user profile serializer.
+    # Handle password hashes in update, which is important since
+    # this function is called from the user profile serializer.
     # See https://stackoverflow.com/a/49190645.
     def update(self, instance, validated_data):
         if "password" in validated_data:
