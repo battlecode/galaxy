@@ -251,6 +251,9 @@ class App extends Component {
     // Whenever this API call finishes, we should always be ready to re-include the routes,
     // and thus potentially re-render the URL that the user is looking to navigate to.
 
+    console.log(process.env.REACT_APP_BUILD_TIMESTAMP);
+    console.log(process.env.REACT_APP_BUILD_TIMESTAMP_2);
+
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
     let onTeamElemsToRender =
       on_team && is_game_released ? this.onTeamElems : [];
