@@ -9,7 +9,7 @@ class Account extends Component {
     super();
 
     this.state = {
-      profile: {
+      user_profile: {
         user: {
           id: "",
           username: "",
@@ -79,7 +79,7 @@ class Account extends Component {
   componentDidMount() {
     Api.getUserProfile(
       function (u) {
-        this.setState({ profile: u });
+        this.setState({ user_profile: u });
       }.bind(this)
     );
   }
@@ -118,7 +118,7 @@ class Account extends Component {
     }
 
     let resume_status = null;
-    if (this.state.user.verified === false) {
+    if (this.state.user_profile.has_resume === false) {
       resume_status = (
         <label style={{ float: "right" }}>
           {" "}
@@ -163,7 +163,7 @@ class Account extends Component {
                             readOnly
                             id="username"
                             onChange={this.changeHandler}
-                            value={this.state.user.username}
+                            value={this.state.user_profile.user.username}
                           />
                         </div>
                       </div>
@@ -175,7 +175,7 @@ class Account extends Component {
                             className="form-control"
                             id="email"
                             onChange={this.changeHandler}
-                            value={this.state.user.email}
+                            value={this.state.user_profile.user.email}
                           />
                         </div>
                       </div>
@@ -189,7 +189,7 @@ class Account extends Component {
                             className="form-control"
                             id="first_name"
                             onChange={this.changeHandler}
-                            value={this.state.user.first_name}
+                            value={this.state.user_profile.user.first_name}
                           />
                         </div>
                       </div>
@@ -201,7 +201,7 @@ class Account extends Component {
                             className="form-control"
                             id="last_name"
                             onChange={this.changeHandler}
-                            value={this.state.user.last_name}
+                            value={this.state.user_profile.user.last_name}
                           />
                         </div>
                       </div>
@@ -215,7 +215,7 @@ class Account extends Component {
                             className="form-control"
                             id="date_of_birth"
                             onChange={this.changeHandler}
-                            value={this.state.user.date_of_birth}
+                            value={this.state.user_profile.date_of_birth}
                           />
                         </div>
                       </div>
@@ -226,7 +226,7 @@ class Account extends Component {
                           <select
                             className="form-control"
                             id="country"
-                            value={this.state.user.country}
+                            value="TODO: country?" //{this.state.user.country}
                             onChange={this.changeHandler}
                           >
                             <option value=""></option>
@@ -496,7 +496,7 @@ class Account extends Component {
                             id="avatar"
                             className="form-control"
                             onChange={this.changeHandler}
-                            value={this.state.user.avatar}
+                            value="TODO: avatar" //{this.state.user.avatar}
                           />
                         </div>
                       </div>
@@ -511,7 +511,7 @@ class Account extends Component {
                             placeholder="Put your bio here."
                             onChange={this.changeHandler}
                             id="bio"
-                            value={this.state.user.bio}
+                            value={this.state.user_profile.biography}
                           />
                         </div>
                       </div>
@@ -575,7 +575,7 @@ class Account extends Component {
                 </div>
               </div>
               <div className="col-md-4">
-                <UserCard user={this.state.user} />
+                <UserCard user_profile={this.state.user_profile} />
               </div>
             </div>
           </div>
