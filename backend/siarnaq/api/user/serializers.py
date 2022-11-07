@@ -1,3 +1,4 @@
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from siarnaq.api.user.models import User, UserProfile
@@ -12,13 +13,10 @@ class UserSerializer(serializers.ModelSerializer):
             "username": {"validators": []},
         }
 
-    # Handle password hashes in update, which is important since
-    # this function is called from the user profile serializer.
-    # See https://stackoverflow.com/a/49190645.
-    def update(self, instance, validated_data):
-        if "password" in validated_data:
-            instance.set_password(validated_data.pop("password"))
-        super().update(instance, validated_data)
+    # Automatically hash password upon validation.
+    # See https://stackoverflow.com/a/54752925.
+    def validate_password(self, password):
+        return make_password(password)
 
     # Custom validator that permits for the username to be "updated" to the same value
     # as its current one. See https://stackoverflow.com/a/56171137.
@@ -58,8 +56,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         # Create user
+        user_serializer = self.fields["user"]
         user_data = validated_data.pop("user")
-        user = User.objects.create_user(**user_data)
+        user = user_serializer.create(user_data)
         # Create associated user profile
         user_profile = UserProfile.objects.create(user=user, **validated_data)
         return user_profile
