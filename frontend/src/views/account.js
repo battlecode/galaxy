@@ -60,7 +60,7 @@ class Account extends Component {
   updateUser() {
     this.setState({ up: '<i class="fa fa-circle-o-notch fa-spin"></i>' });
     Api.updateUser(
-      this.state.user,
+      this.state.user_profile,
       function (response) {
         if (response) this.setState({ up: '<i class="fa fa-check"></i>' });
         else this.setState({ up: '<i class="fa fa-times"></i>' });
@@ -76,12 +76,13 @@ class Account extends Component {
 
   uploadProfile(e) {
     var reader = new FileReader();
-    reader.onloadend = () =>
-      this.setState(function (prevState, props) {
-        prevState.user.avatar = reader.result;
-        return prevState;
-      });
-    reader.readAsDataURL(e.target.files[0]);
+    // TODO: avatar stuff
+    // reader.onloadend = () =>
+    //   this.setState(function (prevState, props) {
+    //     prevState.user.avatar = reader.result;
+    //     return prevState;
+    //   });
+    // reader.readAsDataURL(e.target.files[0]);
   }
 
   componentDidMount() {
