@@ -61,6 +61,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "kerberos",
             "has_avatar",
             "has_resume",
+            "country",
         ]
 
     def create(self, validated_data):
