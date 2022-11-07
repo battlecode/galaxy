@@ -428,7 +428,7 @@ class Api {
 
   static updateUser(profile, callback) {
     $.ajax({
-      url: `${URL}/api/user/detail/current`,
+      url: `${URL}/api/user/detail/current/`,
       data: JSON.stringify(profile),
       type: "PATCH",
       contentType: "application/json",
