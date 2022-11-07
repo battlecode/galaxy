@@ -12,6 +12,14 @@ class UserSerializer(serializers.ModelSerializer):
             "username": {"validators": []},
         }
 
+    # Handle password hashes in update, which is important since this function
+    # is called from the user profile serializer.
+    # See https://stackoverflow.com/a/49190645.
+    def update(self, instance, validated_data):
+        if "password" in validated_data:
+            instance.set_password(validated_data.pop("password"))
+        super().update(instance, validated_data)
+
     # Custom validator that permits for the username to be "updated" to the same value
     # as its current one. See https://stackoverflow.com/a/56171137.
     def validate_username(self, username):
