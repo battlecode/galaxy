@@ -7,7 +7,28 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "password", "email", "first_name", "last_name"]
-        extra_kwargs = {"password": {"write_only": True}}
+        extra_kwargs = {
+            "password": {"write_only": True},
+            "username": {"validators": []},
+        }
+
+    # Custom validator that permits for the username to be "updated" to the same value
+    # as its current one. See https://stackoverflow.com/a/56171137.
+    def validate_username(self, username):
+        check_query = User.objects.filter(username=username)
+        if self.instance:
+            check_query = check_query.exclude(pk=self.instance.pk)
+
+        if self.parent is not None and self.parent.instance is not None:
+            user_instance = self.parent.instance.user
+            check_query = check_query.exclude(pk=user_instance.pk)
+
+        if check_query.exists():
+            raise serializers.ValidationError(
+                "A user with that username already exists."
+            )
+
+        return username
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
