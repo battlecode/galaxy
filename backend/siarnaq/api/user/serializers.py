@@ -7,10 +7,19 @@ from siarnaq.api.user.models import User, UserProfile
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "username", "password", "email", "first_name", "last_name"]
+        fields = [
+            "id",
+            "username",
+            "password",
+            "email",
+            "first_name",
+            "last_name",
+            "is_staff",
+        ]
         extra_kwargs = {
             "password": {"write_only": True},
             "username": {"validators": []},
+            "is_staff": {"read_only": True},
         }
 
     # Automatically hash password upon validation.
