@@ -36,10 +36,18 @@ class Account extends Component {
   changeHandler(e) {
     var id = e.target.id;
     var val = e.target.value;
-    this.setState(function (prevState, props) {
-      prevState.user[id] = val;
-      return prevState;
-    });
+    if (id.startsWith("user")) {
+      this.setState(function (prevState, props) {
+        user_field = id.split("-")[2];
+        prevState.user_profile.user[user_field] = val;
+        return prevState;
+      });
+    } else {
+      this.setState(function (prevState, props) {
+        prevState.user_profile[id] = val;
+        return prevState;
+      });
+    }
   }
 
   fileChangeHandler = (event) => {
@@ -510,7 +518,7 @@ class Account extends Component {
                             className="form-control"
                             placeholder="Put your bio here."
                             onChange={this.changeHandler}
-                            id="bio"
+                            id="biography"
                             value={this.state.user_profile.biography}
                           />
                         </div>
