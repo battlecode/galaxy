@@ -18,10 +18,8 @@
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "startx": "BROWSER=none react-scripts start",
     "start": "react-scripts start",
     "build": "rm -rf build && react-scripts build",
-    "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
   "browserslist": [
