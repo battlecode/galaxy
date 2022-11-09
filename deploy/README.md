@@ -26,9 +26,13 @@ granted.
 Whenever you make changes and apply them, you should add and commit all `.tf` files as
 well as the `.terraform.lock.hcl` file.
 
+Whenever you create a new resource, think about sizing. Be warned that small resources
+(especially shared-core ones) might not be sufficient for high-traffic components, and
+might only be sufficient for testing environments.
+
 ## Initial Terraform configuration
 
-*These steps have already been completed, but are noted here for posterity.*
+_These steps have already been completed, but are noted here for posterity._
 
 There is a first time for everything. When initializing Terraform for the first time in
 a new project:
