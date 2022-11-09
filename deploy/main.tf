@@ -12,8 +12,21 @@ resource "google_storage_bucket" "secure" {
   storage_class = "STANDARD"
 }
 
+resource "google_storage_bucket" "frontend" {
+  name = "mitbattlecode-frontend"
+
+  location      = "US"
+  storage_class = "STANDARD"
+}
+
 resource "google_storage_bucket_access_control" "public" {
   bucket = google_storage_bucket.public.name
+  role   = "READER"
+  entity = "allUsers"
+}
+
+resource "google_storage_bucket_access_control" "frontend" {
+  bucket = google_storage_bucket.frontend.name
   role   = "READER"
   entity = "allUsers"
 }
@@ -32,6 +45,8 @@ module "galaxy_artifact" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+
+  storage_frontend_name = google_storage_bucket.frontend.name
 }
 
 module "releases_maven" {
@@ -105,4 +120,17 @@ module "saturn_execute" {
   max_instances = 40
   min_instances = 0
   load_ratio    = 10
+}
+
+module "web" {
+  source = "./web"
+
+  name        = "web"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+
+  cloudrun_service_name = module.siarnaq.run_service_name
+  storage_public_name   = google_storage_bucket.public.name
+  storage_frontend_name = google_storage_bucket.frontend.name
 }

@@ -36,6 +36,12 @@ resource "google_cloudbuild_trigger" "this" {
       dir  = "saturn"
     }
 
+    step {
+      name = "gcr.io/cloud-builders/gsutil"
+      args = ["rsync", "-r", "-c", "-d", ".", "gs://${var.storage_frontend_name}"]
+      dir  = "frontend"
+    }
+
     images = [
       local.siarnaq_image,
       local.saturn_image,

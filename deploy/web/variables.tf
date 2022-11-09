@@ -18,6 +18,16 @@ variable "gcp_zone" {
   type        = string
 }
 
+variable "cloudrun_service_name" {
+  description = "The name of the Cloud Run service to be routed to"
+  type        = string
+}
+
+variable "storage_public_name" {
+  description = "Name of Google Cloud Storage bucket resource for public artifacts"
+  type        = string
+}
+
 variable "storage_frontend_name" {
   description = "Name of Google Cloud Storage bucket resource for website frontend"
   type        = string
