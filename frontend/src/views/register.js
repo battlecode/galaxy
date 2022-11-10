@@ -3,14 +3,17 @@ import Api from "../api";
 
 class Register extends Component {
   state = {
-    email: "",
-    password: "",
-    username: "",
-    first: "",
-    last: "",
-    dob: "",
-    gender: "",
-
+    user_profile: {
+      user: {
+        username: "",
+        password: "",
+        email: "",
+        first_name: "",
+        last_name: "",
+      },
+      gender: "",
+      date_of_birth: "",
+    },
     register: false,
     error: "",
     success: "",
@@ -35,41 +38,47 @@ class Register extends Component {
     this.submitRegister();
   };
 
-  submitLogin = () => {
-    const { username, password } = this.state;
-    Api.login(username, password, this.callback);
-  };
-
   submitRegister = () => {
-    const { username, register, email, first, last, dob, password, gender } =
-      this.state;
-    // ensure that all fields are correct
-    if (username.length < 4)
+    const user_profile = this.state.user_profile;
+    const user = user_profile.user;
+    // Validate fields
+    if (user.username.length < 4)
       this.setState({ error: "Username must be at least 4 characters." });
-    else if (email.length < 4)
+    else if (user.email.length < 4)
       this.setState({ error: "Email must be at least 4 characters." });
-    else if (username.indexOf(".") > -1)
+    else if (user.username.indexOf(".") > -1)
       this.setState({ error: "Username must not contain dots." });
-    else if (!first) this.setState({ error: "Must provide first name." });
-    else if (!last) this.setState({ error: "Must provide last name." });
-    else if (!dob.match(/^\d{4}-\d{2}-\d{2}$/g))
+    else if (!user.first_name)
+      this.setState({ error: "Must provide first name." });
+    else if (!user.last_name)
+      this.setState({ error: "Must provide last name." });
+    else if (!user_profile.date_of_birth.match(/^\d{4}-\d{2}-\d{2}$/g))
       this.setState({ error: "Must provide DOB in YYYY-MM-DD form." });
-    else if (password.length < 6)
+    else if (user.password.length < 6)
       this.setState({ error: "Password must be at least 6 characters." });
-    // TODO validate gender. Make sure that "gender" entry isn't empty, place error msg if not, etc
-    else {
-      // TODO pass gender in here
-      // TODO it'd be great to create a json here, rather than in api.js,
-      // since passing in 7 flattened arguments in a specified order (rather than as a dict)
-      // gets really confusing and doesn't scale well
-      Api.register(email, username, password, first, last, dob, this.callback);
+    else if (gender == "") {
+      this.setState({ error: "Must select a gender." });
+    } else {
+      Api.register(this.state.user_profile, this.callback);
     }
   };
 
+  // Similarly structured to the changeHandler in account.js
   changeHandler = (e) => {
-    const { id } = e.target;
+    const id = e.target.id;
     const val = e.target.value;
-    this.setState({ [id]: val });
+    if (id.startsWith("user")) {
+      this.setState(function (prevState, props) {
+        var user_field = id.split("-")[1];
+        prevState.user_profile.user[user_field] = val;
+        return prevState;
+      });
+    } else {
+      this.setState(function (prevState, props) {
+        prevState.user_profile[id] = val;
+        return prevState;
+      });
+    }
   };
 
   render() {
@@ -174,7 +183,7 @@ class Register extends Component {
                     <label>Username</label>
                     <input
                       type="text"
-                      id="username"
+                      id="user-username"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -185,7 +194,7 @@ class Register extends Component {
                     <label>Password</label>
                     <input
                       type="password"
-                      id="password"
+                      id="user-password"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -196,7 +205,7 @@ class Register extends Component {
                     <label>Email</label>
                     <input
                       type="email"
-                      id="email"
+                      id="user-email"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -208,7 +217,7 @@ class Register extends Component {
                     <label>First Name</label>
                     <input
                       type="text"
-                      id="first"
+                      id="user-first_name"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -219,7 +228,7 @@ class Register extends Component {
                     <label>Last Name</label>
                     <input
                       type="text"
-                      id="last"
+                      id="user-last_name"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -230,7 +239,7 @@ class Register extends Component {
                     <label>Date of Birth</label>
                     <input
                       type="text"
-                      id="dob"
+                      id="date_of_birth"
                       placeholder="YYYY-MM-DD"
                       className="form-control"
                       onChange={this.changeHandler}
@@ -249,7 +258,7 @@ class Register extends Component {
                       {/* TODO expand this to more options.
                       It's fine to hard-code them according to backend
                       (enough of our frontend is hardcoded-but-from-backend anyways) */}
-                      <option value="An option">An option</option>
+                      <option value="?">An option</option>
                     </select>
                   </div>
                 </div>
