@@ -194,9 +194,22 @@ GCLOUD_SECURED_BUCKET = "battle-secure-upload"
 # Change this in production and while running system integration tests.
 GCLOUD_DISABLE_ALL_ACTIONS = True
 
+# Publish Topic for PubSub
+# TODO: setup Topics on GCloud
+COMPETE_SATURN_COMPILE_TOPIC = "compile"
+COMPETE_SATURN_EXECUTE_TOPIC = "execute"
+
+# Ordering for PubSub
+#TODO: setup Ordering on GCloud
+COMPETE_SATURN_COMPILE_ORDER = "compile_order"
+COMPETE_SATURN_EXECUTE_ORDER = "execute_order"
+
+
 # Penalized Elo configuration
 
 TEAMS_ELO_INITIAL = 1500.0
 TEAMS_ELO_K = 24.0
 TEAMS_ELO_SCALE = 400.0
 TEAMS_ELO_PENALTY = 0.85
+
+
