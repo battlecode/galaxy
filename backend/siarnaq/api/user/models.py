@@ -1,6 +1,9 @@
+import posixpath
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
@@ -8,7 +11,12 @@ class User(AbstractUser):
     A database model for the basic information about a user account.
     """
 
-    pass
+    # Override AbstractUser fields to make them required.
+    # See https://stackoverflow.com/questions/49134831/django-make-user-email-required
+    # and https://github.com/django/django/blob/main/django/contrib/auth/models.py
+    first_name = models.CharField(_("first name"), max_length=30, blank=False)
+    last_name = models.CharField(_("last name"), max_length=30, blank=False)
+    email = models.EmailField(_("email address"), blank=False)
 
 
 class Gender(models.TextChoices):
@@ -60,4 +68,9 @@ class UserProfile(models.Model):
     has_resume = models.BooleanField(default=False)
     """Whether the user has an uploaded resume."""
 
-    REQUIRED_FIELDS = ["email", "first_name", "last_name", "gender", "data_of_birth"]
+    country = models.TextField(blank=True)
+    """The country of the user."""
+
+    def get_resume_path(self):
+        """Return the path of the resume on Google cloud storage."""
+        return posixpath.join("user", str(self.pk), "resume.pdf")
