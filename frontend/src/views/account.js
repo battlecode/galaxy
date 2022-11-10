@@ -23,6 +23,7 @@ class Account extends Component {
         kerberos: "",
         has_avatar: false,
         has_resume: false,
+        country: "",
       },
       up: "Update Info",
       selectedFile: null,
@@ -234,7 +235,7 @@ class Account extends Component {
                           <select
                             className="form-control"
                             id="country"
-                            value="TODO: country?" //{this.state.user.country}
+                            value={this.state.user_profile.country}
                             onChange={this.changeHandler}
                           >
                             <option value=""></option>
