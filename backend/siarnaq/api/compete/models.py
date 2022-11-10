@@ -125,7 +125,17 @@ class Submission(SaturnInvocation):
 
     def enqueue_options(self):
         """Return the options to be submitted to the compilation queue."""
-        raise NotImplementedError
+        return {
+            "id": self.pk,
+            "episode": self.episode_id,
+            # ex: bc23/submission/12423/source.zip
+            "source-path": self.get_source_path(), 
+            "binary": {
+                "path": f"{self.episode.short_name}/submission/{self.pk}/binary.zip",
+                "options": ""
+            },
+        }
+ 
 
 
 class MatchParticipant(models.Model):
@@ -330,11 +340,28 @@ class Match(SaturnInvocation):
 
     def get_replay_path(self):
         """Return the path to the replay file."""
-        raise NotImplementedError
+        return self.replay
 
     def enqueue_options(self):
         """Return the options to be submitted to the execution queue."""
-        raise NotImplementedError
+        return {
+            "id": self.pk,
+            "episode": self.episode_id,
+            "players": [{
+               "path": self.red.team,
+               "options": ""
+            },
+            {
+                "path": self.blue.team,
+                "options": ""
+            }],
+            "replay-path": self.get_replay_path(),
+ 
+            #NOTE: ExecuteTask in /battlecode/saturn/blob/main/worker/pkg/run/types.go
+            # specifies that map be a string, not list. Use a comma seperated string of map names
+            "map": ",".join(map.name for map in self.maps),
+        }
+
 
     def try_finalize_ratings(self):
         """Try to finalize the ratings of the participations if possible."""
