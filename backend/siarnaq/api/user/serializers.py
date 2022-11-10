@@ -22,14 +22,18 @@ class UserSerializer(serializers.ModelSerializer):
             "is_staff": {"read_only": True},
         }
 
-    # Automatically hash password upon validation.
-    # See https://stackoverflow.com/a/54752925.
     def validate_password(self, password):
+        """
+        Automatically hash password upon validation.
+        See https://stackoverflow.com/a/54752925.
+        """
         return make_password(password)
 
-    # Custom validator that permits for the username to be "updated" to the same value
-    # as its current one. See https://stackoverflow.com/a/56171137.
     def validate_username(self, username):
+        """
+        Custom validator that permits for the username to be "updated" to the same value
+        as its current one. See https://stackoverflow.com/a/56171137.
+        """
         check_query = User.objects.filter(username=username)
         if self.instance:
             check_query = check_query.exclude(pk=self.instance.pk)
@@ -74,8 +78,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return user_profile
 
     def update(self, instance, validated_data):
-        # If updated user data provided, create updated user and put it in
-        # validated data field. See https://stackoverflow.com/a/65972405
+        """
+        If updated user data provided, create updated user and put it in
+        validated data field. See https://stackoverflow.com/a/65972405
+        """
         if "user" in validated_data:
             user_serializer = self.fields["user"]
             user_instance = instance.user
