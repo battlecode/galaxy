@@ -25,7 +25,7 @@ class UserProfileViewSet(
 ):
     """
     A viewset for retrieving and updating all user info.
-    When "current" is provided for the ID, return info for the current logged in user.
+    When "current" is provided for the ID, retrieve/update info for logged in user.
     """
 
     serializer_class = UserProfileSerializer
