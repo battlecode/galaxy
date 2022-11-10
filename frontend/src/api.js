@@ -426,10 +426,10 @@ class Api {
       });
   }
 
-  static updateUser(profile, callback) {
+  static updateUser(user_profile, callback) {
     $.ajax({
       url: `${URL}/api/user/detail/current/`,
-      data: JSON.stringify(profile),
+      data: JSON.stringify(user_profile),
       type: "PATCH",
       contentType: "application/json",
       dataType: "json",
@@ -698,9 +698,12 @@ class Api {
   // default for all subsequent requests. The header is a JWT token: see
   // https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
   static setLoginHeader() {
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("access")}` },
-    });
+    const access_token = Cookies.get("access");
+    if (access_token) {
+      $.ajaxSetup({
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
+    }
   }
 
   // Checks whether the currently held JWT access token is still valid (by posting it to the verify endpoint),
@@ -755,23 +758,20 @@ class Api {
       });
   }
 
-  static register(email, username, password, first, last, dob, callback) {
-    $.post(`${URL}/api/user/`, {
-      // TODO generate the JSON in the register page, see there
-      // TODO change all variable names to exactly match the fields that backend expects
-      // so that we can use JSON.stringify
-      // (see account.js for a good example)
-      // It'd be better to generally pick one way of doing things,
-      // and stringify is generally better
-      email,
-      username,
-      password,
-      first_name: first,
-      last_name: last,
-      date_of_birth: dob,
+  static register(user_profile, callback) {
+    $.ajax({
+      url: `${URL}/api/user/detail/`,
+      data: JSON.stringify(user_profile),
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
     })
       .done((data, status) => {
-        this.login(username, password, callback);
+        this.login(
+          user_profile.user.username,
+          user_profile.user.password,
+          callback
+        );
       })
       .fail((xhr, status, error) => {
         if (xhr.responseJSON.username)
