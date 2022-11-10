@@ -2,6 +2,7 @@ import google.cloud.storage as storage
 from django.conf import settings
 from django.db import transaction
 from django.http import FileResponse, Http404
+from django.shortcuts import get_object_or_404
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -24,6 +25,7 @@ class UserProfileViewSet(
 ):
     """
     A viewset for retrieving and updating all user info.
+    When "current" is provided for the ID, retrieve/update info for logged in user.
     """
 
     serializer_class = UserProfileSerializer
@@ -31,6 +33,17 @@ class UserProfileViewSet(
 
     def get_queryset(self):
         return UserProfile.objects.select_related("user").all()
+
+    # See https://stackoverflow.com/a/36626403.
+    def get_object(self):
+        pk = self.kwargs.get("pk")
+
+        if pk == "current":
+            return get_object_or_404(
+                self.get_queryset().filter(pk=self.request.user.pk)
+            )
+
+        return super().get_object()
 
     @action(detail=True, methods=["get", "put"], serializer_class=UserResumeSerializer)
     def resume(self, request, pk=None):
