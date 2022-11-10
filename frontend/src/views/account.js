@@ -35,8 +35,8 @@ class Account extends Component {
   }
 
   changeHandler(e) {
-    var id = e.target.id;
-    var val = e.target.value;
+    const id = e.target.id;
+    const val = e.target.value;
     if (id.startsWith("user")) {
       this.setState(function (prevState, props) {
         var user_field = id.split("-")[1];
