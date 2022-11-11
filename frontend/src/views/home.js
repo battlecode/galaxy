@@ -195,6 +195,8 @@ class Home extends Component {
   }
 
   componentDidMount() {
+    // TODO as api is changed, change this
+
     Api.getUserTeam(
       function (e) {
         this.setState({ on_team: e !== null });

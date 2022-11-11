@@ -92,6 +92,8 @@ class YesTeam extends Component {
   }
 
   componentDidMount() {
+    // TODO as api is changed, change this
+
     Api.getUserTeam(
       function (new_state) {
         this.setState({ team: new_state });
@@ -549,6 +551,8 @@ class Team extends Component {
   }
 
   componentDidMount() {
+    // TODO as api is changed, change this
+
     Api.getUserTeam(
       function (new_state) {
         this.setState({ team: new_state });
