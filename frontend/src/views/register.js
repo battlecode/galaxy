@@ -148,7 +148,10 @@ class Register extends Component {
           }}
         >
           {/* Note that this page does not change depending on episode */}
-          Register below to participate in Battlecode!
+          Register below to participate in Battlecode! For those who are taking
+          this class <br />
+          for credit, go to the "Account" page and fill in your kerb after
+          registering.
         </p>
         {errorDiv}
         {successDiv}
