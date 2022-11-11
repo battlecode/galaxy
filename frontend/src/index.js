@@ -149,7 +149,7 @@ class App extends Component {
     });
 
     Api.getUserProfile((user_profile) => {
-      this.setState({ user: user_profile });
+      this.setState({ user_profile });
     });
 
     Api.getUserTeam((user_team_data) => {
@@ -162,7 +162,9 @@ class App extends Component {
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
     let onTeamElemsToRender = this.state.on_team ? this.onTeamElems : [];
     let staffElemsToRender =
-      this.state.user && this.state.user.is_staff ? this.staffElems : [];
+      this.state.user_profile && this.state.user_profile.user.is_staff
+        ? this.staffElems
+        : [];
 
     let elemsToRender = this.nonLoggedInElems.concat(
       loggedInElemsToRender,
