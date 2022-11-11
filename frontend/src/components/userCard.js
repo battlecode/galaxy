@@ -4,14 +4,12 @@ import Avatar from "../components/avatar";
 class UserCard extends Component {
   render() {
     const user_profile = this.props.user_profile;
-    // const staff_msg = user.is_staff ? (
-    //   <small>
-    //     {" "}
-    //     | <label>Staff</label>
-    //   </small>
-    // ) : null;
-    const staff_msg = null;
-    // TODO: staff message?
+    const staff_msg = this.props.user_profile.user.is_staff ? (
+      <small>
+        {" "}
+        | <label>Staff</label>
+      </small>
+    ) : null;
     return (
       <div className="card card-user">
         <div className="image"></div>
