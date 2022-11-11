@@ -51,7 +51,7 @@ class SideBar extends Component {
     });
 
     Api.getUserProfile((user_profile) => {
-      this.setState({ user: user_profile });
+      this.setState({ user_profile });
     });
 
     Api.getUserTeam((user_team_data) => {
@@ -74,7 +74,7 @@ class SideBar extends Component {
   // Note that this duplicates a method in submissions.js;
   // this will be cleaned up. See #74
   isGameReleasedForUser() {
-    if (this.state.user.is_staff == true) {
+    if (this.state.user_profile.user.is_staff == true) {
       return true;
     }
     if (this.state.league.game_released == true) {
@@ -179,7 +179,7 @@ class SideBar extends Component {
             <br />
 
             {/* Only visible if a staff user */}
-            {this.state.user.is_staff && (
+            {this.state.user_profile.user.is_staff && (
               <NLink
                 to={`/${this.state.episode}/staff`}
                 icon={"pe-7s-tools"}
