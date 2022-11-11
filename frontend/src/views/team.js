@@ -116,7 +116,7 @@ class YesTeam extends Component {
                 which prizes your team is eligible for. Check all boxes that
                 apply to all members your team.
               </p>
-              <EligibiltyOptions
+              <EligibilityOptions
                 change={this.changeHandler}
                 team={this.state.team}
                 update={this.updateTeam}
@@ -226,12 +226,14 @@ class YesTeam extends Component {
 class NoTeam extends Component {
   constructor() {
     super();
+    const episode = MultiEpisode.getEpisodeFromCurrentPathname(); // TODO: see where this should really go, don't repeat many times
     this.state = {
       team_name: "",
       secret_key: "",
       team_join_name: "",
       joinTeamError: false,
       createTeamError: false,
+      episode: episode,
     };
 
     this.joinTeam = this.joinTeam.bind(this);
@@ -268,7 +270,11 @@ class NoTeam extends Component {
 
   createTeam() {
     // TODO fix
-    Api.createTeam(this.state.team_name, this.createCallback);
+    Api.createTeam(
+      this.state.team_name,
+      this.state.episode,
+      this.createCallback
+    );
   }
 
   createCallback = (success) => {
@@ -410,7 +416,7 @@ class ResumeStatus extends Component {
 
 // pass change handler in props.change and team in props.team
 // NOTE: If you are ever working with teams' eligility (for example, to pull teams for the newbie tournament), please see backend/docs/ELIGIBILITY.md before you do anything! The variable names here are poorly named (because columns in the database are poorly named).
-class EligibiltyOptions extends Component {
+class EligibilityOptions extends Component {
   constructor(props) {
     super(props);
     const episode = MultiEpisode.getEpisodeFromCurrentPathname();
