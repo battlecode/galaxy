@@ -247,6 +247,7 @@ class NoTeam extends Component {
   }
 
   joinTeam() {
+    // TODO either fix now, or track in separate issue
     Api.joinTeam(
       this.state.secret_key,
       this.state.team_join_name,
@@ -257,17 +258,22 @@ class NoTeam extends Component {
   joinCallback = (success) => {
     this.setState({ joinTeamError: success });
     if (success) {
+      // Theoretically, we could have the frontend simply refresh all its state, including current-team.
+      // But reload is fine too, and a little safer.
       window.location.reload();
     }
   };
 
   createTeam() {
+    // TODO fix
     Api.createTeam(this.state.team_name, this.createCallback);
   }
 
   createCallback = (success) => {
     this.setState({ createTeamError: !success });
     if (success) {
+      // Theoretically, we could have the frontend simply refresh all its state, including current-team.
+      // But reload is fine too, and a little safer.
       window.location.reload();
     }
   };
@@ -538,6 +544,7 @@ class EligibiltyOptions extends Component {
 class Team extends Component {
   constructor() {
     super();
+    // TODO based on how the rest of everything works, this should be null, not false
     this.state = { team: false };
   }
 
