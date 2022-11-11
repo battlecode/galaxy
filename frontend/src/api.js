@@ -375,9 +375,22 @@ class Api {
 
   //----USER FUNCTIONS----
 
-  static createTeam(team_name, callback) {
+  static createTeam(team_name, episode, callback) {
     // TODO fix, should be easy
-    $.post(`${URL}/api/${LEAGUE}/team/`, { name: team_name })
+    const team_data = {
+      team: {
+        episode: episode, // TODO: should be part of URL
+        name: team_name,
+        status: "R", // TODO: shd be default
+      },
+    };
+    $.ajax({
+      url: `${URL}/api/team/detail/`,
+      data: JSON.stringify(team_data),
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
+    })
       .done((data, status) => {
         // TODO I don't think you need cookies here; there oughta be a better way.
         // Let's delete these two lines, and see what happens.
