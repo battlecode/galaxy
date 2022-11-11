@@ -147,6 +147,7 @@ class App extends Component {
       this.setState({ user_profile });
     });
 
+    // TODO as API is changed, change this
     Api.getUserTeam((user_team_data) => {
       // This should be cleaned up in #91
       this.setState({ on_team: user_team_data !== null });

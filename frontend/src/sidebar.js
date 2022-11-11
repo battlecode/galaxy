@@ -54,6 +54,7 @@ class SideBar extends Component {
       this.setState({ user_profile });
     });
 
+    // TODO as api is changed, change this
     Api.getUserTeam((user_team_data) => {
       this.setState({ on_team: user_team_data !== null });
       // This function, for mobile devices, moves the navbar into the sidebar and then
