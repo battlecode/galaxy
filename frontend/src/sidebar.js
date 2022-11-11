@@ -74,7 +74,12 @@ class SideBar extends Component {
   // Note that this duplicates a method in submissions.js;
   // this will be cleaned up. See #74
   isGameReleasedForUser() {
-    if (this.state.user_profile.user.is_staff == true) {
+    if (
+      // Short-circuit check for nested object,
+      // in case user_profile hasn't been set yet.
+      this.state.user_profile &&
+      this.state.user_profile.user.is_staff == true
+    ) {
       return true;
     }
     if (this.state.league.game_released == true) {
@@ -179,13 +184,16 @@ class SideBar extends Component {
             <br />
 
             {/* Only visible if a staff user */}
-            {this.state.user_profile.user.is_staff && (
-              <NLink
-                to={`/${this.state.episode}/staff`}
-                icon={"pe-7s-tools"}
-                label="Staff"
-              />
-            )}
+            {this.state.user_profile &&
+              // Short-circuit check for nested object,
+              // in case user_profile hasn't been set yet.
+              this.state.user_profile.user.is_staff && (
+                <NLink
+                  to={`/${this.state.episode}/staff`}
+                  icon={"pe-7s-tools"}
+                  label="Staff"
+                />
+              )}
 
             <br />
           </ul>
