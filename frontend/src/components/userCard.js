@@ -7,7 +7,7 @@ class UserCard extends Component {
     const staff_msg =
       // Short-circuit check for nested object,
       // in case user_profile hasn't been set yet.
-      this.props.user_profile && this.state.user_profile.user.is_staff ? (
+      user_profile && user_profile.user.is_staff ? (
         <small>
           {" "}
           | <label>Staff</label>
