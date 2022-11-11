@@ -323,26 +323,40 @@ class Api {
   //---TEAM INFO---
 
   static getUserTeam(callback) {
+    // TODO fix this; would be great to use "current" instead of having to pass in a username,
+    // which i think is doable??
     $.get(
       `${URL}/api/userteam/${encodeURIComponent(
         Cookies.get("username")
       )}/${LEAGUE}/`
     )
       .done((data, status) => {
+        // TODO i would, like, love to not use these cookies....
+        // I feel like smth we did with user flow would work here too
         Cookies.set("team_id", data.id);
         Cookies.set("team_name", data.name);
 
+        // TODO in the old days...
+        // frontend needed to query backend, w username, to get the team id
+        // then frontend needed to again query backend, w team id, to get the entire team info
+        // This sucks
+        // You should be able to skip the above cookie-setting-and-first call step,
+        // and not have to use 2 API calls...
+        // (might take some backend tweaks but yeah)
         $.get(`${URL}/api/${LEAGUE}/team/${data.id}/`).done((data, status) => {
           callback(data);
         });
       })
       .fail((xhr, status, error) => {
         // possibly dangerous???
+        // TODO might have to rework this, based on what the callback is.
+        // I doubt it tho
         callback(null);
       });
   }
 
   // updates team
+  // TODO fix this. would be great to use "current"
   static updateTeam(params, callback) {
     $.ajax({
       url: `${URL}/api/${LEAGUE}/team/${Cookies.get("team_id")}/`,
@@ -362,8 +376,11 @@ class Api {
   //----USER FUNCTIONS----
 
   static createTeam(team_name, callback) {
+    // TODO fix, should be easy
     $.post(`${URL}/api/${LEAGUE}/team/`, { name: team_name })
       .done((data, status) => {
+        // TODO I don't think you need cookies here; there oughta be a better way.
+        // Let's delete these two lines, and see what happens.
         Cookies.set("team_id", data.id);
         Cookies.set("team_name", data.name);
         callback(true);
@@ -401,6 +418,9 @@ class Api {
     );
   }
 
+  // TODO fix this;
+  // would be great to use "current"
+  // I'm not even sure you can leave a team yet tho; if so, track in future issue
   static leaveTeam(callback) {
     $.ajax({
       url: `${URL}/api/${LEAGUE}/team/${Cookies.get("team_id")}/leave/`,
