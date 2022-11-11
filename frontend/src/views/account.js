@@ -88,8 +88,8 @@ class Account extends Component {
 
   componentDidMount() {
     Api.getUserProfile(
-      function (u) {
-        this.setState({ user_profile: u });
+      function (user_profile) {
+        this.setState({ user_profile });
       }.bind(this)
     );
   }
