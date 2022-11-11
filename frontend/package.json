@@ -17,10 +17,8 @@
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "todo": "inserting build times apparently needs an external script, cuz of cross-platform problems. Well, i guess our deploy scripts are external scripts, so it's not like we're introducing new problems or smth. This script would need to generate .env.production.local on the fly, and use that?? include some links to docs about which one is used, https://create-react-app.dev/docs/adding-custom-environment-variables/ ",
     "start": "react-scripts start",
-    "todo2": "the below command gets interpreted by powershell/cmd, which doesn't have a rm -rf, so this kinda doesn't even work lol",
-    "build": "rm -rf build && react-scripts build",
+    "build": "react-scripts build",
     "eject": "react-scripts eject"
   },
   "browserslist": [
