@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.models import TeamProfile, TeamStatus
 from siarnaq.api.teams.permissions import IsOnRequestedTeam, IsOnTeam
-from siarnaq.api.teams.serializers import TeamProfileSerializer
+from siarnaq.api.teams.serializers import TeamJoinSerializer, TeamProfileSerializer
 
 
 class TeamViewSet(
@@ -56,24 +56,34 @@ class TeamViewSet(
         pk = self.kwargs.get("pk")
 
         if pk == "current":
-            # TODO: enforce a uniqueness constraint,
-            # below queryset should never have >1 teams
-            return get_object_or_404(
-                self.get_queryset().filter(team__members__id=self.request.user.pk)
-            )
+            return self.get_current_object()
 
         return super().get_object()
 
     # TODO: this should not need/accept team data, it doesn't need any
-    @action(detail=True, methods=["patch"])
+    @action(detail=False, methods=["post"])
     def leave(self, request, **kwargs):
         """Leave a team."""
-        team_profile = self.get_object()
+        team_profile = self.get_current_object()
         team = team_profile.team
 
         team.members.remove(request.user.id)
         if team.members.count() == 0:
             team.status = TeamStatus.INACTIVE  # TODO: delete / pseudo delete team?
+        team.save()
+
+        serializer = self.get_serializer(team_profile)
+        return Response(serializer.data, status.HTTP_200_OK)
+
+    # TODO: schema should show that this accepts join_key data
+    @action(detail=False, methods=["post"], serializer_class=TeamJoinSerializer)
+    def join(self, request):
+        team_profile = get_object_or_404(
+            self.get_queryset().filter(team__join_key=self.request.data.join_key)
+        )
+        team = team_profile.team
+
+        team.members.add(request.user)
         team.save()
 
         serializer = self.get_serializer(team_profile)

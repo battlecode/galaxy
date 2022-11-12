@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 import siarnaq.api.refs as refs
@@ -137,6 +138,13 @@ class Team(models.Model):
     def get_active_submission(self):
         """Return the current active submission belonging to the team."""
         return self.submissions.filter(accepted=True).order_by("-created").first()
+
+    def clean(self):
+        members = self.cleaned_data.get("members")
+        if members and members.count() > settings.MAX_TEAM_SIZE:
+            raise ValidationError("Maximum number of team members exceeded.")
+
+        return self.cleaned_data
 
 
 class TeamProfile(models.Model):

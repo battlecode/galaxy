@@ -84,6 +84,12 @@ class TeamProfileSerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+class TeamJoinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ["join_key"]
+
+
 @extend_schema_field(OpenApiTypes.DOUBLE)
 class RatingField(serializers.Field):
     def to_representation(self, instance):
