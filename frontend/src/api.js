@@ -344,10 +344,7 @@ class Api {
         //       });
       })
       .fail((xhr, status, error) => {
-        // possibly dangerous???
-        // TODO might have to rework this, based on what the callback is.
-        // I doubt it tho
-        callback(null);
+        console.log("Error in getting user's team profile", xhr, status, error);
       });
   }
 

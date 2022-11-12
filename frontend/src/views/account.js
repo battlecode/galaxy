@@ -5,28 +5,15 @@ import UserCard from "../components/userCard";
 import Floater from "react-floater";
 
 class Account extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+
+    // Copy the fetched user profile for use in editable form state.
+    const copied_user_profile = { ...this.props.user_profile };
+    copied_user_profile.user = { ...this.props.user_profile.user };
 
     this.state = {
-      user_profile: {
-        user: {
-          id: "",
-          username: "",
-          email: "",
-          first_name: "",
-          last_name: "",
-        },
-        gender: "",
-        gender_details: "",
-        date_of_birth: "",
-        school: "",
-        biography: "",
-        kerberos: "",
-        has_avatar: false,
-        has_resume: false,
-        country: "",
-      },
+      user_profile: copied_user_profile,
       up: "Update Info",
       selectedFile: null,
     };
@@ -86,14 +73,6 @@ class Account extends Component {
     //     return prevState;
     //   });
     // reader.readAsDataURL(e.target.files[0]);
-  }
-
-  componentDidMount() {
-    Api.getUserProfile(
-      function (user_profile) {
-        this.setState({ user_profile });
-      }.bind(this)
-    );
   }
 
   uploadResume = () => {
