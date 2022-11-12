@@ -15,12 +15,7 @@ from siarnaq.api.compete.models import (
     ScrimmageRequestStatus,
     Submission,
 )
-from siarnaq.api.compete.permissions import (
-    HasTeamSubmission,
-    IsEpisodeAvailable,
-    IsOnTeam,
-    IsScrimmageRequestActor,
-)
+from siarnaq.api.compete.permissions import HasTeamSubmission, IsScrimmageRequestActor
 from siarnaq.api.compete.serializers import (
     MatchReportSerializer,
     MatchSerializer,
@@ -28,7 +23,9 @@ from siarnaq.api.compete.serializers import (
     SubmissionReportSerializer,
     SubmissionSerializer,
 )
+from siarnaq.api.episodes.permissions import IsEpisodeAvailableForSubmission
 from siarnaq.api.teams.models import Team
+from siarnaq.api.teams.permissions import IsOnTeam
 
 
 class EpisodeTeamUserContextMixin:
@@ -70,7 +67,11 @@ class SubmissionViewSet(
     """
 
     serializer_class = SubmissionSerializer
-    permission_classes = (IsAuthenticated, IsEpisodeAvailable | IsAdminUser, IsOnTeam)
+    permission_classes = (
+        IsAuthenticated,
+        IsEpisodeAvailableForSubmission | IsAdminUser,
+        IsOnTeam,
+    )
 
     def get_queryset(self):
         queryset = (
@@ -170,7 +171,7 @@ class MatchViewSet(
     """
 
     serializer_class = MatchSerializer
-    permission_classes = (IsEpisodeAvailable | IsAdminUser,)
+    permission_classes = (IsEpisodeAvailableForSubmission | IsAdminUser,)
 
     def get_queryset(self):
         return (
@@ -192,7 +193,7 @@ class MatchViewSet(
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=(IsAuthenticated, IsEpisodeAvailable, IsOnTeam),
+        permission_classes=(IsAuthenticated, IsEpisodeAvailableForSubmission, IsOnTeam),
     )
     def my(self, request, *, episode_id):
         """List all scrimmages that the authenticated team participated in."""
@@ -271,21 +272,21 @@ class ScrimmageRequestViewSet(
         match self.action:
             case "create":
                 # Episode must not be frozen in order to create new requests
-                permissions.append((IsEpisodeAvailable | IsAdminUser)())
+                permissions.append((IsEpisodeAvailableForSubmission | IsAdminUser)())
                 permissions.append(HasTeamSubmission())
             case "accept":
                 # Episode must not be frozen in order to allow new matches
-                permissions.append((IsEpisodeAvailable | IsAdminUser)())
+                permissions.append((IsEpisodeAvailableForSubmission | IsAdminUser)())
                 permissions.append(IsScrimmageRequestActor("requested_to"))
                 permissions.append(HasTeamSubmission())
             case "reject" | "destroy":
                 # Episode can be frozen, but use permission to ensure episode visible
                 # AllowAny will allow all access, and we just use the permission to
                 # raise a 404 if the user shouldn't know that the episode exists
-                permissions.append(IsEpisodeAvailable(allow_frozen=True))
+                permissions.append(IsEpisodeAvailableForSubmission(allow_frozen=True))
                 permissions.append(IsScrimmageRequestActor("requested_by"))
             case _:
-                permissions.append((IsEpisodeAvailable | IsAdminUser)())
+                permissions.append((IsEpisodeAvailableForSubmission | IsAdminUser)())
                 permissions.append(IsOnTeam())
         return permissions
 

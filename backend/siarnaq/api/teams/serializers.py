@@ -9,7 +9,15 @@ class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
         fields = ["episode", "name", "members", "status"]
-        read_only_fields = ["members"]
+        read_only_fields = ["episode", "members", "status"]
+
+    def to_internal_value(self, data):
+        """
+        Use the episode ID provided in URL as the team's episode.
+        """
+        ret = super().to_internal_value(data)
+        ret.update(episode_id=self.context["view"].kwargs.get("episode_id"))
+        return ret
 
 
 class TeamProfileSerializer(serializers.ModelSerializer):
@@ -26,6 +34,15 @@ class TeamProfileSerializer(serializers.ModelSerializer):
             "auto_accept_unranked",
             "eligible_for",
         ]
+
+    def __init__(self, *args, **kwargs):
+        """
+        Provide nested team serializer with the context, so that
+        it can access URL episode ID.
+        See https://stackoverflow.com/q/30560470.
+        """
+        super().__init__(*args, **kwargs)
+        self.fields["team"].context.update(self.context)
 
     def create(self, validated_data):
         eligible_for_exists = "eligible_for" in validated_data
