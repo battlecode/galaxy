@@ -200,7 +200,7 @@ COMPETE_SATURN_COMPILE_TOPIC = "compile"
 COMPETE_SATURN_EXECUTE_TOPIC = "execute"
 
 # Ordering for PubSub
-#TODO: setup Ordering on GCloud
+# TODO: setup Ordering on GCloud
 COMPETE_SATURN_COMPILE_ORDER = "compile_order"
 COMPETE_SATURN_EXECUTE_ORDER = "execute_order"
 
@@ -211,5 +211,3 @@ TEAMS_ELO_INITIAL = 1500.0
 TEAMS_ELO_K = 24.0
 TEAMS_ELO_SCALE = 400.0
 TEAMS_ELO_PENALTY = 0.85
-
-
