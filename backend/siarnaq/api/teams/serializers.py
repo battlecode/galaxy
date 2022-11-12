@@ -16,6 +16,8 @@ class TeamSerializer(serializers.ModelSerializer):
         Use the episode ID provided in URL as the team's episode.
         """
         ret = super().to_internal_value(data)
+        # TODO: this prevents some validation (e.g. uniqueness of (episode, team)),
+        # which is undesirable.
         ret.update(episode_id=self.context["view"].kwargs.get("episode_id"))
         return ret
 
