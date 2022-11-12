@@ -19,7 +19,6 @@ class YesTeam extends Component {
     };
 
     this.changeHandler = this.changeHandler.bind(this);
-    this.checkHandler = this.checkHandler.bind(this);
     this.updateTeam = this.updateTeam.bind(this);
     this.uploadProfile = this.uploadProfile.bind(this);
   }
@@ -34,30 +33,28 @@ class YesTeam extends Component {
     var id = e.target.id;
     var val = e.target.type === "checkbox" ? e.target.checked : e.target.value;
 
-    if (!id) id = e.target.parentElement.id;
+    // TODO: handle changes to eligiblity options
+    // if (id === "international") val = !val;
 
-    if (id === "international") val = !val;
-
-    this.setState(function (prevState, props) {
-      prevState.team_profile[id] = val;
-      return prevState;
-    });
-  }
-
-  checkHandler(e) {
-    var correct = e.target.id;
-    if (correct === "") correct = e.target.parentElement.parentElement.id;
-
-    this.setState(function (prevState, props) {
-      prevState.team[correct] = !prevState.team[correct];
-      return prevState;
-    });
+    if (id.startsWith("team")) {
+      this.setState(function (prevState, props) {
+        var team_field = id.split("-")[1];
+        prevState.team_profile.team[team_field] = val;
+        return prevState;
+      });
+    } else {
+      this.setState(function (prevState, props) {
+        prevState.team_profile[id] = val;
+        return prevState;
+      });
+    }
   }
 
   updateTeam() {
     this.setState({ up: '<i class="fa fa-circle-o-notch fa-spin"></i>' });
     Api.updateTeam(
       this.state.team_profile,
+      this.props.episode,
       function (response) {
         if (response) this.setState({ up: '<i class="fa fa-check"></i>' });
         else this.setState({ up: '<i class="fa fa-times"></i>' });
@@ -79,16 +76,6 @@ class YesTeam extends Component {
         return prevState;
       });
     reader.readAsDataURL(e.target.files[0]);
-  }
-
-  componentDidMount() {
-    // TODO as api is changed, change this
-
-    Api.getUserTeamProfile(
-      function (new_state) {
-        this.setState({ team: new_state });
-      }.bind(this)
-    );
   }
 
   render() {
@@ -124,12 +111,13 @@ class YesTeam extends Component {
               <div className="row">
                 <div className="col-md-7">
                   <div className="form-group">
-                    <label>Team Name (static)</label>
+                    <label>Team Name</label>
                     <input
                       type="text"
+                      id="team-name"
                       className="form-control"
-                      readOnly
-                      value={this.state.team_profile.name}
+                      onChange={this.changeHandler}
+                      value={this.state.team_profile.team.name}
                     />
                   </div>
                 </div>
@@ -146,15 +134,28 @@ class YesTeam extends Component {
                 </div>
               </div>
               <div className="row">
-                <div className="col-md-6">
-                  <label id="auto_accept_unranked" className="center-row">
+                <div className="col-md-4">
+                  <label className="center-row">
                     <input
                       type="checkbox"
+                      id="auto_accept_ranked"
                       checked={this.state.team_profile.auto_accept_unranked}
                       onChange={this.changeHandler}
                       className="form-control center-row-start"
                     />{" "}
-                    Auto-accept scrimmages.
+                    Auto-accept ranked scrimmages.
+                  </label>
+                </div>
+                <div className="col-md-4">
+                  <label className="center-row">
+                    <input
+                      type="checkbox"
+                      id="auto_accept_unranked"
+                      checked={this.state.team_profile.auto_accept_unranked}
+                      onChange={this.changeHandler}
+                      className="form-control center-row-start"
+                    />{" "}
+                    Auto-accept unranked scrimmages.
                   </label>
                 </div>
               </div>
@@ -175,13 +176,27 @@ class YesTeam extends Component {
               <div className="row">
                 <div className="col-md-12">
                   <div className="form-group">
+                    <label>Team Quote</label>
+                    <input
+                      type="text"
+                      id="quote"
+                      className="form-control"
+                      onChange={this.changeHandler}
+                      value={this.state.team_profile.quote}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-12">
+                  <div className="form-group">
                     <label>Team Bio</label>
                     <textarea
+                      id="biography"
                       rows={5}
                       className="form-control"
                       placeholder="Put your team bio here."
                       onChange={this.changeHandler}
-                      id="bio"
                       value={this.state.team_profile.bio}
                     />
                   </div>
