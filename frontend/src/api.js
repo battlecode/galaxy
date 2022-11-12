@@ -389,32 +389,24 @@ class Api {
       });
   }
 
-  static joinTeam(secret_key, team_name, callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/team/?search=${encodeURIComponent(team_name)}`,
-      (team_data, team_success) => {
-        let found_result = null;
-        team_data.forEach((result) => {
-          if (result.name === team_name) {
-            found_result = result;
-          }
-        });
-        if (found_result === null) return callback(false);
-        $.ajax({
-          url: `${URL}/api/${LEAGUE}/team/${found_result.id}/join/`,
-          type: "PATCH",
-          data: { team_key: secret_key },
-        })
-          .done((data, status) => {
-            Cookies.set("team_id", data.id);
-            Cookies.set("team_name", data.name);
-            callback(true);
-          })
-          .fail((xhr, status, error) => {
-            callback(false);
-          });
-      }
-    );
+  static joinTeam(join_key, team_name, episode, callback) {
+    const join_data = {
+      join_key: join_key,
+      name: team_name,
+    };
+    $.ajax({
+      url: `${URL}/api/team/${episode}/detail/join/`,
+      data: JSON.stringify(join_data),
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
+    })
+      .done((data, status) => {
+        callback(true);
+      })
+      .fail((xhr, status, error) => {
+        callback(false);
+      });
   }
 
   static leaveTeam(episode, callback) {

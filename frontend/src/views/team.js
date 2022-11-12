@@ -258,6 +258,7 @@ class NoTeam extends Component {
     Api.joinTeam(
       this.state.join_key,
       this.state.team_join_name,
+      this.props.episode,
       this.joinCallback
     );
   }
