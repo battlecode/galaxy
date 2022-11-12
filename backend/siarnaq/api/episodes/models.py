@@ -76,12 +76,7 @@ class Episode(models.Model):
 
     objects = EpisodeQuerySet.as_manager()
 
-    def frozen_registration(self):
-        """Return whether the episode is currently frozen to registrations."""
-        now = timezone.now()
-        return now < self.registration
-
-    def frozen_submission(self):
+    def frozen(self):
         """Return whether the episode is currently frozen to submissions."""
         now = timezone.now()
         if self.submission_frozen or now < self.game_release:
