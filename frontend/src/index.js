@@ -40,9 +40,41 @@ class App extends Component {
     super();
     const episode = MultiEpisode.getEpisodeFromCurrentPathname();
     this.state = { logged_in: null, episode: episode };
+
+    // Sets the login header based on currently held cookies, before any
+    // requests are run.
+    Api.setLoginHeader();
+  }
+
+  componentDidMount() {
+    // duped in various places, see sidebar.js
+    // This is messy and hard to understand, it will be cleaned in #91.
+    Api.loginCheck((logged_in) => {
+      this.setState({ logged_in });
+    });
+
+    Api.getUserProfile((user_profile) => {
+      this.setState({ user_profile });
+    });
+
+    // TODO as API is changed, change this
+    Api.getUserTeamProfile(this.state.episode, (user_team_profile) => {
+      // This should be cleaned up in #91
+      this.setState({ user_team_profile });
+    });
+  }
+
+  render() {
     // Note that `Route`s define what routes a user may access / what routes exist to a user.
     // Does _NOT_ actually render a clickable link to that route.
     // That is done in navbar.js, sidebar.js, footer.js, etc
+
+    // Short-circuit check for nested object,
+    // in case user_profile hasn't been set yet.
+    const is_staff =
+      this.state.user_profile && this.state.user_profile.user.is_staff;
+
+    const on_team = this.state.user_team_profile !== null;
 
     // should always be viewable, even when not logged in
     this.nonLoggedInElems = [
@@ -52,7 +84,11 @@ class App extends Component {
         {<Redirect to={`${MultiEpisode.getDefaultEpisode()}/home`} />}
       </Route>,
 
-      <Route path={`/:episode/home`} component={Home} key="home" />,
+      <Route
+        path={`/:episode/home`}
+        component={(props) => <Home {...props} on_team={on_team} />}
+        key="home"
+      />,
       <Route path={`/:episode/updates`} component={Updates} key="updates" />,
       // commented but kept since we might use this later
       // <Route path={`/search`} component={Search} key="search" />,
@@ -130,38 +166,15 @@ class App extends Component {
       // We need to make sure that login-check, etc, properly run first.
       <Route path="*" component={NotFound} key="notfound" />,
     ];
-
-    // Sets the login header based on currently held cookies, before any
-    // requests are run.
-    Api.setLoginHeader();
-  }
-
-  componentDidMount() {
-    // duped in various places, see sidebar.js
-    // This is messy and hard to understand, it will be cleaned in #91.
-    Api.loginCheck((logged_in) => {
-      this.setState({ logged_in });
-    });
-
-    Api.getUserProfile((user_profile) => {
-      this.setState({ user_profile });
-    });
-
-    // TODO as API is changed, change this
-    Api.getUserTeam(this.state.episode, (user_team) => {
-      // This should be cleaned up in #91
-      this.setState({ user_team });
-    });
-  }
-
-  render() {
     // Note that the "toRender" arrays are computed during the render method
     // This is important! Checking whether the user is logged-in, etc,
     // takes an API call, which takes time.
     // Whenever this API call finishes, we should always be ready to re-include the routes,
     // and thus potentially re-render the URL that the user is looking to navigate to.
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
-    let onTeamElemsToRender = this.state.user_team ? this.onTeamElems : [];
+    let onTeamElemsToRender = this.state.user_team_profile
+      ? this.onTeamElems
+      : [];
     let staffElemsToRender =
       this.state.user_profile && this.state.user_profile.user.is_staff
         ? this.staffElems
@@ -181,11 +194,6 @@ class App extends Component {
     // Does _NOT_ actually render a clickable link to that route.
     // That is done in navbar.js, sidebar.js, footer.js, etc
 
-    // Short-circuit check for nested object,
-    // in case user_profile hasn't been set yet.
-    const is_staff =
-      this.state.user_profile && this.state.user_profile.user.is_staff;
-
     return (
       <Switch>
         {/* Some pages, eg login and register, should not render alongside sidebar, navbar, etc
@@ -201,19 +209,22 @@ class App extends Component {
         <Route path={`/password_change`} component={PasswordChange} />,
         {/* To be able to render NotFound without a sidebar, etc */}
         <Route path={`/not-found`} component={NotFound} />,
-        <div className="wrapper">
-          <SideBar
-            logged_in={this.state.logged_in}
-            is_staff={is_staff}
-            on_team={this.state.user_team}
-            episode={this.state.episode}
-          />
-          <div className="main-panel">
-            <NavBar />
-            <Switch>{elemsToRender}</Switch>
-            <Footer />
+        {/* Fallback route if none of above: include sidebar, navbar, etc. */}
+        <Route>
+          <div className="wrapper">
+            <SideBar
+              logged_in={this.state.logged_in}
+              is_staff={is_staff}
+              on_team={on_team}
+              episode={this.state.episode}
+            />
+            <div className="main-panel">
+              <NavBar logged_in={this.state.logged_in} />
+              <Switch>{elemsToRender}</Switch>
+              <Footer />
+            </div>
           </div>
-        </div>
+        </Route>
       </Switch>
     );
   }
