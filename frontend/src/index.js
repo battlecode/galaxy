@@ -38,7 +38,7 @@ import Api from "./api";
 class App extends Component {
   constructor() {
     super();
-    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
+    const episode = MultiEpisode.getEpisodeFromCurrentPathname(false);
     this.state = {
       logged_in: null,
       episode: episode,
