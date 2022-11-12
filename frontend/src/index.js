@@ -38,8 +38,8 @@ import Api from "./api";
 class App extends Component {
   constructor() {
     super();
-    this.state = { logged_in: null };
-
+    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
+    this.state = { logged_in: null, episode: episode };
     // Note that `Route`s define what routes a user may access / what routes exist to a user.
     // Does _NOT_ actually render a clickable link to that route.
     // That is done in navbar.js, sidebar.js, footer.js, etc
@@ -148,9 +148,9 @@ class App extends Component {
     });
 
     // TODO as API is changed, change this
-    Api.getUserTeam((user_team_data) => {
+    Api.getUserTeam(this.state.episode, (user_team) => {
       // This should be cleaned up in #91
-      this.setState({ on_team: user_team_data !== null });
+      this.setState({ user_team });
     });
   }
 
@@ -161,7 +161,7 @@ class App extends Component {
     // Whenever this API call finishes, we should always be ready to re-include the routes,
     // and thus potentially re-render the URL that the user is looking to navigate to.
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
-    let onTeamElemsToRender = this.state.on_team ? this.onTeamElems : [];
+    let onTeamElemsToRender = this.state.user_team ? this.onTeamElems : [];
     let staffElemsToRender =
       this.state.user_profile && this.state.user_profile.user.is_staff
         ? this.staffElems
@@ -181,6 +181,11 @@ class App extends Component {
     // Does _NOT_ actually render a clickable link to that route.
     // That is done in navbar.js, sidebar.js, footer.js, etc
 
+    // Short-circuit check for nested object,
+    // in case user_profile hasn't been set yet.
+    const is_staff =
+      this.state.user_profile && this.state.user_profile.user.is_staff;
+
     return (
       <Switch>
         {/* Some pages, eg login and register, should not render alongside sidebar, navbar, etc
@@ -196,16 +201,19 @@ class App extends Component {
         <Route path={`/password_change`} component={PasswordChange} />,
         {/* To be able to render NotFound without a sidebar, etc */}
         <Route path={`/not-found`} component={NotFound} />,
-        <Route>
-          <div className="wrapper">
-            <SideBar />
-            <div className="main-panel">
-              <NavBar />
-              <Switch>{elemsToRender}</Switch>
-              <Footer />
-            </div>
+        <div className="wrapper">
+          <SideBar
+            logged_in={this.state.logged_in}
+            is_staff={is_staff}
+            on_team={this.state.user_team}
+            episode={this.state.episode}
+          />
+          <div className="main-panel">
+            <NavBar />
+            <Switch>{elemsToRender}</Switch>
+            <Footer />
           </div>
-        </Route>
+        </div>
       </Switch>
     );
   }
