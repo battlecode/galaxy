@@ -123,12 +123,11 @@ class YesTeam extends Component {
                 </div>
                 <div className="col-md-5">
                   <div className="form-group">
-                    <label>Secret Key (static)</label>
+                    <label>Join Key (static)</label>
                     <input
                       type="text"
                       className="form-control"
-                      readOnly
-                      value={this.state.team_profile.team_key}
+                      value={this.state.team_profile.team.join_key}
                     />
                   </div>
                 </div>
@@ -234,7 +233,7 @@ class NoTeam extends Component {
     super();
     this.state = {
       team_name: "",
-      secret_key: "",
+      join_key: "",
       team_join_name: "",
       joinTeamError: false,
       createTeamError: false,
@@ -257,7 +256,7 @@ class NoTeam extends Component {
   joinTeam() {
     // TODO either fix now, or track in separate issue
     Api.joinTeam(
-      this.state.secret_key,
+      this.state.join_key,
       this.state.team_join_name,
       this.joinCallback
     );
@@ -296,7 +295,7 @@ class NoTeam extends Component {
         message = "Sorry, this team name is already being used.";
       } else if (type === "joinTeamError") {
         message =
-          "Sorry, that team name and secret key combination is not valid.";
+          "Sorry, that team name and join key combination is not valid.";
       }
 
       return <p style={{ color: "#FF4A55" }}> {message} </p>;
@@ -344,11 +343,11 @@ class NoTeam extends Component {
             <div className="row">
               <div className="col-md-8">
                 <div className="form-group">
-                  <label>Team Secret Key</label>
+                  <label>Team Join Key</label>
                   <input
                     type="text"
                     className="form-control"
-                    id="secret_key"
+                    id="join_key"
                     onChange={this.changeHandler}
                   />
                 </div>
