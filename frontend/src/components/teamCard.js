@@ -16,7 +16,7 @@ class TeamCard extends Component {
 
   setupUsers() {
     const dummyArr = [];
-    this.props.team.users.forEach((user) => {
+    this.props.team_profile.team.members.forEach((user) => {
       dummyArr.push({ username: user });
     });
 
@@ -35,7 +35,7 @@ class TeamCard extends Component {
   }
 
   getUserData() {
-    this.props.team.users.forEach((user) => {
+    this.props.team_profile.team.members.forEach((user) => {
       Api.getProfileByUser(user, this.setUser);
     });
   }
@@ -60,7 +60,7 @@ class TeamCard extends Component {
   };
 
   componentDidUpdate() {
-    if (this.state.users.length === 0 && this.props.team.users) {
+    if (this.state.users.length === 0 && this.props.team_profile.team.members) {
       this.setupUsers();
       this.getUserData();
     }
@@ -91,7 +91,7 @@ class TeamCard extends Component {
             </h4>
           </div>
           <br />
-          <p className="description text-center">{team.bio}</p>
+          <p className="description text-center">{team_profile.team.bio}</p>
         </div>
       </div>
     );
