@@ -39,7 +39,7 @@ class TeamViewSet(
         ]
         if self.action == "create" or self.action == "join":
             # Must not be on more than one team
-            permissions.append(not IsOnTeam())
+            permissions.append((~IsOnTeam)())
 
         return permissions
 
