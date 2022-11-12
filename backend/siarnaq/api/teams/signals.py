@@ -1,10 +1,12 @@
 import uuid
 
-from django.db.models.signals import post_save, pre_save
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
 
 from siarnaq.api.compete.models import MatchParticipant
-from siarnaq.api.teams.models import Team, TeamProfile
+from siarnaq.api.teams.models import Team, TeamProfile, TeamStatus
 
 
 @receiver(post_save, sender=MatchParticipant)
@@ -28,3 +30,17 @@ def gen_team_key(instance, update_fields, **kwargs):
     """
     if instance._state.adding:
         instance.join_key = uuid.uuid4().hex[:16]
+
+
+@receiver(m2m_changed, sender=Team.members.through)
+def make_empty_team_inactive(instance, action, **kwargs):
+    if action == "post_remove":
+        if instance.members.count() == 0:
+            instance.status = TeamStatus.INACTIVE
+
+
+@receiver(m2m_changed, sender=Team.members.through)
+def prevent_team_exceed_capacity(instance, action, **kwargs):
+    if action == "pre_add":
+        if instance.members.count() == settings.MAX_TEAM_SIZE:
+            raise ValidationError("Maximum number of team members exceeded.")

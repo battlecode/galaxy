@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
-from siarnaq.api.teams.models import TeamProfile, TeamStatus
+from siarnaq.api.teams.models import TeamProfile
 from siarnaq.api.teams.permissions import IsOnRequestedTeam, IsOnTeam
 from siarnaq.api.teams.serializers import TeamJoinSerializer, TeamProfileSerializer
 
@@ -69,8 +69,6 @@ class TeamViewSet(
         team = team_profile.team
 
         team.members.remove(request.user.id)
-        if team.members.count() == 0:
-            team.status = TeamStatus.INACTIVE
         team.save()
 
         serializer = self.get_serializer(team_profile)
