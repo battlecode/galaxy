@@ -422,16 +422,19 @@ class Api {
       });
   }
 
-  // This process will be touched up in #86
-  // note that this is blocked by the new backend -- hold off for now
-  static getUserProfile(callback) {
-    $.get(`${URL}/api/user/detail/current/`)
+  static getProfileByUser(user_id, callback, public_only = false) {
+    const endpoint = public_only ? "public" : "detail";
+    $.get(`${URL}/api/user/${endpoint}/${user_id}/`)
       .done((data, status) => {
         callback(data);
       })
       .fail((xhr, status, error) => {
         console.log("Error in getting profile for user", xhr, status, error);
       });
+  }
+
+  static getUserProfile(callback) {
+    this.getProfileByUser("current", callback);
   }
 
   static updateUser(user_profile, callback) {
