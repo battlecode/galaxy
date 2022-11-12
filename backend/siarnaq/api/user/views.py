@@ -34,8 +34,11 @@ class UserProfileViewSet(
     def get_queryset(self):
         return UserProfile.objects.select_related("user").all()
 
-    # See https://stackoverflow.com/a/36626403.
     def get_object(self):
+        """
+        If provided ID is "current", set object to logged in user.
+        See https://stackoverflow.com/a/36626403.
+        """
         pk = self.kwargs.get("pk")
 
         if pk == "current":
