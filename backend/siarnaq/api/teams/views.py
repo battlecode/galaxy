@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.models import TeamProfile
-from siarnaq.api.teams.permissions import IsOnTeam
+from siarnaq.api.teams.permissions import IsOnRequestedTeam
 from siarnaq.api.teams.serializers import TeamProfileSerializer
 
 
@@ -29,7 +29,11 @@ class TeamViewSet(
         return TeamProfile.objects.all()  # TODO: any select related's to use here?
 
     def get_permissions(self):
-        return [IsAuthenticated(), IsEpisodeAvailable(allow_frozen=True), IsOnTeam()]
+        return [
+            IsAuthenticated(),
+            IsEpisodeAvailable(allow_frozen=True),
+            IsOnRequestedTeam(),
+        ]
 
     def get_object(self):
         """
