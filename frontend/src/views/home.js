@@ -189,21 +189,6 @@ class LinksCard extends Component {
 }
 
 class Home extends Component {
-  constructor() {
-    super();
-    this.state = { on_team: null };
-  }
-
-  componentDidMount() {
-    // TODO as api is changed, change this
-
-    Api.getUserTeam(
-      function (e) {
-        this.setState({ on_team: e !== null });
-      }.bind(this)
-    );
-  }
-
   render() {
     return (
       <div className="content">
@@ -217,7 +202,7 @@ class Home extends Component {
                 <div className="row">
                   <Countdown />
                 </div>
-                <div className="row">{this.state.on_team && <StatCard />}</div>
+                <div className="row">{this.props.on_team && <StatCard />}</div>
               </div>
             </div>
             <div className="col-md-6">

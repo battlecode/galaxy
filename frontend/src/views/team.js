@@ -94,7 +94,7 @@ class YesTeam extends Component {
   componentDidMount() {
     // TODO as api is changed, change this
 
-    Api.getUserTeam(
+    Api.getUserTeamProfile(
       function (new_state) {
         this.setState({ team: new_state });
       }.bind(this)
