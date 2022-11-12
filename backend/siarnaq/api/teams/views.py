@@ -62,6 +62,8 @@ class TeamViewSet(
                 self.get_queryset().filter(team__members__id=self.request.user.pk)
             )
 
+        return super().get_object()
+
     # TODO: this should not need/accept team data, it doesn't need any
     @action(detail=True, methods=["patch"])
     def leave(self, request, **kwargs):
