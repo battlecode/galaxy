@@ -123,6 +123,12 @@ class Submission(SaturnInvocation):
             "source.zip",
         )
 
+    def get_binary_path(self):
+        """return the path of the binary code on Google cloud storage"""
+        return posixpath.join(
+            self.episode.name_short, "submission", str(self.pk), "binary.zip"
+        )
+
     def enqueue_options(self):
         """Return the options to be submitted to the compilation queue."""
         return {
@@ -131,7 +137,7 @@ class Submission(SaturnInvocation):
             # ex: bc23/submission/12423/source.zip
             "source-path": self.get_source_path(),
             "binary": {
-                "path": f"{self.episode.short_name}/submission/{self.pk}/binary.zip",
+                "path": self.get_binary_path(),
                 "options": "",
             },
         }

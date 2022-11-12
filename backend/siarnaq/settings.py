@@ -200,7 +200,6 @@ COMPETE_SATURN_COMPILE_TOPIC = "compile"
 COMPETE_SATURN_EXECUTE_TOPIC = "execute"
 
 # Ordering for PubSub
-# TODO: setup Ordering on GCloud
 COMPETE_SATURN_COMPILE_ORDER = "compile_order"
 COMPETE_SATURN_EXECUTE_ORDER = "execute_order"
 
