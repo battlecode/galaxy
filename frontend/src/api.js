@@ -419,8 +419,8 @@ class Api {
 
   static leaveTeam(episode, callback) {
     $.ajax({
-      url: `${URL}/api/team/${episode}/detail/current/leave/`,
-      type: "PATCH",
+      url: `${URL}/api/team/${episode}/detail/leave/`,
+      type: "POST",
     })
       .done((data, status) => {
         callback(true);
