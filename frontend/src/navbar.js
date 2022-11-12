@@ -38,7 +38,7 @@ class NavBar extends Component {
             </NavLink>
           </div>
           <div className="collapse navbar-collapse">
-            <NavBarAccount />
+            <NavBarAccount logged_in={this.props.logged_in} />
           </div>
         </div>
       </nav>
@@ -51,20 +51,13 @@ class NavBarAccount extends Component {
     super();
     // This is odd, see #93 for explanation
     this.state = {
-      logged_in: null,
       episode: MultiEpisode.getEpisodeFromCurrentPathname(false),
     };
-  }
-  componentDidMount() {
-    // duped in various places, see sidebar.js
-    Api.loginCheck((logged_in) => {
-      this.setState({ logged_in });
-    });
   }
 
   render() {
     // This is odd, see #93 for explanation
-    if (this.state.logged_in) {
+    if (this.props.logged_in) {
       return (
         <ul className="nav navbar-nav navbar-right">
           <li>
@@ -79,7 +72,7 @@ class NavBarAccount extends Component {
         </ul>
       );
     }
-    if (this.state.logged_in === false) {
+    if (this.props.logged_in === false) {
       return (
         <ul className="nav navbar-nav navbar-right">
           <li>
