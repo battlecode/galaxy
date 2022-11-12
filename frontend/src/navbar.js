@@ -52,7 +52,7 @@ class NavBarAccount extends Component {
     // This is odd, see #93 for explanation
     this.state = {
       logged_in: null,
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
+      episode: MultiEpisode.getEpisodeFromCurrentPathname(false),
     };
   }
   componentDidMount() {

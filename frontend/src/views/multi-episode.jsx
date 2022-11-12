@@ -24,7 +24,7 @@ class MultiEpisode extends Component {
   // but we can't use it within the helper method)
   // NOTE: Assumes that when episodes are in URLs, the episode is the first part of the URL.
   // This is what we have done elsewhere, but is subject to change and this code would suddenly break.
-  static getEpisodeFromPathname(pathname) {
+  static getEpisodeFromPathname(pathname, forceRedirect = true) {
     // Special case:
     if (pathname == "" || pathname == "/") {
       return DEFAULT_EPISODE;
@@ -39,13 +39,17 @@ class MultiEpisode extends Component {
     if (EPISODES.includes(episodeInPathName)) {
       return episodeInPathName;
     } else {
-      window.location.replace("/not-found");
+      if (forceRedirect) {
+        window.location.replace("/not-found");
+      } else {
+        return null;
+      }
     }
   }
 
   // Gets the episode based on the currently navigated URL.
-  static getEpisodeFromCurrentPathname() {
-    return this.getEpisodeFromPathname(window.location.pathname);
+  static getEpisodeFromCurrentPathname(forceRedirect = true) {
+    return this.getEpisodeFromPathname(window.location.pathname, forceRedirect);
   }
 
   static getExtension(episode) {
