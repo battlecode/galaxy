@@ -87,7 +87,7 @@ class TeamProfileSerializer(serializers.ModelSerializer):
 class TeamJoinSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ["join_key"]
+        fields = ["join_key", "name"]
 
 
 @extend_schema_field(OpenApiTypes.DOUBLE)

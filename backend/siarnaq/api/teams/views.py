@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -61,6 +62,7 @@ class TeamViewSet(
         return super().get_object()
 
     # TODO: this should not need/accept team data, it doesn't need any
+    @extend_schema(request=None)
     @action(detail=False, methods=["post"])
     def leave(self, request, **kwargs):
         """Leave a team."""
@@ -76,15 +78,21 @@ class TeamViewSet(
         return Response(serializer.data, status.HTTP_200_OK)
 
     # TODO: schema should show that this accepts join_key data
+    @extend_schema(responses={status.HTTP_200_OK: TeamProfileSerializer})
     @action(detail=False, methods=["post"], serializer_class=TeamJoinSerializer)
-    def join(self, request):
+    def join(self, request, **kwargs):
+        print(self.request.data)
         team_profile = get_object_or_404(
-            self.get_queryset().filter(team__join_key=self.request.data.join_key)
+            self.get_queryset().filter(
+                team__join_key=self.request.data["join_key"],
+                team__name=self.request.data["name"],
+                team__episode=self.kwargs["episode_id"],
+            )
         )
         team = team_profile.team
 
         team.members.add(request.user)
         team.save()
 
-        serializer = self.get_serializer(team_profile)
+        serializer = TeamProfileSerializer(team_profile)
         return Response(serializer.data, status.HTTP_200_OK)
