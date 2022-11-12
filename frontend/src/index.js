@@ -43,7 +43,7 @@ class App extends Component {
       logged_in: null,
       episode: episode,
       user_profile: null,
-      user_team_profile: null,
+      team_profile: null,
     };
 
     // Sets the login header based on currently held cookies, before any
@@ -63,9 +63,9 @@ class App extends Component {
     });
 
     // TODO as API is changed, change this
-    Api.getUserTeamProfile(this.state.episode, (user_team_profile) => {
+    Api.getUserTeamProfile(this.state.episode, (team_profile) => {
       // This should be cleaned up in #91
-      this.setState({ user_team_profile });
+      this.setState({ team_profile });
     });
   }
 
@@ -79,7 +79,7 @@ class App extends Component {
     const is_staff =
       this.state.user_profile && this.state.user_profile.user.is_staff;
 
-    const on_team = this.state.user_team_profile !== null;
+    const on_team = this.state.team_profile !== null;
 
     // should always be viewable, even when not logged in
     this.nonLoggedInElems = [
@@ -138,7 +138,17 @@ class App extends Component {
     // should only be visible to logged in users
     // If user is not logged-in, should 404 and not even render
     this.loggedInElems = [
-      <Route path={`/:episode/team`} component={Team} key="team" />,
+      <Route
+        path={`/:episode/team`}
+        component={(props) => (
+          <Team
+            {...props}
+            team_profile={this.state.team_profile}
+            episode={this.state.episode}
+          />
+        )}
+        key="team"
+      />,
       <Route
         path={`/:episode/account`}
         component={(props) => (
@@ -183,9 +193,7 @@ class App extends Component {
     // Whenever this API call finishes, we should always be ready to re-include the routes,
     // and thus potentially re-render the URL that the user is looking to navigate to.
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
-    let onTeamElemsToRender = this.state.user_team_profile
-      ? this.onTeamElems
-      : [];
+    let onTeamElemsToRender = this.state.team_profile ? this.onTeamElems : [];
     let staffElemsToRender =
       this.state.user_profile && this.state.user_profile.user.is_staff
         ? this.staffElems

@@ -382,10 +382,6 @@ class Api {
       dataType: "json",
     })
       .done((data, status) => {
-        // TODO I don't think you need cookies here; there oughta be a better way.
-        // Let's delete these two lines, and see what happens.
-        Cookies.set("team_id", data.id);
-        Cookies.set("team_name", data.name);
         callback(true);
       })
       .fail((xhr, status, error) => {
@@ -421,12 +417,9 @@ class Api {
     );
   }
 
-  // TODO fix this;
-  // would be great to use "current"
-  // I'm not even sure you can leave a team yet tho; if so, track in future issue
-  static leaveTeam(callback) {
+  static leaveTeam(episode, callback) {
     $.ajax({
-      url: `${URL}/api/${LEAGUE}/team/${Cookies.get("team_id")}/leave/`,
+      url: `${URL}/api/team/${episode}/detail/current/leave/`,
       type: "PATCH",
     })
       .done((data, status) => {
