@@ -322,7 +322,7 @@ class Api {
 
   //---TEAM INFO---
 
-  static getUserTeam(episode, callback) {
+  static getUserTeamProfile(episode, callback) {
     // TODO fix this; would be great to use "current" instead of having to pass in a username,
     // which i think is doable??
     $.get(`${URL}/api/team/${episode}/detail/current/`)
