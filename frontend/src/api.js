@@ -350,10 +350,10 @@ class Api {
 
   // updates team
   // TODO fix this. would be great to use "current"
-  static updateTeam(params, callback) {
+  static updateTeam(team_profile, episode, callback) {
     $.ajax({
-      url: `${URL}/api/${LEAGUE}/team/${Cookies.get("team_id")}/`,
-      data: JSON.stringify(params),
+      url: `${URL}/api/team/${episode}/detail/current/`,
+      data: JSON.stringify(team_profile),
       type: "PATCH",
       contentType: "application/json",
       dataType: "json",
