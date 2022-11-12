@@ -139,7 +139,7 @@ class YesTeam extends Component {
                     <input
                       type="checkbox"
                       id="auto_accept_ranked"
-                      checked={this.state.team_profile.auto_accept_unranked}
+                      checked={this.state.team_profile.auto_accept_ranked}
                       onChange={this.changeHandler}
                       className="form-control center-row-start"
                     />{" "}
