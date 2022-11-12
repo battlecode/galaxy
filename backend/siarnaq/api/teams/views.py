@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -43,13 +44,10 @@ class TeamViewSet(
         pk = self.kwargs.get("pk")
 
         if pk == "current":
-            # TODO: change to get once unique constraint enforced
-            #            return get_object_or_404(
-            return (
-                self.get_queryset()
-                .filter(team__members__id=self.request.user.pk)
-                .first()
+            # TODO: enforce a uniqueness constraint,
+            # below queryset should never have >1 teams
+            return get_object_or_404(
+                self.get_queryset().filter(team__members__id=self.request.user.pk)
             )
-        #            )
 
         return super().get_object()
