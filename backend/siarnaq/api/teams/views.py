@@ -37,11 +37,16 @@ class TeamViewSet(
             IsEpisodeAvailable(allow_frozen=True),
             IsOnRequestedTeam(),
         ]
-        if self.action == "create":
+        if self.action == "create" or self.action == "join":
             # Must not be on more than one team
             permissions.append(not IsOnTeam())
 
         return permissions
+
+    def get_current_object(self):
+        return get_object_or_404(
+            self.get_queryset().filter(team__members__id=self.request.user.pk)
+        )
 
     def get_object(self):
         """
