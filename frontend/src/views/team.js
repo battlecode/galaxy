@@ -127,6 +127,7 @@ class YesTeam extends Component {
                     <input
                       type="text"
                       className="form-control"
+                      onChange={() => null}
                       value={this.state.team_profile.team.join_key}
                     />
                   </div>
@@ -221,7 +222,7 @@ class YesTeam extends Component {
           </div>
         </div>
         <div className="col-md-4">
-          {/*<TeamCard team={this.state.team_profile} />TODO: renable team card*/}
+          {<TeamCard team_profile={this.state.team_profile} />}
         </div>
       </div>
     );
