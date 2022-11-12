@@ -8,8 +8,8 @@ from siarnaq.api.teams.models import Rating, Team, TeamProfile
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ["episode", "name", "members", "status"]
-        read_only_fields = ["episode", "members", "status"]
+        fields = ["episode", "name", "members", "status", "join_key"]
+        read_only_fields = ["episode", "members", "status", "join_key"]
 
     def to_internal_value(self, data):
         """
