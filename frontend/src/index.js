@@ -238,7 +238,10 @@ class App extends Component {
               episode={this.state.episode}
             />
             <div className="main-panel">
-              <NavBar logged_in={this.state.logged_in} />
+              <NavBar
+                logged_in={this.state.logged_in}
+                episode={this.state.episode}
+              />
               <Switch>{elemsToRender}</Switch>
               <Footer />
             </div>
