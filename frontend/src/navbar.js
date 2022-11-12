@@ -1,16 +1,7 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
-import Api from "./api";
-import MultiEpisode from "./views/multi-episode";
 
 class NavBar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
-    };
-  }
-
   toggleNavigation() {
     window.click_toggle();
   }
@@ -34,11 +25,14 @@ class NavBar extends Component {
               <span className="icon-bar" />
             </button>
             <NavLink className="navbar-brand" to={`/home`}>
-              Battlecode {this.state.episode}
+              Battlecode {this.props.episode}
             </NavLink>
           </div>
           <div className="collapse navbar-collapse">
-            <NavBarAccount logged_in={this.props.logged_in} />
+            <NavBarAccount
+              logged_in={this.props.logged_in}
+              episode={this.props.episode}
+            />
           </div>
         </div>
       </nav>
@@ -47,14 +41,6 @@ class NavBar extends Component {
 }
 
 class NavBarAccount extends Component {
-  constructor() {
-    super();
-    // This is odd, see #93 for explanation
-    this.state = {
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(false),
-    };
-  }
-
   render() {
     // This is odd, see #93 for explanation
     if (this.props.logged_in) {
@@ -64,7 +50,7 @@ class NavBarAccount extends Component {
             <NavLink to={`/multi-episode`}>Change Episode</NavLink>
           </li>
           <li>
-            <NavLink to={`/${this.state.episode}/account`}>Account</NavLink>
+            <NavLink to={`/${this.props.episode}/account`}>Account</NavLink>
           </li>
           <li>
             <NavLink to={`/logout`}>Log out</NavLink>
