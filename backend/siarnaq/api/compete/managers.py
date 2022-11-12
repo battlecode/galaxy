@@ -1,3 +1,5 @@
+import json
+
 import google.cloud.pubsub as pubsub
 from django.conf import settings
 from django.db import models, transaction
@@ -26,7 +28,34 @@ class SaturnInvokableQuerySet(models.QuerySet):
 
     def enqueue(self):
         """Enqueue all unqueued items in this queryset for invocation on Saturn."""
-        raise NotImplementedError
+        invocations = (
+            # removed filter because should only be called on already filtered Queryset
+            self.select_for_update()
+            .filter(status=self.model.SaturnStatus.CREATED)
+            .all()
+        )
+        futures = [
+            self._publish_client.publish(
+                topic=self._publish_topic,
+                data=json.encode(invocation.enqueue_options()),
+                ordering_key=self._publish_ordering_key,
+            )
+            for invocation in invocations
+        ]
+        for invocation, future in zip(invocations, futures):
+            try:
+                message_id = future.result()
+                invocation.status = self.model.SaturnStatus.QUEUED
+                invocation.logs = f"Enqueued with ID: {message_id}"
+            except Exception as err:
+                invocation.status = self.model.SaturnStatus.ERRORED
+                self._publish_client.resume_publish(
+                    topic=self._publish_topic,
+                    ordering_key=self._publish_ordering_key,
+                )
+                invocation.logs = f"type: {type(err)} Exception message: {err}"
+            finally:
+                invocation.save(update_fields=["status", "logs"])
 
 
 class SubmissionQuerySet(SaturnInvokableQuerySet):
