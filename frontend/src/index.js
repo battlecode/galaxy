@@ -44,10 +44,6 @@ class App extends Component {
     // Does _NOT_ actually render a clickable link to that route.
     // That is done in navbar.js, sidebar.js, footer.js, etc
 
-    // NOTE: Every page in the following lists
-    // should render with navbar and sidebar, and should have an inherent episode.
-    // Handling otherwise is incredibly tricky, and is not worth the special case.
-
     // should always be viewable, even when not logged in
     this.nonLoggedInElems = [
       // Redirect empty path to the default episode's home page
@@ -128,12 +124,11 @@ class App extends Component {
     // When in the list of routes, this route must be last.
     // (for wildcard to work properly)
     this.notFoundElems = [
-      <Route path="*" key="notfound">
-        {/* Simply adding the NotFound component to the route will still have a sidebar, etc,
-        which is odd since the sidebar needs an episode but the not-found page doesn't necessarily have one
-        So, instead, redirect to a dedicated not-found route with just its own component */}
-        {<Redirect to={`/not-found`} />}
-      </Route>,
+      // Once upon a time, this redirected. This turned out not to work.
+      // For example, what happens if the requested route seems inaccessible now,
+      // just because login-check hasn't finished running?
+      // We need to make sure that login-check, etc, properly run first.
+      <Route path="*" component={NotFound} key="notfound" />,
     ];
 
     // Sets the login header based on currently held cookies, before any
@@ -159,6 +154,11 @@ class App extends Component {
   }
 
   render() {
+    // Note that the "toRender" arrays are computed during the render method
+    // This is important! Checking whether the user is logged-in, etc,
+    // takes an API call, which takes time.
+    // Whenever this API call finishes, we should always be ready to re-include the routes,
+    // and thus potentially re-render the URL that the user is looking to navigate to.
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
     let onTeamElemsToRender = this.state.on_team ? this.onTeamElems : [];
     let staffElemsToRender =
