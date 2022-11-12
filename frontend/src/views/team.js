@@ -7,24 +7,14 @@ import Floater from "react-floater";
 
 class YesTeam extends Component {
   constructor(props) {
-    super();
+    super(props);
+
+    // Copy the user's fetched team profile for use in editable form state.
+    const copied_team_profile = { ...props.team_profile };
+    copied_team_profile.team = { ...props.team_profile.team };
 
     this.state = {
-      team: {
-        name: "",
-        id: 0,
-        team_key: "",
-        auto_accept_ranked: false,
-        auto_accept_unranked: false,
-        bio: "",
-        avatar: "",
-        users: [],
-        verified_users: [],
-        mit: false,
-        student: false,
-        high_school: false,
-        international: true,
-      },
+      team_profile: copied_team_profile,
       up: "Update Info",
     };
 
@@ -34,11 +24,11 @@ class YesTeam extends Component {
     this.uploadProfile = this.uploadProfile.bind(this);
   }
 
-  leaveTeam() {
-    Api.leaveTeam(function (success) {
+  leaveTeam = () => {
+    Api.leaveTeam(this.props.episode, function (success) {
       if (success) window.location.reload();
     });
-  }
+  };
 
   changeHandler(e) {
     var id = e.target.id;
@@ -49,7 +39,7 @@ class YesTeam extends Component {
     if (id === "international") val = !val;
 
     this.setState(function (prevState, props) {
-      prevState.team[id] = val;
+      prevState.team_profile[id] = val;
       return prevState;
     });
   }
@@ -67,7 +57,7 @@ class YesTeam extends Component {
   updateTeam() {
     this.setState({ up: '<i class="fa fa-circle-o-notch fa-spin"></i>' });
     Api.updateTeam(
-      this.state.team,
+      this.state.team_profile,
       function (response) {
         if (response) this.setState({ up: '<i class="fa fa-check"></i>' });
         else this.setState({ up: '<i class="fa fa-times"></i>' });
@@ -116,12 +106,13 @@ class YesTeam extends Component {
                 which prizes your team is eligible for. Check all boxes that
                 apply to all members your team.
               </p>
-              <EligibilityOptions
+              {/*<EligibilityOptions
                 change={this.changeHandler}
-                team={this.state.team}
+                team_profile={this.state.team_profile}
                 update={this.updateTeam}
                 up_but={this.state.up}
-              />
+                episode={this.props.episode}
+                /> TODO: eligibility options*/}
             </div>
           </div>
 
@@ -138,7 +129,7 @@ class YesTeam extends Component {
                       type="text"
                       className="form-control"
                       readOnly
-                      value={this.state.team.name}
+                      value={this.state.team_profile.name}
                     />
                   </div>
                 </div>
@@ -149,7 +140,7 @@ class YesTeam extends Component {
                       type="text"
                       className="form-control"
                       readOnly
-                      value={this.state.team.team_key}
+                      value={this.state.team_profile.team_key}
                     />
                   </div>
                 </div>
@@ -159,7 +150,7 @@ class YesTeam extends Component {
                   <label id="auto_accept_unranked" className="center-row">
                     <input
                       type="checkbox"
-                      checked={this.state.team.auto_accept_unranked}
+                      checked={this.state.team_profile.auto_accept_unranked}
                       onChange={this.changeHandler}
                       className="form-control center-row-start"
                     />{" "}
@@ -176,7 +167,7 @@ class YesTeam extends Component {
                       id="avatar"
                       className="form-control"
                       onChange={this.changeHandler}
-                      value={this.state.team.avatar}
+                      value={this.state.team_profile.avatar}
                     />
                   </div>
                 </div>
@@ -191,7 +182,7 @@ class YesTeam extends Component {
                       placeholder="Put your team bio here."
                       onChange={this.changeHandler}
                       id="bio"
-                      value={this.state.team.bio}
+                      value={this.state.team_profile.bio}
                     />
                   </div>
                 </div>
@@ -216,7 +207,7 @@ class YesTeam extends Component {
           </div>
         </div>
         <div className="col-md-4">
-          <TeamCard team={this.state.team} />
+          {/*<TeamCard team={this.state.team_profile} />TODO: renable team card*/}
         </div>
       </div>
     );
@@ -226,14 +217,12 @@ class YesTeam extends Component {
 class NoTeam extends Component {
   constructor() {
     super();
-    const episode = MultiEpisode.getEpisodeFromCurrentPathname(); // TODO: see where this should really go, don't repeat many times
     this.state = {
       team_name: "",
       secret_key: "",
       team_join_name: "",
       joinTeamError: false,
       createTeamError: false,
-      episode: episode,
     };
 
     this.joinTeam = this.joinTeam.bind(this);
@@ -269,15 +258,14 @@ class NoTeam extends Component {
   };
 
   createTeam() {
-    // TODO fix
     Api.createTeam(
       this.state.team_name,
-      this.state.episode,
-      this.createCallback
+      this.props.episode,
+      this.createUserCallback
     );
   }
 
-  createCallback = (success) => {
+  createUserCallback = (success) => {
     this.setState({ createTeamError: !success });
     if (success) {
       // Theoretically, we could have the frontend simply refresh all its state, including current-team.
@@ -419,10 +407,8 @@ class ResumeStatus extends Component {
 class EligibilityOptions extends Component {
   constructor(props) {
     super(props);
-    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
     this.state = {
-      episode: episode,
-      extension: MultiEpisode.getExtension(episode),
+      extension: MultiEpisode.getExtension(props.episode),
     };
   }
 
@@ -440,7 +426,7 @@ class EligibilityOptions extends Component {
                     college students to be eligible for prizes. If you are
                     unsure about whether you are an active student, read more
                     about eligibilty under{" "}
-                    <a href={`/${this.state.episode}/tournaments`}>
+                    <a href={`/${this.props.episode}/tournaments`}>
                       tournaments
                     </a>{" "}
                     or reach out to one of Teh Devs on Discord or over email.
@@ -556,13 +542,13 @@ class Team extends Component {
         <div className="content">
           <div className="container-fluid">
             <div className="row">
-              {!this.props.route.team && (
-                <NoTeam episode={this.props.route.episode} />
+              {!this.props.team_profile && (
+                <NoTeam episode={this.props.episode} />
               )}
-              {this.props.route.team && (
+              {this.props.team_profile && (
                 <YesTeam
-                  team={this.props.route.team}
-                  episode={this.props.route.episode}
+                  team_profile={this.props.team_profile}
+                  episode={this.props.episode}
                 />
               )}
             </div>
