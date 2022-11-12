@@ -24,3 +24,27 @@ provider "google-beta" {
   access_token    = data.google_service_account_access_token.default.access_token
   request_timeout = "60s"
 }
+
+resource "google_project_service" "artifactregistry" {
+  project = var.gcp_project
+  service = "artifactregistry.googleapis.com"
+  disable_dependent_services = true
+}
+
+resource "google_project_service" "run" {
+  project = var.gcp_project
+  service = "run.googleapis.com"
+  disable_dependent_services = true
+}
+
+resource "google_project_service" "secretmanager" {
+  project = var.gcp_project
+  service = "secretmanager.googleapis.com"
+  disable_dependent_services = true
+}
+
+resource "google_project_service" "sqladmin" {
+  project = var.gcp_project
+  service = "sqladmin.googleapis.com"
+  disable_dependent_services = true
+}

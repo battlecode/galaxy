@@ -109,7 +109,7 @@ resource "google_cloud_run_service" "this" {
           value_from {
             secret_key_ref {
               key  = "latest"
-              name = google_secret_manager_secret.this.name
+              name = google_secret_manager_secret.this.secret_id
             }
           }
         }

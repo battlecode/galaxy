@@ -129,7 +129,7 @@ resource "google_compute_autoscaler" "this" {
 
     metric {
       name                       = "pubsub.googleapis.com/subscription/num_undelivered_messages"
-      filter                     = "resource_type = pubsub_subscription AND resource.label.subscription_id = \"${google_pubsub_subscription.queue.id}\""
+      filter                     = "resource.type = pubsub_subscription AND resource.label.subscription_id = \"${google_pubsub_subscription.queue.id}\""
       single_instance_assignment = var.load_ratio
     }
   }

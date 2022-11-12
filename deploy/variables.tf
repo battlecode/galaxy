@@ -19,5 +19,5 @@ variable "gcp_region" {
 variable "gcp_zone" {
   description = "Google Cloud zone where all zonal resources are located"
   type        = string
-  default     = "us-east1b"
+  default     = "us-east1-b"
 }

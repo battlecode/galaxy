@@ -47,6 +47,10 @@ module "galaxy_artifact" {
   gcp_zone    = var.gcp_zone
 
   storage_frontend_name = google_storage_bucket.frontend.name
+
+  depends_on = [
+    google_project_service.artifactregistry,
+  ]
 }
 
 module "releases_maven" {
@@ -56,6 +60,10 @@ module "releases_maven" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+
+  depends_on = [
+    google_project_service.artifactregistry,
+  ]
 }
 
 module "siarnaq" {
@@ -72,6 +80,13 @@ module "siarnaq" {
 
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name
+
+  depends_on = [
+    google_project_service.artifactregistry,
+    google_project_service.run,
+    google_project_service.secretmanager,
+    google_project_service.sqladmin,
+  ]
 }
 
 module "saturn_compile" {
@@ -96,6 +111,10 @@ module "saturn_compile" {
   max_instances = 10
   min_instances = 0
   load_ratio    = 25
+
+  depends_on = [
+    google_project_service.artifactregistry,
+  ]
 }
 
 module "saturn_execute" {
@@ -117,9 +136,13 @@ module "saturn_execute" {
   image        = "us-east1-docker.pkg.dev/mitbattlecode/galaxy/saturn"  # TODO make automatic
   command      = "execute"
 
-  max_instances = 40
+  max_instances = 10
   min_instances = 0
   load_ratio    = 10
+
+  depends_on = [
+    google_project_service.artifactregistry,
+  ]
 }
 
 module "web" {
