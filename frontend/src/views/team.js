@@ -550,30 +550,21 @@ class EligibilityOptions extends Component {
 }
 
 class Team extends Component {
-  constructor() {
-    super();
-    // TODO based on how the rest of everything works, this should be null, not false
-    this.state = { team: false };
-  }
-
-  componentDidMount() {
-    // TODO as api is changed, change this
-
-    Api.getUserTeam(
-      function (new_state) {
-        this.setState({ team: new_state });
-      }.bind(this)
-    );
-  }
-
   render() {
     return (
       <div className="content">
         <div className="content">
           <div className="container-fluid">
             <div className="row">
-              {this.state.team === null && <NoTeam />}
-              {this.state.team && <YesTeam team={this.state.team} />}
+              {!this.props.route.team && (
+                <NoTeam episode={this.props.route.episode} />
+              )}
+              {this.props.route.team && (
+                <YesTeam
+                  team={this.props.route.team}
+                  episode={this.props.route.episode}
+                />
+              )}
             </div>
           </div>
         </div>
