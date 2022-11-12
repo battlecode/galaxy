@@ -61,7 +61,6 @@ class TeamViewSet(
 
         return super().get_object()
 
-    # TODO: this should not need/accept team data, it doesn't need any
     @extend_schema(request=None)
     @action(detail=False, methods=["post"])
     def leave(self, request, **kwargs):
@@ -71,13 +70,12 @@ class TeamViewSet(
 
         team.members.remove(request.user.id)
         if team.members.count() == 0:
-            team.status = TeamStatus.INACTIVE  # TODO: delete / pseudo delete team?
+            team.status = TeamStatus.INACTIVE
         team.save()
 
         serializer = self.get_serializer(team_profile)
         return Response(serializer.data, status.HTTP_200_OK)
 
-    # TODO: schema should show that this accepts join_key data
     @extend_schema(responses={status.HTTP_200_OK: TeamProfileSerializer})
     @action(detail=False, methods=["post"], serializer_class=TeamJoinSerializer)
     def join(self, request, **kwargs):
