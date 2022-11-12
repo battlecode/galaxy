@@ -74,11 +74,11 @@ class TeamProfileSerializer(serializers.ModelSerializer):
             nested_data = validated_data.pop("team")
             # Run team update serializer
             nested_serializer.update(nested_instance, nested_data)
-
         if "eligible_for" in validated_data:
-            instance.eligible_for.set(
-                validated_data.pop("eligible_for", instance.eligible_for).all()
-            )
+            eligibility_data = validated_data.pop("eligible_for", instance.eligible_for)
+            # Ensure that criteria are present
+            if eligibility_data:
+                instance.eligible_for.set(eligibility_data.all())
         # Runs the original parent update(), since the nested fields were
         # "popped" out of the data
         return super().update(instance, validated_data)
