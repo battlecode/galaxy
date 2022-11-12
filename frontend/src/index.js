@@ -39,7 +39,12 @@ class App extends Component {
   constructor() {
     super();
     const episode = MultiEpisode.getEpisodeFromCurrentPathname();
-    this.state = { logged_in: null, episode: episode };
+    this.state = {
+      logged_in: null,
+      episode: episode,
+      user_profile: null,
+      user_team_profile: null,
+    };
 
     // Sets the login header based on currently held cookies, before any
     // requests are run.
@@ -134,7 +139,13 @@ class App extends Component {
     // If user is not logged-in, should 404 and not even render
     this.loggedInElems = [
       <Route path={`/:episode/team`} component={Team} key="team" />,
-      <Route path={`/:episode/account`} component={Account} key="account" />,
+      <Route
+        path={`/:episode/account`}
+        component={(props) => (
+          <Account {...props} user_profile={this.state.user_profile} />
+        )}
+        key="account"
+      />,
     ];
 
     // Should only be visible and renderable to users on a team
