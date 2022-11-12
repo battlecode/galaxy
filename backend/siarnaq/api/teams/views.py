@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.models import TeamProfile
@@ -50,4 +52,17 @@ class TeamViewSet(
                 self.get_queryset().filter(team__members__id=self.request.user.pk)
             )
 
-        return super().get_object()
+    # TODO: this should not need/accept team data, it doesn't need any
+    @action(detail=True, methods=["patch"])
+    def leave(self, request, **kwargs):
+        """Leave a team."""
+        team_profile = self.get_object()
+        team = team_profile.team
+
+        team.members.remove(request.user.id)
+        if team.members.count() == 0:
+            pass  # TODO: delete / pseudo delete team?
+        team.save()
+
+        serializer = self.get_serializer(team_profile)
+        return Response(serializer.data, status.HTTP_200_OK)
