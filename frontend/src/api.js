@@ -322,19 +322,15 @@ class Api {
 
   //---TEAM INFO---
 
-  static getUserTeam(callback) {
+  static getUserTeam(episode, callback) {
     // TODO fix this; would be great to use "current" instead of having to pass in a username,
     // which i think is doable??
-    $.get(
-      `${URL}/api/userteam/${encodeURIComponent(
-        Cookies.get("username")
-      )}/${LEAGUE}/`
-    )
+    $.get(`${URL}/api/team/${episode}/detail/current/`)
       .done((data, status) => {
         // TODO i would, like, love to not use these cookies....
         // I feel like smth we did with user flow would work here too
-        Cookies.set("team_id", data.id);
-        Cookies.set("team_name", data.name);
+        //        Cookies.set("team_id", data.id);
+        //        Cookies.set("team_name", data.name);
 
         // TODO in the old days...
         // frontend needed to query backend, w username, to get the team id
@@ -343,9 +339,9 @@ class Api {
         // You should be able to skip the above cookie-setting-and-first call step,
         // and not have to use 2 API calls...
         // (might take some backend tweaks but yeah)
-        $.get(`${URL}/api/${LEAGUE}/team/${data.id}/`).done((data, status) => {
-          callback(data);
-        });
+        //        $.get(`${URL}/api/${LEAGUE}/team/${data.id}/`).done((data, status) => {
+        callback(data);
+        //       });
       })
       .fail((xhr, status, error) => {
         // possibly dangerous???
@@ -376,16 +372,13 @@ class Api {
   //----USER FUNCTIONS----
 
   static createTeam(team_name, episode, callback) {
-    // TODO fix, should be easy
     const team_data = {
       team: {
-        episode: episode, // TODO: should be part of URL
         name: team_name,
-        status: "R", // TODO: shd be default
       },
     };
     $.ajax({
-      url: `${URL}/api/team/detail/`,
+      url: `${URL}/api/team/${episode}/detail/`,
       data: JSON.stringify(team_data),
       type: "POST",
       contentType: "application/json",
