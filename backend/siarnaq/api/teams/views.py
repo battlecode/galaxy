@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
-from siarnaq.api.teams.models import TeamProfile
-from siarnaq.api.teams.permissions import IsOnRequestedTeam
+from siarnaq.api.teams.models import TeamProfile, TeamStatus
+from siarnaq.api.teams.permissions import IsOnRequestedTeam, IsOnTeam
 from siarnaq.api.teams.serializers import TeamProfileSerializer
 
 
@@ -32,11 +32,16 @@ class TeamViewSet(
         return TeamProfile.objects.all()  # TODO: any select related's to use here?
 
     def get_permissions(self):
-        return [
+        permissions = [
             IsAuthenticated(),
             IsEpisodeAvailable(allow_frozen=True),
             IsOnRequestedTeam(),
         ]
+        if self.action == "create":
+            # Must not be on more than one team
+            permissions.append(not IsOnTeam())
+
+        return permissions
 
     def get_object(self):
         """
@@ -61,7 +66,7 @@ class TeamViewSet(
 
         team.members.remove(request.user.id)
         if team.members.count() == 0:
-            pass  # TODO: delete / pseudo delete team?
+            team.status = TeamStatus.INACTIVE  # TODO: delete / pseudo delete team?
         team.save()
 
         serializer = self.get_serializer(team_profile)
