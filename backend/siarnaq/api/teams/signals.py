@@ -1,7 +1,5 @@
-import uuid
-
 from django.conf import settings
-from django.db.models.signals import m2m_changed, post_save, pre_save
+from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
 from rest_framework.exceptions import ValidationError
 
@@ -21,15 +19,6 @@ def copy_rating_to_profile(instance, update_fields, **kwargs):
         TeamProfile.objects.filter(
             team=instance.team_id, rating__n__lt=instance.rating.n
         ).update(rating=instance.rating)
-
-
-@receiver(pre_save, sender=Team)
-def gen_team_key(instance, update_fields, **kwargs):
-    """
-    Generate a new team join key.
-    """
-    if instance._state.adding:
-        instance.join_key = uuid.uuid4().hex[:16]
 
 
 @receiver(m2m_changed, sender=Team.members.through)
