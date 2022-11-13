@@ -266,7 +266,7 @@ class NoTeam extends Component {
 
   joinCallback = (success) => {
     this.setState({ joinTeamError: success });
-    this.props.updateBaseState();
+    if (success) this.props.updateBaseState();
   };
 
   createTeam() {
@@ -279,7 +279,7 @@ class NoTeam extends Component {
 
   createUserCallback = (success) => {
     this.setState({ createTeamError: !success });
-    this.props.updateBaseState();
+    if (success) this.props.updateBaseState();
   };
 
   renderError(type, data) {
