@@ -24,8 +24,8 @@ class YesTeam extends Component {
   }
 
   leaveTeam = () => {
-    Api.leaveTeam(this.props.episode, function (success) {
-      if (success) window.location.reload();
+    Api.leaveTeam(this.props.episode, (success) => {
+      this.props.updateBaseState();
     });
   };
 
@@ -58,6 +58,7 @@ class YesTeam extends Component {
       function (response) {
         if (response) this.setState({ up: '<i class="fa fa-check"></i>' });
         else this.setState({ up: '<i class="fa fa-times"></i>' });
+        this.props.updateBaseState();
         setTimeout(
           function () {
             this.setState({ up: "Update Info" });
@@ -265,11 +266,7 @@ class NoTeam extends Component {
 
   joinCallback = (success) => {
     this.setState({ joinTeamError: success });
-    if (success) {
-      // Theoretically, we could have the frontend simply refresh all its state, including current-team.
-      // But reload is fine too, and a little safer.
-      window.location.reload();
-    }
+    this.props.updateBaseState();
   };
 
   createTeam() {
@@ -282,11 +279,7 @@ class NoTeam extends Component {
 
   createUserCallback = (success) => {
     this.setState({ createTeamError: !success });
-    if (success) {
-      // Theoretically, we could have the frontend simply refresh all its state, including current-team.
-      // But reload is fine too, and a little safer.
-      window.location.reload();
-    }
+    this.props.updateBaseState();
   };
 
   renderError(type, data) {
@@ -558,12 +551,16 @@ class Team extends Component {
           <div className="container-fluid">
             <div className="row">
               {!this.props.team_profile && (
-                <NoTeam episode={this.props.episode} />
+                <NoTeam
+                  episode={this.props.episode}
+                  updateBaseState={this.props.updateBaseState}
+                />
               )}
               {this.props.team_profile && (
                 <YesTeam
                   team_profile={this.props.team_profile}
                   episode={this.props.episode}
+                  updateBaseState={this.props.updateBaseState}
                 />
               )}
             </div>
