@@ -255,7 +255,6 @@ class NoTeam extends Component {
   }
 
   joinTeam() {
-    // TODO either fix now, or track in separate issue
     Api.joinTeam(
       this.state.join_key,
       this.state.team_join_name,
