@@ -329,6 +329,7 @@ class Api {
       })
       .fail((xhr, status, error) => {
         console.log("Error in getting user's team profile", xhr, status, error);
+        callback(null);
       });
   }
 

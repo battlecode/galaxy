@@ -59,7 +59,6 @@ class TeamCard extends Component {
     const team_profile = this.props.team_profile;
 
     const userDivs = this.state.users.map((user_profile) => {
-      console.log("user_profile: ", user_profile);
       return user_profile ? (
         <div className="small-user-list" key={user_profile.user.username}>
           {" "}
