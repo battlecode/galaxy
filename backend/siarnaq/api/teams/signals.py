@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 
 from siarnaq.api.compete.models import MatchParticipant
 from siarnaq.api.teams.models import Team, TeamProfile, TeamStatus
+from siarnaq.api.user.models import User
 
 
 @receiver(post_save, sender=MatchParticipant)
@@ -29,9 +30,13 @@ def make_empty_team_inactive(instance, action, **kwargs):
 
 
 @receiver(m2m_changed, sender=Team.members.through)
-def prevent_team_exceed_capacity(instance, action, **kwargs):
+def prevent_team_exceed_capacity(instance, action, pk_set, **kwargs):
     if action == "pre_add":
-        if instance.get_non_staff_count() == settings.TEAMS_MAX_TEAM_SIZE:
+        if (
+            instance.get_non_staff_count()
+            + User.objects.filter(pk__in=pk_set, is_staff=False).count()
+            > settings.TEAMS_MAX_TEAM_SIZE
+        ):
             raise ValidationError("Maximum number of team members exceeded.")
 
 
