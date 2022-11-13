@@ -62,9 +62,7 @@ class App extends Component {
       this.setState({ user_profile });
     });
 
-    // TODO as API is changed, change this
     Api.getUserTeamProfile(this.state.episode, (team_profile) => {
-      // This should be cleaned up in #91
       this.setState({ team_profile });
     });
   }
