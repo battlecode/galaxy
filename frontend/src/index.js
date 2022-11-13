@@ -54,16 +54,29 @@ class App extends Component {
   componentDidMount() {
     // duped in various places, see sidebar.js
     // This is messy and hard to understand, it will be cleaned in #91.
-    Api.loginCheck((logged_in) => {
+    const ajax1 = Api.loginCheck((logged_in) => {
       this.setState({ logged_in });
     });
 
-    Api.getUserProfile((user_profile) => {
+    const ajax2 = Api.getUserProfile((user_profile) => {
       this.setState({ user_profile });
     });
 
-    Api.getUserTeamProfile(this.state.episode, (team_profile) => {
+    const ajax3 = Api.getUserTeamProfile(this.state.episode, (team_profile) => {
       this.setState({ team_profile });
+    });
+
+    // Run this function when all AJAX queries are completed.
+    // See https://stackoverflow.com/a/9865124.
+    $.when(ajax1, ajax2, ajax3).done(() => {
+      // This function, for mobile devices, moves the navbar into the sidebar and then
+      // collapses the sidebar. Better responsive display
+      // (Only call it when the entire DOM has fully loaded, since otherwise,
+      // the _incomplete_ navbar gets moved and is stuck there.)
+      // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
+      $(document).ready(function () {
+        window.init_right_menu();
+      });
     });
   }
 
