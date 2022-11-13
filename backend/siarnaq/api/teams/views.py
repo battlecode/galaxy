@@ -77,7 +77,6 @@ class TeamViewSet(
     @extend_schema(responses={status.HTTP_200_OK: TeamProfileSerializer})
     @action(detail=False, methods=["post"], serializer_class=TeamJoinSerializer)
     def join(self, request, **kwargs):
-        print(self.request.data)
         team_profile = get_object_or_404(
             self.get_queryset().filter(
                 team__join_key=self.request.data["join_key"],
