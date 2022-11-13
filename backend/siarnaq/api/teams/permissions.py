@@ -17,4 +17,4 @@ class IsOnRequestedTeam(permissions.BasePermission):
 
     def has_object_permission(self, request, _, obj):
         user = self.request.user
-        return user.teams_set.filter(team=obj).exists()
+        return user in obj.members.all()
