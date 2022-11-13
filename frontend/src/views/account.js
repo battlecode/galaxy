@@ -52,10 +52,9 @@ class Account extends Component {
     Api.updateUser(
       this.state.user_profile,
       function (response) {
-        // TODO: now that state has been lifted into props,
-        // we need to refresh the page here, so that `index` can load its (new) state properly
         if (response) this.setState({ up: '<i class="fa fa-check"></i>' });
         else this.setState({ up: '<i class="fa fa-times"></i>' });
+        this.props.updateBaseState();
         setTimeout(
           function () {
             this.setState({ up: "Update Info" });
