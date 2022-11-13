@@ -66,21 +66,20 @@ class TeamViewSet(
 
     @extend_schema(request=None)
     @action(detail=False, methods=["post"])
-    @transaction.atomic
     def leave(self, request, **kwargs):
         """Leave a team."""
         team_profile = self.get_current_object()
         team = team_profile.team
 
-        team.members.remove(request.user.id)
-        team.save()
+        with transaction.atomic():
+            team.members.remove(request.user.id)
+            team.save()
 
         serializer = self.get_serializer(team_profile)
         return Response(serializer.data, status.HTTP_200_OK)
 
     @extend_schema(responses={status.HTTP_200_OK: TeamProfileSerializer})
     @action(detail=False, methods=["post"], serializer_class=TeamJoinSerializer)
-    @transaction.atomic
     def join(self, request, **kwargs):
         team_profile = get_object_or_404(
             self.get_queryset().filter(
@@ -91,8 +90,9 @@ class TeamViewSet(
         )
         team = team_profile.team
 
-        team.members.add(request.user)
-        team.save()
+        with transaction.atomic():
+            team.members.add(request.user)
+            team.save()
 
         serializer = TeamProfileSerializer(team_profile)
         return Response(serializer.data, status.HTTP_200_OK)
