@@ -14,7 +14,6 @@ from siarnaq.api.teams.serializers import TeamJoinSerializer, TeamProfileSeriali
 class TeamViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
-    mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
 ):
