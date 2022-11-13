@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, status, viewsets
@@ -65,6 +66,7 @@ class TeamViewSet(
 
     @extend_schema(request=None)
     @action(detail=False, methods=["post"])
+    @transaction.atomic
     def leave(self, request, **kwargs):
         """Leave a team."""
         team_profile = self.get_current_object()
@@ -78,6 +80,7 @@ class TeamViewSet(
 
     @extend_schema(responses={status.HTTP_200_OK: TeamProfileSerializer})
     @action(detail=False, methods=["post"], serializer_class=TeamJoinSerializer)
+    @transaction.atomic
     def join(self, request, **kwargs):
         team_profile = get_object_or_404(
             self.get_queryset().filter(
