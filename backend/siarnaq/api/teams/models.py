@@ -138,6 +138,9 @@ class Team(models.Model):
         """Return the current active submission belonging to the team."""
         return self.submissions.filter(accepted=True).order_by("-created").first()
 
+    def get_non_staff_count(self):
+        return self.members.filter(is_staff=False).count()
+
 
 class TeamProfile(models.Model):
     """

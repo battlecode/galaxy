@@ -1,9 +1,9 @@
 import uuid
 
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.db.models.signals import m2m_changed, post_save, pre_save
 from django.dispatch import receiver
+from rest_framework.exceptions import ValidationError
 
 from siarnaq.api.compete.models import MatchParticipant
 from siarnaq.api.teams.models import Team, TeamProfile, TeamStatus
@@ -42,7 +42,7 @@ def make_empty_team_inactive(instance, action, **kwargs):
 @receiver(m2m_changed, sender=Team.members.through)
 def prevent_team_exceed_capacity(instance, action, **kwargs):
     if action == "pre_add":
-        if instance.members.count() == settings.MAX_TEAM_SIZE:
+        if instance.get_non_staff_count() == settings.TEAMS_MAX_TEAM_SIZE:
             raise ValidationError("Maximum number of team members exceeded.")
 
 
