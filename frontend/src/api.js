@@ -323,25 +323,9 @@ class Api {
   //---TEAM INFO---
 
   static getUserTeamProfile(episode, callback) {
-    // TODO fix this; would be great to use "current" instead of having to pass in a username,
-    // which i think is doable??
     $.get(`${URL}/api/team/${episode}/detail/current/`)
       .done((data, status) => {
-        // TODO i would, like, love to not use these cookies....
-        // I feel like smth we did with user flow would work here too
-        //        Cookies.set("team_id", data.id);
-        //        Cookies.set("team_name", data.name);
-
-        // TODO in the old days...
-        // frontend needed to query backend, w username, to get the team id
-        // then frontend needed to again query backend, w team id, to get the entire team info
-        // This sucks
-        // You should be able to skip the above cookie-setting-and-first call step,
-        // and not have to use 2 API calls...
-        // (might take some backend tweaks but yeah)
-        //        $.get(`${URL}/api/${LEAGUE}/team/${data.id}/`).done((data, status) => {
         callback(data);
-        //       });
       })
       .fail((xhr, status, error) => {
         console.log("Error in getting user's team profile", xhr, status, error);
@@ -349,7 +333,6 @@ class Api {
   }
 
   // updates team
-  // TODO fix this. would be great to use "current"
   static updateTeam(team_profile, episode, callback) {
     $.ajax({
       url: `${URL}/api/team/${episode}/detail/current/`,
