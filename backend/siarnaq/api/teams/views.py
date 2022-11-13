@@ -29,7 +29,11 @@ class TeamViewSet(
     serializer_class = TeamProfileSerializer
 
     def get_queryset(self):
-        return TeamProfile.objects.all()  # TODO: any select related's to use here?
+        return TeamProfile.objects.select_related(
+            "team",
+            "team__members",
+            "rating",
+        )
 
     def get_permissions(self):
         permissions = [
