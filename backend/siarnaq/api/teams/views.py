@@ -33,7 +33,7 @@ class TeamViewSet(
         return TeamProfile.objects.select_related(
             "team",
             "rating",
-        )
+        ).prefetch_related("team__members")
 
     def get_permissions(self):
         permissions = [
