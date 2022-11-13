@@ -31,7 +31,6 @@ class TeamViewSet(
     def get_queryset(self):
         return TeamProfile.objects.select_related(
             "team",
-            "team__members",
             "rating",
         )
 
