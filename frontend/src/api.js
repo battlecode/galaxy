@@ -323,7 +323,7 @@ class Api {
   //---TEAM INFO---
 
   static getUserTeamProfile(episode, callback) {
-    $.get(`${URL}/api/team/${episode}/detail/current/`)
+    return $.get(`${URL}/api/team/${episode}/detail/current/`)
       .done((data, status) => {
         callback(data);
       })
@@ -334,7 +334,7 @@ class Api {
 
   // updates team
   static updateTeam(team_profile, episode, callback) {
-    $.ajax({
+    return $.ajax({
       url: `${URL}/api/team/${episode}/detail/current/`,
       data: JSON.stringify(team_profile),
       type: "PATCH",
@@ -357,7 +357,7 @@ class Api {
         name: team_name,
       },
     };
-    $.ajax({
+    return $.ajax({
       url: `${URL}/api/team/${episode}/detail/`,
       data: JSON.stringify(team_data),
       type: "POST",
@@ -377,7 +377,7 @@ class Api {
       join_key: join_key,
       name: team_name,
     };
-    $.ajax({
+    return $.ajax({
       url: `${URL}/api/team/${episode}/detail/join/`,
       data: JSON.stringify(join_data),
       type: "POST",
@@ -393,7 +393,7 @@ class Api {
   }
 
   static leaveTeam(episode, callback) {
-    $.ajax({
+    return $.ajax({
       url: `${URL}/api/team/${episode}/detail/leave/`,
       type: "POST",
     })
@@ -407,7 +407,7 @@ class Api {
 
   static getProfileByUser(user_id, callback, public_only = false) {
     const endpoint = public_only ? "public" : "detail";
-    $.get(`${URL}/api/user/${endpoint}/${user_id}/`)
+    return $.get(`${URL}/api/user/${endpoint}/${user_id}/`)
       .done((data, status) => {
         callback(data);
       })
@@ -417,11 +417,11 @@ class Api {
   }
 
   static getUserProfile(callback) {
-    this.getProfileByUser("current", callback);
+    return this.getProfileByUser("current", callback);
   }
 
   static updateUser(user_profile, callback) {
-    $.ajax({
+    return $.ajax({
       url: `${URL}/api/user/detail/current/`,
       data: JSON.stringify(user_profile),
       type: "PATCH",
@@ -706,7 +706,7 @@ class Api {
   // Callers of this method should check this, before rendering their logged-in or un-logged-in versions.
   // If not logged in, then api calls will give 403s, and the website will tell you to log in anyways.
   static loginCheck(callback) {
-    $.post(`${URL}/api/token/verify/`, {
+    return $.post(`${URL}/api/token/verify/`, {
       token: Cookies.get("access"),
     })
       .done((data, status) => {
@@ -718,23 +718,10 @@ class Api {
       });
   }
 
-  static verifyAccount(registrationKey, callback) {
-    const userId = encodeURIComponent(Cookies.get("username"));
-    $.post(
-      `${URL}/api/verify/${userId}/verifyUser/`,
-      {
-        registration_key: registrationKey,
-      },
-      (data, success) => {
-        callback(data, success);
-      }
-    );
-  }
-
   // Our login (and token) flow currently uses a subset of JWT features
   // see the comment block under the "AUTHORIZATION" comment header
   static login(username, password, callback) {
-    $.post(`${URL}/api/token/`, {
+    return $.post(`${URL}/api/token/`, {
       username,
       password,
     })
@@ -753,7 +740,7 @@ class Api {
   }
 
   static register(user_profile, callback) {
-    $.ajax({
+    return $.ajax({
       url: `${URL}/api/user/detail/`,
       data: JSON.stringify(user_profile),
       type: "POST",
