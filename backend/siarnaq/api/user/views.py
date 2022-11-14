@@ -83,7 +83,9 @@ class UserProfileViewSet(
         """Retrieve or update uploaded avatar"""
         profile = self.get_object()
         client = storage.Client()
-        blob = client.bucket("battle-public-upload").blob(profile.get_avatar_path())
+        blob = client.bucket(settings.GCLOUD_PUBLIC_BUCKET).blob(
+            profile.get_avatar_path()
+        )
         match request.method.lower():
             case "get":
                 if profile.avatar_extension is None:
