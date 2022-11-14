@@ -76,4 +76,4 @@ class UserProfile(models.Model):
         return posixpath.join("user", str(self.pk), "resume.pdf")
 
     def get_avatar_path(self):
-        return posixpath.join("user", str(self.pk), "avatar")
+        return posixpath.join("user", str(self.pk), f"avatar.{self.avatar_extension}")

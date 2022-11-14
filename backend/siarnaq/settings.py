@@ -197,6 +197,9 @@ USER_GCLOUD_ADMIN_USERNAME = "galaxy-admin"
 # Bucket for storing all files whose access is protected by authentication
 GCLOUD_SECURED_BUCKET = "battle-secure-upload"
 
+# Bucket for public assets
+GCLOUD_PUBLIC_BUCKET = "battle-public-upload"
+
 # Do not inadvertently interact with cloud resources while testing locally.
 # Change this in production and while running system integration tests.
 GCLOUD_DISABLE_ALL_ACTIONS = True
