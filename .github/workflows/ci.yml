@@ -14,12 +14,6 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v2.4.0
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v0.8.0
-        with:
-          create_credentials_file: true
-          workload_identity_provider: projects/830784087321/locations/global/workloadIdentityPools/galaxy-ci/providers/github-ci-main
-          service_account: github-ci-agent@mitbattlecode.iam.gserviceaccount.com
       - name: Cache conda
         uses: actions/cache@v3.0.11
         env:
@@ -45,12 +39,6 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v2.4.0
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v0.8.0
-        with:
-          create_credentials_file: true
-          workload_identity_provider: projects/830784087321/locations/global/workloadIdentityPools/galaxy-ci/providers/github-ci-main
-          service_account: github-ci-agent@mitbattlecode.iam.gserviceaccount.com
       - name: Cache conda
         uses: actions/cache@v3.0.11
         env:
