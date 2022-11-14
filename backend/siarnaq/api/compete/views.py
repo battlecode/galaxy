@@ -15,12 +15,7 @@ from siarnaq.api.compete.models import (
     ScrimmageRequestStatus,
     Submission,
 )
-from siarnaq.api.compete.permissions import (
-    HasTeamSubmission,
-    IsEpisodeAvailable,
-    IsOnTeam,
-    IsScrimmageRequestActor,
-)
+from siarnaq.api.compete.permissions import HasTeamSubmission, IsScrimmageRequestActor
 from siarnaq.api.compete.serializers import (
     MatchReportSerializer,
     MatchSerializer,
@@ -28,7 +23,9 @@ from siarnaq.api.compete.serializers import (
     SubmissionReportSerializer,
     SubmissionSerializer,
 )
+from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.models import Team
+from siarnaq.api.teams.permissions import IsOnTeam
 
 
 class EpisodeTeamUserContextMixin:
@@ -70,7 +67,11 @@ class SubmissionViewSet(
     """
 
     serializer_class = SubmissionSerializer
-    permission_classes = (IsAuthenticated, IsEpisodeAvailable | IsAdminUser, IsOnTeam)
+    permission_classes = (
+        IsAuthenticated,
+        IsEpisodeAvailable | IsAdminUser,
+        IsOnTeam,
+    )
 
     def get_queryset(self):
         queryset = (

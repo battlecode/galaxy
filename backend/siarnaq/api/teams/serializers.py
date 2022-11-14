@@ -8,8 +8,18 @@ from siarnaq.api.teams.models import Rating, Team, TeamProfile
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ["episode", "name", "members", "status"]
-        read_only_fields = ["members"]
+        fields = ["episode", "name", "members", "status", "join_key"]
+        read_only_fields = ["episode", "members", "status", "join_key"]
+
+    def to_internal_value(self, data):
+        """
+        Use the episode ID provided in URL as the team's episode.
+        """
+        ret = super().to_internal_value(data)
+        # TODO: this prevents some validation (e.g. uniqueness of (episode, team)),
+        # which is undesirable.
+        ret.update(episode_id=self.context["view"].kwargs.get("episode_id"))
+        return ret
 
 
 class TeamProfileSerializer(serializers.ModelSerializer):
@@ -26,6 +36,15 @@ class TeamProfileSerializer(serializers.ModelSerializer):
             "auto_accept_unranked",
             "eligible_for",
         ]
+
+    def __init__(self, *args, **kwargs):
+        """
+        Provide nested team serializer with the context, so that
+        it can access URL episode ID.
+        See https://stackoverflow.com/q/30560470.
+        """
+        super().__init__(*args, **kwargs)
+        self.fields["team"].context.update(self.context)
 
     def create(self, validated_data):
         eligible_for_exists = "eligible_for" in validated_data
@@ -55,14 +74,19 @@ class TeamProfileSerializer(serializers.ModelSerializer):
             nested_data = validated_data.pop("team")
             # Run team update serializer
             nested_serializer.update(nested_instance, nested_data)
-
         if "eligible_for" in validated_data:
             instance.eligible_for.set(
-                validated_data.pop("eligible_for", instance.eligible_for).all()
+                validated_data.pop("eligible_for", instance.eligible_for)
             )
         # Runs the original parent update(), since the nested fields were
         # "popped" out of the data
         return super().update(instance, validated_data)
+
+
+class TeamJoinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ["join_key", "name"]
 
 
 @extend_schema_field(OpenApiTypes.DOUBLE)
