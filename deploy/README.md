@@ -3,13 +3,15 @@
 We use Terraform to deploy our infrastructure, to ensure full documentation of our
 resources and ease of reproducibility. See these instructions for how to use it.
 
-## tl;dr
+## How to develop and deploy
+
+tl;dr:
 
 - To install dependency Terraform modules: `terraform init`
 - To check what Terraform would change: `terraform plan`
 - To make Terraform changes: `terraform apply`
 
-## Getting started
+### Getting started
 
 You should have installed the Google Cloud SDK and authenticated it as yourself. Ensure
 your conda environment contains `terraform` as required by the environment specification
@@ -21,7 +23,7 @@ existence is a security risk. Instead, Terraform has been configured to automati
 impersonate (convert to) the Terraform service account, where minimal permissions are
 granted.
 
-## Making changes
+### Making changes
 
 Whenever you make changes and apply them, you should add and commit all `.tf` files as
 well as the `.terraform.lock.hcl` file.
@@ -30,7 +32,7 @@ Whenever you create a new resource, think about sizing. Be warned that small res
 (especially shared-core ones) might not be sufficient for high-traffic components, and
 might only be sufficient for testing environments.
 
-## Initial Terraform configuration
+### Initial Terraform configuration
 
 _These steps have already been completed, but are noted here for posterity._
 
@@ -43,11 +45,24 @@ a new project:
   as specified in `variables.tf`. Grant it roles permitting it to administer all
   resources you require.
 
-## Shutting down
+### Shutting down
 
 You can shut everything off with `terraform destroy`. Be warned that this might not
 actually destroy all resources, because some resources are configured to stick around.
 But also, why would you ever need to run this?
+
+## The system design architecture
+
+![](architecture.png)
+
+In terraform:
+
+- `siarnaq` owns the Cloud Run, Cloud SQL, and Secret Manager modules, as well as the
+  Pub/Sub topics.
+- `saturn` owns its Pub/Sub subscriptions and compute clusters.
+- `ganymede` (coming soon) owns its Pub/Sub subscription and Cloud Function.
+- `network` owns the Load Balancer and Cloud CDN configurations.
+- `cd` owns the Continuous Deployment setup.
 
 ## Todos, and old notes
 
