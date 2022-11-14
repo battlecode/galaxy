@@ -95,6 +95,10 @@ class UserResumeSerializer(serializers.Serializer):
     resume = serializers.FileField(write_only=True)
 
 
+class UserAvatarSerializer(serializers.Serializer):
+    avatar = serializers.ImageField(write_only=True)
+
+
 class PublicUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
