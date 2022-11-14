@@ -62,7 +62,7 @@ class UserProfile(models.Model):
     kerberos = models.SlugField(max_length=16, blank=True)
     """The kerberos username of the user, if an MIT student."""
 
-    avatar_extension = models.TextField(default=None)
+    has_avatar = models.BooleanField(default=False)
     """Whether the user has an uploaded avatar."""
 
     has_resume = models.BooleanField(default=False)
@@ -76,4 +76,4 @@ class UserProfile(models.Model):
         return posixpath.join("user", str(self.pk), "resume.pdf")
 
     def get_avatar_path(self):
-        return posixpath.join("user", str(self.pk), f"avatar.{self.avatar_extension}")
+        return posixpath.join("user", str(self.pk), "avatar.png")

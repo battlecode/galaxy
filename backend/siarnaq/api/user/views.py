@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import transaction
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
+from PIL import Image
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
@@ -88,7 +89,7 @@ class UserProfileViewSet(
         )
         match request.method.lower():
             case "get":
-                if profile.avatar_extension is None:
+                if not profile.has_avatar:
                     raise Http404
 
                 url = "https://storage.googleapis.com"
@@ -99,13 +100,19 @@ class UserProfileViewSet(
                 serializer = self.get_serializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
                 avatar = serializer.validated_data["avatar"]
+
+                MAX_AVATAR_SIZE = (512, 512)
+                img = Image.open(avatar)
+                img.thumbnail(MAX_AVATAR_SIZE)
+                img.save(os.path.splitext(avatar)[0].png)
+
                 with transaction.atomic():
-                    # record file type
-                    profile.avatar_extension = os.path.splitext(request.data)
-                    profile.save(update_fields=["avatar_extension"])
+                    profile.has_avatar = True
+                    profile.save(update_fields=["has_avatar"])
                     if not settings.GCLOUD_DISABLE_ALL_ACTIONS:
                         with blob.open("wb") as f:
-                            for chunk in avatar.chunks():
+                            # img should always have filename attribute
+                            for chunk in img.filename.chunks():
                                 f.write(chunk)
                     blob.metadata = {"Content-Type": "image/png"}
                     blob.patch()
