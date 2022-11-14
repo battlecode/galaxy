@@ -74,3 +74,6 @@ class UserProfile(models.Model):
     def get_resume_path(self):
         """Return the path of the resume on Google cloud storage."""
         return posixpath.join("user", str(self.pk), "resume.pdf")
+
+    def get_avatar_path(self):
+        return posixpath.join("user", str(self.pk), "avatar")

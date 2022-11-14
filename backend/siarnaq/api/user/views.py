@@ -12,6 +12,7 @@ from siarnaq.api.user.models import UserProfile
 from siarnaq.api.user.permissions import IsAuthenticatedAsRequestedUser
 from siarnaq.api.user.serializers import (
     PublicUserProfileSerializer,
+    UserAvatarSerializer,
     UserProfileSerializer,
     UserResumeSerializer,
 )
@@ -74,6 +75,34 @@ class UserProfileViewSet(
                 return Response(serializer.data)
             case _:
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
+
+    @action(detail=True, methods=["get", "put"], serializer_class=UserAvatarSerializer)
+    def avatar(self, request, pk=None):
+        """Retrieve or update uploaded avatar"""
+        profile = self.get_object()
+        client = storage.Client()
+        blob = client.bucket("battle-public-upload").blob(profile.get_avatar_path())
+        match request.method.lower():
+            case "get":
+                if not profile.has_avatar:
+                    raise Http404
+                return (
+                    "https://storage.googleapis.com/battle-public-upload/"
+                    + profile.get_avatar_path()
+                )
+            case "put":
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                avatar = serializer.validated_data["avatar"]
+                with transaction.atomic():
+                    profile.has_avatar = True
+                    profile.save(update_fields=["has_avatar"])
+                    if not settings.GCLOUD_DISABLE_ALL_ACTIONS:
+                        with blob.open("wb") as f:
+                            for chunk in avatar.chunks():
+                                f.write(chunk)
+                    blob.metadata = {"Content-Type": "image/png"}
+                    blob.patch()
 
 
 class PublicUserProfileViewSet(viewsets.ReadOnlyModelViewSet):
