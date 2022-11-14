@@ -1,3 +1,5 @@
+import os
+
 import google.cloud.storage as storage
 from django.conf import settings
 from django.db import transaction
@@ -84,7 +86,7 @@ class UserProfileViewSet(
         blob = client.bucket("battle-public-upload").blob(profile.get_avatar_path())
         match request.method.lower():
             case "get":
-                if not profile.has_avatar:
+                if profile.avatar_extension is None:
                     raise Http404
                 return (
                     "https://storage.googleapis.com/battle-public-upload/"
@@ -95,14 +97,17 @@ class UserProfileViewSet(
                 serializer.is_valid(raise_exception=True)
                 avatar = serializer.validated_data["avatar"]
                 with transaction.atomic():
-                    profile.has_avatar = True
-                    profile.save(update_fields=["has_avatar"])
+                    # record file type
+                    profile.avatar_extension = os.path.splitext(request.data)
+                    profile.save(update_fields=["avatar_extension"])
                     if not settings.GCLOUD_DISABLE_ALL_ACTIONS:
                         with blob.open("wb") as f:
                             for chunk in avatar.chunks():
                                 f.write(chunk)
                     blob.metadata = {"Content-Type": "image/png"}
                     blob.patch()
+            case _:
+                raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
 
 
 class PublicUserProfileViewSet(viewsets.ReadOnlyModelViewSet):
