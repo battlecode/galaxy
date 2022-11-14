@@ -4,6 +4,9 @@ defaults:
   run:
     shell: bash -l {0}
 
+env:
+  CACHE_NUMBER: 0
+
 jobs:
   lint:
     name: Linter (pre-commit)
@@ -13,19 +16,17 @@ jobs:
       id-token: write
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.1.0
       - name: Cache conda
         uses: actions/cache@v3.0.11
-        env:
-          CACHE_NUMBER: 0
         with:
           path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
       - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v2.1.1
+        uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           environment-file: environment-dev.yml
+          use-only-tar-bz2: true
       - name: Run linter
         run: |
           pre-commit install
@@ -38,19 +39,17 @@ jobs:
       id-token: write
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.1.0
       - name: Cache conda
         uses: actions/cache@v3.0.11
-        env:
-          CACHE_NUMBER: 0
         with:
           path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
       - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v2.1.1
+        uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           environment-file: environment-dev.yml
+          use-only-tar-bz2: true
       - name: Initialize migrations
         run: ./manage.py makemigrations
         working-directory: ./backend
