@@ -88,12 +88,11 @@ class UserProfileViewSet(
             case "get":
                 if profile.avatar_extension is None:
                     raise Http404
-                base_url = "https://storage.googleapis.com"
-                return f"""
-                {base_url}/
-                {settings.GCLOUD_PUBLIC_BUCKET}/
-                {profile.get_avatar_path()}
-                """
+
+                url = "https://storage.googleapis.com"
+                return (
+                    f"{url}/{settings.GCLOUD_PUBLIC_BUCKET}/{profile.get_avatar_path()}"
+                )
             case "put":
                 serializer = self.get_serializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
