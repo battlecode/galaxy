@@ -24,10 +24,10 @@ class Gender(models.TextChoices):
     An immutable type enumerating the available gender selections.
     """
 
-    WOMAN = "W"
-    MAN = "M"
+    FEMALE = "F"
+    MALE = "M"
     NON_BINARY = "N"
-    CUSTOM = "*"
+    PREFER_TO_SELF_DESCRIBE = "*"
     RATHER_NOT_SAY = "?"
 
 
