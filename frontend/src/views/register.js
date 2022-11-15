@@ -13,7 +13,7 @@ class Register extends Component {
         last_name: "",
       },
       gender: "",
-      date_of_birth: "",
+      gender_details: "",
     },
     register: false,
     error: "",
@@ -176,7 +176,7 @@ class Register extends Component {
           <div
             className="card"
             style={{
-              width: "350px",
+              width: "600px",
               margin: error ? "20px auto" : "40px auto",
             }}
           >
@@ -238,27 +238,14 @@ class Register extends Component {
                     />
                   </div>
                 </div>
-                <div className="col-xs-6">
+                <div className="col-xs-4">
                   <div className="form-group">
-                    <label>Date of Birth</label>
-                    <input
-                      type="text"
-                      id="date_of_birth"
-                      placeholder="YYYY-MM-DD"
-                      className="form-control"
-                      onChange={this.changeHandler}
-                    />
-                  </div>
-                </div>
-                <div className="col-xs-6">
-                  <div className="form-group">
-                    <label>Gender</label>
+                    <label>Gender Identity</label>
                     <Floater
                       content={
                         <div>
-                          If you prefer to self-describe your gender identity,
-                          then select that option, register, and then provide
-                          any information you'd like to in the "Account" page.
+                          We collect this information to help report diversity
+                          information to ourselves and our sponsors.
                         </div>
                       }
                       showCloseButton={true}
@@ -274,9 +261,22 @@ class Register extends Component {
                       <option value="F">Female </option>
                       <option value="M">Male </option>
                       <option value="N">Non-binary </option>
-                      <option value="*">Prefer to self-describe </option>
+                      <option value="*">
+                        Prefer to self-describe (use space below)
+                      </option>
                       <option value="?">Rather not say </option>
                     </select>
+                  </div>
+                </div>
+                <div className="col-xs-8">
+                  <div className="form-group">
+                    <label>Self-described Gender Identity</label>
+                    <input
+                      type="text"
+                      id="gender_details"
+                      className="form-control"
+                      onChange={this.changeHandler}
+                    />
                   </div>
                 </div>
               </div>
