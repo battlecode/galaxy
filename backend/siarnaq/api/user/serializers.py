@@ -59,7 +59,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "user",
             "gender",
             "gender_details",
-            "date_of_birth",
             "school",
             "biography",
             "kerberos",
