@@ -14,6 +14,7 @@ class Register extends Component {
       },
       gender: "",
       gender_details: "",
+      school: "",
     },
     register: false,
     error: "",
@@ -58,7 +59,9 @@ class Register extends Component {
     else if (user.password.length < 6)
       this.setState({ error: "Password must be at least 6 characters." });
     else if (gender == "") {
-      this.setState({ error: "Must select an option in the Gender dropdown." });
+      this.setState({
+        error: "Must select an option in the Gender Identity dropdown.",
+      });
     } else {
       Api.register(this.state.user_profile, this.callback);
     }
@@ -184,7 +187,7 @@ class Register extends Component {
               <div className="row">
                 <div className="col-md-12">
                   <div className="form-group">
-                    <label>Username</label>
+                    <label>Username *</label>
                     <input
                       type="text"
                       id="user-username"
@@ -195,7 +198,7 @@ class Register extends Component {
                 </div>
                 <div className="col-md-12">
                   <div className="form-group">
-                    <label>Password</label>
+                    <label>Password *</label>
                     <input
                       type="password"
                       id="user-password"
@@ -206,7 +209,7 @@ class Register extends Component {
                 </div>
                 <div className="col-md-12">
                   <div className="form-group">
-                    <label>Email</label>
+                    <label>Email *</label>
                     <input
                       type="email"
                       id="user-email"
@@ -218,7 +221,7 @@ class Register extends Component {
                 </div>
                 <div className="col-xs-6">
                   <div className="form-group">
-                    <label>First Name</label>
+                    <label>First Name *</label>
                     <input
                       type="text"
                       id="user-first_name"
@@ -229,7 +232,7 @@ class Register extends Component {
                 </div>
                 <div className="col-xs-6">
                   <div className="form-group">
-                    <label>Last Name</label>
+                    <label>Last Name *</label>
                     <input
                       type="text"
                       id="user-last_name"
@@ -238,14 +241,25 @@ class Register extends Component {
                     />
                   </div>
                 </div>
+                <div className="col-md-12">
+                  <div className="form-group">
+                    <label>School</label>
+                    <input
+                      type="text"
+                      id="school"
+                      className="form-control"
+                      onChange={this.changeHandler}
+                    />
+                  </div>
+                </div>
                 <div className="col-xs-4">
                   <div className="form-group">
-                    <label>Gender Identity</label>
+                    <label>Gender Identity *</label>
                     <Floater
                       content={
                         <div>
-                          We collect this information to help report diversity
-                          information to ourselves and our sponsors.
+                          This information helps us track diversity progress for
+                          ourselves and our sponsors!
                         </div>
                       }
                       showCloseButton={true}
@@ -262,7 +276,7 @@ class Register extends Component {
                       <option value="M">Male </option>
                       <option value="N">Non-binary </option>
                       <option value="*">
-                        Prefer to self-describe (use space below)
+                        Prefer to self-describe (use space to the right)
                       </option>
                       <option value="?">Rather not say </option>
                     </select>
