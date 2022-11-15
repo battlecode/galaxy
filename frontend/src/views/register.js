@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Api from "../api";
+import Floater from "react-floater";
 
 class Register extends Component {
   state = {
@@ -57,7 +58,7 @@ class Register extends Component {
     else if (user.password.length < 6)
       this.setState({ error: "Password must be at least 6 characters." });
     else if (gender == "") {
-      this.setState({ error: "Must select a gender." });
+      this.setState({ error: "Must select an option in the Gender dropdown." });
     } else {
       Api.register(this.state.user_profile, this.callback);
     }
@@ -252,16 +253,29 @@ class Register extends Component {
                 <div className="col-xs-6">
                   <div className="form-group">
                     <label>Gender</label>
+                    <Floater
+                      content={
+                        <div>
+                          If you prefer to self-describe your gender identity,
+                          then select that option, register, and then provide
+                          any information you'd like to in the "Account" page.
+                        </div>
+                      }
+                      showCloseButton={true}
+                    >
+                      <i className="pe-7s-info pe-fw" />
+                    </Floater>
                     <select
                       className="form-control"
                       id="gender"
                       onChange={this.changeHandler}
                     >
                       <option value=""></option>
-                      {/* TODO expand this to more options.
-                      It's fine to hard-code them according to backend
-                      (enough of our frontend is hardcoded-but-from-backend anyways) */}
-                      <option value="?">An option</option>
+                      <option value="F">Female </option>
+                      <option value="M">Male </option>
+                      <option value="N">Non-binary </option>
+                      <option value="*">Prefer to self-describe </option>
+                      <option value="?">Rather not say </option>
                     </select>
                   </div>
                 </div>
