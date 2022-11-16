@@ -26,39 +26,20 @@ class NLink extends Component {
 }
 
 class SideBar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      league: {},
-    };
-  }
-
-  // This is messy, will clean in #91
-  componentDidMount() {
-    // This function, for mobile devices, moves the navbar into the sidebar and then
-    // collapses the sidebar. Better responsive display
-    // (Only call it when the entire DOM has fully loaded, since otherwise,
-    // the _incomplete_ navbar gets moved and is stuck there.)
-    // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
-    $(document).ready(function () {
-      window.init_right_menu();
-    });
-
-    Api.getLeague((league) => {
-      this.setState({ league }); // TODO: update league function here
-    });
-  }
-
   // Note that this duplicates a method in submissions.js;
   // this will be cleaned up. See #74
   isGameReleasedForUser() {
-    if (this.props.is_staff) {
-      return true;
+    console.log(this.props.episode_info);
+    if (this.props.episode_info) {
+      console.log(new Date());
+      console.log(new Date(this.props.episode_info.game_release));
+      console.log(new Date() > new Date(this.props.episode_info.game_release));
     }
-    if (this.state.league.game_released == true) {
-      return true;
-    }
-    return false;
+    return (
+      this.props.is_staff ||
+      (this.props.episode_info &&
+        new Date() > new Date(this.props.episode_info.game_release))
+    );
   }
 
   // for icon options below, see https://themes-pixeden.com/font-demos/7-stroke/

@@ -219,17 +219,15 @@ class Api {
 
   //----GENERAL INFO----
 
-  static getLeague(callback) {
-    $.get(`${URL}/api/league/${LEAGUE}/`).done((data, status) => {
-      Cookies.set("league_url", data.url);
-      $.get(data.url)
-        .done((data, success) => {
-          callback(data);
-        })
-        .fail((xhr, status, error) => {
-          console.log("Error in getting league: ", xhr, status, error);
-        });
-    });
+  static getEpisodeInfo(episode, callback) {
+    $.get(`${URL}/api/episode/e/${episode}/`)
+      .done((data, success) => {
+        console.log(data);
+        callback(data);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting episode info: ", xhr, status, error);
+      });
   }
 
   static getUpdates(callback) {
