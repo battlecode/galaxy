@@ -131,7 +131,7 @@ class App extends Component {
         key="issues"
       />,
       <Route
-        path={`/:episode/debugging`}
+        path={`/:episode/debugging-tips`}
         component={Debugging}
         key="debugging"
       />,
@@ -145,12 +145,12 @@ class App extends Component {
         component={Resources}
         key="resources"
       />,
-      <Route
-        path={`/:episode/rankings/:team_id`}
-        component={TeamInfo}
-        key="rankings-team"
-      />,
-      <Route path={`/:episode/rankings`} component={Rankings} key="rankings" />,
+      // <Route
+      //   path={`/:episode/rankings/:team_id`}
+      //   component={TeamInfo}
+      //   key="rankings-team"
+      // />,
+      // <Route path={`/:episode/rankings`} component={Rankings} key="rankings" />,
     ];
 
     // should only be visible to logged in users

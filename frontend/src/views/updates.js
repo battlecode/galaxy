@@ -8,11 +8,15 @@ class Updates extends Component {
   }
 
   componentDidMount() {
+    // The backend does not currently support making/retrieving a list of
+    // announcements, so this has been commented out for now.
+    /*
     Api.getUpdates(
       function (new_state) {
         this.setState({ updates: new_state });
       }.bind(this)
     );
+    */
   }
 
   render() {
