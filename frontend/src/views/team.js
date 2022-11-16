@@ -198,7 +198,7 @@ class YesTeam extends Component {
                       className="form-control"
                       placeholder="Put your team bio here."
                       onChange={this.changeHandler}
-                      value={this.state.team_profile.bio}
+                      value={this.state.team_profile.biography}
                     />
                   </div>
                 </div>
@@ -273,11 +273,11 @@ class NoTeam extends Component {
     Api.createTeam(
       this.state.team_name,
       this.props.episode,
-      this.createUserCallback
+      this.createTeamCallback
     );
   }
 
-  createUserCallback = (success) => {
+  createTeamCallback = (success) => {
     this.setState({ createTeamError: !success });
     if (success) this.props.updateBaseState();
   };
