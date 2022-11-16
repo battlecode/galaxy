@@ -756,13 +756,7 @@ class Api {
         );
       })
       .fail((xhr, status, error) => {
-        if (xhr.responseJSON.username)
-          callback(xhr.responseJSON.username, false);
-        else if (xhr.responseJSON.email)
-          callback(xhr.responseJSON.email, false);
-        else {
-          callback("there was an error", false);
-        }
+        callback(JSON.stringify(xhr.responseJSON), false);
       });
   }
 
