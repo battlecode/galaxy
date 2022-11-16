@@ -54,11 +54,9 @@ class Register extends Component {
       this.setState({ error: "Must provide first name." });
     else if (!user.last_name)
       this.setState({ error: "Must provide last name." });
-    else if (!user_profile.date_of_birth.match(/^\d{4}-\d{2}-\d{2}$/g))
-      this.setState({ error: "Must provide DOB in YYYY-MM-DD form." });
     else if (user.password.length < 6)
       this.setState({ error: "Password must be at least 6 characters." });
-    else if (gender == "") {
+    else if (user.gender == "") {
       this.setState({
         error: "Must select an option in the Gender Identity dropdown.",
       });
