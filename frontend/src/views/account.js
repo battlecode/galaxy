@@ -200,19 +200,6 @@ class Account extends Component {
                     <div className="row">
                       <div className="col-md-6">
                         <div className="form-group">
-                          <label>Date of Birth (YYYY-MM-DD)</label>
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="date_of_birth"
-                            onChange={this.changeHandler}
-                            value={this.state.user_profile.date_of_birth}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="col-md-6">
-                        <div className="form-group">
                           <label>Country</label>
                           <select
                             className="form-control"
