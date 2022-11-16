@@ -24,7 +24,10 @@ class NavBar extends Component {
               <span className="icon-bar" />
               <span className="icon-bar" />
             </button>
-            <NavLink className="navbar-brand" to={`/home`}>
+            <NavLink
+              className="navbar-brand"
+              to={`/${this.props.episode}/home`}
+            >
               Battlecode {this.props.episode}
             </NavLink>
           </div>
