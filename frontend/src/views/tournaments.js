@@ -33,11 +33,11 @@ class Tournaments extends Component {
                 </div>
                 <div className="content">
                   <p>
-                    Battlecode {this.state.episode} will consist of seven
+                    Battlecode {this.state.episode} will consist of several
                     tournaments throughout the month! We stream and commentate
-                    all tournaments online.
+                    all tournaments online. <i>More details coming soon!</i>
                   </p>
-                  <ul>
+                  {/* <ul>
                     <li>
                       <b>Sprint Tournament 1: 1/11.</b> One week after spec
                       release, you're given a chance to win small prizes in this
@@ -86,7 +86,7 @@ class Tournaments extends Component {
                       The deadline to submit code for each non-final tournament
                       is 7 pm EST <i>the day before</i> the tournament.
                     </b>
-                  </p>
+                  </p> */}
                 </div>
               </div>
 

@@ -16,7 +16,7 @@ class Resources extends Component {
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-12">
-              <div className="card">
+              {/*<div className="card">
                 <div className="header">
                   <h4 className="title">Game Specifications</h4>
                 </div>
@@ -40,7 +40,7 @@ class Resources extends Component {
                     </a>
                   </p>
                 </div>
-              </div>
+              </div> */}
               <div className="card">
                 <div className="header">
                   <h4 className="title">Coding Resources</h4>
@@ -70,7 +70,7 @@ class Resources extends Component {
                     <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
-                      href={`/${this.state.episode}/debugging`}
+                      href={`/${this.state.episode}/debugging-tips`}
                     >
                       Debugging Tips
                     </a>
@@ -110,8 +110,9 @@ class Resources extends Component {
                     Battlecode {this.state.episode} will be holding lectures,
                     where a dev will be going over possible strategy, coding up
                     an example player, answering questions, etc. Lectures are
-                    streamed on Twitch every weekday the first two weeks of IAP
-                    7-10 PM Eastern Time.
+                    streamed on Twitch .
+                    {/* every weekday the first two weeks of IAP. */}
+                    <i>More details coming soon!</i>
                   </p>
                   <p>
                     All lectures are streamed live on{" "}
