@@ -78,11 +78,12 @@ class SideBar extends Component {
               icon={"pe-7s-note2"}
               label="Resources"
             />
-            <NLink
+
+            {/* <NLink
               to={`/${this.props.episode}/updates`}
               icon={"pe-7s-bell"}
               label="Updates"
-            />
+            /> */}
 
             <br />
 
@@ -91,11 +92,13 @@ class SideBar extends Component {
               icon={"pe-7s-medal"}
               label="Tournaments"
             />
-            <NLink
+
+            {/* <NLink
               to={`/${this.props.episode}/rankings`}
               icon={"pe-7s-graph1"}
               label="Rankings"
-            />
+            /> */}
+
             {/* search bar link, unused since Search is broken
             Commented in case someone wants to bring it back in the future
             You'd have to refactor the code to match the other NLink's */}
