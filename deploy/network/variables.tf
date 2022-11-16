@@ -18,6 +18,11 @@ variable "gcp_zone" {
   type        = string
 }
 
+variable "domain" {
+  description = "Domain to be managed by the DNS"
+  type        = string
+}
+
 variable "cloudrun_service_name" {
   description = "The name of the Cloud Run service to be routed to"
   type        = string

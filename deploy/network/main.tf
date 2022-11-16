@@ -153,5 +153,16 @@ resource "google_compute_url_map" "this" {
   }
 }
 
-# resource "google_dns" "this" {
-# }
+resource "google_dns_managed_zone" "this" {
+  name     = var.name
+  dns_name = var.domain
+}
+
+resource "google_dns_record_set" "this" {
+  name = google_dns_managed_zone.this.dns_name
+  type = "A"
+  ttl  = 300
+
+  managed_zone = google_dns_managed_zone.this.name
+  rrdatas      = [module.lb.external_ip]
+}

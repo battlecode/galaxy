@@ -75,6 +75,7 @@ module "network" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  domain      = "battlecode.org."
 
   cloudrun_service_name = module.production.run_service_name
   storage_frontend_name = module.production.storage_frontend_name
