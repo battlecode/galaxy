@@ -70,7 +70,7 @@ class SideBar extends Component {
         {/* data-color is defined in light-bootstrap-dashboard.css */}
         <div className="sidebar-wrapper">
           <div className="logo">
-            <a href="/home">
+            <a href={`/${this.props.episode}/home`}>
               <img src="/bc/img/logo.png" />
             </a>
             <p>Battlecode {this.props.episode}</p>
