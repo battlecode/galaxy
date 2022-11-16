@@ -1,0 +1,19 @@
+name: siarnaq
+channels:
+  - conda-forge
+dependencies:
+  - ca-certificates=2022.9.24
+  - django=4.1.2
+  - django-cors-headers=3.13.0
+  - djangorestframework=3.14.0
+  - drf-spectacular=0.24.2
+  - google-auth=2.13.0
+  - google-cloud-pubsub=2.13.10
+  - google-cloud-storage=2.5.0
+  - openssl=3.0.5
+  - pip=22.3
+  - python=3.10
+  - uwsgi=2.0.20
+  - pip:
+    - djangorestframework-simplejwt==5.2.2
+    - google-cloud-scheduler==2.7.3
