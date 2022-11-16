@@ -42,6 +42,7 @@ class App extends Component {
     this.state = {
       logged_in: null,
       episode: episode,
+      episode_info: null,
       user_profile: null,
       team_profile: null,
     };
@@ -64,9 +65,13 @@ class App extends Component {
       this.setState({ team_profile });
     });
 
+    const ajax4 = Api.getEpisodeInfo(this.state.episode, (episode_info) => {
+      this.setState({ episode_info });
+    });
+
     // Run this function when all AJAX queries are completed.
     // See https://stackoverflow.com/a/9865124.
-    $.when(ajax1, ajax2, ajax3).done(callback);
+    $.when(ajax1, ajax2, ajax3, ajax4).done(callback);
   };
 
   componentDidMount() {
@@ -254,6 +259,7 @@ class App extends Component {
               is_staff={is_staff}
               on_team={on_team}
               episode={this.state.episode}
+              episode_info={this.state.episode_info}
             />
             <div className="main-panel">
               <NavBar
