@@ -18,6 +18,7 @@ dependencies:
   - mypy=0.942
   - openssl=3.0.5
   - pip=22.3
+  - pillow=9.0.1
   - pre_commit=2.20.0
   - python=3.10
   - pyupgrade=3.1.0
