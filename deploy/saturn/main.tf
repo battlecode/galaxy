@@ -1,5 +1,5 @@
 resource "google_service_account" "this" {
-  account_id   = "${var.name}-agent"
+  account_id   = var.name
   display_name = "Saturn Agent"
   description  = "Service account for performing Saturn actions"
 }

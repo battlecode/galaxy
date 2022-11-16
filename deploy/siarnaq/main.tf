@@ -23,7 +23,7 @@ resource "google_storage_bucket_iam_member" "secure" {
 resource "google_project_iam_member" "scheduler" {
   project = var.gcp_project
   role    = "roles/cloudscheduler.admin"
-  member = "serviceAccount:${google_service_account.this.email}"
+  member  = "serviceAccount:${google_service_account.this.email}"
 }
 
 resource "google_pubsub_topic" "this" {
@@ -46,7 +46,7 @@ resource "google_sql_database_instance" "this" {
   database_version = "POSTGRES_14"
 
   settings {
-    tier = "db-custom-1-3840"
+    tier = var.database_tier
 
     ip_configuration {
       ipv4_enabled = true
@@ -74,7 +74,7 @@ resource "google_sql_user" "this" {
 }
 
 resource "google_secret_manager_secret" "this" {
-  secret_id = var.name
+  secret_id = "${var.name}-db-password"
 
   replication {
     automatic = true
@@ -94,6 +94,7 @@ resource "google_secret_manager_secret_iam_member" "this" {
 }
 
 resource "google_cloud_run_service" "this" {
+  count    = var.create_cloud_run ? 1 : 0
   name     = var.name
   location = var.gcp_region
 

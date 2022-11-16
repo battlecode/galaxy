@@ -1,5 +1,5 @@
 output "run_service_name" {
-  value = google_cloud_run_service.this.name
+  value = var.create_cloud_run ? google_cloud_run_service.this[0].name : null
 }
 
 output "topic_antivirus_name" {

@@ -23,12 +23,17 @@ variable "cloudrun_service_name" {
   type        = string
 }
 
-variable "storage_public_name" {
-  description = "Name of Google Cloud Storage bucket resource for public artifacts"
-  type        = string
-}
-
 variable "storage_frontend_name" {
   description = "Name of Google Cloud Storage bucket resource for website frontend"
   type        = string
+}
+
+variable "production_buckets" {
+  description = "Specifications for buckets to be routed in production"
+  type        = map(object({ bucket_name=string, enable_cdn=bool, paths=list(string) }))
+}
+
+variable "staging_buckets" {
+  description = "Specifications for buckets to be routed in staging"
+  type        = map(object({ bucket_name=string, enable_cdn=bool, paths=list(string) }))
 }

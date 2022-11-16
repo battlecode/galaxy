@@ -9,18 +9,26 @@ resource "google_compute_region_network_endpoint_group" "serverless" {
   }
 }
 
-resource "google_compute_backend_bucket" "public" {
-  name = "${var.name}-public"
-
-  bucket_name = var.storage_public_name
+resource "google_compute_backend_bucket" "frontend" {
+  name        = "${var.name}-frontend"
+  bucket_name = var.storage_frontend_name
   enable_cdn  = true
 }
 
-resource "google_compute_backend_bucket" "frontend" {
-  name = "${var.name}-frontend"
+resource "google_compute_backend_bucket" "production" {
+  for_each = var.production_buckets
 
-  bucket_name = var.storage_frontend_name
-  enable_cdn  = true
+  name        = "${var.name}-production-${each.key}"
+  bucket_name = each.value.bucket_name
+  enable_cdn  = each.value.enable_cdn
+}
+
+resource "google_compute_backend_bucket" "staging" {
+  for_each = var.staging_buckets
+
+  name        = "${var.name}-staging-${each.key}"
+  bucket_name = each.value.bucket_name
+  enable_cdn  = each.value.enable_cdn
 }
 
 module "lb" {
@@ -103,11 +111,16 @@ resource "google_compute_url_map" "this" {
 
   host_rule {
     hosts        = ["*"]
-    path_matcher = "allpaths"
+    path_matcher = "production"
+  }
+
+  host_rule {
+    hosts        = ["staging.battlecode.org"]
+    path_matcher = "staging"
   }
 
   path_matcher {
-    name = "allpaths"
+    name            = "production"
     default_service = google_compute_backend_bucket.frontend.self_link
 
     path_rule {
@@ -117,12 +130,25 @@ resource "google_compute_url_map" "this" {
       ]
       service = module.lb.backend_services["serverless"].self_link
     }
-    path_rule {
-      paths = [
-        "/public",
-        "/public/*",
-      ]
-      service = google_compute_backend_bucket.public.self_link
+    dynamic "path_rule" {
+      for_each = var.production_buckets
+      content {
+        paths   = path_rule.value.paths
+        service = google_compute_backend_bucket.production[path_rule.key].self_link
+      }
+    }
+  }
+
+  path_matcher {
+    name            = "staging"
+    default_service = google_compute_backend_bucket.frontend.self_link
+
+    dynamic "path_rule" {
+      for_each = var.staging_buckets
+      content {
+        paths   = path_rule.value.paths
+        service = google_compute_backend_bucket.staging[path_rule.key].self_link
+      }
     }
   }
 }

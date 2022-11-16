@@ -1,43 +1,3 @@
-resource "google_storage_bucket" "public" {
-  name = "mitbattlecode-public"
-
-  location      = "US"
-  storage_class = "STANDARD"
-}
-
-resource "google_storage_bucket" "secure" {
-  name = "mitbattlecode-secure"
-
-  location      = "US"
-  storage_class = "STANDARD"
-}
-
-resource "google_storage_bucket" "frontend" {
-  name = "mitbattlecode-frontend"
-
-  location      = "US"
-  storage_class = "STANDARD"
-}
-
-resource "google_storage_bucket_access_control" "public" {
-  bucket = google_storage_bucket.public.name
-  role   = "READER"
-  entity = "allUsers"
-}
-
-resource "google_storage_bucket_access_control" "frontend" {
-  bucket = google_storage_bucket.frontend.name
-  role   = "READER"
-  entity = "allUsers"
-}
-
-resource "google_compute_network" "this" {
-  name = "galaxy"
-
-  auto_create_subnetworks = false
-  routing_mode            = "REGIONAL"
-}
-
 module "cd" {
   source = "./cd"
 
@@ -46,11 +6,7 @@ module "cd" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
-  storage_frontend_name = google_storage_bucket.frontend.name
-
-  depends_on = [
-    google_project_service.artifactregistry,
-  ]
+  storage_frontend_name = module.production.storage_public_name
 }
 
 module "releases_maven" {
@@ -66,20 +22,20 @@ module "releases_maven" {
   ]
 }
 
-module "siarnaq" {
-  source = "./siarnaq"
-
-  name        = "siarnaq"
+module "production" {
+  source      = "./galaxy"
+  name        = "production"
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
-  image       = module.cd.artifact_siarnaq_image
 
-  database_name = "battlecode"
-  database_user = "siarnaq"
+  create_website = true
+  siarnaq_image  = module.cd.artifact_siarnaq_image
+  database_tier  = "db-custom-1-3840"
 
-  storage_public_name = google_storage_bucket.public.name
-  storage_secure_name = google_storage_bucket.secure.name
+  saturn_image          = module.cd.artifact_saturn_image
+  max_compile_instances = 10
+  max_execute_instances = 10
 
   depends_on = [
     google_project_service.artifactregistry,
@@ -89,59 +45,26 @@ module "siarnaq" {
   ]
 }
 
-module "saturn_compile" {
-  source = "./saturn"
-
-  name        = "saturn-compile"
+module "staging" {
+  source      = "./galaxy"
+  name        = "staging"
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
-  pubsub_topic_name   = module.siarnaq.topic_compile_name
-  storage_public_name = google_storage_bucket.public.name
-  storage_secure_name = google_storage_bucket.secure.name
+  create_website = false
+  siarnaq_image  = null
+  database_tier  = "db-f1-micro"
 
-  network_vpc_id = google_compute_network.this.id
-  subnetwork_ip_cidr = "172.16.0.0/16"
-
-  machine_type = "e2-medium"
-  image        = module.cd.artifact_saturn_image
-  command      = "compile"
-
-  max_instances = 10
-  min_instances = 0
-  load_ratio    = 25
+  saturn_image          = module.cd.artifact_saturn_image
+  max_compile_instances = 1
+  max_execute_instances = 1
 
   depends_on = [
     google_project_service.artifactregistry,
-  ]
-}
-
-module "saturn_execute" {
-  source = "./saturn"
-
-  name        = "saturn-execute"
-  gcp_project = var.gcp_project
-  gcp_region  = var.gcp_region
-  gcp_zone    = var.gcp_zone
-
-  pubsub_topic_name   = module.siarnaq.topic_execute_name
-  storage_public_name = google_storage_bucket.public.name
-  storage_secure_name = google_storage_bucket.secure.name
-
-  network_vpc_id = google_compute_network.this.id
-  subnetwork_ip_cidr = "172.17.0.0/16"
-
-  machine_type = "e2-highmem-2"
-  image        = "us-east1-docker.pkg.dev/mitbattlecode/galaxy/saturn"  # TODO make automatic
-  command      = "execute"
-
-  max_instances = 10
-  min_instances = 0
-  load_ratio    = 10
-
-  depends_on = [
-    google_project_service.artifactregistry,
+    google_project_service.run,
+    google_project_service.secretmanager,
+    google_project_service.sqladmin,
   ]
 }
 
@@ -153,7 +76,22 @@ module "network" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
-  cloudrun_service_name = module.siarnaq.run_service_name
-  storage_public_name   = google_storage_bucket.public.name
-  storage_frontend_name = google_storage_bucket.frontend.name
+  cloudrun_service_name = module.production.run_service_name
+  storage_frontend_name = module.production.storage_frontend_name
+
+  production_buckets = {
+    public = {
+      bucket_name = module.production.storage_public_name
+      enable_cdn  = true
+      paths       = ["/public", "/public/*"]
+    }
+  }
+
+  staging_buckets = {
+    public = {
+      bucket_name = module.staging.storage_public_name
+      enable_cdn  = false
+      paths       = ["/public", "/public/*"]
+    }
+  }
 }
