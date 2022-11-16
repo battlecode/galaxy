@@ -1,4 +1,4 @@
-name: siarnaq
+name: galaxy
 channels:
   - conda-forge
 dependencies:

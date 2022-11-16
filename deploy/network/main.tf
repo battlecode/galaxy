@@ -44,9 +44,10 @@ module "lb" {
   project = var.gcp_project
   name    = var.name
 
-  url_map        = google_compute_url_map.this.self_link
-  create_url_map = false
-  https_redirect = true
+  url_map           = google_compute_url_map.this.self_link
+  create_url_map    = false
+  https_redirect    = true
+  firewall_networks = []
 
   ssl                             = true
   use_ssl_certificates            = false
@@ -60,10 +61,10 @@ module "lb" {
   backends = {
     serverless = {
       description = "Serverless backend"
-      protocol    = "HTTPS"
-      port        = 443
-      port_name   = "https"
-      timeout_sec = 10
+      protocol    = "HTTP"
+      port        = 80
+      port_name   = "http"
+      timeout_sec = null
       enable_cdn  = false
 
       custom_request_headers  = null
@@ -74,16 +75,7 @@ module "lb" {
       session_affinity                = null
       affinity_cookie_ttl_sec         = null
 
-      health_check = {
-        check_interval_sec  = null
-        timeout_sec         = null
-        healthy_threshold   = null
-        unhealthy_threshold = null
-        request_path        = "/api/ping"
-        port                = 443
-        host                = null
-        logging             = null
-      }
+      health_check = null
 
       log_config = {
         enable = true

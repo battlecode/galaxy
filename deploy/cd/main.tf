@@ -12,7 +12,6 @@ locals {
 
 resource "google_cloudbuild_trigger" "home" {
   name     = "${var.name}-home"
-  location = var.gcp_region
   filename = "cloudbuild.yaml"
 
   github {
@@ -26,7 +25,6 @@ resource "google_cloudbuild_trigger" "home" {
 
 resource "google_cloudbuild_trigger" "galaxy" {
   name     = "${var.name}-galaxy"
-  location = var.gcp_region
 
   github {
     owner = "battlecode"
@@ -41,24 +39,11 @@ resource "google_cloudbuild_trigger" "galaxy" {
     step {
       name = "gcr.io/cloud-builders/docker"
       args = ["build", "-t", local.siarnaq_image, "."]
-      dir  = "siarnaq"
-    }
-
-    step {
-      name = "gcr.io/cloud-builders/docker"
-      args = ["build", "-t", local.saturn_image, "."]
-      dir  = "saturn"
-    }
-
-    step {
-      name = "gcr.io/cloud-builders/gsutil"
-      args = ["rsync", "-r", "-c", "-d", ".", "gs://${var.storage_frontend_name}"]
-      dir  = "frontend"
+      dir  = "backend"
     }
 
     images = [
       local.siarnaq_image,
-      local.saturn_image,
     ]
   }
 }
