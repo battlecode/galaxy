@@ -1,3 +1,16 @@
+resource "google_storage_bucket" "home" {
+  name = "mitbattlecode-home"
+
+  location      = "US"
+  storage_class = "STANDARD"
+}
+
+resource "google_storage_bucket_access_control" "home" {
+  bucket = google_storage_bucket.home.name
+  role   = "READER"
+  entity = "allUsers"
+}
+
 module "cd" {
   source = "./cd"
 
@@ -71,13 +84,16 @@ module "staging" {
 module "network" {
   source = "./network"
 
-  name        = "network"
+  name        = "galaxy-network"
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
-  domain      = "battlecode.org."
+
+  managed_zone_name = "battlecode-dns-zone"
+  domain            = "battlecode.org."
 
   cloudrun_service_name = module.production.run_service_name
+  storage_home_name     = google_storage_bucket.home.name
   storage_frontend_name = module.production.storage_frontend_name
 
   production_buckets = {

@@ -9,6 +9,12 @@ resource "google_compute_region_network_endpoint_group" "serverless" {
   }
 }
 
+resource "google_compute_backend_bucket" "home" {
+  name        = "${var.name}-home"
+  bucket_name = var.storage_home_name
+  enable_cdn  = true
+}
+
 resource "google_compute_backend_bucket" "frontend" {
   name        = "${var.name}-frontend"
   bucket_name = var.storage_frontend_name
@@ -44,7 +50,12 @@ module "lb" {
 
   ssl                             = true
   use_ssl_certificates            = false
-  managed_ssl_certificate_domains = ["battlecode.org", "play.battlecode.org"]
+  managed_ssl_certificate_domains = [
+    "battlecode.org",
+    "play.battlecode.org",
+    "staging.battlecode.org",
+    "www.battlecode.org",
+  ]
 
   backends = {
     serverless = {
@@ -107,10 +118,10 @@ module "lb" {
 resource "google_compute_url_map" "this" {
   name = var.name
 
-  default_service = google_compute_backend_bucket.frontend.self_link
+  default_service = google_compute_backend_bucket.home.self_link
 
   host_rule {
-    hosts        = ["*"]
+    hosts        = ["play.battlecode.org"]
     path_matcher = "production"
   }
 
@@ -153,16 +164,17 @@ resource "google_compute_url_map" "this" {
   }
 }
 
-resource "google_dns_managed_zone" "this" {
-  name     = var.name
-  dns_name = var.domain
+data "google_dns_managed_zone" "this" {
+  name = var.managed_zone_name
 }
 
 resource "google_dns_record_set" "this" {
-  name = google_dns_managed_zone.this.dns_name
+  for_each = toset(["", "play.", "staging.", "www."])
+
+  name = "${each.value}${data.google_dns_managed_zone.this.dns_name}"
   type = "A"
   ttl  = 300
 
-  managed_zone = google_dns_managed_zone.this.name
+  managed_zone = data.google_dns_managed_zone.this.name
   rrdatas      = [module.lb.external_ip]
 }
