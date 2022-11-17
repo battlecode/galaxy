@@ -13,7 +13,7 @@ const EPISODE_TO_SCAFFOLD_LINK = {
 const EPISODE_TO_SCAFFOLD_NAME = {
   2023: "battlecode23-scaffold",
 };
-const DEFAULT_EPISODE = "2023";
+const DEFAULT_EPISODE = "bc23";
 
 class MultiEpisode extends Component {
   // Given the window.location.pathname of a page (e.g. /2022/getting-started)
