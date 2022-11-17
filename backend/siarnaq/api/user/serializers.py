@@ -1,4 +1,5 @@
 from django.contrib.auth.hashers import make_password
+from django.db import transaction
 from rest_framework import serializers
 
 from siarnaq.api.user.models import User, UserProfile
@@ -71,9 +72,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         # Create user
         user_serializer = self.fields["user"]
         user_data = validated_data.pop("user")
-        user = user_serializer.create(user_data)
-        # Create associated user profile
-        user_profile = UserProfile.objects.create(user=user, **validated_data)
+        # Create user and associated user profile
+        with transaction.atomic():
+            user = user_serializer.create(user_data)
+            user_profile = UserProfile.objects.create(user=user, **validated_data)
         return user_profile
 
     def update(self, instance, validated_data):
