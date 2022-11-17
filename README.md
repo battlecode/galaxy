@@ -71,6 +71,7 @@ gcloud auth application-default login --scopes=openid,https://www.googleapis.com
 ```
 
 You can then access the staging environment by setting the environment variable `SIARNAQ_MODE=STAGING`.
+You may need to ask someone to give you the IAM "Service Account Token Creator" role to be able to do this.
 
 ## How to contribute
 
