@@ -435,15 +435,22 @@ class Api {
   }
 
   static resumeUpload(resume_file, callback) {
-    $.post(`${Cookies.get("user_url")}resume_upload/`, (data, succcess) => {
-      $.ajax({
-        url: data["upload_url"],
-        method: "PUT",
-        data: resume_file,
-        processData: false,
-        contentType: false,
+    const data = new FormData();
+    data.append("resume", resume_file);
+    return $.ajax({
+      url: `${URL}/api/user/detail/current/resume/`,
+      type: "PUT",
+      data: data,
+      dataType: "json",
+      processData: false,
+      contentType: false,
+    })
+      .done((data, status) => {
+        callback(true);
+      })
+      .fail((xhr, status, error) => {
+        callback(false);
       });
-    });
   }
 
   //----SCRIMMAGING----
