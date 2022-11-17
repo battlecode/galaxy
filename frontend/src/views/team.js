@@ -11,7 +11,9 @@ class YesTeam extends Component {
 
     // Copy the user's fetched team profile for use in editable form state.
     const copied_team_profile = { ...props.team_profile };
-    copied_team_profile.team = { ...props.team_profile.team };
+    copied_team_profile.team = props.team_profile
+      ? { ...props.team_profile.team }
+      : {};
 
     this.state = {
       team_profile: copied_team_profile,
