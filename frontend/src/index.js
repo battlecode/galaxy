@@ -99,6 +99,10 @@ class App extends Component {
 
     const on_team = this.state.team_profile !== null;
 
+    const episode_name_long = this.state.episode_info
+      ? this.state.episode_info.name_long
+      : null;
+
     // should always be viewable, even when not logged in
     this.nonLoggedInElems = [
       // Redirect empty path to the default episode's home page
@@ -109,30 +113,54 @@ class App extends Component {
 
       <Route
         path={`/:episode/home`}
-        component={(props) => <Home {...props} on_team={on_team} />}
+        component={(props) => (
+          <Home
+            {...props}
+            on_team={on_team}
+            episode_name_long={episode_name_long}
+          />
+        )}
         key="home"
       />,
-      <Route path={`/:episode/updates`} component={Updates} key="updates" />,
+
+      // <Route path={`/:episode/updates`} component={Updates} key="updates" />,
+
       // commented but kept since we might use this later
       // <Route path={`/search`} component={Search} key="search" />,
       <Route
         path={`/:episode/tournaments`}
-        component={Tournaments}
+        component={(props) => (
+          <Tournaments
+            {...props}
+            episode_name_long={episode_name_long}
+            episode={this.state.episode}
+          />
+        )}
         key="tournaments"
       />,
       <Route
         path={`/:episode/getting-started`}
-        component={GettingStarted}
+        component={(props) => (
+          <GettingStarted
+            {...props}
+            episode_name_long={episode_name_long}
+            episode={this.state.episode}
+          />
+        )}
         key="getting-started"
       />,
       <Route
         path={`/:episode/common-issues`}
-        component={Issues}
+        component={(props) => (
+          <Issues {...props} episode={this.state.episode} />
+        )}
         key="issues"
       />,
       <Route
         path={`/:episode/debugging-tips`}
-        component={Debugging}
+        component={(props) => (
+          <Issues {...props} episode={this.state.episode} />
+        )}
         key="debugging"
       />,
       <Route
@@ -142,7 +170,13 @@ class App extends Component {
       />,
       <Route
         path={`/:episode/resources`}
-        component={Resources}
+        component={(props) => (
+          <Resources
+            {...props}
+            episode_info={this.state.episode_info}
+            episode={this.state.episode}
+          />
+        )}
         key="resources"
       />,
       // <Route
@@ -260,11 +294,13 @@ class App extends Component {
               on_team={on_team}
               episode={this.state.episode}
               episode_info={this.state.episode_info}
+              episode_name_long={episode_name_long}
             />
             <div className="main-panel">
               <NavBar
                 logged_in={this.state.logged_in}
                 episode={this.state.episode}
+                episode_name_long={episode_name_long}
               />
               <Switch>{elemsToRender}</Switch>
               <Footer />

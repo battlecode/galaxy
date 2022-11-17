@@ -5,12 +5,10 @@ import MultiEpisode from "./multi-episode";
 class Issues extends Component {
   constructor(props) {
     super(props);
-    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
     this.state = {
-      episode: episode,
-      extension: MultiEpisode.getExtension(episode),
-      scaffoldName: MultiEpisode.getScaffoldName(episode),
-      scaffoldLink: MultiEpisode.getScaffoldLink(episode),
+      extension: MultiEpisode.getExtension(props.episode),
+      scaffoldName: MultiEpisode.getScaffoldName(props.episode),
+      scaffoldLink: MultiEpisode.getScaffoldLink(props.episode),
     };
   }
 
@@ -129,10 +127,10 @@ class Issues extends Component {
                       once the web version of the visualizer is live, you can
                       just use the web version at{" "}
                       <a
-                        href={`https://play.battlecode.org/clients/${this.state.episode}/visualizer.html`}
+                        href={`https://play.battlecode.org/clients/${this.props.episode}/visualizer.html`}
                         style={{ fontWeight: 700 }}
                       >
-                        https://play.battlecode.org/clients/{this.state.episode}
+                        https://play.battlecode.org/clients/{this.props.episode}
                         /visualizer.html
                       </a>{" "}
                       rather than the desktop application.{" "}

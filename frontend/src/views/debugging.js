@@ -4,12 +4,10 @@ import MultiEpisode from "./multi-episode";
 class Debugging extends Component {
   constructor(props) {
     super(props);
-    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
 
     this.state = {
       ide: "intellij",
-      episode: episode,
-      scaffoldName: MultiEpisode.getScaffoldName(episode),
+      scaffoldName: MultiEpisode.getScaffoldName(props.episode),
     };
   }
 
