@@ -54,7 +54,7 @@ class SideBar extends Component {
             <a href={`/${this.props.episode}/home`}>
               <img src="/bc/img/logo.png" />
             </a>
-            <p>Battlecode {this.props.episode}</p>
+            <p>{this.props.episode_name_long}</p>
           </div>
           {/* NOTE: this only controls what appears in the sidebars.
           Independent of this, users can still go to the links by typing it in their browser, etc.

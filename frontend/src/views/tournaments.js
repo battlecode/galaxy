@@ -1,16 +1,6 @@
 import React, { Component } from "react";
 import Api from "../api";
-import MultiEpisode from "./multi-episode";
-
 class Tournaments extends Component {
-  constructor() {
-    super();
-    this.state = {
-      tournaments: [],
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
-    };
-  }
-
   componentDidMount() {
     Api.getTournaments(
       function (t) {
@@ -28,12 +18,12 @@ class Tournaments extends Component {
               <div className="card">
                 <div className="header">
                   <h4 className="title">
-                    {this.state.episode} Tournament Schedule
+                    {this.props.episode_name_long} Tournament Schedule
                   </h4>
                 </div>
                 <div className="content">
                   <p>
-                    Battlecode {this.state.episode} will consist of several
+                    {this.props.episode_name_long} will consist of several
                     tournaments throughout the month! We stream and commentate
                     all tournaments online. <i>More details coming soon!</i>
                   </p>
