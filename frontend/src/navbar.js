@@ -28,13 +28,13 @@ class NavBar extends Component {
               className="navbar-brand"
               to={`/${this.props.episode}/home`}
             >
-              Battlecode {this.props.episode}
+              {this.props.episode_name_long}
             </NavLink>
           </div>
           <div className="collapse navbar-collapse">
             <NavBarAccount
               logged_in={this.props.logged_in}
-              episode={this.props.episode}
+              episode={this.props.episode_name_long}
             />
           </div>
         </div>

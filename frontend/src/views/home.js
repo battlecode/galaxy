@@ -5,7 +5,6 @@ import { PieChart } from "chartist";
 import Api from "../api";
 import Countdown from "../components/countdown";
 import UpdateCard from "../components/updateCard";
-import MultiEpisode from "./multi-episode";
 
 class StatCard extends UpdateCard {
   constructor(props) {
@@ -70,6 +69,9 @@ class DateCard extends UpdateCard {
   }
 
   componentDidMount() {
+    // The backend does not currently support making/retrieving a list of
+    // announcements, so this has been commented out for now.
+    /*
     Api.getUpdates(
       function (dates) {
         this.setState({ dates: dates.length > 5 ? dates.slice(0, 5) : dates });
@@ -78,6 +80,7 @@ class DateCard extends UpdateCard {
         }
       }.bind(this)
     );
+    */
   }
 
   render() {
@@ -114,7 +117,6 @@ class InstrCard extends UpdateCard {
     super();
     this.state = {
       dates: [],
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
     };
   }
 
@@ -126,7 +128,7 @@ class InstrCard extends UpdateCard {
     return (
       <div className="card">
         <div className="header">
-          <h4 className="title">Welcome to Battlecode {this.state.episode}!</h4>
+          <h4 className="title">Welcome to {this.props.episode_name_long}!</h4>
         </div>
         <div className="content">
           <p></p>
@@ -197,7 +199,7 @@ class Home extends Component {
             <div className="col-md-6">
               <div className="container-fluid">
                 <div className="row">
-                  <InstrCard />
+                  <InstrCard episode_name_long={this.props.episode_name_long} />
                 </div>
                 <div className="row">
                   <Countdown />

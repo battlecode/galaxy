@@ -1,15 +1,7 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
-import MultiEpisode from "./multi-episode";
 
 class Resources extends Component {
-  constructor(params) {
-    super(params);
-    this.state = {
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
-    };
-  }
-
   render() {
     return (
       <div className="content">
@@ -25,18 +17,18 @@ class Resources extends Component {
                     <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
-                      href={`https://play.battlecode.org/specs/${this.state.episode}/specs.md.html`}
+                      href={`https://play.battlecode.org/specs/${this.props.episode}/specs.md.html`}
                     >
-                      Specifications for {this.state.episode}!
+                      Specifications for {this.props.episode}!
                     </a>
                   </p>
                   <p className="text-center">
                     <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
-                      href={`https://play.battlecode.org/javadocs/${this.state.episode}/index.html`}
+                      href={`https://play.battlecode.org/javadocs/${this.props.episode}/index.html`}
                     >
-                      Javadocs for {this.state.episode}!
+                      Javadocs for {this.props.episode}!
                     </a>
                   </p>
                 </div>
@@ -49,7 +41,7 @@ class Resources extends Component {
                   <p>
                     If you're just starting out, check out the{" "}
                     <NavLink
-                      to={`/${this.state.episode}/getting-started`}
+                      to={`/${this.props.episode}/getting-started`}
                       style={{ fontWeight: 700 }}
                     >
                       getting started
@@ -61,7 +53,7 @@ class Resources extends Component {
                     <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
-                      href={`/${this.state.episode}/common-issues`}
+                      href={`/${this.props.episode}/common-issues`}
                     >
                       Common Issues
                     </a>
@@ -70,7 +62,7 @@ class Resources extends Component {
                     <a
                       type="button"
                       className="btn btn-info btn-fill text-center"
-                      href={`/${this.state.episode}/debugging-tips`}
+                      href={`/${this.props.episode}/debugging-tips`}
                     >
                       Debugging Tips
                     </a>
@@ -107,7 +99,7 @@ class Resources extends Component {
                 </div>
                 <div className="content">
                   <p>
-                    Battlecode {this.state.episode} will be holding lectures,
+                    {this.props.episode_name_long} will be holding lectures,
                     where a dev will be going over possible strategy, coding up
                     an example player, answering questions, etc. Lectures are
                     streamed on Twitch .
