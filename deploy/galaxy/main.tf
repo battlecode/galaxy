@@ -21,18 +21,18 @@ resource "google_storage_bucket" "frontend" {
   storage_class = "STANDARD"
 }
 
-resource "google_storage_bucket_access_control" "public" {
+resource "google_storage_bucket_iam_member" "public" {
   bucket = google_storage_bucket.public.name
-  role   = "READER"
-  entity = "allUsers"
+  role   = "roles/storage.legacyObjectReader"
+  member = "allUsers"
 }
 
-resource "google_storage_bucket_access_control" "frontend" {
+resource "google_storage_bucket_iam_member" "frontend" {
   count = var.create_website ? 1 : 0
 
   bucket = google_storage_bucket.frontend[count.index].name
-  role   = "READER"
-  entity = "allUsers"
+  role   = "roles/storage.legacyObjectReader"
+  member = "allUsers"
 }
 
 resource "google_compute_network" "this" {

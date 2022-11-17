@@ -3,12 +3,16 @@ resource "google_storage_bucket" "home" {
 
   location      = "US"
   storage_class = "STANDARD"
+
+  website {
+    main_page_suffix = "index.html"
+  }
 }
 
-resource "google_storage_bucket_access_control" "home" {
+resource "google_storage_bucket_iam_member" "home" {
   bucket = google_storage_bucket.home.name
-  role   = "READER"
-  entity = "allUsers"
+  role   = "roles/storage.legacyObjectReader"
+  member = "allUsers"
 }
 
 module "cd" {
