@@ -11,8 +11,9 @@ class Account extends Component {
 
     // Copy the fetched user profile for use in editable form state.
     const copied_user_profile = { ...props.user_profile };
-    if (copied_user_profile)
-      copied_user_profile.user = { ...props.user_profile.user };
+    copied_user_profile.user = props.user_profile
+      ? { ...props.user_profile.user }
+      : {};
 
     this.state = {
       user_profile: copied_user_profile,
