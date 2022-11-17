@@ -105,7 +105,7 @@ match os.getenv("SIARNAQ_MODE", None):
                 "ENGINE": "django.db.backends.postgresql_psycopg2",
                 "NAME": "battlecode",
                 "USER": "siarnaq",
-                "PASSWORD": os.getenv("SIARNAQ_SECRET"),
+                "PASSWORD": os.getenv("SIARNAQ_DB_PASSWORD"),
                 "HOST": (
                     f"/cloudsql/{gcloud.project_id}:"
                     f"{gcloud.location}:production-siarnaq-db"

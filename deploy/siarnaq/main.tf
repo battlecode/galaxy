@@ -122,7 +122,7 @@ resource "google_cloud_run_service" "this" {
         image = var.image
 
         env {
-          name = "SIARNAQ_SECRET"
+          name = "SIARNAQ_DB_PASSWORD"
           value_from {
             secret_key_ref {
               key  = "latest"
