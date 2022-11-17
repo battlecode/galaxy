@@ -222,7 +222,6 @@ class Api {
   static getEpisodeInfo(episode, callback) {
     $.get(`${URL}/api/episode/e/${episode}/`)
       .done((data, success) => {
-        console.log(data);
         callback(data);
       })
       .fail((xhr, status, error) => {
