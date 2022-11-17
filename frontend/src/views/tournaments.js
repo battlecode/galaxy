@@ -27,7 +27,8 @@ class Tournaments extends Component {
                     tournaments throughout the month! We stream and commentate
                     all tournaments online. <i>More details coming soon!</i>
                   </p>
-                  {/* <ul>
+                  {/* This should eventually be dynamic. See #229 and #231
+                  <ul>
                     <li>
                       <b>Sprint Tournament 1: 1/11.</b> One week after spec
                       release, you're given a chance to win small prizes in this
