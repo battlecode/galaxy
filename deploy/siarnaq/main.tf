@@ -26,6 +26,14 @@ resource "google_project_iam_member" "scheduler" {
   member  = "serviceAccount:${google_service_account.this.email}"
 }
 
+resource "google_project_iam_member" "sql" {
+  count = var.create_cloud_run ? 1 : 0
+
+  project = var.gcp_project
+  role    = "roles/cloudsql.client"
+  member  = "serviceAccount:${google_service_account.this.email}"
+}
+
 resource "google_pubsub_topic" "this" {
   for_each = local.pubsub_topics
 
@@ -50,6 +58,14 @@ resource "google_sql_database_instance" "this" {
 
     ip_configuration {
       ipv4_enabled = true
+
+      dynamic authorized_networks {
+        for_each = var.database_authorized_networks
+        iterator = network
+        content {
+          value = network.value
+        }
+      }
     }
 
     location_preference {
@@ -114,6 +130,12 @@ resource "google_cloud_run_service" "this" {
             }
           }
         }
+      }
+    }
+    metadata {
+      annotations = {
+        "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.this.connection_name
+        "run.googleapis.com/client-name"        = "terraform"
       }
     }
   }

@@ -53,9 +53,10 @@ module "siarnaq" {
   create_cloud_run = var.create_website
   image            = var.siarnaq_image
 
-  database_tier = var.database_tier
-  database_name = "battlecode"
-  database_user = "siarnaq"
+  database_tier                = var.database_tier
+  database_name                = "battlecode"
+  database_user                = "siarnaq"
+  database_authorized_networks = var.database_authorized_networks
 
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name

@@ -63,6 +63,15 @@ While developing, you may find the `api/specs/swagger-ui` endpoint userful for v
 
 If you ever get your database into a really broken state, just delete `db.sqlite3` and all the migration files, and start again.
 
+Eventually, you will have a blazing new feature you'd like to contribute, and you'd like to test your code in the staging environment first.
+To authenticate, run:
+
+```
+gcloud auth application-default login --scopes=openid,https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/userinfo.email
+```
+
+You can then access the staging environment by setting the environment variable `SIARNAQ_MODE=STAGING`.
+
 ## How to contribute
 
 If you're new to Django, it's fancy.

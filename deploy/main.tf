@@ -46,9 +46,10 @@ module "production" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
-  create_website = true
-  siarnaq_image  = module.cd.artifact_siarnaq_image
-  database_tier  = "db-custom-1-3840"
+  create_website               = true
+  siarnaq_image                = module.cd.artifact_siarnaq_image
+  database_tier                = "db-custom-1-3840"
+  database_authorized_networks = []
 
   saturn_image          = module.cd.artifact_saturn_image
   max_compile_instances = 10
@@ -69,9 +70,10 @@ module "staging" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
-  create_website = false
-  siarnaq_image  = null
-  database_tier  = "db-f1-micro"
+  create_website               = false
+  siarnaq_image                = null
+  database_tier                = "db-f1-micro"
+  database_authorized_networks = ["0.0.0.0/0"]
 
   saturn_image          = module.cd.artifact_saturn_image
   max_compile_instances = 1
@@ -114,5 +116,9 @@ module "network" {
       enable_cdn  = false
       paths       = ["/public", "/public/*"]
     }
+  }
+
+  dns_additional_records = {
+    "db.staging." = module.staging.sql_instance_ip
   }
 }

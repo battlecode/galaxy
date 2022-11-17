@@ -52,3 +52,8 @@ variable "staging_buckets" {
   description = "Specifications for buckets to be routed in staging"
   type        = map(object({ bucket_name=string, enable_cdn=bool, paths=list(string) }))
 }
+
+variable "dns_additional_records" {
+  description = "Additional DNS A records for the zone"
+  type        = map(string)
+}

@@ -1,6 +1,8 @@
 import os
 
 import google.auth
+import google.auth.impersonated_credentials as impersonated_credentials
+import google.cloud.secretmanager as secretmanager
 
 match os.getenv("SIARNAQ_MODE", None):
     case "PRODUCTION":
@@ -21,10 +23,18 @@ match os.getenv("SIARNAQ_MODE", None):
 
     case "STAGING":
         credentials, project_id = google.auth.default()
+        admin_email = "staging-siarnaq-agent@mitbattlecode.iam.gserviceaccount.com"
+        credentials = impersonated_credentials.Credentials(
+            source_credentials=credentials,
+            target_principal=admin_email,
+            target_scopes=[
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/userinfo.email",
+            ],
+        )
         location = "us-east1"
         enable_actions = True
 
-        admin_email = credentials.service_account_email
         admin_username = "galaxy-admin"
 
         public_bucket = "mitbattlecode-staging-public"
@@ -50,3 +60,12 @@ match os.getenv("SIARNAQ_MODE", None):
         saturn_execute_topic = "nowhere-siarnaq-execute"
         saturn_compile_order = "compile_order"
         saturn_execute_order = "execute_order"
+
+
+def get_secret(name: str, version: str = "latest") -> bytes:
+    """Access the secret version from the Google Secret Manager."""
+    client = secretmanager.SecretManagerServiceClient()
+    request = secretmanager.AccessSecretVersionRequest(
+        name=client.secret_version_path(project_id, name, version)
+    )
+    return client.access_secret_version(request=request).payload.data
