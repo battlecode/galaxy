@@ -99,6 +99,11 @@ class App extends Component {
 
     const on_team = this.state.team_profile !== null;
 
+    const is_game_released =
+      this.props.is_staff ||
+      (this.props.episode_info &&
+        new Date() > new Date(this.props.episode_info.game_release));
+
     const episode_name_long = this.state.episode_info
       ? this.state.episode_info.name_long
       : null;
@@ -175,6 +180,7 @@ class App extends Component {
             {...props}
             episode_info={this.state.episode_info}
             episode={this.state.episode}
+            is_game_released={is_game_released}
           />
         )}
         key="resources"
@@ -295,6 +301,7 @@ class App extends Component {
               episode={this.state.episode}
               episode_info={this.state.episode_info}
               episode_name_long={episode_name_long}
+              is_game_released={is_game_released}
             />
             <div className="main-panel">
               <NavBar
