@@ -22,6 +22,8 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
+from siarnaq.api import views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/user/", include("siarnaq.api.user.urls")),
@@ -38,4 +40,7 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="specs"),
         name="swagger-ui",
     ),
+    # Misc:
+    path("api/ping/", views.ping, name="ping"),
+    path("api/version/", views.version, name="version"),
 ]
