@@ -52,7 +52,7 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
         time_zone=settings.TIME_ZONE,
     )
 
-    client = scheduler.CloudSchedulerClient()
+    client = scheduler.CloudSchedulerClient(credentials=gcloud.credentials)
     if old_schedule is None:
         client.create_job(request=dict(parent=parent, job=job))
     elif new_schedule is None:

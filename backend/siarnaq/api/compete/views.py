@@ -99,7 +99,7 @@ class SubmissionViewSet(
             instance = serializer.save()
             if gcloud.enable_actions:
                 # Upload file to storage
-                client = storage.Client()
+                client = storage.Client(credentials=gcloud.credentials)
                 blob = client.bucket(gcloud.secure_bucket).blob(
                     instance.get_source_path()
                 )
@@ -129,7 +129,7 @@ class SubmissionViewSet(
         """Download the source code associated with a submission."""
         submission = self.get_object()
         if gcloud.enable_actions:
-            client = storage.Client()
+            client = storage.Client(credentials=gcloud.credentials)
             blob = (
                 client.bucket(gcloud.secure_bucket)
                 .blob(submission.get_source_path())

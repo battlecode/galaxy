@@ -64,7 +64,7 @@ match os.getenv("SIARNAQ_MODE", None):
 
 def get_secret(name: str, version: str = "latest") -> bytes:
     """Access the secret version from the Google Secret Manager."""
-    client = secretmanager.SecretManagerServiceClient()
+    client = secretmanager.SecretManagerServiceClient(credentials=credentials)
     request = secretmanager.AccessSecretVersionRequest(
         name=client.secret_version_path(project_id, name, version)
     )

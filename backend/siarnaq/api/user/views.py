@@ -58,7 +58,7 @@ class UserProfileViewSet(
             case "get":
                 if not profile.has_resume:
                     raise Http404
-                client = storage.Client()
+                client = storage.Client(credentials=gcloud.credentials)
                 blob = client.bucket(gcloud.secure_bucket).blob(
                     profile.get_resume_path()
                 )
@@ -76,7 +76,7 @@ class UserProfileViewSet(
                     profile.has_resume = True
                     profile.save(update_fields=["has_resume"])
                     if gcloud.enable_actions:
-                        client = storage.Client()
+                        client = storage.Client(credentials=gcloud.credentials)
                         blob = client.bucket(gcloud.secure_bucket).blob(
                             profile.get_resume_path()
                         )
