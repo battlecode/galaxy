@@ -133,3 +133,19 @@ resource "google_cloud_run_service" "this" {
     google_secret_manager_secret_iam_member.this,
   ]
 }
+
+data "google_iam_policy" "noauth" {
+  binding {
+    role    = "roles/run.invoker"
+    members = ["allUsers"]
+  }
+}
+
+resource "google_cloud_run_service_iam_policy" "noauth" {
+  count = var.create_cloud_run ? 1 : 0
+
+  location    = google_cloud_run_service.this[count.index].location
+  project     = google_cloud_run_service.this[count.index].project
+  service     = google_cloud_run_service.this[count.index].name
+  policy_data = data.google_iam_policy.noauth.policy_data
+}
