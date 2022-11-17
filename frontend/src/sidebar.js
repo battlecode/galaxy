@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import Api from "./api";
 import $ from "jquery";
-import MultiEpisode from "./views/multi-episode";
 
 class NLink extends Component {
   render() {
@@ -29,12 +28,6 @@ class SideBar extends Component {
   // Note that this duplicates a method in submissions.js;
   // this will be cleaned up. See #74
   isGameReleasedForUser() {
-    console.log(this.props.episode_info);
-    if (this.props.episode_info) {
-      console.log(new Date());
-      console.log(new Date(this.props.episode_info.game_release));
-      console.log(new Date() > new Date(this.props.episode_info.game_release));
-    }
     return (
       this.props.is_staff ||
       (this.props.episode_info &&
