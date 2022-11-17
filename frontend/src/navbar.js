@@ -34,7 +34,7 @@ class NavBar extends Component {
           <div className="collapse navbar-collapse">
             <NavBarAccount
               logged_in={this.props.logged_in}
-              episode={this.props.episode_name_long}
+              episode={this.props.episode}
             />
           </div>
         </div>
