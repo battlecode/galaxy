@@ -25,18 +25,7 @@ class NLink extends Component {
 }
 
 class SideBar extends Component {
-  // Note that this duplicates a method in submissions.js;
-  // this will be cleaned up. See #74
-  isGameReleasedForUser() {
-    return (
-      this.props.is_staff ||
-      (this.props.episode_info &&
-        new Date() > new Date(this.props.episode_info.game_release))
-    );
-  }
-
   // for icon options below, see https://themes-pixeden.com/font-demos/7-stroke/
-
   render() {
     return (
       <div className="sidebar" data-color="anomoly">
@@ -110,7 +99,7 @@ class SideBar extends Component {
 
             {/* #74 considers combining these two checks and &&, into one*/}
             {/* Only visible when on a team AND game is released */}
-            {this.props.on_team && this.isGameReleasedForUser() && (
+            {this.props.on_team && this.props.is_game_released && (
               <NLink
                 to={`/${this.props.episode}/submissions`}
                 icon={"pe-7s-up-arrow"}
@@ -123,7 +112,7 @@ class SideBar extends Component {
             and I couldn't get both NLinks to be in the same element while still looking ok
             Do at your own risk
             - Nathan */}
-            {this.props.on_team && this.isGameReleasedForUser() && (
+            {this.props.on_team && this.props.is_game_released && (
               <NLink
                 to={`/${this.props.episode}/scrimmaging`}
                 icon={"pe-7s-joy"}

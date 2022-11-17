@@ -8,31 +8,33 @@ class Resources extends Component {
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-12">
-              {/*<div className="card">
-                <div className="header">
-                  <h4 className="title">Game Specifications</h4>
+              {this.props.is_game_released && (
+                <div className="card">
+                  <div className="header">
+                    <h4 className="title">Game Specifications</h4>
+                  </div>
+                  <div className="content">
+                    <p className="text-center">
+                      <a
+                        type="button"
+                        className="btn btn-info btn-fill text-center"
+                        href={`https://play.battlecode.org/specs/${this.props.episode}/specs.md.html`}
+                      >
+                        Specifications for {this.props.episode}!
+                      </a>
+                    </p>
+                    <p className="text-center">
+                      <a
+                        type="button"
+                        className="btn btn-info btn-fill text-center"
+                        href={`https://play.battlecode.org/javadocs/${this.props.episode}/index.html`}
+                      >
+                        Javadocs for {this.props.episode}!
+                      </a>
+                    </p>
+                  </div>
                 </div>
-                <div className="content">
-                  <p className="text-center">
-                    <a
-                      type="button"
-                      className="btn btn-info btn-fill text-center"
-                      href={`https://play.battlecode.org/specs/${this.props.episode}/specs.md.html`}
-                    >
-                      Specifications for {this.props.episode}!
-                    </a>
-                  </p>
-                  <p className="text-center">
-                    <a
-                      type="button"
-                      className="btn btn-info btn-fill text-center"
-                      href={`https://play.battlecode.org/javadocs/${this.props.episode}/index.html`}
-                    >
-                      Javadocs for {this.props.episode}!
-                    </a>
-                  </p>
-                </div>
-              </div> */}
+              )}
               <div className="card">
                 <div className="header">
                   <h4 className="title">Coding Resources</h4>
