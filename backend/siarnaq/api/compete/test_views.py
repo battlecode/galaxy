@@ -57,7 +57,7 @@ class SubmissionViewSetTestCase(APITestCase):
     # episode: frozen, not frozen, hidden
     # file size: large, small
 
-    @patch("django.conf.settings.GCLOUD_DISABLE_ALL_ACTIONS", new=False)
+    @patch("siarnaq.gcloud.enable_actions", new=True)
     @patch("google.cloud.storage.Blob.open")
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
@@ -99,7 +99,7 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(Submission.objects.exists())
 
-    @patch("django.conf.settings.GCLOUD_DISABLE_ALL_ACTIONS", new=False)
+    @patch("siarnaq.gcloud.enable_actions", new=True)
     @patch("google.cloud.storage.Blob.open")
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True

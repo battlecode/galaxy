@@ -14,8 +14,6 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-import google.auth
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -186,31 +184,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-# Google Cloud Platform configuration
-
-GOOGLE_CLOUD_CREDENTIALS, GOOGLE_CLOUD_PROJECT_ID = google.auth.default()
-GOOGLE_CLOUD_LOCATION = "us-east1"
-USER_GCLOUD_ADMIN_EMAIL = GOOGLE_CLOUD_CREDENTIALS.service_account_email
-USER_GCLOUD_ADMIN_USERNAME = "galaxy-admin"
-
-# Bucket for storing all files whose access is protected by authentication
-GCLOUD_SECURED_BUCKET = "battle-secure-upload"
-
-# Do not inadvertently interact with cloud resources while testing locally.
-# Change this in production and while running system integration tests.
-GCLOUD_DISABLE_ALL_ACTIONS = True
-
-# Publish Topic for PubSub
-# TODO: setup Topics on GCloud
-COMPETE_SATURN_COMPILE_TOPIC = "compile"
-COMPETE_SATURN_EXECUTE_TOPIC = "execute"
-
-# Ordering for PubSub
-COMPETE_SATURN_COMPILE_ORDER = "compile_order"
-COMPETE_SATURN_EXECUTE_ORDER = "execute_order"
-
 
 # Penalized Elo configuration
 
