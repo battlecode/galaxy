@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import Api from "../api";
 import Floater from "react-floater";
 
+import Country from "../components/country";
+
 class Register extends Component {
   state = {
     user_profile: {
@@ -239,7 +241,7 @@ class Register extends Component {
                     />
                   </div>
                 </div>
-                <div className="col-md-12">
+                <div className="col-md-6">
                   <div className="form-group">
                     <label>School</label>
                     <input
@@ -249,6 +251,9 @@ class Register extends Component {
                       onChange={this.changeHandler}
                     />
                   </div>
+                </div>
+                <div className="col-md-6">
+                  <Country />
                 </div>
                 <div className="col-xs-4">
                   <div className="form-group">
