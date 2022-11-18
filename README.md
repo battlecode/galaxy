@@ -20,6 +20,8 @@ Please follow these steps carefully to ensure your development environment is in
    Your local git will reject commits that fail these sanity-checks.
    Initialize Pre-commit using `pre-commit install`.
 
+If the Conda specifications are updated upstream, you can refresh your local environment to match it by running `conda env update -n galaxy -f environment-dev.yml`.
+
 ## Development workflow
 
 Develop new features on branches and use pull-requests to request code-review.
