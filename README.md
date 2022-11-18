@@ -20,6 +20,8 @@ Please follow these steps carefully to ensure your development environment is in
    Your local git will reject commits that fail these sanity-checks.
    Initialize Pre-commit using `pre-commit install`.
 
+If the Conda specifications are updated upstream, you can refresh your local environment to match it by running `conda env update -n galaxy -f environment-dev.yml`.
+
 ## Development workflow
 
 Develop new features on branches and use pull-requests to request code-review.
@@ -62,6 +64,18 @@ Move code into a Manager if it makes implementation easier.
 While developing, you may find the `api/specs/swagger-ui` endpoint userful for viewing and querying the avaiable API.
 
 If you ever get your database into a really broken state, just delete `db.sqlite3` and all the migration files, and start again.
+
+Eventually, you will have a blazing new feature you'd like to contribute, and you'd like to test your code in the staging environment first.
+To authenticate, first [install the Google Cloud SDK](https://cloud.google.com/sdk/docs/install).
+Then, run the following two commands to connect your installation to our project; you will be prompted to log in.
+
+```
+gcloud auth application-default login --scopes=openid,https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/userinfo.email
+gcloud config set core/project mitbattlecode
+```
+
+Ask someone to give you the IAM "Service Account Token Creator" role.
+You can then access the staging environment by setting the environment variable `SIARNAQ_MODE=STAGING`.
 
 ## How to contribute
 

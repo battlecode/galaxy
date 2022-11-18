@@ -1,5 +1,6 @@
+import io
+
 import google.cloud.storage as storage
-from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.http import FileResponse
@@ -9,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
+import siarnaq.gcloud as gcloud
 from siarnaq.api.compete.models import (
     Match,
     ScrimmageRequest,
@@ -95,10 +97,10 @@ class SubmissionViewSet(
 
         with transaction.atomic():
             instance = serializer.save()
-            if not settings.GCLOUD_DISABLE_ALL_ACTIONS:
+            if gcloud.enable_actions:
                 # Upload file to storage
-                client = storage.Client()
-                blob = client.bucket(settings.GCLOUD_SECURED_BUCKET).blob(
+                client = storage.Client(credentials=gcloud.credentials)
+                blob = client.bucket(gcloud.secure_bucket).blob(
                     instance.get_source_path()
                 )
                 with blob.open("wb") as f:
@@ -126,12 +128,17 @@ class SubmissionViewSet(
     def download(self, request, pk=None, *, episode_id):
         """Download the source code associated with a submission."""
         submission = self.get_object()
-        client = storage.Client()
-        blob = client.bucket(settings.GCLOUD_SECURED_BUCKET).blob(
-            submission.get_source_path()
-        )
+        if gcloud.enable_actions:
+            client = storage.Client(credentials=gcloud.credentials)
+            blob = (
+                client.bucket(gcloud.secure_bucket)
+                .blob(submission.get_source_path())
+                .open("rb")
+            )
+        else:
+            blob = io.BytesIO()
         return FileResponse(
-            blob.open("rb"),
+            blob,
             as_attachment=True,
             filename="submission.zip",
         )

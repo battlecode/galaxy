@@ -9,9 +9,11 @@ dependencies:
   - drf-spectacular=0.24.2
   - google-auth=2.13.0
   - google-cloud-pubsub=2.13.10
+  - google-cloud-secret-manager=2.12.6
   - google-cloud-storage=2.5.0
   - openssl=3.0.5
   - pip=22.3
+  - psycopg2=2.9.3
   - python=3.10
   - uwsgi=2.0.20
   - pip:

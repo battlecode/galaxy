@@ -170,3 +170,14 @@ resource "google_dns_record_set" "this" {
   managed_zone = data.google_dns_managed_zone.this.name
   rrdatas      = [module.lb.external_ip]
 }
+
+resource "google_dns_record_set" "additional" {
+  for_each = var.dns_additional_records
+
+  name = "${each.key}${data.google_dns_managed_zone.this.dns_name}"
+  type = "A"
+  ttl  = 300
+
+  managed_zone = data.google_dns_managed_zone.this.name
+  rrdatas      = [each.value]
+}

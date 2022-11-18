@@ -33,6 +33,11 @@ variable "database_tier" {
   type        = string
 }
 
+variable "database_authorized_networks" {
+  description = "The IP CIDR ranges authorized to access the database via external IP"
+  type        = list(string)
+}
+
 variable "saturn_image" {
   description = "Image for the Saturn Docker container"
   type        = string

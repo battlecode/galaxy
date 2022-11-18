@@ -5,17 +5,10 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models import OuterRef, Subquery
 
+import siarnaq.gcloud as gcloud
+
 
 class SaturnInvokableQuerySet(models.QuerySet):
-    _publish_client = pubsub.PublisherClient(
-        publisher_options=pubsub.types.PublisherOptions(
-            enable_message_ordering=True,
-        ),
-        client_options={
-            "api_endpoint": "us-east1-pubsub.googleapis.com:443",
-        },
-    )
-
     @property
     def _publish_topic(self):
         """The name of the topic to which queued items should be published."""
@@ -28,6 +21,15 @@ class SaturnInvokableQuerySet(models.QuerySet):
 
     def enqueue(self):
         """Enqueue all unqueued items in this queryset for invocation on Saturn."""
+        publish_client = pubsub.PublisherClient(
+            credentials=gcloud.credentials,
+            publisher_options=pubsub.types.PublisherOptions(
+                enable_message_ordering=True,
+            ),
+            client_options={
+                "api_endpoint": "us-east1-pubsub.googleapis.com:443",
+            },
+        )
         invocations = (
             # removed filter because should only be called on already filtered Queryset
             self.select_for_update()
@@ -35,7 +37,7 @@ class SaturnInvokableQuerySet(models.QuerySet):
             .all()
         )
         futures = [
-            self._publish_client.publish(
+            publish_client.publish(
                 topic=self._publish_topic,
                 data=json.encode(invocation.enqueue_options()),
                 ordering_key=self._publish_ordering_key,
@@ -49,7 +51,7 @@ class SaturnInvokableQuerySet(models.QuerySet):
                 invocation.logs = f"Enqueued with ID: {message_id}"
             except Exception as err:
                 invocation.status = self.model.SaturnStatus.ERRORED
-                self._publish_client.resume_publish(
+                publish_client.resume_publish(
                     topic=self._publish_topic,
                     ordering_key=self._publish_ordering_key,
                 )

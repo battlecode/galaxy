@@ -2,6 +2,10 @@ output "run_service_name" {
   value = module.siarnaq.run_service_name
 }
 
+output "sql_instance_ip" {
+  value = module.siarnaq.sql_instance_ip
+}
+
 output "storage_public_name" {
   value = google_storage_bucket.public.name
 }
