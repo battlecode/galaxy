@@ -222,6 +222,7 @@ class App extends Component {
     ];
 
     // Should only be visible and renderable to users on a team
+    // TODO this should more accurately be called, like, onTeamAndGameReleased
     this.onTeamElems = [
       <Route
         path={`/:episode/scrimmaging`}
@@ -255,7 +256,12 @@ class App extends Component {
     // takes an API call, which takes time.
     // Whenever this API call finishes, we should always be ready to re-include the routes,
     // and thus potentially re-render the URL that the user is looking to navigate to.
+
+    // TODO to de-dupe code, consider using the is_staff,  on_team, and is_game_released defined around line 100
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
+    // TODO change this only to render when on_team and is_game_released
+    // (which is more accurate, anyways)
+    // Rename variables to match, too
     let onTeamElemsToRender = this.state.team_profile ? this.onTeamElems : [];
     let staffElemsToRender =
       this.state.user_profile && this.state.user_profile.user.is_staff
@@ -296,10 +302,20 @@ class App extends Component {
           <div className="wrapper">
             <SideBar
               logged_in={this.state.logged_in}
+              // TODO  Consider this? I don't actually know what's best, but do wanna point it out.
+              // It's safer that the is_staff, on_team, episode_name_long, is_game_released
+              // that are being based down are part of App's _state_, not dangling vars
+              // (thus, any changes would be changes to state,
+              // which would force a rerender which is safer)
+              // Right now I don't think anything breaks anyways,
+              // and I don't think child components would do anything that requires a rerender/recompute/etc
+              // but it would be much better for down the road...
+
               is_staff={is_staff}
               on_team={on_team}
               episode={this.state.episode}
               episode_info={this.state.episode_info}
+              // TODO see above ^
               episode_name_long={episode_name_long}
               is_game_released={is_game_released}
             />
