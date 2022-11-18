@@ -120,24 +120,20 @@ class InstrCard extends UpdateCard {
     };
   }
 
-  componentDidMount() {
-    // meh
-  }
-
   render() {
     return (
       <div className="card">
         <div className="header">
           <h4 className="title">Welcome to {this.props.episode_name_long}!</h4>
         </div>
-        {/* <div className="content">
-          <p></p>
-          <p>
+        <div className="content">
+          {/* <p></p> */}
+          {/* <p>
             Come to the Final Tournament,{" "}
             <b>at MIT in Stata (32-123) at 7pm on February 5</b>. You can still
             play matches -- find the specs (and javadocs!) in the resources tab!
-          </p>
-        </div> */}
+          </p> */}
+        </div>
       </div>
     );
   }
