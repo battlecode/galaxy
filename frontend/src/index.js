@@ -71,7 +71,7 @@ class App extends Component {
 
     // Run this function when all AJAX queries are completed.
     // See https://stackoverflow.com/a/9865124.
-    $.when(ajax1, ajax2, ajax3, ajax4).done(callback);
+    $.when(ajax1, ajax2, ajax3, ajax4).done(callback).fail(callback);
   };
 
   componentDidMount() {
