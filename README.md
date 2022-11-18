@@ -64,20 +64,16 @@ While developing, you may find the `api/specs/swagger-ui` endpoint userful for v
 If you ever get your database into a really broken state, just delete `db.sqlite3` and all the migration files, and start again.
 
 Eventually, you will have a blazing new feature you'd like to contribute, and you'd like to test your code in the staging environment first.
-To authenticate, run:
+To authenticate, first [install the Google Cloud SDK](https://cloud.google.com/sdk/docs/install).
+Then, run the following two commands to connect your installation to our project; you will be prompted to log in.
 
 ```
 gcloud auth application-default login --scopes=openid,https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/userinfo.email
-```
-
-and also
-
-```
 gcloud config set core/project mitbattlecode
 ```
 
+Ask someone to give you the IAM "Service Account Token Creator" role.
 You can then access the staging environment by setting the environment variable `SIARNAQ_MODE=STAGING`.
-You may need to ask someone to give you the IAM "Service Account Token Creator" role to be able to do this.
 
 ## How to contribute
 
