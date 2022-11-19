@@ -80,7 +80,13 @@ class Account extends Component {
   }
 
   uploadResume = () => {
-    Api.resumeUpload(this.state.selectedFile, null);
+    Api.resumeUpload(this.state.selectedFile, () =>
+      this.props.updateBaseState()
+    );
+  };
+
+  retrieveResume = () => {
+    Api.resumeRetrieve(() => null);
   };
 
   render() {
@@ -94,7 +100,7 @@ class Account extends Component {
         className={btn_class}
       >
         {" "}
-        Upload{" "}
+        Upload Resume{" "}
       </button>
     );
     if (this.state.selectedFile !== null) {
@@ -107,7 +113,7 @@ class Account extends Component {
           className={btn_class}
         >
           {" "}
-          Upload{" "}
+          Upload Resume{" "}
         </button>
       );
     }
@@ -124,7 +130,7 @@ class Account extends Component {
       resume_status = (
         <label style={{ float: "right", color: "green" }}>
           <i className="pe-7s-check pe-fw" style={{ fontWeight: "bold" }} />
-          Uploaded!
+          <a onClick={this.retrieveResume}>Uploaded!</a>
         </label>
       );
     }
