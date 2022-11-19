@@ -100,9 +100,9 @@ class App extends Component {
     const on_team = this.state.team_profile !== null;
 
     const is_game_released =
-      this.props.is_staff ||
-      (this.props.episode_info &&
-        new Date() > new Date(this.props.episode_info.game_release));
+      is_staff ||
+      (this.state.episode_info &&
+        new Date() > new Date(this.state.episode_info.game_release));
 
     const episode_name_long = this.state.episode_info
       ? this.state.episode_info.name_long
