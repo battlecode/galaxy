@@ -57,3 +57,13 @@ variable "max_execute_instances" {
   description = "The maximum allowable number of Saturn execute instances"
   type        = number
 }
+
+variable "mailjet_api_key" {
+  description = "Our API Key for Mailjet"
+  type        = string
+}
+
+variable "mailjet_api_secret" {
+  description = "Our API Secret for Mailjet"
+  type        = string
+}

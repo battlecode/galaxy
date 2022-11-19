@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import json
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -97,6 +98,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "siarnaq.wsgi.application"
 
+# Parse our secrets from secret manager
+SIARNAQ_SECRETS_JSON = os.getenv("SIARNAQ_SECRETS_JSON")
+if SIARNAQ_SECRETS_JSON is not None:
+    SIARNAQ_SECRETS = json.loads(SIARNAQ_SECRETS_JSON)
+else:
+    # I'm sure there's a better way to provide defaults but can't think of it right now
+    SIARNAQ_SECRETS = {
+        "db-password": "",
+        "mailjet-api-key": "",
+        "mailjet-api-secret": "",
+    }
+
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -108,7 +121,7 @@ match os.getenv("SIARNAQ_MODE", None):
                 "ENGINE": "django.db.backends.postgresql_psycopg2",
                 "NAME": "battlecode",
                 "USER": "siarnaq",
-                "PASSWORD": os.getenv("SIARNAQ_DB_PASSWORD"),
+                "PASSWORD": SIARNAQ_SECRETS["db-password"],
                 "HOST": (
                     f"/cloudsql/{gcloud.project_id}:"
                     f"{gcloud.location}:production-siarnaq-db"
@@ -240,6 +253,6 @@ USER_MAX_AVATAR_SIZE = (512, 512)
 EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 EMAIL_HOST_USER = "battlecode@mit.edu"
 ANYMAIL = {
-    "MAILJET_API_KEY": "redacted todo create env",
-    "MAILJET_SECRET_KEY": "redacted todo create env",
+    "MAILJET_API_KEY": SIARNAQ_SECRETS["mailjet-api-key"],
+    "MAILJET_SECRET_KEY": SIARNAQ_SECRETS["mailjet-api-secret"],
 }
