@@ -94,6 +94,12 @@ class Account extends Component {
     );
   };
 
+  uploadAvatar = () => {
+    Api.resumeUpload(this.state.selectedAvatarFile, () =>
+      this.props.updateBaseState()
+    );
+  };
+
   retrieveResume = () => {
     Api.resumeRetrieve(() => null);
   };

@@ -434,6 +434,25 @@ class Api {
       });
   }
 
+  static avatarUpload(avatar_file, callback) {
+    const data = new FormData();
+    data.append("avatar", avatar_file);
+    return $.ajax({
+      url: `${URL}/api/user/detail/current/avatar/`,
+      type: "POST",
+      data: data,
+      dataType: "json",
+      processData: false,
+      contentType: false,
+    })
+      .done((data, status) => {
+        callback(true);
+      })
+      .fail((xhr, status, error) => {
+        callback(false);
+      });
+  }
+
   static resumeUpload(resume_file, callback) {
     const data = new FormData();
     data.append("resume", resume_file);
