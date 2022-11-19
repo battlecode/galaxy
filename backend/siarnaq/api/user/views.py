@@ -93,41 +93,31 @@ class UserProfileViewSet(
             case _:
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
 
-    @action(detail=True, methods=["get", "put"], serializer_class=UserAvatarSerializer)
+    @action(detail=True, methods=["put"], serializer_class=UserAvatarSerializer)
     def avatar(self, request, pk=None):
         """Retrieve or update uploaded avatar"""
         profile = self.get_object()
         client = storage.Client()
         blob = client.bucket(gcloud.public_bucket).blob(profile.get_avatar_path())
-        match request.method.lower():
-            case "get":
-                if not profile.has_avatar:
-                    raise Http404
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        avatar = serializer.validated_data["avatar"]
 
-                url = "https://storage.googleapis.com"
-                return f"{url}/{gcloud.public_bucket}/{profile.get_avatar_path()}"
-            case "put":
-                serializer = self.get_serializer(data=request.data)
-                serializer.is_valid(raise_exception=True)
-                avatar = serializer.validated_data["avatar"]
+        MAX_AVATAR_SIZE = (512, 512)
+        img = Image.open(avatar)
+        img.thumbnail(MAX_AVATAR_SIZE)
+        img.save(os.path.splitext(avatar)[0].png)
 
-                MAX_AVATAR_SIZE = (512, 512)
-                img = Image.open(avatar)
-                img.thumbnail(MAX_AVATAR_SIZE)
-                img.save(os.path.splitext(avatar)[0].png)
-
-                with transaction.atomic():
-                    profile.has_avatar = True
-                    profile.save(update_fields=["has_avatar"])
-                    if gcloud.enable_actions:
-                        with blob.open("wb") as f:
-                            # img should always have filename attribute
-                            for chunk in img.filename.chunks():
-                                f.write(chunk)
-                    blob.metadata = {"Content-Type": "image/png"}
-                    blob.patch()
-            case _:
-                raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
+        with transaction.atomic():
+            profile.has_avatar = True
+            profile.save(update_fields=["has_avatar"])
+            if gcloud.enable_actions:
+                with blob.open("wb") as f:
+                    # img should always have filename attribute
+                    for chunk in img.filename.chunks():
+                        f.write(chunk)
+            blob.metadata = {"Content-Type": "image/png"}
+            blob.patch()
 
 
 class PublicUserProfileViewSet(viewsets.ReadOnlyModelViewSet):

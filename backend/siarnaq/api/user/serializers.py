@@ -1,6 +1,8 @@
 from django.contrib.auth.hashers import make_password
+from django.http import Http404
 from rest_framework import serializers
 
+import siarnaq.gcloud as gcloud
 from siarnaq.api.user.models import User, UserProfile
 
 
@@ -52,11 +54,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True)
+    avatar_url = serializers.SerializerMethodField()
 
     class Meta:
         model = UserProfile
         fields = [
             "user",
+            "avatar_url",
             "gender",
             "gender_details",
             "school",
@@ -66,6 +70,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "has_resume",
             "country",
         ]
+
+    def get_avatar_url(self, obj):
+        # profile = self.get_object()
+        # client = storage.Client()
+        # blob = client.bucket(gcloud.public_bucket).blob(self.get_avatar_path())
+
+        if not obj.has_avatar:
+            raise Http404
+
+        url = "https://storage.googleapis.com"
+        return f"{url}/{gcloud.public_bucket}/{obj.get_avatar_path()}"
 
     def create(self, validated_data):
         # Create user
