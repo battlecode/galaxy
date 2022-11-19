@@ -99,8 +99,17 @@ TEMPLATES = [
 WSGI_APPLICATION = "siarnaq.wsgi.application"
 
 # Parse our secrets from secret manager
-SIARNAQ_SECRETS_JSON = os.getenv("SIARNAQ_SECRETS_JSON")
-if SIARNAQ_SECRETS_JSON is not None:
+match os.getenv("SIARNAQ_MODE", None):
+    case "PRODUCTION":
+        SIARNAQ_SECRETS_JSON = secret.get_secret("production-siarnaq-secrets").decode()
+
+    case "STAGING":
+        SIARNAQ_SECRETS_JSON = secret.get_secret("staging-siarnaq-secrets").decode()
+
+    case _:
+        SIARNAQ_SECRETS_JSON = ""
+
+if SIARNAQ_SECRETS_JSON:
     SIARNAQ_SECRETS = json.loads(SIARNAQ_SECRETS_JSON)
 else:
     # I'm sure there's a better way to provide defaults but can't think of it right now
@@ -136,7 +145,7 @@ match os.getenv("SIARNAQ_MODE", None):
                 "ENGINE": "django.db.backends.postgresql_psycopg2",
                 "NAME": "battlecode",
                 "USER": "siarnaq",
-                "PASSWORD": secret.get_secret("staging-siarnaq-db-password").decode(),
+                "PASSWORD": SIARNAQ_SECRETS["db-password"],
                 "HOST": "db.staging.battlecode.org",
                 "PORT": 5432,
             }

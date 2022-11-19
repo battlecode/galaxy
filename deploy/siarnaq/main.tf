@@ -90,7 +90,7 @@ resource "google_sql_user" "this" {
 }
 
 resource "google_secret_manager_secret" "this" {
-  secret_id = "${var.name}-db-password"
+  secret_id = "${var.name}-secrets"
 
   replication {
     automatic = true
