@@ -1,5 +1,4 @@
 import io
-import os
 
 import google.cloud.storage as storage
 from django.db import transaction
@@ -106,7 +105,7 @@ class UserProfileViewSet(
         MAX_AVATAR_SIZE = (512, 512)
         img = Image.open(avatar)
         img.thumbnail(MAX_AVATAR_SIZE)
-        img.save(os.path.splitext(avatar)[0].png)
+        img.save(avatar, "PNG")
 
         with transaction.atomic():
             profile.has_avatar = True
