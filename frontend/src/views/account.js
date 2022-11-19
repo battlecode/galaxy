@@ -3,6 +3,7 @@ import Api from "../api";
 
 import UserCard from "../components/userCard";
 import Country from "../components/country";
+import Gender from "../components/gender";
 import Floater from "react-floater";
 
 class Account extends Component {
@@ -281,6 +282,11 @@ class Account extends Component {
                         </div>
                       </div>
                     </div> */}
+                    <Gender
+                      changeHandler={this.changeHandler}
+                      gender={this.state.user_profile.gender}
+                      gender_details={this.state.user_profile.gender_details}
+                    />
                     <div className="row">
                       <div className="col-md-12">
                         <div className="form-group">
