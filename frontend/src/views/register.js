@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import Api from "../api";
-import Floater from "react-floater";
 
 import Country from "../components/country";
+import Gender from "../components/gender";
 
 class Register extends Component {
   state = {
@@ -255,47 +255,7 @@ class Register extends Component {
                 <div className="col-md-6">
                   <Country onChange={this.changeHandler} />
                 </div>
-                <div className="col-xs-4">
-                  <div className="form-group">
-                    <label>Gender Identity *</label>
-                    <Floater
-                      content={
-                        <div>
-                          This information helps us track diversity progress for
-                          ourselves and our sponsors!
-                        </div>
-                      }
-                      showCloseButton={true}
-                    >
-                      <i className="pe-7s-info pe-fw" />
-                    </Floater>
-                    <select
-                      className="form-control"
-                      id="gender"
-                      onChange={this.changeHandler}
-                    >
-                      <option value=""></option>
-                      <option value="F">Female </option>
-                      <option value="M">Male </option>
-                      <option value="N">Non-binary </option>
-                      <option value="*">
-                        Prefer to self-describe (use space to the right)
-                      </option>
-                      <option value="?">Rather not say </option>
-                    </select>
-                  </div>
-                </div>
-                <div className="col-xs-8">
-                  <div className="form-group">
-                    <label>Self-described Gender Identity</label>
-                    <input
-                      type="text"
-                      id="gender_details"
-                      className="form-control"
-                      onChange={this.changeHandler}
-                    />
-                  </div>
-                </div>
+                <Gender changeHandler={this.changeHandler} />
               </div>
               {buttons}
             </div>
