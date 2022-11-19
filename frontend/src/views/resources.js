@@ -20,7 +20,7 @@ class Resources extends Component {
                         className="btn btn-info btn-fill text-center"
                         href={`https://play.battlecode.org/specs/${this.props.episode}/specs.md.html`}
                       >
-                        Specifications for {this.props.episode}!
+                        Specifications for {this.props.episode_name_long}!
                       </a>
                     </p>
                     <p className="text-center">
@@ -29,7 +29,7 @@ class Resources extends Component {
                         className="btn btn-info btn-fill text-center"
                         href={`https://play.battlecode.org/javadocs/${this.props.episode}/index.html`}
                       >
-                        Javadocs for {this.props.episode}!
+                        Javadocs for {this.props.episode_name_long}!
                       </a>
                     </p>
                   </div>
