@@ -10,8 +10,8 @@ class Country extends Component {
         <select
           className="form-control"
           id="country"
-          value={this.props.country}
-          onChange={this.props.changeHandler}
+          value={this.props.value}
+          onChange={this.props.onChange}
         >
           <option value=""></option>
           <option value="Afghanistan">Afghanistan</option>
