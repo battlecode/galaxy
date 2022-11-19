@@ -18,7 +18,8 @@ class Account extends Component {
     this.state = {
       user_profile: copied_user_profile,
       up: "Update Info",
-      selectedFile: null,
+      selectedResumeFile: null,
+      selectedAvatarFile: null,
     };
 
     this.changeHandler = this.changeHandler.bind(this);
@@ -44,10 +45,18 @@ class Account extends Component {
   }
 
   fileChangeHandler = (event) => {
-    this.setState({
-      selectedFile: event.target.files[0],
-      loaded: 0,
-    });
+    const id = event.target.id;
+    if (id == "resume_file_upload") {
+      this.setState({
+        selectedResumeFile: event.target.files[0],
+        loaded: 0,
+      });
+    } else if (id == "avatar_file_upload") {
+      this.setState({
+        selectedAvatarFile: event.target.files[0],
+        loaded: 0,
+      });
+    }
   };
 
   updateUser() {
@@ -80,7 +89,7 @@ class Account extends Component {
   }
 
   uploadResume = () => {
-    Api.resumeUpload(this.state.selectedFile, () =>
+    Api.resumeUpload(this.state.selectedResumeFile, () =>
       this.props.updateBaseState()
     );
   };
@@ -90,33 +99,24 @@ class Account extends Component {
   };
 
   render() {
-    let btn_class = "btn btn";
-    let file_label = "No file chosen.";
-    let button = (
+    // Resume upload button logic
+    const resume_uploaded = this.state.selectedResumeFile !== null;
+    const resume_file_label = !resume_uploaded
+      ? "No file chosen."
+      : this.state.selectedResumeFile["name"];
+    const resume_btn_class =
+      "btn btn" + (!resume_uploaded ? "" : " btn-info btn-fill");
+    const resume_upload_button = (
       <button
-        disabled
+        disabled={!resume_uploaded}
         style={{ float: "right" }}
         onClick={this.uploadResume}
-        className={btn_class}
+        className={resume_btn_class}
       >
         {" "}
         Upload Resume{" "}
       </button>
     );
-    if (this.state.selectedFile !== null) {
-      btn_class += " btn-info btn-fill";
-      file_label = this.state.selectedFile["name"];
-      button = (
-        <button
-          style={{ float: "right" }}
-          onClick={this.uploadResume}
-          className={btn_class}
-        >
-          {" "}
-          Upload Resume{" "}
-        </button>
-      );
-    }
 
     let resume_status = null;
     if (this.state.user_profile.has_resume === false) {
@@ -134,6 +134,25 @@ class Account extends Component {
         </label>
       );
     }
+
+    // Avatar upload button logic
+    const avatar_uploaded = this.state.selectedAvatarFile !== null;
+    const avatar_file_label = !avatar_uploaded
+      ? "No file chosen."
+      : this.state.selectedAvatarFile["name"];
+    const avatar_btn_class =
+      "btn btn" + (!avatar_uploaded ? "" : " btn-info btn-fill");
+    const avatar_upload_button = (
+      <button
+        disabled={!avatar_uploaded}
+        style={{ float: "right" }}
+        onClick={this.uploadAvatar}
+        className={avatar_btn_class}
+      >
+        {" "}
+        Upload Avatar{" "}
+      </button>
+    );
 
     return (
       <div className="content">
@@ -226,7 +245,7 @@ class Account extends Component {
                         />
                       </div>
                     </div>
-                    <div className="row">
+                    {/* <div className="row">
                       <div className="col-md-12">
                         <div className="form-group">
                           <label>User Avatar URL</label>
@@ -239,7 +258,7 @@ class Account extends Component {
                           />
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                     <div className="row">
                       <div className="col-md-12">
                         <div className="form-group">
@@ -252,6 +271,41 @@ class Account extends Component {
                             id="biography"
                             value={this.state.user_profile.biography}
                           />
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={this.updateUser}
+                      className="btn btn-info btn-fill pull-right"
+                      dangerouslySetInnerHTML={{ __html: this.state.up }}
+                    ></button>
+                    <div className="clearfix" />
+                    <div className="row">
+                      <div className="col-md-12">
+                        <div className="form-group">
+                          <label>Avatar</label>
+                          <br />
+                          <label htmlFor="avatar_file_upload">
+                            <div className="btn"> Choose File </div>{" "}
+                            <span
+                              style={{
+                                textTransform: "none",
+                                marginLeft: "10px",
+                                fontSize: "14px",
+                              }}
+                            >
+                              {" "}
+                              {avatar_file_label}{" "}
+                            </span>
+                          </label>
+                          <input
+                            id="avatar_file_upload"
+                            type="file"
+                            onChange={this.fileChangeHandler}
+                            style={{ display: "none" }}
+                          />
+                          {avatar_upload_button}
                         </div>
                       </div>
                     </div>
@@ -279,7 +333,7 @@ class Account extends Component {
                           </Floater>
                           {resume_status}
                           <br />
-                          <label htmlFor="file_upload">
+                          <label htmlFor="resume_file_upload">
                             <div className="btn"> Choose File </div>{" "}
                             <span
                               style={{
@@ -289,27 +343,20 @@ class Account extends Component {
                               }}
                             >
                               {" "}
-                              {file_label}{" "}
+                              {resume_file_label}{" "}
                             </span>
                           </label>
                           <input
-                            id="file_upload"
+                            id="resume_file_upload"
                             type="file"
                             accept=".pdf"
                             onChange={this.fileChangeHandler}
                             style={{ display: "none" }}
                           />
-                          {button}
+                          {resume_upload_button}
                         </div>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={this.updateUser}
-                      className="btn btn-info btn-fill pull-right"
-                      dangerouslySetInnerHTML={{ __html: this.state.up }}
-                    ></button>
-                    <div className="clearfix" />
                   </div>
                 </div>
               </div>
