@@ -178,7 +178,7 @@ class App extends Component {
         component={(props) => (
           <Resources
             {...props}
-            episode_info={this.state.episode_info}
+            episode_name_long={episode_name_long}
             episode={this.state.episode}
             is_game_released={is_game_released}
           />
