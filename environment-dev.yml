@@ -11,6 +11,7 @@ dependencies:
   - djangorestframework=3.14.0
   - drf-spectacular=0.24.2
   - flake8=5.0.4
+  - go=1.18.5
   - google-auth=2.13.0
   - google-cloud-pubsub=2.13.10
   - google-cloud-secret-manager=2.12.6
