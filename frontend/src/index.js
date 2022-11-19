@@ -259,10 +259,7 @@ class App extends Component {
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
     let onTeamElemsToRender =
       on_team && is_game_released ? this.onTeamElems : [];
-    let staffElemsToRender =
-      this.state.user_profile && this.state.user_profile.user.is_staff
-        ? this.staffElems
-        : [];
+    let staffElemsToRender = is_staff ? this.staffElems : [];
 
     let elemsToRender = this.nonLoggedInElems.concat(
       loggedInElemsToRender,
