@@ -215,8 +215,8 @@ class Account extends Component {
                       </div>
                       <div className="col-md-6">
                         <Country
-                          country={this.state.user_profile.country}
-                          changeHandler={this.changeHandler}
+                          value={this.state.user_profile.country}
+                          onChange={this.changeHandler}
                         />
                       </div>
                     </div>

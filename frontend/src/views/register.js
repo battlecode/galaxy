@@ -253,7 +253,7 @@ class Register extends Component {
                   </div>
                 </div>
                 <div className="col-md-6">
-                  <Country />
+                  <Country onChange={this.changeHandler} />
                 </div>
                 <div className="col-xs-4">
                   <div className="form-group">
