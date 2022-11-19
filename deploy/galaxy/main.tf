@@ -62,6 +62,18 @@ module "siarnaq" {
   storage_secure_name = google_storage_bucket.secure.name
 }
 
+module "titan" {
+  source = "../titan"
+
+  name        = "${var.name}-titan"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+
+  image         = var.titan_image
+  storage_names = [google_storage_bucket.public.name, google_storage_bucket.secure.name]
+}
+
 module "saturn_compile" {
   source = "../saturn"
 

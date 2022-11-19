@@ -51,12 +51,15 @@ module "production" {
   database_tier                = "db-custom-1-3840"
   database_authorized_networks = []
 
+  titan_image = module.cd.artifact_titan_image
+
   saturn_image          = module.cd.artifact_saturn_image
   max_compile_instances = 10
   max_execute_instances = 10
 
   depends_on = [
     google_project_service.artifactregistry,
+    google_project_service.eventarc,
     google_project_service.run,
     google_project_service.secretmanager,
     google_project_service.sqladmin,
@@ -75,12 +78,15 @@ module "staging" {
   database_tier                = "db-f1-micro"
   database_authorized_networks = ["0.0.0.0/0"]
 
+  titan_image = module.cd.artifact_titan_image
+
   saturn_image          = module.cd.artifact_saturn_image
   max_compile_instances = 1
   max_execute_instances = 1
 
   depends_on = [
     google_project_service.artifactregistry,
+    google_project_service.eventarc,
     google_project_service.run,
     google_project_service.secretmanager,
     google_project_service.sqladmin,

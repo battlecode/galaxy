@@ -6,10 +6,6 @@ output "sql_instance_ip" {
   value = google_sql_database_instance.this.first_ip_address
 }
 
-output "topic_antivirus_name" {
-  value = google_pubsub_topic.this["antivirus"].name
-}
-
 output "topic_compile_name" {
   value = google_pubsub_topic.this["compile"].name
 }

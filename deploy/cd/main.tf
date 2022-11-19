@@ -7,6 +7,7 @@ resource "google_artifact_registry_repository" "this" {
 
 locals {
   siarnaq_image = "${google_artifact_registry_repository.this.location}-docker.pkg.dev/${google_artifact_registry_repository.this.project}/${google_artifact_registry_repository.this.repository_id}/siarnaq"
+  titan_image = "${google_artifact_registry_repository.this.location}-docker.pkg.dev/${google_artifact_registry_repository.this.project}/${google_artifact_registry_repository.this.repository_id}/titan"
   saturn_image = "${google_artifact_registry_repository.this.location}-docker.pkg.dev/${google_artifact_registry_repository.this.project}/${google_artifact_registry_repository.this.repository_id}/saturn"
 }
 
@@ -42,8 +43,15 @@ resource "google_cloudbuild_trigger" "galaxy" {
       dir  = "backend"
     }
 
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = ["build", "-t", local.titan_image, "."]
+      dir  = "titan"
+    }
+
     images = [
       local.siarnaq_image,
+      local.titan_image,
     ]
   }
 }
