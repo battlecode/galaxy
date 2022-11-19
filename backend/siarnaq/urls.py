@@ -16,7 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
+
+from siarnaq.api import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -26,6 +32,7 @@ urlpatterns = [
     path("api/team/", include("siarnaq.api.teams.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
     # Schema:
     path("api/specs/", SpectacularAPIView.as_view(), name="specs"),
     path(
@@ -33,4 +40,7 @@ urlpatterns = [
         SpectacularSwaggerView.as_view(url_name="specs"),
         name="swagger-ui",
     ),
+    # Misc:
+    path("api/ping/", views.ping, name="ping"),
+    path("api/version/", views.version, name="version"),
 ]

@@ -1,3 +1,6 @@
+import importlib
+import os
+
 from django.test import RequestFactory, TestCase
 from google.auth.exceptions import DefaultCredentialsError
 from google.auth.transport import requests
@@ -6,6 +9,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+import siarnaq.gcloud as gcloud
 from siarnaq.api.user.models import User
 
 
@@ -13,8 +17,14 @@ class GoogleCloudAuthenticationTest(TestCase):
     """Test suite for token-based authentication for Google Cloud service accounts."""
 
     def setUp(self):
+        os.environ["SIARNAQ_MODE"] = "STAGING"
+        importlib.reload(gcloud)
         User.objects.create_user(username="user")
         self.factory = RequestFactory()
+
+    def tearDown(self):
+        del os.environ["SIARNAQ_MODE"]
+        importlib.reload(gcloud)
 
     def get_gcloud_token(self, audience):
         """Generate an OIDC token for the service account to be authenticated."""

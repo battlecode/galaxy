@@ -14,7 +14,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
-import google.auth
+import siarnaq.gcloud as gcloud
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "play.battlecode.org",
+    "staging.battlecode.org",
 ]
 
 
@@ -57,6 +58,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # Place CORS first. See https://stackoverflow.com/a/45376281
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -64,7 +67,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -96,12 +98,41 @@ WSGI_APPLICATION = "siarnaq.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+match os.getenv("SIARNAQ_MODE", None):
+    case "PRODUCTION":
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql_psycopg2",
+                "NAME": "battlecode",
+                "USER": "siarnaq",
+                "PASSWORD": os.getenv("SIARNAQ_DB_PASSWORD"),
+                "HOST": (
+                    f"/cloudsql/{gcloud.project_id}:"
+                    f"{gcloud.location}:production-siarnaq-db"
+                ),
+                "PORT": 5432,
+            }
+        }
+
+    case "STAGING":
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql_psycopg2",
+                "NAME": "battlecode",
+                "USER": "siarnaq",
+                "PASSWORD": gcloud.get_secret("staging-siarnaq-db-password").decode(),
+                "HOST": "db.staging.battlecode.org",
+                "PORT": 5432,
+            }
+        }
+
+    case _:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": str(BASE_DIR / "db.sqlite3"),
+            }
+        }
 
 # Custom user model
 # https://docs.djangoproject.com/en/4.0/topics/auth/customizing
@@ -186,27 +217,13 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
-# Google Cloud Platform configuration
-
-GOOGLE_CLOUD_CREDENTIALS, GOOGLE_CLOUD_PROJECT_ID = google.auth.default()
-GOOGLE_CLOUD_LOCATION = "us-east1"
-USER_GCLOUD_ADMIN_EMAIL = GOOGLE_CLOUD_CREDENTIALS.service_account_email
-USER_GCLOUD_ADMIN_USERNAME = "galaxy-admin"
-
-# Bucket for storing all files whose access is protected by authentication
-GCLOUD_SECURED_BUCKET = "battle-secure-upload"
-
-# Bucket for public assets
-GCLOUD_PUBLIC_BUCKET = "battle-public-upload"
-
-# Do not inadvertently interact with cloud resources while testing locally.
-# Change this in production and while running system integration tests.
-GCLOUD_DISABLE_ALL_ACTIONS = True
-
 # Penalized Elo configuration
 
 TEAMS_ELO_INITIAL = 1500.0
 TEAMS_ELO_K = 24.0
 TEAMS_ELO_SCALE = 400.0
 TEAMS_ELO_PENALTY = 0.85
+
+# Team limits
+
+TEAMS_MAX_TEAM_SIZE = 4

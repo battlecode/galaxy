@@ -1,7 +1,7 @@
+import io
 import os
 
 import google.cloud.storage as storage
-from django.conf import settings
 from django.db import transaction
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
@@ -11,6 +11,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+import siarnaq.gcloud as gcloud
 from siarnaq.api.user.models import UserProfile
 from siarnaq.api.user.permissions import IsAuthenticatedAsRequestedUser
 from siarnaq.api.user.serializers import (
@@ -38,8 +39,11 @@ class UserProfileViewSet(
     def get_queryset(self):
         return UserProfile.objects.select_related("user").all()
 
-    # See https://stackoverflow.com/a/36626403.
     def get_object(self):
+        """
+        If provided ID is "current", set object to logged in user.
+        See https://stackoverflow.com/a/36626403.
+        """
         pk = self.kwargs.get("pk")
 
         if pk == "current":
@@ -53,15 +57,20 @@ class UserProfileViewSet(
     def resume(self, request, pk=None):
         """Retrieve or update the uploaded resume."""
         profile = self.get_object()
-        client = storage.Client()
-        blob = client.bucket(settings.GCLOUD_SECURED_BUCKET).blob(
-            profile.get_resume_path()
-        )
         match request.method.lower():
             case "get":
                 if not profile.has_resume:
                     raise Http404
-                return FileResponse(blob.open("rb"), filename="resume.pdf")
+                client = storage.Client(credentials=gcloud.credentials)
+                blob = client.bucket(gcloud.secure_bucket).blob(
+                    profile.get_resume_path()
+                )
+                if gcloud.enable_actions:
+                    data = blob.open("rb")
+                else:
+                    data = io.BytesIO()
+                return FileResponse(data, filename="resume.pdf")
+
             case "put":
                 serializer = self.get_serializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
@@ -69,13 +78,18 @@ class UserProfileViewSet(
                 with transaction.atomic():
                     profile.has_resume = True
                     profile.save(update_fields=["has_resume"])
-                    if not settings.GCLOUD_DISABLE_ALL_ACTIONS:
+                    if gcloud.enable_actions:
+                        client = storage.Client(credentials=gcloud.credentials)
+                        blob = client.bucket(gcloud.secure_bucket).blob(
+                            profile.get_resume_path()
+                        )
                         with blob.open("wb") as f:
                             for chunk in resume.chunks():
                                 f.write(chunk)
                     blob.metadata = {"Content-Type": "application/pdf"}
                     blob.patch()
                 return Response(serializer.data)
+
             case _:
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
 
@@ -84,18 +98,14 @@ class UserProfileViewSet(
         """Retrieve or update uploaded avatar"""
         profile = self.get_object()
         client = storage.Client()
-        blob = client.bucket(settings.GCLOUD_PUBLIC_BUCKET).blob(
-            profile.get_avatar_path()
-        )
+        blob = client.bucket(gcloud.public_bucket).blob(profile.get_avatar_path())
         match request.method.lower():
             case "get":
                 if not profile.has_avatar:
                     raise Http404
 
                 url = "https://storage.googleapis.com"
-                return (
-                    f"{url}/{settings.GCLOUD_PUBLIC_BUCKET}/{profile.get_avatar_path()}"
-                )
+                return f"{url}/{gcloud.public_bucket}/{profile.get_avatar_path()}"
             case "put":
                 serializer = self.get_serializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
@@ -109,7 +119,7 @@ class UserProfileViewSet(
                 with transaction.atomic():
                     profile.has_avatar = True
                     profile.save(update_fields=["has_avatar"])
-                    if not settings.GCLOUD_DISABLE_ALL_ACTIONS:
+                    if gcloud.enable_actions:
                         with blob.open("wb") as f:
                             # img should always have filename attribute
                             for chunk in img.filename.chunks():

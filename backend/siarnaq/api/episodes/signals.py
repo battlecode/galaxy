@@ -5,6 +5,7 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 
+import siarnaq.gcloud as gcloud
 from siarnaq.api.episodes.models import Episode
 
 
@@ -14,7 +15,7 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
     Update the Google Cloud Scheduler resource for automatic scrimmage scheduling
     whenever the specification is changed, raising an exception if the operation fails.
     """
-    if settings.GCLOUD_DISABLE_ALL_ACTIONS:
+    if not gcloud.enable_actions:
         return
     if update_fields is not None and "autoscrim_schedule" not in update_fields:
         return  # No new schedule
@@ -32,10 +33,7 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
     # wish, perhaps by adding `best_of` as a column in the Episode model.
     best_of = 3
 
-    parent = (
-        f"projects/{settings.GOOGLE_CLOUD_PROJECT_ID}/"
-        f"locations/{settings.GOOGLE_CLOUD_LOCATION}"
-    )
+    parent = f"projects/{gcloud.project_id}/locations/{gcloud.location}"
     job_name = f"{parent}/jobs/autoscrim_{instance.name_short}"
     url = "https://{}{}".format(
         Site.objects.get_current().domain,
@@ -48,15 +46,13 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
             uri=url,
             http_method=scheduler.HttpMethod.POST,
             body=f"best_of={best_of}".encode(),
-            oidc_token=scheduler.OidcToken(
-                service_account_email=settings.USER_GCLOUD_ADMIN_EMAIL,
-            ),
+            oidc_token=scheduler.OidcToken(service_account_email=gcloud.admin_email),
         ),
         schedule=new_schedule,
         time_zone=settings.TIME_ZONE,
     )
 
-    client = scheduler.CloudSchedulerClient()
+    client = scheduler.CloudSchedulerClient(credentials=gcloud.credentials)
     if old_schedule is None:
         client.create_job(request=dict(parent=parent, job=job))
     elif new_schedule is None:
