@@ -453,6 +453,29 @@ class Api {
       });
   }
 
+  static resumeRetrieve(callback) {
+    return $.ajax({
+      url: `${URL}/api/user/detail/current/resume/`,
+      type: "GET",
+    })
+      .done((data, status) => {
+        const blob = new Blob([data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        // See https://stackoverflow.com/a/9970672 for file download logic
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = "resume.pdf";
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        callback(true);
+      })
+      .fail((xhr, status, error) => {
+        callback(false);
+      });
+  }
+
   //----SCRIMMAGING----
 
   static acceptScrimmage(scrimmage_id, callback) {
