@@ -105,18 +105,13 @@ class UserProfileViewSet(
         MAX_AVATAR_SIZE = (512, 512)
         img = Image.open(avatar)
         img.thumbnail(MAX_AVATAR_SIZE)
-        img.save(avatar, "PNG")
 
         with transaction.atomic():
             profile.has_avatar = True
             profile.save(update_fields=["has_avatar"])
             if gcloud.enable_actions:
                 with blob.open("wb") as f:
-                    # img should always have filename attribute
-                    for chunk in img.filename.chunks():
-                        f.write(chunk)
-            blob.metadata = {"Content-Type": "image/png"}
-            blob.patch()
+                    img.save(f, "PNG")
 
 
 class PublicUserProfileViewSet(viewsets.ReadOnlyModelViewSet):
