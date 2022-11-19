@@ -93,7 +93,7 @@ class UserProfileViewSet(
             case _:
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
 
-    @action(detail=True, methods=["put"], serializer_class=UserAvatarSerializer)
+    @action(detail=True, methods=["post"], serializer_class=UserAvatarSerializer)
     def avatar(self, request, pk=None):
         """Retrieve or update uploaded avatar"""
         profile = self.get_object()
