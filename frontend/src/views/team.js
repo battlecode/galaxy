@@ -164,7 +164,7 @@ class YesTeam extends Component {
               </div>
               <div className="row">
                 <div className="col-md-12">
-                  <div className="form-group">
+                  {/* <div className="form-group">
                     <label>Team Avatar URL</label>
                     <input
                       type="text"
@@ -173,7 +173,7 @@ class YesTeam extends Component {
                       onChange={this.changeHandler}
                       value={this.state.team_profile.avatar}
                     />
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="row">
