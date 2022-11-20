@@ -106,12 +106,19 @@ class UserProfileViewSet(
         img = Image.open(avatar)
         img.thumbnail(MAX_AVATAR_SIZE)
 
+        # Prepare image bytes for upload to Google Cloud
+        # See https://stackoverflow.com/a/71094317
+        bytestream = io.BytesIO()
+        img.save(bytestream, format="png")
+        img_bytes = bytestream.getvalue()
+
         with transaction.atomic():
             profile.has_avatar = True
             profile.save(update_fields=["has_avatar"])
             if gcloud.enable_actions:
-                with blob.open("wb") as f:
-                    img.save(f, "PNG")
+                blob.upload_from_string(img_bytes)
+
+        return Response(serializer.data)
 
 
 class PublicUserProfileViewSet(viewsets.ReadOnlyModelViewSet):
