@@ -13,12 +13,16 @@ class UserCard extends Component {
           | <label>Staff</label>
         </small>
       ) : null;
+    let avatar = "";
+    if (user_profile) avatar = "loading";
+    if (user_profile.avatar_url != "") avatar = user_profile.avatar_url;
+
     return (
       <div className="card card-user">
         <div className="image"></div>
         <div className="content">
           <div className="author">
-            {/*<Avatar data={user} />*/}
+            <Avatar data={user_profile} />
             <h4 className="title">
               {user_profile.user.first_name + " " + user_profile.user.last_name}
               <br />
