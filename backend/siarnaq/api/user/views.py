@@ -1,10 +1,8 @@
-import io
-
 import google.cloud.storage as storage
 from django.db import transaction
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
-from rest_framework import mixins, viewsets
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -17,6 +15,7 @@ from siarnaq.api.user.serializers import (
     UserProfileSerializer,
     UserResumeSerializer,
 )
+from siarnaq.gcloud import titan
 
 
 class UserProfileViewSet(
@@ -58,15 +57,13 @@ class UserProfileViewSet(
             case "get":
                 if not profile.has_resume:
                     raise Http404
-                client = storage.Client(credentials=gcloud.credentials)
-                blob = client.bucket(gcloud.secure_bucket).blob(
-                    profile.get_resume_path()
-                )
-                if gcloud.enable_actions:
-                    data = blob.open("rb")
-                else:
-                    data = io.BytesIO()
-                return FileResponse(data, filename="resume.pdf")
+                try:
+                    f = titan.get_object_if_safe(
+                        gcloud.secure_bucket, profile.get_resume_path()
+                    )
+                except titan.RequestRefused as e:
+                    return Response(e.reason, status.HTTP_404_NOT_FOUND)
+                return FileResponse(f, filename="resume.pdf")
 
             case "put":
                 serializer = self.get_serializer(data=request.data)
@@ -80,12 +77,11 @@ class UserProfileViewSet(
                         blob = client.bucket(gcloud.secure_bucket).blob(
                             profile.get_resume_path()
                         )
-                        with blob.open("wb") as f:
+                        with blob.open("wb", content_type="application/pdf") as f:
                             for chunk in resume.chunks():
                                 f.write(chunk)
-                    blob.metadata = {"Content-Type": "application/pdf"}
-                    blob.patch()
-                return Response(serializer.data)
+                        titan.request_scan(blob)
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
             case _:
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")

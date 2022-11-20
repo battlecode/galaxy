@@ -38,6 +38,11 @@ variable "database_authorized_networks" {
   type        = list(string)
 }
 
+variable "titan_image" {
+  description = "Image for the Titan Docker container"
+  type        = string
+}
+
 variable "saturn_image" {
   description = "Image for the Saturn Docker container"
   type        = string
