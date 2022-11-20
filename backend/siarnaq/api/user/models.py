@@ -64,7 +64,7 @@ class UserProfile(models.Model):
     """Whether the user has an uploaded avatar."""
 
     avatar_uuid = models.UUIDField(default=uuid.uuid4)
-    """The ID identifying the avatar file of this user."""
+    """A unique ID to identify each new avatar upload."""
 
     has_resume = models.BooleanField(default=False)
     """Whether the user has an uploaded resume."""
@@ -77,4 +77,4 @@ class UserProfile(models.Model):
         return posixpath.join("user", str(self.pk), "resume.pdf")
 
     def get_avatar_path(self):
-        return posixpath.join("user", str(self.pk), f"avatar-{self.avatar_uuid}.png")
+        return posixpath.join("user", str(self.pk), "avatar.png")

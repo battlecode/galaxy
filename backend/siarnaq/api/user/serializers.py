@@ -77,9 +77,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
             return ""
 
         client = storage.Client()
-        return (
+        public_url = (
             client.bucket(gcloud.public_bucket).blob(obj.get_avatar_path()).public_url
         )
+        # Append UUID to public URL to prevent use of cached previous avatar
+        return f"{public_url}?{obj.avatar_uuid}"
 
     def create(self, validated_data):
         # Create user
