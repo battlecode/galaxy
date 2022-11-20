@@ -1,3 +1,4 @@
+import google.cloud.storage as storage
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
@@ -75,8 +76,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if not obj.has_avatar:
             return ""
 
-        url = "https://storage.googleapis.com"
-        return f"{url}/{gcloud.public_bucket}/{obj.get_avatar_path()}"
+        client = storage.Client()
+        return (
+            client.bucket(gcloud.public_bucket).blob(obj.get_avatar_path()).public_url
+        )
 
     def create(self, validated_data):
         # Create user

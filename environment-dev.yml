@@ -18,8 +18,8 @@ dependencies:
   - isort=5.10.1
   - mypy=0.942
   - openssl=3.0.5
-  - pip=22.3
   - pillow=9.0.1
+  - pip=22.3
   - pre_commit=2.20.0
   - psycopg2=2.9.3
   - python=3.10

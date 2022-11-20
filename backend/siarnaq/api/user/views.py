@@ -94,10 +94,8 @@ class UserProfileViewSet(
 
     @action(detail=True, methods=["post"], serializer_class=UserAvatarSerializer)
     def avatar(self, request, pk=None):
-        """Retrieve or update uploaded avatar"""
+        """updates uploaded avatar"""
         profile = self.get_object()
-        client = storage.Client()
-        blob = client.bucket(gcloud.public_bucket).blob(profile.get_avatar_path())
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         avatar = serializer.validated_data["avatar"]
@@ -116,6 +114,10 @@ class UserProfileViewSet(
             profile.has_avatar = True
             profile.save(update_fields=["has_avatar"])
             if gcloud.enable_actions:
+                client = storage.Client()
+                blob = client.bucket(gcloud.public_bucket).blob(
+                    profile.get_avatar_path()
+                )
                 blob.upload_from_string(img_bytes)
 
         return Response(serializer.data)
