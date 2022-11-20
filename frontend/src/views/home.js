@@ -5,7 +5,6 @@ import { PieChart } from "chartist";
 import Api from "../api";
 import Countdown from "../components/countdown";
 import UpdateCard from "../components/updateCard";
-import MultiEpisode from "./multi-episode";
 
 class StatCard extends UpdateCard {
   constructor(props) {
@@ -16,20 +15,20 @@ class StatCard extends UpdateCard {
   }
 
   componentDidMount() {
-    Api.getTeamWinStats(
-      function (stats) {
-        if (stats[0] == 0 && stats[1] == 0) {
-          this.setState({ matchesplayed: false });
-        } else {
-          this.setState({ matchesplayed: true }, function () {
-            return new PieChart("#stat_chart", {
-              labels: stats,
-              series: stats,
-            });
-          });
-        }
-      }.bind(this)
-    );
+    // Api.getTeamWinStats(
+    //   function (stats) {
+    //     if (stats[0] == 0 && stats[1] == 0) {
+    //       this.setState({ matchesplayed: false });
+    //     } else {
+    //       this.setState({ matchesplayed: true }, function () {
+    //         return new PieChart("#stat_chart", {
+    //           labels: stats,
+    //           series: stats,
+    //         });
+    //       });
+    //     }
+    //   }.bind(this)
+    // );
   }
 
   render() {
@@ -70,6 +69,9 @@ class DateCard extends UpdateCard {
   }
 
   componentDidMount() {
+    // The backend does not currently support making/retrieving a list of
+    // announcements, so this has been commented out for now.
+    /*
     Api.getUpdates(
       function (dates) {
         this.setState({ dates: dates.length > 5 ? dates.slice(0, 5) : dates });
@@ -78,6 +80,7 @@ class DateCard extends UpdateCard {
         }
       }.bind(this)
     );
+    */
   }
 
   render() {
@@ -114,27 +117,22 @@ class InstrCard extends UpdateCard {
     super();
     this.state = {
       dates: [],
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
     };
-  }
-
-  componentDidMount() {
-    // meh
   }
 
   render() {
     return (
       <div className="card">
         <div className="header">
-          <h4 className="title">Welcome to Battlecode {this.state.episode}!</h4>
+          <h4 className="title">Welcome to {this.props.episode_name_long}!</h4>
         </div>
         <div className="content">
-          <p></p>
-          <p>
+          {/* <p></p> */}
+          {/* <p>
             Come to the Final Tournament,{" "}
             <b>at MIT in Stata (32-123) at 7pm on February 5</b>. You can still
             play matches -- find the specs (and javadocs!) in the resources tab!
-          </p>
+          </p> */}
         </div>
       </div>
     );
@@ -189,19 +187,6 @@ class LinksCard extends Component {
 }
 
 class Home extends Component {
-  constructor() {
-    super();
-    this.state = { on_team: null };
-  }
-
-  componentDidMount() {
-    Api.getUserTeam(
-      function (e) {
-        this.setState({ on_team: e !== null });
-      }.bind(this)
-    );
-  }
-
   render() {
     return (
       <div className="content">
@@ -210,12 +195,12 @@ class Home extends Component {
             <div className="col-md-6">
               <div className="container-fluid">
                 <div className="row">
-                  <InstrCard />
+                  <InstrCard episode_name_long={this.props.episode_name_long} />
                 </div>
                 <div className="row">
                   <Countdown />
                 </div>
-                <div className="row">{this.state.on_team && <StatCard />}</div>
+                <div className="row">{this.props.on_team && <StatCard />}</div>
               </div>
             </div>
             <div className="col-md-6">

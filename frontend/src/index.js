@@ -38,15 +38,75 @@ import Api from "./api";
 class App extends Component {
   constructor() {
     super();
-    this.state = { logged_in: null };
+    const episode = MultiEpisode.getEpisodeFromCurrentPathname(false);
+    this.state = {
+      logged_in: null,
+      episode: episode,
+      episode_info: null,
+      user_profile: null,
+      team_profile: null,
+    };
 
+    // Sets the login header based on currently held cookies, before any
+    // requests are run.
+    Api.setLoginHeader();
+  }
+
+  updateBaseState = (callback = () => {}) => {
+    const ajax1 = Api.loginCheck((logged_in) => {
+      this.setState({ logged_in });
+    });
+
+    const ajax2 = Api.getUserProfile((user_profile) => {
+      this.setState({ user_profile });
+    });
+
+    const ajax3 = Api.getUserTeamProfile(this.state.episode, (team_profile) => {
+      this.setState({ team_profile });
+    });
+
+    const ajax4 = Api.getEpisodeInfo(this.state.episode, (episode_info) => {
+      this.setState({ episode_info });
+    });
+
+    // Run this function when all AJAX queries are completed.
+    // See https://stackoverflow.com/a/9865124.
+    $.when(ajax1, ajax2, ajax3, ajax4).done(callback).fail(callback);
+  };
+
+  componentDidMount() {
+    this.updateBaseState(() => {
+      // This function, for mobile devices, moves the navbar into the sidebar and then
+      // collapses the sidebar. Better responsive display
+      // (Only call it when the entire DOM has fully loaded, since otherwise,
+      // the _incomplete_ navbar gets moved and is stuck there.)
+      // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
+      $(document).ready(function () {
+        window.init_right_menu();
+      });
+    });
+  }
+
+  render() {
     // Note that `Route`s define what routes a user may access / what routes exist to a user.
     // Does _NOT_ actually render a clickable link to that route.
     // That is done in navbar.js, sidebar.js, footer.js, etc
 
-    // NOTE: Every page in the following lists
-    // should render with navbar and sidebar, and should have an inherent episode.
-    // Handling otherwise is incredibly tricky, and is not worth the special case.
+    // Short-circuit check for nested object,
+    // in case user_profile hasn't been set yet.
+    const is_staff =
+      this.state.user_profile && this.state.user_profile.user.is_staff;
+
+    const on_team = this.state.team_profile !== null;
+
+    const is_game_released =
+      is_staff ||
+      (this.state.episode_info &&
+        new Date() > new Date(this.state.episode_info.game_release));
+
+    const episode_name_long = this.state.episode_info
+      ? this.state.episode_info.name_long
+      : null;
 
     // should always be viewable, even when not logged in
     this.nonLoggedInElems = [
@@ -56,28 +116,56 @@ class App extends Component {
         {<Redirect to={`${MultiEpisode.getDefaultEpisode()}/home`} />}
       </Route>,
 
-      <Route path={`/:episode/home`} component={Home} key="home" />,
-      <Route path={`/:episode/updates`} component={Updates} key="updates" />,
+      <Route
+        path={`/:episode/home`}
+        component={(props) => (
+          <Home
+            {...props}
+            on_team={on_team}
+            episode_name_long={episode_name_long}
+          />
+        )}
+        key="home"
+      />,
+
+      // <Route path={`/:episode/updates`} component={Updates} key="updates" />,
+
       // commented but kept since we might use this later
       // <Route path={`/search`} component={Search} key="search" />,
       <Route
         path={`/:episode/tournaments`}
-        component={Tournaments}
+        component={(props) => (
+          <Tournaments
+            {...props}
+            episode_name_long={episode_name_long}
+            episode={this.state.episode}
+          />
+        )}
         key="tournaments"
       />,
       <Route
         path={`/:episode/getting-started`}
-        component={GettingStarted}
+        component={(props) => (
+          <GettingStarted
+            {...props}
+            episode_name_long={episode_name_long}
+            episode={this.state.episode}
+          />
+        )}
         key="getting-started"
       />,
       <Route
         path={`/:episode/common-issues`}
-        component={Issues}
+        component={(props) => (
+          <Issues {...props} episode={this.state.episode} />
+        )}
         key="issues"
       />,
       <Route
-        path={`/:episode/debugging`}
-        component={Debugging}
+        path={`/:episode/debugging-tips`}
+        component={(props) => (
+          <Issues {...props} episode={this.state.episode} />
+        )}
         key="debugging"
       />,
       <Route
@@ -87,26 +175,54 @@ class App extends Component {
       />,
       <Route
         path={`/:episode/resources`}
-        component={Resources}
+        component={(props) => (
+          <Resources
+            {...props}
+            episode_name_long={episode_name_long}
+            episode={this.state.episode}
+            is_game_released={is_game_released}
+          />
+        )}
         key="resources"
       />,
-      <Route
-        path={`/:episode/rankings/:team_id`}
-        component={TeamInfo}
-        key="rankings-team"
-      />,
-      <Route path={`/:episode/rankings`} component={Rankings} key="rankings" />,
+      // <Route
+      //   path={`/:episode/rankings/:team_id`}
+      //   component={TeamInfo}
+      //   key="rankings-team"
+      // />,
+      // <Route path={`/:episode/rankings`} component={Rankings} key="rankings" />,
     ];
 
     // should only be visible to logged in users
     // If user is not logged-in, should 404 and not even render
     this.loggedInElems = [
-      <Route path={`/:episode/team`} component={Team} key="team" />,
-      <Route path={`/:episode/account`} component={Account} key="account" />,
+      <Route
+        path={`/:episode/team`}
+        component={(props) => (
+          <Team
+            {...props}
+            team_profile={this.state.team_profile}
+            episode={this.state.episode}
+            updateBaseState={this.updateBaseState}
+          />
+        )}
+        key="team"
+      />,
+      <Route
+        path={`/:episode/account`}
+        component={(props) => (
+          <Account
+            {...props}
+            user_profile={this.state.user_profile}
+            updateBaseState={this.updateBaseState}
+          />
+        )}
+        key="account"
+      />,
     ];
 
     // Should only be visible and renderable to users on a team
-    this.onTeamElems = [
+    this.onTeamAndGameReleasedElems = [
       <Route
         path={`/:episode/scrimmaging`}
         component={Scrimmaging}
@@ -128,37 +244,22 @@ class App extends Component {
     // When in the list of routes, this route must be last.
     // (for wildcard to work properly)
     this.notFoundElems = [
-      <Route path="*" key="notfound">
-        {/* Simply adding the NotFound component to the route will still have a sidebar, etc,
-        which is odd since the sidebar needs an episode but the not-found page doesn't necessarily have one
-        So, instead, redirect to a dedicated not-found route with just its own component */}
-        {<Redirect to={`/not-found`} />}
-      </Route>,
+      // Once upon a time, this redirected. This turned out not to work.
+      // For example, what happens if the requested route seems inaccessible now,
+      // just because login-check hasn't finished running?
+      // We need to make sure that login-check, etc, properly run first.
+      <Route path="*" component={NotFound} key="notfound" />,
     ];
-  }
+    // Note that the "toRender" arrays are computed during the render method
+    // This is important! Checking whether the user is logged-in, etc,
+    // takes an API call, which takes time.
+    // Whenever this API call finishes, we should always be ready to re-include the routes,
+    // and thus potentially re-render the URL that the user is looking to navigate to.
 
-  componentDidMount() {
-    // duped in various places, see sidebar.js
-    // This is messy and hard to understand, it will be cleaned in #91.
-    Api.loginCheck((logged_in) => {
-      this.setState({ logged_in });
-    });
-
-    Api.getUserProfile((user_profile) => {
-      this.setState({ user: user_profile });
-    });
-
-    Api.getUserTeam((user_team_data) => {
-      // This should be cleaned up in #91
-      this.setState({ on_team: user_team_data !== null });
-    });
-  }
-
-  render() {
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
-    let onTeamElemsToRender = this.state.on_team ? this.onTeamElems : [];
-    let staffElemsToRender =
-      this.state.user && this.state.user.is_staff ? this.staffElems : [];
+    let onTeamElemsToRender =
+      on_team && is_game_released ? this.onTeamElems : [];
+    let staffElemsToRender = is_staff ? this.staffElems : [];
 
     let elemsToRender = this.nonLoggedInElems.concat(
       loggedInElemsToRender,
@@ -189,11 +290,24 @@ class App extends Component {
         <Route path={`/password_change`} component={PasswordChange} />,
         {/* To be able to render NotFound without a sidebar, etc */}
         <Route path={`/not-found`} component={NotFound} />,
+        {/* Fallback route if none of above: include sidebar, navbar, etc. */}
         <Route>
           <div className="wrapper">
-            <SideBar />
+            <SideBar
+              logged_in={this.state.logged_in}
+              is_staff={is_staff}
+              on_team={on_team}
+              episode={this.state.episode}
+              episode_info={this.state.episode_info}
+              episode_name_long={episode_name_long}
+              is_game_released={is_game_released}
+            />
             <div className="main-panel">
-              <NavBar />
+              <NavBar
+                logged_in={this.state.logged_in}
+                episode={this.state.episode}
+                episode_name_long={episode_name_long}
+              />
               <Switch>{elemsToRender}</Switch>
               <Footer />
             </div>

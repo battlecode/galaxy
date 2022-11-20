@@ -7,70 +7,60 @@ import Floater from "react-floater";
 
 class YesTeam extends Component {
   constructor(props) {
-    super();
+    super(props);
+
+    // Copy the user's fetched team profile for use in editable form state.
+    const copied_team_profile = { ...props.team_profile };
+    copied_team_profile.team = props.team_profile
+      ? { ...props.team_profile.team }
+      : {};
 
     this.state = {
-      team: {
-        name: "",
-        id: 0,
-        team_key: "",
-        auto_accept_ranked: false,
-        auto_accept_unranked: false,
-        bio: "",
-        avatar: "",
-        users: [],
-        verified_users: [],
-        mit: false,
-        student: false,
-        high_school: false,
-        international: true,
-      },
+      team_profile: copied_team_profile,
       up: "Update Info",
     };
 
     this.changeHandler = this.changeHandler.bind(this);
-    this.checkHandler = this.checkHandler.bind(this);
     this.updateTeam = this.updateTeam.bind(this);
     this.uploadProfile = this.uploadProfile.bind(this);
   }
 
-  leaveTeam() {
-    Api.leaveTeam(function (success) {
-      if (success) window.location.reload();
+  leaveTeam = () => {
+    Api.leaveTeam(this.props.episode, (success) => {
+      this.props.updateBaseState();
     });
-  }
+  };
 
   changeHandler(e) {
     var id = e.target.id;
     var val = e.target.type === "checkbox" ? e.target.checked : e.target.value;
 
-    if (!id) id = e.target.parentElement.id;
+    // TODO: handle changes to eligiblity options
+    // if (id === "international") val = !val;
 
-    if (id === "international") val = !val;
-
-    this.setState(function (prevState, props) {
-      prevState.team[id] = val;
-      return prevState;
-    });
-  }
-
-  checkHandler(e) {
-    var correct = e.target.id;
-    if (correct === "") correct = e.target.parentElement.parentElement.id;
-
-    this.setState(function (prevState, props) {
-      prevState.team[correct] = !prevState.team[correct];
-      return prevState;
-    });
+    if (id.startsWith("team")) {
+      this.setState(function (prevState, props) {
+        var team_field = id.split("-")[1];
+        prevState.team_profile.team[team_field] = val;
+        return prevState;
+      });
+    } else {
+      this.setState(function (prevState, props) {
+        prevState.team_profile[id] = val;
+        return prevState;
+      });
+    }
   }
 
   updateTeam() {
     this.setState({ up: '<i class="fa fa-circle-o-notch fa-spin"></i>' });
     Api.updateTeam(
-      this.state.team,
+      this.state.team_profile,
+      this.props.episode,
       function (response) {
         if (response) this.setState({ up: '<i class="fa fa-check"></i>' });
         else this.setState({ up: '<i class="fa fa-times"></i>' });
+        this.props.updateBaseState();
         setTimeout(
           function () {
             this.setState({ up: "Update Info" });
@@ -91,14 +81,6 @@ class YesTeam extends Component {
     reader.readAsDataURL(e.target.files[0]);
   }
 
-  componentDidMount() {
-    Api.getUserTeam(
-      function (new_state) {
-        this.setState({ team: new_state });
-      }.bind(this)
-    );
-  }
-
   render() {
     return (
       <div>
@@ -114,12 +96,13 @@ class YesTeam extends Component {
                 which prizes your team is eligible for. Check all boxes that
                 apply to all members your team.
               </p>
-              <EligibiltyOptions
+              {/*<EligibilityOptions
                 change={this.changeHandler}
-                team={this.state.team}
+                team_profile={this.state.team_profile}
                 update={this.updateTeam}
                 up_but={this.state.up}
-              />
+                episode={this.props.episode}
+                /> TODO: eligibility options*/}
             </div>
           </div>
 
@@ -131,50 +114,78 @@ class YesTeam extends Component {
               <div className="row">
                 <div className="col-md-7">
                   <div className="form-group">
-                    <label>Team Name (static)</label>
+                    <label>Team Name</label>
                     <input
                       type="text"
+                      id="team-name"
                       className="form-control"
-                      readOnly
-                      value={this.state.team.name}
+                      onChange={this.changeHandler}
+                      value={this.state.team_profile.team.name}
                     />
                   </div>
                 </div>
                 <div className="col-md-5">
                   <div className="form-group">
-                    <label>Secret Key (static)</label>
+                    <label>Join Key (static)</label>
                     <input
                       type="text"
                       className="form-control"
-                      readOnly
-                      value={this.state.team.team_key}
+                      onChange={() => null}
+                      value={this.state.team_profile.team.join_key}
                     />
                   </div>
                 </div>
               </div>
               <div className="row">
-                <div className="col-md-6">
-                  <label id="auto_accept_unranked" className="center-row">
+                <div className="col-md-4">
+                  <label className="center-row">
                     <input
                       type="checkbox"
-                      checked={this.state.team.auto_accept_unranked}
+                      id="auto_accept_ranked"
+                      checked={this.state.team_profile.auto_accept_ranked}
                       onChange={this.changeHandler}
                       className="form-control center-row-start"
                     />{" "}
-                    Auto-accept scrimmages.
+                    Auto-accept ranked scrimmages.
+                  </label>
+                </div>
+                <div className="col-md-4">
+                  <label className="center-row">
+                    <input
+                      type="checkbox"
+                      id="auto_accept_unranked"
+                      checked={this.state.team_profile.auto_accept_unranked}
+                      onChange={this.changeHandler}
+                      className="form-control center-row-start"
+                    />{" "}
+                    Auto-accept unranked scrimmages.
                   </label>
                 </div>
               </div>
               <div className="row">
                 <div className="col-md-12">
-                  <div className="form-group">
+                  {/* <div className="form-group">
                     <label>Team Avatar URL</label>
                     <input
                       type="text"
                       id="avatar"
                       className="form-control"
                       onChange={this.changeHandler}
-                      value={this.state.team.avatar}
+                      value={this.state.team_profile.avatar}
+                    />
+                  </div> */}
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-12">
+                  <div className="form-group">
+                    <label>Team Quote</label>
+                    <input
+                      type="text"
+                      id="quote"
+                      className="form-control"
+                      onChange={this.changeHandler}
+                      value={this.state.team_profile.quote}
                     />
                   </div>
                 </div>
@@ -184,12 +195,12 @@ class YesTeam extends Component {
                   <div className="form-group">
                     <label>Team Bio</label>
                     <textarea
+                      id="biography"
                       rows={5}
                       className="form-control"
                       placeholder="Put your team bio here."
                       onChange={this.changeHandler}
-                      id="bio"
-                      value={this.state.team.bio}
+                      value={this.state.team_profile.biography}
                     />
                   </div>
                 </div>
@@ -214,7 +225,7 @@ class YesTeam extends Component {
           </div>
         </div>
         <div className="col-md-4">
-          <TeamCard team={this.state.team} />
+          {<TeamCard team_profile={this.state.team_profile} />}
         </div>
       </div>
     );
@@ -226,7 +237,7 @@ class NoTeam extends Component {
     super();
     this.state = {
       team_name: "",
-      secret_key: "",
+      join_key: "",
       team_join_name: "",
       joinTeamError: false,
       createTeamError: false,
@@ -248,28 +259,29 @@ class NoTeam extends Component {
 
   joinTeam() {
     Api.joinTeam(
-      this.state.secret_key,
+      this.state.join_key,
       this.state.team_join_name,
+      this.props.episode,
       this.joinCallback
     );
   }
 
   joinCallback = (success) => {
     this.setState({ joinTeamError: success });
-    if (success) {
-      window.location.reload();
-    }
+    if (success) this.props.updateBaseState();
   };
 
   createTeam() {
-    Api.createTeam(this.state.team_name, this.createCallback);
+    Api.createTeam(
+      this.state.team_name,
+      this.props.episode,
+      this.createTeamCallback
+    );
   }
 
-  createCallback = (success) => {
+  createTeamCallback = (success) => {
     this.setState({ createTeamError: !success });
-    if (success) {
-      window.location.reload();
-    }
+    if (success) this.props.updateBaseState();
   };
 
   renderError(type, data) {
@@ -279,7 +291,7 @@ class NoTeam extends Component {
         message = "Sorry, this team name is already being used.";
       } else if (type === "joinTeamError") {
         message =
-          "Sorry, that team name and secret key combination is not valid.";
+          "Sorry, that team name and join key combination is not valid.";
       }
 
       return <p style={{ color: "#FF4A55" }}> {message} </p>;
@@ -327,11 +339,11 @@ class NoTeam extends Component {
             <div className="row">
               <div className="col-md-8">
                 <div className="form-group">
-                  <label>Team Secret Key</label>
+                  <label>Team Join Key</label>
                   <input
                     type="text"
                     className="form-control"
-                    id="secret_key"
+                    id="join_key"
                     onChange={this.changeHandler}
                   />
                 </div>
@@ -402,13 +414,11 @@ class ResumeStatus extends Component {
 
 // pass change handler in props.change and team in props.team
 // NOTE: If you are ever working with teams' eligility (for example, to pull teams for the newbie tournament), please see backend/docs/ELIGIBILITY.md before you do anything! The variable names here are poorly named (because columns in the database are poorly named).
-class EligibiltyOptions extends Component {
+class EligibilityOptions extends Component {
   constructor(props) {
     super(props);
-    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
     this.state = {
-      episode: episode,
-      extension: MultiEpisode.getExtension(episode),
+      extension: MultiEpisode.getExtension(props.episode),
     };
   }
 
@@ -426,7 +436,7 @@ class EligibiltyOptions extends Component {
                     college students to be eligible for prizes. If you are
                     unsure about whether you are an active student, read more
                     about eligibilty under{" "}
-                    <a href={`/${this.state.episode}/tournaments`}>
+                    <a href={`/${this.props.episode}/tournaments`}>
                       tournaments
                     </a>{" "}
                     or reach out to one of Teh Devs on Discord or over email.
@@ -536,27 +546,25 @@ class EligibiltyOptions extends Component {
 }
 
 class Team extends Component {
-  constructor() {
-    super();
-    this.state = { team: false };
-  }
-
-  componentDidMount() {
-    Api.getUserTeam(
-      function (new_state) {
-        this.setState({ team: new_state });
-      }.bind(this)
-    );
-  }
-
   render() {
     return (
       <div className="content">
         <div className="content">
           <div className="container-fluid">
             <div className="row">
-              {this.state.team === null && <NoTeam />}
-              {this.state.team && <YesTeam team={this.state.team} />}
+              {!this.props.team_profile && (
+                <NoTeam
+                  episode={this.props.episode}
+                  updateBaseState={this.props.updateBaseState}
+                />
+              )}
+              {this.props.team_profile && (
+                <YesTeam
+                  team_profile={this.props.team_profile}
+                  episode={this.props.episode}
+                  updateBaseState={this.props.updateBaseState}
+                />
+              )}
             </div>
           </div>
         </div>

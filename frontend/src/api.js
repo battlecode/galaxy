@@ -176,16 +176,8 @@ class Api {
   }
 
   static getTeamMuHistory(team, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
-
     $.get(`${URL}/api/${LEAGUE}/team/${team}/history/`).done((data, status) => {
       callback(data);
-    });
-
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
     });
   }
 
@@ -211,55 +203,33 @@ class Api {
 
   //get data for team with team_id
   static getTeamById(team_id, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
-
     $.get(`${URL}/api/${LEAGUE}/team/${team_id}/`).done((data, status) => {
       callback(data);
-    });
-
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
     });
   }
 
   //calculates rank of given team, with tied teams receiving the same rank
   //i.e. if mu is 10,10,1 the ranks would be 1,1,3
   static getTeamRanking(team_id, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
-
     const requestUrl = `${URL}/api/${LEAGUE}/team/${team_id}/ranking/`;
     $.get(requestUrl).done((data, status) => {
       callback(data);
-    });
-
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
     });
   }
 
   //----GENERAL INFO----
 
-  static getLeague(callback) {
-    $.get(`${URL}/api/league/${LEAGUE}/`).done((data, status) => {
-      Cookies.set("league_url", data.url);
-      $.get(data.url)
-        .done((data, success) => {
-          callback(data);
-        })
-        .fail((xhr, status, error) => {
-          console.log("Error in getting league: ", xhr, status, error);
-        });
-    });
+  static getEpisodeInfo(episode, callback) {
+    $.get(`${URL}/api/episode/e/${episode}/`)
+      .done((data, success) => {
+        callback(data);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting episode info: ", xhr, status, error);
+      });
   }
 
   static getUpdates(callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
     $.get(`${URL}/api/league/${LEAGUE}/`, (data, success) => {
       for (let i = 0; i < data.updates.length; i++) {
         const d = new Date(data.updates[i].time);
@@ -269,9 +239,6 @@ class Api {
       }
 
       callback(data.updates);
-    });
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
     });
   }
 
@@ -310,9 +277,6 @@ class Api {
   static searchRanking(apiURL, query, page, callback) {
     const encQuery = encodeURIComponent(query);
     const teamUrl = `${apiURL}/?ordering=-score,name&search=${encQuery}&page=${page}`;
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
     $.get(teamUrl, (teamData) => {
       const teamLimit =
         parseInt(teamData.count / PAGE_LIMIT, 10) +
@@ -324,9 +288,6 @@ class Api {
         teamPage: page,
       });
     });
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-    }); // re-add the authorization info
   }
 
   static searchTeam(query, page, callback) {
@@ -358,31 +319,22 @@ class Api {
 
   //---TEAM INFO---
 
-  static getUserTeam(callback) {
-    $.get(
-      `${URL}/api/userteam/${encodeURIComponent(
-        Cookies.get("username")
-      )}/${LEAGUE}/`
-    )
+  static getUserTeamProfile(episode, callback) {
+    return $.get(`${URL}/api/team/${episode}/detail/current/`)
       .done((data, status) => {
-        Cookies.set("team_id", data.id);
-        Cookies.set("team_name", data.name);
-
-        $.get(`${URL}/api/${LEAGUE}/team/${data.id}/`).done((data, status) => {
-          callback(data);
-        });
+        callback(data);
       })
       .fail((xhr, status, error) => {
-        // possibly dangerous???
+        console.log("Error in getting user's team profile", xhr, status, error);
         callback(null);
       });
   }
 
   // updates team
-  static updateTeam(params, callback) {
-    $.ajax({
-      url: `${URL}/api/${LEAGUE}/team/${Cookies.get("team_id")}/`,
-      data: JSON.stringify(params),
+  static updateTeam(team_profile, episode, callback) {
+    return $.ajax({
+      url: `${URL}/api/team/${episode}/detail/current/`,
+      data: JSON.stringify(team_profile),
       type: "PATCH",
       contentType: "application/json",
       dataType: "json",
@@ -397,50 +349,18 @@ class Api {
 
   //----USER FUNCTIONS----
 
-  static createTeam(team_name, callback) {
-    $.post(`${URL}/api/${LEAGUE}/team/`, { name: team_name })
-      .done((data, status) => {
-        Cookies.set("team_id", data.id);
-        Cookies.set("team_name", data.name);
-        callback(true);
-      })
-      .fail((xhr, status, error) => {
-        callback(false);
-      });
-  }
-
-  static joinTeam(secret_key, team_name, callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/team/?search=${encodeURIComponent(team_name)}`,
-      (team_data, team_success) => {
-        let found_result = null;
-        team_data.forEach((result) => {
-          if (result.name === team_name) {
-            found_result = result;
-          }
-        });
-        if (found_result === null) return callback(false);
-        $.ajax({
-          url: `${URL}/api/${LEAGUE}/team/${found_result.id}/join/`,
-          type: "PATCH",
-          data: { team_key: secret_key },
-        })
-          .done((data, status) => {
-            Cookies.set("team_id", data.id);
-            Cookies.set("team_name", data.name);
-            callback(true);
-          })
-          .fail((xhr, status, error) => {
-            callback(false);
-          });
-      }
-    );
-  }
-
-  static leaveTeam(callback) {
-    $.ajax({
-      url: `${URL}/api/${LEAGUE}/team/${Cookies.get("team_id")}/leave/`,
-      type: "PATCH",
+  static createTeam(team_name, episode, callback) {
+    const team_data = {
+      team: {
+        name: team_name,
+      },
+    };
+    return $.ajax({
+      url: `${URL}/api/team/${episode}/detail/`,
+      data: JSON.stringify(team_data),
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
     })
       .done((data, status) => {
         callback(true);
@@ -450,55 +370,58 @@ class Api {
       });
   }
 
-  // This process will be touched up in #86
-  // note that this is blocked by the new backend -- hold off for now
-  static getUserProfile(callback) {
-    Api.getProfileByUser(Cookies.get("username"), Api.setUserUrl(callback));
-  }
-
-  // essentially like python decorator, wraps
-  // sets user url before making call to that endpoint and passing on to callback
-  static setUserUrl(callback) {
-    return function (data) {
-      Cookies.set("user_url", data.url);
-      $.get(data.url)
-        .done((data, success) => {
-          callback(data);
-        })
-        .fail((xhr, status, error) => {
-          console.log("Error in setting user URL: ", xhr, status, error);
-        });
+  static joinTeam(join_key, team_name, episode, callback) {
+    const join_data = {
+      join_key: join_key,
+      name: team_name,
     };
+    return $.ajax({
+      url: `${URL}/api/team/${episode}/detail/join/`,
+      data: JSON.stringify(join_data),
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
+    })
+      .done((data, status) => {
+        callback(true);
+      })
+      .fail((xhr, status, error) => {
+        callback(false);
+      });
   }
 
-  static getProfileByUser(username, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
+  static leaveTeam(episode, callback) {
+    return $.ajax({
+      url: `${URL}/api/team/${episode}/detail/leave/`,
+      type: "POST",
+    })
+      .done((data, status) => {
+        callback(true);
+      })
+      .fail((xhr, status, error) => {
+        callback(false);
+      });
+  }
 
-    $.get(`${URL}/api/user/profile/${username}/`)
+  static getProfileByUser(user_id, callback, public_only = false) {
+    const endpoint = public_only ? "public" : "detail";
+    return $.get(`${URL}/api/user/${endpoint}/${user_id}/`)
       .done((data, status) => {
         callback(data);
       })
       .fail((xhr, status, error) => {
-        console.log(
-          "Error in getting profile for user: ",
-          username,
-          xhr,
-          status,
-          error
-        );
+        console.log("Error in getting profile for user", xhr, status, error);
       });
-
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-    });
   }
 
-  static updateUser(profile, callback) {
-    $.ajax({
-      url: Cookies.get("user_url"),
-      data: JSON.stringify(profile),
+  static getUserProfile(callback) {
+    return this.getProfileByUser("current", callback);
+  }
+
+  static updateUser(user_profile, callback) {
+    return $.ajax({
+      url: `${URL}/api/user/detail/current/`,
+      data: JSON.stringify(user_profile),
       type: "PATCH",
       contentType: "application/json",
       dataType: "json",
@@ -511,16 +434,65 @@ class Api {
       });
   }
 
-  static resumeUpload(resume_file, callback) {
-    $.post(`${Cookies.get("user_url")}resume_upload/`, (data, succcess) => {
-      $.ajax({
-        url: data["upload_url"],
-        method: "PUT",
-        data: resume_file,
-        processData: false,
-        contentType: false,
+  static avatarUpload(avatar_file, callback) {
+    const data = new FormData();
+    data.append("avatar", avatar_file);
+    return $.ajax({
+      url: `${URL}/api/user/detail/current/avatar/`,
+      type: "POST",
+      data: data,
+      dataType: "json",
+      processData: false,
+      contentType: false,
+    })
+      .done((data, status) => {
+        callback(true);
+      })
+      .fail((xhr, status, error) => {
+        callback(false);
       });
-    });
+  }
+
+  static resumeUpload(resume_file, callback) {
+    const data = new FormData();
+    data.append("resume", resume_file);
+    return $.ajax({
+      url: `${URL}/api/user/detail/current/resume/`,
+      type: "PUT",
+      data: data,
+      dataType: "json",
+      processData: false,
+      contentType: false,
+    })
+      .done((data, status) => {
+        callback(true);
+      })
+      .fail((xhr, status, error) => {
+        callback(false);
+      });
+  }
+
+  static resumeRetrieve(callback) {
+    return $.ajax({
+      url: `${URL}/api/user/detail/current/resume/`,
+      type: "GET",
+    })
+      .done((data, status) => {
+        const blob = new Blob([data], { type: "application/pdf" });
+        const url = window.URL.createObjectURL(blob);
+        // See https://stackoverflow.com/a/9970672 for file download logic
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = "resume.pdf";
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        callback(true);
+      })
+      .fail((xhr, status, error) => {
+        callback(false);
+      });
   }
 
   //----SCRIMMAGING----
@@ -690,10 +662,6 @@ class Api {
     }
 
     $.get(url, (replay, super_sucess) => {
-      $.ajaxSetup({
-        headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-      });
-
       callback(replay);
     });
   }
@@ -742,9 +710,6 @@ class Api {
   }
 
   static getTournaments(callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    } // we should not require valid login for this.
     $.get(`${URL}/api/${LEAGUE}/tournament/`).done((data, status) => {
       callback(data.results);
     });
@@ -752,22 +717,47 @@ class Api {
 
   //----AUTHENTICATION----
 
-  static logout(callback) {
-    Cookies.set("token", "");
+  // NOTE: The backend currently uses JWT, so we use that too.
+  // Similar to OAuth2, JWT by default has 2 tokens, access and refresh
+  // ! Currently, the frontend only uses a subset of JWT's features!
+  // It only utilizes the access token, not the refresh token.
+  // It also does not rely on timestamps to determine token expiry.
+  // If the access token is invalid (eg expired), then render the page as logged-out,
+  // and have the user enter their username and password to get a new access token.
+  // (To enable this, the access token lasts for a long time. See the backend JWT setup)
+
+  // For issues to track improving our token flow, see #168 and #169
+
+  static logout() {
+    Cookies.set("access", "");
     Cookies.set("refresh", "");
-    callback();
+    Api.setLoginHeader();
+    window.location.replace("/");
   }
 
-  // This process is very confusing; #90 will clean it up.
-  static loginCheck(callback) {
-    $.ajaxSetup({
-      headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-    });
+  // Set authorization header based on the current cookie state, which is provided by
+  // default for all subsequent requests. The header is a JWT token: see
+  // https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+  static setLoginHeader() {
+    const access_token = Cookies.get("access");
+    if (access_token) {
+      $.ajaxSetup({
+        headers: { Authorization: `Bearer ${access_token}` },
+      });
+    }
+  }
 
-    $.post(`${URL}/auth/token/verify/`, {
-      token: Cookies.get("token"),
+  // Checks whether the currently held JWT access token is still valid (by posting it to the verify endpoint),
+  // hence whether or not the frontend still has logged-in access.
+  // "Returns" true or false, via callback.
+  // Callers of this method should check this, before rendering their logged-in or un-logged-in versions.
+  // If not logged in, then api calls will give 403s, and the website will tell you to log in anyways.
+  static loginCheck(callback) {
+    return $.post(`${URL}/api/token/verify/`, {
+      token: Cookies.get("access"),
     })
       .done((data, status) => {
+        // Set authorization header for all other requests
         callback(true);
       })
       .fail((xhr, status, error) => {
@@ -775,33 +765,16 @@ class Api {
       });
   }
 
-  static verifyAccount(registrationKey, callback) {
-    const userId = encodeURIComponent(Cookies.get("username"));
-    $.post(
-      `${URL}/api/verify/${userId}/verifyUser/`,
-      {
-        registration_key: registrationKey,
-      },
-      (data, success) => {
-        callback(data, success);
-      }
-    );
-  }
-
-  // This process is very confusing; #90 will clean it up.
+  // Our login (and token) flow currently uses a subset of JWT features
+  // see the comment block under the "AUTHORIZATION" comment header
   static login(username, password, callback) {
-    $.post(`${URL}/auth/token/`, {
+    return $.post(`${URL}/api/token/`, {
       username,
       password,
     })
       .done((data, status) => {
-        Cookies.set("token", data.access);
+        Cookies.set("access", data.access);
         Cookies.set("refresh", data.refresh);
-        Cookies.set("username", username);
-
-        $.ajaxSetup({
-          headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-        });
 
         callback(data, true);
       })
@@ -813,38 +786,27 @@ class Api {
       });
   }
 
-  static register(email, username, password, first, last, dob, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    }
-
-    $.post(`${URL}/api/user/`, {
-      email,
-      username,
-      password,
-      first_name: first,
-      last_name: last,
-      date_of_birth: dob,
+  static register(user_profile, callback) {
+    return $.ajax({
+      url: `${URL}/api/user/detail/`,
+      data: JSON.stringify(user_profile),
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
     })
       .done((data, status) => {
-        this.login(username, password, callback);
+        this.login(
+          user_profile.user.username,
+          user_profile.user.password,
+          callback
+        );
       })
       .fail((xhr, status, error) => {
-        if (xhr.responseJSON.username)
-          callback(xhr.responseJSON.username, false);
-        else if (xhr.responseJSON.email)
-          callback(xhr.responseJSON.email, false);
-        else {
-          callback("there was an error", false);
-        }
+        callback(JSON.stringify(xhr.responseJSON), false);
       });
   }
 
   static doResetPassword(password, token, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    }
-
     var req = {
       password: password,
       token: token,
@@ -858,9 +820,6 @@ class Api {
   }
 
   static forgotPassword(email, callback) {
-    if ($.ajaxSettings && $.ajaxSettings.headers) {
-      delete $.ajaxSettings.headers.Authorization;
-    }
     $.post(`${URL}/api/password_reset/`, {
       email,
     })

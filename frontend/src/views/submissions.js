@@ -29,8 +29,8 @@ class Submissions extends Component {
       upload_status: -1,
     };
     Api.getUserProfile(
-      function (u) {
-        this.setState({ user: u });
+      function (user_profile) {
+        this.setState({ user_profile });
       }.bind(this)
     );
   }
@@ -229,7 +229,12 @@ class Submissions extends Component {
   // Note that this duplicates a method in submissions.js;
   // this will be cleaned up. See #74
   isSubmissionEnabled() {
-    if (this.state.user.is_staff == true) {
+    if (
+      // Short-circuit check for nested object,
+      // in case user_profile hasn't been set yet.
+      this.state.user_profile &&
+      this.state.user_profile.user.is_staff == true
+    ) {
       return true;
     }
     if (

@@ -1,16 +1,7 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
-import Api from "./api";
-import MultiEpisode from "./views/multi-episode";
 
 class NavBar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
-    };
-  }
-
   toggleNavigation() {
     window.click_toggle();
   }
@@ -33,12 +24,18 @@ class NavBar extends Component {
               <span className="icon-bar" />
               <span className="icon-bar" />
             </button>
-            <NavLink className="navbar-brand" to={`/home`}>
-              Battlecode {this.state.episode}
+            <NavLink
+              className="navbar-brand"
+              to={`/${this.props.episode}/home`}
+            >
+              {this.props.episode_name_long}
             </NavLink>
           </div>
           <div className="collapse navbar-collapse">
-            <NavBarAccount />
+            <NavBarAccount
+              logged_in={this.props.logged_in}
+              episode={this.props.episode}
+            />
           </div>
         </div>
       </nav>
@@ -47,31 +44,16 @@ class NavBar extends Component {
 }
 
 class NavBarAccount extends Component {
-  constructor() {
-    super();
-    // This is odd, see #93 for explanation
-    this.state = {
-      logged_in: null,
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
-    };
-  }
-  componentDidMount() {
-    // duped in various places, see sidebar.js
-    Api.loginCheck((logged_in) => {
-      this.setState({ logged_in });
-    });
-  }
-
   render() {
     // This is odd, see #93 for explanation
-    if (this.state.logged_in) {
+    if (this.props.logged_in) {
       return (
         <ul className="nav navbar-nav navbar-right">
-          <li>
+          {/* <li>
             <NavLink to={`/multi-episode`}>Change Episode</NavLink>
-          </li>
+          </li> */}
           <li>
-            <NavLink to={`/${this.state.episode}/account`}>Account</NavLink>
+            <NavLink to={`/${this.props.episode}/account`}>Account</NavLink>
           </li>
           <li>
             <NavLink to={`/logout`}>Log out</NavLink>
@@ -79,12 +61,12 @@ class NavBarAccount extends Component {
         </ul>
       );
     }
-    if (this.state.logged_in === false) {
+    if (this.props.logged_in === false) {
       return (
         <ul className="nav navbar-nav navbar-right">
-          <li>
+          {/* <li>
             <NavLink to={`/multi-episode`}>Change Episode</NavLink>
-          </li>
+          </li> */}
           <li>
             <NavLink to={`/register`}>Register</NavLink>
           </li>

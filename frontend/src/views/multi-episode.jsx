@@ -1,21 +1,19 @@
 import { Component } from "react";
 
 // NOTE: Save extensions as strings, not numbers, since episodes could be strings too (eg Battlehack)
-const EPISODES = ["2022", "2023"];
+const EPISODES = ["bc23"];
 
 // NOTE: dictionary keys that are strings-of-numbers can just be numbers.
 // The formatter will convert them as such,
 // and the code will treat them the same way
-const EPISODE_TO_EXTENSION = { 2022: ".bc22", 2023: ".bc23" };
+const EPISODE_TO_EXTENSION = { bc23: ".bc23" };
 const EPISODE_TO_SCAFFOLD_LINK = {
-  2022: "https://github.com/battlecode/battlecode22-scaffold",
   2023: "https://github.com/battlecode/battlecode23-scaffold",
 };
 const EPISODE_TO_SCAFFOLD_NAME = {
-  2022: "battlecode22-scaffold",
   2023: "battlecode23-scaffold",
 };
-const DEFAULT_EPISODE = "2022";
+const DEFAULT_EPISODE = "bc23";
 
 class MultiEpisode extends Component {
   // Given the window.location.pathname of a page (e.g. /2022/getting-started)
@@ -24,7 +22,7 @@ class MultiEpisode extends Component {
   // but we can't use it within the helper method)
   // NOTE: Assumes that when episodes are in URLs, the episode is the first part of the URL.
   // This is what we have done elsewhere, but is subject to change and this code would suddenly break.
-  static getEpisodeFromPathname(pathname) {
+  static getEpisodeFromPathname(pathname, forceRedirect = true) {
     // Special case:
     if (pathname == "" || pathname == "/") {
       return DEFAULT_EPISODE;
@@ -39,13 +37,17 @@ class MultiEpisode extends Component {
     if (EPISODES.includes(episodeInPathName)) {
       return episodeInPathName;
     } else {
-      window.location.replace("/not-found");
+      if (forceRedirect) {
+        window.location.replace("/not-found");
+      } else {
+        return null;
+      }
     }
   }
 
   // Gets the episode based on the currently navigated URL.
-  static getEpisodeFromCurrentPathname() {
-    return this.getEpisodeFromPathname(window.location.pathname);
+  static getEpisodeFromCurrentPathname(forceRedirect = true) {
+    return this.getEpisodeFromPathname(window.location.pathname, forceRedirect);
   }
 
   static getExtension(episode) {

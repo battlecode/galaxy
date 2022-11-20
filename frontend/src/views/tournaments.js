@@ -1,16 +1,6 @@
 import React, { Component } from "react";
 import Api from "../api";
-import MultiEpisode from "./multi-episode";
-
 class Tournaments extends Component {
-  constructor() {
-    super();
-    this.state = {
-      tournaments: [],
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
-    };
-  }
-
   componentDidMount() {
     Api.getTournaments(
       function (t) {
@@ -28,15 +18,16 @@ class Tournaments extends Component {
               <div className="card">
                 <div className="header">
                   <h4 className="title">
-                    {this.state.episode} Tournament Schedule
+                    {this.props.episode_name_long} Tournament Schedule
                   </h4>
                 </div>
                 <div className="content">
                   <p>
-                    Battlecode {this.state.episode} will consist of seven
+                    {this.props.episode_name_long} will consist of several
                     tournaments throughout the month! We stream and commentate
-                    all tournaments online.
+                    all tournaments online. <i>More details coming soon!</i>
                   </p>
+                  {/* This should eventually be dynamic. See #229 and #231
                   <ul>
                     <li>
                       <b>Sprint Tournament 1: 1/11.</b> One week after spec
@@ -86,7 +77,7 @@ class Tournaments extends Component {
                       The deadline to submit code for each non-final tournament
                       is 7 pm EST <i>the day before</i> the tournament.
                     </b>
-                  </p>
+                  </p> */}
                 </div>
               </div>
 

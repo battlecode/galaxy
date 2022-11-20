@@ -5,20 +5,13 @@ import Api from "../api";
 class TeamCard extends Component {
   constructor(props) {
     super(props);
-
     this.setupUsers();
   }
 
-  // don't want to make ajax calls before component is mounted!
-  componentDidMount() {
-    this.getUserData();
-  }
-
   setupUsers() {
-    const dummyArr = [];
-    this.props.team.users.forEach((user) => {
-      dummyArr.push({ username: user });
-    });
+    // Form dummy team member data before the users have been fetched.
+    const members = this.props.team_profile.team.members;
+    const dummyArr = Array(members.length).fill(null);
 
     // If the "state" variable is already initialized,
     // be careful not to re-assign it again.
@@ -34,48 +27,45 @@ class TeamCard extends Component {
     }
   }
 
+  // don't want to make ajax calls before component is mounted!
+  componentDidMount() {
+    this.getUserData();
+  }
+
   getUserData() {
-    this.props.team.users.forEach((user) => {
-      Api.getProfileByUser(user, this.setUser);
+    this.props.team_profile.team.members.forEach((user_id, user_index) => {
+      Api.getProfileByUser(user_id, this.getSetUserCallback(user_index), true);
     });
   }
 
   /* add user to state array, should never change length of users */
-  setUser = (user_data) => {
-    const users = this.state.users;
-
-    // find current index of user in the array
-    let user_index = 0;
-    for (var i = 0; i < users.length; i++) {
-      if (users[i].username === user_data.username) {
-        user_index = i;
-      }
-    }
-
-    const newUsers = users
-      .slice(0, user_index)
-      .concat([user_data])
-      .concat(users.slice(user_index + 1));
-    this.setState({ users: newUsers });
-  };
+  getSetUserCallback(user_index) {
+    return (user_profile) => {
+      this.setState(function (prevState, props) {
+        prevState.users[user_index] = user_profile;
+        return prevState;
+      });
+    };
+  }
 
   componentDidUpdate() {
-    if (this.state.users.length === 0 && this.props.team.users) {
+    if (this.state.users.length === 0 && this.props.team_profile.team.members) {
       this.setupUsers();
       this.getUserData();
     }
   }
 
   render() {
-    const team = this.props.team;
+    const team_profile = this.props.team_profile;
 
-    const userDivs = this.state.users.map((user) => {
-      return (
-        <div className="small-user-list" key={user.username}>
+    const userDivs = this.state.users.map((user_profile) => {
+      return user_profile ? (
+        <div className="small-user-list" key={user_profile.user.username}>
           {" "}
-          <Avatar data={user} /> <small>{user.username}</small>
+          {/*<Avatar data={user} /> TODO: avatar*/}
+          <small>{user_profile.user.username}</small>
         </div>
-      );
+      ) : null;
     });
 
     return (
@@ -83,15 +73,15 @@ class TeamCard extends Component {
         <div className="image"></div>
         <div className="content" style={{ minHeight: "190px" }}>
           <div className="author">
-            <Avatar data={team} />
+            {/*<Avatar data={team} /> TODO: team avatar */}
             <h4 className="title">
-              {team.name}
+              {team_profile.team.name}
               <br />
               <div className="row-items-box">{userDivs}</div>
             </h4>
           </div>
           <br />
-          <p className="description text-center">{team.bio}</p>
+          <p className="description text-center">{team_profile.biography}</p>
         </div>
       </div>
     );

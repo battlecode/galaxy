@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import Api from "./api";
 import $ from "jquery";
-import MultiEpisode from "./views/multi-episode";
 
 class NLink extends Component {
   render() {
@@ -26,65 +25,7 @@ class NLink extends Component {
 }
 
 class SideBar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      on_team: null,
-      logged_in: null,
-      user: {},
-      league: {},
-      episode: MultiEpisode.getEpisodeFromCurrentPathname(),
-    };
-  }
-
-  // This is messy, will clean in #91
-  componentDidMount() {
-    // Yes, the method surrounding loginCheck is duped across index, sidebar, and navbar.
-    // But, it's just one method and one identical bit of code.
-    // And, I did try to dedupe, but it didn't work out easily.
-    // (Issues arise from callbacks, async-ness, etc...)
-    // Try at your own risk, and if you dupe,
-    // _make sure to keep the methods as small as possible, and keep these notes (about duping) around_
-    // -Nathan
-    Api.loginCheck((logged_in) => {
-      this.setState({ logged_in });
-    });
-
-    Api.getUserProfile((user_profile) => {
-      this.setState({ user: user_profile });
-    });
-
-    Api.getUserTeam((user_team_data) => {
-      this.setState({ on_team: user_team_data !== null });
-      // This function, for mobile devices, moves the navbar into the sidebar and then
-      // collapses the sidebar. Better responsive display
-      // (Only call it when the entire DOM has fully loaded, since otherwise,
-      // the _incomplete_ navbar gets moved and is stuck there.)
-      // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
-      $(document).ready(function () {
-        window.init_right_menu();
-      });
-    });
-
-    Api.getLeague((league) => {
-      this.setState({ league });
-    });
-  }
-
-  // Note that this duplicates a method in submissions.js;
-  // this will be cleaned up. See #74
-  isGameReleasedForUser() {
-    if (this.state.user.is_staff == true) {
-      return true;
-    }
-    if (this.state.league.game_released == true) {
-      return true;
-    }
-    return false;
-  }
-
   // for icon options below, see https://themes-pixeden.com/font-demos/7-stroke/
-
   render() {
     return (
       <div className="sidebar" data-color="anomoly">
@@ -92,10 +33,10 @@ class SideBar extends Component {
         {/* data-color is defined in light-bootstrap-dashboard.css */}
         <div className="sidebar-wrapper">
           <div className="logo">
-            <a href="/home">
+            <a href={`/${this.props.episode}/home`}>
               <img src="/bc/img/logo.png" />
             </a>
-            <p>Battlecode {this.state.episode}</p>
+            <p>{this.props.episode_name_long}</p>
           </div>
           {/* NOTE: this only controls what appears in the sidebars.
           Independent of this, users can still go to the links by typing it in their browser, etc.
@@ -105,38 +46,41 @@ class SideBar extends Component {
             {/* This invisible element is needed for proper spacing */}
             <NLink to={`#`} style={{ visibility: "hidden" }}></NLink>
             <NLink
-              to={`/${this.state.episode}/home`}
+              to={`/${this.props.episode}/home`}
               icon={"pe-7s-home"}
               label="Home"
             />
             <NLink
-              to={`/${this.state.episode}/getting-started`}
+              to={`/${this.props.episode}/getting-started`}
               icon={"pe-7s-sun"}
               label="Getting Started"
             />
             <NLink
-              to={`/${this.state.episode}/resources`}
+              to={`/${this.props.episode}/resources`}
               icon={"pe-7s-note2"}
               label="Resources"
             />
-            <NLink
-              to={`/${this.state.episode}/updates`}
+
+            {/* <NLink
+              to={`/${this.props.episode}/updates`}
               icon={"pe-7s-bell"}
               label="Updates"
-            />
+            /> */}
 
             <br />
 
             <NLink
-              to={`/${this.state.episode}/tournaments`}
+              to={`/${this.props.episode}/tournaments`}
               icon={"pe-7s-medal"}
               label="Tournaments"
             />
-            <NLink
-              to={`/${this.state.episode}/rankings`}
+
+            {/* <NLink
+              to={`/${this.props.episode}/rankings`}
               icon={"pe-7s-graph1"}
               label="Rankings"
-            />
+            /> */}
+
             {/* search bar link, unused since Search is broken
             Commented in case someone wants to bring it back in the future
             You'd have to refactor the code to match the other NLink's */}
@@ -145,9 +89,9 @@ class SideBar extends Component {
             <br />
 
             {/* Only visible when logged in */}
-            {this.state.logged_in && (
+            {this.props.logged_in && (
               <NLink
-                to={`/${this.state.episode}/team`}
+                to={`/${this.props.episode}/team`}
                 icon={"pe-7s-users"}
                 label="Team"
               />
@@ -155,9 +99,9 @@ class SideBar extends Component {
 
             {/* #74 considers combining these two checks and &&, into one*/}
             {/* Only visible when on a team AND game is released */}
-            {this.state.on_team && this.isGameReleasedForUser() && (
+            {this.props.on_team && this.props.is_game_released && (
               <NLink
-                to={`/${this.state.episode}/submissions`}
+                to={`/${this.props.episode}/submissions`}
                 icon={"pe-7s-up-arrow"}
                 label="Submissions"
               />
@@ -168,9 +112,9 @@ class SideBar extends Component {
             and I couldn't get both NLinks to be in the same element while still looking ok
             Do at your own risk
             - Nathan */}
-            {this.state.on_team && this.isGameReleasedForUser() && (
+            {this.props.on_team && this.props.is_game_released && (
               <NLink
-                to={`/${this.state.episode}/scrimmaging`}
+                to={`/${this.props.episode}/scrimmaging`}
                 icon={"pe-7s-joy"}
                 label="Scrimmaging"
               />
@@ -179,9 +123,9 @@ class SideBar extends Component {
             <br />
 
             {/* Only visible if a staff user */}
-            {this.state.user.is_staff && (
+            {this.props.is_staff && (
               <NLink
-                to={`/${this.state.episode}/staff`}
+                to={`/${this.props.episode}/staff`}
                 icon={"pe-7s-tools"}
                 label="Staff"
               />

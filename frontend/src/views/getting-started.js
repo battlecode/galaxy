@@ -6,13 +6,11 @@ import MultiEpisode from "./multi-episode";
 class GettingStarted extends Component {
   constructor(props) {
     super(props);
-    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
 
     this.state = {
       ide: "intellij",
-      episode: episode,
-      scaffold_name: MultiEpisode.getScaffoldName(episode),
-      scaffold_link: MultiEpisode.getScaffoldLink(episode),
+      scaffold_name: MultiEpisode.getScaffoldName(props.episode),
+      scaffold_link: MultiEpisode.getScaffoldLink(props.episode),
     };
   }
 
@@ -243,15 +241,15 @@ class GettingStarted extends Component {
                 </div>
                 <div className="content">
                   <p>
-                    This is the Battlecode {this.state.episode} contest website,
+                    This is the {this.props.episode_name_long} contest website,
                     which will be your main hub for all Battlecode-related
                     things for the duration of the contest. For a general
                     overview of what Battlecode is, visit{" "}
                     <a href="https://battlecode.org">our landing page</a>.
                   </p>
                   <p>
-                    While the opportunity to compete in tournaments is over,
-                    Battlecode {this.state.episode} is still running! See below
+                    While the opportunity to compete in tournaments is over,{" "}
+                    {this.props.episode_name_long} is still running! See below
                     for instructions on getting started.
                   </p>
                 </div>
@@ -343,7 +341,7 @@ class GettingStarted extends Component {
                         href={this.state.scaffold_link}
                         style={{ fontWeight: 700 }}
                       >
-                        Battlecode {this.state.episode} scaffold
+                        {this.props.episode_name_long} scaffold
                       </a>
                     </b>
                     . To get up and running quickly, you can click "Clone or
@@ -385,8 +383,8 @@ class GettingStarted extends Component {
                   <p>
                     We recommend using an IDE like IntelliJ IDEA or Eclipse to
                     work on Battlecode, but you can also use your favorite text
-                    editor combined with a terminal. Battlecode{" "}
-                    {this.state.episode} uses Gradle to run tasks like{" "}
+                    editor combined with a terminal.{" "}
+                    {this.props.episode_name_long} uses Gradle to run tasks like{" "}
                     <code>run</code>, <code>debug</code> and{" "}
                     <code>jarForUpload</code> (but don't worry about that — you
                     don't need to install it).
@@ -482,7 +480,7 @@ class GettingStarted extends Component {
                   <p>
                     Once you're all set up, make sure to check out the{" "}
                     <NavLink
-                      to={`/${this.state.episode}/resources`}
+                      to={`/${this.props.episode}/resources`}
                       style={{ fontWeight: 700 }}
                     >
                       resources

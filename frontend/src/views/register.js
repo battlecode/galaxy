@@ -1,14 +1,23 @@
 import React, { Component } from "react";
 import Api from "../api";
 
+import Country from "../components/country";
+import Gender from "../components/gender";
+
 class Register extends Component {
   state = {
-    email: "",
-    password: "",
-    username: "",
-    first: "",
-    last: "",
-    dob: "",
+    user_profile: {
+      user: {
+        username: "",
+        password: "",
+        email: "",
+        first_name: "",
+        last_name: "",
+      },
+      gender: "",
+      gender_details: "",
+      school: "",
+    },
     register: false,
     error: "",
     success: "",
@@ -33,36 +42,47 @@ class Register extends Component {
     this.submitRegister();
   };
 
-  submitLogin = () => {
-    const { username, password } = this.state;
-    Api.login(username, password, this.callback);
-  };
-
   submitRegister = () => {
-    const { username, register, email, first, last, dob, password } =
-      this.state;
-    // ensure that all fields are correct
-    if (username.length < 4)
+    const user_profile = this.state.user_profile;
+    const user = user_profile.user;
+    // Validate fields
+    if (user.username.length < 4)
       this.setState({ error: "Username must be at least 4 characters." });
-    else if (email.length < 4)
+    else if (user.email.length < 4)
       this.setState({ error: "Email must be at least 4 characters." });
-    else if (username.indexOf(".") > -1)
+    else if (user.username.indexOf(".") > -1)
       this.setState({ error: "Username must not contain dots." });
-    else if (!first) this.setState({ error: "Must provide first name." });
-    else if (!last) this.setState({ error: "Must provide last name." });
-    else if (!dob.match(/^\d{4}-\d{2}-\d{2}$/g))
-      this.setState({ error: "Must provide DOB in YYYY-MM-DD form." });
-    else if (password.length < 6)
+    else if (!user.first_name)
+      this.setState({ error: "Must provide first name." });
+    else if (!user.last_name)
+      this.setState({ error: "Must provide last name." });
+    else if (user.password.length < 6)
       this.setState({ error: "Password must be at least 6 characters." });
-    else {
-      Api.register(email, username, password, first, last, dob, this.callback);
+    else if (user.gender == "") {
+      this.setState({
+        error: "Must select an option in the Gender Identity dropdown.",
+      });
+    } else {
+      Api.register(this.state.user_profile, this.callback);
     }
   };
 
+  // Similarly structured to the changeHandler in account.js
   changeHandler = (e) => {
-    const { id } = e.target;
+    const id = e.target.id;
     const val = e.target.value;
-    this.setState({ [id]: val });
+    if (id.startsWith("user")) {
+      this.setState(function (prevState, props) {
+        var user_field = id.split("-")[1];
+        prevState.user_profile.user[user_field] = val;
+        return prevState;
+      });
+    } else {
+      this.setState(function (prevState, props) {
+        prevState.user_profile[id] = val;
+        return prevState;
+      });
+    }
   };
 
   render() {
@@ -159,7 +179,7 @@ class Register extends Component {
           <div
             className="card"
             style={{
-              width: "350px",
+              width: "600px",
               margin: error ? "20px auto" : "40px auto",
             }}
           >
@@ -167,77 +187,77 @@ class Register extends Component {
               <div className="row">
                 <div className="col-md-12">
                   <div className="form-group">
-                    <label>Username</label>
+                    <label>Username *</label>
                     <input
                       type="text"
-                      id="username"
-                      className="form-control"
-                      onChange={this.changeHandler}
-                    />
-                  </div>
-                  <div class="clearfix"></div>
-                </div>
-                <div className="col-xs-6">
-                  <div className="form-group">
-                    <label>First Name</label>
-                    <input
-                      type="text"
-                      id="first"
+                      id="user-username"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
                   </div>
                 </div>
-                <div className="col-xs-6">
-                  <div className="form-group">
-                    <label>Last Name</label>
-                    <input
-                      type="text"
-                      id="last"
-                      className="form-control"
-                      onChange={this.changeHandler}
-                    />
-                  </div>
-                </div>
-                <div className="col-xs-6">
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      id="email"
-                      className="form-control"
-                      onChange={this.changeHandler}
-                    />
-                  </div>
-                </div>
-                <div className="col-xs-6">
-                  <div className="form-group">
-                    <label>Date of Birth</label>
-                    <input
-                      type="text"
-                      id="dob"
-                      placeholder="YYYY-MM-DD"
-                      className="form-control"
-                      onChange={this.changeHandler}
-                    />
-                  </div>
-                </div>
-                <div class="clearfix"></div>
                 <div className="col-md-12">
                   <div className="form-group">
-                    <label>Password</label>
+                    <label>Password *</label>
                     <input
                       type="password"
-                      id="password"
+                      id="user-password"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
                   </div>
                 </div>
+                <div className="col-md-12">
+                  <div className="form-group">
+                    <label>Email *</label>
+                    <input
+                      type="email"
+                      id="user-email"
+                      className="form-control"
+                      onChange={this.changeHandler}
+                    />
+                  </div>
+                  <div className="clearfix"></div>
+                </div>
+                <div className="col-xs-6">
+                  <div className="form-group">
+                    <label>First Name *</label>
+                    <input
+                      type="text"
+                      id="user-first_name"
+                      className="form-control"
+                      onChange={this.changeHandler}
+                    />
+                  </div>
+                </div>
+                <div className="col-xs-6">
+                  <div className="form-group">
+                    <label>Last Name *</label>
+                    <input
+                      type="text"
+                      id="user-last_name"
+                      className="form-control"
+                      onChange={this.changeHandler}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="form-group">
+                    <label>School</label>
+                    <input
+                      type="text"
+                      id="school"
+                      className="form-control"
+                      onChange={this.changeHandler}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <Country onChange={this.changeHandler} />
+                </div>
+                <Gender changeHandler={this.changeHandler} />
               </div>
               {buttons}
-
-              <div className="clearfix" />
             </div>
           </div>
         </form>
