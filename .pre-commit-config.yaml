@@ -15,6 +15,11 @@ repos:
         types_or: [css, html, javascript, json, jsx, markdown]
         exclude: ^frontend/public/assets
 
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+
   - repo: local
     hooks:
       - id: black-conda
