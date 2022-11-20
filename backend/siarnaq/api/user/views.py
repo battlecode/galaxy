@@ -96,7 +96,7 @@ class UserProfileViewSet(
 
     @action(detail=True, methods=["post"], serializer_class=UserAvatarSerializer)
     def avatar(self, request, pk=None):
-        """updates uploaded avatar"""
+        """Update uploaded avatar."""
         profile = self.get_object()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
