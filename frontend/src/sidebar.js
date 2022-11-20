@@ -122,14 +122,14 @@ class SideBar extends Component {
 
             <br />
 
-            {/* Only visible if a staff user */}
-            {this.props.is_staff && (
+            {/* Only visible if a staff user. (No staff elements yet.) */}
+            {/* {this.state.user.is_staff && (
               <NLink
                 to={`/${this.props.episode}/staff`}
                 icon={"pe-7s-tools"}
                 label="Staff"
               />
-            )}
+            )} */}
 
             <br />
           </ul>

@@ -16,7 +16,6 @@ import Team from "./views/team";
 import Issues from "./views/issues";
 import Debugging from "./views/debugging";
 import CodeOfConduct from "./views/codeofconduct";
-import Staff from "./views/staff";
 import Rankings from "./views/rankings";
 import Account from "./views/account";
 import Resources from "./views/resources";
@@ -234,11 +233,8 @@ class App extends Component {
       />,
     ];
 
-    this.staffElems = [
-      // Make sure to have an auth check in the backend for any methods that this page hits_
-      // (this part is absolutely necessary regardless of frontend setup)
-      <Route path={`/:episode/staff`} component={Staff} key="staff" />,
-    ];
+    // No staff-only views yet
+    this.staffElems = [];
 
     // When in the list of routes, this route must be last.
     // (for wildcard to work properly)
