@@ -3,13 +3,17 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.models import TeamProfile
 from siarnaq.api.teams.permissions import IsOnRequestedTeam, IsOnTeam
-from siarnaq.api.teams.serializers import TeamJoinSerializer, TeamProfileSerializer
+from siarnaq.api.teams.serializers import (
+    PublicTeamProfileSerializer,
+    TeamJoinSerializer,
+    TeamProfileSerializer,
+)
 
 
 class TeamViewSet(
@@ -96,3 +100,12 @@ class TeamViewSet(
 
         serializer = TeamProfileSerializer(team_profile)
         return Response(serializer.data, status.HTTP_200_OK)
+
+
+class PublicTeamProfileViewSet(viewsets.ReadOnlyModelViewSet):
+
+    serializer_class = PublicTeamProfileSerializer
+    permission_classes = (AllowAny,)
+
+    def get_queryset(self):
+        return TeamProfile.objects.all()
