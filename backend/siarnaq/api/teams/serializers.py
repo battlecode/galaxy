@@ -98,8 +98,14 @@ class RatingField(serializers.Field):
             return instance.to_value()
 
 
+class PublicTeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ["name"]
+
+
 class PublicTeamProfileSerializer(serializers.ModelSerializer):
-    team = TeamProfileSerializer(required=True)
+    team = PublicTeamSerializer(required=True)
 
     class Meta:
         model = TeamProfile

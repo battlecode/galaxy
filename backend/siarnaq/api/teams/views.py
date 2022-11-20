@@ -108,4 +108,7 @@ class PublicTeamProfileViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        return TeamProfile.objects.all()
+        return TeamProfile.objects.select_related(
+            "team",
+            "rating",
+        ).prefetch_related("team__members")
