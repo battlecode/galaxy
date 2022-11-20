@@ -1,4 +1,5 @@
 import posixpath
+import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -62,6 +63,9 @@ class UserProfile(models.Model):
     has_avatar = models.BooleanField(default=False)
     """Whether the user has an uploaded avatar."""
 
+    avatar_uuid = models.UUIDField(default=uuid.uuid4)
+    """A unique ID to identify each new avatar upload."""
+
     has_resume = models.BooleanField(default=False)
     """Whether the user has an uploaded resume."""
 
@@ -71,3 +75,6 @@ class UserProfile(models.Model):
     def get_resume_path(self):
         """Return the path of the resume on Google cloud storage."""
         return posixpath.join("user", str(self.pk), "resume.pdf")
+
+    def get_avatar_path(self):
+        return posixpath.join("user", str(self.pk), "avatar.png")

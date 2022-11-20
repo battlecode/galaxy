@@ -1,7 +1,9 @@
+import google.cloud.storage as storage
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from rest_framework import serializers
 
+import siarnaq.gcloud as gcloud
 from siarnaq.api.user.models import User, UserProfile
 
 
@@ -53,11 +55,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(required=True)
+    avatar_url = serializers.SerializerMethodField()
 
     class Meta:
         model = UserProfile
         fields = [
             "user",
+            "avatar_url",
             "gender",
             "gender_details",
             "school",
@@ -67,6 +71,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "has_resume",
             "country",
         ]
+
+    def get_avatar_url(self, obj):
+
+        if not obj.has_avatar:
+            return ""
+
+        client = storage.Client()
+        public_url = (
+            client.bucket(gcloud.public_bucket).blob(obj.get_avatar_path()).public_url
+        )
+        # Append UUID to public URL to prevent use of cached previous avatar
+        return f"{public_url}?{obj.avatar_uuid}"
 
     def create(self, validated_data):
         # Create user
@@ -94,6 +110,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserResumeSerializer(serializers.Serializer):
     resume = serializers.FileField(write_only=True)
+
+
+class UserAvatarSerializer(serializers.Serializer):
+    avatar = serializers.ImageField(write_only=True)
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
