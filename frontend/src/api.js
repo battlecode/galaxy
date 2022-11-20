@@ -161,15 +161,6 @@ class Api {
 
   //----TEAM STATS---
 
-  static getUpcomingDates(callback) {
-    const newState = [
-      { id: 0, date: "hi", data: "message" },
-      { id: 1, date: "24", data: "message2" },
-    ];
-
-    callback(newState);
-  }
-
   // data from scrimmaging
   static getOwnTeamMuHistory(callback) {
     return Api.getTeamMuHistory(Cookies.get("team_id"), callback);
