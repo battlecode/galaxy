@@ -22,7 +22,7 @@ Here's a good tutorial to NPM, that should give you all you need. (It might actu
 
 If this ever goes down or you don't like this tutorial, try this: [https://nodesource.com/blog/an-absolute-beginners-guide-to-using-npm/](https://nodesource.com/blog/an-absolute-beginners-guide-to-using-npm/)
 
-also, react-scripts TODO
+also, react-scripts TODO, tracked in #49
 
 ### React
 
@@ -49,26 +49,26 @@ This is thanks to Routes and Switches, from `react-router`. You might want to kn
 
 #### Technical Detail
 
-You actually probably don't need to know how JQuery works, other than how its API is exposed as a dollar sign object. TODO good links?
+You actually probably don't need to know how JQuery works, other than how its API is exposed as a dollar sign object. TODO good links? tracked in #49
 
 ### APIs and the Web
 
 ### HTTP Requests
 
-What is? TODO Link to a small explanation
+What is? TODO Link to a small explanation. tracked in #49
 Note that this is a thing for backend and frontend!
 
 #### Technical Detail
 
-TODO link to a small explanation
+TODO link to a small explanation. tracked in #49
 
 ### Async, Promises, and Callbacks
 
-TODO one-sentence description if at all
+TODO one-sentence description if at all. tracked in #49
 
 #### Technical Detail
 
-TODO link to a small explanation
+TODO link to a small explanation. tracked in #49
 
 Any linked explanation or explnation we write ought to discuss
 
@@ -98,10 +98,10 @@ See `src/index.js` for how we expose a single-page app, with routes and matching
 
 ### Our API
 
-TODO
+TODO. tracked in #49
 
 (hits backend, and sometimes hits other external sites too)
 
 #### Technical Detail
 
-TODO
+TODO. tracked in #49
