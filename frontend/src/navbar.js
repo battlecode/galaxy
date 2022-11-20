@@ -49,9 +49,9 @@ class NavBarAccount extends Component {
     if (this.props.logged_in) {
       return (
         <ul className="nav navbar-nav navbar-right">
-          <li>
+          {/* <li>
             <NavLink to={`/multi-episode`}>Change Episode</NavLink>
-          </li>
+          </li> */}
           <li>
             <NavLink to={`/${this.props.episode}/account`}>Account</NavLink>
           </li>
@@ -64,9 +64,9 @@ class NavBarAccount extends Component {
     if (this.props.logged_in === false) {
       return (
         <ul className="nav navbar-nav navbar-right">
-          <li>
+          {/* <li>
             <NavLink to={`/multi-episode`}>Change Episode</NavLink>
-          </li>
+          </li> */}
           <li>
             <NavLink to={`/register`}>Register</NavLink>
           </li>
