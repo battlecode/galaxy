@@ -58,11 +58,11 @@ class UserProfileViewSet(
                 if not profile.has_resume:
                     raise Http404
                 try:
-                    f = titan.get_object(
+                    f = titan.get_object_if_safe(
                         gcloud.secure_bucket, profile.get_resume_path()
                     )
                 except titan.RequestRefused as e:
-                    return Response(e.reason, status.HTTP_403_FORBIDDEN)
+                    return Response(e.reason, status.HTTP_404_NOT_FOUND)
                 return FileResponse(f, filename="resume.pdf")
 
             case "put":
@@ -81,7 +81,7 @@ class UserProfileViewSet(
                             for chunk in resume.chunks():
                                 f.write(chunk)
                         titan.request_scan(blob)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
             case _:
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")

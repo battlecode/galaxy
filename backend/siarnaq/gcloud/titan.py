@@ -35,12 +35,14 @@ class FileMalicious(RequestRefused):
 
 def request_scan(blob: storage.Blob) -> None:
     """Request that Titan scan a blob for malware."""
+    # Titan responds to google.cloud.storage.object.v1.metadataUpdated events via
+    # Eventarc, so it suffices to set the Titan metadata field.
     blob.metadata = {"Titan-Status": "Unverified"}
     blob.patch()
 
 
-def get_object(bucket: str, name: str) -> BinaryIO:
-    """Retrieve a file if Titan has marked it as safe."""
+def get_object_if_safe(bucket: str, name: str) -> BinaryIO:
+    """Retrieve a file, raising RequestRefused is Titan has not marked it as safe."""
     if not enable_actions:
         return io.BytesIO()
     client = storage.Client(credentials=credentials)
