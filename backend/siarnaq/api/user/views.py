@@ -1,4 +1,5 @@
 import io
+import uuid
 
 import google.cloud.storage as storage
 from django.db import transaction
@@ -112,7 +113,8 @@ class UserProfileViewSet(
 
         with transaction.atomic():
             profile.has_avatar = True
-            profile.save(update_fields=["has_avatar"])
+            profile.avatar_uuid = uuid.uuid4()
+            profile.save(update_fields=["has_avatar", "avatar_uuid"])
             if gcloud.enable_actions:
                 client = storage.Client()
                 blob = client.bucket(gcloud.public_bucket).blob(
