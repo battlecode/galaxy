@@ -128,9 +128,8 @@ class App extends Component {
         key="home"
       />,
 
-      // <Route path={`/:episode/updates`} component={Updates} key="updates" />,
-
       // commented but kept since we might use this later
+      // <Route path={`/:episode/updates`} component={Updates} key="updates" />,
       // <Route path={`/search`} component={Search} key="search" />,
       <Route
         path={`/:episode/tournaments`}
