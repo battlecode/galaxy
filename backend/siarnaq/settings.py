@@ -227,3 +227,7 @@ TEAMS_ELO_PENALTY = 0.85
 # Team limits
 
 TEAMS_MAX_TEAM_SIZE = 4
+
+# User avatar settings
+
+USER_MAX_AVATAR_SIZE = (512, 512)

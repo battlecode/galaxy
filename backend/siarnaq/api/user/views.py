@@ -2,6 +2,7 @@ import io
 import uuid
 
 import google.cloud.storage as storage
+from django.conf import settings
 from django.db import transaction
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
@@ -101,9 +102,8 @@ class UserProfileViewSet(
         serializer.is_valid(raise_exception=True)
         avatar = serializer.validated_data["avatar"]
 
-        MAX_AVATAR_SIZE = (512, 512)
         img = Image.open(avatar)
-        img.thumbnail(MAX_AVATAR_SIZE)
+        img.thumbnail(settings.USER_MAX_AVATAR_SIZE)
 
         # Prepare image bytes for upload to Google Cloud
         # See https://stackoverflow.com/a/71094317
