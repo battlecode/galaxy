@@ -140,7 +140,7 @@ class Account extends Component {
             className="pe-7s-check pe-fw"
             style={{ fontWeight: "bold", color: "green" }}
           />
-          <a onClick={this.retrieveResume}>Resume uploaded!</a>
+          Resume uploaded! <a onClick={this.retrieveResume}>Download.</a>
           <Floater
             content={
               <div>
