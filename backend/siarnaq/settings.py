@@ -15,6 +15,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import siarnaq.gcloud as gcloud
+from siarnaq.gcloud import secret
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -120,7 +121,7 @@ match os.getenv("SIARNAQ_MODE", None):
                 "ENGINE": "django.db.backends.postgresql_psycopg2",
                 "NAME": "battlecode",
                 "USER": "siarnaq",
-                "PASSWORD": gcloud.get_secret("staging-siarnaq-db-password").decode(),
+                "PASSWORD": secret.get_secret("staging-siarnaq-db-password").decode(),
                 "HOST": "db.staging.battlecode.org",
                 "PORT": 5432,
             }

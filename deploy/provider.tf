@@ -31,6 +31,12 @@ resource "google_project_service" "artifactregistry" {
   disable_dependent_services = true
 }
 
+resource "google_project_service" "eventarc" {
+  project = var.gcp_project
+  service = "eventarc.googleapis.com"
+  disable_dependent_services = true
+}
+
 resource "google_project_service" "run" {
   project = var.gcp_project
   service = "run.googleapis.com"
