@@ -134,9 +134,25 @@ class Account extends Component {
       );
     } else {
       resume_status = (
-        <label style={{ float: "right", color: "green" }}>
-          <i className="pe-7s-check pe-fw" style={{ fontWeight: "bold" }} />
+        <label style={{ float: "right" }}>
+          <i
+            className="pe-7s-check pe-fw"
+            style={{ fontWeight: "bold", color: "green" }}
+          />
           <a onClick={this.retrieveResume}>Uploaded!</a>
+          <Floater
+            content={
+              <div>
+                <p>
+                  It may take a few minutes for your resume to be processed and
+                  available for download.
+                </p>
+              </div>
+            }
+            showCloseButton={true}
+          >
+            <i className="pe-7s-info pe-fw" />
+          </Floater>
         </label>
       );
     }
