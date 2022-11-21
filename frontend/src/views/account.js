@@ -143,11 +143,12 @@ class Account extends Component {
     } else {
       resume_status = (
         <label style={{ float: "right" }}>
-          <i
+          {/* <i
             className="pe-7s-check pe-fw"
             style={{ fontWeight: "bold", color: "green" }}
-          />
-          Resume uploaded! <a onClick={this.retrieveResume}>Download.</a>
+          /> */}
+          Resume uploaded!
+          {/* <a onClick={this.retrieveResume}>Download.</a>
           <Floater
             content={
               <div>
@@ -160,7 +161,7 @@ class Account extends Component {
             showCloseButton={true}
           >
             <i className="pe-7s-info pe-fw" />
-          </Floater>
+          </Floater>*/}
         </label>
       );
     }
