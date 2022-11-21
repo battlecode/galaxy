@@ -76,8 +76,8 @@ module "staging" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
-  mailjet_api_key    = null
-  mailjet_api_secret = null
+  mailjet_api_key    = var.mailjet_api_key
+  mailjet_api_secret = var.mailjet_api_secret
 
   create_website               = false
   siarnaq_image                = null
