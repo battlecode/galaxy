@@ -17,7 +17,7 @@ class User(AbstractUser):
     # and https://github.com/django/django/blob/main/django/contrib/auth/models.py
     first_name = models.CharField(_("first name"), max_length=30, blank=False)
     last_name = models.CharField(_("last name"), max_length=30, blank=False)
-    email = models.EmailField(_("email address"), blank=False)
+    email = models.EmailField(_("email address"), blank=False, unique=True)
 
 
 class Gender(models.TextChoices):
