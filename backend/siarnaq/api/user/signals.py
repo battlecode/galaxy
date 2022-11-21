@@ -16,33 +16,29 @@ def send_password_reset_token_email(
     """
 
     if not settings.EMAIL_ENABLED:
-        raise RuntimeError(
-            "Emails are not allowed to be sent from your backend configuration."
-        )
-    else:
-        user_email = reset_password_token.user.email
-        context = {
-            "username": reset_password_token.user.username,
-            "reset_password_url": "{}?token={}".format(
-                instance.request.build_absolute_uri(
-                    reverse("password_reset:reset-password-confirm")
-                ),
-                reset_password_token.key,
-            ),
-        }
-        email_html_message = render_to_string(
-            "../templates/password_reset.html", context
-        )
+        return
 
-        send_mail(
-            subject="Battlecode Password Reset Token",
-            # both message and html_message are necessary;
-            # html_message renders as nice html
-            # but message is required (by the email package and by protocol)
-            # as a fallback
-            message=email_html_message,
-            html_message=email_html_message,
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[user_email],
-            fail_silently=False,
-        )
+    user_email = reset_password_token.user.email
+    context = {
+        "username": reset_password_token.user.username,
+        "reset_password_url": "{}?token={}".format(
+            instance.request.build_absolute_uri(
+                reverse("password_reset:reset-password-confirm")
+            ),
+            reset_password_token.key,
+        ),
+    }
+    email_html_message = render_to_string("../templates/password_reset.html", context)
+
+    send_mail(
+        subject="Battlecode Password Reset Token",
+        # both message and html_message are necessary;
+        # html_message renders as nice html
+        # but message is required (by the email package and by protocol)
+        # as a fallback
+        message=email_html_message,
+        html_message=email_html_message,
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[user_email],
+        fail_silently=False,
+    )
