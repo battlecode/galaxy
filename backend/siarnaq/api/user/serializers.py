@@ -22,6 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "password": {"write_only": True},
             "username": {"validators": []},
+            "email": {"validators": []},
             "is_staff": {"read_only": True},
         }
 
@@ -32,12 +33,15 @@ class UserSerializer(serializers.ModelSerializer):
         """
         return make_password(password)
 
-    def validate_username(self, username):
+    def _validate_unique_field(self, field_name, field_value):
         """
-        Custom validator that permits for the username to be "updated" to the same value
+        Custom validator that permits for a field to be "updated" to the same value
         as its current one. See https://stackoverflow.com/a/56171137.
         """
-        check_query = User.objects.filter(username=username)
+        # A keyword argument trick to filter by field_name=field_value
+        # with dynamic field_name.
+        # See https://stackoverflow.com/a/310785
+        check_query = User.objects.filter(**{field_name: field_value})
         if self.instance:
             check_query = check_query.exclude(pk=self.instance.pk)
 
@@ -47,10 +51,16 @@ class UserSerializer(serializers.ModelSerializer):
 
         if check_query.exists():
             raise serializers.ValidationError(
-                "A user with that username already exists."
+                f"A user with that ${field_name} already exists."
             )
 
-        return username
+        return field_value
+
+    def validate_username(self, username):
+        return self._validate_unique_field("username", username)
+
+    def validate_email(self, username):
+        return self._validate_unique_field("email", username)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
