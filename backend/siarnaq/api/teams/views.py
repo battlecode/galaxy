@@ -73,9 +73,7 @@ class TeamViewSet(
 
         with transaction.atomic():
             team.members.remove(request.user.id)
-
-        serializer = self.get_serializer(team_profile)
-        return Response(serializer.data, status.HTTP_200_OK)
+        return Response(None, status.HTTP_204_NO_CONTENT)
 
     @extend_schema(responses={status.HTTP_200_OK: TeamProfileSerializer})
     @action(detail=False, methods=["post"], serializer_class=TeamJoinSerializer)
@@ -101,6 +99,4 @@ class TeamViewSet(
 
         with transaction.atomic():
             team.members.add(request.user)
-
-        serializer = TeamProfileSerializer(team_profile)
         return Response(serializer.data, status.HTTP_200_OK)
