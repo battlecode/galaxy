@@ -57,10 +57,10 @@ class UserSerializer(serializers.ModelSerializer):
         return field_value
 
     def validate_username(self, username):
-        return self._validate_unique_field(self, "username", username)
+        return self._validate_unique_field("username", username)
 
     def validate_email(self, username):
-        return self._validate_unique_field(self, "email", username)
+        return self._validate_unique_field("email", username)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
