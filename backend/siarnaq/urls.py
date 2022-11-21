@@ -25,7 +25,7 @@ from rest_framework_simplejwt.views import (
 from siarnaq.api import views
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("api/admin/", admin.site.urls),
     path("api/user/", include("siarnaq.api.user.urls")),
     path("api/compete/", include("siarnaq.api.compete.urls")),
     path("api/episode/", include("siarnaq.api.episodes.urls")),
