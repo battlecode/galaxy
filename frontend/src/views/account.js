@@ -4,6 +4,7 @@ import Api from "../api";
 import UserCard from "../components/userCard";
 import Country from "../components/country";
 import Gender from "../components/gender";
+import Alert from "../components/alert";
 import Floater from "react-floater";
 import get_user_errors from "../utils/error_handling";
 
@@ -22,6 +23,7 @@ class Account extends Component {
       up: "Update Info",
       selectedResumeFile: null,
       selectedAvatarFile: null,
+      errors: [],
     };
 
     this.changeHandler = this.changeHandler.bind(this);
@@ -75,11 +77,11 @@ class Account extends Component {
       function (response_json, success) {
         if (success) {
           this.setState({ up: '<i class="fa fa-check"></i>' });
+          this.props.updateBaseState();
         } else {
           this.setState({ up: '<i class="fa fa-times"></i>' });
           this.setState({ errors: get_user_errors(response_json) });
         }
-        this.props.updateBaseState();
         setTimeout(
           function () {
             this.setState({ up: "Update Info" });
@@ -115,6 +117,10 @@ class Account extends Component {
 
   retrieveResume = () => {
     Api.resumeRetrieve(() => null);
+  };
+
+  closeAlert = () => {
+    this.setState({ errors: [] });
   };
 
   render() {
@@ -190,8 +196,19 @@ class Account extends Component {
       </button>
     );
 
+    // Error reporting
+    const errors = this.state.errors;
+    let alert_message;
+    if (errors.length > 0) {
+      const [first_field, first_error] = errors[0];
+      alert_message = `Error in field ${first_field}: ${first_error}`;
+    } else {
+      alert_message = "";
+    }
+
     return (
       <div className="content">
+        <Alert alert_message={alert_message} closeAlert={this.closeAlert} />
         <div className="content">
           <div className="container-fluid">
             <div className="row">
