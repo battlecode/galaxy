@@ -28,7 +28,7 @@ def send_password_reset_token_email(
             reset_password_token.key,
         ),
     }
-    email_html_message = render_to_string("../templates/password_reset.html", context)
+    email_html_message = render_to_string("password_reset.html", context)
 
     send_mail(
         subject="Battlecode Password Reset Token",
