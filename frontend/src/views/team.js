@@ -294,7 +294,28 @@ class NoTeam extends Component {
           "Sorry, that team name and join key combination is not valid.";
       }
 
-      return <p style={{ color: "#FF4A55" }}> {message} </p>;
+      // The dismissing button has "display: none" added to it, because it's not ready yet.
+      // We need this to be *re-rendered* each time, even if it's the same message.
+      // Otherwise, if the user gets the same error, this is not re-rendered, and if
+      // they've dismissed it already, it won't actually pop up again.
+      return (
+        <div
+          className="alert alert-danger alert-dismissible"
+          role="alert"
+          style={{ position: "fixed", bottom: "30px", right: "30px" }}
+        >
+          <button
+            type="button"
+            className="close"
+            data-dismiss="alert"
+            aria-label="Close"
+            style={{ display: "none" }}
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <span>{message}</span>
+        </div>
+      );
     }
   }
 
