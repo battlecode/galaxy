@@ -87,7 +87,7 @@ class YesTeam extends Component {
         <div className="col-md-8">
           <div className="card">
             <div className="header">
-              <h4 className="title">Tournament Eligibilty</h4>
+              <h4 className="title">Tournament Eligibility</h4>
             </div>
             <div className="content">
               {/* <ResumeStatus team={this.state.team} /> */}
