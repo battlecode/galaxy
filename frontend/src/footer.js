@@ -9,7 +9,7 @@ class Footer extends Component {
           <nav className="pull-left">
             <ul>
               <li>
-                <a href="https://play.battlecode.org/">Home</a>
+                <a href="/">Home</a>
               </li>
               <li>
                 <NavLink to="codeofconduct">Code of Conduct</NavLink>
