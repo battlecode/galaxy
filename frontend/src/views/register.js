@@ -85,6 +85,13 @@ class Register extends Component {
     }
   };
 
+  blankGenderDetails = () => {
+    this.setState(function (prevState, props) {
+      prevState.user_profile.gender_details = "";
+      return prevState;
+    });
+  };
+
   render() {
     const { error, success, register } = this.state;
 
@@ -255,7 +262,11 @@ class Register extends Component {
                 <div className="col-md-6">
                   <Country onChange={this.changeHandler} />
                 </div>
-                <Gender changeHandler={this.changeHandler} />
+                <Gender
+                  changeHandler={this.changeHandler}
+                  gender={this.state.user_profile.gender}
+                  blankGenderDetails={this.blankGenderDetails}
+                />
               </div>
               {buttons}
             </div>

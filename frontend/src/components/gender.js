@@ -2,6 +2,11 @@ import React, { Component } from "react";
 import Floater from "react-floater";
 
 class Gender extends Component {
+  genderChangeHandler = (e) => {
+    this.props.changeHandler(e);
+    this.props.blankGenderDetails();
+  };
+
   render() {
     return (
       <div>
@@ -22,7 +27,7 @@ class Gender extends Component {
             <select
               className="form-control"
               id="gender"
-              onChange={this.props.changeHandler}
+              onChange={this.genderChangeHandler}
               value={this.props.gender}
             >
               <option value=""></option>
@@ -36,18 +41,20 @@ class Gender extends Component {
             </select>
           </div>
         </div>
-        <div className="col-xs-8">
-          <div className="form-group">
-            <label>Self-described Gender Identity</label>
-            <input
-              type="text"
-              id="gender_details"
-              className="form-control"
-              onChange={this.props.changeHandler}
-              value={this.props.gender_details}
-            />
+        {this.props.gender == "*" && (
+          <div className="col-xs-8">
+            <div className="form-group">
+              <label>Self-described Gender Identity</label>
+              <input
+                type="text"
+                id="gender_details"
+                className="form-control"
+                onChange={this.props.changeHandler}
+                value={this.props.gender_details}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     );
   }

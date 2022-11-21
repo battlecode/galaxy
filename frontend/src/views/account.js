@@ -45,6 +45,13 @@ class Account extends Component {
     }
   }
 
+  blankGenderDetails = () => {
+    this.setState(function (prevState, props) {
+      prevState.user_profile.gender_details = "";
+      return prevState;
+    });
+  };
+
   fileChangeHandler = (event) => {
     const id = event.target.id;
     if (id == "resume_file_upload") {
@@ -263,6 +270,7 @@ class Account extends Component {
                         changeHandler={this.changeHandler}
                         gender={this.state.user_profile.gender}
                         gender_details={this.state.user_profile.gender_details}
+                        blankGenderDetails={this.blankGenderDetails}
                       />
                       {/* <div className="row">
                       <div className="col-md-12">
