@@ -101,7 +101,7 @@ class RatingField(serializers.Field):
 class PublicTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = Team
-        fields = ["name"]
+        fields = ["episode", "name", "members", "status"]
 
 
 class PublicTeamProfileSerializer(serializers.ModelSerializer):
