@@ -188,14 +188,6 @@ class Account extends Component {
                     <h4 className="title">Edit Profile</h4>
                   </div>
                   <div className="content">
-                    <h5>
-                      Make sure to press the "Update Info" button, and wait for
-                      confirmation!
-                    </h5>
-                    <h5>
-                      Your info here is <u>used for all episodes</u> and{" "}
-                      <u>changed for all episodes!</u>
-                    </h5>
                     <div className="row">
                       <div className="col-md-6">
                         <div className="form-group">
