@@ -21,6 +21,8 @@ from siarnaq.gcloud import secret
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Detect environment, in particular which backend system is in use
+SIARNAQ_MODE = os.getenv("SIARNAQ_MODE", None)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -99,7 +101,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "siarnaq.wsgi.application"
 
 # Parse our secrets from secret manager
-match os.getenv("SIARNAQ_MODE", None):
+match SIARNAQ_MODE:
     case "PRODUCTION":
         SIARNAQ_SECRETS_JSON = secret.get_secret("production-siarnaq-secrets").decode()
 
@@ -123,7 +125,7 @@ else:
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-match os.getenv("SIARNAQ_MODE", None):
+match SIARNAQ_MODE:
     case "PRODUCTION":
         DATABASES = {
             "default": {
@@ -265,3 +267,7 @@ ANYMAIL = {
     "MAILJET_API_KEY": SIARNAQ_SECRETS["mailjet-api-key"],
     "MAILJET_SECRET_KEY": SIARNAQ_SECRETS["mailjet-api-secret"],
 }
+
+# When testing, feel free to change this.
+# ! Make sure to change it back before committing to main!
+EMAIL_ENABLED = SIARNAQ_MODE == "PRODUCTION"
