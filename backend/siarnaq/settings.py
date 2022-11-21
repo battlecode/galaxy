@@ -254,7 +254,7 @@ USER_MAX_AVATAR_SIZE = (512, 512)
 # Email config
 
 EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
-EMAIL_HOST_USER = "battlecode@mit.edu"
+EMAIL_HOST_USER = "no-reply@battlecode.org"
 ANYMAIL = {
     "MAILJET_API_KEY": SIARNAQ_SECRETS["mailjet-api-key"],
     "MAILJET_SECRET_KEY": SIARNAQ_SECRETS["mailjet-api-secret"],
