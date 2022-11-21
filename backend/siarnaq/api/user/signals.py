@@ -15,7 +15,11 @@ def password_reset_token_created(
     See https://github.com/anexia-it/django-rest-passwordreset/blob/master/README.md.
     """
 
-    if settings.EMAIL_ENABLED:
+    if not settings.EMAIL_ENABLED:
+        raise RuntimeError(
+            "Emails are not allowed to be sent from your backend configuration."
+        )
+    else:
         user_email = reset_password_token.user.email
         context = {
             "username": reset_password_token.user.username,
@@ -30,25 +34,15 @@ def password_reset_token_created(
             "../templates/password_reset.html", context
         )
 
-        try:
-            send_mail(
-                subject="Battlecode Password Reset Token",
-                # both message and html_message are necessary;
-                # html_message renders as nice html
-                # but message is required (by the email package and by protocol)
-                # as a fallback
-                message=email_html_message,
-                html_message=email_html_message,
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[user_email],
-                fail_silently=False,
-            )
-        except Exception:
-            # Hide the detailed error info that the email package might expose
-            raise RuntimeError(
-                "Email could not be sent from our servers. Contact Teh Devs for help."
-            )
-    else:
-        raise RuntimeError(
-            "Emails are not allowed to be sent from your backend configuration."
+        send_mail(
+            subject="Battlecode Password Reset Token",
+            # both message and html_message are necessary;
+            # html_message renders as nice html
+            # but message is required (by the email package and by protocol)
+            # as a fallback
+            message=email_html_message,
+            html_message=email_html_message,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[user_email],
+            fail_silently=False,
         )
