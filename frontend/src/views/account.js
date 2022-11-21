@@ -6,7 +6,7 @@ import Country from "../components/country";
 import Gender from "../components/gender";
 import Alert from "../components/alert";
 import Floater from "react-floater";
-import get_user_errors from "../utils/error_handling";
+import { get_user_errors } from "../utils/error_handling";
 
 class Account extends Component {
   constructor(props) {

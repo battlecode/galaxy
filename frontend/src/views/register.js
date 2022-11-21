@@ -3,7 +3,7 @@ import Api from "../api";
 
 import Country from "../components/country";
 import Gender from "../components/gender";
-import get_user_errors from "../utils/error_handling";
+import { get_user_errors } from "../utils/error_handling";
 
 class Register extends Component {
   state = {

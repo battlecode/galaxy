@@ -5,6 +5,7 @@ import TeamCard from "../components/teamCard";
 import Alert from "../components/alert";
 import MultiEpisode from "./multi-episode";
 import Floater from "react-floater";
+import { get_team_errors } from "../utils/error_handling";
 
 class YesTeam extends Component {
   constructor(props) {
@@ -19,6 +20,7 @@ class YesTeam extends Component {
     this.state = {
       team_profile: copied_team_profile,
       up: "Update Info",
+      errors: [],
     };
 
     this.changeHandler = this.changeHandler.bind(this);
@@ -58,10 +60,14 @@ class YesTeam extends Component {
     Api.updateTeam(
       this.state.team_profile,
       this.props.episode,
-      function (response) {
-        if (response) this.setState({ up: '<i class="fa fa-check"></i>' });
-        else this.setState({ up: '<i class="fa fa-times"></i>' });
-        this.props.updateBaseState();
+      function (response_json, success) {
+        if (success) {
+          this.setState({ up: '<i class="fa fa-check"></i>' });
+          this.props.updateBaseState();
+        } else {
+          this.setState({ up: '<i class="fa fa-times"></i>' });
+          this.setState({ errors: get_team_errors(response_json) });
+        }
         setTimeout(
           function () {
             this.setState({ up: "Update Info" });
@@ -83,8 +89,18 @@ class YesTeam extends Component {
   }
 
   render() {
+    // Error reporting
+    const errors = this.state.errors;
+    let alert_message;
+    if (errors.length > 0) {
+      const [first_field, first_error] = errors[0];
+      alert_message = `Error in field ${first_field}: ${first_error}`;
+    } else {
+      alert_message = "";
+    }
     return (
       <div>
+        <Alert alert_message={alert_message} closeAlert={this.closeAlert} />
         <div className="col-md-8">
           <div className="card">
             <div className="header">
