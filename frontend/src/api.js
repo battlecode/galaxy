@@ -803,7 +803,7 @@ class Api {
       token: token,
     };
 
-    $.post(`${URL}/api/password_reset/confirm/`, req, (data, success) => {
+    $.post(`${URL}/api/user/password_reset/confirm/`, req, (data, success) => {
       callback(data, success);
     }).fail((xhr, status, error) => {
       callback(xhr.responseJSON, false);
@@ -811,7 +811,7 @@ class Api {
   }
 
   static forgotPassword(email, callback) {
-    $.post(`${URL}/api/password_reset/`, {
+    $.post(`${URL}/api/user/password_reset/`, {
       email,
     })
       .done((data, success) => {
