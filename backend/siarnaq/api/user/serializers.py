@@ -22,6 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "password": {"write_only": True},
             "username": {"validators": []},
+            "email": {"validators": []},
             "is_staff": {"read_only": True},
         }
 
@@ -51,6 +52,24 @@ class UserSerializer(serializers.ModelSerializer):
             )
 
         return username
+
+    def validate_email(self, email):
+        """
+        Custom validator that permits for the email to be "updated" to the same value
+        as its current one. See https://stackoverflow.com/a/56171137.
+        """
+        check_query = User.objects.filter(email=email)
+        if self.instance:
+            check_query = check_query.exclude(pk=self.instance.pk)
+
+        if self.parent is not None and self.parent.instance is not None:
+            user_instance = self.parent.instance.user
+            check_query = check_query.exclude(pk=user_instance.pk)
+
+        if check_query.exists():
+            raise serializers.ValidationError("A user with that email already exists.")
+
+        return email
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
