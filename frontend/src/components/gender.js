@@ -10,7 +10,7 @@ class Gender extends Component {
   render() {
     return (
       <div>
-        <div className="col-xs-4">
+        <div className="col-md-4">
           <div className="form-group">
             <label>Gender Identity *</label>
             <Floater
@@ -34,15 +34,13 @@ class Gender extends Component {
               <option value="F">Female </option>
               <option value="M">Male </option>
               <option value="N">Non-binary </option>
-              <option value="*">
-                Prefer to self-describe (use space to the right)
-              </option>
+              <option value="*">Prefer to self-describe</option>
               <option value="?">Rather not say </option>
             </select>
           </div>
         </div>
         {this.props.gender == "*" && (
-          <div className="col-xs-8">
+          <div className="col-md-8">
             <div className="form-group">
               <label>Self-described Gender Identity</label>
               <input
