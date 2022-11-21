@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import json
 import os
+from collections import defaultdict
 from datetime import timedelta
 from pathlib import Path
 
@@ -109,18 +110,9 @@ match SIARNAQ_MODE:
         SIARNAQ_SECRETS_JSON = secret.get_secret("staging-siarnaq-secrets").decode()
 
     case _:
-        SIARNAQ_SECRETS_JSON = ""
+        SIARNAQ_SECRETS_JSON = "{}"  # an empty json
 
-if SIARNAQ_SECRETS_JSON:
-    SIARNAQ_SECRETS = json.loads(SIARNAQ_SECRETS_JSON)
-else:
-    # I'm sure there's a better way to provide defaults but can't think of it right now
-    SIARNAQ_SECRETS = {
-        "db-password": "",
-        "mailjet-api-key": "",
-        "mailjet-api-secret": "",
-    }
-
+SIARNAQ_SECRETS = defaultdict(lambda: None, json.loads(SIARNAQ_SECRETS_JSON))
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
