@@ -267,7 +267,7 @@ class NoTeam extends Component {
   }
 
   joinCallback = (success) => {
-    this.setState({ joinTeamError: success });
+    this.setState({ joinTeamError: !success });
     if (success) this.props.updateBaseState();
   };
 
