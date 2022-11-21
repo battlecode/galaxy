@@ -5,6 +5,7 @@ import UserCard from "../components/userCard";
 import Country from "../components/country";
 import Gender from "../components/gender";
 import Floater from "react-floater";
+import get_user_errors from "../utils/error_handling";
 
 class Account extends Component {
   constructor(props) {
@@ -71,9 +72,13 @@ class Account extends Component {
     this.setState({ up: '<i class="fa fa-circle-o-notch fa-spin"></i>' });
     Api.updateUser(
       this.state.user_profile,
-      function (response) {
-        if (response) this.setState({ up: '<i class="fa fa-check"></i>' });
-        else this.setState({ up: '<i class="fa fa-times"></i>' });
+      function (response_json, success) {
+        if (success) {
+          this.setState({ up: '<i class="fa fa-check"></i>' });
+        } else {
+          this.setState({ up: '<i class="fa fa-times"></i>' });
+          this.setState({ errors: get_user_errors(response_json) });
+        }
         this.props.updateBaseState();
         setTimeout(
           function () {

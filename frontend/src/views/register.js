@@ -3,6 +3,7 @@ import Api from "../api";
 
 import Country from "../components/country";
 import Gender from "../components/gender";
+import get_user_errors from "../utils/error_handling";
 
 class Register extends Component {
   state = {
@@ -31,23 +32,8 @@ class Register extends Component {
     if (success) {
       window.location.assign("/");
     } else {
-      let message = "";
-      // Process the response JSON for all errors and produce
-      // a list of [field, error message] pairs
-      const errors = [];
-      if (response_json.user) {
-        for (const [field, error_message] of Object.entries(
-          response_json.user
-        )) {
-          errors.push([field, error_message]);
-        }
-      }
-      for (const [field, error_message] of Object.entries(response_json)) {
-        if (field == "user") continue;
-        errors.push([field, error_message]);
-      }
       this.setState({
-        errors: errors,
+        errors: get_user_errors(response_json),
       });
     }
   };
