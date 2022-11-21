@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
-from siarnaq.api.teams.models import TeamProfile
+from siarnaq.api.teams.models import TeamProfile, TeamStatus
 from siarnaq.api.teams.permissions import IsOnRequestedTeam, IsOnTeam
 from siarnaq.api.teams.serializers import TeamJoinSerializer, TeamProfileSerializer
 
@@ -73,7 +73,6 @@ class TeamViewSet(
 
         with transaction.atomic():
             team.members.remove(request.user.id)
-            team.save()
 
         serializer = self.get_serializer(team_profile)
         return Response(serializer.data, status.HTTP_200_OK)
@@ -81,18 +80,24 @@ class TeamViewSet(
     @extend_schema(responses={status.HTTP_200_OK: TeamProfileSerializer})
     @action(detail=False, methods=["post"], serializer_class=TeamJoinSerializer)
     def join(self, request, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        queryset = self.get_queryset()
+        if not request.user.is_staff:
+            # Regular users may only join active regular teams
+            queryset = queryset.filter(team__status=TeamStatus.REGULAR)
+
         team_profile = get_object_or_404(
-            self.get_queryset().filter(
-                team__join_key=self.request.data["join_key"],
-                team__name=self.request.data["name"],
-                team__episode=self.kwargs["episode_id"],
-            )
+            queryset,
+            team__join_key=serializer.validated_data["join_key"],
+            team__name=serializer.validated_data["name"],
+            team__episode=self.kwargs["episode_id"],
         )
         team = team_profile.team
 
         with transaction.atomic():
             team.members.add(request.user)
-            team.save()
 
         serializer = TeamProfileSerializer(team_profile)
         return Response(serializer.data, status.HTTP_200_OK)

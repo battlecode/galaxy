@@ -27,6 +27,7 @@ def make_empty_team_inactive(instance, action, **kwargs):
     if action == "post_remove":
         if instance.members.count() == 0:
             instance.status = TeamStatus.INACTIVE
+            instance.save(update_fields=["status"])
 
 
 @receiver(m2m_changed, sender=Team.members.through)
@@ -38,9 +39,3 @@ def prevent_team_exceed_capacity(instance, action, pk_set, **kwargs):
             > settings.TEAMS_MAX_TEAM_SIZE
         ):
             raise ValidationError("Maximum number of team members exceeded.")
-
-
-@receiver(m2m_changed, sender=Team.members.through)
-def prevent_joining_inactive_team(instance, action, **kwargs):
-    if action == "pre_add" and instance.status == TeamStatus.INACTIVE:
-        raise ValidationError("Cannot join an inactive team.")

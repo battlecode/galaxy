@@ -16,5 +16,4 @@ class IsOnRequestedTeam(permissions.BasePermission):
     message = "Must be authenticated as the requested team."
 
     def has_object_permission(self, request, _, obj):
-        user = self.request.user
-        return user in obj.members.all()
+        return request.user in obj.team.members.all()
