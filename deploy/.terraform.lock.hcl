@@ -2,9 +2,11 @@
 # Manual edits may be lost in future updates.
 
 provider "registry.terraform.io/hashicorp/google" {
-  version = "4.42.1"
+  version     = "4.42.1"
+  constraints = ">= 3.53.0, < 5.0.0"
   hashes = [
     "h1:1e0v2Na1K1CMrv34A0SLDvSDX2rl1EYWMKpOI29kX/w=",
+    "h1:O3qSX1HIwZlhFgFrRcL/R5LYa8qum4MMO0T1SQ1ocpQ=",
     "zh:0a4a244b2b65c4e403ae3825d610949cf98c2593a6f6894c36ccd21f5dea7b1e",
     "zh:0fc5dfaa24d1c790fd17eafbe768d3f8a15b450d80cf3d7ab18f3f81d521adb6",
     "zh:37fe844eac11ee61da141fdc8502ecec9f722a828754dff7795499de5981de22",
@@ -21,8 +23,10 @@ provider "registry.terraform.io/hashicorp/google" {
 }
 
 provider "registry.terraform.io/hashicorp/google-beta" {
-  version = "4.42.1"
+  version     = "4.42.1"
+  constraints = ">= 3.53.0, < 5.0.0"
   hashes = [
+    "h1:esQ77cokPeVn5YwJYuI89E4zyw7h7F1+dkRrR8mGqAU=",
     "h1:xfSmMAcaOiRxX67xdfE/ENeIyxi2K1YzpXimeL5zFnw=",
     "zh:157a5fdc429ec1e2e58cdf2f89287da700b85a41b69bd9a4a1baab9c829484a2",
     "zh:31bb4603fe5ac887b47e30befda70ea192fd94e238cedf6b75db275406fe51ef",
@@ -42,6 +46,7 @@ provider "registry.terraform.io/hashicorp/google-beta" {
 provider "registry.terraform.io/hashicorp/random" {
   version = "3.4.3"
   hashes = [
+    "h1:hXUPrH8igYBhatzatkp80RCeeUJGu9lQFDyKemOlsTo=",
     "h1:tL3katm68lX+4lAncjQA9AXL4GR/VM+RPwqYf4D2X8Q=",
     "zh:41c53ba47085d8261590990f8633c8906696fa0a3c4b384ff6a7ecbf84339752",
     "zh:59d98081c4475f2ad77d881c4412c5129c56214892f490adf11c7e7a5a47de9b",

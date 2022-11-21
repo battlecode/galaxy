@@ -8,8 +8,8 @@ resources and ease of reproducibility. See these instructions for how to use it.
 tl;dr:
 
 - To install dependency Terraform modules: `terraform init`
-- To check what Terraform would change: `terraform plan`
-- To make Terraform changes: `terraform apply`
+- To check what Terraform would change: `terraform plan -var-file="secret.tfvars"`
+- To make Terraform changes: `terraform apply -var-file="secret.tfvars"`
 
 ### Getting started
 
@@ -24,6 +24,8 @@ impersonate (convert to) the Terraform service account, where minimal permission
 granted.
 
 ### Making changes
+
+First, you should obtain the `secret.tfvars` file from a dev. Then, put this in the `deploy` folder.
 
 Whenever you make changes and apply them, you should add and commit all `.tf` files as
 well as the `.terraform.lock.hcl` file.

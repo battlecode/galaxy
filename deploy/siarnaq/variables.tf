@@ -57,3 +57,13 @@ variable "storage_secure_name" {
   description = "Name of Google Cloud Storage bucket resource for secure artifacts"
   type        = string
 }
+
+variable "mailjet_api_key" {
+  description = "Our API Key for Mailjet"
+  type        = string
+}
+
+variable "mailjet_api_secret" {
+  description = "Our API Secret for Mailjet"
+  type        = string
+}

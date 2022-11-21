@@ -9,4 +9,8 @@ router.register("public", views.PublicUserProfileViewSet, basename="user-public"
 
 urlpatterns = [
     path("", include(router.urls)),
+    path(
+        "password_reset/",
+        include("django_rest_passwordreset.urls", namespace="password_reset"),
+    ),
 ]

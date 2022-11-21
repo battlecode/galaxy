@@ -46,6 +46,9 @@ module "production" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
+  mailjet_api_key    = var.mailjet_api_key
+  mailjet_api_secret = var.mailjet_api_secret
+
   create_website               = true
   siarnaq_image                = module.cd.artifact_siarnaq_image
   database_tier                = "db-custom-1-3840"
@@ -72,6 +75,9 @@ module "staging" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+
+  mailjet_api_key    = var.mailjet_api_key
+  mailjet_api_secret = var.mailjet_api_secret
 
   create_website               = false
   siarnaq_image                = null

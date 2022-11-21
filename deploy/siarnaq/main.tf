@@ -90,7 +90,7 @@ resource "google_sql_user" "this" {
 }
 
 resource "google_secret_manager_secret" "this" {
-  secret_id = "${var.name}-db-password"
+  secret_id = "${var.name}-secrets"
 
   replication {
     automatic = true
@@ -100,7 +100,11 @@ resource "google_secret_manager_secret" "this" {
 resource "google_secret_manager_secret_version" "this" {
   secret = google_secret_manager_secret.this.id
 
-  secret_data = random_password.db_password.result
+  secret_data = jsonencode({
+    "mailjet-api-key" : var.mailjet_api_key,
+    "mailjet-api-secret" : var.mailjet_api_secret,
+    "db-password" : random_password.db_password.result
+  })
 }
 
 resource "google_secret_manager_secret_iam_member" "this" {
@@ -122,7 +126,7 @@ resource "google_cloud_run_service" "this" {
         image = var.image
 
         env {
-          name = "SIARNAQ_DB_PASSWORD"
+          name = "SIARNAQ_SECRETS_JSON"
           value_from {
             secret_key_ref {
               key  = "latest"
