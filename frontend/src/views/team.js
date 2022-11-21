@@ -137,7 +137,7 @@ class YesTeam extends Component {
                 </div>
               </div>
               <div className="row">
-                <div className="col-md-4">
+                <div className="col-md-6">
                   <label className="center-row">
                     <input
                       type="checkbox"
@@ -149,7 +149,7 @@ class YesTeam extends Component {
                     Auto-accept ranked scrimmages.
                   </label>
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-6">
                   <label className="center-row">
                     <input
                       type="checkbox"
