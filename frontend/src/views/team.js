@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Api from "../api";
 
 import TeamCard from "../components/teamCard";
+import Alert from "../components/alert";
 import MultiEpisode from "./multi-episode";
 import Floater from "react-floater";
 
@@ -239,8 +240,7 @@ class NoTeam extends Component {
       team_name: "",
       join_key: "",
       team_join_name: "",
-      joinTeamError: false,
-      createTeamError: false,
+      alert_message: "",
     };
 
     this.joinTeam = this.joinTeam.bind(this);
@@ -267,8 +267,12 @@ class NoTeam extends Component {
   }
 
   joinCallback = (success) => {
-    this.setState({ joinTeamError: !success });
     if (success) this.props.updateBaseState();
+    else
+      this.setState({
+        alert_message:
+          "Sorry, that team name and join key combination is not valid.",
+      });
   };
 
   createTeam() {
@@ -280,48 +284,24 @@ class NoTeam extends Component {
   }
 
   createTeamCallback = (success) => {
-    this.setState({ createTeamError: !success });
     if (success) this.props.updateBaseState();
+    else
+      this.setState({
+        alert_message: "Sorry, this team name is already being used.",
+      });
   };
 
-  renderError(type, data) {
-    if (data === true) {
-      let message = "";
-      if (type === "createTeamError") {
-        message = "Sorry, this team name is already being used.";
-      } else if (type === "joinTeamError") {
-        message =
-          "Sorry, that team name and join key combination is not valid.";
-      }
-
-      // The dismissing button has "display: none" added to it, because it's not ready yet.
-      // We need this to be *re-rendered* each time, even if it's the same message.
-      // Otherwise, if the user gets the same error, this is not re-rendered, and if
-      // they've dismissed it already, it won't actually pop up again.
-      return (
-        <div
-          className="alert alert-danger alert-dismissible"
-          role="alert"
-          style={{ position: "fixed", bottom: "30px", right: "30px" }}
-        >
-          <button
-            type="button"
-            className="close"
-            data-dismiss="alert"
-            aria-label="Close"
-            style={{ display: "none" }}
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-          <span>{message}</span>
-        </div>
-      );
-    }
-  }
+  closeAlert = () => {
+    this.setState({ alert_message: "" });
+  };
 
   render() {
     return (
       <div className="col-md-12">
+        <Alert
+          alert_message={this.state.alert_message}
+          closeAlert={this.closeAlert}
+        />
         <div className="card">
           <div className="header">
             <h4 className="title">Create a Team</h4>
@@ -340,7 +320,6 @@ class NoTeam extends Component {
                 </div>
               </div>
             </div>
-            {this.renderError("createTeamError", this.state.createTeamError)}
             <button
               type="button"
               className="btn btn-info btn-fill pull-right"
@@ -381,7 +360,6 @@ class NoTeam extends Component {
                 </div>
               </div>
             </div>
-            {this.renderError("joinTeamError", this.state.joinTeamError)}
             <button
               type="button"
               className="btn btn-info btn-fill pull-right"
