@@ -1,3 +1,5 @@
+import urllib.parse
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.dispatch import receiver
@@ -19,14 +21,13 @@ def send_password_reset_token_email(
         return
 
     user_email = reset_password_token.user.email
+    uri = instance.request.build_absolute_uri(
+        reverse("password_reset:reset-password-confirm")
+    )
+    token_encoded = urllib.parse.urlencode({"token": reset_password_token.key})
     context = {
         "username": reset_password_token.user.username,
-        "reset_password_url": "{}?token={}".format(
-            instance.request.build_absolute_uri(
-                reverse("password_reset:reset-password-confirm")
-            ),
-            reset_password_token.key,
-        ),
+        "reset_password_url": f"{uri}?{token_encoded}",
     }
     email_html_message = render_to_string("password_reset.html", context)
 
