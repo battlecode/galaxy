@@ -793,7 +793,7 @@ class Api {
         );
       })
       .fail((xhr, status, error) => {
-        callback(JSON.stringify(xhr.responseJSON), false);
+        callback(xhr.responseJSON, false);
       });
   }
 

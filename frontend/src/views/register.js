@@ -19,7 +19,7 @@ class Register extends Component {
       school: "",
     },
     register: false,
-    error: "",
+    errors: [],
     success: "",
   };
 
@@ -27,12 +27,27 @@ class Register extends Component {
     window.location.replace("/forgotPassword");
   };
 
-  callback = (message, success) => {
+  callback = (response_json, success) => {
     if (success) {
       window.location.assign("/");
     } else {
+      let message = "";
+      // Process the response JSON for all errors and produce
+      // a list of [field, error message] pairs
+      const errors = [];
+      if (response_json.user) {
+        for (const [field, error_message] of Object.entries(
+          response_json.user
+        )) {
+          errors.push([field, error_message]);
+        }
+      }
+      for (const [field, error_message] of Object.entries(response_json)) {
+        if (field == "user") continue;
+        errors.push([field, error_message]);
+      }
       this.setState({
-        error: message,
+        errors: errors,
       });
     }
   };
@@ -44,27 +59,7 @@ class Register extends Component {
 
   submitRegister = () => {
     const user_profile = this.state.user_profile;
-    const user = user_profile.user;
-    // Validate fields
-    if (user.username.length < 4)
-      this.setState({ error: "Username must be at least 4 characters." });
-    else if (user.email.length < 4)
-      this.setState({ error: "Email must be at least 4 characters." });
-    else if (user.username.indexOf(".") > -1)
-      this.setState({ error: "Username must not contain dots." });
-    else if (!user.first_name)
-      this.setState({ error: "Must provide first name." });
-    else if (!user.last_name)
-      this.setState({ error: "Must provide last name." });
-    else if (user.password.length < 6)
-      this.setState({ error: "Password must be at least 6 characters." });
-    else if (user.gender == "") {
-      this.setState({
-        error: "Must select an option in the Gender Identity dropdown.",
-      });
-    } else {
-      Api.register(this.state.user_profile, this.callback);
-    }
+    Api.register(this.state.user_profile, this.callback);
   };
 
   // Similarly structured to the changeHandler in account.js
@@ -93,21 +88,29 @@ class Register extends Component {
   };
 
   render() {
-    const { error, success, register } = this.state;
+    const { errors, success, register } = this.state;
 
-    const errorDiv = error && (
+    const errorReports = errors.map(function (error, i) {
+      const [field, error_message] = error;
+      return (
+        <div key={i}>
+          Error in field <b>{field}</b>: {error_message}
+        </div>
+      );
+    });
+
+    const errorsDiv = errors.length > 0 && (
       <div
         className="card"
         style={{
           padding: "20px",
-          width: "350px",
+          width: "500px",
           margin: "40px auto",
           marginBottom: "0px",
           fontSize: "1.1em",
         }}
       >
-        <b>Error. </b>
-        {error}
+        {errorReports}
       </div>
     );
 
@@ -180,14 +183,14 @@ class Register extends Component {
           for credit, go to the "Account" page and fill in your Kerberos ID
           after registering.
         </p>
-        {errorDiv}
+        {errorsDiv}
         {successDiv}
         <form onSubmit={this.formSubmit}>
           <div
             className="card"
             style={{
               width: "600px",
-              margin: error ? "20px auto" : "40px auto",
+              margin: errors.length > 0 ? "20px auto" : "40px auto",
             }}
           >
             <div className="content">
