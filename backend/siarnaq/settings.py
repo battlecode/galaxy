@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import json
 import os
+from collections import defaultdict
 from datetime import timedelta
 from pathlib import Path
 
@@ -20,6 +22,8 @@ from siarnaq.gcloud import secret
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Detect environment, in particular which backend system is in use
+SIARNAQ_MODE = os.getenv("SIARNAQ_MODE", None)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -56,6 +60,8 @@ INSTALLED_APPS = [
     "siarnaq.api.episodes",
     "siarnaq.api.teams",
     "drf_spectacular",
+    "django_rest_passwordreset",
+    "anymail",
 ]
 
 MIDDLEWARE = [
@@ -80,7 +86,7 @@ SITE_ID = 1
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "siarnaq/templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -95,18 +101,30 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "siarnaq.wsgi.application"
 
+# Parse our secrets from secret manager
+match SIARNAQ_MODE:
+    case "PRODUCTION":
+        SIARNAQ_SECRETS_JSON = secret.get_secret("production-siarnaq-secrets").decode()
+
+    case "STAGING":
+        SIARNAQ_SECRETS_JSON = secret.get_secret("staging-siarnaq-secrets").decode()
+
+    case _:
+        SIARNAQ_SECRETS_JSON = "{}"  # an empty json
+
+SIARNAQ_SECRETS = defaultdict(lambda: None, json.loads(SIARNAQ_SECRETS_JSON))
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-match os.getenv("SIARNAQ_MODE", None):
+match SIARNAQ_MODE:
     case "PRODUCTION":
         DATABASES = {
             "default": {
                 "ENGINE": "django.db.backends.postgresql_psycopg2",
                 "NAME": "battlecode",
                 "USER": "siarnaq",
-                "PASSWORD": os.getenv("SIARNAQ_DB_PASSWORD"),
+                "PASSWORD": SIARNAQ_SECRETS["db-password"],
                 "HOST": (
                     f"/cloudsql/{gcloud.project_id}:"
                     f"{gcloud.location}:production-siarnaq-db"
@@ -121,7 +139,7 @@ match os.getenv("SIARNAQ_MODE", None):
                 "ENGINE": "django.db.backends.postgresql_psycopg2",
                 "NAME": "battlecode",
                 "USER": "siarnaq",
-                "PASSWORD": secret.get_secret("staging-siarnaq-db-password").decode(),
+                "PASSWORD": SIARNAQ_SECRETS["db-password"],
                 "HOST": "db.staging.battlecode.org",
                 "PORT": 5432,
             }
@@ -171,25 +189,6 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
-# Templates
-# https://docs.djangoproject.com/en/4.1/topics/templates/
-
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "siarnaq/templates")],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
-
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
@@ -232,3 +231,16 @@ TEAMS_MAX_TEAM_SIZE = 4
 # User avatar settings
 
 USER_MAX_AVATAR_SIZE = (512, 512)
+
+# Email config
+
+EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+EMAIL_HOST_USER = "no-reply@battlecode.org"
+ANYMAIL = {
+    "MAILJET_API_KEY": SIARNAQ_SECRETS["mailjet-api-key"],
+    "MAILJET_SECRET_KEY": SIARNAQ_SECRETS["mailjet-api-secret"],
+}
+
+# When testing, feel free to change this.
+# ! Make sure to change it back before committing to main!
+EMAIL_ENABLED = SIARNAQ_MODE == "PRODUCTION"

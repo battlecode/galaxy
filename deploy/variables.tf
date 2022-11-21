@@ -21,3 +21,13 @@ variable "gcp_zone" {
   type        = string
   default     = "us-east1-b"
 }
+
+variable "mailjet_api_key" {
+  description = "Our API Key for Mailjet"
+  type        = string
+}
+
+variable "mailjet_api_secret" {
+  description = "Our API Secret for Mailjet"
+  type        = string
+}
