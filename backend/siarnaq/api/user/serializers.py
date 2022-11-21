@@ -33,12 +33,12 @@ class UserSerializer(serializers.ModelSerializer):
         """
         return make_password(password)
 
-    def validate_username(self, username):
+    def _validate_unique_field(self, field_name, field_value):
         """
-        Custom validator that permits for the username to be "updated" to the same value
+        Custom validator that permits for a field to be "updated" to the same value
         as its current one. See https://stackoverflow.com/a/56171137.
         """
-        check_query = User.objects.filter(username=username)
+        check_query = User.objects.filter(**{f"{field_name}": field_value})
         if self.instance:
             check_query = check_query.exclude(pk=self.instance.pk)
 
@@ -48,28 +48,16 @@ class UserSerializer(serializers.ModelSerializer):
 
         if check_query.exists():
             raise serializers.ValidationError(
-                "A user with that username already exists."
+                f"A user with that ${field_name} already exists."
             )
 
-        return username
+        return field_value
 
-    def validate_email(self, email):
-        """
-        Custom validator that permits for the email to be "updated" to the same value
-        as its current one. See https://stackoverflow.com/a/56171137.
-        """
-        check_query = User.objects.filter(email=email)
-        if self.instance:
-            check_query = check_query.exclude(pk=self.instance.pk)
+    def validate_username(self, username):
+        return self._validate_unique_field(self, "username", username)
 
-        if self.parent is not None and self.parent.instance is not None:
-            user_instance = self.parent.instance.user
-            check_query = check_query.exclude(pk=user_instance.pk)
-
-        if check_query.exists():
-            raise serializers.ValidationError("A user with that email already exists.")
-
-        return email
+    def validate_email(self, username):
+        return self._validate_unique_field(self, "email", username)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
