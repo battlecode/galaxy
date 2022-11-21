@@ -41,7 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
         # A keyword argument trick to filter by field_name=field_value
         # with dynamic field_name.
         # See https://stackoverflow.com/a/310785
-        check_query = User.objects.filter(**{f"{field_name}": field_value})
+        check_query = User.objects.filter(**{field_name: field_value})
         if self.instance:
             check_query = check_query.exclude(pk=self.instance.pk)
 
