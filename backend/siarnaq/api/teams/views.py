@@ -85,12 +85,15 @@ class TeamViewSet(
 
         queryset = self.get_queryset()
         if not request.user.is_staff:
-            # Regular users may only join active regular teams
-            queryset = queryset.filter(team__status=TeamStatus.REGULAR)
+            # Regular users may only join active regular teams and must have the correct
+            # join key. Staff users do not have these restrictions.
+            queryset = queryset.filter(
+                team__status=TeamStatus.REGULAR,
+                team__join_key=serializer.validated_data["join_key"],
+            )
 
         team_profile = get_object_or_404(
             queryset,
-            team__join_key=serializer.validated_data["join_key"],
             team__name=serializer.validated_data["name"],
             team__episode=self.kwargs["episode_id"],
         )
