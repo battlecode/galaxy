@@ -79,6 +79,8 @@ gcloud config set core/project mitbattlecode
 Ask someone to give you the IAM "Service Account Token Creator" role.
 You can then access the staging environment by setting the environment variable `DJANGO_CONFIGURATION=Staging`.
 
+To check deploy readiness, verify the pre-deploy checklist by running `./manage.py check --deploy`.
+
 ## How to contribute
 
 If you're new to Django, it's fancy.
