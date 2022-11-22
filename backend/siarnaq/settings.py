@@ -234,8 +234,8 @@ class Staging(Base):
 
     GALAXY_ADMIN_EMAILS = [
         "staging-siarnaq-agent@mitbattlecode.iam.gserviceaccount.com",
-        "saturn-staging-compile@mitbattlecode.iam.gserviceaccount.com",
-        "saturn-staging-execute@mitbattlecode.iam.gserviceaccount.com",
+        "staging-saturn-compile@mitbattlecode.iam.gserviceaccount.com",
+        "staging-saturn-execute@mitbattlecode.iam.gserviceaccount.com",
     ]
     GALAXY_ADMIN_USERNAME = "galaxy-admin"
 
@@ -298,8 +298,8 @@ class Production(Base):
 
     GALAXY_ADMIN_EMAILS = [
         "production-siarnaq-agent@mitbattlecode.iam.gserviceaccount.com",
-        "saturn-production-compile@mitbattlecode.iam.gserviceaccount.com",
-        "saturn-production-execute@mitbattlecode.iam.gserviceaccount.com",
+        "production-saturn-compile@mitbattlecode.iam.gserviceaccount.com",
+        "production-saturn-execute@mitbattlecode.iam.gserviceaccount.com",
     ]
     GALAXY_ADMIN_USERNAME = "galaxy-admin"
 
