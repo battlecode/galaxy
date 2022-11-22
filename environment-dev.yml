@@ -5,6 +5,7 @@ dependencies:
   - black=22.10.0
   - ca-certificates=2022.9.24
   - click<8.1.0
+  - coverage=6.5.0
   - django=4.1.2
   - django-cors-headers=3.13.0
   - django-stubs<1.12.0

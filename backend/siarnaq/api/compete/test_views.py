@@ -43,13 +43,19 @@ class SubmissionViewSetTestCase(APITestCase):
             submission_frozen=False,
             language=Language.JAVA_8,
         )
-        self.user = User.objects.create_user(username="user1")
+        self.user = User.objects.create_user(
+            username="user1", email="user1@example.com"
+        )
         self.team = Team.objects.create(episode=self.e1, name="team1")
         self.team.members.add(self.user)
-        other_user = User.objects.create_user(username="user2")
+        other_user = User.objects.create_user(
+            username="user2", email="user2@example.com"
+        )
         other_team = Team.objects.create(episode=self.e1, name="team2")
         other_team.members.add(other_user)
-        self.admin = User.objects.create_user(username="admin", is_staff=True)
+        self.admin = User.objects.create_user(
+            username="admin", email="admin@example.com", is_staff=True
+        )
 
     # Partitions for: create.
     # user: on team, not on team, not authenticated
@@ -57,13 +63,15 @@ class SubmissionViewSetTestCase(APITestCase):
     # episode: frozen, not frozen, hidden
     # file size: large, small
 
-    @patch("google.cloud.storage.Blob.open")
+    @patch("google.cloud.storage.Client")
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
     @override_settings(GCLOUD_ENABLE_ACTIONS=True)
-    def test_create_has_team_staff_hidden_small(self, enqueue, writer):
+    def test_create_has_team_staff_hidden_small(self, enqueue, client):
+        writer = client().bucket().blob().open
         mock_open(writer)
+
         self.user.is_staff = True
         self.user.save()
         self.client.force_authenticate(self.user)
@@ -99,15 +107,17 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(Submission.objects.exists())
 
-    @patch("google.cloud.storage.Blob.open")
+    @patch("google.cloud.storage.Client")
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
     @override_settings(GCLOUD_ENABLE_ACTIONS=True)
-    def test_create_has_team_not_staff_not_frozen_large(self, enqueue, writer):
+    def test_create_has_team_not_staff_not_frozen_large(self, enqueue, client):
         random.seed(1)
         data = random.randbytes(2**27)  # 128MiB of stuff
+        writer = client().bucket().blob().open
         mock_open(writer)
+
         self.client.force_authenticate(self.user)
         with io.BytesIO(data) as f:
             response = self.client.post(
@@ -144,7 +154,9 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertFalse(Submission.objects.exists())
 
     def test_create_no_team(self):
-        self.client.force_authenticate(User.objects.create_user(username="user3"))
+        self.client.force_authenticate(
+            User.objects.create_user(username="user3", email="user3@example.com")
+        )
         with io.BytesIO(b"abcdefg") as f:
             response = self.client.post(
                 reverse("submission-list", kwargs={"episode_id": "e1"}),
@@ -315,7 +327,9 @@ class MatchSerializerTestCase(TestCase):
 
         self.users, self.teams, self.submissions = [], [], []
         for i in range(4):
-            u = User.objects.create(username=f"user{i}")
+            u = User.objects.create_user(
+                username=f"user{i}", email=f"user{i}@example.com"
+            )
             t = Team.objects.create(episode=self.e1, name=f"team{i}")
             t.members.add(u)
             self.submissions.append(
@@ -327,7 +341,9 @@ class MatchSerializerTestCase(TestCase):
             self.teams.append(t)
         self.teams[-1].status = TeamStatus.STAFF
         self.teams[-1].save()
-        self.staff = User.objects.create(username="staff", is_staff=True)
+        self.staff = User.objects.create_user(
+            username="staff", email="staff@example.com", is_staff=True
+        )
 
     # Partitions:
     # user: admin, not admin
@@ -820,7 +836,9 @@ class MatchViewSetTestCase(APITestCase):
 
         self.users, self.teams, self.submissions = [], [], []
         for i in range(2):
-            u = User.objects.create(username=f"user{i}")
+            u = User.objects.create_user(
+                username=f"user{i}", email=f"user{i}@example.com"
+            )
             t = Team.objects.create(episode=self.e1, name=f"team{i}")
             t.members.add(u)
             self.submissions.append(
@@ -944,7 +962,9 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             )
         self.users, self.teams, self.submissions = [], [], []
         for i in range(3):
-            u = User.objects.create(username=f"user{i}")
+            u = User.objects.create_user(
+                username=f"user{i}", email=f"user{i}@example.com"
+            )
             t = Team.objects.create(
                 episode=self.e1 if i < 2 else self.e2, name=f"team{i}"
             )

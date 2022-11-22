@@ -24,7 +24,7 @@ class GoogleCloudAuthenticationTest(TestCase):
     """Test suite for token-based authentication for Google Cloud service accounts."""
 
     def setUp(self):
-        User.objects.create_user(username="user")
+        User.objects.create_user(username="user", email="user@example.com")
         self.factory = RequestFactory()
 
     # Partitions:

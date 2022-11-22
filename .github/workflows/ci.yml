@@ -1,8 +1,19 @@
 name: CI
-on: push
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - review_requested
+  workflow_dispatch: {}
+
 defaults:
   run:
     shell: bash -l {0}
+
+env:
+  CACHE_NUMBER: 1
 
 jobs:
   lint:
@@ -13,25 +24,18 @@ jobs:
       id-token: write
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v2.4.0
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v0.8.0
-        with:
-          create_credentials_file: true
-          workload_identity_provider: projects/830784087321/locations/global/workloadIdentityPools/galaxy-ci/providers/github-ci-main
-          service_account: github-ci-agent@mitbattlecode.iam.gserviceaccount.com
+        uses: actions/checkout@v3.1.0
       - name: Cache conda
         uses: actions/cache@v3.0.11
-        env:
-          CACHE_NUMBER: 0
         with:
           path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
       - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v2.1.1
+        uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           environment-file: environment-dev.yml
+          use-only-tar-bz2: true
+          mamba-version: "*"
       - name: Run linter
         run: |
           pre-commit install
@@ -44,28 +48,24 @@ jobs:
       id-token: write
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v2.4.0
-      - name: Authenticate to GCP
-        uses: google-github-actions/auth@v0.8.0
-        with:
-          create_credentials_file: true
-          workload_identity_provider: projects/830784087321/locations/global/workloadIdentityPools/galaxy-ci/providers/github-ci-main
-          service_account: github-ci-agent@mitbattlecode.iam.gserviceaccount.com
+        uses: actions/checkout@v3.1.0
       - name: Cache conda
         uses: actions/cache@v3.0.11
-        env:
-          CACHE_NUMBER: 0
         with:
           path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
       - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v2.1.1
+        uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           environment-file: environment-dev.yml
+          use-only-tar-bz2: true
+          mamba-version: "*"
       - name: Initialize migrations
         run: ./manage.py makemigrations
         working-directory: ./backend
       - name: Run tests
-        run: find * -type f -name "test*.py" | sed "s/\.py$//g" | sed "s/\//./g" | xargs ./manage.py test -v=2
+        run: find * -type f -name "test*.py" | sed "s/\.py$//g" | sed "s/\//./g" | xargs coverage run --branch --source='.' ./manage.py test -v=2
+        working-directory: ./backend
+      - name: Report coverage
+        run: coverage report
         working-directory: ./backend

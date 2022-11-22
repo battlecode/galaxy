@@ -1,9 +1,10 @@
 import json
 
-import google.cloud.pubsub as pubsub
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import OuterRef, Subquery
+
+from siarnaq.gcloud import saturn
 
 
 class SaturnInvokableQuerySet(models.QuerySet):
@@ -22,20 +23,9 @@ class SaturnInvokableQuerySet(models.QuerySet):
         """Enqueue all unqueued items in this queryset for invocation on Saturn."""
         from siarnaq.api.compete.models import SaturnStatus
 
-        publish_client = pubsub.PublisherClient(
-            credentials=settings.GCLOUD_CREDENTIALS,
-            publisher_options=pubsub.types.PublisherOptions(
-                enable_message_ordering=True,
-            ),
-            client_options={
-                "api_endpoint": "us-east1-pubsub.googleapis.com:443",
-            },
-        )
-        invocations = (
-            # removed filter because should only be called on already filtered Queryset
-            self.select_for_update()
-            .filter(status=SaturnStatus.CREATED)
-            .all()
+        publish_client = saturn.get_publish_client()
+        invocations = list(
+            self.select_for_update().filter(status=SaturnStatus.CREATED).all()
         )
         futures = [
             publish_client.publish(
@@ -57,8 +47,7 @@ class SaturnInvokableQuerySet(models.QuerySet):
                     ordering_key=self._publish_ordering_key,
                 )
                 invocation.logs = f"type: {type(err)} Exception message: {err}"
-            finally:
-                invocation.save(update_fields=["status", "logs"])
+        self.model.objects.bulk_update(invocations, ["status", "logs"])
 
 
 class SubmissionQuerySet(SaturnInvokableQuerySet):
