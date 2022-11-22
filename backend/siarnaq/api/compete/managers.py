@@ -61,11 +61,11 @@ class SaturnInvokableQuerySet(models.QuerySet):
 class SubmissionQuerySet(SaturnInvokableQuerySet):
     @property
     def _publish_topic(self):
-        return settings.COMPETE_SATURN_COMPILE_TOPIC
+        return settings.GCLOUD_TOPIC_COMPILE
 
     @property
     def _publish_ordering_key(self):
-        return settings.COMPETE_SATURN_COMPILE_ORDER
+        return settings.GCLOUD_ORDER_COMPILE
 
 
 class MatchParticipantManager(models.Manager):
@@ -100,11 +100,11 @@ class MatchParticipantManager(models.Manager):
 class MatchQuerySet(SaturnInvokableQuerySet):
     @property
     def _publish_topic(self):
-        return settings.COMPETE_SATURN_EXECUTE_TOPIC
+        return settings.GCLOUD_TOPIC_EXECUTE
 
     @property
     def _publish_ordering_key(self):
-        return settings.COMPETE_SATURN_EXECUTE_ORDER
+        return settings.GCLOUD_ORDER_EXECUTE
 
 
 class ScrimmageRequestQuerySet(models.QuerySet):
