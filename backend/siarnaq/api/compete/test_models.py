@@ -6,7 +6,7 @@ from django.utils import timezone
 from siarnaq.api.compete.models import (
     Match,
     MatchParticipant,
-    PlayerColor,
+    PlayerOrder,
     SaturnStatus,
     ScrimmageRequest,
     Submission,
@@ -21,7 +21,7 @@ class MatchParticipantLinkedListTestCase(TestCase):
 
     def setUp(self):
         """Initialize the episode and teams available in the test suite."""
-        e1 = Episode.objects.create(
+        self.e1 = Episode.objects.create(
             name_short="e1",
             registration=timezone.now(),
             game_release=timezone.now(),
@@ -29,16 +29,21 @@ class MatchParticipantLinkedListTestCase(TestCase):
             language=Language.JAVA_8,
         )
         for name in ["team1", "team2", "team3"]:
-            t = Team.objects.create(episode=e1, name=name)
+            t = Team.objects.create(episode=self.e1, name=name)
             TeamProfile.objects.create(team=t, rating=Rating.objects.create())
             Submission.objects.create(
-                episode=e1,
+                episode=self.e1,
                 team=t,
                 user=User.objects.create_user(
                     username=name + "_user", email=f"{name}@example.com"
                 ),
                 accepted=True,
             )
+
+    def make_match(self):
+        return Match.objects.create(
+            episode=self.e1, alternate_order=False, is_ranked=False
+        )
 
     # Partitions for: single creation.
     # - team only has 1 participation
@@ -48,9 +53,15 @@ class MatchParticipantLinkedListTestCase(TestCase):
         t1 = Team.objects.get(name="team1")
         t2 = Team.objects.get(name="team2")
         t3 = Team.objects.get(name="team3")
-        p1 = MatchParticipant.objects.create(team=t1)
-        p2 = MatchParticipant.objects.create(team=t2)
-        p3 = MatchParticipant.objects.create(team=t3)
+        p1 = MatchParticipant.objects.create(
+            team=t1, match=self.make_match(), player_index=0
+        )
+        p2 = MatchParticipant.objects.create(
+            team=t2, match=self.make_match(), player_index=0
+        )
+        p3 = MatchParticipant.objects.create(
+            team=t3, match=self.make_match(), player_index=0
+        )
         for p in [p1, p2, p3]:
             self.assertIsNone(p.previous_participation)
             self.assertFalse(hasattr(p, "next_participation"))
@@ -58,9 +69,15 @@ class MatchParticipantLinkedListTestCase(TestCase):
     def test_individual_create_multiple_element(self):
         t1 = Team.objects.get(name="team1")
         t2 = Team.objects.get(name="team2")
-        p1 = MatchParticipant.objects.create(team=t1)
-        p2 = MatchParticipant.objects.create(team=t2)
-        p3 = MatchParticipant.objects.create(team=t1)
+        p1 = MatchParticipant.objects.create(
+            team=t1, match=self.make_match(), player_index=0
+        )
+        p2 = MatchParticipant.objects.create(
+            team=t2, match=self.make_match(), player_index=0
+        )
+        p3 = MatchParticipant.objects.create(
+            team=t1, match=self.make_match(), player_index=0
+        )
 
         self.assertIsNone(p1.previous_participation)
         self.assertEqual(p1.next_participation, p3)
@@ -82,9 +99,15 @@ class MatchParticipantLinkedListTestCase(TestCase):
         s3 = Submission.objects.get(team=t3)
         MatchParticipant.objects.bulk_create(
             [
-                MatchParticipant(team=t1, submission=s1),
-                MatchParticipant(team=t2, submission=s2),
-                MatchParticipant(team=t3, submission=s3),
+                MatchParticipant(
+                    team=t1, match=self.make_match(), player_index=0, submission=s1
+                ),
+                MatchParticipant(
+                    team=t2, match=self.make_match(), player_index=0, submission=s2
+                ),
+                MatchParticipant(
+                    team=t3, match=self.make_match(), player_index=0, submission=s3
+                ),
             ]
         )
         self.assertFalse(
@@ -102,16 +125,28 @@ class MatchParticipantLinkedListTestCase(TestCase):
         s3 = Submission.objects.get(team=t3)
         MatchParticipant.objects.bulk_create(
             [
-                MatchParticipant(team=t1, submission=s1),
-                MatchParticipant(team=t2, submission=s2),
-                MatchParticipant(team=t3, submission=s3),
+                MatchParticipant(
+                    team=t1, match=self.make_match(), player_index=0, submission=s1
+                ),
+                MatchParticipant(
+                    team=t2, match=self.make_match(), player_index=0, submission=s2
+                ),
+                MatchParticipant(
+                    team=t3, match=self.make_match(), player_index=0, submission=s3
+                ),
             ]
         )
         objs = MatchParticipant.objects.bulk_create(
             [
-                MatchParticipant(team=t1, submission=s1),
-                MatchParticipant(team=t2, submission=s2),
-                MatchParticipant(team=t3, submission=s3),
+                MatchParticipant(
+                    team=t1, match=self.make_match(), player_index=0, submission=s1
+                ),
+                MatchParticipant(
+                    team=t2, match=self.make_match(), player_index=0, submission=s2
+                ),
+                MatchParticipant(
+                    team=t3, match=self.make_match(), player_index=0, submission=s3
+                ),
             ]
         )
         for obj in objs:
@@ -156,51 +191,67 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         t3 = Team.objects.get(name="team3")
         r1 = Rating.objects.create(n=10)
         r2 = Rating.objects.create(n=20)
-        Match.objects.create(
+        m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1, rating=r1),
-            blue=MatchParticipant.objects.create(team=t2, score=0, rating=r2),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
             status=SaturnStatus.COMPLETED,
         )
+        MatchParticipant.objects.create(
+            team=t1, match=m1, player_index=0, score=1, rating=r1
+        )
+        MatchParticipant.objects.create(
+            team=t2, match=m1, player_index=1, score=0, rating=r2
+        )
         m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t3, score=0),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
-            status=SaturnStatus.COMPLETED,
+            status=SaturnStatus.RUNNING,
         )
+        red = MatchParticipant.objects.create(
+            team=t1, match=m2, player_index=0, score=1
+        )
+        MatchParticipant.objects.create(team=t3, match=m2, player_index=1, score=0)
+
+        m2.status = SaturnStatus.COMPLETED
+        m2.save()
+        red.refresh_from_db()
         # Expect rating increase after win
-        self.assertIsNotNone(m2.red.rating)
-        self.assertGreater(m2.red.rating.mean, m2.red.get_old_rating().mean)
-        self.assertEqual(m2.red.rating.n, r1.n + 1)
-        self.assertEqual(t1.profile.rating, m2.red.rating)
+        self.assertIsNotNone(red.rating)
+        self.assertGreater(red.rating.mean, red.get_old_rating().mean)
+        self.assertEqual(red.rating.n, r1.n + 1)
+        self.assertEqual(t1.profile.rating, red.rating)
 
     def test_finalize_ranked_completed_previous_not_ready(self):
         e1 = Episode.objects.get(name_short="e1")
         t1 = Team.objects.get(name="team1")
         t2 = Team.objects.get(name="team2")
         t3 = Team.objects.get(name="team3")
-        Match.objects.create(
+        m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1),
-            blue=MatchParticipant.objects.create(team=t2),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
             status=SaturnStatus.RUNNING,
         )
+        MatchParticipant.objects.create(team=t1, match=m1, player_index=0)
+        MatchParticipant.objects.create(team=t2, match=m1, player_index=1)
         m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t3, score=0),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
-            status=SaturnStatus.COMPLETED,
+            status=SaturnStatus.RUNNING,
         )
+        red = MatchParticipant.objects.create(
+            team=t1, match=m2, player_index=0, score=1
+        )
+        MatchParticipant.objects.create(team=t3, match=m2, player_index=1, score=0)
+
+        m2.status = SaturnStatus.COMPLETED
+        m2.save()
+        red.refresh_from_db()
         # Expect no rating because previous not ready
-        self.assertIsNone(m2.red.rating)
+        self.assertIsNone(red.rating)
 
     def test_finalize_ranked_completed_previous_nonexistent(self):
         e1 = Episode.objects.get(name_short="e1")
@@ -208,17 +259,23 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         t2 = Team.objects.get(name="team2")
         m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t2, score=0),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
             status=SaturnStatus.COMPLETED,
         )
+        red = MatchParticipant.objects.create(
+            team=t1, match=m1, player_index=0, score=1
+        )
+        MatchParticipant.objects.create(team=t2, match=m1, player_index=1, score=0)
+
+        m1.status = SaturnStatus.COMPLETED
+        m1.save()
+        red.refresh_from_db()
         # Expect rating increase after win
-        self.assertIsNotNone(m1.red.rating)
-        self.assertGreater(m1.red.rating.mean, m1.red.get_old_rating().mean)
-        self.assertEqual(m1.red.rating.n, 1)
-        self.assertEqual(t1.profile.rating, m1.red.rating)
+        self.assertIsNotNone(red.rating)
+        self.assertGreater(red.rating.mean, red.get_old_rating().mean)
+        self.assertEqual(red.rating.n, 1)
+        self.assertEqual(t1.profile.rating, red.rating)
 
     def test_finalize_ranked_failed_previous_ready(self):
         e1 = Episode.objects.get(name_short="e1")
@@ -229,46 +286,59 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         r2 = Rating.objects.create(n=20)
         m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1, rating=r1),
-            blue=MatchParticipant.objects.create(team=t2, score=0, rating=r2),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
             status=SaturnStatus.COMPLETED,
         )
+        red1 = MatchParticipant.objects.create(
+            team=t1, match=m1, player_index=0, score=1, rating=r1
+        )
+        MatchParticipant.objects.create(
+            team=t2, match=m1, player_index=1, score=0, rating=r2
+        )
         m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1),
-            blue=MatchParticipant.objects.create(team=t3),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
-            status=SaturnStatus.ERRORED,
+            status=SaturnStatus.RUNNING,
         )
+        red2 = MatchParticipant.objects.create(team=t1, match=m2, player_index=0)
+        MatchParticipant.objects.create(team=t3, match=m2, player_index=1)
+
+        m2.status = SaturnStatus.ERRORED
+        m2.save()
+        red1.refresh_from_db()
+        red2.refresh_from_db()
         # Expect no change because no result
-        self.assertEqual(m2.red.rating, m1.red.rating)
+        self.assertEqual(red1.rating, red2.rating)
 
     def test_finalize_ranked_failed_previous_not_ready(self):
         e1 = Episode.objects.get(name_short="e1")
         t1 = Team.objects.get(name="team1")
         t2 = Team.objects.get(name="team2")
         t3 = Team.objects.get(name="team3")
-        Match.objects.create(
+        m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1),
-            blue=MatchParticipant.objects.create(team=t2),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
             status=SaturnStatus.RUNNING,
         )
+        MatchParticipant.objects.create(team=t1, match=m1, player_index=0)
+        MatchParticipant.objects.create(team=t2, match=m1, player_index=1)
         m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1),
-            blue=MatchParticipant.objects.create(team=t3),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
-            status=SaturnStatus.ERRORED,
+            status=SaturnStatus.RUNNING,
         )
+        red = MatchParticipant.objects.create(team=t1, match=m2, player_index=0)
+        MatchParticipant.objects.create(team=t3, match=m2, player_index=1)
+
+        m2.status = SaturnStatus.ERRORED
+        m2.save()
+        red.refresh_from_db()
         # Expect no rating because previous not ready
-        self.assertIsNone(m2.red.rating)
+        self.assertIsNone(red.rating)
 
     def test_finalize_ranked_inprogress_previous_ready(self):
         e1 = Episode.objects.get(name_short="e1")
@@ -277,24 +347,32 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         t3 = Team.objects.get(name="team3")
         r1 = Rating.objects.create(n=10)
         r2 = Rating.objects.create(n=20)
-        Match.objects.create(
+        m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1, rating=r1),
-            blue=MatchParticipant.objects.create(team=t2, score=0, rating=r2),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
             status=SaturnStatus.COMPLETED,
         )
+        MatchParticipant.objects.create(
+            team=t1, match=m1, player_index=0, score=1, rating=r1
+        )
+        MatchParticipant.objects.create(
+            team=t2, match=m1, player_index=1, score=0, rating=r2
+        )
         m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1),
-            blue=MatchParticipant.objects.create(team=t3),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
-            status=SaturnStatus.RUNNING,
+            status=SaturnStatus.CREATED,
         )
+        red = MatchParticipant.objects.create(team=t1, match=m2, player_index=0)
+        MatchParticipant.objects.create(team=t3, match=m2, player_index=1)
+
+        m2.status = SaturnStatus.RUNNING
+        m2.save()
+        red.refresh_from_db()
         # Expect no rating because no result
-        self.assertIsNone(m2.red.rating)
+        self.assertIsNone(red.rating)
 
     def test_finalize_unranked_completed_previous_ready(self):
         e1 = Episode.objects.get(name_short="e1")
@@ -305,47 +383,64 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         r2 = Rating.objects.create(n=20)
         m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1, rating=r1),
-            blue=MatchParticipant.objects.create(team=t2, score=0, rating=r2),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
             status=SaturnStatus.COMPLETED,
+        )
+        red1 = MatchParticipant.objects.create(
+            team=t1, match=m1, player_index=0, score=1, rating=r1
+        )
+        MatchParticipant.objects.create(
+            team=t2, match=m1, player_index=1, score=0, rating=r2
         )
         m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t3, score=0),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
-            status=SaturnStatus.COMPLETED,
+            status=SaturnStatus.RUNNING,
         )
+        red2 = MatchParticipant.objects.create(
+            team=t1, match=m2, player_index=0, score=1
+        )
+        MatchParticipant.objects.create(team=t3, match=m2, player_index=1, score=0)
+
+        m2.status = SaturnStatus.COMPLETED
+        m2.save()
+        red1.refresh_from_db()
+        red2.refresh_from_db()
         # Expect no change because unranked
-        self.assertEqual(m2.red.rating, m1.red.rating)
-        self.assertEqual(t1.profile.rating, m2.red.rating)
+        self.assertEqual(red1.rating, red2.rating)
+        self.assertEqual(t1.profile.rating, red2.rating)
 
     def test_finalize_unranked_completed_previous_not_ready(self):
         e1 = Episode.objects.get(name_short="e1")
         t1 = Team.objects.get(name="team1")
         t2 = Team.objects.get(name="team2")
         t3 = Team.objects.get(name="team3")
-        Match.objects.create(
+        m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1),
-            blue=MatchParticipant.objects.create(team=t2),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
             status=SaturnStatus.RUNNING,
         )
+        MatchParticipant.objects.create(team=t1, match=m1, player_index=0)
+        MatchParticipant.objects.create(team=t2, match=m1, player_index=1)
         m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t3, score=0),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
-            status=SaturnStatus.COMPLETED,
+            status=SaturnStatus.RUNNING,
         )
+        red = MatchParticipant.objects.create(
+            team=t1, match=m2, player_index=0, score=1
+        )
+        MatchParticipant.objects.create(team=t3, match=m2, player_index=1, score=0)
+
+        m2.status = SaturnStatus.COMPLETED
+        m2.save()
+        red.refresh_from_db()
         # Expect no rating because previous not ready
-        self.assertIsNone(m2.red.rating)
+        self.assertIsNone(red.rating)
 
     def test_finalize_unranked_completed_previous_nonexistent(self):
         e1 = Episode.objects.get(name_short="e1")
@@ -353,17 +448,23 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         t2 = Team.objects.get(name="team2")
         m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t2, score=0),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
-            status=SaturnStatus.COMPLETED,
+            status=SaturnStatus.RUNNING,
         )
+        red = MatchParticipant.objects.create(
+            team=t1, match=m1, player_index=0, score=1
+        )
+        MatchParticipant.objects.create(team=t2, match=m1, player_index=1, score=0)
+
+        m1.status = SaturnStatus.COMPLETED
+        m1.save()
+        red.refresh_from_db()
         # Expect no change because unranked
-        self.assertIsNotNone(m1.red.rating)
-        self.assertEqual(m1.red.rating.to_value(), m1.red.get_old_rating().to_value())
-        self.assertEqual(m1.red.rating.n, 0)
-        self.assertEqual(t1.profile.rating.to_value(), m1.red.rating.to_value())
+        self.assertIsNotNone(red.rating)
+        self.assertEqual(red.rating.to_value(), red.get_old_rating().to_value())
+        self.assertEqual(red.rating.n, 0)
+        self.assertEqual(t1.profile.rating.to_value(), red.rating.to_value())
 
     # Partitions for: finalize chaining. Testing finalizations propagate correctly.
     # - chain has finalized opponent
@@ -376,39 +477,47 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         t3 = Team.objects.get(name="team3")
         m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1),
-            blue=MatchParticipant.objects.create(team=t2),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
             status=SaturnStatus.RUNNING,
         )
-        Match.objects.create(
+        red1 = MatchParticipant.objects.create(team=t1, match=m1, player_index=0)
+        blue1 = MatchParticipant.objects.create(team=t2, match=m1, player_index=1)
+        m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t2),
-            blue=MatchParticipant.objects.create(team=t3),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
             status=SaturnStatus.RUNNING,
         )
+        MatchParticipant.objects.create(team=t2, match=m2, player_index=0)
+        MatchParticipant.objects.create(team=t3, match=m2, player_index=1)
         m3 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t3, score=0),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
             status=SaturnStatus.COMPLETED,
         )
-        m1.status, m1.red.score, m1.blue.score = SaturnStatus.COMPLETED, 1, 0
-        m1.red.save()
-        m1.blue.save()
+        red3 = MatchParticipant.objects.create(
+            team=t1, match=m3, player_index=0, score=1
+        )
+        blue3 = MatchParticipant.objects.create(
+            team=t3, match=m3, player_index=1, score=0
+        )
+
+        m1.status, red1.score, blue1.score = SaturnStatus.COMPLETED, 1, 0
+        red1.save()
+        blue1.save()
         m1.save()
+        red1.refresh_from_db()
+        red3.refresh_from_db()
+        blue3.refresh_from_db()
         # Expect m3 red to not be finalized yet, because t3 is not finalized
-        self.assertIsNotNone(m1.red.rating)
-        self.assertGreater(m1.red.rating.mean, m1.red.get_old_rating().mean)
-        self.assertEqual(m1.red.rating.n, 1)
-        self.assertEqual(t1.profile.rating, m1.red.rating)
-        self.assertIsNone(m3.red.rating)
-        self.assertIsNone(m3.blue.rating)
+        self.assertIsNotNone(red1.rating)
+        self.assertGreater(red1.rating.mean, red1.get_old_rating().mean)
+        self.assertEqual(red1.rating.n, 1)
+        self.assertEqual(t1.profile.rating, red1.rating)
+        self.assertIsNone(red3.rating)
+        self.assertIsNone(blue3.rating)
 
     def test_chain_opponent_finalized(self):
         e1 = Episode.objects.get(name_short="e1")
@@ -419,40 +528,50 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         r2 = Rating.objects.create(n=20)
         m1 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1),
-            blue=MatchParticipant.objects.create(team=t2),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
             status=SaturnStatus.RUNNING,
         )
-        Match.objects.create(
+        red1 = MatchParticipant.objects.create(team=t1, match=m1, player_index=0)
+        blue1 = MatchParticipant.objects.create(team=t2, match=m1, player_index=1)
+        m2 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t2, score=1, rating=r1),
-            blue=MatchParticipant.objects.create(team=t3, score=0, rating=r2),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
             status=SaturnStatus.COMPLETED,
+        )
+        MatchParticipant.objects.create(
+            team=t2, match=m2, player_index=0, score=1, rating=r1
+        )
+        MatchParticipant.objects.create(
+            team=t3, match=m2, player_index=1, score=0, rating=r2
         )
         m3 = Match.objects.create(
             episode=e1,
-            red=MatchParticipant.objects.create(team=t1, score=1),
-            blue=MatchParticipant.objects.create(team=t3, score=0),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
             status=SaturnStatus.COMPLETED,
         )
-        m1.status, m1.red.score, m1.blue.score = SaturnStatus.COMPLETED, 1, 0
-        m1.red.save()
-        m1.blue.save()
+        red3 = MatchParticipant.objects.create(
+            team=t1, match=m3, player_index=0, score=1
+        )
+        blue3 = MatchParticipant.objects.create(
+            team=t3, match=m3, player_index=1, score=0
+        )
+
+        m1.status, red1.score, blue1.score = SaturnStatus.COMPLETED, 1, 0
+        red1.save()
+        blue1.save()
         m1.save()
+        red3.refresh_from_db()
+        blue3.refresh_from_db()
         # Expect m3 red and blue to be both finalized
-        m3.refresh_from_db()
-        self.assertIsNotNone(m3.red.rating)
-        self.assertGreater(m3.red.rating.mean, m3.red.get_old_rating().mean)
-        self.assertEqual(m3.red.rating.n, 2)
-        self.assertIsNotNone(m3.blue.rating)
-        self.assertLess(m3.blue.rating.mean, m3.blue.get_old_rating().mean)
-        self.assertEqual(m3.blue.rating.n, r2.n + 1)
+        self.assertIsNotNone(red3.rating)
+        self.assertGreater(red3.rating.mean, red3.get_old_rating().mean)
+        self.assertEqual(red3.rating.n, 2)
+        self.assertIsNotNone(blue3.rating)
+        self.assertLess(blue3.rating.mean, blue3.get_old_rating().mean)
+        self.assertEqual(blue3.rating.n, r2.n + 1)
 
 
 class ScrimmageRequestQuerySetTestCase(TestCase):
@@ -487,57 +606,64 @@ class ScrimmageRequestQuerySetTestCase(TestCase):
                 is_ranked=True,
                 requested_by=self.teams[0],
                 requested_to=self.teams[1],
-                requester_color=PlayerColor.ALTERNATE_RANDOM,
+                player_order=PlayerOrder.SHUFFLED,
             )
             r.maps.add(self.m)
 
     # Partitions for: accept
-    # requester color: red first, blue first, random
+    # player order: requester first, requester last, shuffled
 
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
-    def test_accept_red_first(self, enqueue):
-        ScrimmageRequest.objects.update(requester_color=PlayerColor.ALWAYS_RED)
+    def test_accept_requester_first(self, enqueue):
+        ScrimmageRequest.objects.update(player_order=PlayerOrder.REQUESTER_FIRST)
         ScrimmageRequest.objects.accept()
         self.assertEqual(Match.objects.count(), self.n)
         self.assertEqual(Map.objects.get().scrimmage_requests.count(), self.n)
         self.assertEqual(
-            Match.objects.filter(
-                red__team=self.teams[0], blue__team=self.teams[1], alternate_color=False
-            ).count(),
+            MatchParticipant.objects.filter(team=self.teams[0], player_index=0).count(),
             self.n,
         )
+        self.assertEqual(
+            MatchParticipant.objects.filter(team=self.teams[1], player_index=1).count(),
+            self.n,
+        )
+        self.assertEqual(Match.objects.filter(alternate_order=False).count(), self.n)
 
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
-    def test_accept_blue_first(self, enqueue):
-        ScrimmageRequest.objects.update(requester_color=PlayerColor.ALWAYS_BLUE)
+    def test_accept_requester_last(self, enqueue):
+        ScrimmageRequest.objects.update(player_order=PlayerOrder.REQUESTER_LAST)
         ScrimmageRequest.objects.accept()
         self.assertEqual(Match.objects.count(), self.n)
         self.assertEqual(Map.objects.get().scrimmage_requests.count(), self.n)
         self.assertEqual(
-            Match.objects.filter(
-                red__team=self.teams[1], blue__team=self.teams[0], alternate_color=False
-            ).count(),
+            MatchParticipant.objects.filter(team=self.teams[0], player_index=1).count(),
             self.n,
         )
+        self.assertEqual(
+            MatchParticipant.objects.filter(team=self.teams[1], player_index=0).count(),
+            self.n,
+        )
+        self.assertEqual(Match.objects.filter(alternate_order=False).count(), self.n)
 
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
-    def test_accept_alternate_random(self, enqueue):
-        ScrimmageRequest.objects.update(requester_color=PlayerColor.ALTERNATE_RANDOM)
+    def test_accept_shuffled(self, enqueue):
+        ScrimmageRequest.objects.update(player_order=PlayerOrder.SHUFFLED)
         ScrimmageRequest.objects.accept()
         self.assertEqual(Match.objects.count(), self.n)
         self.assertEqual(Map.objects.get().scrimmage_requests.count(), self.n)
-        q1 = Match.objects.filter(
-            red__team=self.teams[0], blue__team=self.teams[1], alternate_color=True
-        )
-        q2 = Match.objects.filter(
-            red__team=self.teams[1], blue__team=self.teams[0], alternate_color=True
-        )
-        self.assertTrue(q1.exists())
-        self.assertTrue(q2.exists())
-        self.assertEqual(q1.count() + q2.count(), self.n)
+
+        q00 = MatchParticipant.objects.filter(team=self.teams[0], player_index=0)
+        q01 = MatchParticipant.objects.filter(team=self.teams[0], player_index=1)
+        q10 = MatchParticipant.objects.filter(team=self.teams[1], player_index=0)
+        q11 = MatchParticipant.objects.filter(team=self.teams[1], player_index=1)
+
+        self.assertEqual(Match.objects.filter(alternate_order=True).count(), self.n)
+        self.assertTrue(q00.exists() and q01.exists() and q10.exists() and q11.exists())
+        self.assertEqual(q00.count() + q01.count(), self.n)
+        self.assertEqual(q10.count() + q11.count(), self.n)

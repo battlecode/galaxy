@@ -12,7 +12,7 @@ from rest_framework.test import APITestCase, APITransactionTestCase
 from siarnaq.api.compete.models import (
     Match,
     MatchParticipant,
-    PlayerColor,
+    PlayerOrder,
     SaturnStatus,
     ScrimmageRequest,
     ScrimmageRequestStatus,
@@ -364,20 +364,24 @@ class MatchSerializerTestCase(TestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=self.r_unreleased,
-            red=MatchParticipant.objects.create(
-                team=self.teams[0],
-                submission=self.submissions[0],
-                score=0,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[1],
-                submission=self.submissions[1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=True,
+        )
+        red = MatchParticipant.objects.create(
+            team=self.teams[0],
+            submission=self.submissions[0],
+            match=match,
+            player_index=0,
+            score=0,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
@@ -387,24 +391,26 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "red": {
-                    "team": match.red.team.pk,
-                    "teamname": match.red.team.name,
-                    "submission": match.red.submission.pk,
-                    "score": match.red.score,
-                    "rating": match.red.rating.to_value(),
-                    "old_rating": match.red.get_old_rating().to_value(),
-                },
-                "blue": {
-                    "team": match.blue.team.pk,
-                    "teamname": match.blue.team.name,
-                    "submission": match.blue.submission.pk,
-                    "score": match.blue.score,
-                    "rating": match.blue.rating.to_value(),
-                    "old_rating": match.blue.get_old_rating().to_value(),
-                },
+                "participants": [
+                    {
+                        "team": red.team.pk,
+                        "teamname": red.team.name,
+                        "submission": red.submission.pk,
+                        "score": red.score,
+                        "rating": red.rating.to_value(),
+                        "old_rating": red.get_old_rating().to_value(),
+                    },
+                    {
+                        "team": blue.team.pk,
+                        "teamname": blue.team.name,
+                        "submission": blue.submission.pk,
+                        "score": blue.score,
+                        "rating": blue.rating.to_value(),
+                        "old_rating": blue.get_old_rating().to_value(),
+                    },
+                ],
                 "maps": [self.map.name],
-                "alternate_color": match.alternate_color,
+                "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
                 "replay": str(match.replay),
@@ -424,20 +430,24 @@ class MatchSerializerTestCase(TestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=None,
-            red=MatchParticipant.objects.create(
-                team=self.teams[0],
-                submission=self.submissions[0],
-                score=0,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[-1],
-                submission=self.submissions[-1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(
+            team=self.teams[0],
+            submission=self.submissions[0],
+            match=match,
+            player_index=0,
+            score=0,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(
+            team=self.teams[-1],
+            submission=self.submissions[-1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
@@ -447,24 +457,26 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "red": {
-                    "team": match.red.team.pk,
-                    "teamname": match.red.team.name,
-                    "submission": match.red.submission.pk,
-                    "score": match.red.score,
-                    "rating": match.red.rating.to_value(),
-                    "old_rating": match.red.get_old_rating().to_value(),
-                },
-                "blue": {
-                    "team": match.blue.team.pk,
-                    "teamname": match.blue.team.name,
-                    "submission": None,
-                    "score": match.blue.score,
-                    "rating": match.blue.rating.to_value(),
-                    "old_rating": match.blue.get_old_rating().to_value(),
-                },
+                "participants": [
+                    {
+                        "team": red.team.pk,
+                        "teamname": red.team.name,
+                        "submission": red.submission.pk,
+                        "score": red.score,
+                        "rating": red.rating.to_value(),
+                        "old_rating": red.get_old_rating().to_value(),
+                    },
+                    {
+                        "team": blue.team.pk,
+                        "teamname": blue.team.name,
+                        "submission": None,
+                        "score": blue.score,
+                        "rating": blue.rating.to_value(),
+                        "old_rating": blue.get_old_rating().to_value(),
+                    },
+                ],
                 "maps": [self.map.name],
-                "alternate_color": match.alternate_color,
+                "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
                 "replay": str(match.replay),
@@ -484,20 +496,24 @@ class MatchSerializerTestCase(TestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=self.r_released,
-            red=MatchParticipant.objects.create(
-                team=self.teams[0],
-                submission=self.submissions[0],
-                score=0,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[1],
-                submission=self.submissions[1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(
+            team=self.teams[0],
+            submission=self.submissions[0],
+            match=match,
+            player_index=0,
+            score=0,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
@@ -507,24 +523,26 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "red": {
-                    "team": match.red.team.pk,
-                    "teamname": match.red.team.name,
-                    "submission": match.red.submission.pk,
-                    "score": match.red.score,
-                    "rating": match.red.rating.to_value(),
-                    "old_rating": match.red.get_old_rating().to_value(),
-                },
-                "blue": {
-                    "team": match.blue.team.pk,
-                    "teamname": match.blue.team.name,
-                    "submission": None,
-                    "score": match.blue.score,
-                    "rating": match.blue.rating.to_value(),
-                    "old_rating": match.blue.get_old_rating().to_value(),
-                },
+                "participants": [
+                    {
+                        "team": red.team.pk,
+                        "teamname": red.team.name,
+                        "submission": red.submission.pk,
+                        "score": red.score,
+                        "rating": red.rating.to_value(),
+                        "old_rating": red.get_old_rating().to_value(),
+                    },
+                    {
+                        "team": blue.team.pk,
+                        "teamname": blue.team.name,
+                        "submission": None,
+                        "score": blue.score,
+                        "rating": blue.rating.to_value(),
+                        "old_rating": blue.get_old_rating().to_value(),
+                    },
+                ],
                 "maps": [self.map.name],
-                "alternate_color": match.alternate_color,
+                "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
                 "replay": str(match.replay),
@@ -544,20 +562,24 @@ class MatchSerializerTestCase(TestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=self.r_unreleased,
-            red=MatchParticipant.objects.create(
-                team=self.teams[0],
-                submission=self.submissions[0],
-                score=0,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[1],
-                submission=self.submissions[1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[0],
+            submission=self.submissions[0],
+            match=match,
+            player_index=0,
+            score=0,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
@@ -567,10 +589,9 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "red": None,
-                "blue": None,
+                "participants": None,
                 "maps": None,
-                "alternate_color": match.alternate_color,
+                "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
                 "replay": None,
@@ -590,20 +611,24 @@ class MatchSerializerTestCase(TestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=None,
-            red=MatchParticipant.objects.create(
-                team=self.teams[0],
-                submission=self.submissions[0],
-                score=0,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[1],
-                submission=self.submissions[1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(
+            team=self.teams[0],
+            submission=self.submissions[0],
+            match=match,
+            player_index=0,
+            score=0,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
@@ -613,24 +638,26 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "red": {
-                    "team": match.red.team.pk,
-                    "teamname": match.red.team.name,
-                    "submission": match.red.submission.pk,
-                    "score": match.red.score,
-                    "rating": match.red.rating.to_value(),
-                    "old_rating": match.red.get_old_rating().to_value(),
-                },
-                "blue": {
-                    "team": match.blue.team.pk,
-                    "teamname": match.blue.team.name,
-                    "submission": None,
-                    "score": match.blue.score,
-                    "rating": match.blue.rating.to_value(),
-                    "old_rating": match.blue.get_old_rating().to_value(),
-                },
+                "participants": [
+                    {
+                        "team": red.team.pk,
+                        "teamname": red.team.name,
+                        "submission": red.submission.pk,
+                        "score": red.score,
+                        "rating": red.rating.to_value(),
+                        "old_rating": red.get_old_rating().to_value(),
+                    },
+                    {
+                        "team": blue.team.pk,
+                        "teamname": blue.team.name,
+                        "submission": None,
+                        "score": blue.score,
+                        "rating": blue.rating.to_value(),
+                        "old_rating": blue.get_old_rating().to_value(),
+                    },
+                ],
                 "maps": [self.map.name],
-                "alternate_color": match.alternate_color,
+                "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
                 "replay": str(match.replay),
@@ -650,20 +677,24 @@ class MatchSerializerTestCase(TestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=None,
-            red=MatchParticipant.objects.create(
-                team=self.teams[1],
-                submission=self.submissions[1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[-1],
-                submission=self.submissions[-1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=0,
+            score=1,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(
+            team=self.teams[-1],
+            submission=self.submissions[-1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
@@ -673,24 +704,26 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "red": {
-                    "team": match.red.team.pk,
-                    "teamname": match.red.team.name,
-                    "submission": None,
-                    "score": None,
-                    "rating": match.red.rating.to_value(),
-                    "old_rating": match.red.get_old_rating().to_value(),
-                },
-                "blue": {
-                    "team": match.blue.team.pk,
-                    "teamname": match.blue.team.name,
-                    "submission": None,
-                    "score": None,
-                    "rating": match.blue.rating.to_value(),
-                    "old_rating": match.blue.get_old_rating().to_value(),
-                },
+                "participants": [
+                    {
+                        "team": red.team.pk,
+                        "teamname": red.team.name,
+                        "submission": None,
+                        "score": None,
+                        "rating": red.rating.to_value(),
+                        "old_rating": red.get_old_rating().to_value(),
+                    },
+                    {
+                        "team": blue.team.pk,
+                        "teamname": blue.team.name,
+                        "submission": None,
+                        "score": None,
+                        "rating": blue.rating.to_value(),
+                        "old_rating": blue.get_old_rating().to_value(),
+                    },
+                ],
                 "maps": [self.map.name],
-                "alternate_color": match.alternate_color,
+                "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
                 "replay": None,
@@ -712,20 +745,24 @@ class MatchSerializerTestCase(TestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=None,
-            red=MatchParticipant.objects.create(
-                team=self.teams[1],
-                submission=self.submissions[1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[-1],
-                submission=self.submissions[-1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=0,
+            score=1,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[-1],
+            submission=self.submissions[-1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
@@ -735,10 +772,9 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "red": None,
-                "blue": None,
+                "participants": None,
                 "maps": None,
-                "alternate_color": match.alternate_color,
+                "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
                 "replay": None,
@@ -758,20 +794,24 @@ class MatchSerializerTestCase(TestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=None,
-            red=MatchParticipant.objects.create(
-                team=self.teams[1],
-                submission=self.submissions[1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[2],
-                submission=self.submissions[2],
-                score=2,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=0,
+            score=1,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(
+            team=self.teams[2],
+            submission=self.submissions[2],
+            match=match,
+            player_index=1,
+            score=2,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
@@ -781,24 +821,26 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "red": {
-                    "team": match.red.team.pk,
-                    "teamname": match.red.team.name,
-                    "submission": None,
-                    "score": match.red.score,
-                    "rating": match.red.rating.to_value(),
-                    "old_rating": match.red.get_old_rating().to_value(),
-                },
-                "blue": {
-                    "team": match.blue.team.pk,
-                    "teamname": match.blue.team.name,
-                    "submission": None,
-                    "score": match.blue.score,
-                    "rating": match.blue.rating.to_value(),
-                    "old_rating": match.blue.get_old_rating().to_value(),
-                },
+                "participants": [
+                    {
+                        "team": red.team.pk,
+                        "teamname": red.team.name,
+                        "submission": None,
+                        "score": red.score,
+                        "rating": red.rating.to_value(),
+                        "old_rating": red.get_old_rating().to_value(),
+                    },
+                    {
+                        "team": blue.team.pk,
+                        "teamname": blue.team.name,
+                        "submission": None,
+                        "score": blue.score,
+                        "rating": blue.rating.to_value(),
+                        "old_rating": blue.get_old_rating().to_value(),
+                    },
+                ],
                 "maps": [self.map.name],
-                "alternate_color": match.alternate_color,
+                "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
                 "replay": None,
@@ -857,20 +899,24 @@ class MatchViewSetTestCase(APITestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=self.r_released,
-            red=MatchParticipant.objects.create(
-                team=self.teams[0],
-                submission=self.submissions[0],
-                score=0,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[1],
-                submission=self.submissions[1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[0],
+            submission=self.submissions[0],
+            match=match,
+            player_index=0,
+            score=0,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         response = self.client.get(reverse("match-my", kwargs={"episode_id": "e1"}))
@@ -884,20 +930,24 @@ class MatchViewSetTestCase(APITestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=self.r_unreleased,
-            red=MatchParticipant.objects.create(
-                team=self.teams[0],
-                submission=self.submissions[0],
-                score=0,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[1],
-                submission=self.submissions[1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[0],
+            submission=self.submissions[0],
+            match=match,
+            player_index=0,
+            score=0,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         response = self.client.get(reverse("match-my", kwargs={"episode_id": "e1"}))
@@ -910,20 +960,24 @@ class MatchViewSetTestCase(APITestCase):
         match = Match.objects.create(
             episode=self.e1,
             tournament_round=None,
-            red=MatchParticipant.objects.create(
-                team=self.teams[0],
-                submission=self.submissions[0],
-                score=0,
-                rating=Rating.objects.create(),
-            ),
-            blue=MatchParticipant.objects.create(
-                team=self.teams[1],
-                submission=self.submissions[1],
-                score=1,
-                rating=Rating.objects.create(),
-            ),
-            alternate_color=True,
+            alternate_order=True,
             is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[0],
+            submission=self.submissions[0],
+            match=match,
+            player_index=0,
+            score=0,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
         response = self.client.get(reverse("match-my", kwargs={"episode_id": "e1"}))
@@ -1005,7 +1059,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -1024,7 +1078,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -1036,7 +1090,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         self.assertEqual(r.is_ranked, True)
         self.assertEqual(r.requested_by, self.teams[0])
         self.assertEqual(r.requested_to, self.teams[1])
-        self.assertEqual(r.requester_color, PlayerColor.ALWAYS_RED)
+        self.assertEqual(r.player_order, PlayerOrder.REQUESTER_FIRST)
         self.assertEqual(r.maps.count(), 3)
         self.assertFalse(Match.objects.exists())
 
@@ -1049,7 +1103,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -1066,7 +1120,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -1085,7 +1139,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": False,
                 "requested_to": self.teams[1].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -1102,7 +1156,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -1117,7 +1171,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[0].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -1134,7 +1188,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -1153,7 +1207,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -1168,7 +1222,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[2].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map2"],
             },
             format="json",
@@ -1183,7 +1237,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map3"],
             },
             format="json",
@@ -1198,7 +1252,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "requester_color": PlayerColor.ALWAYS_RED,
+                "player_order": PlayerOrder.REQUESTER_FIRST,
                 "map_names": ["map0", "map1", "map4"],
             },
             format="json",
@@ -1217,7 +1271,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
                     {
                         "is_ranked": is_ranked,
                         "requested_to": self.teams[1].pk,
-                        "requester_color": PlayerColor.ALWAYS_RED,
+                        "player_order": PlayerOrder.REQUESTER_FIRST,
                         "map_names": ["map0", "map1", "map2"],
                     },
                     format="json",
@@ -1240,7 +1294,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
                     {
                         "is_ranked": is_ranked,
                         "requested_to": self.teams[1].pk,
-                        "requester_color": PlayerColor.ALWAYS_RED,
+                        "player_order": PlayerOrder.REQUESTER_FIRST,
                         "map_names": ["map0", "map1", "map2"],
                     },
                     format="json",
@@ -1267,7 +1321,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             is_ranked=True,
             requested_by=self.teams[0],
             requested_to=self.teams[1],
-            requester_color=PlayerColor.ALWAYS_RED,
+            player_order=PlayerOrder.REQUESTER_FIRST,
         )
         r.maps.add(*self.maps[:3])
         response = self.client.post(
@@ -1279,16 +1333,15 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         m = Match.objects.get()
         self.assertEqual(m.episode, self.e1)
         self.assertEqual(m.tournament_round, None)
-        self.assertEqual(m.red.team, self.teams[0])
-        self.assertEqual(m.red.submission, self.submissions[0])
-        self.assertEqual(m.red.score, None)
-        self.assertEqual(m.red.rating, None)
-        self.assertEqual(m.blue.team, self.teams[1])
-        self.assertEqual(m.blue.submission, self.submissions[1])
-        self.assertEqual(m.blue.score, None)
-        self.assertEqual(m.blue.rating, None)
+        for participant, team, submission in zip(
+            m.participants.all(), self.teams, self.submissions
+        ):
+            self.assertEqual(participant.team, team)
+            self.assertEqual(participant.submission, submission)
+            self.assertEqual(participant.score, None)
+            self.assertEqual(participant.rating, None)
         self.assertEqual(m.maps.count(), 3)
-        self.assertEqual(m.alternate_color, False)
+        self.assertEqual(m.alternate_order, False)
         self.assertEqual(m.is_ranked, True)
         enqueue.assert_called()
 
@@ -1300,7 +1353,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             is_ranked=True,
             requested_by=self.teams[0],
             requested_to=self.teams[1],
-            requester_color=PlayerColor.ALWAYS_RED,
+            player_order=PlayerOrder.REQUESTER_FIRST,
         )
         r.maps.add(*self.maps[:3])
         response = self.client.post(
@@ -1319,7 +1372,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             is_ranked=True,
             requested_by=self.teams[0],
             requested_to=self.teams[1],
-            requester_color=PlayerColor.ALWAYS_RED,
+            player_order=PlayerOrder.REQUESTER_FIRST,
         )
         r.maps.add(*self.maps[:3])
         response = self.client.post(
@@ -1340,7 +1393,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             is_ranked=True,
             requested_by=self.teams[0],
             requested_to=self.teams[1],
-            requester_color=PlayerColor.ALWAYS_RED,
+            player_order=PlayerOrder.REQUESTER_FIRST,
         )
         r.maps.add(*self.maps[:3])
         response = self.client.post(
@@ -1366,7 +1419,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
                     is_ranked=True,
                     requested_by=self.teams[0],
                     requested_to=self.teams[1],
-                    requester_color=PlayerColor.ALWAYS_RED,
+                    player_order=PlayerOrder.REQUESTER_FIRST,
                 )
                 r.maps.add(*self.maps[:3])
                 response = self.client.delete(
