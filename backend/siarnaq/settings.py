@@ -184,6 +184,9 @@ class Local(Base):
         "localhost",
         "127.0.0.1",
     ]
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
     GALAXY_ADMIN_EMAILS = ["admin@example.com"]
     GALAXY_ADMIN_USERNAME = "galaxy-admin"
@@ -225,6 +228,9 @@ class Staging(Base):
         "localhost",
         "127.0.0.1",
     ]
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
     GALAXY_ADMIN_EMAILS = [
         "staging-siarnaq-agent@mitbattlecode.iam.gserviceaccount.com",
@@ -286,6 +292,9 @@ class Production(Base):
     ALLOWED_HOSTS = [
         "play.battlecode.org",
     ]
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
     GALAXY_ADMIN_EMAILS = [
         "production-siarnaq-agent@mitbattlecode.iam.gserviceaccount.com",
