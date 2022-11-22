@@ -69,6 +69,12 @@ class SubmissionSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+class SubmissionDownloadSerializer(serializers.Serializer):
+    ready = serializers.BooleanField(read_only=True)
+    url = serializers.URLField(read_only=True)
+    reason = serializers.CharField(read_only=True)
+
+
 class SubmissionReportSerializer(serializers.Serializer):
     invocation = SaturnInvocationSerializer()
     accepted = serializers.BooleanField(required=False)

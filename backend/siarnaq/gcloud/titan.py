@@ -1,35 +1,8 @@
-import io
-from typing import BinaryIO
+import datetime
 
 import google.cloud.storage as storage
 from django.conf import settings
-
-
-class RequestRefused(Exception):
-    """
-    RequestRefused may be raised if a request to download a file is blocked for safety
-    reasons. This is the base class for all Titan-related exceptions.
-    """
-
-    reason = "This request was refused for an unknown reason."
-
-
-class FileUnverified(RequestRefused):
-    """FileUnverified is raised when an unverified file is requested."""
-
-    reason = (
-        "This file is still being processed. "
-        "It should be ready within a minute or two."
-    )
-
-
-class FileMalicious(RequestRefused):
-    """FileMalicious is raised when a file marked as malicious is requested."""
-
-    reason = (
-        "This file was not automatically cleared and requires manual review. "
-        "You may either wait, or if you own this file, replace it with a new upload."
-    )
+from google.auth import impersonated_credentials
 
 
 def request_scan(blob: storage.Blob) -> None:
@@ -40,18 +13,67 @@ def request_scan(blob: storage.Blob) -> None:
     blob.patch()
 
 
-def get_object_if_safe(bucket: str, name: str) -> BinaryIO:
-    """Retrieve a file, raising RequestRefused is Titan has not marked it as safe."""
+def get_object(bucket: str, name: str, check_safety: bool) -> dict[str, str | bool]:
+    """
+    Retrieve a file from storage, performing safety checks if required.
+
+    Parameters
+    ----------
+    bucket : str
+        The bucket from which the object should be retrieved.
+    name : str
+        The name (full path) of the object in the bucket.
+    check_safety : bool
+        Whether the object should only be returned if verified by Titan.
+
+    Returns
+    -------
+    dict[str, str]
+        A dictionary consisting of a boolean field "ready" indicating whether the file
+        has passed any requested safety checks. If this is true, then an additional
+        field "url" is supplied with a signed download link. Otherwise, a field "reason"
+        is available explaining why the file cannot be downloaded.
+    """
     if not settings.GCLOUD_ENABLE_ACTIONS:
-        return io.BytesIO()
+        return {"ready": True, "url": ""}
+
     client = storage.Client(credentials=settings.GCLOUD_CREDENTIALS)
     blob = client.bucket(bucket).get_blob(name)
-    match blob.metadata:
-        case {"Titan-Status": "Unverified"}:
-            raise FileUnverified
-        case {"Titan-Status": "Verified"}:
-            return blob.open("rb")
-        case {"Titan-Status": "Malicious"}:
-            raise FileMalicious
+    match (check_safety, blob.metadata):
+        case (False, _) | (True, {"Titan-Status": "Verified"}):
+            # Signing is complicated due to an issue with the Google Auth library.
+            # See: https://github.com/googleapis/google-auth-library-python/issues/50
+            signing_credentials = impersonated_credentials.Credentials(
+                source_credentials=settings.GCLOUD_CREDENTIALS,
+                target_principal=settings.GCLOUD_SERVICE_EMAIL,
+                target_scopes="https://www.googleapis.com/auth/devstorage.read_only",
+                lifetime=5,
+            )
+            url = blob.generate_signed_url(
+                expiration=datetime.timedelta(hours=1),
+                method="GET",
+                credentials=signing_credentials,
+            )
+            return {
+                "ready": True,
+                "url": url,
+            }
+        case (_, {"Titan-Status": "Unverified"}):
+            return {
+                "ready": False,
+                "reason": (
+                    "This file is still being processed. It should be ready within a "
+                    "minute or two."
+                ),
+            }
+        case (_, {"Titan-Status": "Malicious"}):
+            return {
+                "ready": False,
+                "reason": (
+                    "This file was not automatically cleared and requires manual "
+                    "review. You may either wait, or if you own this file, replace it "
+                    "with a new upload."
+                ),
+            }
         case _:
-            raise RequestRefused
+            raise ValueError("Unexpected state.")

@@ -4,7 +4,7 @@ import uuid
 import google.cloud.storage as storage
 from django.conf import settings
 from django.db import transaction
-from django.http import FileResponse, Http404
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from PIL import Image
 from rest_framework import mixins, status, viewsets
@@ -62,13 +62,13 @@ class UserProfileViewSet(
             case "get":
                 if not profile.has_resume:
                     raise Http404
-                try:
-                    f = titan.get_object_if_safe(
-                        settings.GCLOUD_BUCKET_SECURE, profile.get_resume_path()
-                    )
-                except titan.RequestRefused as e:
-                    return Response(e.reason, status.HTTP_404_NOT_FOUND)
-                return FileResponse(f, filename="resume.pdf")
+                data = titan.get_object(
+                    bucket=settings.GCLOUD_BUCKET_SECURE,
+                    name=profile.get_resume_path(),
+                    check_safety=True,
+                )
+                serializer = self.get_serializer(data)
+                return Response(serializer.data)
 
             case "put":
                 serializer = self.get_serializer(data=request.data)

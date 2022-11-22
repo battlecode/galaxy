@@ -122,6 +122,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserResumeSerializer(serializers.Serializer):
     resume = serializers.FileField(write_only=True)
+    ready = serializers.BooleanField(read_only=True)
+    url = serializers.URLField(read_only=True)
+    reason = serializers.CharField(read_only=True)
 
 
 class UserAvatarSerializer(serializers.Serializer):
