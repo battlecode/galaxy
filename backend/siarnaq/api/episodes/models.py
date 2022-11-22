@@ -128,6 +128,25 @@ class Map(models.Model):
         ]
 
 
+class EligibilityCriterion(models.Model):
+    """
+    A database model for an eligibility criterion for entering into a tournament.
+    """
+
+    episode = models.ForeignKey(
+        refs.EPISODE_MODEL,
+        on_delete=models.CASCADE,
+        related_name="eligibility_criteria",
+    )
+    """The episode to which this criterion belongs."""
+
+    question = models.TextField()
+    """The text question to be asked for this criterion."""
+
+    icon = models.CharField(max_length=8)
+    """An icon to display for teams that satisfy this criterion."""
+
+
 class TournamentStyle(models.TextChoices):
     """
     An immutable type enumerating the available styles of tournament.
@@ -162,7 +181,7 @@ class Tournament(models.Model):
     """The style of this tournament."""
 
     eligibility_includes = models.ManyToManyField(
-        refs.ELIGIBILITY_CRITERION_MODEL,
+        EligibilityCriterion,
         related_name="include_tournaments",
     )
     """
@@ -170,7 +189,7 @@ class Tournament(models.Model):
     """
 
     eligibility_excludes = models.ManyToManyField(
-        refs.ELIGIBILITY_CRITERION_MODEL,
+        EligibilityCriterion,
         related_name="exclude_tournaments",
     )
     """

@@ -1,6 +1,12 @@
 from django.contrib import admin
 
-from siarnaq.api.episodes.models import Episode, Map, Tournament, TournamentRound
+from siarnaq.api.episodes.models import (
+    EligibilityCriterion,
+    Episode,
+    Map,
+    Tournament,
+    TournamentRound,
+)
 
 
 @admin.register(Episode)
@@ -46,6 +52,19 @@ class MapAdmin(admin.ModelAdmin):
     list_select_related = ("episode",)
     search_fields = ("name",)
     search_help_text = "Search for a map name."
+
+    @admin.display()
+    def episode_name_short(self, obj):
+        return obj.episode.name_short
+
+
+@admin.register(EligibilityCriterion)
+class EligibilityCriterionAdmin(admin.ModelAdmin):
+    fields = (("question",), ("episode", "icon"))
+    list_display = ("question", "episode_name_short", "icon")
+    list_select_related = ("episode",)
+    search_fields = ("question",)
+    search_help_text = "Search for a question."
 
     @admin.display()
     def episode_name_short(self, obj):

@@ -7,25 +7,6 @@ import siarnaq.api.refs as refs
 from siarnaq.api.teams.managers import TeamQuerySet
 
 
-class EligibilityCriterion(models.Model):
-    """
-    A database model for an eligibility criterion for entering into a tournament.
-    """
-
-    episode = models.ForeignKey(
-        refs.EPISODE_MODEL,
-        on_delete=models.CASCADE,
-        related_name="eligibility_criteria",
-    )
-    """The episode to which this criterion belongs."""
-
-    question = models.TextField()
-    """The text question to be asked for this criterion."""
-
-    icon = models.CharField(max_length=8)
-    """An icon to display for teams that satisfy this criterion."""
-
-
 class Rating(models.Model):
     """
     An immutable database model for a Penalized Elo rating.
@@ -188,7 +169,7 @@ class TeamProfile(models.Model):
     """Whether the team automatically accepts unranked match requests."""
 
     eligible_for = models.ManyToManyField(
-        EligibilityCriterion, related_name="teams", blank=True
+        refs.ELIGIBILITY_CRITERION_MODEL, related_name="teams", blank=True
     )
     """The eligibility criteria that this team satisfies."""
 
