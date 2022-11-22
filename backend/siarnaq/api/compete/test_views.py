@@ -63,13 +63,15 @@ class SubmissionViewSetTestCase(APITestCase):
     # episode: frozen, not frozen, hidden
     # file size: large, small
 
-    @patch("google.cloud.storage.Blob.open")
+    @patch("google.cloud.storage.Client")
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
     @override_settings(GCLOUD_ENABLE_ACTIONS=True)
-    def test_create_has_team_staff_hidden_small(self, enqueue, writer):
+    def test_create_has_team_staff_hidden_small(self, enqueue, client):
+        writer = client().bucket().blob().open
         mock_open(writer)
+
         self.user.is_staff = True
         self.user.save()
         self.client.force_authenticate(self.user)
@@ -105,15 +107,17 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(Submission.objects.exists())
 
-    @patch("google.cloud.storage.Blob.open")
+    @patch("google.cloud.storage.Client")
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
     @override_settings(GCLOUD_ENABLE_ACTIONS=True)
-    def test_create_has_team_not_staff_not_frozen_large(self, enqueue, writer):
+    def test_create_has_team_not_staff_not_frozen_large(self, enqueue, client):
         random.seed(1)
         data = random.randbytes(2**27)  # 128MiB of stuff
+        writer = client().bucket().blob().open
         mock_open(writer)
+
         self.client.force_authenticate(self.user)
         with io.BytesIO(data) as f:
             response = self.client.post(
