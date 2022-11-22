@@ -113,20 +113,12 @@ module "network" {
   cloudrun_service_name = module.production.run_service_name
   storage_home_name     = google_storage_bucket.home.name
 
-  production_buckets = {
-    public = {
-      bucket_name = module.production.storage_public_name
-      enable_cdn  = true
-      paths       = ["/public", "/public/*"]
-    }
-    frontend = {
+  additional_buckets = {
+    "production-frontend" = {
       bucket_name = module.production.storage_frontend_name
       enable_cdn  = true
-      paths       = ["/*"]
+      subdomain   = "play."
     }
-  }
-
-  staging_buckets = {
   }
 
   dns_additional_records = {
