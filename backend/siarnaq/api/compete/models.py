@@ -125,7 +125,7 @@ class Submission(SaturnInvocation):
         )
 
     def get_binary_path(self):
-        """return the path of the binary code on Google cloud storage"""
+        """Return the path of the binary code on Google cloud storage"""
         return posixpath.join(
             self.episode.name_short, "submission", str(self.pk), "binary.zip"
         )
@@ -346,7 +346,11 @@ class Match(SaturnInvocation):
 
     def get_replay_path(self):
         """Return the path to the replay file."""
-        return self.replay
+        return posixpath.join(
+            self.episode.name_short,
+            "replays",
+            f"{self.replay}.{self.episode.name_short}",
+        )
 
     def enqueue_options(self):
         """Return the options to be submitted to the execution queue."""
@@ -354,14 +358,14 @@ class Match(SaturnInvocation):
             "id": self.pk,
             "episode": self.episode_id,
             "players": [
-                {"path": self.red.team, "options": ""},
-                {"path": self.blue.team, "options": ""},
+                {"path": self.red.submission.get_binary_path(), "options": ""},
+                {"path": self.blue.submission.get_binary_path(), "options": ""},
             ],
             "replay-path": self.get_replay_path(),
             # NOTE: ExecuteTask in /battlecode/saturn/blob/main/worker/pkg/run/types.go
             # specifies that map be a string, not list.
             # Use a comma seperated string of map names.
-            "map": ",".join(map.name for map in self.maps),
+            "map": ",".join(map.name for map in self.maps.all()),
         }
 
     def try_finalize_ratings(self):
