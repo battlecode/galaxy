@@ -17,8 +17,11 @@ class SaturnInvokableQuerySet(models.QuerySet):
         """The ordering key with which to ensure FIFO order of queued items."""
         raise NotImplementedError
 
+    @transaction.atomic
     def enqueue(self):
         """Enqueue all unqueued items in this queryset for invocation on Saturn."""
+        from siarnaq.api.compete.models import SaturnStatus
+
         publish_client = pubsub.PublisherClient(
             credentials=settings.GCLOUD_CREDENTIALS,
             publisher_options=pubsub.types.PublisherOptions(
@@ -31,13 +34,13 @@ class SaturnInvokableQuerySet(models.QuerySet):
         invocations = (
             # removed filter because should only be called on already filtered Queryset
             self.select_for_update()
-            .filter(status=self.model.SaturnStatus.CREATED)
+            .filter(status=SaturnStatus.CREATED)
             .all()
         )
         futures = [
             publish_client.publish(
                 topic=self._publish_topic,
-                data=json.encode(invocation.enqueue_options()),
+                data=json.dumps(invocation.enqueue_options()).encode(),
                 ordering_key=self._publish_ordering_key,
             )
             for invocation in invocations
@@ -45,10 +48,10 @@ class SaturnInvokableQuerySet(models.QuerySet):
         for invocation, future in zip(invocations, futures):
             try:
                 message_id = future.result()
-                invocation.status = self.model.SaturnStatus.QUEUED
+                invocation.status = SaturnStatus.QUEUED
                 invocation.logs = f"Enqueued with ID: {message_id}"
             except Exception as err:
-                invocation.status = self.model.SaturnStatus.ERRORED
+                invocation.status = SaturnStatus.ERRORED
                 publish_client.resume_publish(
                     topic=self._publish_topic,
                     ordering_key=self._publish_ordering_key,
