@@ -3,7 +3,7 @@ import random
 from datetime import timedelta
 from unittest.mock import mock_open, patch
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
@@ -57,11 +57,11 @@ class SubmissionViewSetTestCase(APITestCase):
     # episode: frozen, not frozen, hidden
     # file size: large, small
 
-    @patch("siarnaq.gcloud.enable_actions", new=True)
     @patch("google.cloud.storage.Blob.open")
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
+    @override_settings(GCLOUD_ENABLE_ACTIONS=True)
     def test_create_has_team_staff_hidden_small(self, enqueue, writer):
         mock_open(writer)
         self.user.is_staff = True
@@ -99,11 +99,11 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(Submission.objects.exists())
 
-    @patch("siarnaq.gcloud.enable_actions", new=True)
     @patch("google.cloud.storage.Blob.open")
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
+    @override_settings(GCLOUD_ENABLE_ACTIONS=True)
     def test_create_has_team_not_staff_not_frozen_large(self, enqueue, writer):
         random.seed(1)
         data = random.randbytes(2**27)  # 128MiB of stuff

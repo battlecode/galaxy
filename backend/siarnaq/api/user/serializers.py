@@ -1,9 +1,9 @@
 import google.cloud.storage as storage
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from rest_framework import serializers
 
-import siarnaq.gcloud as gcloud
 from siarnaq.api.user.models import User, UserProfile
 
 
@@ -89,7 +89,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
         client = storage.Client()
         public_url = (
-            client.bucket(gcloud.public_bucket).blob(obj.get_avatar_path()).public_url
+            client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
+            .blob(obj.get_avatar_path())
+            .public_url
         )
         # Append UUID to public URL to prevent use of cached previous avatar
         return f"{public_url}?{obj.avatar_uuid}"

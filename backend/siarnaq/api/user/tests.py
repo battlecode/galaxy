@@ -1,44 +1,38 @@
-import importlib
-import os
+from typing import Any
+from unittest.mock import patch
 
+from django.conf import settings
 from django.test import RequestFactory, TestCase
-from google.auth.exceptions import DefaultCredentialsError
-from google.auth.transport import requests
-from google.oauth2 import id_token
+from google.auth.exceptions import GoogleAuthError
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-import siarnaq.gcloud as gcloud
 from siarnaq.api.user.models import User
 
 
+def mock_verify_oauth2_token(id_token: str | bytes, request: Any) -> dict[str, Any]:
+    if id_token not in {"correct", b"correct"}:
+        raise GoogleAuthError
+    return {
+        "email": settings.GALAXY_ADMIN_EMAILS[0],
+    }
+
+
+@patch("google.oauth2.id_token.verify_oauth2_token", mock_verify_oauth2_token)
 class GoogleCloudAuthenticationTest(TestCase):
     """Test suite for token-based authentication for Google Cloud service accounts."""
 
     def setUp(self):
-        os.environ["SIARNAQ_MODE"] = "STAGING"
-        importlib.reload(gcloud)
         User.objects.create_user(username="user")
         self.factory = RequestFactory()
-
-    def tearDown(self):
-        del os.environ["SIARNAQ_MODE"]
-        importlib.reload(gcloud)
-
-    def get_gcloud_token(self, audience):
-        """Generate an OIDC token for the service account to be authenticated."""
-        try:
-            return id_token.fetch_id_token(requests.Request(), audience)
-        except DefaultCredentialsError as e:
-            self.skipTest("Could not get ID token: " + str(e))
 
     # Partitions:
     # User agent: internal, not internal
     # Token: valid for gcloud account, valid for regular user, invalid, missing
 
     def test_token_internal_valid_gcloud(self):
-        token = self.get_gcloud_token("audience")
+        token = "correct"
         request = self.factory.get(
             "/api/",
             HTTP_USER_AGENT="Galaxy-Saturn",
@@ -60,7 +54,7 @@ class GoogleCloudAuthenticationTest(TestCase):
             request.user
 
     def test_token_external_valid_gcloud(self):
-        token = self.get_gcloud_token("audience")
+        token = "correct"
         request = self.factory.get("/api/", HTTP_AUTHORIZATION=f"Bearer {token}")
         request = APIView().initialize_request(request)
         with self.assertRaises(AuthenticationFailed):

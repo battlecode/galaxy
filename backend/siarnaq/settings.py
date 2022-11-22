@@ -12,38 +12,30 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import json
 import os
-from collections import defaultdict
 from datetime import timedelta
 from pathlib import Path
 
+import google.auth
+import google.cloud.secretmanager as secretmanager
 from configurations import Configuration
+from google.auth import impersonated_credentials
+from google.auth.credentials import Credentials
 
-import siarnaq.gcloud as gcloud
-from siarnaq.gcloud import secret
+
+def _get_secret(
+    credentials: Credentials, project_id: str, name: str, version: str = "latest"
+) -> bytes:
+    """Access the secret version from the Google Secret Manager."""
+    client = secretmanager.SecretManagerServiceClient(credentials=credentials)
+    request = secretmanager.AccessSecretVersionRequest(
+        name=client.secret_version_path(project_id, name, version)
+    )
+    return client.access_secret_version(request=request).payload.data
 
 
 class Base(Configuration):
     # Build paths inside the project like this: BASE_DIR / 'subdir'.
     BASE_DIR = Path(__file__).resolve().parent.parent
-
-    # Detect environment, in particular which backend system is in use
-    SIARNAQ_MODE = os.getenv("SIARNAQ_MODE", None)
-
-    # Quick-start development settings - unsuitable for production
-    # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
-
-    # SECURITY WARNING: keep the secret key used in production secret!
-    SECRET_KEY = "django-insecure-2r0p5r8#j1!4v%cb@w#_^)6+^#vs5b*9mqf)!q)pz!5tqnbx*("
-
-    # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = True
-
-    ALLOWED_HOSTS = [
-        "localhost",
-        "127.0.0.1",
-        "play.battlecode.org",
-        "staging.battlecode.org",
-    ]
 
     # Application definition
 
@@ -103,60 +95,6 @@ class Base(Configuration):
     ]
 
     WSGI_APPLICATION = "siarnaq.wsgi.application"
-
-    # Parse our secrets from secret manager
-    match SIARNAQ_MODE:
-        case "PRODUCTION":
-            SIARNAQ_SECRETS_JSON = secret.get_secret(
-                "production-siarnaq-secrets"
-            ).decode()
-
-        case "STAGING":
-            SIARNAQ_SECRETS_JSON = secret.get_secret("staging-siarnaq-secrets").decode()
-
-        case _:
-            SIARNAQ_SECRETS_JSON = "{}"  # an empty json
-
-    SIARNAQ_SECRETS = defaultdict(lambda: None, json.loads(SIARNAQ_SECRETS_JSON))
-
-    # Database
-    # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-    match SIARNAQ_MODE:
-        case "PRODUCTION":
-            DATABASES = {
-                "default": {
-                    "ENGINE": "django.db.backends.postgresql_psycopg2",
-                    "NAME": "battlecode",
-                    "USER": "siarnaq",
-                    "PASSWORD": SIARNAQ_SECRETS["db-password"],
-                    "HOST": (
-                        f"/cloudsql/{gcloud.project_id}:"
-                        f"{gcloud.location}:production-siarnaq-db"
-                    ),
-                    "PORT": 5432,
-                }
-            }
-
-        case "STAGING":
-            DATABASES = {
-                "default": {
-                    "ENGINE": "django.db.backends.postgresql_psycopg2",
-                    "NAME": "battlecode",
-                    "USER": "siarnaq",
-                    "PASSWORD": SIARNAQ_SECRETS["db-password"],
-                    "HOST": "db.staging.battlecode.org",
-                    "PORT": 5432,
-                }
-            }
-
-        case _:
-            DATABASES = {
-                "default": {
-                    "ENGINE": "django.db.backends.sqlite3",
-                    "NAME": str(BASE_DIR / "db.sqlite3"),
-                }
-            }
 
     # Custom user model
     # https://docs.djangoproject.com/en/4.0/topics/auth/customizing
@@ -239,15 +177,158 @@ class Base(Configuration):
 
     EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
     EMAIL_HOST_USER = "no-reply@battlecode.org"
-    ANYMAIL = {
-        "MAILJET_API_KEY": SIARNAQ_SECRETS["mailjet-api-key"],
-        "MAILJET_SECRET_KEY": SIARNAQ_SECRETS["mailjet-api-secret"],
-    }
-
-    # When testing, feel free to change this.
-    # ! Make sure to change it back before committing to main!
-    EMAIL_ENABLED = SIARNAQ_MODE == "PRODUCTION"
 
 
 class Local(Base):
-    pass
+    ALLOWED_HOSTS = [
+        "localhost",
+        "127.0.0.1",
+    ]
+
+    GALAXY_ADMIN_EMAILS = ["admin@example.com"]
+    GALAXY_ADMIN_USERNAME = "galaxy-admin"
+
+    GCLOUD_SERVICE_EMAIL = GALAXY_ADMIN_EMAILS[0]
+    GCLOUD_LOCATION = "nowhere"
+    GCLOUD_ENABLE_ACTIONS = False
+
+    GCLOUD_BUCKET_PUBLIC = "nowhere-public"
+    GCLOUD_BUCKET_SECURE = "nowhere-secure"
+    GCLOUD_TOPIC_COMPILE = "nowhere-siarnaq-compile"
+    GCLOUD_TOPIC_EXECUTE = "nowhere-siarnaq-execute"
+    GCLOUD_ORDER_COMPILE = "compile-order"
+    GCLOUD_ORDER_EXECUTE = "execute-order"
+
+    DEBUG = True
+    EMAIL_ENABLED = False
+
+    GCLOUD_CREDENTIALS, GCLOUD_PROJECT = None, "null-project"
+    SECRET_KEY = "django-insecure-2r0p5r8#j1!4v%cb@w#_^)6+^#vs5b*9mqf)!q)pz!5tqnbx*("
+    ANYMAIL = {
+        "MAILJET_API_KEY": "",
+        "MAILJET_SECRET_KEY": "",
+    }
+
+    @property
+    def DATABASES(self):
+        return {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": str(self.BASE_DIR / "db.sqlite3"),
+            }
+        }
+
+
+class Staging(Base):
+    ALLOWED_HOSTS = [
+        "localhost",
+        "127.0.0.1",
+    ]
+
+    GALAXY_ADMIN_EMAILS = [
+        "staging-siarnaq-agent@mitbattlecode.iam.gserviceaccount.com",
+        "saturn-staging-compile@mitbattlecode.iam.gserviceaccount.com",
+        "saturn-staging-execute@mitbattlecode.iam.gserviceaccount.com",
+    ]
+    GALAXY_ADMIN_USERNAME = "galaxy-admin"
+
+    GCLOUD_SERVICE_EMAIL = GALAXY_ADMIN_EMAILS[0]
+    GCLOUD_LOCATION = "us-east1"
+    GCLOUD_ENABLE_ACTIONS = True
+
+    GCLOUD_BUCKET_PUBLIC = "mitbattlecode-staging-public"
+    GCLOUD_BUCKET_SECURE = "mitbattlecode-staging-secure"
+    GCLOUD_TOPIC_COMPILE = "staging-siarnaq-compile"
+    GCLOUD_TOPIC_EXECUTE = "staging-siarnaq-execute"
+    GCLOUD_ORDER_COMPILE = "compile-order"
+    GCLOUD_ORDER_EXECUTE = "execute-order"
+
+    DEBUG = True
+    EMAIL_ENABLED = False
+
+    @classmethod
+    def pre_setup(cls):
+        super().pre_setup()
+        user_credentials, cls.GCLOUD_PROJECT = google.auth.default()
+        cls.GCLOUD_CREDENTIALS = impersonated_credentials.Credentials(
+            source_credentials=user_credentials,
+            target_principal=cls.GCLOUD_SERVICE_EMAIL,
+            target_scopes=[
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/userinfo.email",
+            ],
+        )
+        secrets = json.loads(
+            _get_secret(
+                cls.GCLOUD_CREDENTIALS, cls.GCLOUD_PROJECT, "staging-siarnaq-secrets"
+            ).decode()
+        )
+        cls.SECRET_KEY = secrets["django-key"]
+        cls.ANYMAIL = {
+            "MAILJET_API_KEY": secrets["mailjet-api-key"],
+            "MAILJET_SECRET_KEY": secrets["mailjet-api-secret"],
+        }
+        cls.DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql_psycopg2",
+                "NAME": "battlecode",
+                "USER": "siarnaq",
+                "PASSWORD": secrets["db-password"],
+                "HOST": "db.staging.battlecode.org",
+                "PORT": 5432,
+            }
+        }
+
+
+class Production(Base):
+    ALLOWED_HOSTS = [
+        "play.battlecode.org",
+    ]
+
+    GALAXY_ADMIN_EMAILS = [
+        "production-siarnaq-agent@mitbattlecode.iam.gserviceaccount.com",
+        "saturn-production-compile@mitbattlecode.iam.gserviceaccount.com",
+        "saturn-production-execute@mitbattlecode.iam.gserviceaccount.com",
+    ]
+    GALAXY_ADMIN_USERNAME = "galaxy-admin"
+
+    GCLOUD_SERVICE_EMAIL = GALAXY_ADMIN_EMAILS[0]
+    GCLOUD_LOCATION = "us-east1"
+    GCLOUD_ENABLE_ACTIONS = True
+
+    GCLOUD_BUCKET_PUBLIC = "mitbattlecode-production-public"
+    GCLOUD_BUCKET_SECURE = "mitbattlecode-production-secure"
+    GCLOUD_TOPIC_COMPILE = "production-siarnaq-compile"
+    GCLOUD_TOPIC_EXECUTE = "production-siarnaq-execute"
+    GCLOUD_ORDER_COMPILE = "compile-order"
+    GCLOUD_ORDER_EXECUTE = "execute-order"
+
+    DEBUG = False
+    EMAIL_ENABLED = True
+
+    @classmethod
+    def pre_setup(cls):
+        super().pre_setup()
+        cls.GCLOUD_CREDENTIALS, cls.GCLOUD_PROJECT = google.auth.default()
+        secrets = json.loads(
+            _get_secret(
+                cls.GCLOUD_CREDENTIALS, cls.GCLOUD_PROJECT, "production-siarnaq-secrets"
+            ).decode()
+        )
+        cls.SECRET_KEY = secrets["django-key"]
+        cls.DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql_psycopg2",
+                "NAME": "battlecode",
+                "USER": "siarnaq",
+                "PASSWORD": secrets["db-password"],
+                "HOST": (
+                    f"/cloudsql/{cls.GCLOUD_PROJECT}:"
+                    f"{cls.GCLOUD_LOCATION}:production-siarnaq-db"
+                ),
+            }
+        }
+        cls.ANYMAIL = {
+            "MAILJET_API_KEY": secrets["mailjet-api-key"],
+            "MAILJET_SECRET_KEY": secrets["mailjet-api-secret"],
+        }

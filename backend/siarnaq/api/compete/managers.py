@@ -5,8 +5,6 @@ from django.conf import settings
 from django.db import models, transaction
 from django.db.models import OuterRef, Subquery
 
-import siarnaq.gcloud as gcloud
-
 
 class SaturnInvokableQuerySet(models.QuerySet):
     @property
@@ -22,7 +20,7 @@ class SaturnInvokableQuerySet(models.QuerySet):
     def enqueue(self):
         """Enqueue all unqueued items in this queryset for invocation on Saturn."""
         publish_client = pubsub.PublisherClient(
-            credentials=gcloud.credentials,
+            credentials=settings.GCLOUD_CREDENTIALS,
             publisher_options=pubsub.types.PublisherOptions(
                 enable_message_ordering=True,
             ),

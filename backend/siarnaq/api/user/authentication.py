@@ -1,10 +1,10 @@
+from django.conf import settings
 from google.auth.exceptions import GoogleAuthError
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from rest_framework import authentication
 from rest_framework.exceptions import AuthenticationFailed
 
-import siarnaq.gcloud as gcloud
 from siarnaq.api.user.models import User
 
 
@@ -53,12 +53,11 @@ class GoogleCloudAuthentication(authentication.BaseAuthentication):
             )
         except (ValueError, GoogleAuthError):
             raise AuthenticationFailed("Invalid authorization token")
-        if idinfo.get("email") != gcloud.admin_email:
+        if idinfo.get("email") not in settings.GALAXY_ADMIN_EMAILS:
             raise AuthenticationFailed("Unauthorized client")
 
         user, _ = User.objects.get_or_create(
-            username=gcloud.admin_username,
-            email=gcloud.admin_email,
+            username=settings.GALAXY_ADMIN_USERNAME,
             is_staff=True,
         )
         return (user, None)
