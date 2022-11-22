@@ -25,7 +25,7 @@ from rest_framework_simplejwt.views import (
 from siarnaq.api import views
 
 urlpatterns = [
-    path("api/admin/", admin.site.urls),
+    path("admin/", admin.site.urls),
     path("api/user/", include("siarnaq.api.user.urls")),
     path("api/compete/", include("siarnaq.api.compete.urls")),
     path("api/episode/", include("siarnaq.api.episodes.urls")),
@@ -41,6 +41,6 @@ urlpatterns = [
         name="swagger-ui",
     ),
     # Misc:
-    path("api/ping/", views.ping, name="ping"),
-    path("api/version/", views.version, name="version"),
+    path("ping/", views.ping, name="ping"),
+    path("version/", views.version, name="version"),
 ]

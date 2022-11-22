@@ -33,7 +33,10 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
     best_of = 3
 
     parent = f"projects/{settings.GCLOUD_PROJECT}/locations/{settings.GCLOUD_LOCATION}"
-    job_name = f"{parent}/jobs/autoscrim_{instance.name_short}"
+    job_name = (
+        f"{parent}/jobs/"
+        f"{settings.GCLOUD_SCHEDULER_PREFIX}-autoscrim-{instance.name_short}"
+    )
     url = "https://{}{}".format(
         Site.objects.get_current().domain,
         reverse("episode-autoscrim", kwargs={"pk": instance.pk}),

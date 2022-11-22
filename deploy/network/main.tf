@@ -1,3 +1,7 @@
+locals {
+  subdomains = concat(["", "www.", "api."], [for b in var.additional_buckets : b.subdomain])
+}
+
 resource "google_compute_region_network_endpoint_group" "serverless" {
   name   = "${var.name}-serverless"
   region = var.gcp_region
@@ -15,24 +19,10 @@ resource "google_compute_backend_bucket" "home" {
   enable_cdn  = true
 }
 
-resource "google_compute_backend_bucket" "frontend" {
-  name        = "${var.name}-frontend"
-  bucket_name = var.storage_frontend_name
-  enable_cdn  = true
-}
+resource "google_compute_backend_bucket" "buckets" {
+  for_each = var.additional_buckets
 
-resource "google_compute_backend_bucket" "production" {
-  for_each = var.production_buckets
-
-  name        = "${var.name}-production-${each.key}"
-  bucket_name = each.value.bucket_name
-  enable_cdn  = each.value.enable_cdn
-}
-
-resource "google_compute_backend_bucket" "staging" {
-  for_each = var.staging_buckets
-
-  name        = "${var.name}-staging-${each.key}"
+  name        = "${var.name}-${each.key}"
   bucket_name = each.value.bucket_name
   enable_cdn  = each.value.enable_cdn
 }
@@ -51,12 +41,7 @@ module "lb" {
 
   ssl                             = true
   use_ssl_certificates            = false
-  managed_ssl_certificate_domains = [
-    "battlecode.org",
-    "play.battlecode.org",
-    "staging.battlecode.org",
-    "www.battlecode.org",
-  ]
+  managed_ssl_certificate_domains = [for subdomain in local.subdomains : "${subdomain}battlecode.org" ]
 
   backends = {
     serverless = {
@@ -113,45 +98,32 @@ resource "google_compute_url_map" "this" {
   default_service = google_compute_backend_bucket.home.self_link
 
   host_rule {
-    hosts        = ["play.battlecode.org"]
-    path_matcher = "production"
+    hosts        = ["api.battlecode.org"]
+    path_matcher = "backend"
   }
 
-  host_rule {
-    hosts        = ["staging.battlecode.org"]
-    path_matcher = "staging"
-  }
+  dynamic "host_rule" {
+    for_each = var.additional_buckets
+    iterator = bucket
 
-  path_matcher {
-    name            = "production"
-    default_service = google_compute_backend_bucket.frontend.self_link
-
-    path_rule {
-      paths = [
-        "/api",
-        "/api/*",
-      ]
-      service = module.lb.backend_services["serverless"].self_link
-    }
-    dynamic "path_rule" {
-      for_each = var.production_buckets
-      content {
-        paths   = path_rule.value.paths
-        service = google_compute_backend_bucket.production[path_rule.key].self_link
-      }
+    content {
+      hosts        = ["${bucket.value.subdomain}battlecode.org"]
+      path_matcher = bucket.key
     }
   }
 
   path_matcher {
-    name            = "staging"
-    default_service = google_compute_backend_bucket.frontend.self_link
+    name            = "backend"
+    default_service = module.lb.backend_services["serverless"].self_link
+  }
 
-    dynamic "path_rule" {
-      for_each = var.staging_buckets
-      content {
-        paths   = path_rule.value.paths
-        service = google_compute_backend_bucket.staging[path_rule.key].self_link
-      }
+  dynamic "path_matcher" {
+    for_each = var.additional_buckets
+    iterator = bucket
+
+    content {
+      name            = bucket.key
+      default_service = google_compute_backend_bucket.buckets[bucket.key].self_link
     }
   }
 }
@@ -161,7 +133,7 @@ data "google_dns_managed_zone" "this" {
 }
 
 resource "google_dns_record_set" "this" {
-  for_each = toset(["", "play.", "staging.", "www."])
+  for_each = toset(local.subdomains)
 
   name = "${each.value}${data.google_dns_managed_zone.this.dns_name}"
   type = "A"

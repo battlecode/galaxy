@@ -81,7 +81,7 @@ module "titan" {
 module "saturn_compile" {
   source = "../saturn"
 
-  name        = "saturn-${var.name}-compile"
+  name        = "${var.name}-saturn-compile"
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
@@ -105,7 +105,7 @@ module "saturn_compile" {
 module "saturn_execute" {
   source = "../saturn"
 
-  name        = "saturn-${var.name}-execute"
+  name        = "${var.name}-saturn-execute"
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone

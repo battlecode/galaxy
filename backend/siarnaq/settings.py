@@ -71,7 +71,6 @@ class Base(Configuration):
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
 
-    CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = True
 
     ROOT_URLCONF = "siarnaq.urls"
@@ -184,6 +183,9 @@ class Local(Base):
         "localhost",
         "127.0.0.1",
     ]
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
     GALAXY_ADMIN_EMAILS = ["admin@example.com"]
     GALAXY_ADMIN_USERNAME = "galaxy-admin"
@@ -198,8 +200,10 @@ class Local(Base):
     GCLOUD_TOPIC_EXECUTE = "nowhere-siarnaq-execute"
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
+    GCLOUD_SCHEDULER_PREFIX = "nothing"
 
     DEBUG = True
+    CORS_ALLOW_ALL_ORIGINS = True
     EMAIL_ENABLED = False
 
     GCLOUD_CREDENTIALS, GCLOUD_PROJECT = None, "null-project"
@@ -224,11 +228,14 @@ class Staging(Base):
         "localhost",
         "127.0.0.1",
     ]
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
 
     GALAXY_ADMIN_EMAILS = [
         "staging-siarnaq-agent@mitbattlecode.iam.gserviceaccount.com",
-        "saturn-staging-compile@mitbattlecode.iam.gserviceaccount.com",
-        "saturn-staging-execute@mitbattlecode.iam.gserviceaccount.com",
+        "staging-saturn-compile@mitbattlecode.iam.gserviceaccount.com",
+        "staging-saturn-execute@mitbattlecode.iam.gserviceaccount.com",
     ]
     GALAXY_ADMIN_USERNAME = "galaxy-admin"
 
@@ -242,8 +249,10 @@ class Staging(Base):
     GCLOUD_TOPIC_EXECUTE = "staging-siarnaq-execute"
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
+    GCLOUD_SCHEDULER_PREFIX = "staging"
 
     DEBUG = True
+    CORS_ALLOW_ALL_ORIGINS = True
     EMAIL_ENABLED = False
 
     @classmethod
@@ -284,11 +293,14 @@ class Production(Base):
     ALLOWED_HOSTS = [
         "play.battlecode.org",
     ]
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
     GALAXY_ADMIN_EMAILS = [
         "production-siarnaq-agent@mitbattlecode.iam.gserviceaccount.com",
-        "saturn-production-compile@mitbattlecode.iam.gserviceaccount.com",
-        "saturn-production-execute@mitbattlecode.iam.gserviceaccount.com",
+        "production-saturn-compile@mitbattlecode.iam.gserviceaccount.com",
+        "production-saturn-execute@mitbattlecode.iam.gserviceaccount.com",
     ]
     GALAXY_ADMIN_USERNAME = "galaxy-admin"
 
@@ -302,8 +314,10 @@ class Production(Base):
     GCLOUD_TOPIC_EXECUTE = "production-siarnaq-execute"
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
+    GCLOUD_SCHEDULER_PREFIX = "production"
 
     DEBUG = False
+    CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://\w+\.battlecode\.org$"]
     EMAIL_ENABLED = True
 
     @classmethod
