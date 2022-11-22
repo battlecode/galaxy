@@ -96,7 +96,16 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MatchParticipant
-        fields = ["team", "teamname", "submission", "score", "rating", "old_rating"]
+        fields = [
+            "team",
+            "teamname",
+            "submission",
+            "match",
+            "player_index",
+            "score",
+            "rating",
+            "old_rating",
+        ]
         read_only_fields = fields
 
     @extend_schema_field(OpenApiTypes.DOUBLE)
