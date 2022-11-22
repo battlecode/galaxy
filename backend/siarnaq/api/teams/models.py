@@ -191,3 +191,9 @@ class TeamProfile(models.Model):
         EligibilityCriterion, related_name="teams", blank=True
     )
     """The eligibility criteria that this team satisfies."""
+
+    def save(self, *args, **kwargs):
+        """Save to database, ensuring the profile has a rating."""
+        if self._state.adding and self.rating_id is None:
+            self.rating = Rating.objects.create()
+        super().save(*args, **kwargs)
