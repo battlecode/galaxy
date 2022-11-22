@@ -15,12 +15,6 @@ resource "google_compute_backend_bucket" "home" {
   enable_cdn  = true
 }
 
-resource "google_compute_backend_bucket" "frontend" {
-  name        = "${var.name}-frontend"
-  bucket_name = var.storage_frontend_name
-  enable_cdn  = true
-}
-
 resource "google_compute_backend_bucket" "production" {
   for_each = var.production_buckets
 
@@ -124,7 +118,6 @@ resource "google_compute_url_map" "this" {
 
   path_matcher {
     name            = "production"
-    default_service = google_compute_backend_bucket.frontend.self_link
 
     path_rule {
       paths = [
@@ -144,7 +137,6 @@ resource "google_compute_url_map" "this" {
 
   path_matcher {
     name            = "staging"
-    default_service = google_compute_backend_bucket.frontend.self_link
 
     dynamic "path_rule" {
       for_each = var.staging_buckets
