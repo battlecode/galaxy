@@ -8,6 +8,12 @@ resource "google_service_account" "this" {
   description  = "Service account for performing Siarnaq actions"
 }
 
+resource "google_service_account_iam_member" "sign" {
+  service_account_id = google_service_account.this.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${google_service_account.this.email}"
+}
+
 resource "google_service_account_iam_member" "actas" {
   service_account_id = google_service_account.this.name
   role               = "roles/iam.serviceAccountUser"

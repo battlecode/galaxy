@@ -1,10 +1,7 @@
-import io
-
 import google.cloud.storage as storage
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
-from django.http import FileResponse
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -22,12 +19,14 @@ from siarnaq.api.compete.serializers import (
     MatchReportSerializer,
     MatchSerializer,
     ScrimmageRequestSerializer,
+    SubmissionDownloadSerializer,
     SubmissionReportSerializer,
     SubmissionSerializer,
 )
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.models import Team
 from siarnaq.api.teams.permissions import IsOnTeam
+from siarnaq.gcloud import titan
 
 
 class EpisodeTeamUserContextMixin:
@@ -117,31 +116,17 @@ class SubmissionViewSet(
             headers=headers,
         )
 
-    @extend_schema(
-        responses={
-            status.HTTP_200_OK: OpenApiResponse(
-                description="Successfully retrieved the requested file"
-            )
-        }
-    )
-    @action(detail=True, methods=["get"])
+    @action(detail=True, methods=["get"], serializer_class=SubmissionDownloadSerializer)
     def download(self, request, pk=None, *, episode_id):
         """Download the source code associated with a submission."""
         submission = self.get_object()
-        if settings.GCLOUD_ENABLE_ACTIONS:
-            client = storage.Client(credentials=settings.GCLOUD_CREDENTIALS)
-            blob = (
-                client.bucket(settings.GCLOUD_BUCKET_SECURE)
-                .blob(submission.get_source_path())
-                .open("rb")
-            )
-        else:
-            blob = io.BytesIO()
-        return FileResponse(
-            blob,
-            as_attachment=True,
-            filename="submission.zip",
+        data = titan.get_object(
+            bucket=settings.GCLOUD_BUCKET_SECURE,
+            name=submission.get_source_path(),
+            check_safety=False,
         )
+        serializer = self.get_serializer(data)
+        return Response(serializer.data)
 
     @extend_schema(
         responses={
