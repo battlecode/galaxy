@@ -331,10 +331,10 @@ class Api {
       dataType: "json",
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr.responseJSON, false);
       });
   }
 
@@ -418,10 +418,10 @@ class Api {
       dataType: "json",
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr.responseJSON, false);
       });
   }
 
@@ -793,7 +793,7 @@ class Api {
         );
       })
       .fail((xhr, status, error) => {
-        callback(JSON.stringify(xhr.responseJSON), false);
+        callback(xhr.responseJSON, false);
       });
   }
 

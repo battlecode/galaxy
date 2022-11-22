@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import Api from "../api";
 
 import TeamCard from "../components/teamCard";
+import Alert from "../components/alert";
 import MultiEpisode from "./multi-episode";
 import Floater from "react-floater";
+import { get_team_errors } from "../utils/error_handling";
 
 class YesTeam extends Component {
   constructor(props) {
@@ -18,6 +20,7 @@ class YesTeam extends Component {
     this.state = {
       team_profile: copied_team_profile,
       up: "Update Info",
+      errors: [],
     };
 
     this.changeHandler = this.changeHandler.bind(this);
@@ -57,10 +60,14 @@ class YesTeam extends Component {
     Api.updateTeam(
       this.state.team_profile,
       this.props.episode,
-      function (response) {
-        if (response) this.setState({ up: '<i class="fa fa-check"></i>' });
-        else this.setState({ up: '<i class="fa fa-times"></i>' });
-        this.props.updateBaseState();
+      function (response_json, success) {
+        if (success) {
+          this.setState({ up: '<i class="fa fa-check"></i>' });
+          this.props.updateBaseState();
+        } else {
+          this.setState({ up: '<i class="fa fa-times"></i>' });
+          this.setState({ errors: get_team_errors(response_json) });
+        }
         setTimeout(
           function () {
             this.setState({ up: "Update Info" });
@@ -82,8 +89,18 @@ class YesTeam extends Component {
   }
 
   render() {
+    // Error reporting
+    const errors = this.state.errors;
+    let alert_message;
+    if (errors.length > 0) {
+      const [first_field, first_error] = errors[0];
+      alert_message = `Error in field ${first_field}: ${first_error}`;
+    } else {
+      alert_message = "";
+    }
     return (
       <div>
+        <Alert alert_message={alert_message} closeAlert={this.closeAlert} />
         <div className="col-md-8">
           <div className="card">
             <div className="header">
@@ -239,8 +256,7 @@ class NoTeam extends Component {
       team_name: "",
       join_key: "",
       team_join_name: "",
-      joinTeamError: false,
-      createTeamError: false,
+      alert_message: "",
     };
 
     this.joinTeam = this.joinTeam.bind(this);
@@ -267,8 +283,12 @@ class NoTeam extends Component {
   }
 
   joinCallback = (success) => {
-    this.setState({ joinTeamError: !success });
     if (success) this.props.updateBaseState();
+    else
+      this.setState({
+        alert_message:
+          "Sorry, that team name and join key combination is not valid.",
+      });
   };
 
   createTeam() {
@@ -280,27 +300,24 @@ class NoTeam extends Component {
   }
 
   createTeamCallback = (success) => {
-    this.setState({ createTeamError: !success });
     if (success) this.props.updateBaseState();
+    else
+      this.setState({
+        alert_message: "Sorry, this team name is already being used.",
+      });
   };
 
-  renderError(type, data) {
-    if (data === true) {
-      let message = "";
-      if (type === "createTeamError") {
-        message = "Sorry, this team name is already being used.";
-      } else if (type === "joinTeamError") {
-        message =
-          "Sorry, that team name and join key combination is not valid.";
-      }
-
-      return <p style={{ color: "#FF4A55" }}> {message} </p>;
-    }
-  }
+  closeAlert = () => {
+    this.setState({ alert_message: "" });
+  };
 
   render() {
     return (
       <div className="col-md-12">
+        <Alert
+          alert_message={this.state.alert_message}
+          closeAlert={this.closeAlert}
+        />
         <div className="card">
           <div className="header">
             <h4 className="title">Create a Team</h4>
@@ -319,7 +336,6 @@ class NoTeam extends Component {
                 </div>
               </div>
             </div>
-            {this.renderError("createTeamError", this.state.createTeamError)}
             <button
               type="button"
               className="btn btn-info btn-fill pull-right"
@@ -360,7 +376,6 @@ class NoTeam extends Component {
                 </div>
               </div>
             </div>
-            {this.renderError("joinTeamError", this.state.joinTeamError)}
             <button
               type="button"
               className="btn btn-info btn-fill pull-right"

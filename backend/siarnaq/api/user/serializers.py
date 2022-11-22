@@ -51,7 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         if check_query.exists():
             raise serializers.ValidationError(
-                f"A user with that ${field_name} already exists."
+                f"A user with that {field_name} already exists."
             )
 
         return field_value
