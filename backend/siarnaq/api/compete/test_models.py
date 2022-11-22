@@ -34,7 +34,9 @@ class MatchParticipantLinkedListTestCase(TestCase):
             Submission.objects.create(
                 episode=e1,
                 team=t,
-                user=User.objects.create_user(username=name + "_user", password=name),
+                user=User.objects.create_user(
+                    username=name + "_user", email=f"{name}@example.com"
+                ),
                 accepted=True,
             )
 
@@ -136,7 +138,9 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
             Submission.objects.create(
                 episode=e1,
                 team=t,
-                user=User.objects.create_user(username=name + "_user", password=name),
+                user=User.objects.create_user(
+                    username=name + "_user", email=f"{name}@example.com"
+                ),
                 accepted=True,
             )
 
@@ -470,7 +474,9 @@ class ScrimmageRequestQuerySetTestCase(TestCase):
             Submission.objects.create(
                 episode=e1,
                 team=t,
-                user=User.objects.create_user(username=name + "_user", password=name),
+                user=User.objects.create_user(
+                    username=name + "_user", email=f"{name}@example.com"
+                ),
                 accepted=True,
             )
             self.teams.append(t)

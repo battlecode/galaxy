@@ -43,13 +43,19 @@ class SubmissionViewSetTestCase(APITestCase):
             submission_frozen=False,
             language=Language.JAVA_8,
         )
-        self.user = User.objects.create_user(username="user1")
+        self.user = User.objects.create_user(
+            username="user1", email="user1@example.com"
+        )
         self.team = Team.objects.create(episode=self.e1, name="team1")
         self.team.members.add(self.user)
-        other_user = User.objects.create_user(username="user2")
+        other_user = User.objects.create_user(
+            username="user2", email="user2@example.com"
+        )
         other_team = Team.objects.create(episode=self.e1, name="team2")
         other_team.members.add(other_user)
-        self.admin = User.objects.create_user(username="admin", is_staff=True)
+        self.admin = User.objects.create_user(
+            username="admin", email="admin@example.com", is_staff=True
+        )
 
     # Partitions for: create.
     # user: on team, not on team, not authenticated
@@ -144,7 +150,9 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertFalse(Submission.objects.exists())
 
     def test_create_no_team(self):
-        self.client.force_authenticate(User.objects.create_user(username="user3"))
+        self.client.force_authenticate(
+            User.objects.create_user(username="user3", email="user3@example.com")
+        )
         with io.BytesIO(b"abcdefg") as f:
             response = self.client.post(
                 reverse("submission-list", kwargs={"episode_id": "e1"}),
@@ -315,7 +323,9 @@ class MatchSerializerTestCase(TestCase):
 
         self.users, self.teams, self.submissions = [], [], []
         for i in range(4):
-            u = User.objects.create(username=f"user{i}")
+            u = User.objects.create_user(
+                username=f"user{i}", email=f"user{i}@example.com"
+            )
             t = Team.objects.create(episode=self.e1, name=f"team{i}")
             t.members.add(u)
             self.submissions.append(
@@ -327,7 +337,9 @@ class MatchSerializerTestCase(TestCase):
             self.teams.append(t)
         self.teams[-1].status = TeamStatus.STAFF
         self.teams[-1].save()
-        self.staff = User.objects.create(username="staff", is_staff=True)
+        self.staff = User.objects.create_user(
+            username="staff", email="staff@example.com", is_staff=True
+        )
 
     # Partitions:
     # user: admin, not admin
@@ -820,7 +832,9 @@ class MatchViewSetTestCase(APITestCase):
 
         self.users, self.teams, self.submissions = [], [], []
         for i in range(2):
-            u = User.objects.create(username=f"user{i}")
+            u = User.objects.create_user(
+                username=f"user{i}", email=f"user{i}@example.com"
+            )
             t = Team.objects.create(episode=self.e1, name=f"team{i}")
             t.members.add(u)
             self.submissions.append(
@@ -944,7 +958,9 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             )
         self.users, self.teams, self.submissions = [], [], []
         for i in range(3):
-            u = User.objects.create(username=f"user{i}")
+            u = User.objects.create_user(
+                username=f"user{i}", email=f"user{i}@example.com"
+            )
             t = Team.objects.create(
                 episode=self.e1 if i < 2 else self.e2, name=f"team{i}"
             )
