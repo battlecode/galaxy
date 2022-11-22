@@ -27,6 +27,7 @@ jobs:
         with:
           environment-file: environment-dev.yml
           use-only-tar-bz2: true
+          mamba-version: "*"
       - name: Run linter
         run: |
           pre-commit install
@@ -50,6 +51,7 @@ jobs:
         with:
           environment-file: environment-dev.yml
           use-only-tar-bz2: true
+          mamba-version: "*"
       - name: Initialize migrations
         run: ./manage.py makemigrations
         working-directory: ./backend
