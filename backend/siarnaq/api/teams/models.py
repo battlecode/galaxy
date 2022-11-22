@@ -29,6 +29,11 @@ class EligibilityCriterion(models.Model):
 class Rating(models.Model):
     """
     An immutable database model for a Penalized Elo rating.
+
+    While only intended for two-player games, this model computes rating changes for
+    arbitrary N-player games. This is purely for the sake of potential future
+    extensibility. The actual outputs here for games with more than 2 players may be
+    nonsensical.
     """
 
     mean = models.FloatField(default=settings.TEAMS_ELO_INITIAL)
@@ -37,19 +42,22 @@ class Rating(models.Model):
     n = models.PositiveIntegerField(default=0)
     """The number of rated games played before this rating."""
 
-    def step(self, opponent_rating, score):
+    def step(self, opponent_ratings, score):
         """Produce the new rating after a specific match is played."""
-        e_self = self.win_probability(opponent_rating)
+        e_self = self.expected_score(opponent_ratings)
         new_mean = self.mean + settings.TEAMS_ELO_K * (score - e_self)
         return Rating.objects.create(
             mean=new_mean,
             n=self.n + 1,
         )
 
-    def win_probability(self, opponent_rating):
-        """Return the probability of winning against a given opponent."""
-        diff = self.mean - opponent_rating.mean
-        return 1 / (1 + 10 ** (-diff / settings.TEAMS_ELO_SCALE))
+    def expected_score(self, opponent_ratings):
+        """Return the expected score against a given set of opponents."""
+        total = 0
+        for r in opponent_ratings:
+            diff = self.mean - r.mean
+            total += 1 / (1 + 10 ** (-diff / settings.TEAMS_ELO_SCALE))
+        return total / len(opponent_ratings)
 
     def to_value(self):
         """Return the penalized version of this Elo rating."""

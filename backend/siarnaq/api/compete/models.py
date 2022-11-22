@@ -206,8 +206,11 @@ class Match(SaturnInvocation):
         """Try to finalize the ratings of the participations if possible."""
         if self.is_ranked and not self.is_finalized():
             return  # Not ready yet
-        for participant in self.participants.all():
-            participant.try_finalize_rating(self.participants.all())
+        participants = self.participants.all()
+        for i, participant in enumerate(participants):
+            participant.try_finalize_rating(
+                opponents=[o for o in participants if o is not participant]
+            )
 
 
 class MatchParticipant(models.Model):
@@ -290,7 +293,7 @@ class MatchParticipant(models.Model):
             return None
         return self.rating.to_value() - self.get_old_rating().to_value()
 
-    def try_finalize_rating(self, *, opponent):
+    def try_finalize_rating(self, *, opponents):
         """
         Attempt to finalize the rating for this participation if ready.
 
@@ -312,7 +315,7 @@ class MatchParticipant(models.Model):
 
         Parameters
         ----------
-        opponent : MatchParticipant
+        opponent : list[MatchParticipant]
             The opponent of this participation. Should be the return value of
             match.get_opponent(self)
         """
@@ -335,11 +338,13 @@ class MatchParticipant(models.Model):
                 # Occurs when this is the team's first-ever match.
                 old_rating.save()
             self.rating = old_rating
+
         elif self.match.is_finalized():
-            opponent_rating = opponent.get_old_rating()
-            if opponent_rating is not None:
+            opponent_ratings = [opponent.get_old_rating() for opponent in opponents]
+            total_score = self.score + sum(opponent.score for opponent in opponents)
+            if all(r is not None for r in opponent_ratings):
                 self.rating = self.get_old_rating().step(
-                    opponent_rating, self.score / (self.score + opponent.score)
+                    opponent_ratings, self.score / total_score
                 )
 
         if self.rating is not None:
