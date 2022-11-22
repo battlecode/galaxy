@@ -71,7 +71,6 @@ class Base(Configuration):
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
 
-    CORS_ORIGIN_ALLOW_ALL = True
     CORS_ALLOW_CREDENTIALS = True
 
     ROOT_URLCONF = "siarnaq.urls"
@@ -200,6 +199,7 @@ class Local(Base):
     GCLOUD_ORDER_EXECUTE = "execute-order"
 
     DEBUG = True
+    CORS_ALLOW_ALL_ORIGINS = True
     EMAIL_ENABLED = False
 
     GCLOUD_CREDENTIALS, GCLOUD_PROJECT = None, "null-project"
@@ -244,6 +244,7 @@ class Staging(Base):
     GCLOUD_ORDER_EXECUTE = "execute-order"
 
     DEBUG = True
+    CORS_ALLOW_ALL_ORIGINS = True
     EMAIL_ENABLED = False
 
     @classmethod
@@ -304,6 +305,7 @@ class Production(Base):
     GCLOUD_ORDER_EXECUTE = "execute-order"
 
     DEBUG = False
+    CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://\w+\.battlecode\.org$"]
     EMAIL_ENABLED = True
 
     @classmethod
