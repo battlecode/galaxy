@@ -12,7 +12,6 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-import siarnaq.gcloud as gcloud
 from siarnaq.api.user.models import UserProfile
 from siarnaq.api.user.permissions import IsAuthenticatedAsRequestedUser
 from siarnaq.api.user.serializers import (
@@ -65,7 +64,7 @@ class UserProfileViewSet(
                     raise Http404
                 try:
                     f = titan.get_object_if_safe(
-                        gcloud.secure_bucket, profile.get_resume_path()
+                        settings.GCLOUD_BUCKET_SECURE, profile.get_resume_path()
                     )
                 except titan.RequestRefused as e:
                     return Response(e.reason, status.HTTP_404_NOT_FOUND)
@@ -78,9 +77,9 @@ class UserProfileViewSet(
                 with transaction.atomic():
                     profile.has_resume = True
                     profile.save(update_fields=["has_resume"])
-                    if gcloud.enable_actions:
-                        client = storage.Client(credentials=gcloud.credentials)
-                        blob = client.bucket(gcloud.secure_bucket).blob(
+                    if settings.GCLOUD_ENABLE_ACTIONS:
+                        client = storage.Client(credentials=settings.GCLOUD_CREDENTIALS)
+                        blob = client.bucket(settings.GCLOUD_BUCKET_SECURE).blob(
                             profile.get_resume_path()
                         )
                         with blob.open("wb", content_type="application/pdf") as f:
@@ -113,9 +112,9 @@ class UserProfileViewSet(
             profile.has_avatar = True
             profile.avatar_uuid = uuid.uuid4()
             profile.save(update_fields=["has_avatar", "avatar_uuid"])
-            if gcloud.enable_actions:
+            if settings.GCLOUD_ENABLE_ACTIONS:
                 client = storage.Client()
-                blob = client.bucket(gcloud.public_bucket).blob(
+                blob = client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(
                     profile.get_avatar_path()
                 )
                 blob.upload_from_string(img_bytes)

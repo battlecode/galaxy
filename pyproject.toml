@@ -11,7 +11,7 @@ python_version = "3.10"
 mypy_path = "backend"
 ignore_missing_imports = true
 scripts_are_modules = true
-plugins = "mypy_django_plugin.main"
+plugins = "backend/mypy_django_configurations_plugin.py"
 
 [tool.django-stubs]
 django_settings_module = "siarnaq.settings"

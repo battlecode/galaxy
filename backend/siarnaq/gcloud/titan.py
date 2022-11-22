@@ -2,8 +2,7 @@ import io
 from typing import BinaryIO
 
 import google.cloud.storage as storage
-
-from .auth import credentials, enable_actions
+from django.conf import settings
 
 
 class RequestRefused(Exception):
@@ -43,9 +42,9 @@ def request_scan(blob: storage.Blob) -> None:
 
 def get_object_if_safe(bucket: str, name: str) -> BinaryIO:
     """Retrieve a file, raising RequestRefused is Titan has not marked it as safe."""
-    if not enable_actions:
+    if not settings.GCLOUD_ENABLE_ACTIONS:
         return io.BytesIO()
-    client = storage.Client(credentials=credentials)
+    client = storage.Client(credentials=settings.GCLOUD_CREDENTIALS)
     blob = client.bucket(bucket).get_blob(name)
     match blob.metadata:
         case {"Titan-Status": "Unverified"}:

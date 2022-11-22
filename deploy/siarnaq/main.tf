@@ -79,6 +79,10 @@ resource "google_sql_database" "this" {
   instance = google_sql_database_instance.this.name
 }
 
+resource "random_password" "django_key" {
+  length = 50
+}
+
 resource "random_password" "db_password" {
   length = 24
 }
@@ -90,7 +94,7 @@ resource "google_sql_user" "this" {
 }
 
 resource "google_secret_manager_secret" "this" {
-  secret_id = "${var.name}-secrets"
+  secret_id = var.name
 
   replication {
     automatic = true
@@ -101,6 +105,7 @@ resource "google_secret_manager_secret_version" "this" {
   secret = google_secret_manager_secret.this.id
 
   secret_data = jsonencode({
+    "django-key" : random_password.django_key.result,
     "mailjet-api-key" : var.mailjet_api_key,
     "mailjet-api-secret" : var.mailjet_api_secret,
     "db-password" : random_password.db_password.result
