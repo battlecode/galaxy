@@ -260,7 +260,7 @@ class Staging(Base):
         )
         secrets = json.loads(
             _get_secret(
-                cls.GCLOUD_CREDENTIALS, cls.GCLOUD_PROJECT, "staging-siarnaq-secrets"
+                cls.GCLOUD_CREDENTIALS, cls.GCLOUD_PROJECT, "staging-siarnaq"
             ).decode()
         )
         cls.SECRET_KEY = secrets["django-key"]
@@ -312,7 +312,7 @@ class Production(Base):
         cls.GCLOUD_CREDENTIALS, cls.GCLOUD_PROJECT = google.auth.default()
         secrets = json.loads(
             _get_secret(
-                cls.GCLOUD_CREDENTIALS, cls.GCLOUD_PROJECT, "production-siarnaq-secrets"
+                cls.GCLOUD_CREDENTIALS, cls.GCLOUD_PROJECT, "production-siarnaq"
             ).decode()
         )
         cls.SECRET_KEY = secrets["django-key"]
