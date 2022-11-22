@@ -198,6 +198,7 @@ class Local(Base):
     GCLOUD_TOPIC_EXECUTE = "nowhere-siarnaq-execute"
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
+    GCLOUD_SCHEDULER_PREFIX = "nothing"
 
     DEBUG = True
     EMAIL_ENABLED = False
@@ -242,6 +243,7 @@ class Staging(Base):
     GCLOUD_TOPIC_EXECUTE = "staging-siarnaq-execute"
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
+    GCLOUD_SCHEDULER_PREFIX = "staging"
 
     DEBUG = True
     EMAIL_ENABLED = False
@@ -302,6 +304,7 @@ class Production(Base):
     GCLOUD_TOPIC_EXECUTE = "production-siarnaq-execute"
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
+    GCLOUD_SCHEDULER_PREFIX = "production"
 
     DEBUG = False
     EMAIL_ENABLED = True
