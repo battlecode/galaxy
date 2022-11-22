@@ -127,29 +127,23 @@ class ScrimmageRequestQuerySet(models.QuerySet):
                 .values_list("pk", "active_submission")
                 .all()
             )
-            participations = MatchParticipant.objects.bulk_create(
-                MatchParticipant(
-                    team_id=team_id,
-                    submission_id=team_submissions[team_id],
-                )
-                for request in requests
-                for team_id in (
-                    [request.requested_by_id, request.requested_to_id]
-                    if request.determine_is_requester_red_first()
-                    else [request.requested_to_id, request.requested_by_id]
-                )
-            )
             matches = Match.objects.bulk_create(
                 Match(
                     episode_id=request.episode_id,
-                    red=red,
-                    blue=blue,
-                    alternate_color=request.is_alternating_color(),
+                    alternate_order=request.determine_is_alternating(),
                     is_ranked=request.is_ranked,
                 )
-                for red, blue, request in zip(
-                    participations[0::2], participations[1::2], requests
+                for request in requests
+            )
+            MatchParticipant.objects.bulk_create(
+                MatchParticipant(
+                    team_id=team_id,
+                    submission_id=team_submissions[team_id],
+                    match=match,
+                    player_index=player_index,
                 )
+                for request, match in zip(requests, matches)
+                for player_index, team_id in enumerate(request.determine_order())
             )
             Match.maps.through.objects.bulk_create(
                 Match.maps.through(match=match, map=map_obj)

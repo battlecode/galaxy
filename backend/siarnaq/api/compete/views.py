@@ -168,16 +168,14 @@ class MatchViewSet(
     def get_queryset(self):
         return (
             Match.objects.filter(episode=self.kwargs["episode_id"])
-            .select_related(
-                "red__previous_participation__rating",
-                "blue__previous_participation__rating",
-                "red__rating",
-                "blue__rating",
-                "red__team__profile__rating",
-                "blue__team__profile__rating",
-                "tournament_round",
+            .select_related("tournament_round")
+            .prefetch_related(
+                "participants__previous_participation__rating",
+                "participants__rating",
+                "participants__team__profile__rating",
+                "participants__team__members",
+                "maps",
             )
-            .prefetch_related("red__team__members", "blue__team__members", "maps")
             .order_by("-pk")
         )
 
@@ -194,7 +192,7 @@ class MatchViewSet(
         # is a design choice not to return any tournament matches at all, because it
         # seems logical that they are not part of a scrimmage listing.
         queryset = self.get_queryset().filter(
-            Q(red__team__members=request.user) | Q(blue__team__members=request.user),
+            participants__team__members=request.user,
             tournament_round__isnull=True,
         )
         page = self.paginate_queryset(queryset)

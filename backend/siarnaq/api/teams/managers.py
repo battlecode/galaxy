@@ -163,25 +163,23 @@ class TeamQuerySet(models.QuerySet):
         MatchParticipant = apps.get_model("compete", "MatchParticipant")
         Match = apps.get_model("compete", "Match")
         with transaction.atomic():
-            participations = MatchParticipant.objects.bulk_create(
-                MatchParticipant(
-                    team_id=teams[node]["pk"],
-                    submission_id=teams[node]["active_submission"],
-                )
-                for edge in edges
-                for node in edge
-            )
-            if len(participations) % 2 != 0:
-                raise RuntimeError("Unexpected odd number of participations")
             matches = Match.objects.bulk_create(
                 Match(
                     episode=episode,
-                    red=red,
-                    blue=blue,
-                    alternate_color=True,
+                    alternate_order=True,
                     is_ranked=True,
                 )
-                for red, blue in zip(participations[0::2], participations[1::2])
+                for edge in edges
+            )
+            MatchParticipant.objects.bulk_create(
+                MatchParticipant(
+                    team_id=teams[node]["pk"],
+                    submission_id=teams[node]["active_submission"],
+                    match=match,
+                    player_index=player_index,
+                )
+                for edge, match in zip(edges, matches)
+                for player_index, node in enumerate(edge)
             )
             Match.maps.through.objects.bulk_create(
                 Match.maps.through(match_id=match.pk, map_id=map_id)
