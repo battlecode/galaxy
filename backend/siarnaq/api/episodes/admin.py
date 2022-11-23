@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from siarnaq.api.compete.models import Match
 from siarnaq.api.episodes.models import (
     EligibilityCriterion,
     Episode,
@@ -13,6 +14,7 @@ class MapInline(admin.TabularInline):
     model = Map
     extra = 0
     fields = ("name", "is_public")
+    ordering = ("name",)
 
 
 @admin.register(Episode)
@@ -50,6 +52,7 @@ class EpisodeAdmin(admin.ModelAdmin):
     )
     inlines = [MapInline]
     list_display = ("name_short", "name_long", "game_release")
+    ordering = ("-game_release",)
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
 
@@ -59,6 +62,7 @@ class MapAdmin(admin.ModelAdmin):
     fields = ("name", "episode", "is_public")
     list_display = ("name", "episode", "is_public")
     list_select_related = ("episode",)
+    ordering = ("-episode__game_release", "name")
     search_fields = ("name",)
     search_help_text = "Search for a map name."
 
@@ -67,19 +71,21 @@ class MapAdmin(admin.ModelAdmin):
 class EligibilityCriterionAdmin(admin.ModelAdmin):
     fields = ("question", "icon")
     list_display = ("question", "icon")
+    ordering = ("question",)
     search_fields = ("question",)
     search_help_text = "Search for a question."
 
 
-class TournamentRoundInline(admin.StackedInline):
+class TournamentRoundInline(admin.TabularInline):
     model = TournamentRound
     extra = 0
-    fields = (
-        ("name", "challonge_id", "is_released"),
-        ("maps",),
-    )
+    fields = ("name", "maps", "challonge_id", "is_released")
+    ordering = ("challonge_id",)
     raw_id_fields = ("maps",)
     readonly_fields = ("challonge_id",)
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("maps")
 
 
 @admin.register(Tournament)
@@ -121,9 +127,28 @@ class TournamentAdmin(admin.ModelAdmin):
         "in_progress",
     )
     list_select_related = ("episode",)
+    ordering = ("-episode__game_release", "-submission_freeze")
     readonly_fields = ("in_progress",)
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
+
+
+class MatchInline(admin.TabularInline):
+    model = Match
+    classes = ("collapse",)
+    extra = 0
+    fields = ("__str__", "created", "replay", "status")
+    ordering = ("-pk",)
+    readonly_fields = fields
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("participants__team")
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def has_delete_permission(self, request, obj):
+        return False
 
 
 @admin.register(TournamentRound)
@@ -132,7 +157,9 @@ class TournamentRoundAdmin(admin.ModelAdmin):
         ("name", "challonge_id", "is_released"),
         ("maps",),
     )
+    inlines = [MatchInline]
     list_display = ("name", "tournament", "is_released")
     list_select_related = ("tournament",)
+    ordering = ("-tournament__submission_freeze", "challonge_id")
     raw_id_fields = ("maps",)
     readonly_fields = ("challonge_id",)

@@ -26,7 +26,8 @@ class SubmissionAdmin(admin.ModelAdmin):
         "status",
         "created",
     )
-    list_select_related = ("team", "user", "episode")
+    list_select_related = ("team", "episode")
+    ordering = ("-pk",)
     raw_id_fields = ("team", "user")
     readonly_fields = (
         "status",
@@ -41,11 +42,14 @@ class MatchParticipantInline(admin.StackedInline):
         ("team", "submission"),
         ("player_index", "score", "rating"),
     )
+    ordering = ("player_index",)
     raw_id_fields = ("team", "submission")
-    readonly_fields = (
-        "player_index",
-        "rating",
-    )
+    readonly_fields = ("rating",)
+
+    def get_queryset(self, request):
+        return (
+            super().get_queryset(request).select_related("team", "submission", "rating")
+        )
 
 
 @admin.register(Match)
@@ -60,13 +64,13 @@ class MatchAdmin(admin.ModelAdmin):
     )
     inlines = [MatchParticipantInline]
     list_display = (
-        "pk",
         "__str__",
         "episode",
         "tournament_round",
         "status",
         "created",
     )
+    ordering = ("-pk",)
     raw_id_fields = ("tournament_round", "maps")
     readonly_fields = ("replay", "status", "created")
 
@@ -96,5 +100,6 @@ class ScrimmageRequestAdmin(admin.ModelAdmin):
         "is_ranked",
     )
     list_select_related = ("requested_by", "requested_to", "episode")
+    ordering = ("-pk",)
     raw_id_fields = ("requested_by", "requested_to", "maps")
     readonly_fields = ("created", "status")

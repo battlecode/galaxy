@@ -113,6 +113,9 @@ class Submission(SaturnInvocation):
 
     objects = SubmissionQuerySet.as_manager()
 
+    def __str__(self):
+        return f"#{self.pk}"
+
     def get_source_path(self):
         """Return the path of the source code on Google cloud storage."""
         return posixpath.join(
@@ -182,7 +185,11 @@ class Match(SaturnInvocation):
     objects = MatchQuerySet.as_manager()
 
     def __str__(self):
-        return " \u2022 ".join(str(p) for p in self.participants.all())
+        return (
+            f"#{self.pk} ("
+            + " \u2022 ".join(str(p) for p in self.participants.all())
+            + ")"
+        )
 
     def get_replay_path(self):
         """Return the path to the replay file."""
