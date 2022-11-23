@@ -2,7 +2,6 @@ from django.apps import apps
 from django.db import models
 from django.utils import timezone
 
-import siarnaq.api.refs as refs
 from siarnaq.api.episodes.managers import EpisodeQuerySet
 
 
@@ -13,6 +12,21 @@ class Language(models.TextChoices):
 
     JAVA_8 = "java8"
     PYTHON_3 = "py3"
+
+
+class EligibilityCriterion(models.Model):
+    """
+    A database model for an eligibility criterion for entering into a tournament.
+    """
+
+    question = models.TextField()
+    """The text question to be asked for this criterion."""
+
+    icon = models.CharField(max_length=8)
+    """An icon to display for teams that satisfy this criterion."""
+
+    def __str__(self) -> str:
+        return self.question
 
 
 class Episode(models.Model):
@@ -61,6 +75,11 @@ class Episode(models.Model):
 
     release_version = models.SlugField(max_length=32, blank=True)
     """The most up-to-date version of the episode code release."""
+
+    eligibility_criteria = models.ManyToManyField(
+        EligibilityCriterion, related_name="episodes"
+    )
+    """The eligibility criteria active in this episode."""
 
     pass_requirement_win = models.PositiveSmallIntegerField(null=True, blank=True)
     """
@@ -126,25 +145,6 @@ class Map(models.Model):
                 name="map-unique-episode-name",
             )
         ]
-
-
-class EligibilityCriterion(models.Model):
-    """
-    A database model for an eligibility criterion for entering into a tournament.
-    """
-
-    episode = models.ForeignKey(
-        refs.EPISODE_MODEL,
-        on_delete=models.CASCADE,
-        related_name="eligibility_criteria",
-    )
-    """The episode to which this criterion belongs."""
-
-    question = models.TextField()
-    """The text question to be asked for this criterion."""
-
-    icon = models.CharField(max_length=8)
-    """An icon to display for teams that satisfy this criterion."""
 
 
 class TournamentStyle(models.TextChoices):

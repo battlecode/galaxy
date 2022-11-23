@@ -9,6 +9,12 @@ from siarnaq.api.episodes.models import (
 )
 
 
+class MapInline(admin.TabularInline):
+    model = Map
+    extra = 0
+    fields = ("name", "is_public")
+
+
 @admin.register(Episode)
 class EpisodeAdmin(admin.ModelAdmin):
     fieldsets = (
@@ -16,8 +22,10 @@ class EpisodeAdmin(admin.ModelAdmin):
             "General",
             {
                 "fields": (
-                    ("name_short", "name_long", "blurb"),
+                    ("name_short", "name_long"),
                     ("language", "release_version"),
+                    ("blurb",),
+                    ("eligibility_criteria",),
                 ),
             },
         ),
@@ -40,6 +48,7 @@ class EpisodeAdmin(admin.ModelAdmin):
             },
         ),
     )
+    inlines = [MapInline]
     list_display = ("name_short", "name_long", "game_release")
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
@@ -60,23 +69,18 @@ class MapAdmin(admin.ModelAdmin):
 
 @admin.register(EligibilityCriterion)
 class EligibilityCriterionAdmin(admin.ModelAdmin):
-    fields = (("question",), ("episode", "icon"))
-    list_display = ("question", "episode_name_short", "icon")
-    list_select_related = ("episode",)
+    fields = ("question", "icon")
+    list_display = ("question", "icon")
     search_fields = ("question",)
     search_help_text = "Search for a question."
-
-    @admin.display()
-    def episode_name_short(self, obj):
-        return obj.episode.name_short
 
 
 class TournamentRoundInline(admin.StackedInline):
     model = TournamentRound
     extra = 0
     fields = (
-        ("name", "challonge_id"),
-        ("maps", "is_released"),
+        ("name", "challonge_id", "is_released"),
+        ("maps",),
     )
     raw_id_fields = ("maps",)
     readonly_fields = ("challonge_id",)

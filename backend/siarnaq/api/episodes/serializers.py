@@ -17,4 +17,5 @@ class EpisodeSerializer(serializers.ModelSerializer):
             "game_release",
             "language",
             "release_version",
+            "eligibility_criteria",
         ]
