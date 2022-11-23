@@ -44,7 +44,6 @@ class Base(Configuration):
         "django.contrib.auth",
         "django.contrib.contenttypes",
         "django.contrib.sessions",
-        "django.contrib.sites",
         "django.contrib.messages",
         "django.contrib.staticfiles",
         "corsheaders",
@@ -74,8 +73,6 @@ class Base(Configuration):
     CORS_ALLOW_CREDENTIALS = True
 
     ROOT_URLCONF = "siarnaq.urls"
-
-    SITE_ID = 1
 
     TEMPLATES = [
         {

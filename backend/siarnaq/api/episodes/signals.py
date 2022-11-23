@@ -1,6 +1,5 @@
 import google.cloud.scheduler as scheduler
 from django.conf import settings
-from django.contrib.sites.models import Site
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.urls import reverse
@@ -38,7 +37,7 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
         f"{settings.GCLOUD_SCHEDULER_PREFIX}-autoscrim-{instance.name_short}"
     )
     url = "https://{}{}".format(
-        Site.objects.get_current().domain,
+        settings.ALLOWED_HOSTS[0],
         reverse("episode-autoscrim", kwargs={"pk": instance.pk}),
     )
     job = scheduler.Job(
