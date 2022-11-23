@@ -94,7 +94,7 @@ class RatingField(serializers.Field):
         if instance is None:
             return None
         else:
-            return instance.to_value()
+            return instance.value
 
 
 class PublicTeamSerializer(serializers.ModelSerializer):

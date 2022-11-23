@@ -39,17 +39,13 @@ class MatchParticipantInline(admin.StackedInline):
     extra = 0
     fields = (
         ("team", "submission"),
-        ("player_index", "score", "rating_value"),
+        ("player_index", "score", "rating"),
     )
     raw_id_fields = ("team", "submission")
     readonly_fields = (
         "player_index",
-        "rating_value",
+        "rating",
     )
-
-    @admin.display()
-    def rating_value(self, obj):
-        return obj.rating.to_value()
 
 
 @admin.register(Match)

@@ -297,7 +297,7 @@ class MatchParticipant(models.Model):
         """
         if self.rating is None:
             return None
-        return self.rating.to_value() - self.get_old_rating().to_value()
+        return self.rating.value - self.get_old_rating().value
 
     def try_finalize_rating(self, *, opponents):
         """

@@ -8,22 +8,18 @@ class TeamProfileInline(admin.StackedInline):
     fields = (
         ("quote",),
         ("biography",),
-        ("rating_value", "has_avatar"),
+        ("rating", "has_avatar"),
         ("auto_accept_ranked", "auto_accept_unranked"),
         ("eligible_for",),
     )
-    readonly_fields = ("rating_value", "has_avatar")
-
-    @admin.display()
-    def rating_value(self, obj):
-        return obj.rating.to_value()
+    readonly_fields = ("rating", "has_avatar")
 
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     fields = (("name",), ("episode",), ("status", "join_key"), ("members",))
     inlines = [TeamProfileInline]
-    list_display = ("name", "episode", "rating_value")
+    list_display = ("name", "episode", "rating")
     list_select_related = ("episode", "profile__rating")
     raw_id_fields = ("members",)
     readonly_fields = ("join_key",)
@@ -31,5 +27,5 @@ class TeamAdmin(admin.ModelAdmin):
     search_help_text = "Search for a team name."
 
     @admin.display()
-    def rating_value(self, obj):
-        return obj.profile.rating.to_value()
+    def rating(self, obj):
+        return obj.profile.rating

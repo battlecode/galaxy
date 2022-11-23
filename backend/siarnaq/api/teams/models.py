@@ -23,6 +23,21 @@ class Rating(models.Model):
     n = models.PositiveIntegerField(default=0)
     """The number of rated games played before this rating."""
 
+    value = models.FloatField()
+    """The penalized Elo value of this rating."""
+
+    def __str__(self):
+        return f"{self.value:.0f}"
+
+    def save(self, *args, **kwargs):
+        """Save to database, calculating the penalized value."""
+        if self._state.adding:
+            self.value = (
+                self.mean
+                - settings.TEAMS_ELO_INITIAL * settings.TEAMS_ELO_PENALTY**self.n
+            )
+        super().save(*args, **kwargs)
+
     def step(self, opponent_ratings, score):
         """Produce the new rating after a specific match is played."""
         e_self = self.expected_score(opponent_ratings)
@@ -39,13 +54,6 @@ class Rating(models.Model):
             diff = self.mean - r.mean
             total += 1 / (1 + 10 ** (-diff / settings.TEAMS_ELO_SCALE))
         return total / len(opponent_ratings)
-
-    def to_value(self):
-        """Return the penalized version of this Elo rating."""
-        return (
-            self.mean
-            - settings.TEAMS_ELO_INITIAL * settings.TEAMS_ELO_PENALTY**self.n
-        )
 
 
 class TeamStatus(models.TextChoices):
