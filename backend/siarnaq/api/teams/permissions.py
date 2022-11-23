@@ -10,10 +10,3 @@ class IsOnTeam(permissions.BasePermission):
         return Team.objects.filter(
             episode=view.kwargs["episode_id"], members=request.user
         ).exists()
-
-
-class IsOnRequestedTeam(permissions.BasePermission):
-    message = "Must be authenticated as the requested team."
-
-    def has_object_permission(self, request, _, obj):
-        return request.user in obj.team.members.all()

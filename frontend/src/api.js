@@ -311,7 +311,7 @@ class Api {
   //---TEAM INFO---
 
   static getUserTeamProfile(episode, callback) {
-    return $.get(`${URL}/api/team/${episode}/detail/current/`)
+    return $.get(`${URL}/api/team/${episode}/t/me/`)
       .done((data, status) => {
         callback(data);
       })
@@ -324,7 +324,7 @@ class Api {
   // updates team
   static updateTeam(team_profile, episode, callback) {
     return $.ajax({
-      url: `${URL}/api/team/${episode}/detail/current/`,
+      url: `${URL}/api/team/${episode}/t/me/`,
       data: JSON.stringify(team_profile),
       type: "PATCH",
       contentType: "application/json",
@@ -347,7 +347,7 @@ class Api {
       },
     };
     return $.ajax({
-      url: `${URL}/api/team/${episode}/detail/`,
+      url: `${URL}/api/team/${episode}/t/`,
       data: JSON.stringify(team_data),
       type: "POST",
       contentType: "application/json",
@@ -367,7 +367,7 @@ class Api {
       name: team_name,
     };
     return $.ajax({
-      url: `${URL}/api/team/${episode}/detail/join/`,
+      url: `${URL}/api/team/${episode}/t/join/`,
       data: JSON.stringify(join_data),
       type: "POST",
       contentType: "application/json",
@@ -383,7 +383,7 @@ class Api {
 
   static leaveTeam(episode, callback) {
     return $.ajax({
-      url: `${URL}/api/team/${episode}/detail/leave/`,
+      url: `${URL}/api/team/${episode}/t/leave/`,
       type: "POST",
     })
       .done((data, status) => {

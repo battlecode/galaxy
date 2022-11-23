@@ -1,7 +1,7 @@
 import uuid
 
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 
 import siarnaq.api.refs as refs
 from siarnaq.api.teams.managers import TeamQuerySet
@@ -124,8 +124,22 @@ class Team(models.Model):
             )
         ]
 
+    def __init__(self, *args, profile=None, **kwargs):
+        """Construct a team object, ensuring it has a profile."""
+        super().__init__(*args, **kwargs)
+        if not hasattr(self, "profile"):
+            profile = profile or {}
+            self.profile = TeamProfile(**profile)
+
     def __str__(self):
         return self.name
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        """Save a team object, ensuring it has a profile recorded in the database."""
+        super().save(*args, **kwargs)
+        if self.profile._state.adding:
+            self.profile.save()
 
     def is_staff(self):
         """Check whether this is a team with staff privileges."""

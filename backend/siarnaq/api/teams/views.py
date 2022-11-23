@@ -3,85 +3,92 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
-from siarnaq.api.teams.models import TeamProfile, TeamStatus
-from siarnaq.api.teams.permissions import IsOnRequestedTeam, IsOnTeam
+from siarnaq.api.teams.models import Team, TeamStatus
+from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.api.teams.serializers import (
-    PublicTeamProfileSerializer,
     TeamJoinSerializer,
-    TeamProfileSerializer,
+    TeamPrivateSerializer,
+    TeamPublicSerializer,
 )
 
 
 class TeamViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
+    mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
 ):
     """
     A viewset for retrieving and updating all team/team profile info.
 
     When creating a team, add the logged in user as the sole member.
-
-    When "current" is provided for the ID, retrieve/update info for
-    the logged in user's team.
     """
 
-    serializer_class = TeamProfileSerializer
-
     def get_queryset(self):
-        return TeamProfile.objects.select_related(
-            "team",
-            "rating",
-        ).prefetch_related("team__members")
-
-    def get_permissions(self):
-        permissions = [
-            IsAuthenticated(),
-            IsEpisodeAvailable(allow_frozen=True),
-            IsOnRequestedTeam(),
-        ]
-        if self.action == "create" or self.action == "join":
-            # Must not be on more than one team
-            permissions.append((~IsOnTeam)())
-
-        return permissions
-
-    def get_current_object(self):
-        return get_object_or_404(
-            self.get_queryset().filter(team__members__id=self.request.user.pk)
+        return (
+            Team.objects.filter(episode=self.kwargs["episode_id"])
+            .select_related("profile__rating")
+            .prefetch_related("members")
         )
 
-    def get_object(self):
-        """
-        If provided ID is "current", set object to logged in user's team.
-        See https://stackoverflow.com/a/36626403.
-        """
-        pk = self.kwargs.get("pk")
+    def get_serializer_class(self):
+        match self.action:
+            case "create" | "me":
+                return TeamPrivateSerializer
+            case "retrieve" | "list":
+                return TeamPublicSerializer
+            case "join":
+                return TeamJoinSerializer
+            case "leave":
+                return None
+            case _:
+                raise RuntimeError("Unexpected action")
 
-        if pk == "current":
-            return self.get_current_object()
+    def get_permissions(self):
+        match self.action:
+            case "create" | "join":
+                return (
+                    IsAuthenticated(),
+                    IsEpisodeAvailable(allow_frozen=True),
+                    (~IsOnTeam)(),
+                )
+            case "retrieve" | "list":
+                return (IsEpisodeAvailable(allow_frozen=True),)
+            case "me" | "leave":
+                return (IsAuthenticated(), IsEpisodeAvailable(allow_frozen=True))
 
-        return super().get_object()
+    @action(detail=False, methods=["get", "patch"])
+    def me(self, request, *, episode_id):
+        """Retrieve or update information about the current team."""
+        team = get_object_or_404(self.get_queryset(), members=request.user)
+        match request.method.lower():
+            case "get":
+                serializer = self.get_serializer(team)
+                return Response(serializer.data)
+            case "patch":
+                serializer = self.get_serializer(team, data=request.data, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
 
     @extend_schema(request=None)
     @action(detail=False, methods=["post"])
-    def leave(self, request, **kwargs):
+    def leave(self, request, *, episode_id):
         """Leave a team."""
-        team_profile = self.get_current_object()
-        team = team_profile.team
-
         with transaction.atomic():
-            team.members.remove(request.user.id)
-        return Response(None, status.HTTP_204_NO_CONTENT)
+            team = get_object_or_404(
+                self.get_queryset().select_for_update(), members=request.user
+            )
+            team.members.remove(request.user)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
 
-    @extend_schema(responses={status.HTTP_200_OK: TeamProfileSerializer})
-    @action(detail=False, methods=["post"], serializer_class=TeamJoinSerializer)
-    def join(self, request, **kwargs):
+    @extend_schema(responses={status.HTTP_204_NO_CONTENT: None})
+    @action(detail=False, methods=["post"])
+    def join(self, request, pk=None, *, episode_id):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -90,29 +97,15 @@ class TeamViewSet(
             # Regular users may only join active regular teams and must have the correct
             # join key. Staff users do not have these restrictions.
             queryset = queryset.filter(
-                team__status=TeamStatus.REGULAR,
-                team__join_key=serializer.validated_data["join_key"],
+                status=TeamStatus.REGULAR,
+                join_key=serializer.validated_data["join_key"],
             )
 
-        team_profile = get_object_or_404(
-            queryset,
-            team__name=serializer.validated_data["name"],
-            team__episode=self.kwargs["episode_id"],
-        )
-        team = team_profile.team
-
         with transaction.atomic():
+            team = get_object_or_404(
+                queryset.select_for_update(),
+                name=serializer.validated_data["name"],
+                episode=self.kwargs["episode_id"],
+            )
             team.members.add(request.user)
-        return Response(serializer.data, status.HTTP_200_OK)
-
-
-class PublicTeamProfileViewSet(viewsets.ReadOnlyModelViewSet):
-
-    serializer_class = PublicTeamProfileSerializer
-    permission_classes = (AllowAny,)
-
-    def get_queryset(self):
-        return TeamProfile.objects.select_related(
-            "team",
-            "rating",
-        ).prefetch_related("team__members")
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
