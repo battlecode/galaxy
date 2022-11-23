@@ -49,13 +49,13 @@ class Base(Configuration):
         "corsheaders",
         "rest_framework",
         "rest_framework_simplejwt",
+        "drf_spectacular",
+        "django_rest_passwordreset",
+        "anymail",
         "siarnaq.api.user",
         "siarnaq.api.compete",
         "siarnaq.api.episodes",
         "siarnaq.api.teams",
-        "drf_spectacular",
-        "django_rest_passwordreset",
-        "anymail",
     ]
 
     MIDDLEWARE = [
