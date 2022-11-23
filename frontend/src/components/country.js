@@ -9,7 +9,7 @@ class Country extends Component {
         <label>Country</label>
         <select
           className="form-control"
-          id="country"
+          id="profile-country"
           value={this.props.value}
           onChange={this.props.onChange}
         >

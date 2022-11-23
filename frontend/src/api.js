@@ -342,9 +342,7 @@ class Api {
 
   static createTeam(team_name, episode, callback) {
     const team_data = {
-      team: {
-        name: team_name,
-      },
+      name: team_name,
     };
     return $.ajax({
       url: `${URL}/api/team/${episode}/t/`,
@@ -405,7 +403,7 @@ class Api {
   }
 
   static getUserProfile(callback) {
-    return this.getProfileByUser("current", callback);
+    return this.getProfileByUser("me", callback);
   }
 
   static updateUser(user_profile, callback) {
