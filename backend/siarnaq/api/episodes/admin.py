@@ -50,6 +50,7 @@ class EpisodeAdmin(admin.ModelAdmin):
             },
         ),
     )
+    filter_horizontal = ("eligibility_criteria",)
     inlines = [MapInline]
     list_display = ("name_short", "name_long", "game_release")
     ordering = ("-game_release",)
@@ -119,6 +120,7 @@ class TournamentAdmin(admin.ModelAdmin):
             },
         ),
     )
+    filter_horizontal = ("eligibility_includes", "eligibility_excludes")
     inlines = [TournamentRoundInline]
     list_display = (
         "name_short",
@@ -159,10 +161,10 @@ class TournamentRoundAdmin(admin.ModelAdmin):
         ("name", "challonge_id", "release_status"),
         ("maps",),
     )
+    filter_horizontal = ("maps",)
     inlines = [MatchInline]
     list_display = ("name", "tournament", "release_status")
     list_filter = ("tournament", "release_status")
     list_select_related = ("tournament",)
     ordering = ("-tournament__submission_freeze", "challonge_id")
-    raw_id_fields = ("maps",)
     readonly_fields = ("challonge_id",)

@@ -13,6 +13,7 @@ class TeamProfileInline(admin.StackedInline):
         ("auto_accept_ranked", "auto_accept_unranked"),
         ("eligible_for",),
     )
+    filter_horizontal = ("eligible_for",)
     readonly_fields = ("rating", "has_avatar")
 
     def get_queryset(self, request):
