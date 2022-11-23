@@ -23,16 +23,12 @@ class TeamProfileInline(admin.StackedInline):
 class TeamAdmin(admin.ModelAdmin):
     fields = (("name",), ("episode",), ("status", "join_key"), ("members",))
     inlines = [TeamProfileInline]
-    list_display = ("name", "episode_name_short", "rating_value")
+    list_display = ("name", "episode", "rating_value")
     list_select_related = ("episode", "profile__rating")
     raw_id_fields = ("members",)
     readonly_fields = ("join_key",)
     search_fields = ("name",)
     search_help_text = "Search for a team name."
-
-    @admin.display()
-    def episode_name_short(self, obj):
-        return obj.episode.name_short
 
     @admin.display()
     def rating_value(self, obj):

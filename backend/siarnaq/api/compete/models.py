@@ -181,6 +181,9 @@ class Match(SaturnInvocation):
 
     objects = MatchQuerySet.as_manager()
 
+    def __str__(self):
+        return " \u2022 ".join(str(p) for p in self.participants.all())
+
     def get_replay_path(self):
         """Return the path to the replay file."""
         return posixpath.join(
@@ -267,6 +270,9 @@ class MatchParticipant(models.Model):
     """The team's previous participation, or null if there is none."""
 
     objects = MatchParticipantManager()
+
+    def __str__(self):
+        return str(self.team)
 
     def save(self, *args, **kwargs):
         """Pull the active submission and save to database."""
@@ -432,6 +438,9 @@ class ScrimmageRequest(models.Model):
     """The maps to be played on the requested match."""
 
     objects = ScrimmageRequestQuerySet.as_manager()
+
+    def __str__(self):
+        return f"{self.requested_by} \u27F9 {self.requested_to}"
 
     def determine_is_alternating(self):
         """Determine whether the player order should be alternating."""

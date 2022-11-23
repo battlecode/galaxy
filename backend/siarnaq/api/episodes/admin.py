@@ -57,14 +57,10 @@ class EpisodeAdmin(admin.ModelAdmin):
 @admin.register(Map)
 class MapAdmin(admin.ModelAdmin):
     fields = ("name", "episode", "is_public")
-    list_display = ("name", "episode_name_short", "is_public")
+    list_display = ("name", "episode", "is_public")
     list_select_related = ("episode",)
     search_fields = ("name",)
     search_help_text = "Search for a map name."
-
-    @admin.display()
-    def episode_name_short(self, obj):
-        return obj.episode.name_short
 
 
 @admin.register(EligibilityCriterion)
@@ -120,7 +116,7 @@ class TournamentAdmin(admin.ModelAdmin):
     list_display = (
         "name_short",
         "name_long",
-        "episode_name_short",
+        "episode",
         "submission_freeze",
         "in_progress",
     )
@@ -128,7 +124,3 @@ class TournamentAdmin(admin.ModelAdmin):
     readonly_fields = ("in_progress",)
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
-
-    @admin.display()
-    def episode_name_short(self, obj):
-        return obj.episode.name_short

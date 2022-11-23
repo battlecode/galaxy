@@ -20,8 +20,8 @@ class SubmissionAdmin(admin.ModelAdmin):
     )
     list_display = (
         "pk",
-        "team_name",
-        "episode_name_short",
+        "team",
+        "episode",
         "accepted",
         "status",
         "created",
@@ -29,24 +29,9 @@ class SubmissionAdmin(admin.ModelAdmin):
     list_select_related = ("team", "user", "episode")
     raw_id_fields = ("team", "user")
     readonly_fields = (
-        "team_name",
-        "user_username",
-        "episode_name_short",
         "status",
         "created",
     )
-
-    @admin.display()
-    def team_name(self, obj):
-        return obj.team.name
-
-    @admin.display()
-    def user_username(self, obj):
-        return obj.user.username
-
-    @admin.display()
-    def episode_name_short(self, obj):
-        return obj.episode.name_short
 
 
 class MatchParticipantInline(admin.StackedInline):
@@ -80,9 +65,9 @@ class MatchAdmin(admin.ModelAdmin):
     inlines = [MatchParticipantInline]
     list_display = (
         "pk",
-        "participants_list",
-        "episode_name_short",
-        "tournament",
+        "__str__",
+        "episode",
+        "tournament_round",
         "status",
         "created",
     )
@@ -97,21 +82,6 @@ class MatchAdmin(admin.ModelAdmin):
             .prefetch_related("participants__team")
         )
 
-    @admin.display()
-    def episode_name_short(self, obj):
-        return obj.episode.name_short
-
-    @admin.display()
-    def participants_list(self, obj):
-        return [participant.team.name for participant in obj.participants.all()]
-
-    @admin.display()
-    def tournament(self, obj):
-        if obj.tournament_round_id is None:
-            return None
-        r = obj.tourmanent_round
-        return f"{r.tournament.name_short} (r.name)"
-
 
 @admin.register(ScrimmageRequest)
 class ScrimmageRequestAdmin(admin.ModelAdmin):
@@ -123,24 +93,12 @@ class ScrimmageRequestAdmin(admin.ModelAdmin):
     )
     list_display = (
         "pk",
-        "requested_by_name",
-        "requested_to_name",
-        "episode_name_short",
+        "requested_by",
+        "requested_to",
+        "episode",
         "status",
         "is_ranked",
     )
     list_select_related = ("requested_by", "requested_to", "episode")
     raw_id_fields = ("requested_by", "requested_to", "maps")
     readonly_fields = ("created", "status")
-
-    @admin.display()
-    def requested_by_name(self, obj):
-        return obj.requested_by.name
-
-    @admin.display()
-    def requested_to_name(self, obj):
-        return obj.requested_to.name
-
-    @admin.display()
-    def episode_name_short(self, obj):
-        return obj.episode.name_short

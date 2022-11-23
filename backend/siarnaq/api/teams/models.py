@@ -117,6 +117,9 @@ class Team(models.Model):
             )
         ]
 
+    def __str__(self):
+        return self.name
+
     def is_staff(self):
         """Check whether this is a team with staff privileges."""
         return self.status in {TeamStatus.STAFF, TeamStatus.INVISIBLE}

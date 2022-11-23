@@ -25,7 +25,7 @@ class EligibilityCriterion(models.Model):
     icon = models.CharField(max_length=8)
     """An icon to display for teams that satisfy this criterion."""
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.question
 
 
@@ -95,6 +95,9 @@ class Episode(models.Model):
 
     objects = EpisodeQuerySet.as_manager()
 
+    def __str__(self):
+        return self.name_short
+
     def frozen(self):
         """Return whether the episode is currently frozen to submissions."""
         now = timezone.now()
@@ -145,6 +148,9 @@ class Map(models.Model):
                 name="map-unique-episode-name",
             )
         ]
+
+    def __str__(self):
+        return f"{self.name} ({self.episode})"
 
 
 class TournamentStyle(models.TextChoices):
@@ -226,6 +232,9 @@ class Tournament(models.Model):
     challonge_public = models.URLField(null=True, blank=True)
     """A public Challonge bracket showing match results as they are released."""
 
+    def __str__(self):
+        return self.name_short
+
     def seed_by_scrimmage(self):
         """
         Seed the tournament with eligible teamsn in order of decreasing rating, and
@@ -278,3 +287,6 @@ class TournamentRound(models.Model):
                 name="round-unique-tournament-challonge",
             )
         ]
+
+    def __str__(self):
+        return f"{self.tournament} ({self.name})"
