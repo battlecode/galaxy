@@ -99,3 +99,25 @@ class RatingField(serializers.Field):
             return None
         else:
             return instance.to_value()
+
+
+class PublicTeamSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ["episode", "name", "members", "status"]
+
+
+class PublicTeamProfileSerializer(serializers.ModelSerializer):
+    team = PublicTeamSerializer(required=True)
+
+    class Meta:
+        model = TeamProfile
+        fields = [
+            "team",
+            "quote",
+            "biography",
+            "has_avatar",
+            "auto_accept_ranked",
+            "auto_accept_unranked",
+            "eligible_for",
+        ]
