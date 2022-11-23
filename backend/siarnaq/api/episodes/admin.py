@@ -61,6 +61,7 @@ class EpisodeAdmin(admin.ModelAdmin):
 class MapAdmin(admin.ModelAdmin):
     fields = ("name", "episode", "is_public")
     list_display = ("name", "episode", "is_public")
+    list_filter = ("episode", "is_public")
     list_select_related = ("episode",)
     ordering = ("-episode__game_release", "name")
     search_fields = ("name",)
@@ -126,6 +127,7 @@ class TournamentAdmin(admin.ModelAdmin):
         "submission_freeze",
         "in_progress",
     )
+    list_filter = ("episode",)
     list_select_related = ("episode",)
     ordering = ("-episode__game_release", "-submission_freeze")
     readonly_fields = ("in_progress",)
@@ -159,6 +161,7 @@ class TournamentRoundAdmin(admin.ModelAdmin):
     )
     inlines = [MatchInline]
     list_display = ("name", "tournament", "is_released")
+    list_filter = ("tournament", "is_released")
     list_select_related = ("tournament",)
     ordering = ("-tournament__submission_freeze", "challonge_id")
     raw_id_fields = ("maps",)

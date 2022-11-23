@@ -51,7 +51,8 @@ class UserAdmin(admin.ModelAdmin):
         ("groups",),
     )
     inlines = [UserProfileInline, TeamInline]
-    list_display = ("username", "first_name", "last_name", "email")
+    list_display = ("username", "first_name", "last_name", "email", "is_staff")
+    list_filter = ("is_staff",)
     ordering = ("username",)
     readonly_fields = ("last_login", "date_joined")
     search_fields = ("username", "first_name", "last_name", "email")

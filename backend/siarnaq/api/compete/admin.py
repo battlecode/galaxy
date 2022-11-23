@@ -26,6 +26,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         "status",
         "created",
     )
+    list_filter = ("episode", "accepted", "status")
     list_select_related = ("team", "episode")
     ordering = ("-pk",)
     raw_id_fields = ("team", "user")
@@ -70,6 +71,7 @@ class MatchAdmin(admin.ModelAdmin):
         "status",
         "created",
     )
+    list_filter = ("episode", "status")
     ordering = ("-pk",)
     raw_id_fields = ("tournament_round", "maps")
     readonly_fields = ("replay", "status", "created")
@@ -99,6 +101,7 @@ class ScrimmageRequestAdmin(admin.ModelAdmin):
         "status",
         "is_ranked",
     )
+    list_filter = ("episode", "status", "is_ranked")
     list_select_related = ("requested_by", "requested_to", "episode")
     ordering = ("-pk",)
     raw_id_fields = ("requested_by", "requested_to", "maps")
