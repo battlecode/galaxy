@@ -101,7 +101,9 @@ class Team(models.Model):
     name = models.CharField(max_length=32)
     """The name of the team."""
 
-    members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="teams")
+    members = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="teams", blank=True
+    )
     """The users who belong to this team."""
 
     join_key = models.SlugField(default=make_team_join_key, editable=False)

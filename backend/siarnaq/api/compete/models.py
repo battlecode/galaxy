@@ -53,6 +53,9 @@ class SaturnInvocation(models.Model):
     )
     """The current status of that task."""
 
+    created = models.DateTimeField(auto_now_add=True)
+    """The time at which this object was created."""
+
     logs = models.TextField(blank=True)
     """The execution logs of the task invocation, if any."""
 
@@ -98,9 +101,6 @@ class Submission(SaturnInvocation):
         related_name="submissions",
     )
     """The user that made this submission."""
-
-    created = models.DateTimeField(auto_now_add=True)
-    """The time at which this submission was created."""
 
     accepted = models.BooleanField(default=False)
     """Whether this submission compiled successfully and has been accepted."""
@@ -172,9 +172,6 @@ class Match(SaturnInvocation):
 
     alternate_order = models.BooleanField()
     """Whether players should alternate orderGbetween successive games of this match."""
-
-    created = models.DateTimeField(auto_now_add=True)
-    """The time at which this match was created."""
 
     is_ranked = models.BooleanField()
     """Whether this match counts for ranked ratings."""
@@ -438,7 +435,7 @@ class ScrimmageRequest(models.Model):
     )
     """The opponent who is receiving this match request."""
 
-    player_order = models.CharField(max_length=3, choices=PlayerOrder.choices)
+    player_order = models.CharField(max_length=1, choices=PlayerOrder.choices)
     """The order of the players in the match."""
 
     maps = models.ManyToManyField(refs.MAP_MODEL, related_name="scrimmage_requests")
