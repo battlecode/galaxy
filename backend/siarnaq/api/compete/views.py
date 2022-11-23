@@ -1,7 +1,7 @@
 import google.cloud.storage as storage
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, Subquery
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -24,7 +24,7 @@ from siarnaq.api.compete.serializers import (
     SubmissionSerializer,
 )
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
-from siarnaq.api.teams.models import Team
+from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.gcloud import titan
 
@@ -195,6 +195,28 @@ class MatchViewSet(
             participants__team__members=request.user,
             tournament_round__isnull=True,
         )
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+    @extend_schema(responses={status.HTTP_200_OK: MatchSerializer(many=True)})
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"with_team/(?P<team_id>\d+)",
+        permission_classes=(IsEpisodeAvailable,),
+    )
+    def with_team(self, request, pk=None, *, episode_id, team_id):
+        """List all scrimmages that a particular team participated in."""
+        queryset = self.get_queryset().filter(
+            participants__team=team_id, tournament_round__isnull=True
+        )
+        if not request.user.is_staff:
+            # Hide all matches with invisible teams.
+            has_invisible = self.get_queryset().filter(
+                participants__team__status=TeamStatus.INVISIBLE
+            )
+            queryset = queryset.exclude(pk__in=Subquery(has_invisible.values("pk")))
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
