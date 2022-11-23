@@ -18,15 +18,19 @@ class SaturnInvokableQuerySet(models.QuerySet):
         """The ordering key with which to ensure FIFO order of queued items."""
         raise NotImplementedError
 
-    @transaction.atomic
     def enqueue(self):
         """Enqueue all unqueued items in this queryset for invocation on Saturn."""
         from siarnaq.api.compete.models import SaturnStatus
 
+        self.filter(status=SaturnStatus.CREATED).enqueue_all()
+
+    @transaction.atomic
+    def enqueue_all(self):
+        """Enqueue all items in this queryset, regardless of their state."""
+        from siarnaq.api.compete.models import SaturnStatus
+
         publish_client = saturn.get_publish_client()
-        invocations = list(
-            self.select_for_update().filter(status=SaturnStatus.CREATED).all()
-        )
+        invocations = list(self.select_for_update().all())
         futures = [
             publish_client.publish(
                 topic=self._publish_topic,

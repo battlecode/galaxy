@@ -8,8 +8,19 @@ from siarnaq.api.compete.models import (
 )
 
 
+@admin.action(description="Add pending tasks to the Saturn queue")
+def enqueue(modeladmin, request, queryset):
+    queryset.enqueue()
+
+
+@admin.action(description="Forcibly re-queue tasks to Saturn")
+def force_requeue(modeladmin, request, queryset):
+    queryset.enqueue_all()
+
+
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
+    actions = [enqueue, force_requeue]
     fields = (
         ("team", "user"),
         ("episode", "created"),
@@ -58,6 +69,7 @@ class MatchParticipantInline(admin.StackedInline):
 
 @admin.register(Match)
 class MatchAdmin(admin.ModelAdmin):
+    actions = [enqueue, force_requeue]
     fields = (
         ("episode", "tournament_round"),
         ("replay", "created"),
