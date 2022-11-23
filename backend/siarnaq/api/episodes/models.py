@@ -2,7 +2,6 @@ from django.apps import apps
 from django.db import models
 from django.utils import timezone
 
-import siarnaq.api.refs as refs
 from siarnaq.api.episodes.managers import EpisodeQuerySet
 
 
@@ -13,6 +12,21 @@ class Language(models.TextChoices):
 
     JAVA_8 = "java8"
     PYTHON_3 = "py3"
+
+
+class EligibilityCriterion(models.Model):
+    """
+    A database model for an eligibility criterion for entering into a tournament.
+    """
+
+    question = models.TextField()
+    """The text question to be asked for this criterion."""
+
+    icon = models.CharField(max_length=8)
+    """An icon to display for teams that satisfy this criterion."""
+
+    def __str__(self):
+        return self.question
 
 
 class Episode(models.Model):
@@ -62,6 +76,11 @@ class Episode(models.Model):
     release_version = models.SlugField(max_length=32, blank=True)
     """The most up-to-date version of the episode code release."""
 
+    eligibility_criteria = models.ManyToManyField(
+        EligibilityCriterion, related_name="episodes"
+    )
+    """The eligibility criteria active in this episode."""
+
     pass_requirement_win = models.PositiveSmallIntegerField(null=True, blank=True)
     """
     The minimum number of matches to be won within a specified window in order to pass
@@ -75,6 +94,9 @@ class Episode(models.Model):
     """
 
     objects = EpisodeQuerySet.as_manager()
+
+    def __str__(self):
+        return self.name_short
 
     def frozen(self):
         """Return whether the episode is currently frozen to submissions."""
@@ -127,6 +149,9 @@ class Map(models.Model):
             )
         ]
 
+    def __str__(self):
+        return f"{self.name} ({self.episode})"
+
 
 class TournamentStyle(models.TextChoices):
     """
@@ -162,7 +187,7 @@ class Tournament(models.Model):
     """The style of this tournament."""
 
     eligibility_includes = models.ManyToManyField(
-        refs.ELIGIBILITY_CRITERION_MODEL,
+        EligibilityCriterion,
         related_name="include_tournaments",
     )
     """
@@ -170,7 +195,7 @@ class Tournament(models.Model):
     """
 
     eligibility_excludes = models.ManyToManyField(
-        refs.ELIGIBILITY_CRITERION_MODEL,
+        EligibilityCriterion,
         related_name="exclude_tournaments",
     )
     """
@@ -206,6 +231,9 @@ class Tournament(models.Model):
 
     challonge_public = models.URLField(null=True, blank=True)
     """A public Challonge bracket showing match results as they are released."""
+
+    def __str__(self):
+        return self.name_short
 
     def seed_by_scrimmage(self):
         """
@@ -259,3 +287,6 @@ class TournamentRound(models.Model):
                 name="round-unique-tournament-challonge",
             )
         ]
+
+    def __str__(self):
+        return f"{self.tournament} ({self.name})"

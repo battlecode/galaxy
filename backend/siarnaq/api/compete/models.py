@@ -113,6 +113,9 @@ class Submission(SaturnInvocation):
 
     objects = SubmissionQuerySet.as_manager()
 
+    def __str__(self):
+        return f"#{self.pk}"
+
     def get_source_path(self):
         """Return the path of the source code on Google cloud storage."""
         return posixpath.join(
@@ -180,6 +183,13 @@ class Match(SaturnInvocation):
     """The replay file of this match."""
 
     objects = MatchQuerySet.as_manager()
+
+    def __str__(self):
+        return (
+            f"#{self.pk} ("
+            + " \u2022 ".join(str(p) for p in self.participants.all())
+            + ")"
+        )
 
     def get_replay_path(self):
         """Return the path to the replay file."""
@@ -268,6 +278,9 @@ class MatchParticipant(models.Model):
 
     objects = MatchParticipantManager()
 
+    def __str__(self):
+        return str(self.team)
+
     def save(self, *args, **kwargs):
         """Pull the active submission and save to database."""
         if self._state.adding and self.submission_id is None:
@@ -291,7 +304,7 @@ class MatchParticipant(models.Model):
         """
         if self.rating is None:
             return None
-        return self.rating.to_value() - self.get_old_rating().to_value()
+        return self.rating.value - self.get_old_rating().value
 
     def try_finalize_rating(self, *, opponents):
         """
@@ -432,6 +445,9 @@ class ScrimmageRequest(models.Model):
     """The maps to be played on the requested match."""
 
     objects = ScrimmageRequestQuerySet.as_manager()
+
+    def __str__(self):
+        return f"{self.requested_by} \u27F9 {self.requested_to}"
 
     def determine_is_alternating(self):
         """Determine whether the player order should be alternating."""

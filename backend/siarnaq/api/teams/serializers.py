@@ -3,7 +3,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from siarnaq.api.teams.models import Rating, Team, TeamProfile
+from siarnaq.api.teams.models import Team, TeamProfile
 
 
 class TeamSerializer(serializers.ModelSerializer):
@@ -52,14 +52,10 @@ class TeamProfileSerializer(serializers.ModelSerializer):
         if eligible_for_exists:
             eligible_for_data = validated_data.pop("eligible_for")
         team_data = validated_data.pop("team")
-        # Set rating to default rating
-        rating_obj = Rating.objects.create()
 
         with transaction.atomic():
             team_obj = Team.objects.create(**team_data)
-            profile_obj = TeamProfile.objects.create(
-                team=team_obj, rating=rating_obj, **validated_data
-            )
+            profile_obj = TeamProfile.objects.create(team=team_obj, **validated_data)
 
         # Add eligibility separately
         if eligible_for_exists:
@@ -98,7 +94,7 @@ class RatingField(serializers.Field):
         if instance is None:
             return None
         else:
-            return instance.to_value()
+            return instance.value
 
 
 class PublicTeamSerializer(serializers.ModelSerializer):

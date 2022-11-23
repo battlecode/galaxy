@@ -7,25 +7,6 @@ import siarnaq.api.refs as refs
 from siarnaq.api.teams.managers import TeamQuerySet
 
 
-class EligibilityCriterion(models.Model):
-    """
-    A database model for an eligibility criterion for entering into a tournament.
-    """
-
-    episode = models.ForeignKey(
-        refs.EPISODE_MODEL,
-        on_delete=models.CASCADE,
-        related_name="eligibility_criteria",
-    )
-    """The episode to which this criterion belongs."""
-
-    question = models.TextField()
-    """The text question to be asked for this criterion."""
-
-    icon = models.CharField(max_length=8)
-    """An icon to display for teams that satisfy this criterion."""
-
-
 class Rating(models.Model):
     """
     An immutable database model for a Penalized Elo rating.
@@ -41,6 +22,20 @@ class Rating(models.Model):
 
     n = models.PositiveIntegerField(default=0)
     """The number of rated games played before this rating."""
+
+    value = models.FloatField()
+    """The penalized Elo value of this rating."""
+
+    def __init__(self, *args, **kwargs):
+        """Create a rating object, saving the penalized value."""
+        super().__init__(*args, **kwargs)
+        self.value = (
+            self.mean
+            - settings.TEAMS_ELO_INITIAL * settings.TEAMS_ELO_PENALTY**self.n
+        )
+
+    def __str__(self):
+        return f"{self.value:.0f}"
 
     def step(self, opponent_ratings, score):
         """Produce the new rating after a specific match is played."""
@@ -58,13 +53,6 @@ class Rating(models.Model):
             diff = self.mean - r.mean
             total += 1 / (1 + 10 ** (-diff / settings.TEAMS_ELO_SCALE))
         return total / len(opponent_ratings)
-
-    def to_value(self):
-        """Return the penalized version of this Elo rating."""
-        return (
-            self.mean
-            - settings.TEAMS_ELO_INITIAL * settings.TEAMS_ELO_PENALTY**self.n
-        )
 
 
 class TeamStatus(models.TextChoices):
@@ -136,6 +124,9 @@ class Team(models.Model):
             )
         ]
 
+    def __str__(self):
+        return self.name
+
     def is_staff(self):
         """Check whether this is a team with staff privileges."""
         return self.status in {TeamStatus.STAFF, TeamStatus.INVISIBLE}
@@ -188,6 +179,12 @@ class TeamProfile(models.Model):
     """Whether the team automatically accepts unranked match requests."""
 
     eligible_for = models.ManyToManyField(
-        EligibilityCriterion, related_name="teams", blank=True
+        refs.ELIGIBILITY_CRITERION_MODEL, related_name="teams", blank=True
     )
     """The eligibility criteria that this team satisfies."""
+
+    def save(self, *args, **kwargs):
+        """Save to database, ensuring the profile has a rating."""
+        if self._state.adding and self.rating_id is None:
+            self.rating = Rating.objects.create()
+        super().save(*args, **kwargs)
