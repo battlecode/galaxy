@@ -394,9 +394,8 @@ class Api {
       });
   }
 
-  static getProfileByUser(user_id, callback, public_only = false) {
-    const endpoint = public_only ? "public" : "detail";
-    return $.get(`${URL}/api/user/${endpoint}/${user_id}/`)
+  static getProfileByUser(user_id, callback) {
+    return $.get(`${URL}/api/user/u/${user_id}/`)
       .done((data, status) => {
         callback(data);
       })
@@ -411,7 +410,7 @@ class Api {
 
   static updateUser(user_profile, callback) {
     return $.ajax({
-      url: `${URL}/api/user/detail/current/`,
+      url: `${URL}/api/user/u/me/`,
       data: JSON.stringify(user_profile),
       type: "PATCH",
       contentType: "application/json",
@@ -429,7 +428,7 @@ class Api {
     const data = new FormData();
     data.append("avatar", avatar_file);
     return $.ajax({
-      url: `${URL}/api/user/detail/current/avatar/`,
+      url: `${URL}/api/user/u/avatar/`,
       type: "POST",
       data: data,
       dataType: "json",
@@ -448,7 +447,7 @@ class Api {
     const data = new FormData();
     data.append("resume", resume_file);
     return $.ajax({
-      url: `${URL}/api/user/detail/current/resume/`,
+      url: `${URL}/api/user/u/resume/`,
       type: "PUT",
       data: data,
       dataType: "json",
@@ -465,7 +464,7 @@ class Api {
 
   static resumeRetrieve(callback) {
     return $.ajax({
-      url: `${URL}/api/user/detail/current/resume/`,
+      url: `${URL}/api/user/u/resume/`,
       type: "GET",
     })
       .done((data, status) => {
@@ -779,7 +778,7 @@ class Api {
 
   static register(user_profile, callback) {
     return $.ajax({
-      url: `${URL}/api/user/detail/`,
+      url: `${URL}/api/user/u/`,
       data: JSON.stringify(user_profile),
       type: "POST",
       contentType: "application/json",

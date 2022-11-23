@@ -5,59 +5,70 @@ import google.cloud.storage as storage
 from django.conf import settings
 from django.db import transaction
 from django.http import Http404
-from django.shortcuts import get_object_or_404
 from PIL import Image
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from siarnaq.api.user.models import UserProfile
-from siarnaq.api.user.permissions import IsAuthenticatedAsRequestedUser
+from siarnaq.api.user.models import User
 from siarnaq.api.user.serializers import (
-    PublicUserProfileSerializer,
     UserAvatarSerializer,
-    UserProfileSerializer,
+    UserPrivateSerializer,
+    UserPublicSerializer,
     UserResumeSerializer,
 )
 from siarnaq.gcloud import titan
 
 
-class UserProfileViewSet(
+class UserViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
-    mixins.UpdateModelMixin,
 ):
     """
     A viewset for retrieving and updating all user info.
-    When "current" is provided for the ID, retrieve/update info for logged in user.
     """
 
-    serializer_class = UserProfileSerializer
-    permission_classes = (IsAuthenticatedAsRequestedUser,)
+    permission_classes = (AllowAny,)
 
     def get_queryset(self):
-        return UserProfile.objects.select_related("user").all()
+        return User.objects.select_related("profile").all()
 
-    def get_object(self):
-        """
-        If provided ID is "current", set object to logged in user.
-        See https://stackoverflow.com/a/36626403.
-        """
-        pk = self.kwargs.get("pk")
+    def get_serializer_class(self):
+        match self.action:
+            case "create" | "me":
+                return UserPrivateSerializer
+            case "retrieve":
+                return UserPublicSerializer
+            case "resume":
+                return UserResumeSerializer
+            case "avatar":
+                return UserAvatarSerializer
+            case _:
+                raise RuntimeError("Unexpected action")
 
-        if pk == "current":
-            return get_object_or_404(
-                self.get_queryset().filter(pk=self.request.user.pk)
-            )
+    @action(
+        detail=False, methods=["get", "patch"], permission_classes=(IsAuthenticated,)
+    )
+    def me(self, request):
+        """Retrieve or update information about the logged-in user."""
+        user = self.get_queryset().get(pk=request.user.pk)
+        match request.method.lower():
+            case "get":
+                serializer = self.get_serializer(user)
+                return Response(serializer.data)
+            case "patch":
+                serializer = self.get_serializer(user, data=request.data, partial=True)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(serializer.data)
 
-        return super().get_object()
-
-    @action(detail=True, methods=["get", "put"], serializer_class=UserResumeSerializer)
-    def resume(self, request, pk=None):
+    @action(detail=False, methods=["get", "put"], permission_classes=(IsAuthenticated,))
+    def resume(self, request):
         """Retrieve or update the uploaded resume."""
-        profile = self.get_object()
+        user = self.get_queryset().get(pk=request.user.pk)
+        profile = user.profile
         match request.method.lower():
             case "get":
                 if not profile.has_resume:
@@ -91,10 +102,11 @@ class UserProfileViewSet(
             case _:
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
 
-    @action(detail=True, methods=["post"], serializer_class=UserAvatarSerializer)
+    @action(detail=False, methods=["post"], permission_classes=(IsAuthenticated,))
     def avatar(self, request, pk=None):
         """Update uploaded avatar."""
-        profile = self.get_object()
+        user = self.get_queryset().get(pk=request.user.pk)
+        profile = user.profile
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         avatar = serializer.validated_data["avatar"]
@@ -119,16 +131,4 @@ class UserProfileViewSet(
                 )
                 blob.upload_from_string(img_bytes)
 
-        return Response(serializer.data)
-
-
-class PublicUserProfileViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    A viewset for retrieving public user info.
-    """
-
-    serializer_class = PublicUserProfileSerializer
-    permission_classes = (AllowAny,)
-
-    def get_queryset(self):
-        return UserProfile.objects.all()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
