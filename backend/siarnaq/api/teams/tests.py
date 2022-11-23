@@ -8,7 +8,7 @@ from django.utils import timezone
 from siarnaq.api.compete.models import Match, MatchParticipant, Submission
 from siarnaq.api.episodes.models import Episode, Language, Map
 from siarnaq.api.teams.managers import generate_4regular_graph
-from siarnaq.api.teams.models import Rating, Team, TeamProfile, TeamStatus
+from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.user.models import User
 
 
@@ -73,7 +73,6 @@ class AutoscrimmageTestCase(TestCase):
     def make_team(self, *, episode, name, n_submissions, **kwargs):
         """Create a team with the given quantity of accepted submissions."""
         t = Team.objects.create(episode=episode, name=name, **kwargs)
-        TeamProfile.objects.create(team=t, rating=Rating.objects.create())
         u = User.objects.create_user(username=name, email=f"{name}@example.com")
         for i in range(n_submissions):
             Submission.objects.create(episode=episode, team=t, user=u, accepted=True)

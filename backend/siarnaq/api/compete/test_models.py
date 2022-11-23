@@ -12,7 +12,7 @@ from siarnaq.api.compete.models import (
     Submission,
 )
 from siarnaq.api.episodes.models import Episode, Language, Map
-from siarnaq.api.teams.models import Rating, Team, TeamProfile
+from siarnaq.api.teams.models import Rating, Team
 from siarnaq.api.user.models import User
 
 
@@ -30,7 +30,6 @@ class MatchParticipantLinkedListTestCase(TestCase):
         )
         for name in ["team1", "team2", "team3"]:
             t = Team.objects.create(episode=self.e1, name=name)
-            TeamProfile.objects.create(team=t, rating=Rating.objects.create())
             Submission.objects.create(
                 episode=self.e1,
                 team=t,
@@ -169,7 +168,6 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         )
         for name in ["team1", "team2", "team3"]:
             t = Team.objects.create(episode=e1, name=name)
-            TeamProfile.objects.create(team=t, rating=Rating.objects.create())
             Submission.objects.create(
                 episode=e1,
                 team=t,
@@ -217,6 +215,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         m2.status = SaturnStatus.COMPLETED
         m2.save()
         red.refresh_from_db()
+        t1.refresh_from_db()
         # Expect rating increase after win
         self.assertIsNotNone(red.rating)
         self.assertGreater(red.rating.mean, red.get_old_rating().mean)
@@ -271,6 +270,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         m1.status = SaturnStatus.COMPLETED
         m1.save()
         red.refresh_from_db()
+        t1.refresh_from_db()
         # Expect rating increase after win
         self.assertIsNotNone(red.rating)
         self.assertGreater(red.rating.mean, red.get_old_rating().mean)
@@ -408,6 +408,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         m2.save()
         red1.refresh_from_db()
         red2.refresh_from_db()
+        t1.refresh_from_db()
         # Expect no change because unranked
         self.assertEqual(red1.rating, red2.rating)
         self.assertEqual(t1.profile.rating, red2.rating)
@@ -460,6 +461,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         m1.status = SaturnStatus.COMPLETED
         m1.save()
         red.refresh_from_db()
+        t1.refresh_from_db()
         # Expect no change because unranked
         self.assertIsNotNone(red.rating)
         self.assertEqual(red.rating.value, red.get_old_rating().value)
@@ -511,6 +513,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         red1.refresh_from_db()
         red3.refresh_from_db()
         blue3.refresh_from_db()
+        t1.refresh_from_db()
         # Expect m3 red to not be finalized yet, because t3 is not finalized
         self.assertIsNotNone(red1.rating)
         self.assertGreater(red1.rating.mean, red1.get_old_rating().mean)
@@ -589,7 +592,6 @@ class ScrimmageRequestQuerySetTestCase(TestCase):
         self.teams = []
         for name in ["team1", "team2"]:
             t = Team.objects.create(episode=e1, name=name)
-            TeamProfile.objects.create(team=t, rating=Rating.objects.create())
             Submission.objects.create(
                 episode=e1,
                 team=t,
