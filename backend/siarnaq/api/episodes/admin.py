@@ -124,3 +124,15 @@ class TournamentAdmin(admin.ModelAdmin):
     readonly_fields = ("in_progress",)
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
+
+
+@admin.register(TournamentRound)
+class TournamentRoundAdmin(admin.ModelAdmin):
+    fields = (
+        ("name", "challonge_id", "is_released"),
+        ("maps",),
+    )
+    list_display = ("name", "tournament", "is_released")
+    list_select_related = ("tournament",)
+    raw_id_fields = ("maps",)
+    readonly_fields = ("challonge_id",)
