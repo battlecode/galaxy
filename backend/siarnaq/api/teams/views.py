@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
-from rest_framework import mixins, status, viewsets
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -27,6 +27,9 @@ class TeamViewSet(
 
     When creating a team, add the logged in user as the sole member.
     """
+
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name", "=members__username"]
 
     def get_queryset(self):
         return (

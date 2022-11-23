@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import transaction
 from django.http import Http404
 from PIL import Image
-from rest_framework import mixins, status, viewsets
+from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -31,6 +31,8 @@ class UserViewSet(
     """
 
     permission_classes = (AllowAny,)
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["username"]
 
     def get_queryset(self):
         return User.objects.select_related("profile").all()
