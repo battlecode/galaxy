@@ -462,9 +462,9 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         red.refresh_from_db()
         # Expect no change because unranked
         self.assertIsNotNone(red.rating)
-        self.assertEqual(red.rating.to_value(), red.get_old_rating().to_value())
+        self.assertEqual(red.rating.value, red.get_old_rating().value)
         self.assertEqual(red.rating.n, 0)
-        self.assertEqual(t1.profile.rating.to_value(), red.rating.to_value())
+        self.assertEqual(t1.profile.rating.value, red.rating.value)
 
     # Partitions for: finalize chaining. Testing finalizations propagate correctly.
     # - chain has finalized opponent
