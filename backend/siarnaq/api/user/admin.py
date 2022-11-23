@@ -15,6 +15,9 @@ class UserProfileInline(admin.StackedInline):
     )
     readonly_fields = ("has_avatar", "has_resume")
 
+    def has_delete_permission(self, request, obj):
+        return False
+
 
 class TeamInline(admin.TabularInline):
     model = Team.members.through
@@ -83,3 +86,6 @@ class UserAdmin(admin.ModelAdmin):
             if f in form.base_fields:
                 form.base_fields[f].disabled = True
         return form
+
+    def has_delete_permission(self, request, obj=None):
+        return False

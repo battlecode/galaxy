@@ -35,6 +35,9 @@ class SubmissionAdmin(admin.ModelAdmin):
         "created",
     )
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class MatchParticipantInline(admin.StackedInline):
     model = MatchParticipant
@@ -84,6 +87,9 @@ class MatchAdmin(admin.ModelAdmin):
             .prefetch_related("participants__team")
         )
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(ScrimmageRequest)
 class ScrimmageRequestAdmin(admin.ModelAdmin):
@@ -106,3 +112,6 @@ class ScrimmageRequestAdmin(admin.ModelAdmin):
     ordering = ("-pk",)
     raw_id_fields = ("requested_by", "requested_to", "maps")
     readonly_fields = ("created", "status")
+
+    def has_delete_permission(self, request, obj=None):
+        return False

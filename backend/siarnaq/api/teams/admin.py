@@ -23,6 +23,9 @@ class TeamProfileInline(admin.StackedInline):
             .prefetch_related("eligible_for")
         )
 
+    def has_delete_permission(self, request, obj):
+        return False
+
 
 class SubmissionInline(admin.TabularInline):
     model = Submission
@@ -81,6 +84,9 @@ class TeamAdmin(admin.ModelAdmin):
     readonly_fields = ("join_key",)
     search_fields = ("name",)
     search_help_text = "Search for a team name."
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
     @admin.display(ordering="profile__rating__value")
     def rating(self, obj):
