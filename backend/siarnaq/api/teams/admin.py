@@ -82,6 +82,6 @@ class TeamAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     search_help_text = "Search for a team name."
 
-    @admin.display()
+    @admin.display(ordering="profile__rating__value")
     def rating(self, obj):
         return obj.profile.rating
