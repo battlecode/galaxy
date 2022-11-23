@@ -4,7 +4,6 @@ import uuid
 
 from django.apps import apps
 from django.db import models
-from django.db.models import Q
 
 import siarnaq.api.refs as refs
 from siarnaq.api.compete.managers import (
@@ -144,6 +143,76 @@ class Submission(SaturnInvocation):
         }
 
 
+class Match(SaturnInvocation):
+    """
+    A database model for a match.
+    """
+
+    episode = models.ForeignKey(
+        refs.EPISODE_MODEL,
+        on_delete=models.PROTECT,
+        related_name="matches",
+    )
+    """The episode to which this match belongs."""
+
+    tournament_round = models.ForeignKey(
+        refs.TOURNAMENT_ROUND_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="matches",
+    )
+    """The tournament round to which this match belongs, if any."""
+
+    maps = models.ManyToManyField(refs.MAP_MODEL, related_name="matches")
+    """The maps to be played in this match."""
+
+    alternate_order = models.BooleanField()
+    """Whether players should alternate orderGbetween successive games of this match."""
+
+    created = models.DateTimeField(auto_now_add=True)
+    """The time at which this match was created."""
+
+    is_ranked = models.BooleanField()
+    """Whether this match counts for ranked ratings."""
+
+    replay = models.UUIDField(default=uuid.uuid4)
+    """The replay file of this match."""
+
+    objects = MatchQuerySet.as_manager()
+
+    def get_replay_path(self):
+        """Return the path to the replay file."""
+        return posixpath.join(
+            self.episode.name_short,
+            "replays",
+            f"{self.replay}.{self.episode.name_short}",
+        )
+
+    def enqueue_options(self):
+        """Return the options to be submitted to the execution queue."""
+        return {
+            "id": self.pk,
+            "episode": self.episode_id,
+            "players": [
+                {"path": participant.submission.get_binary_path(), "options": ""}
+                for participant in self.participants.order_by("player_index").all()
+            ],
+            "replay-path": self.get_replay_path(),
+            "maps": [m.name for m in self.maps.all()],
+        }
+
+    def try_finalize_ratings(self):
+        """Try to finalize the ratings of the participations if possible."""
+        if self.is_ranked and not self.is_finalized():
+            return  # Not ready yet
+        participants = self.participants.all()
+        for i, participant in enumerate(participants):
+            participant.try_finalize_rating(
+                opponents=[o for o in participants if o is not participant]
+            )
+
+
 class MatchParticipant(models.Model):
     """
     A database model for a participation of a team in a match.
@@ -166,6 +235,16 @@ class MatchParticipant(models.Model):
     The active submission that was used by the team in this match. Will be auto-filled
     upon save if left blank.
     """
+
+    match = models.ForeignKey(
+        Match,
+        on_delete=models.PROTECT,
+        related_name="participants",
+    )
+    """The match to which this participant belongs."""
+
+    player_index = models.PositiveSmallIntegerField()
+    """The player number of the participant in the match."""
 
     score = models.PositiveSmallIntegerField(null=True, blank=True)
     """The team's score in the match, or null if the match has not been completed."""
@@ -214,11 +293,7 @@ class MatchParticipant(models.Model):
             return None
         return self.rating.to_value() - self.get_old_rating().to_value()
 
-    def get_match(self):
-        """Retrieve the match that contains this participation."""
-        return Match.objects.get(Q(red=self) | Q(blue=self))
-
-    def try_finalize_rating(self, *, match, opponent):
+    def try_finalize_rating(self, *, opponents):
         """
         Attempt to finalize the rating for this participation if ready.
 
@@ -240,10 +315,7 @@ class MatchParticipant(models.Model):
 
         Parameters
         ----------
-        match : Match
-            The match to which this participation belongs. Should be the return value of
-            self.get_match()
-        opponent : MatchParticipant
+        opponent : list[MatchParticipant]
             The opponent of this participation. Should be the return value of
             match.get_opponent(self)
         """
@@ -256,8 +328,8 @@ class MatchParticipant(models.Model):
 
         # Matches are unranked if they were supposed to be unranked, or if they ended
         # unsuccessfully.
-        is_unranked = (not match.is_ranked) or (
-            match.is_finalized() and match.status != SaturnStatus.COMPLETED
+        is_unranked = (not self.match.is_ranked) or (
+            self.match.is_finalized() and self.match.status != SaturnStatus.COMPLETED
         )
 
         if is_unranked:
@@ -266,114 +338,27 @@ class MatchParticipant(models.Model):
                 # Occurs when this is the team's first-ever match.
                 old_rating.save()
             self.rating = old_rating
-        elif match.is_finalized():
-            opponent_rating = opponent.get_old_rating()
-            if opponent_rating is not None:
+
+        elif self.match.is_finalized():
+            opponent_ratings = [opponent.get_old_rating() for opponent in opponents]
+            total_score = self.score + sum(opponent.score for opponent in opponents)
+            if all(r is not None for r in opponent_ratings):
                 self.rating = self.get_old_rating().step(
-                    opponent_rating, self.score / (self.score + opponent.score)
+                    opponent_ratings, self.score / total_score
                 )
 
         if self.rating is not None:
             self.save(update_fields=["rating"])
             # Finalize ratings for any matches that could now be ready
             try:
-                next_match = Match.objects.select_related(
-                    "red__previous_participation__rating",
-                    "blue__previous_participation__rating",
-                    "red__rating",
-                    "blue__rating",
-                ).get(
-                    Q(red__previous_participation=self)
-                    | Q(blue__previous_participation=self)
-                )
+                next_match = Match.objects.prefetch_related(
+                    "participants__previous_participation__rating",
+                    "participants__rating",
+                ).get(participants__previous_participation=self)
             except Match.DoesNotExist:
                 pass  # No more matches to do
             else:
                 next_match.try_finalize_ratings()
-
-
-class Match(SaturnInvocation):
-    """
-    A database model for a match.
-    """
-
-    episode = models.ForeignKey(
-        refs.EPISODE_MODEL,
-        on_delete=models.PROTECT,
-        related_name="matches",
-    )
-    """The episode to which this match belongs."""
-
-    tournament_round = models.ForeignKey(
-        refs.TOURNAMENT_ROUND_MODEL,
-        null=True,
-        blank=True,
-        on_delete=models.PROTECT,
-        related_name="matches",
-    )
-    """The tournament round to which this match belongs, if any."""
-
-    red = models.OneToOneField(
-        MatchParticipant,
-        on_delete=models.PROTECT,
-        related_name="red_match",
-    )
-    """The red team on the first game in this match."""
-
-    blue = models.OneToOneField(
-        MatchParticipant,
-        on_delete=models.PROTECT,
-        related_name="blue_match",
-    )
-    """The blue team on the first game in this match."""
-
-    maps = models.ManyToManyField(refs.MAP_MODEL, related_name="matches")
-    """The maps to be played in this match."""
-
-    alternate_color = models.BooleanField()
-    """Whether teams should alternate colors between successive games of this match."""
-
-    created = models.DateTimeField(auto_now_add=True)
-    """The time at which this match was created."""
-
-    is_ranked = models.BooleanField()
-    """Whether this match counts for ranked ratings."""
-
-    replay = models.UUIDField(default=uuid.uuid4)
-    """The replay file of this match."""
-
-    objects = MatchQuerySet.as_manager()
-
-    def get_replay_path(self):
-        """Return the path to the replay file."""
-        return posixpath.join(
-            self.episode.name_short,
-            "replays",
-            f"{self.replay}.{self.episode.name_short}",
-        )
-
-    def enqueue_options(self):
-        """Return the options to be submitted to the execution queue."""
-        return {
-            "id": self.pk,
-            "episode": self.episode_id,
-            "players": [
-                {"path": self.red.submission.get_binary_path(), "options": ""},
-                {"path": self.blue.submission.get_binary_path(), "options": ""},
-            ],
-            "replay-path": self.get_replay_path(),
-            # NOTE: ExecuteTask in /battlecode/saturn/blob/main/worker/pkg/run/types.go
-            # specifies that map be a string, not list.
-            # Use a comma seperated string of map names.
-            "map": ",".join(map.name for map in self.maps.all()),
-        }
-
-    def try_finalize_ratings(self):
-        """Try to finalize the ratings of the participations if possible."""
-        if self.is_ranked and not self.is_finalized():
-            return  # Not ready yet
-        self.red.try_finalize_rating(match=self, opponent=self.blue)
-        self.blue.try_finalize_rating(match=self, opponent=self.red)
 
 
 class ScrimmageRequestStatus(models.TextChoices):
@@ -391,16 +376,14 @@ class ScrimmageRequestStatus(models.TextChoices):
     """The request was denied by the opponent."""
 
 
-class PlayerColor(models.TextChoices):
+class PlayerOrder(models.TextChoices):
     """
-    An immutable type enumerating the possible player colors in a scrimmage request.
+    An immutable type enumerating the possible player orders in a scrimmage request.
     """
 
-    ALWAYS_RED = "RRR"
-    ALWAYS_BLUE = "BBB"
-    ALTERNATE_RED = "RBR"
-    ALTERNATE_BLUE = "BRB"
-    ALTERNATE_RANDOM = "???"  # Randomly selected from ALTERNATE_RED and ALTERNATE_BLUE
+    REQUESTER_FIRST = "+"
+    REQUESTER_LAST = "-"
+    SHUFFLED = "?"
 
 
 class ScrimmageRequest(models.Model):
@@ -442,36 +425,27 @@ class ScrimmageRequest(models.Model):
     )
     """The opponent who is receiving this match request."""
 
-    requester_color = models.CharField(max_length=3, choices=PlayerColor.choices)
-    """
-    The color requested by the sender.
-    Note that the opponent will have the opposite color.
-    """
+    player_order = models.CharField(max_length=3, choices=PlayerOrder.choices)
+    """The order of the players in the match."""
 
     maps = models.ManyToManyField(refs.MAP_MODEL, related_name="scrimmage_requests")
     """The maps to be played on the requested match."""
 
     objects = ScrimmageRequestQuerySet.as_manager()
 
-    def is_alternating_color(self):
-        """Determine whether the requested color alternates between games."""
-        return self.requester_color in {
-            PlayerColor.ALTERNATE_RED,
-            PlayerColor.ALTERNATE_BLUE,
-            PlayerColor.ALTERNATE_RANDOM,
-        }
+    def determine_is_alternating(self):
+        """Determine whether the player order should be alternating."""
+        return self.player_order == PlayerOrder.SHUFFLED
 
-    def determine_is_requester_red_first(self):
+    def determine_order(self):
         """
-        Determine whether the requester will be red in the first game.
-        Not guaranteed to behave deterministcally for random selections.
+        Determine the player order for the match. Not guaranteed to behave
+        deterministically for random selections.
         """
-        match self.requester_color:
-            case PlayerColor.ALWAYS_RED | PlayerColor.ALTERNATE_RED:
-                return True
-            case PlayerColor.ALWAYS_BLUE | PlayerColor.ALTERNATE_BLUE:
-                return False
-            case PlayerColor.ALTERNATE_RANDOM:
-                return bool(random.getrandbits(1))
+        match (self.player_order, random.getrandbits(1)):
+            case (PlayerOrder.REQUESTER_FIRST, _) | (PlayerOrder.SHUFFLED, 0):
+                return [self.requested_by_id, self.requested_to_id]
+            case (PlayerOrder.REQUESTER_LAST, _) | (PlayerOrder.SHUFFLED, 1):
+                return [self.requested_to_id, self.requested_by_id]
             case _:
                 raise ValueError("Unknown color")

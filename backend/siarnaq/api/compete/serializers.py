@@ -96,7 +96,16 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MatchParticipant
-        fields = ["team", "teamname", "submission", "score", "rating", "old_rating"]
+        fields = [
+            "team",
+            "teamname",
+            "submission",
+            "match",
+            "player_index",
+            "score",
+            "rating",
+            "old_rating",
+        ]
         read_only_fields = fields
 
     @extend_schema_field(OpenApiTypes.DOUBLE)
@@ -125,8 +134,7 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
 
 
 class MatchSerializer(serializers.ModelSerializer):
-    red = MatchParticipantSerializer()
-    blue = MatchParticipantSerializer()
+    participants = MatchParticipantSerializer(many=True)
     maps = serializers.SerializerMethodField()
 
     class Meta:
@@ -135,10 +143,9 @@ class MatchSerializer(serializers.ModelSerializer):
             "id",
             "status",
             "episode",
-            "red",
-            "blue",
+            "participants",
             "maps",
-            "alternate_color",
+            "alternate_order",
             "created",
             "is_ranked",
             "replay",
@@ -160,27 +167,22 @@ class MatchSerializer(serializers.ModelSerializer):
             and not instance.tournament_round.is_released
         ):
             # Unreleased tournament matches are fully redacted
-            data["red"] = data["blue"] = data["replay"] = data["maps"] = None
-        elif any(
-            member.pk == self.context["user_id"]
-            for member in instance.red.team.members.all()
-        ) or any(
-            member.pk == self.context["user_id"]
-            for member in instance.blue.team.members.all()
-        ):
+            data["participants"] = data["replay"] = data["maps"] = None
+        elif instance.participants.filter(
+            team__members=self.context["user_id"]
+        ).exists():
             # Clients can see everything about their own games
             pass
-        elif (
-            instance.red.team.status == TeamStatus.INVISIBLE
-            or instance.blue.team.status == TeamStatus.INVISIBLE
-        ):
+        elif instance.participants.filter(team__status=TeamStatus.INVISIBLE).exists():
             # Matches with invisible teams are fully redacted, because they are, by
             # definition, invisible
-            data["red"] = data["blue"] = data["replay"] = data["maps"] = None
-        elif instance.red.team.is_staff() or instance.blue.team.is_staff():
+            data["participants"] = data["replay"] = data["maps"] = None
+        elif instance.participants.filter(team__status=TeamStatus.STAFF).exists():
             # Matches with staff teams have scores redacted because they could be for
             # official grading purposes. We redact all of them just in case.
-            data["red"]["score"] = data["blue"]["score"] = data["replay"] = None
+            data["replay"] = None
+            for p in data["participants"]:
+                p["score"] = None
         else:
             # Replay links are private, but scores are ok to be released.
             data["replay"] = None
@@ -189,13 +191,11 @@ class MatchSerializer(serializers.ModelSerializer):
 
 class MatchReportSerializer(serializers.Serializer):
     invocation = SaturnInvocationSerializer()
-    red_score = serializers.IntegerField(min_value=0)
-    blue_score = serializers.IntegerField(min_value=0)
+    scores = serializers.ListField(child=serializers.IntegerField(min_value=0))
 
     def validate(self, data):
-        has_red = data.get("red_score", None) is not None
-        has_blue = data.get("blue_score", None) is not None
-        if has_red + has_blue == 1:
+        scores = data.get("scores")
+        if scores and len(scores) != self.instance.participants.count():
             raise serializers.ValidationError("must provide either no or all scores")
         return data
 
@@ -203,12 +203,11 @@ class MatchReportSerializer(serializers.Serializer):
     def save(self):
         self.instance.status = self.validated_data["invocation"]["status"]
         self.instance.logs += self.validated_data["invocation"]["logs"]
-        if self.validated_data.get("red_score", None) is not None:
-            self.instance.red.score = self.validated_data["red_score"]
-            self.instance.red.save(update_fields=["score"])
-        if self.validated_data.get("blue_score", None) is not None:
-            self.instance.blue.score = self.validated_data["blue_score"]
-            self.instance.blue.save(update_fields=["score"])
+        participants = list(self.instance.participants.order_by("player_index"))
+        for participant, score in zip(participants, self.validated_data["scores"]):
+            participant.score = score
+
+        MatchParticipant.objects.bulk_update(participants, ["score"])
         self.instance.save(update_fields=["status", "logs"])
         return self.instance
 
@@ -243,7 +242,7 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
             "requested_to",
             "requested_to_name",
             "requested_to_rating",
-            "requester_color",
+            "player_order",
             "maps",
             "map_names",
         ]
