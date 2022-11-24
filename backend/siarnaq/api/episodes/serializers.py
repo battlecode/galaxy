@@ -1,6 +1,11 @@
 from rest_framework import serializers
 
-from siarnaq.api.episodes.models import Episode, Tournament
+from siarnaq.api.episodes.models import (
+    Episode,
+    ReleaseStatus,
+    Tournament,
+    TournamentRound,
+)
 
 
 class AutoscrimSerializer(serializers.Serializer):
@@ -38,3 +43,22 @@ class TournamentSerializer(serializers.ModelSerializer):
             "submission_unfreeze",
             "challonge_public",
         ]
+
+
+class TournamentRoundSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TournamentRound
+        fields = [
+            "tournament",
+            "challonge_id",
+            "name",
+            "maps",
+            "release_status",
+        ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Redact maps if not yet fully released
+        if instance.release_status != ReleaseStatus.RESULTS:
+            data["maps"] = None
+        return data
