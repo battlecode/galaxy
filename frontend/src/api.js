@@ -410,7 +410,7 @@ class Api {
     return $.ajax({
       url: `${URL}/api/user/u/me/`,
       data: JSON.stringify(user),
-      type: "PATCH",
+      type: "PUT",
       contentType: "application/json",
       dataType: "json",
     })

@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from siarnaq.api.user.models import User
 from siarnaq.api.user.serializers import (
     UserAvatarSerializer,
+    UserCreateSerializer,
     UserPrivateSerializer,
     UserPublicSerializer,
     UserResumeSerializer,
@@ -39,7 +40,9 @@ class UserViewSet(
 
     def get_serializer_class(self):
         match self.action:
-            case "create" | "me":
+            case "create":
+                return UserCreateSerializer
+            case "me":
                 return UserPrivateSerializer
             case "retrieve":
                 return UserPublicSerializer
@@ -51,7 +54,9 @@ class UserViewSet(
                 raise RuntimeError("Unexpected action")
 
     @action(
-        detail=False, methods=["get", "patch"], permission_classes=(IsAuthenticated,)
+        detail=False,
+        methods=["get", "put", "patch"],
+        permission_classes=(IsAuthenticated,),
     )
     def me(self, request):
         """Retrieve or update information about the logged-in user."""
@@ -59,6 +64,11 @@ class UserViewSet(
         match request.method.lower():
             case "get":
                 serializer = self.get_serializer(user)
+                return Response(serializer.data)
+            case "put":
+                serializer = self.get_serializer(user, data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
                 return Response(serializer.data)
             case "patch":
                 serializer = self.get_serializer(user, data=request.data, partial=True)
