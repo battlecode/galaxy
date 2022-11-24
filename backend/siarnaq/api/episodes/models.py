@@ -207,7 +207,7 @@ class Tournament(models.Model):
     """Whether teams must have submitted resumes in order to enter the tournament."""
 
     is_public = models.BooleanField()
-    """Whether the results of the tournament are released and publicly available."""
+    """Whether this tournament is included in the public index."""
 
     submission_freeze = models.DateTimeField()
     """
@@ -255,6 +255,17 @@ class Tournament(models.Model):
         raise NotImplementedError
 
 
+class ReleaseStatus(models.TextChoices):
+    """
+    An immutable type enumerating the degree to which the results of a tournament match
+    are released.
+    """
+
+    HIDDEN = "H"
+    PARTICIPANTS = "P"
+    RESULTS = "R"
+
+
 class TournamentRound(models.Model):
     """
     A database model for the information regarding a round of a tournament. A round is
@@ -277,8 +288,10 @@ class TournamentRound(models.Model):
     maps = models.ManyToManyField(Map, related_name="tournament_rounds")
     """The maps to be used in this round."""
 
-    is_released = models.BooleanField(default=False)
-    """Whether the results of this round are released publicly."""
+    release_status = models.CharField(
+        max_length=1, choices=ReleaseStatus.choices, default=ReleaseStatus.HIDDEN
+    )
+    """THe degree to which matches in this round are released."""
 
     class Meta:
         constraints = [

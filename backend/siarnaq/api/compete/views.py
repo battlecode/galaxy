@@ -166,9 +166,9 @@ class MatchViewSet(
     permission_classes = (IsEpisodeAvailable | IsAdminUser,)
 
     def get_queryset(self):
-        return (
+        queryset = (
             Match.objects.filter(episode=self.kwargs["episode_id"])
-            .select_related("tournament_round")
+            .select_related("tournament_round__tournament")
             .prefetch_related(
                 "participants__previous_participation__rating",
                 "participants__rating",
@@ -178,6 +178,7 @@ class MatchViewSet(
             )
             .order_by("-pk")
         )
+        return queryset
 
     @extend_schema(responses={status.HTTP_200_OK: MatchSerializer(many=True)})
     @action(

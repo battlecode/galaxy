@@ -23,6 +23,7 @@ from siarnaq.api.episodes.models import (
     Episode,
     Language,
     Map,
+    ReleaseStatus,
     Tournament,
     TournamentRound,
     TournamentStyle,
@@ -318,11 +319,14 @@ class MatchSerializerTestCase(TestCase):
             submission_freeze=timezone.now(),
             submission_unfreeze=timezone.now(),
         )
-        self.r_released = TournamentRound.objects.create(
-            tournament=tournament, is_released=True
+        self.r_hidden = TournamentRound.objects.create(
+            tournament=tournament, release_status=ReleaseStatus.HIDDEN
         )
-        self.r_unreleased = TournamentRound.objects.create(
-            tournament=tournament, is_released=False
+        self.r_participants = TournamentRound.objects.create(
+            tournament=tournament, release_status=ReleaseStatus.PARTICIPANTS
+        )
+        self.r_results = TournamentRound.objects.create(
+            tournament=tournament, release_status=ReleaseStatus.RESULTS
         )
 
         self.users, self.teams, self.submissions = [], [], []
@@ -349,9 +353,9 @@ class MatchSerializerTestCase(TestCase):
     # user: admin, not admin
     # match: includes self, without self
     # match: includes regular staff team, includes invisible team, without staff team
-    # match tournament round: released, not released, none
+    # match tournament round release: none, hidden, participants, results
 
-    def test_admin_has_staff_team_tournament_not_released(self):
+    def test_admin_has_staff_team_tournament_hidden(self):
         serializer = MatchSerializer(
             context={
                 "episode_id": self.e1.pk,
@@ -363,7 +367,7 @@ class MatchSerializerTestCase(TestCase):
         )
         match = Match.objects.create(
             episode=self.e1,
-            tournament_round=self.r_unreleased,
+            tournament_round=self.r_hidden,
             alternate_order=True,
             is_ranked=True,
         )
@@ -491,7 +495,7 @@ class MatchSerializerTestCase(TestCase):
             },
         )
 
-    def test_not_admin_has_self_no_staff_team_tournament_released(self):
+    def test_not_admin_has_self_no_staff_team_tournament_results(self):
         serializer = MatchSerializer(
             context={
                 "episode_id": self.e1.pk,
@@ -503,7 +507,7 @@ class MatchSerializerTestCase(TestCase):
         )
         match = Match.objects.create(
             episode=self.e1,
-            tournament_round=self.r_released,
+            tournament_round=self.r_results,
             alternate_order=True,
             is_ranked=False,
         )
@@ -561,7 +565,7 @@ class MatchSerializerTestCase(TestCase):
             },
         )
 
-    def test_not_admin_has_self_no_staff_team_tournament_not_released(self):
+    def test_not_admin_has_self_no_staff_team_tournament_participants(self):
         serializer = MatchSerializer(
             context={
                 "episode_id": self.e1.pk,
@@ -573,7 +577,77 @@ class MatchSerializerTestCase(TestCase):
         )
         match = Match.objects.create(
             episode=self.e1,
-            tournament_round=self.r_unreleased,
+            tournament_round=self.r_participants,
+            alternate_order=True,
+            is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(
+            team=self.teams[0],
+            submission=self.submissions[0],
+            match=match,
+            player_index=0,
+            score=0,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
+        )
+        match.maps.add(self.map)
+        data = serializer.to_representation(match)
+        self.assertEqual(
+            data,
+            {
+                "id": match.pk,
+                "status": str(match.status),
+                "episode": match.episode.pk,
+                "participants": [
+                    {
+                        "team": red.team.pk,
+                        "teamname": red.team.name,
+                        "submission": red.submission.pk,
+                        "match": match.pk,
+                        "player_index": 0,
+                        "score": None,
+                        "rating": red.rating.value,
+                        "old_rating": red.get_old_rating().value,
+                    },
+                    {
+                        "team": blue.team.pk,
+                        "teamname": blue.team.name,
+                        "submission": None,
+                        "match": match.pk,
+                        "player_index": 1,
+                        "score": None,
+                        "rating": blue.rating.value,
+                        "old_rating": blue.get_old_rating().value,
+                    },
+                ],
+                "maps": None,
+                "alternate_order": match.alternate_order,
+                "created": match.created.isoformat().replace("+00:00", "Z"),
+                "is_ranked": match.is_ranked,
+                "replay": None,
+            },
+        )
+
+    def test_not_admin_has_self_no_staff_team_tournament_hidden(self):
+        serializer = MatchSerializer(
+            context={
+                "episode_id": self.e1.pk,
+                "team_id": self.teams[0],
+                "user_id": self.users[0].pk,
+                "user_is_staff": False,
+                "team_is_staff": False,
+            }
+        )
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=self.r_hidden,
             alternate_order=True,
             is_ranked=False,
         )
@@ -893,11 +967,11 @@ class MatchViewSetTestCase(APITestCase):
             submission_freeze=timezone.now(),
             submission_unfreeze=timezone.now(),
         )
-        self.r_released = TournamentRound.objects.create(
-            tournament=tournament, is_released=True
+        self.r_results = TournamentRound.objects.create(
+            tournament=tournament, release_status=ReleaseStatus.RESULTS
         )
-        self.r_unreleased = TournamentRound.objects.create(
-            tournament=tournament, is_released=False
+        self.r_hidden = TournamentRound.objects.create(
+            tournament=tournament, release_status=ReleaseStatus.HIDDEN
         )
 
         self.users, self.teams, self.submissions = [], [], []
@@ -916,13 +990,13 @@ class MatchViewSetTestCase(APITestCase):
             self.teams.append(t)
 
     # Partitions for: my.
-    # match tournament round: released, not released, none
+    # match tournament round released: results, no results, none
 
-    def test_my_released(self):
+    def test_my_results(self):
         self.client.force_authenticate(self.users[0])
         match = Match.objects.create(
             episode=self.e1,
-            tournament_round=self.r_released,
+            tournament_round=self.r_results,
             alternate_order=True,
             is_ranked=False,
         )
@@ -949,11 +1023,11 @@ class MatchViewSetTestCase(APITestCase):
         # here. This is purely a design choice.
         self.assertEqual(len(response.json()["results"]), 0)
 
-    def test_my_not_released(self):
+    def test_my_no_results(self):
         self.client.force_authenticate(self.users[0])
         match = Match.objects.create(
             episode=self.e1,
-            tournament_round=self.r_unreleased,
+            tournament_round=self.r_hidden,
             alternate_order=True,
             is_ranked=False,
         )

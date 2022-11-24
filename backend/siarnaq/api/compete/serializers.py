@@ -10,7 +10,7 @@ from siarnaq.api.compete.models import (
     ScrimmageRequest,
     Submission,
 )
-from siarnaq.api.episodes.models import Map
+from siarnaq.api.episodes.models import Map, ReleaseStatus
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.serializers import RatingField
 
@@ -164,10 +164,21 @@ class MatchSerializer(serializers.ModelSerializer):
             pass
         elif (
             instance.tournament_round is not None
-            and not instance.tournament_round.is_released
+            and instance.tournament_round.release_status == ReleaseStatus.HIDDEN
+        ) or (
+            instance.tournament_round is not None
+            and not instance.tournament_round.tournament.is_public
         ):
-            # Unreleased tournament matches are fully redacted
+            # Unreleased tournament matches and private tournaments are fully redacted
             data["participants"] = data["replay"] = data["maps"] = None
+        elif (
+            instance.tournament_round is not None
+            and instance.tournament_round.release_status == ReleaseStatus.PARTICIPANTS
+        ):
+            # Participants-only tournament matches are partially redacted
+            data["replay"] = data["maps"] = None
+            for p in data["participants"]:
+                p["score"] = None
         elif instance.participants.filter(
             team__members=self.context["user_id"]
         ).exists():
