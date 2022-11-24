@@ -88,15 +88,13 @@ class TeamPrivateSerializer(TeamPublicSerializer):
     class Meta:
         model = Team
         fields = ["id", "profile", "episode", "name", "members", "join_key", "status"]
-        read_only_fields = ["id", "episode", "members", "join_key", "status"]
+        read_only_fields = ["id", "episode", "name", "members", "join_key", "status"]
 
     def to_internal_value(self, data):
         """
         Use the episode ID provided in URL as the team's episode.
         """
         ret = super().to_internal_value(data)
-        # TODO: this prevents some validation (e.g. uniqueness of (episode, team)),
-        # which is undesirable.
         ret.update(episode_id=self.context["view"].kwargs.get("episode_id"))
         return ret
 
@@ -116,6 +114,13 @@ class TeamPrivateSerializer(TeamPublicSerializer):
             profile_serializer.update(profile, profile_data)
 
         return super(TeamPublicSerializer, self).update(instance, validated_data)
+
+
+class TeamCreateSerializer(TeamPrivateSerializer):
+    class Meta:
+        model = Team
+        fields = ["id", "profile", "episode", "name", "members", "join_key", "status"]
+        read_only_fields = ["id", "episode", "members", "join_key", "status"]
 
 
 class TeamJoinSerializer(serializers.Serializer):
