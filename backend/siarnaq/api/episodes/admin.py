@@ -24,10 +24,12 @@ class EpisodeAdmin(admin.ModelAdmin):
             "General",
             {
                 "fields": (
-                    ("name_short", "name_long"),
-                    ("language", "release_version"),
-                    ("blurb",),
-                    ("eligibility_criteria",),
+                    "name_short",
+                    "name_long",
+                    "language",
+                    "release_version",
+                    "blurb",
+                    "eligibility_criteria",
                 ),
             },
         ),
@@ -101,7 +103,7 @@ class TournamentAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             "General",
-            {"fields": (("name_short", "name_long"), ("episode", "style"), ("blurb",))},
+            {"fields": ("name_short", "name_long", "episode", "style", "blurb")},
         ),
         (
             "Release options",
@@ -165,8 +167,10 @@ class MatchInline(admin.TabularInline):
 @admin.register(TournamentRound)
 class TournamentRoundAdmin(admin.ModelAdmin):
     fields = (
-        ("name", "challonge_id", "release_status"),
-        ("maps",),
+        "name",
+        "challonge_id",
+        "release_status",
+        "maps",
     )
     filter_horizontal = ("maps",)
     inlines = [MatchInline]

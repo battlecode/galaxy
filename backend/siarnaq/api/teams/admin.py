@@ -7,11 +7,13 @@ from siarnaq.api.teams.models import Team, TeamProfile
 class TeamProfileInline(admin.StackedInline):
     model = TeamProfile
     fields = (
-        ("quote",),
-        ("biography",),
-        ("rating", "has_avatar"),
-        ("auto_accept_ranked", "auto_accept_unranked"),
-        ("eligible_for",),
+        "quote",
+        "biography",
+        "auto_accept_ranked",
+        "auto_accept_unranked",
+        "rating",
+        "has_avatar",
+        "eligible_for",
     )
     filter_horizontal = ("eligible_for",)
     readonly_fields = ("rating", "has_avatar")
@@ -75,7 +77,7 @@ class MatchParticipantInline(admin.TabularInline):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    fields = (("name",), ("episode",), ("status", "join_key"), ("members",))
+    fields = ("name", "episode", "status", "members", "join_key")
     inlines = [TeamProfileInline, SubmissionInline, MatchParticipantInline]
     list_display = ("name", "episode", "rating", "status")
     list_filter = ("episode",)
