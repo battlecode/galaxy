@@ -4,8 +4,13 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 
-from siarnaq.api.episodes.models import Episode
-from siarnaq.api.episodes.serializers import AutoscrimSerializer, EpisodeSerializer
+from siarnaq.api.episodes.models import Episode, Tournament
+from siarnaq.api.episodes.permissions import IsEpisodeAvailable
+from siarnaq.api.episodes.serializers import (
+    AutoscrimSerializer,
+    EpisodeSerializer,
+    TournamentSerializer,
+)
 
 
 class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -41,3 +46,22 @@ class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
         serializer.is_valid(raise_exception=True)
         episode.autoscrim(serializer.validated_data["best_of"])
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
+class TournamentViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A viewset for retrieving Tournaments.
+    """
+
+    serializer_class = TournamentSerializer
+    permission_classes = (IsEpisodeAvailable,)
+
+    def get_queryset(self):
+        queryset = (
+            Tournament.objects.filter(episode=self.kwargs["episode_id"])
+            .order_by("submission_freeze")
+            .prefetch_related("eligibility_includes", "eligibility_excludes")
+        )
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(is_public=True)
+        return queryset
