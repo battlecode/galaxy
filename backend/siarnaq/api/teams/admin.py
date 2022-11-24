@@ -88,6 +88,12 @@ class TeamAdmin(admin.ModelAdmin):
     search_fields = ("name",)
     search_help_text = "Search for a team name."
 
+    def get_readonly_fields(self, request, obj=None):
+        fields = super().get_readonly_fields(request, obj=obj)
+        if obj is not None:
+            fields = ("episode",) + fields
+        return fields
+
     def has_delete_permission(self, request, obj=None):
         return False
 

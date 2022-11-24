@@ -6,6 +6,7 @@ from siarnaq.api.compete.models import (
     ScrimmageRequest,
     Submission,
 )
+from siarnaq.api.episodes.models import Map
 
 
 @admin.action(description="Add pending tasks to the Saturn queue")
@@ -59,6 +60,12 @@ class SubmissionAdmin(admin.ModelAdmin):
         "created",
         "logs",
     )
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = super().get_readonly_fields(request, obj=obj)
+        if obj is not None:
+            fields = ("episode",) + fields
+        return fields
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -117,6 +124,18 @@ class MatchAdmin(admin.ModelAdmin):
     raw_id_fields = ("tournament_round",)
     readonly_fields = ("replay", "status", "created", "logs")
 
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        pk = request.resolver_match.kwargs.get("object_id", None)
+        if db_field.name == "maps" and pk is not None:
+            kwargs["queryset"] = Map.objects.filter(episode__matches=pk)
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = super().get_readonly_fields(request, obj=obj)
+        if obj is not None:
+            fields = ("episode",) + fields
+        return fields
+
     def get_queryset(self, request):
         return (
             super()
@@ -155,6 +174,18 @@ class ScrimmageRequestAdmin(admin.ModelAdmin):
     ordering = ("-pk",)
     raw_id_fields = ("requested_by", "requested_to")
     readonly_fields = ("created", "status")
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        pk = request.resolver_match.kwargs.get("object_id", None)
+        if db_field.name == "maps" and pk is not None:
+            kwargs["queryset"] = Map.objects.filter(episode__scrimmage_requests=pk)
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = super().get_readonly_fields(request, obj=obj)
+        if obj is not None:
+            fields = ("episode",) + fields
+        return fields
 
     def has_delete_permission(self, request, obj=None):
         return False

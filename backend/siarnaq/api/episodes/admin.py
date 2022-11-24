@@ -179,3 +179,9 @@ class TournamentRoundAdmin(admin.ModelAdmin):
     list_select_related = ("tournament",)
     ordering = ("-tournament__submission_freeze", "challonge_id")
     readonly_fields = ("challonge_id",)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        pk = request.resolver_match.kwargs.get("object_id", None)
+        if db_field.name == "maps" and pk is not None:
+            kwargs["queryset"] = Map.objects.filter(episode__tournaments__rounds=pk)
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
