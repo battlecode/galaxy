@@ -783,11 +783,7 @@ class Api {
       dataType: "json",
     })
       .done((data, status) => {
-        this.login(
-          user_profile.user.username,
-          user_profile.user.password,
-          callback
-        );
+        this.login(user_profile.username, user_profile.password, callback);
       })
       .fail((xhr, status, error) => {
         callback(xhr.responseJSON, false);
