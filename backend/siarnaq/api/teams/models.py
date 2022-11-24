@@ -23,7 +23,7 @@ class Rating(models.Model):
     n = models.PositiveIntegerField(default=0)
     """The number of rated games played before this rating."""
 
-    value = models.FloatField()
+    value = models.FloatField(default=0)
     """The penalized Elo value of this rating."""
 
     def save(self, *args, **kwargs):

@@ -1026,7 +1026,9 @@ class MatchViewSetTestCase(APITestCase):
             rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
-        response = self.client.get(reverse("match-my", kwargs={"episode_id": "e1"}))
+        response = self.client.get(
+            reverse("match-scrimmage", kwargs={"episode_id": "e1"})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # We define scrimmaages to be non-tournament matches, so we don't expect them
         # here. This is purely a design choice.
@@ -1057,7 +1059,9 @@ class MatchViewSetTestCase(APITestCase):
             rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
-        response = self.client.get(reverse("match-my", kwargs={"episode_id": "e1"}))
+        response = self.client.get(
+            reverse("match-scrimmage", kwargs={"episode_id": "e1"})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # It is important that unreleased tournament matches don't get exposed here.
         self.assertEqual(len(response.json()["results"]), 0)
@@ -1087,7 +1091,9 @@ class MatchViewSetTestCase(APITestCase):
             rating=Rating.objects.create(),
         )
         match.maps.add(self.map)
-        response = self.client.get(reverse("match-my", kwargs={"episode_id": "e1"}))
+        response = self.client.get(
+            reverse("match-scrimmage", kwargs={"episode_id": "e1"})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()["results"]), 1)
 
