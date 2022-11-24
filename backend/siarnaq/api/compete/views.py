@@ -1,9 +1,10 @@
+from typing import Optional
+
 import google.cloud.storage as storage
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q, Subquery
-from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -29,6 +30,13 @@ from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.gcloud import titan
+
+
+def parse_int(v: str) -> Optional[int]:
+    try:
+        return int(v)
+    except (ValueError, TypeError):
+        return None
 
 
 class EpisodeTeamUserContextMixin:
@@ -182,108 +190,86 @@ class MatchViewSet(
         )
         return queryset
 
-    @extend_schema(responses={status.HTTP_200_OK: MatchSerializer(many=True)})
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="tournament_id",
+                type=str,
+                description="A tournament to filter for.",
+            ),
+            OpenApiParameter(
+                name="round_id",
+                type=int,
+                description="A tournament round to filter for.",
+            ),
+            OpenApiParameter(
+                name="team_id", type=int, description="A team to filter for."
+            ),
+        ],
+        responses={status.HTTP_200_OK: MatchSerializer(many=True)},
+    )
     @action(
         detail=False,
         methods=["get"],
-        url_path=r"tournament/(?P<tournament_id>[^\/.]+)",
         permission_classes=(IsEpisodeAvailable,),
     )
-    def tournament(self, request, *, episode_id, tournament_id):
-        """List all matches played in a tournament."""
-        # Check tournament existence and visibility
-        tournament = get_object_or_404(
-            Tournament.objects.filter(episode=episode_id).visible_to_user(
-                is_staff=request.user.is_staff
-            ),
-            pk=tournament_id,
-        )
-        queryset = self.get_queryset().filter(tournament_round__tournament=tournament)
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
+    def tournament(self, request, *, episode_id):
+        """List matches played in a tournament."""
+        queryset = self.get_queryset()
 
-    @extend_schema(responses={status.HTTP_200_OK: MatchSerializer(many=True)})
-    @action(
-        detail=False,
-        methods=["get"],
-        url_path=r"tournament/(?P<tournament_id>[^\/.]+)/round/(?P<round_id>\d+)",
-        permission_classes=(IsEpisodeAvailable,),
-    )
-    def tournament_round(self, request, *, episode_id, tournament_id, round_id):
-        """List all matches played in a tournament round."""
-        # Check tournament existence and visibility
-        tournament = get_object_or_404(
-            Tournament.objects.filter(episode=episode_id).visible_to_user(
-                is_staff=request.user.is_staff
-            ),
-            pk=tournament_id,
-        )
-        tournament_round = get_object_or_404(tournament.rounds, pk=round_id)
-        queryset = self.get_queryset().filter(tournament_round=tournament_round)
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-
-    @extend_schema(responses={status.HTTP_200_OK: MatchSerializer(many=True)})
-    @action(
-        detail=False,
-        methods=["get"],
-        url_path=r"tournament/(?P<tournament_id>[^\/.]+)/team/(?P<team_id>\d+)",
-        permission_classes=(IsEpisodeAvailable,),
-    )
-    def tournament_team(self, request, *, episode_id, tournament_id, team_id):
-        """List all matches a team played in a tournament."""
-        # Check tournament existence and visibility
-        tournament = get_object_or_404(
-            Tournament.objects.filter(episode=episode_id).visible_to_user(
-                is_staff=request.user.is_staff
-            ),
-            pk=tournament_id,
-        )
+        # Filter tournament as requested
+        tournaments = Tournament.objects.visible_to_user(is_staff=request.user.is_staff)
+        tournament_id = self.request.query_params.get("tournament_id")
+        if tournament_id is not None:
+            tournaments = tournaments.filter(pk=tournament_id)
         queryset = self.get_queryset().filter(
-            tournament_round__tournament=tournament, participants__team=team_id
+            tournament_round__tournament__in=Subquery(tournaments.values("pk"))
         )
-        if not request.user.is_staff:
-            queryset = queryset.filter(
-                tournament_round__release_status__gte=ReleaseStatus.PARTICIPANTS
-            )
+
+        # Filter rounds as requested
+        round_id = parse_int(self.request.query_params.get("round_id"))
+        if round_id is not None:
+            queryset = queryset.filter(tournament_round=round_id)
+
+        # Filter teams as requested
+        team_id = parse_int(self.request.query_params.get("team_id"))
+        if team_id is not None:
+            queryset = queryset.filter(participants__team=team_id)
+            if not request.user.is_staff:
+                # Regular users do not know about unreleased tournament matches
+                queryset = queryset.exclude(
+                    tournament_round__release_status__lt=ReleaseStatus.PARTICIPANTS
+                )
+
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
-    @extend_schema(responses={status.HTTP_200_OK: MatchSerializer(many=True)})
-    @action(
-        detail=False,
-        methods=["get"],
-        permission_classes=(IsAuthenticated, IsEpisodeAvailable, IsOnTeam),
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="team_id",
+                type=int,
+                description="A team to filter for. Defaults to your own team.",
+            ),
+        ],
+        responses={status.HTTP_200_OK: MatchSerializer(many=True)},
     )
-    def my(self, request, *, episode_id):
-        """List all scrimmages that the authenticated team participated in."""
-        # It is extremely important that this method does not return any matches in
-        # unreleased tournaments, to not expose results prematurely. On top of this, it
-        # is a design choice not to return any tournament matches at all, because it
-        # seems logical that they are not part of a scrimmage listing.
-        queryset = self.get_queryset().filter(
-            participants__team__members=request.user,
-            tournament_round__isnull=True,
-        )
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-
-    @extend_schema(responses={status.HTTP_200_OK: MatchSerializer(many=True)})
     @action(
         detail=False,
         methods=["get"],
-        url_path=r"with_team/(?P<team_id>\d+)",
         permission_classes=(IsEpisodeAvailable,),
     )
-    def with_team(self, request, pk=None, *, episode_id, team_id):
+    def scrimmage(self, request, pk=None, *, episode_id):
         """List all scrimmages that a particular team participated in."""
-        queryset = self.get_queryset().filter(
-            participants__team=team_id, tournament_round__isnull=True
-        )
+        queryset = self.get_queryset().filter(tournament_round__isnull=True)
+
+        team_id = parse_int(self.request.query_params.get("team_id"))
+        if team_id is not None:
+            queryset = queryset.filter(participants__team=team_id)
+        else:
+            queryset = queryset.filter(participants__team__members=request.user.pk)
+
         if not request.user.is_staff:
             # Hide all matches with invisible teams.
             has_invisible = self.get_queryset().filter(
