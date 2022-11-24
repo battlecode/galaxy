@@ -143,6 +143,7 @@ class MatchSerializer(serializers.ModelSerializer):
             "id",
             "status",
             "episode",
+            "tournament_round",
             "participants",
             "maps",
             "alternate_order",
@@ -164,7 +165,7 @@ class MatchSerializer(serializers.ModelSerializer):
             pass
         elif (
             instance.tournament_round is not None
-            and instance.tournament_round.release_status == ReleaseStatus.HIDDEN
+            and instance.tournament_round.release_status <= ReleaseStatus.HIDDEN
         ) or (
             instance.tournament_round is not None
             and not instance.tournament_round.tournament.is_public
@@ -173,7 +174,7 @@ class MatchSerializer(serializers.ModelSerializer):
             data["participants"] = data["replay"] = data["maps"] = None
         elif (
             instance.tournament_round is not None
-            and instance.tournament_round.release_status == ReleaseStatus.PARTICIPANTS
+            and instance.tournament_round.release_status <= ReleaseStatus.PARTICIPANTS
         ):
             # Participants-only tournament matches are partially redacted
             data["replay"] = data["maps"] = None

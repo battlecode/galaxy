@@ -2,7 +2,7 @@ from django.apps import apps
 from django.db import models
 from django.utils import timezone
 
-from siarnaq.api.episodes.managers import EpisodeQuerySet
+from siarnaq.api.episodes.managers import EpisodeQuerySet, TournamentQuerySet
 
 
 class Language(models.TextChoices):
@@ -232,6 +232,8 @@ class Tournament(models.Model):
     challonge_public = models.URLField(null=True, blank=True)
     """A public Challonge bracket showing match results as they are released."""
 
+    objects = TournamentQuerySet.as_manager()
+
     def __str__(self):
         return self.name_short
 
@@ -255,15 +257,15 @@ class Tournament(models.Model):
         raise NotImplementedError
 
 
-class ReleaseStatus(models.TextChoices):
+class ReleaseStatus(models.IntegerChoices):
     """
     An immutable type enumerating the degree to which the results of a tournament match
-    are released.
+    are released. Greater values indicate greater visibility.
     """
 
-    HIDDEN = "H"
-    PARTICIPANTS = "P"
-    RESULTS = "R"
+    HIDDEN = 0
+    PARTICIPANTS = 1
+    RESULTS = 2
 
 
 class TournamentRound(models.Model):
@@ -288,8 +290,8 @@ class TournamentRound(models.Model):
     maps = models.ManyToManyField(Map, related_name="tournament_rounds")
     """The maps to be used in this round."""
 
-    release_status = models.CharField(
-        max_length=1, choices=ReleaseStatus.choices, default=ReleaseStatus.HIDDEN
+    release_status = models.IntegerField(
+        choices=ReleaseStatus.choices, default=ReleaseStatus.HIDDEN
     )
     """THe degree to which matches in this round are released."""
 

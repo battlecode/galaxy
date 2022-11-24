@@ -49,6 +49,7 @@ class TournamentRoundSerializer(serializers.ModelSerializer):
     class Meta:
         model = TournamentRound
         fields = [
+            "id",
             "tournament",
             "challonge_id",
             "name",
