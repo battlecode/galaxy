@@ -26,13 +26,13 @@ class Rating(models.Model):
     value = models.FloatField()
     """The penalized Elo value of this rating."""
 
-    def __init__(self, *args, **kwargs):
-        """Create a rating object, saving the penalized value."""
-        super().__init__(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        """Save a rating object, ensuring the penalized value is correct."""
         self.value = (
             self.mean
             - settings.TEAMS_ELO_INITIAL * settings.TEAMS_ELO_PENALTY**self.n
         )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.value:.0f}"
