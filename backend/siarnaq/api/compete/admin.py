@@ -117,7 +117,7 @@ class ScrimmageRequestAdmin(admin.ModelAdmin):
         "requested_to",
         "episode",
         "status",
-        "is_ranked",
+        "is_ranked_no_icon",
     )
     list_filter = ("episode", "status", "is_ranked")
     list_select_related = ("requested_by", "requested_to", "episode")
@@ -127,3 +127,11 @@ class ScrimmageRequestAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    @admin.display(description="Is ranked")
+    def is_ranked_no_icon(self, obj):
+        """
+        Return whether a request is for a ranked match. Using this field disables the
+        prettified boolean icons for boolean fields, as they do not make sense here.
+        """
+        return obj.is_ranked

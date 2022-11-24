@@ -77,7 +77,7 @@ class MatchParticipantInline(admin.TabularInline):
 class TeamAdmin(admin.ModelAdmin):
     fields = (("name",), ("episode",), ("status", "join_key"), ("members",))
     inlines = [TeamProfileInline, SubmissionInline, MatchParticipantInline]
-    list_display = ("name", "episode", "rating")
+    list_display = ("name", "episode", "rating", "status")
     list_filter = ("episode",)
     list_select_related = ("episode", "profile__rating")
     ordering = ("-episode__game_release", "name")

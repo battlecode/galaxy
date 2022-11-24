@@ -52,7 +52,13 @@ class EpisodeAdmin(admin.ModelAdmin):
     )
     filter_horizontal = ("eligibility_criteria",)
     inlines = [MapInline]
-    list_display = ("name_short", "name_long", "game_release")
+    list_display = (
+        "name_short",
+        "name_long",
+        "registration",
+        "game_release",
+        "game_archive",
+    )
     ordering = ("-game_release",)
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
@@ -127,6 +133,7 @@ class TournamentAdmin(admin.ModelAdmin):
         "name_long",
         "episode",
         "submission_freeze",
+        "is_public",
         "in_progress",
     )
     list_filter = ("episode",)
