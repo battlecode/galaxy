@@ -395,6 +395,7 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
+                "tournament_round": self.r_hidden.pk,
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -465,6 +466,7 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
+                "tournament_round": None,
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -535,6 +537,7 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
+                "tournament_round": self.r_results.pk,
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -605,6 +608,7 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
+                "tournament_round": self.r_participants.pk,
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -675,6 +679,7 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
+                "tournament_round": self.r_hidden.pk,
                 "participants": None,
                 "maps": None,
                 "alternate_order": match.alternate_order,
@@ -724,6 +729,7 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
+                "tournament_round": None,
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -794,6 +800,7 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
+                "tournament_round": None,
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -866,6 +873,7 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
+                "tournament_round": None,
                 "participants": None,
                 "maps": None,
                 "alternate_order": match.alternate_order,
@@ -915,6 +923,7 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
+                "tournament_round": None,
                 "participants": [
                     {
                         "team": red.team.pk,
