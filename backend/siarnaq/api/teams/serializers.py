@@ -4,6 +4,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from siarnaq.api.teams.models import Team, TeamProfile
+from siarnaq.api.user.serializers import UserNestedSerializer
 
 
 @extend_schema_field(OpenApiTypes.DOUBLE)
@@ -34,6 +35,7 @@ class TeamProfilePublicSerializer(serializers.ModelSerializer):
 
 class TeamPublicSerializer(serializers.ModelSerializer):
     profile = TeamProfilePublicSerializer(required=False)
+    members = UserNestedSerializer(many=True, read_only=True)
 
     class Meta:
         model = Team

@@ -33,8 +33,8 @@ class TeamCard extends Component {
   }
 
   getUserData() {
-    this.props.team.members.forEach((user_id, user_index) => {
-      Api.getProfileByUser(user_id, this.getSetUserCallback(user_index));
+    this.props.team.members.forEach((user, user_index) => {
+      Api.getProfileByUser(user.id, this.getSetUserCallback(user_index));
     });
   }
 
