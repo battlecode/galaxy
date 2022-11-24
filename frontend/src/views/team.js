@@ -12,13 +12,11 @@ class YesTeam extends Component {
     super(props);
 
     // Copy the user's fetched team profile for use in editable form state.
-    const copied_team_profile = { ...props.team_profile };
-    copied_team_profile.team = props.team_profile
-      ? { ...props.team_profile.team }
-      : {};
+    const copied_team = { ...props.team };
+    copied_team.profile = props.team ? { ...props.team.profile } : {};
 
     this.state = {
-      team_profile: copied_team_profile,
+      team: copied_team,
       up: "Update Info",
       errors: [],
     };
@@ -41,15 +39,15 @@ class YesTeam extends Component {
     // TODO: handle changes to eligiblity options
     // if (id === "international") val = !val;
 
-    if (id.startsWith("team")) {
+    if (id.startsWith("profile")) {
       this.setState(function (prevState, props) {
         var team_field = id.split("-")[1];
-        prevState.team_profile.team[team_field] = val;
+        prevState.team.profile[team_field] = val;
         return prevState;
       });
     } else {
       this.setState(function (prevState, props) {
-        prevState.team_profile[id] = val;
+        prevState.team[id] = val;
         return prevState;
       });
     }
@@ -58,7 +56,7 @@ class YesTeam extends Component {
   updateTeam() {
     this.setState({ up: '<i class="fa fa-circle-o-notch fa-spin"></i>' });
     Api.updateTeam(
-      this.state.team_profile,
+      this.state.team,
       this.props.episode,
       function (response_json, success) {
         if (success) {
@@ -115,7 +113,7 @@ class YesTeam extends Component {
               </p>
               {/*<EligibilityOptions
                 change={this.changeHandler}
-                team_profile={this.state.team_profile}
+                team={this.state.team}
                 update={this.updateTeam}
                 up_but={this.state.up}
                 episode={this.props.episode}
@@ -134,10 +132,10 @@ class YesTeam extends Component {
                     <label>Team Name</label>
                     <input
                       type="text"
-                      id="team-name"
+                      id="name"
                       className="form-control"
                       onChange={this.changeHandler}
-                      value={this.state.team_profile.team.name}
+                      value={this.state.team.name}
                     />
                   </div>
                 </div>
@@ -148,7 +146,7 @@ class YesTeam extends Component {
                       type="text"
                       className="form-control"
                       onChange={() => null}
-                      value={this.state.team_profile.team.join_key}
+                      value={this.state.team.join_key}
                     />
                   </div>
                 </div>
@@ -158,8 +156,8 @@ class YesTeam extends Component {
                   <label className="center-row">
                     <input
                       type="checkbox"
-                      id="auto_accept_ranked"
-                      checked={this.state.team_profile.auto_accept_ranked}
+                      id="profile-auto_accept_ranked"
+                      checked={this.state.team.profile.auto_accept_ranked}
                       onChange={this.changeHandler}
                       className="form-control center-row-start"
                     />{" "}
@@ -170,8 +168,8 @@ class YesTeam extends Component {
                   <label className="center-row">
                     <input
                       type="checkbox"
-                      id="auto_accept_unranked"
-                      checked={this.state.team_profile.auto_accept_unranked}
+                      id="profile-auto_accept_unranked"
+                      checked={this.state.team.profile.auto_accept_unranked}
                       onChange={this.changeHandler}
                       className="form-control center-row-start"
                     />{" "}
@@ -188,7 +186,7 @@ class YesTeam extends Component {
                       id="avatar"
                       className="form-control"
                       onChange={this.changeHandler}
-                      value={this.state.team_profile.avatar}
+                      value={this.state.team.avatar}
                     />
                   </div> */}
                 </div>
@@ -199,10 +197,10 @@ class YesTeam extends Component {
                     <label>Team Quote</label>
                     <input
                       type="text"
-                      id="quote"
+                      id="profile-quote"
                       className="form-control"
                       onChange={this.changeHandler}
-                      value={this.state.team_profile.quote}
+                      value={this.state.team.profile.quote}
                     />
                   </div>
                 </div>
@@ -212,12 +210,12 @@ class YesTeam extends Component {
                   <div className="form-group">
                     <label>Team Bio</label>
                     <textarea
-                      id="biography"
+                      id="profile-biography"
                       rows={5}
                       className="form-control"
                       placeholder="Put your team bio here."
                       onChange={this.changeHandler}
-                      value={this.state.team_profile.biography}
+                      value={this.state.team.profile.biography}
                     />
                   </div>
                 </div>
@@ -241,9 +239,7 @@ class YesTeam extends Component {
             </div>
           </div>
         </div>
-        <div className="col-md-4">
-          {<TeamCard team_profile={this.state.team_profile} />}
-        </div>
+        <div className="col-md-4">{<TeamCard team={this.state.team} />}</div>
       </div>
     );
   }
@@ -567,15 +563,15 @@ class Team extends Component {
         <div className="content">
           <div className="container-fluid">
             <div className="row">
-              {!this.props.team_profile && (
+              {!this.props.team && (
                 <NoTeam
                   episode={this.props.episode}
                   updateBaseState={this.props.updateBaseState}
                 />
               )}
-              {this.props.team_profile && (
+              {this.props.team && (
                 <YesTeam
-                  team_profile={this.props.team_profile}
+                  team={this.props.team}
                   episode={this.props.episode}
                   updateBaseState={this.props.updateBaseState}
                 />

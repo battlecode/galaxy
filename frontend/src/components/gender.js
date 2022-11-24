@@ -26,7 +26,7 @@ class Gender extends Component {
             </Floater>
             <select
               className="form-control"
-              id="gender"
+              id="profile-gender"
               onChange={this.genderChangeHandler}
               value={this.props.gender}
             >
@@ -45,7 +45,7 @@ class Gender extends Component {
               <label>Self-described Gender Identity</label>
               <input
                 type="text"
-                id="gender_details"
+                id="profile-gender_details"
                 className="form-control"
                 onChange={this.props.changeHandler}
                 value={this.props.gender_details}

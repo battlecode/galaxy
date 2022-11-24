@@ -7,17 +7,17 @@ import { get_user_errors } from "../utils/error_handling";
 
 class Register extends Component {
   state = {
-    user_profile: {
-      user: {
-        username: "",
-        password: "",
-        email: "",
-        first_name: "",
-        last_name: "",
+    user: {
+      username: "",
+      password: "",
+      email: "",
+      first_name: "",
+      last_name: "",
+      profile: {
+        gender: "",
+        gender_details: "",
+        school: "",
       },
-      gender: "",
-      gender_details: "",
-      school: "",
     },
     register: false,
     errors: [],
@@ -44,23 +44,23 @@ class Register extends Component {
   };
 
   submitRegister = () => {
-    const user_profile = this.state.user_profile;
-    Api.register(this.state.user_profile, this.callback);
+    const user = this.state.user;
+    Api.register(this.state.user, this.callback);
   };
 
   // Similarly structured to the changeHandler in account.js
   changeHandler = (e) => {
     const id = e.target.id;
     const val = e.target.value;
-    if (id.startsWith("user")) {
+    if (id.startsWith("profile")) {
       this.setState(function (prevState, props) {
         var user_field = id.split("-")[1];
-        prevState.user_profile.user[user_field] = val;
+        prevState.user.profile[user_field] = val;
         return prevState;
       });
     } else {
       this.setState(function (prevState, props) {
-        prevState.user_profile[id] = val;
+        prevState.user[id] = val;
         return prevState;
       });
     }
@@ -68,7 +68,7 @@ class Register extends Component {
 
   blankGenderDetails = () => {
     this.setState(function (prevState, props) {
-      prevState.user_profile.gender_details = "";
+      prevState.user.profilegender_details = "";
       return prevState;
     });
   };
@@ -186,7 +186,7 @@ class Register extends Component {
                     <label>Username *</label>
                     <input
                       type="text"
-                      id="user-username"
+                      id="username"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -197,7 +197,7 @@ class Register extends Component {
                     <label>Password *</label>
                     <input
                       type="password"
-                      id="user-password"
+                      id="password"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -208,7 +208,7 @@ class Register extends Component {
                     <label>Email *</label>
                     <input
                       type="email"
-                      id="user-email"
+                      id="email"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -220,7 +220,7 @@ class Register extends Component {
                     <label>First Name *</label>
                     <input
                       type="text"
-                      id="user-first_name"
+                      id="first_name"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -231,7 +231,7 @@ class Register extends Component {
                     <label>Last Name *</label>
                     <input
                       type="text"
-                      id="user-last_name"
+                      id="last_name"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -242,7 +242,7 @@ class Register extends Component {
                     <label>School</label>
                     <input
                       type="text"
-                      id="school"
+                      id="profile-school"
                       className="form-control"
                       onChange={this.changeHandler}
                     />
@@ -253,7 +253,7 @@ class Register extends Component {
                 </div>
                 <Gender
                   changeHandler={this.changeHandler}
-                  gender={this.state.user_profile.gender}
+                  gender={this.state.user.profile.gender}
                   blankGenderDetails={this.blankGenderDetails}
                 />
               </div>

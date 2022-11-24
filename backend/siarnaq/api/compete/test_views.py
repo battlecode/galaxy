@@ -28,7 +28,7 @@ from siarnaq.api.episodes.models import (
     TournamentRound,
     TournamentStyle,
 )
-from siarnaq.api.teams.models import Rating, Team, TeamProfile, TeamStatus
+from siarnaq.api.teams.models import Rating, Team, TeamStatus
 from siarnaq.api.user.models import User
 
 
@@ -1127,15 +1127,14 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
                 username=f"user{i}", email=f"user{i}@example.com"
             )
             t = Team.objects.create(
-                episode=self.e1 if i < 2 else self.e2, name=f"team{i}"
+                episode=self.e1 if i < 2 else self.e2,
+                name=f"team{i}",
+                profile=dict(
+                    auto_accept_ranked=False,
+                    auto_accept_unranked=False,
+                ),
             )
             t.members.add(u)
-            TeamProfile.objects.create(
-                team=t,
-                rating=Rating.objects.create(),
-                auto_accept_ranked=False,
-                auto_accept_unranked=False,
-            )
             self.submissions.append(
                 Submission.objects.create(
                     episode=self.e1, team=t, user=u, accepted=True
