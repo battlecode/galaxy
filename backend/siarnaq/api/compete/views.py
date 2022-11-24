@@ -248,7 +248,9 @@ class MatchViewSet(
     @extend_schema(
         parameters=[
             OpenApiParameter(
-                name="team_id", type=int, description="A team to filter for."
+                name="team_id",
+                type=int,
+                description="A team to filter for. Defaults to your own team.",
             ),
         ],
         responses={status.HTTP_200_OK: MatchSerializer(many=True)},
