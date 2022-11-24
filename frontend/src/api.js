@@ -322,10 +322,10 @@ class Api {
   }
 
   // updates team
-  static updateTeam(team_profile, episode, callback) {
+  static updateTeam(team, episode, callback) {
     return $.ajax({
       url: `${URL}/api/team/${episode}/t/me/`,
-      data: JSON.stringify(team_profile),
+      data: JSON.stringify(team),
       type: "PATCH",
       contentType: "application/json",
       dataType: "json",
@@ -406,10 +406,10 @@ class Api {
     return this.getProfileByUser("me", callback);
   }
 
-  static updateUser(user_profile, callback) {
+  static updateUser(user, callback) {
     return $.ajax({
       url: `${URL}/api/user/u/me/`,
-      data: JSON.stringify(user_profile),
+      data: JSON.stringify(user),
       type: "PATCH",
       contentType: "application/json",
       dataType: "json",
@@ -774,16 +774,16 @@ class Api {
       });
   }
 
-  static register(user_profile, callback) {
+  static register(user, callback) {
     return $.ajax({
       url: `${URL}/api/user/u/`,
-      data: JSON.stringify(user_profile),
+      data: JSON.stringify(user),
       type: "POST",
       contentType: "application/json",
       dataType: "json",
     })
       .done((data, status) => {
-        this.login(user_profile.username, user_profile.password, callback);
+        this.login(user.username, user.password, callback);
       })
       .fail((xhr, status, error) => {
         callback(xhr.responseJSON, false);
