@@ -2,7 +2,7 @@ from django.apps import apps
 from django.db import models
 from django.utils import timezone
 
-from siarnaq.api.episodes.managers import EpisodeQuerySet
+from siarnaq.api.episodes.managers import EpisodeQuerySet, TournamentQuerySet
 
 
 class Language(models.TextChoices):
@@ -207,7 +207,7 @@ class Tournament(models.Model):
     """Whether teams must have submitted resumes in order to enter the tournament."""
 
     is_public = models.BooleanField()
-    """Whether the results of the tournament are released and publicly available."""
+    """Whether this tournament is included in the public index."""
 
     submission_freeze = models.DateTimeField()
     """
@@ -232,6 +232,8 @@ class Tournament(models.Model):
     challonge_public = models.URLField(null=True, blank=True)
     """A public Challonge bracket showing match results as they are released."""
 
+    objects = TournamentQuerySet.as_manager()
+
     def __str__(self):
         return self.name_short
 
@@ -253,6 +255,17 @@ class Tournament(models.Model):
     def enqueue_open_matches(self):
         """Find matches that are waiting to be run, and run them."""
         raise NotImplementedError
+
+
+class ReleaseStatus(models.IntegerChoices):
+    """
+    An immutable type enumerating the degree to which the results of a tournament match
+    are released. Greater values indicate greater visibility.
+    """
+
+    HIDDEN = 0
+    PARTICIPANTS = 1
+    RESULTS = 2
 
 
 class TournamentRound(models.Model):
@@ -277,8 +290,10 @@ class TournamentRound(models.Model):
     maps = models.ManyToManyField(Map, related_name="tournament_rounds")
     """The maps to be used in this round."""
 
-    is_released = models.BooleanField(default=False)
-    """Whether the results of this round are released publicly."""
+    release_status = models.IntegerField(
+        choices=ReleaseStatus.choices, default=ReleaseStatus.HIDDEN
+    )
+    """THe degree to which matches in this round are released."""
 
     class Meta:
         constraints = [

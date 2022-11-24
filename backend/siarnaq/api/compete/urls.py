@@ -5,11 +5,15 @@ from siarnaq.api.compete import views
 
 router = DefaultRouter()
 router.register(
-    r"(?P<episode_id>.+)/submission", views.SubmissionViewSet, basename="submission"
+    r"(?P<episode_id>[^\/.]+)/submission",
+    views.SubmissionViewSet,
+    basename="submission",
 )
-router.register(r"(?P<episode_id>.+)/match", views.MatchViewSet, basename="match")
+router.register(r"(?P<episode_id>[^\/.]+)/match", views.MatchViewSet, basename="match")
 router.register(
-    r"(?P<episode_id>.+)/request", views.ScrimmageRequestViewSet, basename="request"
+    r"(?P<episode_id>[^\/.]+)/request",
+    views.ScrimmageRequestViewSet,
+    basename="request",
 )
 
 urlpatterns = [

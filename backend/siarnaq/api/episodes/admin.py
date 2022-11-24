@@ -80,7 +80,7 @@ class EligibilityCriterionAdmin(admin.ModelAdmin):
 class TournamentRoundInline(admin.TabularInline):
     model = TournamentRound
     extra = 0
-    fields = ("name", "maps", "challonge_id", "is_released")
+    fields = ("name", "maps", "challonge_id", "release_status")
     ordering = ("challonge_id",)
     raw_id_fields = ("maps",)
     readonly_fields = ("challonge_id",)
@@ -156,12 +156,12 @@ class MatchInline(admin.TabularInline):
 @admin.register(TournamentRound)
 class TournamentRoundAdmin(admin.ModelAdmin):
     fields = (
-        ("name", "challonge_id", "is_released"),
+        ("name", "challonge_id", "release_status"),
         ("maps",),
     )
     inlines = [MatchInline]
-    list_display = ("name", "tournament", "is_released")
-    list_filter = ("tournament", "is_released")
+    list_display = ("name", "tournament", "release_status")
+    list_filter = ("tournament", "release_status")
     list_select_related = ("tournament",)
     ordering = ("-tournament__submission_freeze", "challonge_id")
     raw_id_fields = ("maps",)
