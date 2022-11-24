@@ -1,7 +1,9 @@
 from rest_framework import serializers
 
 from siarnaq.api.episodes.models import (
+    EligibilityCriterion,
     Episode,
+    Map,
     ReleaseStatus,
     Tournament,
     TournamentRound,
@@ -12,7 +14,16 @@ class AutoscrimSerializer(serializers.Serializer):
     best_of = serializers.IntegerField(min_value=1)
 
 
+class EligibilityCriterionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EligibilityCriterion
+        fields = ["id", "question", "icon"]
+        read_only_fields = ["question", "icon"]
+
+
 class EpisodeSerializer(serializers.ModelSerializer):
+    eligibility_criteria = EligibilityCriterionSerializer(many=True)
+
     class Meta:
         model = Episode
         fields = [
@@ -24,6 +35,13 @@ class EpisodeSerializer(serializers.ModelSerializer):
             "release_version",
             "eligibility_criteria",
         ]
+
+
+class MapSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Map
+        fields = ["id", "episode", "name", "is_public"]
+        read_only_fields = ["episode", "name", "is_public"]
 
 
 class TournamentSerializer(serializers.ModelSerializer):
