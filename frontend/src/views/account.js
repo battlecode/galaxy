@@ -13,13 +13,11 @@ class Account extends Component {
     super(props);
 
     // Copy the fetched user profile for use in editable form state.
-    const copied_user_profile = { ...props.user_profile };
-    copied_user_profile.user = props.user_profile
-      ? { ...props.user_profile.user }
-      : {};
+    const copied_user = { ...props.user };
+    copied_user.profile = props.user ? { ...props.user.profile } : {};
 
     this.state = {
-      user_profile: copied_user_profile,
+      user: copied_user,
       up: "Update Info",
       selectedResumeFile: null,
       selectedAvatarFile: null,
@@ -34,15 +32,15 @@ class Account extends Component {
   changeHandler(e) {
     const id = e.target.id;
     const val = e.target.value;
-    if (id.startsWith("user")) {
+    if (id.startsWith("profile")) {
       this.setState(function (prevState, props) {
         var user_field = id.split("-")[1];
-        prevState.user_profile.user[user_field] = val;
+        prevState.user.profile[user_field] = val;
         return prevState;
       });
     } else {
       this.setState(function (prevState, props) {
-        prevState.user_profile[id] = val;
+        prevState.user[id] = val;
         return prevState;
       });
     }
@@ -50,7 +48,7 @@ class Account extends Component {
 
   blankGenderDetails = () => {
     this.setState(function (prevState, props) {
-      prevState.user_profile.gender_details = "";
+      prevState.user.profile.gender_details = "";
       return prevState;
     });
   };
@@ -73,7 +71,7 @@ class Account extends Component {
   updateUser() {
     this.setState({ up: '<i class="fa fa-circle-o-notch fa-spin"></i>' });
     Api.updateUser(
-      this.state.user_profile,
+      this.state.user,
       function (response_json, success) {
         if (success) {
           this.setState({ up: '<i class="fa fa-check"></i>' });
@@ -144,7 +142,7 @@ class Account extends Component {
     );
 
     let resume_status = null;
-    if (this.state.user_profile.has_resume === false) {
+    if (this.state.user.profile.has_resume === false) {
       resume_status = (
         <label style={{ float: "right" }}>
           {" "}
@@ -225,9 +223,9 @@ class Account extends Component {
                           <input
                             type="text"
                             className="form-control"
-                            id="user-username"
+                            id="username"
                             onChange={this.changeHandler}
-                            value={this.state.user_profile.user.username}
+                            value={this.state.user.username}
                           />
                         </div>
                       </div>
@@ -237,9 +235,9 @@ class Account extends Component {
                           <input
                             type="email"
                             className="form-control"
-                            id="user-email"
+                            id="email"
                             onChange={this.changeHandler}
-                            value={this.state.user_profile.user.email}
+                            value={this.state.user.email}
                           />
                         </div>
                       </div>
@@ -251,9 +249,9 @@ class Account extends Component {
                           <input
                             type="text"
                             className="form-control"
-                            id="user-first_name"
+                            id="first_name"
                             onChange={this.changeHandler}
-                            value={this.state.user_profile.user.first_name}
+                            value={this.state.user.first_name}
                           />
                         </div>
                       </div>
@@ -263,9 +261,9 @@ class Account extends Component {
                           <input
                             type="text"
                             className="form-control"
-                            id="user-last_name"
+                            id="last_name"
                             onChange={this.changeHandler}
-                            value={this.state.user_profile.user.last_name}
+                            value={this.state.user.last_name}
                           />
                         </div>
                       </div>
@@ -276,23 +274,23 @@ class Account extends Component {
                           <label>School</label>
                           <input
                             type="text"
-                            id="school"
+                            id="profile-school"
                             className="form-control"
                             onChange={this.changeHandler}
-                            value={this.state.user_profile.school}
+                            value={this.state.user.profile.school}
                           />
                         </div>
                       </div>
                       <div className="col-md-6">
                         <Country
-                          value={this.state.user_profile.country}
+                          value={this.state.user.profile.country}
                           onChange={this.changeHandler}
                         />
                       </div>
                       <Gender
                         changeHandler={this.changeHandler}
-                        gender={this.state.user_profile.gender}
-                        gender_details={this.state.user_profile.gender_details}
+                        gender={this.state.user.profile.gender}
+                        gender_details={this.state.user.profile.gender_details}
                         blankGenderDetails={this.blankGenderDetails}
                       />
                       {/* <div className="row">
@@ -317,8 +315,8 @@ class Account extends Component {
                             className="form-control"
                             placeholder="Put your bio here."
                             onChange={this.changeHandler}
-                            id="biography"
-                            value={this.state.user_profile.biography}
+                            id="profile-biography"
+                            value={this.state.user.profile.biography}
                           />
                         </div>
                       </div>
@@ -410,7 +408,7 @@ class Account extends Component {
                 </div>
               </div>
               <div className="col-md-4">
-                <UserCard user_profile={this.state.user_profile} />
+                <UserCard user={this.state.user} />
               </div>
             </div>
           </div>

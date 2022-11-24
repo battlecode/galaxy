@@ -42,8 +42,8 @@ class App extends Component {
       logged_in: null,
       episode: episode,
       episode_info: null,
-      user_profile: null,
-      team_profile: null,
+      user: null,
+      team: null,
     };
 
     // Sets the login header based on currently held cookies, before any
@@ -56,12 +56,12 @@ class App extends Component {
       this.setState({ logged_in });
     });
 
-    const ajax2 = Api.getUserProfile((user_profile) => {
-      this.setState({ user_profile });
+    const ajax2 = Api.getUserProfile((user) => {
+      this.setState({ user });
     });
 
-    const ajax3 = Api.getUserTeamProfile(this.state.episode, (team_profile) => {
-      this.setState({ team_profile });
+    const ajax3 = Api.getUserTeamProfile(this.state.episode, (team) => {
+      this.setState({ team });
     });
 
     const ajax4 = Api.getEpisodeInfo(this.state.episode, (episode_info) => {
@@ -92,11 +92,10 @@ class App extends Component {
     // That is done in navbar.js, sidebar.js, footer.js, etc
 
     // Short-circuit check for nested object,
-    // in case user_profile hasn't been set yet.
-    const is_staff =
-      this.state.user_profile && this.state.user_profile.user.is_staff;
+    // in case user hasn't been set yet.
+    const is_staff = this.state.user && this.state.user.is_staff;
 
-    const on_team = this.state.team_profile !== null;
+    const on_team = this.state.team !== null;
 
     const is_game_released =
       is_staff ||
@@ -199,7 +198,7 @@ class App extends Component {
         component={(props) => (
           <Team
             {...props}
-            team_profile={this.state.team_profile}
+            team={this.state.team}
             episode={this.state.episode}
             updateBaseState={this.updateBaseState}
           />
@@ -211,7 +210,7 @@ class App extends Component {
         component={(props) => (
           <Account
             {...props}
-            user_profile={this.state.user_profile}
+            user={this.state.user}
             updateBaseState={this.updateBaseState}
           />
         )}

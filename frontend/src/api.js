@@ -311,7 +311,7 @@ class Api {
   //---TEAM INFO---
 
   static getUserTeamProfile(episode, callback) {
-    return $.get(`${URL}/api/team/${episode}/detail/current/`)
+    return $.get(`${URL}/api/team/${episode}/t/me/`)
       .done((data, status) => {
         callback(data);
       })
@@ -322,10 +322,10 @@ class Api {
   }
 
   // updates team
-  static updateTeam(team_profile, episode, callback) {
+  static updateTeam(team, episode, callback) {
     return $.ajax({
-      url: `${URL}/api/team/${episode}/detail/current/`,
-      data: JSON.stringify(team_profile),
+      url: `${URL}/api/team/${episode}/t/me/`,
+      data: JSON.stringify(team),
       type: "PATCH",
       contentType: "application/json",
       dataType: "json",
@@ -342,12 +342,10 @@ class Api {
 
   static createTeam(team_name, episode, callback) {
     const team_data = {
-      team: {
-        name: team_name,
-      },
+      name: team_name,
     };
     return $.ajax({
-      url: `${URL}/api/team/${episode}/detail/`,
+      url: `${URL}/api/team/${episode}/t/`,
       data: JSON.stringify(team_data),
       type: "POST",
       contentType: "application/json",
@@ -367,7 +365,7 @@ class Api {
       name: team_name,
     };
     return $.ajax({
-      url: `${URL}/api/team/${episode}/detail/join/`,
+      url: `${URL}/api/team/${episode}/t/join/`,
       data: JSON.stringify(join_data),
       type: "POST",
       contentType: "application/json",
@@ -383,7 +381,7 @@ class Api {
 
   static leaveTeam(episode, callback) {
     return $.ajax({
-      url: `${URL}/api/team/${episode}/detail/leave/`,
+      url: `${URL}/api/team/${episode}/t/leave/`,
       type: "POST",
     })
       .done((data, status) => {
@@ -394,9 +392,8 @@ class Api {
       });
   }
 
-  static getProfileByUser(user_id, callback, public_only = false) {
-    const endpoint = public_only ? "public" : "detail";
-    return $.get(`${URL}/api/user/${endpoint}/${user_id}/`)
+  static getProfileByUser(user_id, callback) {
+    return $.get(`${URL}/api/user/u/${user_id}/`)
       .done((data, status) => {
         callback(data);
       })
@@ -406,13 +403,13 @@ class Api {
   }
 
   static getUserProfile(callback) {
-    return this.getProfileByUser("current", callback);
+    return this.getProfileByUser("me", callback);
   }
 
-  static updateUser(user_profile, callback) {
+  static updateUser(user, callback) {
     return $.ajax({
-      url: `${URL}/api/user/detail/current/`,
-      data: JSON.stringify(user_profile),
+      url: `${URL}/api/user/u/me/`,
+      data: JSON.stringify(user),
       type: "PATCH",
       contentType: "application/json",
       dataType: "json",
@@ -429,7 +426,7 @@ class Api {
     const data = new FormData();
     data.append("avatar", avatar_file);
     return $.ajax({
-      url: `${URL}/api/user/detail/current/avatar/`,
+      url: `${URL}/api/user/u/avatar/`,
       type: "POST",
       data: data,
       dataType: "json",
@@ -448,7 +445,7 @@ class Api {
     const data = new FormData();
     data.append("resume", resume_file);
     return $.ajax({
-      url: `${URL}/api/user/detail/current/resume/`,
+      url: `${URL}/api/user/u/resume/`,
       type: "PUT",
       data: data,
       dataType: "json",
@@ -465,7 +462,7 @@ class Api {
 
   static resumeRetrieve(callback) {
     return $.ajax({
-      url: `${URL}/api/user/detail/current/resume/`,
+      url: `${URL}/api/user/u/resume/`,
       type: "GET",
     })
       .done((data, status) => {
@@ -777,20 +774,16 @@ class Api {
       });
   }
 
-  static register(user_profile, callback) {
+  static register(user, callback) {
     return $.ajax({
-      url: `${URL}/api/user/detail/`,
-      data: JSON.stringify(user_profile),
+      url: `${URL}/api/user/u/`,
+      data: JSON.stringify(user),
       type: "POST",
       contentType: "application/json",
       dataType: "json",
     })
       .done((data, status) => {
-        this.login(
-          user_profile.user.username,
-          user_profile.user.password,
-          callback
-        );
+        this.login(user.username, user.password, callback);
       })
       .fail((xhr, status, error) => {
         callback(xhr.responseJSON, false);

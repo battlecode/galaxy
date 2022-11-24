@@ -1,9 +1,10 @@
 import posixpath
 import uuid
 
+import google.cloud.storage as storage
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
 
@@ -18,6 +19,20 @@ class User(AbstractUser):
     first_name = models.CharField(_("first name"), max_length=30, blank=False)
     last_name = models.CharField(_("last name"), max_length=30, blank=False)
     email = models.EmailField(_("email address"), blank=False, unique=True)
+
+    def __init__(self, *args, profile=None, **kwargs):
+        """Create a user object, ensuring it has a profile."""
+        super().__init__(*args, **kwargs)
+        if not hasattr(self, "profile"):
+            profile = profile or {}
+            self.profile = UserProfile(**profile)
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        """Save a user object, ensuring it has a profile recorded in the database."""
+        super().save(*args, **kwargs)
+        if self.profile._state.adding:
+            self.profile.save()
 
 
 class Gender(models.TextChoices):
@@ -77,4 +92,23 @@ class UserProfile(models.Model):
         return posixpath.join("user", str(self.pk), "resume.pdf")
 
     def get_avatar_path(self):
+        """Return the path of the avatar on Google cloud storage."""
+        if not self.has_avatar:
+            return None
         return posixpath.join("user", str(self.pk), "avatar.png")
+
+    def get_avatar_url(self):
+        """Return a cache-safe URL to the avatar."""
+        # To circumvent caching of old avatars, we append a UUID that changes on each
+        # update.
+        if not self.has_avatar:
+            return None
+
+        client = storage.Client()
+        public_url = (
+            client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
+            .blob(self.get_avatar_path())
+            .public_url
+        )
+        # Append UUID to public URL to prevent caching on avatar update
+        return f"{public_url}?{self.avatar_uuid}"
