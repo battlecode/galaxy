@@ -86,9 +86,7 @@ class TeamViewSet(
     def leave(self, request, *, episode_id):
         """Leave a team."""
         with transaction.atomic():
-            team = get_object_or_404(
-                self.get_queryset().select_for_update(), members=request.user
-            )
+            team = get_object_or_404(self.get_queryset(), members=request.user)
             team.members.remove(request.user)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
@@ -109,7 +107,7 @@ class TeamViewSet(
 
         with transaction.atomic():
             team = get_object_or_404(
-                queryset.select_for_update(),
+                queryset,
                 name=serializer.validated_data["name"],
                 episode=self.kwargs["episode_id"],
             )
