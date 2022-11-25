@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import transaction
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
-from rest_framework import serializers
+from rest_framework import serializers, status
 from rest_framework.exceptions import APIException
 
 from siarnaq.api.compete.models import (
@@ -18,7 +18,7 @@ from siarnaq.api.teams.serializers import RatingField
 
 
 class AlreadyFinalized(APIException):
-    status_code = 409
+    status_code = status.HTTP_409_CONFLICT
     default_detail = "This invocation is already finalized."
     default_code = "already_finalized"
 
