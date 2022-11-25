@@ -34,18 +34,11 @@ class TeamCard extends Component {
 
   getUserData() {
     this.props.team.members.forEach((user, user_index) => {
-      Api.getProfileByUser(user.id, this.getSetUserCallback(user_index));
-    });
-  }
-
-  /* add user to state array, should never change length of users */
-  getSetUserCallback(user_index) {
-    return (user) => {
       this.setState(function (prevState, props) {
         prevState.users[user_index] = user;
         return prevState;
       });
-    };
+    });
   }
 
   componentDidUpdate() {

@@ -5,7 +5,7 @@ from rest_framework import serializers, validators
 
 from siarnaq.api.episodes.models import Episode
 from siarnaq.api.teams.models import Team, TeamProfile
-from siarnaq.api.user.serializers import UserNestedSerializer
+from siarnaq.api.user.serializers import UserPublicSerializer
 
 
 @extend_schema_field(OpenApiTypes.DOUBLE)
@@ -36,7 +36,7 @@ class TeamProfilePublicSerializer(serializers.ModelSerializer):
 
 class TeamPublicSerializer(serializers.ModelSerializer):
     profile = TeamProfilePublicSerializer(required=False)
-    members = UserNestedSerializer(many=True, read_only=True)
+    members = UserPublicSerializer(many=True, read_only=True)
 
     class Meta:
         model = Team
