@@ -44,19 +44,18 @@ class Base(Configuration):
         "django.contrib.auth",
         "django.contrib.contenttypes",
         "django.contrib.sessions",
-        "django.contrib.sites",
         "django.contrib.messages",
         "django.contrib.staticfiles",
         "corsheaders",
         "rest_framework",
         "rest_framework_simplejwt",
+        "drf_spectacular",
+        "django_rest_passwordreset",
+        "anymail",
         "siarnaq.api.user",
         "siarnaq.api.compete",
         "siarnaq.api.episodes",
         "siarnaq.api.teams",
-        "drf_spectacular",
-        "django_rest_passwordreset",
-        "anymail",
     ]
 
     MIDDLEWARE = [
@@ -74,8 +73,6 @@ class Base(Configuration):
     CORS_ALLOW_CREDENTIALS = True
 
     ROOT_URLCONF = "siarnaq.urls"
-
-    SITE_ID = 1
 
     TEMPLATES = [
         {

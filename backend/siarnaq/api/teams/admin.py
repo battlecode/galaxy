@@ -7,12 +7,15 @@ from siarnaq.api.teams.models import Team, TeamProfile
 class TeamProfileInline(admin.StackedInline):
     model = TeamProfile
     fields = (
-        ("quote",),
-        ("biography",),
-        ("rating", "has_avatar"),
-        ("auto_accept_ranked", "auto_accept_unranked"),
-        ("eligible_for",),
+        "quote",
+        "biography",
+        "auto_accept_ranked",
+        "auto_accept_unranked",
+        "rating",
+        "has_avatar",
+        "eligible_for",
     )
+    filter_horizontal = ("eligible_for",)
     readonly_fields = ("rating", "has_avatar")
 
     def get_queryset(self, request):
@@ -74,9 +77,9 @@ class MatchParticipantInline(admin.TabularInline):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
-    fields = (("name",), ("episode",), ("status", "join_key"), ("members",))
+    fields = ("name", "episode", "status", "members", "join_key")
     inlines = [TeamProfileInline, SubmissionInline, MatchParticipantInline]
-    list_display = ("name", "episode", "rating")
+    list_display = ("name", "episode", "rating", "status")
     list_filter = ("episode",)
     list_select_related = ("episode", "profile__rating")
     ordering = ("-episode__game_release", "name")
@@ -84,6 +87,12 @@ class TeamAdmin(admin.ModelAdmin):
     readonly_fields = ("join_key",)
     search_fields = ("name",)
     search_help_text = "Search for a team name."
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = super().get_readonly_fields(request, obj=obj)
+        if obj is not None:
+            fields = ("episode",) + fields
+        return fields
 
     def has_delete_permission(self, request, obj=None):
         return False

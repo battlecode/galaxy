@@ -73,11 +73,11 @@ class Episode(models.Model):
     language = models.CharField(max_length=8, choices=Language.choices)
     """The implementation language supported for this episode."""
 
-    release_version = models.SlugField(max_length=32, blank=True)
+    release_version = models.CharField(max_length=32, blank=True)
     """The most up-to-date version of the episode code release."""
 
     eligibility_criteria = models.ManyToManyField(
-        EligibilityCriterion, related_name="episodes"
+        EligibilityCriterion, related_name="episodes", blank=True
     )
     """The eligibility criteria active in this episode."""
 
@@ -189,6 +189,7 @@ class Tournament(models.Model):
     eligibility_includes = models.ManyToManyField(
         EligibilityCriterion,
         related_name="include_tournaments",
+        blank=True,
     )
     """
     The eligibility criteria that must be satisfied for a team to enter the tournament.
@@ -197,6 +198,7 @@ class Tournament(models.Model):
     eligibility_excludes = models.ManyToManyField(
         EligibilityCriterion,
         related_name="exclude_tournaments",
+        blank=True,
     )
     """
     The eligibility criteria that must not be satisfied for a team to enter the
@@ -287,7 +289,7 @@ class TournamentRound(models.Model):
     name = models.CharField(max_length=64)
     """The name of this round in human-readable form, such as "Round 1"."""
 
-    maps = models.ManyToManyField(Map, related_name="tournament_rounds")
+    maps = models.ManyToManyField(Map, related_name="tournament_rounds", blank=True)
     """The maps to be used in this round."""
 
     release_status = models.IntegerField(

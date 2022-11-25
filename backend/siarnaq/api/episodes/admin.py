@@ -24,10 +24,12 @@ class EpisodeAdmin(admin.ModelAdmin):
             "General",
             {
                 "fields": (
-                    ("name_short", "name_long"),
-                    ("language", "release_version"),
-                    ("blurb",),
-                    ("eligibility_criteria",),
+                    "name_short",
+                    "name_long",
+                    "language",
+                    "release_version",
+                    "blurb",
+                    "eligibility_criteria",
                 ),
             },
         ),
@@ -50,8 +52,15 @@ class EpisodeAdmin(admin.ModelAdmin):
             },
         ),
     )
+    filter_horizontal = ("eligibility_criteria",)
     inlines = [MapInline]
-    list_display = ("name_short", "name_long", "game_release")
+    list_display = (
+        "name_short",
+        "name_long",
+        "registration",
+        "game_release",
+        "game_archive",
+    )
     ordering = ("-game_release",)
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
@@ -94,7 +103,7 @@ class TournamentAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             "General",
-            {"fields": (("name_short", "name_long"), ("episode", "style"), ("blurb",))},
+            {"fields": ("name_short", "name_long", "episode", "style", "blurb")},
         ),
         (
             "Release options",
@@ -119,12 +128,14 @@ class TournamentAdmin(admin.ModelAdmin):
             },
         ),
     )
+    filter_horizontal = ("eligibility_includes", "eligibility_excludes")
     inlines = [TournamentRoundInline]
     list_display = (
         "name_short",
         "name_long",
         "episode",
         "submission_freeze",
+        "is_public",
         "in_progress",
     )
     list_filter = ("episode",)
@@ -156,13 +167,21 @@ class MatchInline(admin.TabularInline):
 @admin.register(TournamentRound)
 class TournamentRoundAdmin(admin.ModelAdmin):
     fields = (
-        ("name", "challonge_id", "release_status"),
-        ("maps",),
+        "name",
+        "challonge_id",
+        "release_status",
+        "maps",
     )
+    filter_horizontal = ("maps",)
     inlines = [MatchInline]
     list_display = ("name", "tournament", "release_status")
     list_filter = ("tournament", "release_status")
     list_select_related = ("tournament",)
     ordering = ("-tournament__submission_freeze", "challonge_id")
-    raw_id_fields = ("maps",)
     readonly_fields = ("challonge_id",)
+
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        pk = request.resolver_match.kwargs.get("object_id", None)
+        if db_field.name == "maps" and pk is not None:
+            kwargs["queryset"] = Map.objects.filter(episode__tournaments__rounds=pk)
+        return super().formfield_for_manytomany(db_field, request, **kwargs)

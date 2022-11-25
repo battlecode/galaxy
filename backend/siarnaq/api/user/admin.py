@@ -1,17 +1,24 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django_rest_passwordreset.models import ResetPasswordToken
 
 from siarnaq.api.teams.models import Team
 from siarnaq.api.user.models import User, UserProfile
+
+admin.site.unregister(ResetPasswordToken)
 
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
     fields = (
-        ("school", "kerberos"),
-        ("biography",),
-        ("gender", "gender_details"),
-        ("has_avatar", "has_resume"),
-        ("country",),
+        "school",
+        "kerberos",
+        "biography",
+        "gender",
+        "gender_details",
+        "country",
+        "has_avatar",
+        "has_resume",
     )
     readonly_fields = ("has_avatar", "has_resume")
 
@@ -42,24 +49,14 @@ class TeamInline(admin.TabularInline):
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    fields = (
-        ("username",),
-        ("first_name", "last_name"),
-        ("email"),
-        ("is_active",),
-        ("is_staff",),
-        ("is_superuser",),
-        ("last_login", "date_joined"),
-        ("groups",),
-    )
+class UserAdmin(BaseUserAdmin):
     inlines = [UserProfileInline, TeamInline]
-    list_display = ("username", "first_name", "last_name", "email", "is_staff")
-    list_filter = ("is_staff",)
-    ordering = ("username",)
     readonly_fields = ("last_login", "date_joined")
-    search_fields = ("username", "first_name", "last_name", "email")
-    search_help_text = "Search for a username, name or email."
+
+    def get_inlines(self, request, obj=None, **kwargs):
+        if obj is None:
+            return []
+        return super().get_inlines(request, obj, **kwargs)
 
     def get_form(self, request, obj=None, **kwargs):
         """Disable form fields that grant too much power."""

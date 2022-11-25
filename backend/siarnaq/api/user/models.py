@@ -84,7 +84,7 @@ class UserProfile(models.Model):
     has_resume = models.BooleanField(default=False)
     """Whether the user has an uploaded resume."""
 
-    country = models.TextField(blank=True)
+    country = models.CharField(max_length=128, blank=True)
     """The country of the user."""
 
     def get_resume_path(self):
