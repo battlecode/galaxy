@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
+from django_countries.fields import CountryField
 
 
 class User(AbstractUser):
@@ -84,7 +85,7 @@ class UserProfile(models.Model):
     has_resume = models.BooleanField(default=False)
     """Whether the user has an uploaded resume."""
 
-    country = models.CharField(max_length=128, blank=True)
+    country = CountryField(blank=True)
     """The country of the user."""
 
     def get_resume_path(self):
