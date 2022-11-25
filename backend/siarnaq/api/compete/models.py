@@ -56,6 +56,9 @@ class SaturnInvocation(models.Model):
     logs = models.TextField(blank=True)
     """The execution logs of the task invocation, if any."""
 
+    num_failures = models.PositiveSmallIntegerField(default=0)
+    """The number of times this invocation has failed."""
+
     class Meta:
         abstract = True
 
