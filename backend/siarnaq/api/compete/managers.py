@@ -44,6 +44,7 @@ class SaturnInvokableQuerySet(models.QuerySet):
                 message_id = future.result()
                 invocation.status = SaturnStatus.QUEUED
                 invocation.logs = f"Enqueued with ID: {message_id}"
+                invocation.num_failures = 0
             except Exception as err:
                 invocation.status = SaturnStatus.ERRORED
                 publish_client.resume_publish(
@@ -51,7 +52,7 @@ class SaturnInvokableQuerySet(models.QuerySet):
                     ordering_key=self._publish_ordering_key,
                 )
                 invocation.logs = f"type: {type(err)} Exception message: {err}"
-        self.model.objects.bulk_update(invocations, ["status", "logs"])
+        self.model.objects.bulk_update(invocations, ["status", "logs", "num_failures"])
 
 
 class SubmissionQuerySet(SaturnInvokableQuerySet):

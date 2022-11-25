@@ -169,6 +169,10 @@ class Base(Configuration):
 
     USER_MAX_AVATAR_SIZE = (512, 512)
 
+    # Saturn settings
+
+    SATURN_MAX_FAILURES = 5
+
     # Email config
 
     EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"

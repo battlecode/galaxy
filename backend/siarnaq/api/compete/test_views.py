@@ -201,7 +201,7 @@ class SubmissionViewSetTestCase(APITestCase):
             },
             format="json",
         )
-        self.assertTrue(status.is_success(response.status_code))
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
         s.refresh_from_db()
         self.assertEqual(s.status, SaturnStatus.COMPLETED)
         self.assertEqual(s.logs, "abc")

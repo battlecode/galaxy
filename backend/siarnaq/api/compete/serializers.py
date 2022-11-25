@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.db import transaction
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.exceptions import APIException
 
 from siarnaq.api.compete.models import (
     Match,
@@ -15,9 +17,34 @@ from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.serializers import RatingField
 
 
+class AlreadyFinalized(APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = "This invocation is already finalized."
+    default_code = "already_finalized"
+
+
 class SaturnInvocationSerializer(serializers.Serializer):
     status = serializers.ChoiceField(SaturnStatus.choices)
     logs = serializers.CharField(required=False)
+    interrupted = serializers.BooleanField(required=False)
+
+    def update(self, instance, validated_data):
+        if instance.is_finalized():
+            raise AlreadyFinalized
+        instance.status = validated_data["status"]
+
+        if logs := validated_data.get("logs", None):
+            instance.logs += logs
+        if instance.status == SaturnStatus.RETRY and not validated_data.get(
+            "interrupted", False
+        ):
+            instance.num_failures += 1
+            if instance.num_failures >= settings.SATURN_MAX_FAILURES:
+                instance.status = SaturnStatus.ERRORED
+                instance.logs += "[siarnaq] Maximum retries reached.\n"
+
+        instance.save(update_fields=["status", "logs", "num_failures"])
+        return instance
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
@@ -81,11 +108,13 @@ class SubmissionReportSerializer(serializers.Serializer):
 
     @transaction.atomic
     def save(self):
-        self.instance.status = self.validated_data["invocation"]["status"]
-        self.instance.logs += self.validated_data["invocation"]["logs"]
-        if self.validated_data.get("accepted", None) is not None:
-            self.instance.accepted = self.validated_data["accepted"]
-        self.instance.save(update_fields=["status", "logs", "accepted"])
+        accepted = self.validated_data.get("accepted", None)
+        if accepted is not None:
+            self.instance.accepted = accepted
+        self.instance.save(update_fields=["accepted"])
+
+        invocation_serializer = self.fields["invocation"]
+        invocation_serializer.update(self.instance, self.validated_data["invocation"])
         return self.instance
 
 
@@ -203,24 +232,26 @@ class MatchSerializer(serializers.ModelSerializer):
 
 class MatchReportSerializer(serializers.Serializer):
     invocation = SaturnInvocationSerializer()
-    scores = serializers.ListField(child=serializers.IntegerField(min_value=0))
+    scores = serializers.ListField(
+        child=serializers.IntegerField(min_value=0), required=False
+    )
 
     def validate(self, data):
-        scores = data.get("scores")
+        scores = data.get("scores", [])
         if scores and len(scores) != self.instance.participants.count():
             raise serializers.ValidationError("must provide either no or all scores")
         return data
 
     @transaction.atomic
     def save(self):
-        self.instance.status = self.validated_data["invocation"]["status"]
-        self.instance.logs += self.validated_data["invocation"]["logs"]
         participants = list(self.instance.participants.order_by("player_index"))
-        for participant, score in zip(participants, self.validated_data["scores"]):
+        scores = self.validated_data.get("scores", [])
+        for participant, score in zip(participants, scores):
             participant.score = score
-
         MatchParticipant.objects.bulk_update(participants, ["score"])
-        self.instance.save(update_fields=["status", "logs"])
+
+        invocation_serializer = self.fields["invocation"]
+        invocation_serializer.update(self.instance, self.validated_data["invocation"])
         return self.instance
 
 

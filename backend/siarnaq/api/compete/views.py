@@ -142,7 +142,10 @@ class SubmissionViewSet(
         responses={
             status.HTTP_204_NO_CONTENT: OpenApiResponse(
                 description="Report has been received"
-            )
+            ),
+            status.HTTP_409_CONFLICT: OpenApiResponse(
+                description="This submission was already finalized"
+            ),
         }
     )
     @action(
@@ -153,14 +156,12 @@ class SubmissionViewSet(
     )
     def report(self, request, pk=None, *, episode_id):
         """
-        Report the outcome of this submission on Saturn. Reports on already-finalized
-        invocations are silently ignored.
+        Report the outcome of this submission on Saturn.
         """
         instance = self.get_object()
-        if not instance.is_finalized():
-            serializer = self.get_serializer(instance, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -284,7 +285,10 @@ class MatchViewSet(
         responses={
             status.HTTP_204_NO_CONTENT: OpenApiResponse(
                 description="Report has been received"
-            )
+            ),
+            status.HTTP_409_CONFLICT: OpenApiResponse(
+                description="This match was already finalized"
+            ),
         }
     )
     @action(
@@ -295,14 +299,12 @@ class MatchViewSet(
     )
     def report(self, request, pk=None, *, episode_id):
         """
-        Report the outcome of this match on Saturn. Reports on already-finalized
-        invocations are silently ignored.
+        Report the outcome of this match on Saturn.
         """
         instance = self.get_object()
-        if not instance.is_finalized():
-            serializer = self.get_serializer(instance, data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
 
