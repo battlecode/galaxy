@@ -193,13 +193,18 @@ class MatchSerializer(serializers.ModelSerializer):
             # Staff can see everything
             pass
         elif (
-            instance.tournament_round is not None
-            and instance.tournament_round.release_status <= ReleaseStatus.HIDDEN
-        ) or (
-            instance.tournament_round is not None
-            and not instance.tournament_round.tournament.is_public
+            (
+                instance.tournament_round is not None
+                and instance.tournament_round.release_status <= ReleaseStatus.HIDDEN
+            )
+            or (
+                instance.tournament_round is not None
+                and not instance.tournament_round.tournament.is_public
+            )
+            or instance.participants.filter(team__status=TeamStatus.INVISIBLE).exists()
         ):
-            # Unreleased tournament matches and private tournaments are fully redacted
+            # Fully redact matches from private tournaments, unreleased tournament
+            # rounds, and those with invisible teams.
             data["participants"] = data["replay"] = data["maps"] = None
         elif (
             instance.tournament_round is not None
@@ -214,10 +219,6 @@ class MatchSerializer(serializers.ModelSerializer):
         ).exists():
             # Clients can see everything about their own games
             pass
-        elif instance.participants.filter(team__status=TeamStatus.INVISIBLE).exists():
-            # Matches with invisible teams are fully redacted, because they are, by
-            # definition, invisible
-            data["participants"] = data["replay"] = data["maps"] = None
         elif instance.participants.filter(team__status=TeamStatus.STAFF).exists():
             # Matches with staff teams have scores redacted because they could be for
             # official grading purposes. We redact all of them just in case.
