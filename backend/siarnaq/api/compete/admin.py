@@ -39,7 +39,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         (
             "Saturn metadata",
             {
-                "fields": ("status", "created", "logs"),
+                "fields": ("status", "created", "num_failures", "logs"),
             },
         ),
     )
@@ -55,11 +55,7 @@ class SubmissionAdmin(admin.ModelAdmin):
     list_select_related = ("team", "episode")
     ordering = ("-pk",)
     raw_id_fields = ("team", "user")
-    readonly_fields = (
-        "status",
-        "created",
-        "logs",
-    )
+    readonly_fields = ("status", "created", "num_failures", "logs")
 
     def get_readonly_fields(self, request, obj=None):
         fields = super().get_readonly_fields(request, obj=obj)
@@ -106,7 +102,7 @@ class MatchAdmin(admin.ModelAdmin):
         (
             "Saturn metadata",
             {
-                "fields": ("status", "created", "logs"),
+                "fields": ("status", "created", "num_failures", "logs"),
             },
         ),
     )
@@ -122,7 +118,7 @@ class MatchAdmin(admin.ModelAdmin):
     list_filter = ("episode", "status")
     ordering = ("-pk",)
     raw_id_fields = ("tournament_round",)
-    readonly_fields = ("replay", "status", "created", "logs")
+    readonly_fields = ("replay", "status", "created", "num_failures", "logs")
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         pk = request.resolver_match.kwargs.get("object_id", None)
