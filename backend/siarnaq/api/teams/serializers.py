@@ -1,8 +1,9 @@
 from django.db import transaction
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
-from rest_framework import serializers
+from rest_framework import serializers, validators
 
+from siarnaq.api.episodes.models import Episode
 from siarnaq.api.teams.models import Team, TeamProfile
 from siarnaq.api.user.serializers import UserNestedSerializer
 
@@ -82,21 +83,26 @@ class TeamProfilePrivateSerializer(TeamProfilePublicSerializer):
         return instance
 
 
+class CurrentEpisodeDefault:
+    """Returns a default value for the episode given by the value in context."""
+
+    requires_context = True
+
+    def __call__(self, serializer_field):
+        episode_id = serializer_field.context["view"].kwargs.get("episode_id")
+        return Episode.objects.get(pk=episode_id)
+
+
 class TeamPrivateSerializer(TeamPublicSerializer):
     profile = TeamProfilePrivateSerializer(required=False)
+    episode = serializers.PrimaryKeyRelatedField(
+        default=CurrentEpisodeDefault(), queryset=Episode.objects.all()
+    )
 
     class Meta:
         model = Team
         fields = ["id", "profile", "episode", "name", "members", "join_key", "status"]
-        read_only_fields = ["id", "episode", "name", "members", "join_key", "status"]
-
-    def to_internal_value(self, data):
-        """
-        Use the episode ID provided in URL as the team's episode.
-        """
-        ret = super().to_internal_value(data)
-        ret.update(episode_id=self.context["view"].kwargs.get("episode_id"))
-        return ret
+        read_only_fields = ["id", "name", "members", "join_key", "status"]
 
     @transaction.atomic
     def create(self, validated_data):
@@ -120,7 +126,13 @@ class TeamCreateSerializer(TeamPrivateSerializer):
     class Meta:
         model = Team
         fields = ["id", "profile", "episode", "name", "members", "join_key", "status"]
-        read_only_fields = ["id", "episode", "members", "join_key", "status"]
+        read_only_fields = ["id", "members", "join_key", "status"]
+        validators = [
+            validators.UniqueTogetherValidator(
+                queryset=Team.objects.all(),
+                fields=["episode", "name"],
+            )
+        ]
 
 
 class TeamJoinSerializer(serializers.Serializer):
