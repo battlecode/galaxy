@@ -111,13 +111,14 @@ class YesTeam extends Component {
                 which prizes your team is eligible for. Check all boxes that
                 apply to all members your team.
               </p>
-              {/*<EligibilityOptions
+              <EligibilityOptions
                 change={this.changeHandler}
                 team={this.state.team}
                 update={this.updateTeam}
                 up_but={this.state.up}
                 episode={this.props.episode}
-                /> TODO: eligibility options*/}
+              />{" "}
+              TODO: eligibility options
             </div>
           </div>
 
@@ -424,7 +425,6 @@ class ResumeStatus extends Component {
 }
 
 // pass change handler in props.change and team in props.team
-// NOTE: If you are ever working with teams' eligility (for example, to pull teams for the newbie tournament), please see backend/docs/ELIGIBILITY.md before you do anything! The variable names here are poorly named (because columns in the database are poorly named).
 class EligibilityOptions extends Component {
   constructor(props) {
     super(props);
