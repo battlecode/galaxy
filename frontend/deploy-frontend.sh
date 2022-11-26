@@ -1,18 +1,23 @@
+# Immediately exit this script if any command fails, to safeguard against being in a broken state.
+# Note that this doesn't catch _everything_ but it helps.
+# Also note that set -e sometimes doesn't behave how you may expect.
+# http://mywiki.wooledge.org/BashFAQ/105
+# However, this script is simple enough that we are okay, for now.
+set -e
+
 # TODO change bucket_name. or perhaps include the subfolder too
 BUCKET_NAME="bc-frontend"
-
-
-# TODO if run manually, with no extra args, then the script should fail.
-# However, include a convoluted second argument (eg --this-is-being-run-from-gcloud) that skips that check ^,
-# and that the GCP deploys use when running. Don't explicitly discuss this flag anywhere else (so that users don't rely on it too much)
 
 # Long-term TODO: advanced users should be able to run this script locally.
 # Have a user-note to manually check some things (on main, up-to-date; in the right working directory; has npm)
 # and then a user prompt, that prevents execution unless the user manually confirms.
 # The automation argument should skip that user prompt
 
-# Clean and make build contents
-rm -r build # TODO ought to skip this for GCP cloud build
+if ! [ "$1" = "--this-is-being-run-from-gcloud" ]
+then
+echo "You should run this from gcloud."
+exit 1
+fi
 
 # TODO assuming the filelocation from which GCP cloud build runs is different, would need to cd to frontend dir
 # `pwd` would help identify this location
