@@ -33,18 +33,12 @@ npm run build
 
 # Handle bucket:
 
-# TODO use rsync, instead of rm/cp, in case rm works but cp fails and we're left emptyhanded.
-# Consider rsync -d, which should be ok?
-
 # TODO I'm not sure if whatever agent that runs the gsutil commands will have permissions;
 # we should check this
 
-# Clean
-gsutil -m rm gs://$BUCKET_NAME/**
-# Upload
 cd build
-gsutil -m cp -r * gs://$BUCKET_NAME
-cd ..
+gsutil -m rsync -r * gs://$BUCKET_NAME
+
 # Enforce cache policy
 gsutil -m setmeta -h "Cache-Control:no-cache" gs://$BUCKET_NAME/**
 # Set home-page; see readme for info
