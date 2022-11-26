@@ -1,14 +1,14 @@
 resource "google_storage_bucket" "public" {
   name = "mitbattlecode-${var.name}-public"
 
-  location      = "US"
+  location      = var.gcp_region
   storage_class = "STANDARD"
 }
 
 resource "google_storage_bucket" "secure" {
   name = "mitbattlecode-${var.name}-secure"
 
-  location      = "US"
+  location      = var.gcp_region
   storage_class = "STANDARD"
 
   dynamic "lifecycle_rule" {
