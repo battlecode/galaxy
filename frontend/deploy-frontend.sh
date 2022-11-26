@@ -24,11 +24,10 @@ pwd
 apt-get -y install npm
 
 npm install
-# TODO inject build timestamp in here.
-# Easiest is to compute timestamp , build_ts = date +(idk i forget the args but)
-# REACT_APP_BUILD_TS=$buildts npm run build
+
+build_ts=$(date +%s)
 # TODO frontend footer should display timestamp too if existing as an env
-npm run build
+REACT_APP_BUILD_TS=$build_ts npm run build
 
 # Handle bucket:
 
