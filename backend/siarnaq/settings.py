@@ -275,6 +275,7 @@ class Local(Base):
 
     GCLOUD_CREDENTIALS, GCLOUD_PROJECT = None, "null-project"
     SECRET_KEY = "django-insecure-2r0p5r8#j1!4v%cb@w#_^)6+^#vs5b*9mqf)!q)pz!5tqnbx*("
+    SUPERUSER_PASSWORD = "admin"
     ANYMAIL = {
         "MAILJET_API_KEY": "",
         "MAILJET_SECRET_KEY": "",
@@ -351,6 +352,7 @@ class Staging(Base):
             ).decode()
         )
         cls.SECRET_KEY = secrets["django-key"]
+        cls.SUPERUSER_PASSWORD = secrets["superuser-password"]
         cls.ANYMAIL = {
             "MAILJET_API_KEY": secrets["mailjet-api-key"],
             "MAILJET_SECRET_KEY": secrets["mailjet-api-secret"],
@@ -419,6 +421,7 @@ class Production(Base):
             ).decode()
         )
         cls.SECRET_KEY = secrets["django-key"]
+        cls.SUPERUSER_PASSWORD = secrets["superuser-password"]
         cls.DATABASES = {
             "default": {
                 "ENGINE": "django.db.backends.postgresql_psycopg2",
