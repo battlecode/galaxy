@@ -14,6 +14,6 @@ WORKDIR $APP_HOME
 ARG BUILD=nightly
 ENV SIARNAQ_BUILD=$BUILD
 
-COPY uwsgi.ini uwsgi.ini
+COPY manage.py uwsgi.ini ./
 COPY siarnaq siarnaq
 CMD /env/bin/uwsgi --chdir=$APP_HOME --http=:$PORT --ini=uwsgi.ini
