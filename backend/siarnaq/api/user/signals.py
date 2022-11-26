@@ -4,7 +4,6 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.dispatch import receiver
 from django.template.loader import render_to_string
-from django.urls import reverse
 from django_rest_passwordreset.signals import reset_password_token_created
 
 
@@ -21,9 +20,7 @@ def send_password_reset_token_email(
         return
 
     user_email = reset_password_token.user.email
-    uri = instance.request.build_absolute_uri(
-        reverse("password_reset:reset-password-confirm")
-    )
+    uri = f"{settings.FRONTEND_ORIGIN}/password_change/"
     token_encoded = urllib.parse.urlencode({"token": reset_password_token.key})
     context = {
         "username": reset_password_token.user.username,

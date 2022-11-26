@@ -205,7 +205,9 @@ class Local(Base):
 
     DEBUG = True
     CORS_ALLOW_ALL_ORIGINS = True
+
     EMAIL_ENABLED = False
+    FRONTEND_ORIGIN = "http://localhost:3000"
 
     GCLOUD_CREDENTIALS, GCLOUD_PROJECT = None, "null-project"
     SECRET_KEY = "django-insecure-2r0p5r8#j1!4v%cb@w#_^)6+^#vs5b*9mqf)!q)pz!5tqnbx*("
@@ -254,7 +256,9 @@ class Staging(Base):
 
     DEBUG = True
     CORS_ALLOW_ALL_ORIGINS = True
+
     EMAIL_ENABLED = False
+    FRONTEND_ORIGIN = "http://localhost:3000"
 
     @classmethod
     def pre_setup(cls):
@@ -319,7 +323,9 @@ class Production(Base):
 
     DEBUG = False
     CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://\w+\.battlecode\.org$"]
+
     EMAIL_ENABLED = True
+    FRONTEND_ORIGIN = "https://play.battlecode.org"
 
     @classmethod
     def pre_setup(cls):
