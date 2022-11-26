@@ -25,7 +25,8 @@ granted.
 
 ### Making changes
 
-First, you should obtain the `secret.tfvars` file from a dev. Then, put this in the `deploy` folder.
+First, you should obtain the `secret.tfvars` file from a dev. Then, put this in the
+`deploy` folder.
 
 Whenever you make changes and apply them, you should add and commit all `.tf` files as
 well as the `.terraform.lock.hcl` file.
@@ -46,6 +47,17 @@ a new project:
 - Create a Service Account for Terraforom to access and manage your resources. Name it
   as specified in `variables.tf`. Grant it roles permitting it to administer all
   resources you require.
+- Ensure you have a Cloud Domain ready, with a managed DNS zone. The Managed DNS Zone
+  name is required in `main.tf`.
+
+### Other manual changes
+
+There are some things which Terraform is unable to do. To configure these, you need
+manual changes:
+
+- Titan runs via Eventarc, which uses a Pub/Sub queue as its transport. However, its
+  deadline is [not long enough](https://github.com/battlecode/galaxy/issues/239). Go to
+  the Cloud Console and manually update them.
 
 ### Shutting down
 
