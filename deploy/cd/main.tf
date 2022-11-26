@@ -39,7 +39,7 @@ resource "google_cloudbuild_trigger" "galaxy" {
   build {
     step {
       name = "gcr.io/cloud-builders/docker"
-      args = ["build", "-t", local.siarnaq_image, "."]
+      args = ["build", "--build-arg", "BUILD=SHORT_SHA", "-t", local.siarnaq_image, "."]
       dir  = "backend"
     }
 
