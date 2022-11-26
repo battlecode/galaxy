@@ -224,8 +224,8 @@ class Account extends Component {
                             type="text"
                             className="form-control"
                             id="username"
-                            onChange={this.changeHandler}
                             value={this.state.user.username}
+                            disabled
                           />
                         </div>
                       </div>
