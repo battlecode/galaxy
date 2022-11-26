@@ -10,6 +10,20 @@ resource "google_storage_bucket" "secure" {
 
   location      = "US"
   storage_class = "STANDARD"
+
+  dynamic "lifecycle_rule" {
+    for_each = var.secure_lifecycle_rules
+
+    content {
+      condition {
+        age = lifecycle_rule.value.age
+      }
+      action {
+        type = "SetStorageClass"
+        storage_class = lifecycle_rule.value.storage_class
+      }
+    }
+  }
 }
 
 resource "google_storage_bucket" "frontend" {

@@ -46,6 +46,11 @@ module "production" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
+  secure_lifecycle_rules = [
+    { age = 60, storage_class = "COLDLINE" },
+    { age = 700, storage_class = "ARCHIVE" },
+  ]
+
   mailjet_api_key    = var.mailjet_api_key
   mailjet_api_secret = var.mailjet_api_secret
 
@@ -75,6 +80,8 @@ module "staging" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+
+  secure_lifecycle_rules = []
 
   mailjet_api_key    = var.mailjet_api_key
   mailjet_api_secret = var.mailjet_api_secret
