@@ -5,8 +5,7 @@
 # However, this script is simple enough that we are okay, for now.
 set -e
 
-# TODO change bucket_name. or perhaps include the subfolder too
-BUCKET_NAME="bc-frontend"
+BUCKET_NAME="mitbattlecode-production-frontend"
 
 # Long-term TODO: advanced users should be able to run this script locally.
 # Have a user-note to manually check some things (on main, up-to-date; in the right working directory; has npm)
