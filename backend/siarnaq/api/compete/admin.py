@@ -1,3 +1,4 @@
+import structlog
 from django.contrib import admin
 
 from siarnaq.api.compete.models import (
@@ -8,14 +9,18 @@ from siarnaq.api.compete.models import (
 )
 from siarnaq.api.episodes.models import Map
 
+logger = structlog.get_logger(__name__)
+
 
 @admin.action(description="Add pending tasks to the Saturn queue")
 def enqueue(modeladmin, request, queryset):
+    logger.info("task_requeue", message="Re-queueing tasks to Saturn.")
     queryset.enqueue()
 
 
 @admin.action(description="Forcibly re-queue tasks to Saturn")
 def force_requeue(modeladmin, request, queryset):
+    logger.info("task_force_requeue", message="Forcibly re-queuing tasks to Saturn.")
     queryset.enqueue_all()
 
 

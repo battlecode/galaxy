@@ -2,6 +2,7 @@ import io
 import uuid
 
 import google.cloud.storage as storage
+import structlog
 from django.conf import settings
 from django.db import transaction
 from django.http import Http404
@@ -20,6 +21,8 @@ from siarnaq.api.user.serializers import (
     UserResumeSerializer,
 )
 from siarnaq.gcloud import titan
+
+logger = structlog.get_logger(__name__)
 
 
 class UserViewSet(
@@ -100,7 +103,12 @@ class UserViewSet(
                 with transaction.atomic():
                     profile.has_resume = True
                     profile.save(update_fields=["has_resume"])
-                    if settings.GCLOUD_ENABLE_ACTIONS:
+                    if not settings.GCLOUD_ENABLE_ACTIONS:
+                        logger.warn(
+                            "resume_disabled", message="Resume uploads are disabled."
+                        )
+                    else:
+                        logger.info("resume_upload", message="Uploading resume.")
                         client = storage.Client(credentials=settings.GCLOUD_CREDENTIALS)
                         blob = client.bucket(settings.GCLOUD_BUCKET_SECURE).blob(
                             profile.get_resume_path()
@@ -136,7 +144,10 @@ class UserViewSet(
             profile.has_avatar = True
             profile.avatar_uuid = uuid.uuid4()
             profile.save(update_fields=["has_avatar", "avatar_uuid"])
-            if settings.GCLOUD_ENABLE_ACTIONS:
+            if not settings.GCLOUD_ENABLE_ACTIONS:
+                logger.warn("avatar_disabled", message="Avatar uploads are disabled.")
+            else:
+                logger.info("avatar_upload", message="Uploading avatar.")
                 client = storage.Client()
                 blob = client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(
                     profile.get_avatar_path()

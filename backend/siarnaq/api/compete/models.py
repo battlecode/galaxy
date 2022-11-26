@@ -2,6 +2,7 @@ import posixpath
 import random
 import uuid
 
+import structlog
 from django.apps import apps
 from django.db import models
 
@@ -12,6 +13,8 @@ from siarnaq.api.compete.managers import (
     ScrimmageRequestQuerySet,
     SubmissionQuerySet,
 )
+
+logger = structlog.get_logger(__name__)
 
 
 class SaturnStatus(models.TextChoices):
@@ -214,8 +217,14 @@ class Match(SaturnInvocation):
 
     def try_finalize_ratings(self):
         """Try to finalize the ratings of the participations if possible."""
+        log = logger.bind(match=self.pk)
         if self.is_ranked and not self.is_finalized():
-            return  # Not ready yet
+            log.debug(
+                "match_not_ready", message="Match ratings are not ready to finalize."
+            )
+            return
+
+        log.debug("match_finalize", message="Attempting to finalize ratings for match.")
         participants = self.participants.all()
         for i, participant in enumerate(participants):
             participant.try_finalize_rating(
@@ -332,12 +341,24 @@ class MatchParticipant(models.Model):
             The opponent of this participation. Should be the return value of
             match.get_opponent(self)
         """
+        log = logger.bind(match=self.match_id, team=self.team_id, participant=self.pk)
+        log.debug(
+            "participant_finalize",
+            message="Attempting to finalize match participant rating",
+        )
         if self.rating is not None:
-            return  # Done already!
+            log.debug(
+                "participant_noop", message="Participant rating is already finalized."
+            )
+            return
 
         old_rating = self.get_old_rating()
         if old_rating is None:
-            return  # Not ready
+            log.debug(
+                "participant_not_ready",
+                message="Participant rating is not ready to finalize.",
+            )
+            return
 
         # Matches are unranked if they were supposed to be unranked, or if they ended
         # unsuccessfully.
@@ -351,13 +372,23 @@ class MatchParticipant(models.Model):
                 # Occurs when this is the team's first-ever match.
                 old_rating.save()
             self.rating = old_rating
+            log.info(
+                "participant_rating_unchanged",
+                message="Participant rating is finalized and unchanged.",
+            )
 
         elif self.match.is_finalized():
             opponent_ratings = [opponent.get_old_rating() for opponent in opponents]
             total_score = self.score + sum(opponent.score for opponent in opponents)
             if all(r is not None for r in opponent_ratings):
-                self.rating = self.get_old_rating().step(
+                self.rating = old_rating.step(
                     opponent_ratings, self.score / total_score
+                )
+                log.info(
+                    "participant_rating_updated",
+                    message="Participant rating is updated.",
+                    old_rating=old_rating.value,
+                    new_rating=self.rating.value,
                 )
 
         if self.rating is not None:
@@ -369,8 +400,17 @@ class MatchParticipant(models.Model):
                     "participants__rating",
                 ).get(participants__previous_participation=self)
             except Match.DoesNotExist:
+                log.info(
+                    "participant_chain_end",
+                    message="No further updates after this participant.",
+                )
                 pass  # No more matches to do
             else:
+                log.debug(
+                    "participant_chain_next",
+                    message="Inspecting next match for finalization.",
+                    match=next_match.pk,
+                )
                 next_match.try_finalize_ratings()
 
 

@@ -14,9 +14,11 @@ import json
 import os
 from datetime import timedelta
 from pathlib import Path
+from typing import Any
 
 import google.auth
 import google.cloud.secretmanager as secretmanager
+import structlog
 from configurations import Configuration
 from google.auth import impersonated_credentials
 from google.auth.credentials import Credentials
@@ -31,6 +33,52 @@ def _get_secret(
         name=client.secret_version_path(project_id, name, version)
     )
     return client.access_secret_version(request=request).payload.data
+
+
+def _gcloud_log_dumps(obj: dict[str, Any], **kwargs):
+    """
+    Dump a log entry as JSON, but renaming fields to be as expected by Google Cloud.
+
+    Renames ``level'' to ``severity''. Also renames ``exception'' to ``message'' for
+    detection by Error Reporting.
+    """
+    if "level" in obj:
+        obj["severity"] = obj.pop("level")
+    if "exception" in obj:
+        if "message" in obj:
+            obj["details"] = obj.pop("message")
+        obj["message"] = obj.pop("exception")
+    return json.dumps(obj, **kwargs)
+
+
+_LOGGING_COMMON = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "plain_console": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(),
+        },
+        "json_formatter": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(_gcloud_log_dumps),
+        },
+    },
+    "handlers": {
+        "null": {
+            "level": "DEBUG",
+            "class": "logging.NullHandler",
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "plain_console",
+        },
+        "json": {
+            "class": "logging.StreamHandler",
+            "formatter": "json_formatter",
+        },
+    },
+}
 
 
 class Base(Configuration):
@@ -68,6 +116,7 @@ class Base(Configuration):
         "django.contrib.auth.middleware.AuthenticationMiddleware",
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
+        "django_structlog.middlewares.RequestMiddleware",
     ]
 
     CORS_ALLOW_CREDENTIALS = True
@@ -209,6 +258,15 @@ class Local(Base):
     EMAIL_ENABLED = False
     FRONTEND_ORIGIN = "http://localhost:3000"
 
+    LOGGING: dict[str, Any] = {
+        **_LOGGING_COMMON,
+        "loggers": {
+            "django": {"handlers": ["null"], "level": "INFO"},
+            "django_structlog": {"handlers": ["console"], "level": "DEBUG"},
+            "siarnaq": {"handlers": ["console"], "level": "DEBUG"},
+        },
+    }
+
     GCLOUD_CREDENTIALS, GCLOUD_PROJECT = None, "null-project"
     SECRET_KEY = "django-insecure-2r0p5r8#j1!4v%cb@w#_^)6+^#vs5b*9mqf)!q)pz!5tqnbx*("
     ANYMAIL = {
@@ -259,6 +317,15 @@ class Staging(Base):
 
     EMAIL_ENABLED = False
     FRONTEND_ORIGIN = "http://localhost:3000"
+
+    LOGGING: dict[str, Any] = {
+        **_LOGGING_COMMON,
+        "loggers": {
+            "django": {"handlers": ["null"], "level": "INFO"},
+            "django_structlog": {"handlers": ["console"], "level": "DEBUG"},
+            "siarnaq": {"handlers": ["console"], "level": "DEBUG"},
+        },
+    }
 
     @classmethod
     def pre_setup(cls):
@@ -327,6 +394,15 @@ class Production(Base):
     EMAIL_ENABLED = True
     FRONTEND_ORIGIN = "https://play.battlecode.org"
 
+    LOGGING: dict[str, Any] = {
+        **_LOGGING_COMMON,
+        "loggers": {
+            "django": {"handlers": ["json"], "level": "INFO"},
+            "django_structlog": {"handlers": ["json"], "level": "DEBUG"},
+            "siarnaq": {"handlers": ["json"], "level": "DEBUG"},
+        },
+    }
+
     @classmethod
     def pre_setup(cls):
         super().pre_setup()
@@ -353,3 +429,20 @@ class Production(Base):
             "MAILJET_API_KEY": secrets["mailjet-api-key"],
             "MAILJET_SECRET_KEY": secrets["mailjet-api-secret"],
         }
+
+
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.filter_by_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.format_exc_info,
+        structlog.processors.UnicodeDecoder(),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+    ],
+    logger_factory=structlog.stdlib.LoggerFactory(),
+    cache_logger_on_first_use=True,
+)

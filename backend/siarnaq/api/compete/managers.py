@@ -1,10 +1,13 @@
 import json
 
+import structlog
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import F, OuterRef, Subquery
 
 from siarnaq.gcloud import saturn
+
+logger = structlog.get_logger(__name__)
 
 
 class SaturnInvokableQuerySet(models.QuerySet):
@@ -29,6 +32,10 @@ class SaturnInvokableQuerySet(models.QuerySet):
         """Enqueue all items in this queryset, regardless of their state."""
         from siarnaq.api.compete.models import SaturnStatus
 
+        logger.debug(
+            "saturn_bulk_enqueue", message="Beginning invocation bulk-enqueue."
+        )
+
         publish_client = saturn.get_publish_client()
         invocations = list(self.select_for_update().all())
         futures = [
@@ -40,12 +47,23 @@ class SaturnInvokableQuerySet(models.QuerySet):
             for invocation in invocations
         ]
         for invocation, future in zip(invocations, futures):
+            log = logger.bind(id=invocation.pk, type=type(self.model))
             try:
                 message_id = future.result()
+                log.info(
+                    "saturn_enqueued",
+                    message="Invocation has been queued.",
+                    message_id=message_id,
+                )
                 invocation.status = SaturnStatus.QUEUED
                 invocation.logs = f"Enqueued with ID: {message_id}"
                 invocation.num_failures = 0
             except Exception as err:
+                log.error(
+                    "saturn_publish_error",
+                    message="Invocation could not be queued.",
+                    exc_info=True,
+                )
                 invocation.status = SaturnStatus.ERRORED
                 publish_client.resume_publish(
                     topic=self._publish_topic,
@@ -145,6 +163,11 @@ class ScrimmageRequestQuerySet(models.QuerySet):
                 .values_list("pk", "active_submission")
                 .all()
             )
+            logger.debug(
+                "scrimmage_accept",
+                message="Bulk accepting %d scrimmage requests." % len(requests),
+                count=len(requests),
+            )
             matches = Match.objects.bulk_create(
                 Match(
                     episode_id=request.episode_id,
@@ -176,6 +199,7 @@ class ScrimmageRequestQuerySet(models.QuerySet):
         """Reject all pending scrimmage requests in this queryset."""
         from siarnaq.api.compete.models import ScrimmageRequestStatus
 
+        logger.debug("scrimmage_reject", message="Bulk-rejecting scrimmage requests.")
         self.filter(status=ScrimmageRequestStatus.PENDING).update(
             status=ScrimmageRequestStatus.REJECTED
         )

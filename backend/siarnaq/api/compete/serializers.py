@@ -1,3 +1,4 @@
+import structlog
 from django.conf import settings
 from django.db import transaction
 from drf_spectacular.types import OpenApiTypes
@@ -16,6 +17,8 @@ from siarnaq.api.episodes.models import Map, ReleaseStatus
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.serializers import RatingField
 
+logger = structlog.get_logger(__name__)
+
 
 class AlreadyFinalized(APIException):
     status_code = status.HTTP_409_CONFLICT
@@ -29,19 +32,30 @@ class SaturnInvocationSerializer(serializers.Serializer):
     interrupted = serializers.BooleanField(required=False)
 
     def update(self, instance, validated_data):
+        log = logger.bind(
+            id=instance.pk, type=type(instance), status=validated_data["status"]
+        )
         if instance.is_finalized():
+            log.warn("saturn_noop", message="Invocation is already finalized.")
             raise AlreadyFinalized
         instance.status = validated_data["status"]
 
         if logs := validated_data.get("logs", None):
             instance.logs += logs
-        if instance.status == SaturnStatus.RETRY and not validated_data.get(
-            "interrupted", False
-        ):
-            instance.num_failures += 1
-            if instance.num_failures >= settings.SATURN_MAX_FAILURES:
-                instance.status = SaturnStatus.ERRORED
-                instance.logs += "[siarnaq] Maximum retries reached.\n"
+        if instance.status == SaturnStatus.RETRY:
+            if validated_data.get("interrupted", False):
+                log.info("saturn_interrupted", message="Invocation was interrupted.")
+            else:
+                log.warn("saturn_failed", message="Invocation failed.")
+                instance.num_failures += 1
+
+        if instance.num_failures >= settings.SATURN_MAX_FAILURES:
+            log.warn(
+                "saturn_errored",
+                message="Invocation errored with maximum retries reached.",
+            )
+            instance.status = SaturnStatus.ERRORED
+            instance.logs += "[siarnaq] Maximum retries reached.\n"
 
         instance.save(update_fields=["status", "logs", "num_failures"])
         return instance

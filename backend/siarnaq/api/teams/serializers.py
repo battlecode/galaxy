@@ -134,6 +134,9 @@ class TeamCreateSerializer(TeamPrivateSerializer):
             )
         ]
 
+    def update(self, instance, validated_data):
+        raise NotImplementedError("Use UserPrivateSerializer to update users.")
+
 
 class TeamJoinSerializer(serializers.Serializer):
     join_key = serializers.CharField()

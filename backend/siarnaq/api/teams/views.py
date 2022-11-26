@@ -1,3 +1,4 @@
+import structlog
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
@@ -16,6 +17,8 @@ from siarnaq.api.teams.serializers import (
     TeamPrivateSerializer,
     TeamPublicSerializer,
 )
+
+logger = structlog.get_logger(__name__)
 
 
 class TeamViewSet(
@@ -96,6 +99,7 @@ class TeamViewSet(
         with transaction.atomic():
             team = get_object_or_404(self.get_queryset(), members=request.user)
             team.members.remove(request.user)
+        logger.debug("team_leave", message="User has left team.", team=team.pk)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
     @extend_schema(responses={status.HTTP_204_NO_CONTENT: None})
@@ -120,4 +124,5 @@ class TeamViewSet(
                 episode=self.kwargs["episode_id"],
             )
             team.members.add(request.user)
+        logger.debug("team_join", message="User has joined team.", team=team.pk)
         return Response(None, status=status.HTTP_204_NO_CONTENT)

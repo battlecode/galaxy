@@ -1,10 +1,13 @@
 import google.cloud.scheduler as scheduler
+import structlog
 from django.conf import settings
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 
 from siarnaq.api.episodes.models import Episode
+
+logger = structlog.get_logger(__name__)
 
 
 @receiver(pre_save, sender=Episode)
@@ -13,8 +16,6 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
     Update the Google Cloud Scheduler resource for automatic scrimmage scheduling
     whenever the specification is changed, raising an exception if the operation fails.
     """
-    if not settings.GCLOUD_ENABLE_ACTIONS:
-        return
     if update_fields is not None and "autoscrim_schedule" not in update_fields:
         return  # No new schedule
     try:
@@ -24,7 +25,18 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
     except Episode.DoesNotExist:
         old_schedule = None
     new_schedule = instance.autoscrim_schedule
+
+    log = logger.bind(
+        pk=instance.pk, old_schedule=old_schedule, new_schedule=new_schedule
+    )
     if old_schedule == new_schedule:
+        log.debug("autoscrim_noop", message="Autoscrim configuration did not change.")
+        return
+    if not settings.GCLOUD_ENABLE_ACTIONS:
+        log.warn(
+            "autoscrim_disabled",
+            message="Not updating autoscrims as actions are disabled.",
+        )
         return
 
     # Autoscrims are always best of 3. Future devs are welcome to change this if they
@@ -57,8 +69,11 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
 
     client = scheduler.CloudSchedulerClient(credentials=settings.GCLOUD_CREDENTIALS)
     if old_schedule is None:
+        log.info("autoscrim_create", message="Creating autoscrim schedule.")
         client.create_job(request=dict(parent=parent, job=job))
     elif new_schedule is None:
+        log.info("autoscrim_delete", message="Deleting autoscrim schedule.")
         client.delete_job(request=dict(name=job_name))
     else:
+        log.info("autoscrim_modify", message="Updating autoscrim schedule.")
         client.update_job(request=dict(job=job))

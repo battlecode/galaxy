@@ -1,10 +1,13 @@
 import urllib.parse
 
+import structlog
 from django.conf import settings
 from django.core.mail import send_mail
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django_rest_passwordreset.signals import reset_password_token_created
+
+logger = structlog.get_logger(__name__)
 
 
 @receiver(reset_password_token_created)
@@ -17,8 +20,10 @@ def send_password_reset_token_email(
     """
 
     if not settings.EMAIL_ENABLED:
+        logger.warn("password_disabled", message="Password reset emails are disabled.")
         return
 
+    logger.info("password_email", message="Sending password reset email.")
     user_email = reset_password_token.user.email
     uri = f"{settings.FRONTEND_ORIGIN}/password_change/"
     token_encoded = urllib.parse.urlencode({"token": reset_password_token.key})
