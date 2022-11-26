@@ -1,4 +1,3 @@
-from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from siarnaq.api.user.models import User, UserProfile
@@ -55,21 +54,15 @@ class UserPrivateSerializer(UserPublicSerializer):
             "id",
             "profile",
             "username",
-            "password",
             "email",
             "first_name",
             "last_name",
             "is_staff",
         ]
-        read_only_fields = ["id", "is_staff"]
-        extra_kwargs = {
-            "password": {"write_only": True},
-            "username": {"validators": []},
-            "email": {"validators": []},
-        }
+        read_only_fields = ["id", "username", "is_staff"]
 
     def create(self, validated_data):
-        return User.objects.create(**validated_data)
+        return User.objects.create_user(**validated_data)
 
     def update(self, instance, validated_data):
         if profile_data := validated_data.pop("profile", None):
@@ -79,37 +72,26 @@ class UserPrivateSerializer(UserPublicSerializer):
 
         return super(UserPublicSerializer, self).update(instance, validated_data)
 
-    def validate_password(self, password):
-        """
-        Automatically hash password upon validation.
-        See https://stackoverflow.com/a/54752925.
-        """
-        return make_password(password)
 
-    def _validate_unique_field(self, field_name, field_value):
-        """
-        Custom validator that permits for a field to be "updated" to the same value
-        as its current one. See https://stackoverflow.com/a/56171137.
-        """
-        # A keyword argument trick to filter by field_name=field_value
-        # with dynamic field_name.
-        # See https://stackoverflow.com/a/310785
-        check_query = User.objects.filter(**{field_name: field_value})
-        if self.instance:
-            check_query = check_query.exclude(pk=self.instance.pk)
+class UserCreateSerializer(UserPrivateSerializer):
+    password = serializers.CharField(write_only=True)
 
-        if check_query.exists():
-            raise serializers.ValidationError(
-                f"A user with that {field_name} already exists."
-            )
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "profile",
+            "username",
+            "password",
+            "email",
+            "first_name",
+            "last_name",
+            "is_staff",
+        ]
+        read_only_fields = ["id", "is_staff"]
 
-        return field_value
-
-    def validate_username(self, username):
-        return self._validate_unique_field("username", username)
-
-    def validate_email(self, username):
-        return self._validate_unique_field("email", username)
+    def update(self, instance, validated_data):
+        raise NotImplementedError("Use UserPrivateSerializer to update users.")
 
 
 class UserResumeSerializer(serializers.Serializer):

@@ -6,6 +6,11 @@ from siarnaq.api.episodes import views
 router = DefaultRouter()
 router.register("e", views.EpisodeViewSet, basename="episode")
 router.register(
+    r"(?P<episode_id>[^\/.]+)/map",
+    views.MapViewSet,
+    basename="map",
+)
+router.register(
     r"(?P<episode_id>[^\/.]+)/tournament",
     views.TournamentViewSet,
     basename="tournament",

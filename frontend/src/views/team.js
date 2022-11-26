@@ -134,8 +134,8 @@ class YesTeam extends Component {
                       type="text"
                       id="name"
                       className="form-control"
-                      onChange={this.changeHandler}
                       value={this.state.team.name}
+                      disabled
                     />
                   </div>
                 </div>

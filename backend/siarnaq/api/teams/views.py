@@ -11,6 +11,7 @@ from siarnaq.api.teams.filters import TeamOrderingFilter
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.api.teams.serializers import (
+    TeamCreateSerializer,
     TeamJoinSerializer,
     TeamPrivateSerializer,
     TeamPublicSerializer,
@@ -43,7 +44,9 @@ class TeamViewSet(
 
     def get_serializer_class(self):
         match self.action:
-            case "create" | "me":
+            case "create":
+                return TeamCreateSerializer
+            case "me":
                 return TeamPrivateSerializer
             case "retrieve" | "list":
                 return TeamPublicSerializer
@@ -67,13 +70,18 @@ class TeamViewSet(
             case "me" | "leave":
                 return (IsAuthenticated(), IsEpisodeAvailable(allow_frozen=True))
 
-    @action(detail=False, methods=["get", "patch"])
+    @action(detail=False, methods=["get", "put", "patch"])
     def me(self, request, *, episode_id):
         """Retrieve or update information about the current team."""
         team = get_object_or_404(self.get_queryset(), members=request.user)
         match request.method.lower():
             case "get":
                 serializer = self.get_serializer(team)
+                return Response(serializer.data)
+            case "put":
+                serializer = self.get_serializer(team, data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
                 return Response(serializer.data)
             case "patch":
                 serializer = self.get_serializer(team, data=request.data, partial=True)

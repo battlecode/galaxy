@@ -4,11 +4,12 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 
-from siarnaq.api.episodes.models import Episode, Tournament, TournamentRound
+from siarnaq.api.episodes.models import Episode, Map, Tournament, TournamentRound
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.episodes.serializers import (
     AutoscrimSerializer,
     EpisodeSerializer,
+    MapSerializer,
     TournamentRoundSerializer,
     TournamentSerializer,
 )
@@ -47,6 +48,22 @@ class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
         serializer.is_valid(raise_exception=True)
         episode.autoscrim(serializer.validated_data["best_of"])
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
+class MapViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A viewset for retrieving Maps.
+    """
+
+    serializer_class = MapSerializer
+    permission_classes = (IsEpisodeAvailable,)
+    pagination_class = None
+
+    def get_queryset(self):
+        queryset = Map.objects.filter(episode=self.kwargs["episode_id"])
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(is_public=True)
+        return queryset
 
 
 class TournamentViewSet(viewsets.ReadOnlyModelViewSet):

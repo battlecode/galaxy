@@ -326,7 +326,7 @@ class Api {
     return $.ajax({
       url: `${URL}/api/team/${episode}/t/me/`,
       data: JSON.stringify(team),
-      type: "PATCH",
+      type: "PUT",
       contentType: "application/json",
       dataType: "json",
     })
@@ -410,7 +410,7 @@ class Api {
     return $.ajax({
       url: `${URL}/api/user/u/me/`,
       data: JSON.stringify(user),
-      type: "PATCH",
+      type: "PUT",
       contentType: "application/json",
       dataType: "json",
     })
