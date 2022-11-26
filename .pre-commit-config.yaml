@@ -28,6 +28,7 @@ repos:
         language: conda
         require_serial: true
         types_or: [python, pyi]
+        exclude: ^backend/.*/migrations
 
       - id: flake8-conda
         name: flake8-conda
@@ -36,6 +37,7 @@ repos:
         require_serial: true
         types_or: [python, pyi]
         args: ["--max-line-length=88", "--max-complexity=18"]
+        exclude: ^backend/.*/migrations
 
       - id: isort-conda
         name: isort-conda
@@ -44,6 +46,7 @@ repos:
         require_serial: true
         types_or: [python, pyi]
         args: ["--filter-files"]
+        exclude: ^backend/.*/migrations
 
       - id: mypy-conda
         name: mypy-conda
@@ -51,6 +54,7 @@ repos:
         language: conda
         require_serial: true
         types_or: [python, pyi]
+        exclude: ^backend/.*/migrations
 
       - id: pyupgrade-conda
         name: pyupgrade-conda
@@ -58,3 +62,4 @@ repos:
         language: conda
         require_serial: true
         types_or: [python, pyi]
+        exclude: ^backend/.*/migrations
