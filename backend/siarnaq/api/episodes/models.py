@@ -2,6 +2,7 @@ import structlog
 from django.apps import apps
 from django.db import models
 from django.utils import timezone
+from sortedm2m.fields import SortedManyToManyField
 
 from siarnaq.api.episodes.managers import EpisodeQuerySet, TournamentQuerySet
 
@@ -299,7 +300,7 @@ class TournamentRound(models.Model):
     name = models.CharField(max_length=64)
     """The name of this round in human-readable form, such as "Round 1"."""
 
-    maps = models.ManyToManyField(Map, related_name="tournament_rounds", blank=True)
+    maps = SortedManyToManyField(Map, related_name="tournament_rounds", blank=True)
     """The maps to be used in this round."""
 
     release_status = models.IntegerField(

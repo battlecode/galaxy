@@ -111,7 +111,6 @@ class MatchAdmin(admin.ModelAdmin):
             },
         ),
     )
-    filter_horizontal = ("maps",)
     inlines = [MatchParticipantInline]
     list_display = (
         "__str__",
@@ -161,7 +160,6 @@ class ScrimmageRequestAdmin(admin.ModelAdmin):
         "is_ranked",
         "maps",
     )
-    filter_horizontal = ("maps",)
     list_display = (
         "pk",
         "requested_by",

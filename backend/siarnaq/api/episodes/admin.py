@@ -172,7 +172,6 @@ class TournamentRoundAdmin(admin.ModelAdmin):
         "release_status",
         "maps",
     )
-    filter_horizontal = ("maps",)
     inlines = [MatchInline]
     list_display = ("name", "tournament", "release_status")
     list_filter = ("tournament", "release_status")

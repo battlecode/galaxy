@@ -7,6 +7,7 @@ import structlog
 from django.apps import apps
 from django.conf import settings
 from django.db import models
+from sortedm2m.fields import SortedManyToManyField
 
 import siarnaq.api.refs as refs
 from siarnaq.api.compete.managers import (
@@ -175,7 +176,7 @@ class Match(SaturnInvocation):
     )
     """The tournament round to which this match belongs, if any."""
 
-    maps = models.ManyToManyField(refs.MAP_MODEL, related_name="matches")
+    maps = SortedManyToManyField(refs.MAP_MODEL, related_name="matches")
     """The maps to be played in this match."""
 
     alternate_order = models.BooleanField()
@@ -492,7 +493,7 @@ class ScrimmageRequest(models.Model):
     player_order = models.CharField(max_length=1, choices=PlayerOrder.choices)
     """The order of the players in the match."""
 
-    maps = models.ManyToManyField(refs.MAP_MODEL, related_name="scrimmage_requests")
+    maps = SortedManyToManyField(refs.MAP_MODEL, related_name="scrimmage_requests")
     """The maps to be played on the requested match."""
 
     objects = ScrimmageRequestQuerySet.as_manager()
