@@ -1,3 +1,4 @@
+from django_countries.serializer_fields import CountryField
 from rest_framework import serializers
 
 from siarnaq.api.user.models import User, UserProfile
@@ -30,6 +31,10 @@ class UserPublicSerializer(serializers.ModelSerializer):
 
 
 class UserProfilePrivateSerializer(UserProfilePublicSerializer):
+    # Couuntry field requires special serialization.
+    # See https://github.com/SmileyChris/django-countries#django-rest-framework
+    country = CountryField(name_only=True)
+
     class Meta:
         model = UserProfile
         fields = [
