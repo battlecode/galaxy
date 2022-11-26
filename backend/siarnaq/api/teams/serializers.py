@@ -33,7 +33,7 @@ class TeamProfilePublicSerializer(serializers.ModelSerializer):
             "auto_accept_unranked",
             "eligible_for",
         ]
-        read_only_fields = ["rating"]
+        read_only_fields = ["rating", "has_avatar", "avatar_url"]
 
     def get_avatar_url(self, obj):
         return obj.get_avatar_url()
