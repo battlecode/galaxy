@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import json
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 from typing import Any
@@ -446,3 +447,10 @@ structlog.configure(
     logger_factory=structlog.stdlib.LoggerFactory(),
     cache_logger_on_first_use=True,
 )
+
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    # Drop all logs in unit test.
+    def dropper(logger, method_name, event_dict):
+        raise structlog.DropEvent
+
+    structlog.configure(processors=[dropper])

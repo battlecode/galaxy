@@ -2,8 +2,10 @@ import posixpath
 import random
 import uuid
 
+import google.cloud.storage as storage
 import structlog
 from django.apps import apps
+from django.conf import settings
 from django.db import models
 
 import siarnaq.api.refs as refs
@@ -200,6 +202,15 @@ class Match(SaturnInvocation):
             self.episode.name_short,
             "replays",
             f"{self.replay}.{self.episode.name_short}",
+        )
+
+    def get_replay_url(self):
+        """Return a URL to the replay file."""
+        client = storage.Client.create_anonymous_client()
+        return (
+            client.bucket(settings.GCLOUD_BUCKET_SECURE)
+            .blob(self.get_replay_path())
+            .public_url
         )
 
     def enqueue_options(self):

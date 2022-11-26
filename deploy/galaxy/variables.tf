@@ -18,6 +18,11 @@ variable "gcp_zone" {
   type        = string
 }
 
+variable "secure_lifecycle_rules" {
+  description = "List of lifecycle rules for the storage bucket of secured objects"
+  type        = list(object({ age=number, storage_class=string }))
+}
+
 variable "create_website" {
   description = "Whether to create the website"
   type        = bool

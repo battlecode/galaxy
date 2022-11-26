@@ -223,7 +223,7 @@ class TeamProfile(models.Model):
         if not self.has_avatar:
             return None
 
-        client = storage.Client()
+        client = storage.Client.create_anonymous_client()
         public_url = (
             client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
             .blob(self.get_avatar_path())
