@@ -51,13 +51,11 @@ module "production" {
     { age = 700, storage_class = "ARCHIVE" },
   ]
 
-  mailjet_api_key    = var.mailjet_api_key
-  mailjet_api_secret = var.mailjet_api_secret
-
   create_website               = true
   siarnaq_image                = module.cd.artifact_siarnaq_image
   database_tier                = "db-custom-1-3840"
   database_authorized_networks = []
+  additional_secrets           = merge(var.additional_secrets_common, var.additional_secrets_production)
 
   titan_image = module.cd.artifact_titan_image
 
@@ -83,13 +81,11 @@ module "staging" {
 
   secure_lifecycle_rules = []
 
-  mailjet_api_key    = var.mailjet_api_key
-  mailjet_api_secret = var.mailjet_api_secret
-
   create_website               = false
   siarnaq_image                = null
   database_tier                = "db-f1-micro"
   database_authorized_networks = ["0.0.0.0/0"]
+  additional_secrets           = merge(var.additional_secrets_common, var.additional_secrets_staging)
 
   titan_image = module.cd.artifact_titan_image
 

@@ -116,12 +116,10 @@ resource "google_secret_manager_secret" "this" {
 resource "google_secret_manager_secret_version" "this" {
   secret = google_secret_manager_secret.this.id
 
-  secret_data = jsonencode({
+  secret_data = jsonencode(merge({
     "django-key" : random_password.django_key.result,
-    "mailjet-api-key" : var.mailjet_api_key,
-    "mailjet-api-secret" : var.mailjet_api_secret,
     "db-password" : random_password.db_password.result
-  })
+  }, var.additional_secrets))
 }
 
 resource "google_secret_manager_secret_iam_member" "this" {
