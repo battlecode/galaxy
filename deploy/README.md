@@ -49,6 +49,9 @@ a new project:
   resources you require.
 - Ensure you have a Cloud Domain ready, with a managed DNS zone. The Managed DNS Zone
   name is required in `main.tf`.
+- Give the Cloud Build service account the following roles: Cloud Run Admin, Compute
+  Instance Admin (v1), Service Account User, Service Account Token Creator, Secret
+  Manager Secret Accesor, Cloud SQL Client.
 
 ### Other manual changes
 

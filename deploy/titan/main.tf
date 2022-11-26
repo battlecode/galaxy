@@ -97,7 +97,6 @@ resource "google_cloud_run_service_iam_member" "this" {
 
 resource "google_cloudbuild_trigger" "this" {
   name            = var.name
-  service_account = google_service_account.this.id
 
   github {
     owner = "battlecode"

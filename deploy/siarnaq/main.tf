@@ -189,7 +189,6 @@ resource "google_cloudbuild_trigger" "this" {
   count = var.create_cloud_run ? 1 : 0
 
   name            = var.name
-  service_account = google_service_account.this.id
 
   github {
     owner = "battlecode"
