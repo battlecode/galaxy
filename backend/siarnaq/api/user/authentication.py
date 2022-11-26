@@ -1,3 +1,4 @@
+import structlog
 from django.conf import settings
 from google.auth.exceptions import GoogleAuthError
 from google.auth.transport import requests
@@ -6,6 +7,8 @@ from rest_framework import authentication
 from rest_framework.exceptions import AuthenticationFailed
 
 from siarnaq.api.user.models import User
+
+logger = structlog.get_logger(__name__)
 
 
 class GoogleCloudAuthentication(authentication.BaseAuthentication):
@@ -42,8 +45,14 @@ class GoogleCloudAuthentication(authentication.BaseAuthentication):
         try:
             method, token = header.split()
         except ValueError:
+            logger.warn(
+                "admin_malformed", message="Admin provided malformed credentials."
+            )
             raise AuthenticationFailed("Malformed authorization header")
         if method.lower() != self.AUTHORIZATION_HEADER_TYPE.lower():
+            logger.warn(
+                "admin_unsupported", message="Admin provided unsupported credentials."
+            )
             raise AuthenticationFailed("Unsupported authorization scheme")
 
         try:
@@ -52,14 +61,21 @@ class GoogleCloudAuthentication(authentication.BaseAuthentication):
                 request=requests.Request(),
             )
         except (ValueError, GoogleAuthError):
+            logger.warn(
+                "admin_invalid", message="Admin provided invalid authentication token."
+            )
             raise AuthenticationFailed("Invalid authorization token")
         if idinfo.get("email") not in settings.GALAXY_ADMIN_EMAILS:
+            logger.warn(
+                "admin_unauthorized", message="Admin provided unauthorized identity."
+            )
             raise AuthenticationFailed("Unauthorized client")
 
         user, _ = User.objects.get_or_create(
             username=settings.GALAXY_ADMIN_USERNAME,
             is_staff=True,
         )
+        logger.info("admin_authenticated", message="Admin has been authenticated.")
         return (user, None)
 
     def authenticate_header(self, request):

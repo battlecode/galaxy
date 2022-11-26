@@ -1,8 +1,11 @@
+import structlog
 from django.apps import apps
 from django.db import models
 from django.utils import timezone
 
 from siarnaq.api.episodes.managers import EpisodeQuerySet, TournamentQuerySet
+
+logger = structlog.get_logger(__name__)
 
 
 class Language(models.TextChoices):
@@ -119,8 +122,12 @@ class Episode(models.Model):
             The number of maps to be played in each match, must be no greater than the
             number of maps available for the episode.
         """
-        if self.frozen() or timezone.now() > self.game_archive:
+        log = logger.bind(episode=self.pk)
+        if self.frozen():
+            log.warn("autoscrim_frozen", message="Refusing to autoscrim: frozen.")
             return
+        if timezone.now() > self.game_archive:
+            log.warn("autoscrim_archived", message="Refusing to autoscrim: archived.")
         apps.get_model("teams", "Team").objects.autoscrim(episode=self, best_of=best_of)
 
 

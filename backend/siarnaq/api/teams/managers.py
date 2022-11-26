@@ -1,8 +1,11 @@
 import random
 
+import structlog
 from django.apps import apps
 from django.db import models, transaction
 from django.db.models import OuterRef
+
+logger = structlog.get_logger(__name__)
 
 
 def generate_4regular_graph(n):
@@ -124,6 +127,11 @@ class TeamQuerySet(models.QuerySet):
             number of maps available for the episode.
         """
 
+        log = logger.bind(episode=episode)
+        log.debug(
+            "autoscrim_matchmake", message="Starting autoscrim matchmaking process."
+        )
+
         maps = list(
             apps.get_model("episodes", "Map")
             .objects.filter(episode=episode, is_public=True)
@@ -163,6 +171,12 @@ class TeamQuerySet(models.QuerySet):
         MatchParticipant = apps.get_model("compete", "MatchParticipant")
         Match = apps.get_model("compete", "Match")
         with transaction.atomic():
+            log.info(
+                "autoscrim_create",
+                message="Creating %d autoscrims." % len(edges),
+                count=len(edges),
+            )
+
             matches = Match.objects.bulk_create(
                 Match(
                     episode=episode,

@@ -1,6 +1,7 @@
 from typing import Optional
 
 import google.cloud.storage as storage
+import structlog
 from django.conf import settings
 from django.db import NotSupportedError, transaction
 from django.db.models import Q, Subquery
@@ -32,6 +33,8 @@ from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.gcloud import titan
+
+logger = structlog.get_logger(__name__)
 
 
 def parse_int(v: str) -> Optional[int]:
@@ -108,8 +111,16 @@ class SubmissionViewSet(
 
         with transaction.atomic():
             instance = serializer.save()
-            if settings.GCLOUD_ENABLE_ACTIONS:
+            log = logger.bind(submission=instance.pk)
+
+            if not settings.GCLOUD_ENABLE_ACTIONS:
+                log.warn(
+                    "submission_disabled",
+                    message="Submission file uploads are disabled.",
+                )
+            else:
                 # Upload file to storage
+                log.info("submission_upload", message="Uploading submission file.")
                 client = storage.Client(credentials=settings.GCLOUD_CREDENTIALS)
                 blob = client.bucket(settings.GCLOUD_BUCKET_SECURE).blob(
                     instance.get_source_path()

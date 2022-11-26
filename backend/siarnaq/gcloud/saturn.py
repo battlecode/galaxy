@@ -1,7 +1,10 @@
 from concurrent.futures import Future
 
 import google.cloud.pubsub as pubsub
+import structlog
 from django.conf import settings
+
+logger = structlog.get_logger(__name__)
 
 
 class NullPublisher:
@@ -16,7 +19,9 @@ class NullPublisher:
 
 def get_publish_client() -> pubsub.PublisherClient | NullPublisher:
     if not settings.GCLOUD_ENABLE_ACTIONS:
+        logger.warn("saturn_disabled", message="Saturn queue is disabled.")
         return NullPublisher()
+
     return pubsub.PublisherClient(
         credentials=settings.GCLOUD_CREDENTIALS,
         publisher_options=pubsub.types.PublisherOptions(

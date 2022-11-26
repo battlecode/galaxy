@@ -1,14 +1,18 @@
 import datetime
 
 import google.cloud.storage as storage
+import structlog
 from django.conf import settings
 from google.auth import impersonated_credentials
+
+logger = structlog.get_logger(__name__)
 
 
 def request_scan(blob: storage.Blob) -> None:
     """Request that Titan scan a blob for malware."""
     # Titan responds to google.cloud.storage.object.v1.metadataUpdated events via
     # Eventarc, so it suffices to set the Titan metadata field.
+    logger.info("titan_request", message="Requesting scan on file.", file=blob.name)
     blob.metadata = {"Titan-Status": "Unverified"}
     blob.patch()
 
@@ -34,7 +38,9 @@ def get_object(bucket: str, name: str, check_safety: bool) -> dict[str, str | bo
         field "url" is supplied with a signed download link. Otherwise, a field "reason"
         is available explaining why the file cannot be downloaded.
     """
+    log = logger.bind(bucket=bucket, name=name)
     if not settings.GCLOUD_ENABLE_ACTIONS:
+        log.warn("titan_disabled", message="Titan is disabled.")
         return {"ready": True, "url": ""}
 
     client = storage.Client(credentials=settings.GCLOUD_CREDENTIALS)
@@ -54,11 +60,13 @@ def get_object(bucket: str, name: str, check_safety: bool) -> dict[str, str | bo
                 method="GET",
                 credentials=signing_credentials,
             )
+            log.debug("titan_success", message="Generated signed download URL.")
             return {
                 "ready": True,
                 "url": url,
             }
         case (_, {"Titan-Status": "Unverified"}):
+            log.debug("titan_unverified", message="File is still unverified.")
             return {
                 "ready": False,
                 "reason": (
@@ -67,6 +75,7 @@ def get_object(bucket: str, name: str, check_safety: bool) -> dict[str, str | bo
                 ),
             }
         case (_, {"Titan-Status": "Malicious"}):
+            log.warn("titan_malicious", message="File is malicious.")
             return {
                 "ready": False,
                 "reason": (
