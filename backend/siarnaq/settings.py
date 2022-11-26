@@ -214,9 +214,9 @@ class Base(Configuration):
 
     TEAMS_MAX_TEAM_SIZE = 4
 
-    # User avatar settings
+    # Avatar settings
 
-    USER_MAX_AVATAR_SIZE = (512, 512)
+    GCLOUD_MAX_AVATAR_SIZE = (512, 512)
 
     # Saturn settings
 

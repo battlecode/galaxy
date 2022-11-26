@@ -1,9 +1,11 @@
 import datetime
+import io
 
 import google.cloud.storage as storage
 import structlog
 from django.conf import settings
 from google.auth import impersonated_credentials
+from PIL import Image
 
 logger = structlog.get_logger(__name__)
 
@@ -86,3 +88,22 @@ def get_object(bucket: str, name: str, check_safety: bool) -> dict[str, str | bo
             }
         case _:
             raise ValueError("Unexpected state.")
+
+
+def upload_image(raw_image, image_path):
+    img = Image.open(raw_image)
+    img.thumbnail(settings.GCLOUD_MAX_AVATAR_SIZE)
+
+    # Prepare image bytes for upload to Google Cloud
+    # See https://stackoverflow.com/a/71094317
+    bytestream = io.BytesIO()
+    img.save(bytestream, format="png")
+    img_bytes = bytestream.getvalue()
+
+    if not settings.GCLOUD_ENABLE_ACTIONS:
+        logger.warn("avatar_disabled", message="Avatar uploads are disabled.")
+    else:
+        logger.info("avatar_upload", message="Uploading avatar.")
+        client = storage.Client()
+        blob = client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(image_path)
+        blob.upload_from_string(img_bytes)

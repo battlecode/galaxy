@@ -1,3 +1,5 @@
+import uuid
+
 import structlog
 from django.db import transaction
 from django.shortcuts import get_object_or_404
@@ -12,11 +14,13 @@ from siarnaq.api.teams.filters import TeamOrderingFilter
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.api.teams.serializers import (
+    TeamAvatarSerializer,
     TeamCreateSerializer,
     TeamJoinSerializer,
     TeamPrivateSerializer,
     TeamPublicSerializer,
 )
+from siarnaq.gcloud import titan
 
 logger = structlog.get_logger(__name__)
 
@@ -57,6 +61,8 @@ class TeamViewSet(
                 return TeamJoinSerializer
             case "leave":
                 return None
+            case "avatar":
+                return TeamAvatarSerializer
             case _:
                 raise RuntimeError("Unexpected action")
 
@@ -70,7 +76,7 @@ class TeamViewSet(
                 )
             case "retrieve" | "list":
                 return (IsEpisodeAvailable(allow_frozen=True),)
-            case "me" | "leave":
+            case "me" | "leave" | "avatar":
                 return (IsAuthenticated(), IsEpisodeAvailable(allow_frozen=True))
 
     @action(detail=False, methods=["get", "put", "patch"])
@@ -125,4 +131,22 @@ class TeamViewSet(
             )
             team.members.add(request.user)
         logger.debug("team_join", message="User has joined team.", team=team.pk)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(responses={status.HTTP_204_NO_CONTENT: None})
+    @action(detail=False, methods=["post"])
+    def avatar(self, request, pk=None, *, episode_id):
+        """Update uploaded avatar."""
+        team = get_object_or_404(self.get_queryset(), members=request.user)
+        profile = team.profile
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        avatar = serializer.validated_data["avatar"]
+
+        with transaction.atomic():
+            profile.has_avatar = True
+            profile.avatar_uuid = uuid.uuid4()
+            profile.save(update_fields=["has_avatar", "avatar_uuid"])
+            titan.upload_image(avatar, profile.get_avatar_path())
+
         return Response(None, status=status.HTTP_204_NO_CONTENT)

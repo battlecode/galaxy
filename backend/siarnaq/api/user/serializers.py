@@ -9,7 +9,8 @@ class UserProfilePublicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ["school", "biography", "avatar_url"]
+        fields = ["school", "biography", "avatar_url", "has_avatar"]
+        read_only_fields = ["has_avatar", "avatar_url"]
 
     def get_avatar_url(self, obj):
         return obj.get_avatar_url()
@@ -44,10 +45,11 @@ class UserProfilePrivateSerializer(UserProfilePublicSerializer):
             "biography",
             "kerberos",
             "avatar_url",
+            "has_avatar",
             "has_resume",
             "country",
         ]
-        read_only_fields = ["has_resume"]
+        read_only_fields = ["has_resume", "has_avatar", "avatar_url"]
 
 
 class UserPrivateSerializer(UserPublicSerializer):

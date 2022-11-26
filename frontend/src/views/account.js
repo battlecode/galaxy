@@ -4,6 +4,7 @@ import Api from "../api";
 import UserCard from "../components/userCard";
 import Country from "../components/country";
 import Gender from "../components/gender";
+import AvatarUpload from "../components/avatarUpload";
 import Alert from "../components/alert";
 import Floater from "react-floater";
 import { get_user_errors } from "../utils/error_handling";
@@ -20,7 +21,6 @@ class Account extends Component {
       user: copied_user,
       up: "Update Info",
       selectedResumeFile: null,
-      selectedAvatarFile: null,
       errors: [],
     };
 
@@ -61,10 +61,10 @@ class Account extends Component {
         loaded: 0,
       });
     } else if (id == "avatar_file_upload") {
-      this.setState({
-        selectedAvatarFile: event.target.files[0],
-        loaded: 0,
-      });
+      // this.setState({
+      //   selectedAvatarFile: event.target.files[0],
+      //   loaded: 0,
+      // });
     }
   };
 
@@ -107,10 +107,8 @@ class Account extends Component {
     );
   };
 
-  uploadAvatar = () => {
-    Api.avatarUpload(this.state.selectedAvatarFile, () =>
-      this.props.updateBaseState()
-    );
+  uploadAvatar = (selected_file) => {
+    Api.avatarUpload(selected_file, () => this.props.updateBaseState());
   };
 
   retrieveResume = () => {
@@ -174,25 +172,6 @@ class Account extends Component {
         </label>
       );
     }
-
-    // Avatar upload button logic
-    const avatar_uploaded = this.state.selectedAvatarFile !== null;
-    const avatar_file_label = !avatar_uploaded
-      ? "No file chosen."
-      : this.state.selectedAvatarFile["name"];
-    const avatar_btn_class =
-      "btn btn" + (!avatar_uploaded ? "" : " btn-info btn-fill");
-    const avatar_upload_button = (
-      <button
-        disabled={!avatar_uploaded}
-        style={{ float: "right" }}
-        onClick={this.uploadAvatar}
-        className={avatar_btn_class}
-      >
-        {" "}
-        Upload Avatar{" "}
-      </button>
-    );
 
     // Error reporting
     const errors = this.state.errors;
@@ -329,32 +308,7 @@ class Account extends Component {
                     ></button>
                     <div className="clearfix" />
                     <div className="row">
-                      <div className="col-md-12">
-                        <div className="form-group">
-                          <label>Avatar</label>
-                          <br />
-                          <label htmlFor="avatar_file_upload">
-                            <div className="btn"> Choose File </div>{" "}
-                            <span
-                              style={{
-                                textTransform: "none",
-                                marginLeft: "10px",
-                                fontSize: "14px",
-                              }}
-                            >
-                              {" "}
-                              {avatar_file_label}{" "}
-                            </span>
-                          </label>
-                          <input
-                            id="avatar_file_upload"
-                            type="file"
-                            onChange={this.fileChangeHandler}
-                            style={{ display: "none" }}
-                          />
-                          {avatar_upload_button}
-                        </div>
-                      </div>
+                      <AvatarUpload uploadAvatar={this.uploadAvatar} />
                     </div>
                     <div className="row">
                       <div className="col-md-12">

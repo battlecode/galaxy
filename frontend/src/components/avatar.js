@@ -44,9 +44,10 @@ class Avatar extends Component {
 
   render() {
     const data = this.props.data;
-    const avatar = data.avatar_url;
-    if (avatar) {
-      // avatar is defined
+    const has_avatar = data.profile.has_avatar;
+    const avatar = data.profile.avatar_url;
+    if (has_avatar) {
+      // avatar is uploaded
       return <img className="avatar border-gray" src={avatar} alt="Avatar" />;
     } else {
       if (!data.name && !data.username && !data.id) {
