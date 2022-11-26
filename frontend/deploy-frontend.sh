@@ -26,6 +26,10 @@ fi
 # (assuming a base image of gcloud, so we have gsutil access and authentication)
 
 npm install
+# TODO inject build timestamp in here.
+# Easiest is to compute timestamp , build_ts = date +(idk i forget the args but)
+# REACT_APP_BUILD_TS=$buildts npm run build
+# TODO frontend footer should display timestamp too if existing as an env
 npm run build
 
 # Handle bucket:
