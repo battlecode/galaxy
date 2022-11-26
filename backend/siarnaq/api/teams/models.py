@@ -1,5 +1,7 @@
+import posixpath
 import uuid
 
+import google.cloud.storage as storage
 from django.conf import settings
 from django.db import models, transaction
 
@@ -185,6 +187,9 @@ class TeamProfile(models.Model):
     has_avatar = models.BooleanField(default=False)
     """Whether the team has an uploaded avatar."""
 
+    avatar_uuid = models.UUIDField(default=uuid.uuid4)
+    """A unique ID to identify each new avatar upload."""
+
     rating = models.OneToOneField(Rating, on_delete=models.PROTECT)
     """The current rating of the team."""
 
@@ -204,3 +209,25 @@ class TeamProfile(models.Model):
         if self._state.adding and self.rating_id is None:
             self.rating = Rating.objects.create()
         super().save(*args, **kwargs)
+
+    def get_avatar_path(self):
+        """Return the path of the avatar on Google cloud storage."""
+        if not self.has_avatar:
+            return None
+        return posixpath.join("team", str(self.pk), "avatar.png")
+
+    def get_avatar_url(self):
+        """Return a cache-safe URL to the avatar."""
+        # To circumvent caching of old avatars, we append a UUID that changes on each
+        # update.
+        if not self.has_avatar:
+            return None
+
+        client = storage.Client()
+        public_url = (
+            client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
+            .blob(self.get_avatar_path())
+            .public_url
+        )
+        # Append UUID to public URL to prevent caching on avatar update
+        return f"{public_url}?{self.avatar_uuid}"

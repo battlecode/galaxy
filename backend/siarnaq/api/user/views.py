@@ -1,4 +1,3 @@
-import io
 import uuid
 
 import google.cloud.storage as storage
@@ -6,7 +5,7 @@ import structlog
 from django.conf import settings
 from django.db import transaction
 from django.http import Http404
-from PIL import Image
+from drf_spectacular.utils import extend_schema
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -122,6 +121,7 @@ class UserViewSet(
             case _:
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
 
+    @extend_schema(responses={status.HTTP_204_NO_CONTENT: None})
     @action(detail=False, methods=["post"], permission_classes=(IsAuthenticated,))
     def avatar(self, request, pk=None):
         """Update uploaded avatar."""
@@ -131,27 +131,10 @@ class UserViewSet(
         serializer.is_valid(raise_exception=True)
         avatar = serializer.validated_data["avatar"]
 
-        img = Image.open(avatar)
-        img.thumbnail(settings.USER_MAX_AVATAR_SIZE)
-
-        # Prepare image bytes for upload to Google Cloud
-        # See https://stackoverflow.com/a/71094317
-        bytestream = io.BytesIO()
-        img.save(bytestream, format="png")
-        img_bytes = bytestream.getvalue()
-
         with transaction.atomic():
             profile.has_avatar = True
             profile.avatar_uuid = uuid.uuid4()
             profile.save(update_fields=["has_avatar", "avatar_uuid"])
-            if not settings.GCLOUD_ENABLE_ACTIONS:
-                logger.warn("avatar_disabled", message="Avatar uploads are disabled.")
-            else:
-                logger.info("avatar_upload", message="Uploading avatar.")
-                client = storage.Client()
-                blob = client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(
-                    profile.get_avatar_path()
-                )
-                blob.upload_from_string(img_bytes)
+            titan.upload_image(avatar, profile.get_avatar_path())
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)

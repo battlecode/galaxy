@@ -55,7 +55,7 @@ class TeamCard extends Component {
       return user ? (
         <div className="small-user-list" key={user.username}>
           {" "}
-          {/*<Avatar data={user} /> TODO: avatar*/}
+          <Avatar data={user} />
           <small>{user.username}</small>
         </div>
       ) : null;
@@ -66,7 +66,7 @@ class TeamCard extends Component {
         <div className="image"></div>
         <div className="content" style={{ minHeight: "190px" }}>
           <div className="author">
-            {/*<Avatar data={team} /> TODO: team avatar */}
+            <Avatar data={team} />
             <h4 className="title">
               {team.name}
               <br />

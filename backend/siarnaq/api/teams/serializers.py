@@ -19,6 +19,7 @@ class RatingField(serializers.Field):
 
 class TeamProfilePublicSerializer(serializers.ModelSerializer):
     rating = RatingField(read_only=True)
+    avatar_url = serializers.SerializerMethodField()
 
     class Meta:
         model = TeamProfile
@@ -26,12 +27,16 @@ class TeamProfilePublicSerializer(serializers.ModelSerializer):
             "quote",
             "biography",
             "has_avatar",
+            "avatar_url",
             "rating",
             "auto_accept_ranked",
             "auto_accept_unranked",
             "eligible_for",
         ]
         read_only_fields = ["rating"]
+
+    def get_avatar_url(self, obj):
+        return obj.get_avatar_url()
 
 
 class TeamPublicSerializer(serializers.ModelSerializer):
@@ -59,12 +64,13 @@ class TeamProfilePrivateSerializer(TeamProfilePublicSerializer):
             "quote",
             "biography",
             "has_avatar",
+            "avatar_url",
             "rating",
             "auto_accept_ranked",
             "auto_accept_unranked",
             "eligible_for",
         ]
-        read_only_fields = ["rating"]
+        read_only_fields = ["rating", "has_avatar", "avatar_url"]
 
     def create(self, validated_data):
         eligible_for = validated_data.pop("eligible_for", None)
@@ -141,3 +147,7 @@ class TeamCreateSerializer(TeamPrivateSerializer):
 class TeamJoinSerializer(serializers.Serializer):
     join_key = serializers.CharField()
     name = serializers.CharField()
+
+
+class TeamAvatarSerializer(serializers.Serializer):
+    avatar = serializers.ImageField(write_only=True)

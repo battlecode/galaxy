@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Api from "../api";
 
 import TeamCard from "../components/teamCard";
+import AvatarUpload from "../components/avatarUpload";
 import Alert from "../components/alert";
 import MultiEpisode from "./multi-episode";
 import Floater from "react-floater";
@@ -85,6 +86,12 @@ class YesTeam extends Component {
       });
     reader.readAsDataURL(e.target.files[0]);
   }
+
+  uploadAvatar = (selected_file) => {
+    Api.teamAvatarUpload(selected_file, this.props.episode, () =>
+      this.props.updateBaseState()
+    );
+  };
 
   render() {
     // Error reporting
@@ -179,20 +186,6 @@ class YesTeam extends Component {
               </div>
               <div className="row">
                 <div className="col-md-12">
-                  {/* <div className="form-group">
-                    <label>Team Avatar URL</label>
-                    <input
-                      type="text"
-                      id="avatar"
-                      className="form-control"
-                      onChange={this.changeHandler}
-                      value={this.state.team.avatar}
-                    />
-                  </div> */}
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-md-12">
                   <div className="form-group">
                     <label>Team Quote</label>
                     <input
@@ -236,6 +229,9 @@ class YesTeam extends Component {
                 Leave Team
               </button>
               <div className="clearfix" />
+              <div className="row">
+                <AvatarUpload uploadAvatar={this.uploadAvatar} />
+              </div>
             </div>
           </div>
         </div>
