@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -71,24 +70,22 @@ func (t *Titan) Start(ctx context.Context, addr string) error {
 
 // Handle responds to a single EventArc event.
 func (t *Titan) Handle(ctx context.Context, event cloudevents.Event) error {
-	fail := func(event *zerolog.Event, message string) error {
-		event.Msg(message)
-		return errors.New(message)
-	}
-
 	if t := event.Type(); t != EventArcTriggerType {
-		return fail(log.Ctx(ctx).Warn().Str("eventType", t), "Unexpected event type.")
+		log.Ctx(ctx).Warn().Str("eventType", t).Msgf("Unexpected event type: %v.", t)
+		return fmt.Errorf("unexpected event type: %v", t)
 	}
 
 	data := &EventPayload{}
 	if err := event.DataAs(data); err != nil {
-		return fail(log.Ctx(ctx).Warn().Err(err), "Failed to parse event payload.")
+		log.Ctx(ctx).Warn().Err(err).Msg("Failed to parse event payload.")
+		return fmt.Errorf("event.DataAs: %v", err)
 	}
 
 	ctx = data.WithLogger(ctx)
 	file, err := t.storage.GetFile(ctx, data)
 	if err != nil {
-		return fail(log.Ctx(ctx).Warn().Err(err), "Failed to retrieve file.")
+		log.Ctx(ctx).Warn().Err(err).Msg("Failed to retrieve file.")
+		return fmt.Errorf("storage.GetFile: %v", err)
 	}
 	return t.HandleFile(ctx, file)
 }

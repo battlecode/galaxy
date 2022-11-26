@@ -12,6 +12,7 @@ dependencies:
   - google-cloud-secret-manager=2.12.6
   - google-cloud-storage=2.5.0
   - openssl=3.0.5
+  - pillow=9.0.1
   - pip=22.3
   - psycopg2=2.9.3
   - python=3.10

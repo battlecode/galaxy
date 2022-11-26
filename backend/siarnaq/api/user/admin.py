@@ -3,6 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django_rest_passwordreset.models import ResetPasswordToken
 
 from siarnaq.api.teams.models import Team
+from siarnaq.api.user.forms import UserCreationForm
 from siarnaq.api.user.models import User, UserProfile
 
 admin.site.unregister(ResetPasswordToken)
@@ -50,6 +51,16 @@ class TeamInline(admin.TabularInline):
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
+    add_form = UserCreationForm
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("username", "email", "password1", "password2"),
+            },
+        ),
+    )
     inlines = [UserProfileInline, TeamInline]
     readonly_fields = ("last_login", "date_joined")
 
