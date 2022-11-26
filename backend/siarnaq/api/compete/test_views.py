@@ -422,7 +422,7 @@ class MatchSerializerTestCase(TestCase):
                 "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
-                "replay": str(match.replay),
+                "replay_url": match.get_replay_url(),
             },
         )
 
@@ -493,7 +493,7 @@ class MatchSerializerTestCase(TestCase):
                 "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
-                "replay": str(match.replay),
+                "replay_url": match.get_replay_url(),
             },
         )
 
@@ -564,7 +564,7 @@ class MatchSerializerTestCase(TestCase):
                 "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
-                "replay": str(match.replay),
+                "replay_url": match.get_replay_url(),
             },
         )
 
@@ -635,7 +635,7 @@ class MatchSerializerTestCase(TestCase):
                 "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
-                "replay": None,
+                "replay_url": None,
             },
         )
 
@@ -685,7 +685,7 @@ class MatchSerializerTestCase(TestCase):
                 "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
-                "replay": None,
+                "replay_url": None,
             },
         )
 
@@ -756,7 +756,7 @@ class MatchSerializerTestCase(TestCase):
                 "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
-                "replay": str(match.replay),
+                "replay_url": match.get_replay_url(),
             },
         )
 
@@ -827,7 +827,7 @@ class MatchSerializerTestCase(TestCase):
                 "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
-                "replay": None,
+                "replay_url": None,
             },
         )
 
@@ -879,7 +879,7 @@ class MatchSerializerTestCase(TestCase):
                 "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
-                "replay": None,
+                "replay_url": None,
             },
         )
 
@@ -950,7 +950,7 @@ class MatchSerializerTestCase(TestCase):
                 "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
-                "replay": None,
+                "replay_url": None,
             },
         )
 

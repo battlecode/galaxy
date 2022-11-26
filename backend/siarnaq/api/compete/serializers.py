@@ -203,6 +203,7 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
 class MatchSerializer(serializers.ModelSerializer):
     participants = MatchParticipantSerializer(many=True)
     maps = serializers.SerializerMethodField()
+    replay_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Match
@@ -216,13 +217,17 @@ class MatchSerializer(serializers.ModelSerializer):
             "alternate_order",
             "created",
             "is_ranked",
-            "replay",
+            "replay_url",
         ]
         read_only_fields = fields
 
     @extend_schema_field({"type": "array", "items": {"type": "string"}})
     def get_maps(self, obj):
         return [m.name for m in obj.maps.all()]
+
+    @extend_schema_field({"type": "string"})
+    def get_replay_url(self, obj):
+        return obj.get_replay_url()
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -243,13 +248,13 @@ class MatchSerializer(serializers.ModelSerializer):
         ):
             # Fully redact matches from private tournaments, unreleased tournament
             # rounds, and those with invisible teams.
-            data["participants"] = data["replay"] = data["maps"] = None
+            data["participants"] = data["replay_url"] = data["maps"] = None
         elif (
             instance.tournament_round is not None
             and instance.tournament_round.release_status <= ReleaseStatus.PARTICIPANTS
         ):
             # Participants-only tournament matches are partially redacted
-            data["replay"] = data["maps"] = None
+            data["replay_url"] = data["maps"] = None
             for p in data["participants"]:
                 p["score"] = None
         elif instance.participants.filter(
@@ -260,12 +265,12 @@ class MatchSerializer(serializers.ModelSerializer):
         elif instance.participants.filter(team__status=TeamStatus.STAFF).exists():
             # Matches with staff teams have scores redacted because they could be for
             # official grading purposes. We redact all of them just in case.
-            data["replay"] = None
+            data["replay_url"] = None
             for p in data["participants"]:
                 p["score"] = None
         else:
             # Replay links are private, but scores are ok to be released.
-            data["replay"] = None
+            data["replay_url"] = None
         return data
 
 
