@@ -222,6 +222,7 @@ class App extends Component {
             {...props}
             team={this.state.team}
             episode={this.state.episode}
+            episode_info={this.state.episode_info}
             updateBaseState={this.updateBaseState}
           />
         )}

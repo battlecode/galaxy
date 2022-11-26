@@ -117,6 +117,7 @@ class YesTeam extends Component {
                 update={this.updateTeam}
                 up_but={this.state.up}
                 episode={this.props.episode}
+                episode_info={this.props.episode_info}
               />{" "}
               TODO: eligibility options
             </div>
@@ -437,6 +438,27 @@ class EligibilityOptions extends Component {
     return (
       <div className="row" style={{ marginTop: "1em" }}>
         <div className="col-md-12">
+          <div className="form-group" style={{ display: "flex" }}>
+            <label>{criterion.question}</label>
+            <Floater
+              content={
+                <div>
+                  <p>{criterion.description}</p>
+                </div>
+              }
+              showCloseButton={true}
+            >
+              <i className="pe-7s-info pe-fw" />
+            </Floater>
+            <input
+              type="checkbox"
+              className="form-control"
+              onChange={this.props.change}
+              style={{ width: "20px", height: "20px", margin: "0 0 0 10px" }}
+              id="student"
+              checked={this.props.team.eligible_for.includes(criterion.id)}
+            />
+          </div>
           <div className="form-group" style={{ display: "flex" }}>
             <label>Full-time Students</label>
             <Floater
