@@ -23,7 +23,7 @@ class EligibilityCriterion(models.Model):
     """
 
     title = models.TextField()
-    """The text question to be asked for this criterion."""
+    """The title of this criterion."""
 
     description = models.TextField()
     """The description of this criterion."""
@@ -32,7 +32,7 @@ class EligibilityCriterion(models.Model):
     """An icon to display for teams that satisfy this criterion."""
 
     def __str__(self):
-        return self.question
+        return self.title
 
 
 class Episode(models.Model):
