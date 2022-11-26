@@ -46,6 +46,17 @@ class YesTeam extends Component {
         prevState.team.profile[team_field] = val;
         return prevState;
       });
+    } else if (id.startsWith("eligibility")) {
+      this.setState(function (prevState, props) {
+        var criterion_id = parseInt(id.split("-")[1]);
+        if (val) prevState.team.profile.eligible_for.push(criterion_id);
+        else
+          prevState.team.profile.eligible_for =
+            prevState.team.profile.eligible_for.filter(
+              (id) => id !== criterion_id
+            );
+        return prevState;
+      });
     } else {
       this.setState(function (prevState, props) {
         prevState.team[id] = val;
@@ -118,13 +129,14 @@ class YesTeam extends Component {
                 which prizes your team is eligible for. Check all boxes that
                 apply to all members your team.
               </p>
-              {/*<EligibilityOptions
+              <EligibilityOptions
                 change={this.changeHandler}
                 team={this.state.team}
                 update={this.updateTeam}
                 up_but={this.state.up}
                 episode={this.props.episode}
-                /> TODO: eligibility options*/}
+                episode_info={this.props.episode_info}
+              />{" "}
             </div>
           </div>
 
@@ -420,7 +432,6 @@ class ResumeStatus extends Component {
 }
 
 // pass change handler in props.change and team in props.team
-// NOTE: If you are ever working with teams' eligility (for example, to pull teams for the newbie tournament), please see backend/docs/ELIGIBILITY.md before you do anything! The variable names here are poorly named (because columns in the database are poorly named).
 class EligibilityOptions extends Component {
   constructor(props) {
     super(props);
@@ -433,119 +444,41 @@ class EligibilityOptions extends Component {
     return (
       <div className="row" style={{ marginTop: "1em" }}>
         <div className="col-md-12">
-          <div className="form-group" style={{ display: "flex" }}>
-            <label>Full-time Students</label>
-            <Floater
-              content={
-                <div>
-                  <p>
-                    Teams must consist entirely of active high-school and/or
-                    college students to be eligible for prizes. If you are
-                    unsure about whether you are an active student, read more
-                    about eligibilty under{" "}
-                    <a href={`/${this.props.episode}/tournaments`}>
-                      tournaments
-                    </a>{" "}
-                    or reach out to one of Teh Devs on Discord or over email.
-                  </p>
-                </div>
-              }
-              showCloseButton={true}
-            >
-              <i className="pe-7s-info pe-fw" />
-            </Floater>
-            <input
-              type="checkbox"
-              className="form-control"
-              onChange={this.props.change}
-              style={{ width: "20px", height: "20px", margin: "0 0 0 10px" }}
-              id="student"
-              checked={this.props.team.student}
-            />
-          </div>
-          <div className="form-group" style={{ display: "flex" }}>
-            <label>US Students</label>
-            <Floater
-              content={
-                <div>
-                  <p>
-                    Teams consisting entirely of US students compete in the US
-                    Qualifying Tournament. If a team has at least one non-US
-                    competitor, it will compete in the International Qualifying
-                    Tournament. A US student is a student who attends a school
-                    in the United States.
-                  </p>
-                </div>
-              }
-              showCloseButton={true}
-            >
-              <i className="pe-7s-info pe-fw" />
-            </Floater>
-            <input
-              type="checkbox"
-              className="form-control"
-              onChange={this.props.change}
-              style={{ width: "20px", height: "20px", margin: "0 0 0 10px" }}
-              id="international"
-              checked={!this.props.team.international}
-            />
-          </div>
-          <div className="form-group" style={{ display: "flex" }}>
-            <label>Newbie</label>
-            <Floater
-              content={
-                <div>
-                  <p>
-                    Teams consisting entirely of MIT students who have never
-                    competed in Battlecode before are eligible for the Newbie
-                    Tournament.
-                  </p>
-                </div>
-              }
-              showCloseButton={true}
-            >
-              <i className="pe-7s-info pe-fw" />
-            </Floater>
-            <input
-              type="checkbox"
-              className="form-control"
-              onChange={this.props.change}
-              style={{ width: "20px", height: "20px", margin: "0 0 0 10px" }}
-              id="mit"
-              checked={this.props.team.mit}
-            />
-          </div>
-          <div className="form-group" style={{ display: "flex" }}>
-            <label>High School Students</label>
-            <Floater
-              content={
-                <div>
-                  <p>
-                    Teams of only high school (and earlier) students are
-                    eligible for the High School Tournament, regardless of
-                    whether you are all US students or not.
-                  </p>
-                </div>
-              }
-              showCloseButton={true}
-            >
-              <i className="pe-7s-info pe-fw" />
-            </Floater>
-            <input
-              type="checkbox"
-              className="form-control"
-              onChange={this.props.change}
-              style={{ width: "20px", height: "20px", margin: "0 0 0 10px" }}
-              id="high_school"
-              checked={this.props.team.high_school}
-            />
-          </div>
-          <button
-            type="button"
-            onClick={this.props.update}
-            className="btn btn-info btn-fill pull-right"
-            dangerouslySetInnerHTML={{ __html: this.props.up_but }}
-          ></button>
+          {this.props.episode_info.eligibility_criteria.map((criterion) => {
+            return (
+              <div
+                className="form-group"
+                style={{ display: "flex" }}
+                key={criterion.id}
+              >
+                <label>{criterion.title}</label>
+                <Floater
+                  content={
+                    <div>
+                      <p>{criterion.description}</p>
+                    </div>
+                  }
+                  showCloseButton={true}
+                >
+                  <i className="pe-7s-info pe-fw" />
+                </Floater>
+                <input
+                  type="checkbox"
+                  className="form-control"
+                  onChange={this.props.change}
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    margin: "0 0 0 10px",
+                  }}
+                  id={`eligibility-${criterion.id}`}
+                  checked={this.props.team.profile.eligible_for.includes(
+                    criterion.id
+                  )}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -569,6 +502,7 @@ class Team extends Component {
                 <YesTeam
                   team={this.props.team}
                   episode={this.props.episode}
+                  episode_info={this.props.episode_info}
                   updateBaseState={this.props.updateBaseState}
                 />
               )}

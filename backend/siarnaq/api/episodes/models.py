@@ -22,14 +22,17 @@ class EligibilityCriterion(models.Model):
     A database model for an eligibility criterion for entering into a tournament.
     """
 
-    question = models.TextField()
-    """The text question to be asked for this criterion."""
+    title = models.CharField(max_length=128)
+    """The title of this criterion."""
+
+    description = models.TextField()
+    """The description of this criterion."""
 
     icon = models.CharField(max_length=8)
     """An icon to display for teams that satisfy this criterion."""
 
     def __str__(self):
-        return self.question
+        return self.title
 
 
 class Episode(models.Model):

@@ -17,8 +17,8 @@ class AutoscrimSerializer(serializers.Serializer):
 class EligibilityCriterionSerializer(serializers.ModelSerializer):
     class Meta:
         model = EligibilityCriterion
-        fields = ["id", "question", "icon"]
-        read_only_fields = ["question", "icon"]
+        fields = ["id", "title", "description", "icon"]
+        read_only_fields = ["title", "description", "icon"]
 
 
 class EpisodeSerializer(serializers.ModelSerializer):
