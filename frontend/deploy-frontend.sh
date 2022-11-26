@@ -26,7 +26,6 @@ apt-get -y install npm
 npm install
 
 build_ts=$(date +%s)
-# TODO frontend footer should display timestamp too if existing as an env
 REACT_APP_BUILD_TS=$build_ts npm run build
 
 # Handle bucket:
