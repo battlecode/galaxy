@@ -25,6 +25,9 @@ class EligibilityCriterion(models.Model):
     question = models.TextField()
     """The text question to be asked for this criterion."""
 
+    description = models.TextField()
+    """The description of this criterion."""
+
     icon = models.CharField(max_length=8)
     """An icon to display for teams that satisfy this criterion."""
 
