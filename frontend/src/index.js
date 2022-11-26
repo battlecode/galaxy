@@ -238,11 +238,6 @@ class App extends Component {
         )}
         key="account"
       />,
-      <Route
-        path={`/:episode/spinner`}
-        component={(props) => <Spinner {...props} />}
-        key="spinner"
-      />,
     ];
 
     // Should only be visible and renderable to users on a team
