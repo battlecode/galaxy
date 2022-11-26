@@ -79,11 +79,11 @@ class MapAdmin(admin.ModelAdmin):
 
 @admin.register(EligibilityCriterion)
 class EligibilityCriterionAdmin(admin.ModelAdmin):
-    fields = ("question", "icon")
-    list_display = ("question", "icon")
-    ordering = ("question",)
-    search_fields = ("question",)
-    search_help_text = "Search for a question."
+    fields = ("title", "description", "icon")
+    list_display = ("title", "description", "icon")
+    ordering = ("title",)
+    search_fields = ("title",)
+    search_help_text = "Search for a title."
 
 
 class TournamentRoundInline(admin.TabularInline):
