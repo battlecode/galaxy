@@ -22,7 +22,7 @@ class EligibilityCriterion(models.Model):
     A database model for an eligibility criterion for entering into a tournament.
     """
 
-    question = models.TextField()
+    title = models.TextField()
     """The text question to be asked for this criterion."""
 
     description = models.TextField()
