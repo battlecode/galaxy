@@ -20,7 +20,7 @@ fi
 
 # TODO assuming the filelocation from which GCP cloud build runs is different, would need to cd to frontend dir
 # `pwd` would help identify this location
-
+pwd
 apt-get -y install npm
 
 npm install
