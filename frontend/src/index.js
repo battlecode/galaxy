@@ -251,13 +251,13 @@ class App extends Component {
     // and thus potentially re-render the URL that the user is looking to navigate to.
 
     let loggedInElemsToRender = this.state.logged_in ? this.loggedInElems : [];
-    let onTeamElemsToRender =
-      on_team && is_game_released ? this.onTeamElems : [];
+    let onTeamAndGameReleasedElemsToRender =
+      on_team && is_game_released ? this.onTeamAndGameReleasedElems : [];
     let staffElemsToRender = is_staff ? this.staffElems : [];
 
     let elemsToRender = this.nonLoggedInElems.concat(
       loggedInElemsToRender,
-      onTeamElemsToRender,
+      onTeamAndGameReleasedElemsToRender,
       staffElemsToRender,
       // notFoundElems must be last to work properly
       this.notFoundElems
