@@ -34,6 +34,8 @@ import NavBar from "./navbar";
 import SideBar from "./sidebar";
 import Api from "./api";
 
+import Spinner from "./components/spinner";
+
 class App extends Component {
   constructor() {
     super();
@@ -44,6 +46,7 @@ class App extends Component {
       episode_info: null,
       user: null,
       team: null,
+      loaded: false,
     };
 
     // Sets the login header based on currently held cookies, before any
@@ -52,25 +55,44 @@ class App extends Component {
   }
 
   updateBaseState = (callback = () => {}) => {
+    let fetched_logged_in, fetched_user, fetched_team, fetched_episode_info;
+
     const ajax1 = Api.loginCheck((logged_in) => {
-      this.setState({ logged_in });
+      fetched_logged_in = logged_in;
     });
 
     const ajax2 = Api.getUserProfile((user) => {
-      this.setState({ user });
+      fetched_user = user;
     });
 
     const ajax3 = Api.getUserTeamProfile(this.state.episode, (team) => {
-      this.setState({ team });
+      fetched_team = team;
     });
 
     const ajax4 = Api.getEpisodeInfo(this.state.episode, (episode_info) => {
-      this.setState({ episode_info });
+      fetched_episode_info = episode_info;
     });
 
-    // Run this function when all AJAX queries are completed.
-    // See https://stackoverflow.com/a/9865124.
-    $.when(ajax1, ajax2, ajax3, ajax4).done(callback).fail(callback);
+    const ajax_queries = [ajax1, ajax2, ajax3, ajax4];
+
+    // To be run when all AJAX queries are complete.
+    const all_queries_finished = () => {
+      this.setState({
+        loaded: true,
+        logged_in: fetched_logged_in,
+        user: fetched_user,
+        team: fetched_team,
+        episode_info: fetched_episode_info,
+      });
+    };
+
+    // Modify each AJAX query to mark as completed, and run all queries finished logic when all completed.
+    let completed_queries = 0;
+    let mark_completed = () => {
+      completed_queries++;
+      if (completed_queries == ajax_queries.length) all_queries_finished();
+    };
+    ajax_queries.map((ajax) => ajax.done(mark_completed).fail(mark_completed));
   };
 
   componentDidMount() {
@@ -216,6 +238,11 @@ class App extends Component {
         )}
         key="account"
       />,
+      <Route
+        path={`/:episode/spinner`}
+        component={(props) => <Spinner {...props} />}
+        key="spinner"
+      />,
     ];
 
     // Should only be visible and renderable to users on a team
@@ -302,7 +329,8 @@ class App extends Component {
                 episode={this.state.episode}
                 episode_name_long={episode_name_long}
               />
-              <Switch>{elemsToRender}</Switch>
+              {this.state.loaded && <Switch>{elemsToRender}</Switch>}
+              {!this.state.loaded && <Spinner />}
               <Footer />
             </div>
           </div>

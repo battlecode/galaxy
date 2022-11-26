@@ -211,7 +211,7 @@ class Api {
   //----GENERAL INFO----
 
   static getEpisodeInfo(episode, callback) {
-    $.get(`${URL}/api/episode/e/${episode}/`)
+    return $.get(`${URL}/api/episode/e/${episode}/`)
       .done((data, success) => {
         callback(data);
       })
