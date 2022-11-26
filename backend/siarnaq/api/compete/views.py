@@ -2,8 +2,9 @@ from typing import Optional
 
 import google.cloud.storage as storage
 from django.conf import settings
-from django.db import transaction
+from django.db import NotSupportedError, transaction
 from django.db.models import Q, Subquery
+from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
@@ -24,6 +25,7 @@ from siarnaq.api.compete.serializers import (
     SubmissionDownloadSerializer,
     SubmissionReportSerializer,
     SubmissionSerializer,
+    TournamentSubmissionSerializer,
 )
 from siarnaq.api.episodes.models import ReleaseStatus, Tournament
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
@@ -125,6 +127,24 @@ class SubmissionViewSet(
             status=status.HTTP_201_CREATED,
             headers=headers,
         )
+
+    @action(
+        detail=False, methods=["get"], serializer_class=TournamentSubmissionSerializer
+    )
+    def tournament(self, request, *, episode_id):
+        """Retrieve the submissions used in tournaments by the current team.."""
+        tournaments = Tournament.objects.filter(
+            episode_id=episode_id, submission_unfreeze__lte=timezone.now()
+        ).visible_to_user(is_staff=request.user.is_staff)
+        queryset = self.get_queryset().for_tournaments(tournaments)
+        serializer = self.get_serializer(queryset, many=True)
+        try:
+            return Response(serializer.data)
+        except NotSupportedError:
+            return Response(
+                "Not supported on this database.",
+                status=status.HTTP_501_NOT_IMPLEMENTED,
+            )
 
     @action(detail=True, methods=["get"], serializer_class=SubmissionDownloadSerializer)
     def download(self, request, pk=None, *, episode_id):

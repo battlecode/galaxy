@@ -96,6 +96,30 @@ class SubmissionSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+class TournamentSubmissionSerializer(SubmissionSerializer):
+    tournament = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Submission
+        fields = [
+            "id",
+            "status",
+            "logs",
+            "episode",
+            "team",
+            "teamname",
+            "user",
+            "username",
+            "created",
+            "accepted",
+            "package",
+            "description",
+            "source_code",
+            "tournament",
+        ]
+        read_only_fields = fields
+
+
 class SubmissionDownloadSerializer(serializers.Serializer):
     ready = serializers.BooleanField(read_only=True)
     url = serializers.URLField(read_only=True)

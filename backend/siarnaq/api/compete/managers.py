@@ -2,7 +2,7 @@ import json
 
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models import OuterRef, Subquery
+from django.db.models import F, OuterRef, Subquery
 
 from siarnaq.gcloud import saturn
 
@@ -63,6 +63,19 @@ class SubmissionQuerySet(SaturnInvokableQuerySet):
     @property
     def _publish_ordering_key(self):
         return settings.GCLOUD_ORDER_COMPILE
+
+    def for_tournaments(self, tournaments):
+        """Filter for and annotate submissions active in a tournament."""
+        return (
+            self.filter(
+                accepted=True,
+                episode__tournaments__in=Subquery(tournaments.values("pk")),
+                created__lt=F("episode__tournaments__submission_unfreeze"),
+            )
+            .annotate(tournament=F("episode__tournaments"))
+            .order_by("tournament", "team", "-pk")
+            .distinct("tournament", "team")
+        )
 
 
 class MatchParticipantManager(models.Manager):
