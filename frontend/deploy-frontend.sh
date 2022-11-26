@@ -21,8 +21,7 @@ fi
 # TODO assuming the filelocation from which GCP cloud build runs is different, would need to cd to frontend dir
 # `pwd` would help identify this location
 
-# TODO install npm via apt-get
-# (assuming a base image of gcloud, so we have gsutil access and authentication)
+apt-get -y install npm
 
 npm install
 # TODO inject build timestamp in here.
