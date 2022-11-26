@@ -52,14 +52,14 @@ module "production" {
   ]
 
   create_website               = true
-  siarnaq_image                = module.cd.artifact_siarnaq_image
+  siarnaq_image                = module.cd.artifact_image["siarnaq"]
   database_tier                = "db-custom-1-3840"
   database_authorized_networks = []
   additional_secrets           = merge(var.additional_secrets_common, var.additional_secrets_production)
 
-  titan_image = module.cd.artifact_titan_image
+  titan_image = module.cd.artifact_image["titan"]
 
-  saturn_image          = module.cd.artifact_saturn_image
+  saturn_image          = module.cd.artifact_image["saturn"]
   max_compile_instances = 10
   max_execute_instances = 10
 
@@ -87,9 +87,9 @@ module "staging" {
   database_authorized_networks = ["0.0.0.0/0"]
   additional_secrets           = merge(var.additional_secrets_common, var.additional_secrets_staging)
 
-  titan_image = module.cd.artifact_titan_image
+  titan_image = module.cd.artifact_image["titan"]
 
-  saturn_image          = module.cd.artifact_saturn_image
+  saturn_image          = module.cd.artifact_image["saturn"]
   max_compile_instances = 1
   max_execute_instances = 1
 

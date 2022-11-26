@@ -175,18 +175,45 @@ resource "google_cloud_run_service" "this" {
   ]
 }
 
-data "google_iam_policy" "noauth" {
-  binding {
-    role    = "roles/run.invoker"
-    members = ["allUsers"]
-  }
-}
-
-resource "google_cloud_run_service_iam_policy" "noauth" {
+resource "google_cloud_run_service_iam_member" "noauth" {
   count = var.create_cloud_run ? 1 : 0
 
-  location    = google_cloud_run_service.this[count.index].location
-  project     = google_cloud_run_service.this[count.index].project
-  service     = google_cloud_run_service.this[count.index].name
-  policy_data = data.google_iam_policy.noauth.policy_data
+  location = google_cloud_run_service.this[count.index].location
+  project  = google_cloud_run_service.this[count.index].project
+  service  = google_cloud_run_service.this[count.index].name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+resource "google_cloudbuild_trigger" "this" {
+  count = var.create_cloud_run ? 1 : 0
+
+  name            = var.name
+  service_account = google_service_account.this.id
+
+  github {
+    owner = "battlecode"
+    name  = "galaxy"
+
+    push {
+      tag = "^siarnaq-backend-.*"
+    }
+  }
+
+  build {
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = ["build", "--build-arg", "BUILD=$SHORT_SHA", "-t", var.image, "."]
+      dir  = "backend"
+    }
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = ["push", var.image]
+    }
+    step {
+      name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+      entrypoint = "gcloud"
+      args = ["run", "deploy", google_cloud_run_service.this[count.index].name, "--image", var.image, "--region", var.gcp_region]
+    }
+  }
 }
