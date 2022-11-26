@@ -206,7 +206,7 @@ class Match(SaturnInvocation):
 
     def get_replay_url(self):
         """Return a URL to the replay file."""
-        client = storage.Client()
+        client = storage.Client.create_anonymous_client()
         return (
             client.bucket(settings.GCLOUD_BUCKET_SECURE)
             .blob(self.get_replay_path())
