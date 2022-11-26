@@ -122,6 +122,9 @@ module "network" {
       bucket_name = module.production.storage_frontend_name
       enable_cdn  = true
       subdomain   = "play."
+      cdn_policy = {
+        cache_mode = "USE_ORIGIN_HEADERS"
+      }
     }
   }
 
