@@ -20,7 +20,7 @@ from typing import Any
 import google.auth
 import google.cloud.secretmanager as secretmanager
 import structlog
-from configurations import Configuration
+from configurations import Configuration, values
 from google.auth import impersonated_credentials
 from google.auth.credentials import Credentials
 
@@ -203,6 +203,10 @@ class Base(Configuration):
     # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
     DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+    # App version
+
+    SIARNAQ_BUILD = values.Value("unknown", environ=True, environ_prefix=None)
 
     # Penalized Elo configuration
 

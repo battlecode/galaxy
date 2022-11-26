@@ -1,5 +1,5 @@
+from django.conf import settings
 from django.http import HttpResponse
-from rest_framework import status
 
 
 def ping(request):
@@ -7,6 +7,6 @@ def ping(request):
     return HttpResponse("pong")
 
 
-def version(request):
+def build(request):
     """Return the current version of the server."""
-    return HttpResponse("unimplemented", status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    return HttpResponse(settings.SIARNAQ_BUILD)
