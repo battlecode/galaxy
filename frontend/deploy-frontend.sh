@@ -7,10 +7,8 @@ set -e
 
 BUCKET_NAME="mitbattlecode-production-frontend"
 
-# Long-term TODO: advanced users should be able to run this script locally.
-# Have a user-note to manually check some things (on main, up-to-date; in the right working directory; has npm)
-# and then a user prompt, that prevents execution unless the user manually confirms.
-# The automation argument should skip that user prompt
+# Warning: You should never run this script locally, because this would involve lots of inconsistencies and cautions.
+# Do so at your own risk. Adapt this script to run locally at your own risk.
 
 if ! [ "$1" = "--this-is-being-run-from-gcloud" ]
 then
