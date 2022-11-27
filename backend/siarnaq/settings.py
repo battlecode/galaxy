@@ -411,6 +411,14 @@ class Production(Base):
         },
     }
 
+    # Static files
+
+    STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+    GS_BUCKET_NAME = GCLOUD_BUCKET_PUBLIC
+    GS_LOCATION = "django"
+    GS_QUERYSTRING_AUTH = False
+    GS_DEFAULT_ACL = None
+
     @classmethod
     def pre_setup(cls):
         super().pre_setup()

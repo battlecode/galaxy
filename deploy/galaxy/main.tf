@@ -3,6 +3,13 @@ resource "google_storage_bucket" "public" {
 
   location      = var.gcp_region
   storage_class = "STANDARD"
+
+  cors {
+    origin          = ["*"]
+    method          = ["GET", "HEAD", "OPTIONS"]
+    response_header = ["*"]
+    max_age_seconds = 3600
+  }
 }
 
 resource "google_storage_bucket" "secure" {

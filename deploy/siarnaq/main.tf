@@ -222,6 +222,10 @@ resource "google_cloudbuild_trigger" "this" {
       args = ["-i", var.image, "-s", "${var.gcp_project}:${var.gcp_region}:${google_sql_database_instance.this.name}", "--", "/env/bin/python", "manage.py", "migrate"]
     }
     step {
+      name = "gcr.io/google-appengine/exec-wrapper"
+      args = ["-i", var.image, "-s", "${var.gcp_project}:${var.gcp_region}:${google_sql_database_instance.this.name}", "--", "/env/bin/python", "manage.py", "collectstatic", "--verbosity=2", "--no-input"]
+    }
+    step {
       name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
       entrypoint = "gcloud"
       args = ["run", "deploy", google_cloud_run_service.this[count.index].name, "--image", var.image, "--region", var.gcp_region]
