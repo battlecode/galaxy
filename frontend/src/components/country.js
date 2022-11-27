@@ -258,7 +258,7 @@ class Country extends Component {
   render() {
     return (
       <div className="form-group">
-        <label>Country</label>
+        <label>Country *</label>
         <select
           className="form-control"
           id="profile-country"

@@ -7,7 +7,7 @@ import Gender from "../components/gender";
 import AvatarUpload from "../components/avatarUpload";
 import Alert from "../components/alert";
 import Floater from "react-floater";
-import { get_user_errors } from "../utils/error_handling";
+import { get_nested_profile_errors } from "../utils/error_handling";
 
 class Account extends Component {
   constructor(props) {
@@ -78,7 +78,7 @@ class Account extends Component {
           this.props.updateBaseState();
         } else {
           this.setState({ up: '<i class="fa fa-times"></i>' });
-          this.setState({ errors: get_user_errors(response_json) });
+          this.setState({ errors: get_nested_profile_errors(response_json) });
         }
         setTimeout(
           function () {
