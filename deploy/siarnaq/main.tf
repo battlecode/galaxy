@@ -173,6 +173,14 @@ resource "google_cloud_run_service" "this" {
     google_secret_manager_secret_version.this,
     google_secret_manager_secret_iam_member.this,
   ]
+
+  lifecycle {
+    ignore_changes = [
+      template[0].metadata[0].annotations["client.knative.dev/user-image"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-name"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-version"],
+    ]
+  }
 }
 
 resource "google_cloud_run_service_iam_member" "noauth" {
