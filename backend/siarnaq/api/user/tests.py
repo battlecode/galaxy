@@ -43,7 +43,7 @@ class GoogleCloudAuthenticationTest(TestCase):
         self.assertTrue(request.user.is_staff)
 
     def test_token_internal_valid_regular(self):
-        token = RefreshToken.for_user(User.objects.get()).access_token
+        token = RefreshToken.for_user(User.objects.get(username="user")).access_token
         request = self.factory.get(
             "/api/",
             HTTP_USER_AGENT="Galaxy-Saturn",
@@ -61,7 +61,7 @@ class GoogleCloudAuthenticationTest(TestCase):
             request.user
 
     def test_token_external_valid_regular(self):
-        token = RefreshToken.for_user(User.objects.get()).access_token
+        token = RefreshToken.for_user(User.objects.get(username="user")).access_token
         request = self.factory.get("/api/", HTTP_AUTHORIZATION=f"Bearer {token}")
         request = APIView().initialize_request(request)
         self.assertTrue(request.user.is_authenticated)

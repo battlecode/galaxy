@@ -94,3 +94,41 @@ resource "google_cloud_run_service_iam_member" "this" {
   role     = "roles/run.invoker"
   member   = "serviceAccount:${google_service_account.this.email}"
 }
+
+resource "google_cloudbuild_trigger" "this" {
+  name            = var.name
+
+  github {
+    owner = "battlecode"
+    name  = "galaxy"
+
+    push {
+      tag = "^titan-.*"
+    }
+  }
+
+  build {
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = ["build", "--build-arg", "BUILD=$SHORT_SHA", "-t", var.image, "."]
+      dir  = "titan"
+    }
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = ["push", var.image]
+    }
+    step {
+      name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+      entrypoint = "gcloud"
+      args = ["run", "deploy", google_cloud_run_service.this.name, "--image", var.image, "--region", var.gcp_region]
+    }
+  }
+}
+
+resource "google_cloud_run_service_iam_member" "deploy" {
+  location = google_cloud_run_service.this.location
+  project  = google_cloud_run_service.this.project
+  service  = google_cloud_run_service.this.name
+  role     = "roles/run.developer"
+  member   = "serviceAccount:${google_service_account.this.email}"
+}

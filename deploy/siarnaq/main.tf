@@ -116,12 +116,10 @@ resource "google_secret_manager_secret" "this" {
 resource "google_secret_manager_secret_version" "this" {
   secret = google_secret_manager_secret.this.id
 
-  secret_data = jsonencode({
+  secret_data = jsonencode(merge({
     "django-key" : random_password.django_key.result,
-    "mailjet-api-key" : var.mailjet_api_key,
-    "mailjet-api-secret" : var.mailjet_api_secret,
     "db-password" : random_password.db_password.result
-  })
+  }, var.additional_secrets))
 }
 
 resource "google_secret_manager_secret_iam_member" "this" {
@@ -175,20 +173,62 @@ resource "google_cloud_run_service" "this" {
     google_secret_manager_secret_version.this,
     google_secret_manager_secret_iam_member.this,
   ]
-}
 
-data "google_iam_policy" "noauth" {
-  binding {
-    role    = "roles/run.invoker"
-    members = ["allUsers"]
+  lifecycle {
+    ignore_changes = [
+      template[0].metadata[0].annotations["client.knative.dev/user-image"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-name"],
+      template[0].metadata[0].annotations["run.googleapis.com/client-version"],
+    ]
   }
 }
 
-resource "google_cloud_run_service_iam_policy" "noauth" {
+resource "google_cloud_run_service_iam_member" "noauth" {
   count = var.create_cloud_run ? 1 : 0
 
-  location    = google_cloud_run_service.this[count.index].location
-  project     = google_cloud_run_service.this[count.index].project
-  service     = google_cloud_run_service.this[count.index].name
-  policy_data = data.google_iam_policy.noauth.policy_data
+  location = google_cloud_run_service.this[count.index].location
+  project  = google_cloud_run_service.this[count.index].project
+  service  = google_cloud_run_service.this[count.index].name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}
+
+resource "google_cloudbuild_trigger" "this" {
+  count = var.create_cloud_run ? 1 : 0
+
+  name            = var.name
+
+  github {
+    owner = "battlecode"
+    name  = "galaxy"
+
+    push {
+      tag = "^siarnaq-backend-.*"
+    }
+  }
+
+  build {
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = ["build", "--build-arg", "BUILD=$SHORT_SHA", "-t", var.image, "."]
+      dir  = "backend"
+    }
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = ["push", var.image]
+    }
+    step {
+      name = "gcr.io/google-appengine/exec-wrapper"
+      args = ["-i", var.image, "-s", "${var.gcp_project}:${var.gcp_region}:${google_sql_database_instance.this.name}", "--", "/env/bin/python", "manage.py", "migrate"]
+    }
+    step {
+      name = "gcr.io/google-appengine/exec-wrapper"
+      args = ["-i", var.image, "-s", "${var.gcp_project}:${var.gcp_region}:${google_sql_database_instance.this.name}", "--", "/env/bin/python", "manage.py", "collectstatic", "--verbosity=2", "--no-input"]
+    }
+    step {
+      name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+      entrypoint = "gcloud"
+      args = ["run", "deploy", google_cloud_run_service.this[count.index].name, "--image", var.image, "--region", var.gcp_region]
+    }
+  }
 }

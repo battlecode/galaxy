@@ -6,6 +6,7 @@ resource "google_storage_bucket" "home" {
 
   website {
     main_page_suffix = "index.html"
+    not_found_page   = "404.html"
   }
 }
 
@@ -51,17 +52,15 @@ module "production" {
     { age = 700, storage_class = "ARCHIVE" },
   ]
 
-  mailjet_api_key    = var.mailjet_api_key
-  mailjet_api_secret = var.mailjet_api_secret
-
   create_website               = true
-  siarnaq_image                = module.cd.artifact_siarnaq_image
+  siarnaq_image                = module.cd.artifact_image["siarnaq"]
   database_tier                = "db-custom-1-3840"
   database_authorized_networks = []
+  additional_secrets           = merge(var.additional_secrets_common, var.additional_secrets_production)
 
-  titan_image = module.cd.artifact_titan_image
+  titan_image = module.cd.artifact_image["titan"]
 
-  saturn_image          = module.cd.artifact_saturn_image
+  saturn_image          = module.cd.artifact_image["saturn"]
   max_compile_instances = 10
   max_execute_instances = 10
 
@@ -83,17 +82,15 @@ module "staging" {
 
   secure_lifecycle_rules = []
 
-  mailjet_api_key    = var.mailjet_api_key
-  mailjet_api_secret = var.mailjet_api_secret
-
   create_website               = false
   siarnaq_image                = null
   database_tier                = "db-f1-micro"
   database_authorized_networks = ["0.0.0.0/0"]
+  additional_secrets           = merge(var.additional_secrets_common, var.additional_secrets_staging)
 
-  titan_image = module.cd.artifact_titan_image
+  titan_image = module.cd.artifact_image["titan"]
 
-  saturn_image          = module.cd.artifact_saturn_image
+  saturn_image          = module.cd.artifact_image["saturn"]
   max_compile_instances = 1
   max_execute_instances = 1
 

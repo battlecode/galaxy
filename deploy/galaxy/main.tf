@@ -3,6 +3,13 @@ resource "google_storage_bucket" "public" {
 
   location      = var.gcp_region
   storage_class = "STANDARD"
+
+  cors {
+    origin          = ["*"]
+    method          = ["GET", "HEAD", "OPTIONS"]
+    response_header = ["*"]
+    max_age_seconds = 3600
+  }
 }
 
 resource "google_storage_bucket" "secure" {
@@ -71,9 +78,7 @@ module "siarnaq" {
   database_name                = "battlecode"
   database_user                = "siarnaq"
   database_authorized_networks = var.database_authorized_networks
-
-  mailjet_api_key    = var.mailjet_api_key
-  mailjet_api_secret = var.mailjet_api_secret
+  additional_secrets           = var.additional_secrets
 
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name

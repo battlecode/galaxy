@@ -54,9 +54,7 @@ class SubmissionViewSetTestCase(APITestCase):
         )
         other_team = Team.objects.create(episode=self.e1, name="team2")
         other_team.members.add(other_user)
-        self.admin = User.objects.create_user(
-            username="admin", email="admin@example.com", is_staff=True
-        )
+        self.admin = User.objects.get(username="admin")
 
     # Partitions for: create.
     # user: on team, not on team, not authenticated
