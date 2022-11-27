@@ -371,7 +371,7 @@ class Staging(Base):
 
 class Production(Base):
     ALLOWED_HOSTS = [
-        "play.battlecode.org",
+        "api.battlecode.org",
     ]
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
