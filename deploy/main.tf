@@ -123,7 +123,11 @@ module "network" {
       enable_cdn  = true
       subdomain   = "play."
       cdn_policy = {
-        cache_mode = "USE_ORIGIN_HEADERS"
+        cache_mode = "CACHE_ALL_STATIC"
+        default_ttl        = 60
+        max_ttl            = 60
+        client_ttl         = 60
+        request_coalescing = true
       }
     }
   }
