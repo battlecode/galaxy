@@ -42,6 +42,30 @@ resource "google_storage_bucket" "frontend" {
   storage_class = "STANDARD"
 }
 
+resource "google_cloudbuild_trigger" "this" {
+  count = var.create_cloud_run ? 1 : 0
+
+  name            = var.name
+
+  github {
+    owner = "battlecode"
+    name  = "galaxy"
+
+    push {
+      tag = "^siarnaq-frontend-.*"
+    }
+  }
+
+  build {
+    step {
+      name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+      entrypoint = "./deploy-frontend.sh"
+      args = ["--this-is-being-run-from-gcloud"]
+      dir  = "frontend"
+    }
+  }
+}
+
 resource "google_storage_bucket_iam_member" "public" {
   bucket = google_storage_bucket.public.name
   role   = "roles/storage.legacyObjectReader"
