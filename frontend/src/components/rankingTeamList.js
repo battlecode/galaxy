@@ -33,7 +33,7 @@ class RankingTeamList extends TeamList {
         }
         return (
           <tr key={team.id} onClick={() => this.redirectToTeamPage(team.id)}>
-            { <td>{Math.round(team.profile.rating)}</td> }
+            {<td>{Math.round(team.profile.rating)}</td>}
             <td>{team.name}</td>
             <td>{team.members.map((member) => member.username).join(", ")}</td>
             {<td>{team.profile.quote}</td>}
@@ -74,7 +74,7 @@ class RankingTeamList extends TeamList {
               <table className="table table-striped">
                 <thead>
                   <tr>
-                    {/* <th>Score</th> */}
+                    <th>Rating</th>
                     <th>Team</th>
                     <th>Members</th>
                     <th>Quote</th>
