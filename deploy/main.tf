@@ -119,9 +119,10 @@ module "network" {
 
   additional_buckets = {
     "production-frontend" = {
-      bucket_name = module.production.storage_frontend_name
-      enable_cdn  = true
-      subdomain   = "play."
+      bucket_name   = module.production.storage_frontend_name
+      enable_cdn    = true
+      cdn_cache_ttl = 60
+      subdomain     = "play."
     }
   }
 

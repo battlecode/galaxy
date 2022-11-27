@@ -40,6 +40,48 @@ resource "google_storage_bucket" "frontend" {
 
   location      = "US"
   storage_class = "STANDARD"
+
+  website {
+    main_page_suffix = "index.html"
+    not_found_page   = "index.html"
+  }
+}
+
+resource "google_cloudbuild_trigger" "this" {
+  count = var.create_website ? 1 : 0
+
+  name            = "${var.name}-frontend"
+
+  github {
+    owner = "battlecode"
+    name  = "galaxy"
+
+    push {
+      tag = "^siarnaq-frontend-.*"
+    }
+  }
+
+  build {
+    step {
+      name = "node"
+      entrypoint = "npm"
+      args = ["install"]
+      dir = "frontend"
+    }
+    step {
+      name = "node"
+      entrypoint = "npm"
+      args = ["run", "build"]
+      dir = "frontend"
+      env = ["REACT_APP_REVISION=$SHORT_SHA"]
+    }
+    step {
+      name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+      entrypoint = "gsutil"
+      args = ["-m", "rsync", "-d", "-r", "build", "gs://${google_storage_bucket.frontend[count.index].name}"]
+      dir = "frontend"
+    }
+  }
 }
 
 resource "google_storage_bucket_iam_member" "public" {

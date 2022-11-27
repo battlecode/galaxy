@@ -343,3 +343,7 @@ root.render(
     <App />
   </BrowserRouter>
 );
+
+if (process.env.REACT_APP_REVISION) {
+  console.log("Frontend built from revision", process.env.REACT_APP_REVISION);
+}

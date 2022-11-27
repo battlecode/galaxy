@@ -40,7 +40,12 @@ variable "storage_home_name" {
 
 variable "additional_buckets" {
   description = "Specifications for any additional buckets to be routed"
-  type        = map(object({ bucket_name=string, enable_cdn=bool, subdomain=string }))
+  type        = map(object({
+    bucket_name=string,
+    enable_cdn=bool,
+    cdn_cache_ttl=number,
+    subdomain=string,
+  }))
 }
 
 variable "dns_additional_records" {
