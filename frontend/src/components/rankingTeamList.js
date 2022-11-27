@@ -33,7 +33,7 @@ class RankingTeamList extends TeamList {
         }
         return (
           <tr key={team.id} onClick={() => this.redirectToTeamPage(team.id)}>
-            {/* <td>{team.score === -1000000 ? "N/A" : Math.round(team.score)}</td> */}
+            { <td>{Math.round(team.profile.rating)}</td> }
             <td>{team.name}</td>
             <td>{team.members.map((member) => member.username).join(", ")}</td>
             {<td>{team.profile.quote}</td>}
