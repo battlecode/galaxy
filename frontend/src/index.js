@@ -344,12 +344,6 @@ root.render(
   </BrowserRouter>
 );
 
-// Log build times,
-// would be best to log them somewhere less obviously visible (eg in the DOM tree) but can tackle later.
-// x1000 cuz Unix-generated ts (that's saved here) is in seconds; JS takes milliseconds.
-if (process.env.REACT_APP_BUILD_TS) {
-  console.log(
-    "Frontend built on",
-    new Date(process.env.REACT_APP_BUILD_TS * 1000).toString()
-  );
+if (process.env.REACT_APP_REVISION) {
+  console.log("Frontend built from revision", process.env.REACT_APP_REVISION);
 }

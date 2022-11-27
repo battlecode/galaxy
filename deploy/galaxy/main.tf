@@ -58,10 +58,22 @@ resource "google_cloudbuild_trigger" "this" {
 
   build {
     step {
+      name = "node"
+      entrypoint = "npm"
+      args = ["install"]
+      dir = "frontend"
+    }
+    step {
+      name = "node"
+      entrypoint = "npm"
+      args = ["run", "build"]
+      dir = "frontend"
+      env = ["REACT_APP_REVISION=$SHORT_SHA"]
+    }
+    step {
       name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
-      entrypoint = "./deploy-frontend.sh"
-      args = ["--this-is-being-run-from-gcloud"]
-      dir  = "frontend"
+      entrypoint = "gsutil"
+      args = ["-m", "rsync", "-r", "*", "gs://${google_storage_bucket.frontend[count.index].name}"]
     }
   }
 }
