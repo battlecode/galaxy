@@ -451,7 +451,9 @@ class EligibilityOptions extends Component {
                 style={{ display: "flex" }}
                 key={criterion.id}
               >
-                <label>{criterion.title}</label>
+                <label>
+                  {criterion.icon} {criterion.title}
+                </label>
                 <Floater
                   content={
                     <div>

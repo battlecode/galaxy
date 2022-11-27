@@ -39,7 +39,7 @@ class RankingTeamList extends TeamList {
             {<td>{team.profile.quote}</td>}
             <td>
               {this.props.episode_info.eligibility_criteria.map((criterion) => {
-                const eligible = this.props.team.profile.eligible_for.includes(
+                const eligible = team.profile.eligible_for.includes(
                   criterion.id
                 );
                 return (
