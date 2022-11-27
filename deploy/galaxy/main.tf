@@ -43,7 +43,7 @@ resource "google_storage_bucket" "frontend" {
 }
 
 resource "google_cloudbuild_trigger" "this" {
-  count = var.create_cloud_run ? 1 : 0
+  count = var.create_website ? 1 : 0
 
   name            = var.name
 
