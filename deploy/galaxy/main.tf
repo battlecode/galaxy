@@ -45,7 +45,7 @@ resource "google_storage_bucket" "frontend" {
 resource "google_cloudbuild_trigger" "this" {
   count = var.create_website ? 1 : 0
 
-  name            = var.name
+  name            = "${var.name}-frontend"
 
   github {
     owner = "battlecode"
@@ -73,7 +73,8 @@ resource "google_cloudbuild_trigger" "this" {
     step {
       name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
       entrypoint = "gsutil"
-      args = ["-m", "rsync", "-r", "*", "gs://${google_storage_bucket.frontend[count.index].name}"]
+      args = ["-m", "rsync", "-d", "-r", "build", "gs://${google_storage_bucket.frontend[count.index].name}"]
+      dir = "frontend"
     }
   }
 }
