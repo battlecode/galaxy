@@ -40,6 +40,11 @@ resource "google_storage_bucket" "frontend" {
 
   location      = "US"
   storage_class = "STANDARD"
+
+  website {
+    main_page_suffix = "index.html"
+    not_found_page   = "index.html"
+  }
 }
 
 resource "google_cloudbuild_trigger" "this" {
