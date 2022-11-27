@@ -8,7 +8,7 @@
 function get_profile_errors(model, response_json) {
   const errors = [];
   if (response_json[model]) {
-    for (const [field, error_message] of Object.entries(response_json.user)) {
+    for (const [field, error_message] of Object.entries(response_json[model])) {
       errors.push([field, error_message]);
     }
   }
@@ -27,4 +27,8 @@ function get_team_errors(response_json) {
   return get_profile_errors("team", response_json);
 }
 
-export { get_user_errors, get_team_errors };
+function get_nested_profile_errors(response_json) {
+  return get_profile_errors("profile", response_json);
+}
+
+export { get_user_errors, get_team_errors, get_nested_profile_errors };
