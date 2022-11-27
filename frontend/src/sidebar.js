@@ -75,11 +75,11 @@ class SideBar extends Component {
               label="Tournaments"
             />
 
-            {/* <NLink
+            <NLink
               to={`/${this.props.episode}/rankings`}
               icon={"pe-7s-graph1"}
               label="Rankings"
-            /> */}
+            />
 
             {/* search bar link, unused since Search is broken
             Commented in case someone wants to bring it back in the future

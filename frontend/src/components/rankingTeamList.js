@@ -1,41 +1,16 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 
 import TeamList from "./teamList";
 import PaginationControl from "./paginationControl";
 
-import MultiEpisode from "../views/multi-episode";
-
-const SUCCESS_TIMEOUT = 2000;
-
 class RankingTeamList extends TeamList {
-  constructor(props) {
-    super(props);
-    // Note that this is not state.
-    // I tried making it state, but strange bugs occur due to
-    // `const { props, state } = this`
-    // which overwrites state.
-    // It's not a big deal, because this variable doesn't need the good things of state
-    // (eg rerendering etc)
-    this.episode = MultiEpisode.getEpisodeFromCurrentPathname();
-  }
-
-  showTeamPage = (teamID) => {
-    //this.props.history.push(`${process.env.PUBLIC_URL}/rankings/${teamID}`)
-    //this.setState({showTeamID: teamID});
-    if (!this.props.canRequest) {
-      this.props.history.push(
-        `${process.env.PUBLIC_URL}/${this.episode}/rankings/${teamID}`
-      );
-    }
-    //this.router.transitionTo('/')
+  redirectToTeamPage = (team_id) => {
+    // this.props.history.push(`/rankings/${team_id}`);
   };
 
   render() {
     const { props, state } = this;
-
-    // if(state.showTeamID !== null) {
-    //     return ( <Redirect to={`${process.env.PUBLIC_URL}/team/${state.showTeamID}`}/> );
-    // }
 
     if (!props.teams) {
       return null;
@@ -57,19 +32,25 @@ class RankingTeamList extends TeamList {
           buttonContent = <i className="fa fa-check"></i>;
         }
         return (
-          <tr key={team.id} onClick={() => this.showTeamPage(team.id)}>
-            <td>{team.score === -1000000 ? "N/A" : Math.round(team.score)}</td>
+          <tr key={team.id} onClick={() => this.redirectToTeamPage(team.id)}>
+            {/* <td>{team.score === -1000000 ? "N/A" : Math.round(team.score)}</td> */}
             <td>{team.name}</td>
-            <td>{team.users.join(", ")}</td>
-            <td>{team.bio}</td>
+            <td>{team.members.map((member) => member.username).join(", ")}</td>
+            {<td>{team.profile.quote}</td>}
             <td>
-              {team.student ? "✅" : "🛑"}
-              {team.student && team.international ? "🌍" : "🇺🇸"}
-              {team.student && team.mit ? "🐥" : ""}
-              {team.student && team.high_school ? "HS" : ""}
+              {this.props.episode_info.eligibility_criteria.map((criterion) => {
+                const eligible = this.props.team.profile.eligible_for.includes(
+                  criterion.id
+                );
+                return (
+                  <span key={criterion.id}>
+                    {eligible ? criterion.icon : ""}
+                  </span>
+                );
+              })}
             </td>
-            <td>{team.auto_accept_unranked ? "Yes" : "No"}</td>
-            {props.canRequest && (
+            {/* <td>{team.auto_accept_unranked ? "Yes" : "No"}</td> */}
+            {/* {props.canRequest && (
               <td>
                 <button
                   className="btn btn-xs"
@@ -78,7 +59,7 @@ class RankingTeamList extends TeamList {
                   {buttonContent}
                 </button>{" "}
               </td>
-            )}
+            )} */}
           </tr>
         );
       });
@@ -93,12 +74,12 @@ class RankingTeamList extends TeamList {
               <table className="table table-striped">
                 <thead>
                   <tr>
-                    <th>Score</th>
+                    {/* <th>Score</th> */}
                     <th>Team</th>
-                    <th>Users</th>
-                    <th>Bio</th>
+                    <th>Members</th>
+                    <th>Quote</th>
                     <th>Eligibility</th>
-                    <th>Auto-Accept</th>
+                    {/* <th>Auto-Accept</th> */}
                   </tr>
                 </thead>
                 <tbody>{teamRows}</tbody>

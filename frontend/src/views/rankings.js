@@ -11,32 +11,31 @@ class Rankings extends Component {
     input: "",
   };
 
+  searchTeam(input, page) {
+    Api.searchTeam(input, page, this.props.episode, (teams) => {
+      this.setState({ teams, teamPage: page });
+    });
+  }
+
   componentDidMount() {
     const { input } = this.state;
-    Api.searchTeamRanking(input, 1, this.onDataLoad);
+    this.searchTeam(input, 1);
   }
 
   handleChange = (e) => {
-    const { input } = this.state;
     this.setState({ input: e.target.value });
-  };
-
-  onDataLoad = (data) => {
-    //this.setState({teams: [{id: "hi", mu: 5, name: "Example Team", users: ["User #1", "User #2", "User #3"], bio: "dfghjkiuytregfdawsqA DKFODLKLASDKA sdadasdas"}]})
-    this.setState(data);
   };
 
   getTeamPage = (page) => {
     const { state } = this;
-    if (page !== state.teamPage && page >= 0 && page <= state.teamLimit) {
-      Api.searchTeamRanking(state.input, page, this.onDataLoad);
+    if (page !== state.teamPage && page >= 0) {
+      this.searchTeam(this.state.input, page);
     }
   };
 
   search = (e) => {
-    const { input } = this.state;
     e.preventDefault();
-    Api.searchTeamRanking(input, 1, this.onDataLoad);
+    this.searchTeam(this.state.input, 1);
   };
 
   render() {
@@ -71,9 +70,9 @@ class Rankings extends Component {
             <RankingTeamList
               teams={state.teams}
               page={state.teamPage}
-              pageLimit={state.teamLimit}
               onPageClick={this.getTeamPage}
               history={this.props.history}
+              episode_info={this.props.episode_info}
             />
           </div>
         </div>

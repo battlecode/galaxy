@@ -205,11 +205,21 @@ class App extends Component {
         key="resources"
       />,
       // <Route
-      //   path={`/:episode/rankings/:team_id`}
-      //   component={TeamInfo}
-      //   key="rankings-team"
+      //    path={`/:episode/rankings/:team_id`}
+      //    component={TeamInfo}
+      //    key="rankings-team"
       // />,
-      // <Route path={`/:episode/rankings`} component={Rankings} key="rankings" />,
+      <Route
+        path={`/:episode/rankings`}
+        component={(props) => (
+          <Rankings
+            {...props}
+            episode={this.state.episode}
+            episode_info={this.state.episode_info}
+          />
+        )}
+        key="rankings"
+      />,
     ];
 
     // should only be visible to logged in users
