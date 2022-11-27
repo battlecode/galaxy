@@ -25,6 +25,14 @@ resource "google_compute_backend_bucket" "buckets" {
   name        = "${var.name}-${each.key}"
   bucket_name = each.value.bucket_name
   enable_cdn  = each.value.enable_cdn
+
+  cdn_policy {
+    cache_mode         = "CACHE_ALL_STATIC"
+    default_ttl        = each.value.cdn_cache_ttl
+    max_ttl            = each.value.cdn_cache_ttl
+    client_ttl         = each.value.cdn_cache_ttl
+    request_coalescing = true
+  }
 }
 
 module "lb" {
