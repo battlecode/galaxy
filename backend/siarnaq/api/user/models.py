@@ -1,12 +1,16 @@
+import io
 import posixpath
+import random
 import uuid
 
 import google.cloud.storage as storage
+import numpy as np
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
+from PIL import Image
 
 
 class User(AbstractUser):
@@ -102,14 +106,80 @@ class UserProfile(models.Model):
         """Return a cache-safe URL to the avatar."""
         # To circumvent caching of old avatars, we append a UUID that changes on each
         # update.
-        if not self.has_avatar:
-            return None
 
-        client = storage.Client.create_anonymous_client()
+        if not self.has_avatar:
+
+            def get_gradient_3d(
+                width, height, start_list, stop_list, is_horizontal_list
+            ):
+                """Generate a gradient image as a numpy array"""
+
+                def get_gradient_2d(start, stop, width, height, is_horizontal):
+                    if is_horizontal:
+                        return np.tile(np.linspace(start, stop, width), (height, 1))
+                    else:
+                        return np.tile(np.linspace(start, stop, height), (width, 1)).T
+
+                result = np.zeros((height, width, len(start_list)), dtype=np.float)
+
+                for i, (start, stop, is_horizontal) in enumerate(
+                    zip(start_list, stop_list, is_horizontal_list)
+                ):
+                    result[:, :, i] = get_gradient_2d(
+                        start, stop, width, height, is_horizontal
+                    )
+
+                return result
+
+            # generate a random avatar
+            self.has_avatar = True
+            self.avatar_uuid = uuid.uuid4()
+            self.save()
+
+            # generate a unique seed
+            random.seed(self.avatar_uuid.int)
+
+            # generate unique rgb
+            rgb1 = (
+                int(random.random() * 255),
+                int(random.random() * 255),
+                int(random.random() * 255),
+            )
+            rgb2 = (
+                int(random.random() * 255),
+                int(random.random() * 255),
+                int(random.random() * 255),
+            )
+
+            array = get_gradient_3d(512, 256, rgb1, rgb2, (True, True, True))
+            avatar = Image.fromarray(np.uint8(array), mode="RGB")
+
+            bytestream = io.BytesIO()
+            avatar.save(bytestream, format="png")
+            img_bytes = bytestream.getvalue()
+
+            # store it in  cloud for future use.
+            client = storage.Client()
+            blob = client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(
+                self.get_avatar_path()
+            )
+            blob.upload_from_string(img_bytes)
+            public_url = (
+                client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
+                .blob(self.get_avatar_path())
+                .public_url
+            )
+
+            return f"{public_url}?{self.avatar_uuid}"
+
+        # store it in  cloud for future use.
+        client = storage.Client()
+        blob = client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(self.get_avatar_path())
         public_url = (
             client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
             .blob(self.get_avatar_path())
             .public_url
         )
+
         # Append UUID to public URL to prevent caching on avatar update
         return f"{public_url}?{self.avatar_uuid}"
