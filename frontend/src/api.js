@@ -239,7 +239,7 @@ class Api {
   static searchTeam(query, page, episode, callback) {
     const apiURL = `${URL}/api/team/${episode}/t`;
     const encQuery = encodeURIComponent(query);
-    const teamUrl = `${apiURL}/?ordering=-rating.name&search=${encQuery}&page=${page}`;
+    const teamUrl = `${apiURL}/?ordering=-rating,name&search=${encQuery}&page=${page}`;
     $.get(teamUrl, (teamData) => {
       callback(teamData.results);
     });
