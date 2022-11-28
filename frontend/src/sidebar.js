@@ -36,7 +36,7 @@ class SideBar extends Component {
             <a href={`/${this.props.episode}/home`}>
               <img src="/bc/img/logo.png" />
             </a>
-            <p>{this.props.episode.name_long.toUpperCase()}</p> 
+            <p>{this.props.episode.name_long.toUpperCase()}</p>
           </div>
           {/* NOTE: this only controls what appears in the sidebars.
           Independent of this, users can still go to the links by typing it in their browser, etc.
