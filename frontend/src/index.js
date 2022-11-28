@@ -77,13 +77,16 @@ class App extends Component {
 
     // To be run when all AJAX queries are complete.
     const all_queries_finished = () => {
-      this.setState({
-        loaded: true,
-        logged_in: fetched_logged_in,
-        user: fetched_user,
-        team: fetched_team,
-        episode_info: fetched_episode_info,
-      });
+      this.setState(
+        {
+          loaded: true,
+          logged_in: fetched_logged_in,
+          user: fetched_user,
+          team: fetched_team,
+          episode_info: fetched_episode_info,
+        },
+        callback
+      );
     };
 
     // Modify each AJAX query to mark as completed, and run all queries finished logic when all completed.
