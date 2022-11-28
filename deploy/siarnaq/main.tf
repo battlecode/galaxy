@@ -68,6 +68,11 @@ resource "google_sql_database_instance" "this" {
   settings {
     tier = var.database_tier
 
+    backup_configuration {
+      enabled = var.database_backup
+      start_time = "09:00"
+    }
+
     ip_configuration {
       ipv4_enabled = true
 
