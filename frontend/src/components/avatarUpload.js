@@ -42,9 +42,14 @@ class AvatarUpload extends Component {
       : this.state.selectedAvatarFile["name"];
     const avatar_btn_class =
       "btn btn" + (!avatar_uploaded ? "" : " btn-info btn-fill");
+
+    const avatar_btn_disabled =
+      !avatar_uploaded ||
+      ["success", "loading", "failure"].includes(this.state.status);
+
     const avatar_upload_button = (
       <button
-        disabled={!avatar_uploaded}
+        disabled={avatar_btn_disabled}
         style={{ float: "right" }}
         onClick={this.uploadAvatar}
         className={avatar_btn_class}
