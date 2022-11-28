@@ -33,6 +33,7 @@ def auto_accept_scrimmage(instance, created, **kwargs):
     if (instance.is_ranked and instance.requested_to.profile.auto_accept_ranked) or (
         not instance.is_ranked and instance.requested_to.profile.auto_accept_unranked
     ):
+        # Must wait for transaction to complete, so that maps are inserted.
         transaction.on_commit(
             lambda: ScrimmageRequest.objects.filter(pk=instance.pk).accept()
         )
