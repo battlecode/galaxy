@@ -68,6 +68,11 @@ resource "google_sql_database_instance" "this" {
   settings {
     tier = var.database_tier
 
+    backup_configuration {
+      enabled = var.database_backup
+      start_time = "09:00"
+    }
+
     ip_configuration {
       ipv4_enabled = true
 
@@ -158,6 +163,14 @@ resource "google_cloud_run_service" "this" {
       }
     }
   }
+
+  metadata {
+    annotations = {
+      "run.googleapis.com/ingress" = "internal-and-cloud-load-balancing"
+    }
+  }
+
+  autogenerate_revision_name = true
 
   traffic {
     percent         = 100

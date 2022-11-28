@@ -52,6 +52,8 @@ a new project:
 - Give the Cloud Build service account the following roles: Cloud Run Admin, Compute
   Instance Admin (v1), Service Account User, Service Account Token Creator, Secret
   Manager Secret Accesor, Cloud SQL Client.
+- Configure a notification channel on Cloud Error Reporting to receive real-time
+  notifications (eg. via email) whenever something goes wrong.
 
 ### Other manual changes
 

@@ -128,8 +128,9 @@ class SubmissionViewSet(
                 with blob.open("wb") as f:
                     for chunk in source_code.chunks():
                         f.write(chunk)
-            # Send to Saturn
-            Submission.objects.filter(pk=instance.pk).enqueue()
+
+        # Send to Saturn
+        Submission.objects.filter(pk=instance.pk).enqueue()
 
         # Generate the Location header, as supplied by CreateModelMixin
         headers = self.get_success_headers(serializer.data)

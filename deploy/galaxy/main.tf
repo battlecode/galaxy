@@ -119,6 +119,7 @@ module "siarnaq" {
   database_tier                = var.database_tier
   database_name                = "battlecode"
   database_user                = "siarnaq"
+  database_backup              = var.database_backup
   database_authorized_networks = var.database_authorized_networks
   additional_secrets           = var.additional_secrets
 
