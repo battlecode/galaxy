@@ -141,24 +141,15 @@ class UserProfile(models.Model):
             random.seed(self.avatar_uuid.int)
 
             # generate unique rgb
-            rgb1 = (
-                int(random.random() * 255),
-                int(random.random() * 255),
-                int(random.random() * 255),
-            )
-            rgb2 = (
-                int(random.random() * 255),
-                int(random.random() * 255),
-                int(random.random() * 255),
-            )
+            rgb1 = tuple(int(random.random() * 255) for _ in range(3))
+            rgb2 = tuple(int(random.random() * 255) for _ in range(3))
 
             array = get_gradient_3d(512, 256, rgb1, rgb2, (True, True, True))
             avatar = Image.fromarray(np.uint8(array), mode="RGB")
 
             titan.upload_image(avatar, self.get_avatar_path())
 
-        # store it in  cloud for future use.
-        client = storage.Client()
+        client = storage.Client.create_anonymous_client()
         public_url = (
             client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
             .blob(self.get_avatar_path())
