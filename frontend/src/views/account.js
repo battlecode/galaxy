@@ -145,9 +145,14 @@ class Account extends Component {
       : this.state.selectedResumeFile["name"];
     const resume_btn_class =
       "btn btn" + (!resume_uploaded ? "" : " btn-info btn-fill");
+
+    const resume_btn_disabled =
+      !resume_uploaded ||
+      ["success", "loading", "failure"].includes(this.state.resume_status);
+
     const resume_upload_button = (
       <button
-        disabled={!resume_uploaded}
+        disabled={resume_btn_disabled}
         style={{ float: "right" }}
         onClick={this.uploadResume}
         className={resume_btn_class}
