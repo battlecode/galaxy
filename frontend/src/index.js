@@ -54,6 +54,17 @@ class App extends Component {
     Api.setLoginHeader();
   }
 
+  // This function, for mobile devices, moves the navbar into the sidebar and then
+  // collapses the sidebar. Better responsive display
+  // (Only call it when the entire DOM has fully loaded, since otherwise,
+  // the _incomplete_ navbar gets moved and is stuck there.)
+  // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
+  updateRightMenu = () => {
+    $(document).ready(function () {
+      window.init_right_menu();
+    });
+  };
+
   updateBaseState = (callback = () => {}) => {
     let fetched_logged_in, fetched_user, fetched_team, fetched_episode_info;
 
@@ -77,13 +88,16 @@ class App extends Component {
 
     // To be run when all AJAX queries are complete.
     const all_queries_finished = () => {
-      this.setState({
-        loaded: true,
-        logged_in: fetched_logged_in,
-        user: fetched_user,
-        team: fetched_team,
-        episode_info: fetched_episode_info,
-      });
+      this.setState(
+        {
+          loaded: true,
+          logged_in: fetched_logged_in,
+          user: fetched_user,
+          team: fetched_team,
+          episode_info: fetched_episode_info,
+        },
+        callback
+      );
     };
 
     // Modify each AJAX query to mark as completed, and run all queries finished logic when all completed.
@@ -97,15 +111,12 @@ class App extends Component {
 
   componentDidMount() {
     this.updateBaseState(() => {
-      // This function, for mobile devices, moves the navbar into the sidebar and then
-      // collapses the sidebar. Better responsive display
-      // (Only call it when the entire DOM has fully loaded, since otherwise,
-      // the _incomplete_ navbar gets moved and is stuck there.)
-      // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
-      $(document).ready(function () {
-        window.init_right_menu();
-      });
+      this.updateRightMenu();
     });
+  }
+
+  componentDidUpdate() {
+    this.updateRightMenu();
   }
 
   render() {
