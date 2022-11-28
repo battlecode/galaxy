@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 // do not change URL here!! rather, for development, change it in ../.env.development
 const URL = process.env.REACT_APP_BACKEND_URL;
 const LEAGUE = 0;
-const PAGE_LIMIT = 10;
+const PAGE_SIZE = 10;
 const SCRIMMAGE_STATUS = {
   PENDING: 0,
   QUEUED: 1,
@@ -241,7 +241,8 @@ class Api {
     const encQuery = encodeURIComponent(query);
     const teamUrl = `${apiURL}/?ordering=-rating,name&search=${encQuery}&page=${page}`;
     $.get(teamUrl, (teamData) => {
-      callback(teamData.results);
+      const pageLimit = Math.ceil(teamData.count / PAGE_SIZE);
+      callback(teamData.results, pageLimit);
     });
   }
 

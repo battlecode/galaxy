@@ -12,8 +12,8 @@ class Rankings extends Component {
   };
 
   searchTeam(input, page) {
-    Api.searchTeam(input, page, this.props.episode, (teams) => {
-      this.setState({ teams, teamPage: page });
+    Api.searchTeam(input, page, this.props.episode, (teams, pageLimit) => {
+      this.setState({ teams, teamPage: page, pageLimit });
     });
   }
 
@@ -70,6 +70,7 @@ class Rankings extends Component {
             <RankingTeamList
               teams={state.teams}
               page={state.teamPage}
+              pageLimit={state.pageLimit}
               onPageClick={this.getTeamPage}
               history={this.props.history}
               episode_info={this.props.episode_info}
