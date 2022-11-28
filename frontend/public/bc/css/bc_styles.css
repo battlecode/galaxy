@@ -222,3 +222,7 @@ ol {
     transform: rotate(360deg);
   }
 }
+
+.sidebar .logo p {
+  font-family: "Josefin Sans", sans-serif;
+}

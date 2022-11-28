@@ -172,10 +172,10 @@ class LinksCard extends Component {
               <a href="https://battlecode.org">Battlecode.org</a>
               <ul>
                 <li>
-                  <a href="https://battlecode.org#faq">FAQs</a>
+                  <a href="https://battlecode.org/schedule.html">Schedule</a>
                 </li>
                 <li>
-                  <a href="https://battlecode.org#about">Eligibility</a>
+                  <a href="https://battlecode.org/about.html">Eligibility</a>
                 </li>
               </ul>
             </li>
