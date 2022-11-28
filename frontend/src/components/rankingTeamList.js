@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 
 import TeamList from "./teamList";
 import PaginationControl from "./paginationControl";
+import Spinner from "./spinner";
 
 class RankingTeamList extends TeamList {
   redirectToTeamPage = (team_id) => {
@@ -12,9 +13,7 @@ class RankingTeamList extends TeamList {
   render() {
     const { props, state } = this;
 
-    if (!props.teams) {
-      return null;
-    } else if (props.teams.length === 0) {
+    if (!this.props.loading && props.teams.length === 0) {
       return (
         <div className="card">
           <div className="header">
@@ -82,8 +81,9 @@ class RankingTeamList extends TeamList {
                     {/* <th>Auto-Accept</th> */}
                   </tr>
                 </thead>
-                <tbody>{teamRows}</tbody>
+                <tbody>{!this.props.loading && teamRows}</tbody>
               </table>
+              {this.props.loading && <Spinner />}
             </div>
           </div>
           <PaginationControl

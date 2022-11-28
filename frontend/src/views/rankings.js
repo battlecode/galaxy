@@ -5,15 +5,17 @@ import RankingTeamList from "../components/rankingTeamList";
 
 class Rankings extends Component {
   state = {
-    teams: null,
+    teams: [],
     teamLimit: 0,
     teamPage: 1,
+    loading: false,
     input: "",
   };
 
   searchTeam(input, page) {
+    this.setState({ loading: true });
     Api.searchTeam(input, page, this.props.episode, (teams, pageLimit) => {
-      this.setState({ teams, teamPage: page, pageLimit });
+      this.setState({ teams, teamPage: page, pageLimit, loading: false });
     });
   }
 
@@ -72,6 +74,7 @@ class Rankings extends Component {
               page={state.teamPage}
               pageLimit={state.pageLimit}
               onPageClick={this.getTeamPage}
+              loading={this.state.loading}
               history={this.props.history}
               episode_info={this.props.episode_info}
             />
