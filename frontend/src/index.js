@@ -65,7 +65,7 @@ class App extends Component {
     });
   };
 
-  updateBaseState = (callback = this.updateRightMenu) => {
+  updateBaseState = (callback = () => {}) => {
     let fetched_logged_in, fetched_user, fetched_team, fetched_episode_info;
 
     const ajax1 = Api.loginCheck((logged_in) => {
@@ -113,6 +113,10 @@ class App extends Component {
     this.updateBaseState(() => {
       this.updateRightMenu();
     });
+  }
+
+  componentDidUpdate() {
+    this.updateRightMenu();
   }
 
   render() {
