@@ -6,6 +6,7 @@ from django.conf import settings
 from django.db import transaction
 from django.http import Http404
 from drf_spectacular.utils import extend_schema
+from PIL import Image
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -135,6 +136,7 @@ class UserViewSet(
             profile.has_avatar = True
             profile.avatar_uuid = uuid.uuid4()
             profile.save(update_fields=["has_avatar", "avatar_uuid"])
-            titan.upload_image(avatar, profile.get_avatar_path())
+            img = Image.open(avatar)
+            titan.upload_image(img, profile.get_avatar_path())
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
