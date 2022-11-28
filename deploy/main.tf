@@ -66,7 +66,7 @@ module "staging" {
   secure_lifecycle_rules = []
 
   create_website               = false
-  siarnaq_image                = null
+  siarnaq_image                = module.cd.artifact_image["siarnaq"]
   database_tier                = "db-f1-micro"
   database_backup              = false
   database_authorized_networks = ["0.0.0.0/0"]

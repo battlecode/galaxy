@@ -18,11 +18,6 @@ variable "gcp_zone" {
   type        = string
 }
 
-variable "create_cloud_run" {
-  description = "Whether to create the Cloud Run service for siarnaq"
-  type        = bool
-}
-
 variable "image" {
   description = "Image for the Docker container to be run"
   type        = string

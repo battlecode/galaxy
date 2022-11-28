@@ -300,6 +300,7 @@ class Local(Base):
 
 class Staging(Base):
     ALLOWED_HOSTS = [
+        "api.staging.battlecode.org",
         "localhost",
         "127.0.0.1",
     ]
@@ -330,7 +331,7 @@ class Staging(Base):
     CORS_ALLOW_ALL_ORIGINS = True
 
     EMAIL_ENABLED = False
-    FRONTEND_ORIGIN = "http://localhost:3000"
+    FRONTEND_ORIGIN = "https://play.staging.battlecode.org"
 
     LOGGING: dict[str, Any] = {
         **_LOGGING_COMMON,

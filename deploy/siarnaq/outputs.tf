@@ -1,5 +1,5 @@
 output "run_service_name" {
-  value = var.create_cloud_run ? google_cloud_run_service.this[0].name : null
+  value = google_cloud_run_service.this.name
 }
 
 output "sql_instance_ip" {
