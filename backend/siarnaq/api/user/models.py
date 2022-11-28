@@ -1,4 +1,3 @@
-import io
 import posixpath
 import random
 import uuid
@@ -11,6 +10,8 @@ from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from PIL import Image
+
+from siarnaq.gcloud import titan
 
 
 class User(AbstractUser):
@@ -154,27 +155,10 @@ class UserProfile(models.Model):
             array = get_gradient_3d(512, 256, rgb1, rgb2, (True, True, True))
             avatar = Image.fromarray(np.uint8(array), mode="RGB")
 
-            bytestream = io.BytesIO()
-            avatar.save(bytestream, format="png")
-            img_bytes = bytestream.getvalue()
-
-            # store it in  cloud for future use.
-            client = storage.Client()
-            blob = client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(
-                self.get_avatar_path()
-            )
-            blob.upload_from_string(img_bytes)
-            public_url = (
-                client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
-                .blob(self.get_avatar_path())
-                .public_url
-            )
-
-            return f"{public_url}?{self.avatar_uuid}"
+            titan.upload_image(avatar, self.get_avatar_path())
 
         # store it in  cloud for future use.
         client = storage.Client()
-        blob = client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(self.get_avatar_path())
         public_url = (
             client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
             .blob(self.get_avatar_path())

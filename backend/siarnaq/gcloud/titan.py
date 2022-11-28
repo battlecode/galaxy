@@ -91,7 +91,11 @@ def get_object(bucket: str, name: str, check_safety: bool) -> dict[str, str | bo
 
 
 def upload_image(raw_image, image_path):
-    img = Image.open(raw_image)
+    try:
+        img = Image.open(raw_image)
+    except AttributeError:
+        img = raw_image
+
     img.thumbnail(settings.GCLOUD_MAX_AVATAR_SIZE)
 
     # Prepare image bytes for upload to Google Cloud
