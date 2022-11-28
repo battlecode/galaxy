@@ -54,7 +54,18 @@ class App extends Component {
     Api.setLoginHeader();
   }
 
-  updateBaseState = (callback = () => {}) => {
+  // This function, for mobile devices, moves the navbar into the sidebar and then
+  // collapses the sidebar. Better responsive display
+  // (Only call it when the entire DOM has fully loaded, since otherwise,
+  // the _incomplete_ navbar gets moved and is stuck there.)
+  // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
+  updateRightMenu = () => {
+    $(document).ready(function () {
+      window.init_right_menu();
+    });
+  };
+
+  updateBaseState = (callback = this.updateRightMenu) => {
     let fetched_logged_in, fetched_user, fetched_team, fetched_episode_info;
 
     const ajax1 = Api.loginCheck((logged_in) => {
@@ -100,14 +111,7 @@ class App extends Component {
 
   componentDidMount() {
     this.updateBaseState(() => {
-      // This function, for mobile devices, moves the navbar into the sidebar and then
-      // collapses the sidebar. Better responsive display
-      // (Only call it when the entire DOM has fully loaded, since otherwise,
-      // the _incomplete_ navbar gets moved and is stuck there.)
-      // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
-      $(document).ready(function () {
-        window.init_right_menu();
-      });
+      this.updateRightMenu();
     });
   }
 

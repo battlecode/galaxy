@@ -42,7 +42,14 @@ lbd = {
   },
 
   initRightMenu: function () {
-    if (!navbar_initialized) {
+    // Note: every time updateBaseState is run,
+    // a new navbar is rendered and created.
+    // Then, initRightMenu is only run after this new creation.
+    // So it's ok to always run initRightMenu without duplicating things
+    // Essentially we assume that 'navbar_initialized' never is true to start off with when initRightMenu is run
+    // (and we actually code this way too)
+
+    // if (!navbar_initialized) {
       $navbar = $("nav").find(".navbar-collapse").first().clone(true);
 
       $sidebar = $(".sidebar");
@@ -107,7 +114,7 @@ lbd = {
         }
       };
       navbar_initialized = true;
-    }
+    // }
   },
 };
 
