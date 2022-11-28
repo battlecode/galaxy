@@ -42,12 +42,15 @@ lbd = {
   },
 
   initRightMenu: function () {
-    // Note: every time updateBaseState is run,
-    // a new navbar is rendered and created.
-    // Then, initRightMenu is only run after this new creation.
-    // So it's ok to always run initRightMenu without duplicating things
-    // Essentially we assume that 'navbar_initialized' never is true to start off with when initRightMenu is run
-    // (and we actually code this way too)
+    // Note: We only call initRightMenu after the index component is first loaded, or updated.
+    // Thus in these cases, we will have a freshly new created navbar.
+    // So we can assume that the navbar is always new, before this code is run.
+    // Thus, we will not accidentally duplicate elements, etc.
+
+    // (The original version of this dashboard js does not account for React and its re-rendering,
+    // it assumes that the navbar is reated one and only one.
+    // The navbar_initialized check is in place to prevent re-adding elements to a navbar
+    // that already has elements.)
 
     // if (!navbar_initialized) {
       $navbar = $("nav").find(".navbar-collapse").first().clone(true);
