@@ -6,6 +6,7 @@ import AvatarUpload from "../components/avatarUpload";
 import Alert from "../components/alert";
 import MultiEpisode from "./multi-episode";
 import Floater from "react-floater";
+import ActionMessage from "../components/actionMessage";
 import { get_team_errors } from "../utils/error_handling";
 
 class YesTeam extends Component {
@@ -19,7 +20,8 @@ class YesTeam extends Component {
     this.state = {
       team: copied_team,
       up: "Update Info",
-      errors: [],
+      alert_message: "",
+      leave_status: "waiting",
     };
 
     this.changeHandler = this.changeHandler.bind(this);
@@ -28,8 +30,18 @@ class YesTeam extends Component {
   }
 
   leaveTeam = () => {
+    this.setState({ leave_status: "loading" });
     Api.leaveTeam(this.props.episode, (success) => {
-      this.props.updateBaseState();
+      if (success) {
+        this.setState({ leave_status: "success" });
+        this.props.updateBaseState();
+      } else {
+        this.setState({ leave_status: "failure" });
+        this.setState({ alert_message: "Failed to leave team." });
+      }
+      setTimeout(() => {
+        this.setState({ leave_status: "waiting" });
+      }, 2000);
     });
   };
 
@@ -76,7 +88,10 @@ class YesTeam extends Component {
           this.props.updateBaseState();
         } else {
           this.setState({ up: '<i class="fa fa-times"></i>' });
-          this.setState({ errors: get_team_errors(response_json) });
+          const errors = get_team_errors(response_json);
+          const [first_field, first_error] = errors[0];
+          const alert_message = `Error in field ${first_field}: ${first_error}`;
+          this.setState({ alert_message });
         }
         setTimeout(
           function () {
@@ -105,18 +120,12 @@ class YesTeam extends Component {
   };
 
   render() {
-    // Error reporting
-    const errors = this.state.errors;
-    let alert_message;
-    if (errors.length > 0) {
-      const [first_field, first_error] = errors[0];
-      alert_message = `Error in field ${first_field}: ${first_error}`;
-    } else {
-      alert_message = "";
-    }
     return (
       <div>
-        <Alert alert_message={alert_message} closeAlert={this.closeAlert} />
+        <Alert
+          alert_message={this.state.alert_message}
+          closeAlert={this.closeAlert}
+        />
         <div className="col-md-8">
           <div className="card">
             <div className="header">
@@ -238,7 +247,10 @@ class YesTeam extends Component {
                 style={{ marginRight: "10px" }}
                 className="btn btn-danger btn-fill pull-right"
               >
-                Leave Team
+                <ActionMessage
+                  default_message="Leave Team"
+                  status={this.state.leave_status}
+                />
               </button>
               <div className="clearfix" />
               <div className="row">
@@ -260,6 +272,8 @@ class NoTeam extends Component {
       team_name: "",
       join_key: "",
       team_join_name: "",
+      create_status: "waiting",
+      join_status: "waiting",
       alert_message: "",
     };
 
@@ -278,6 +292,7 @@ class NoTeam extends Component {
   }
 
   joinTeam() {
+    this.setState({ join_status: "loading" });
     Api.joinTeam(
       this.state.join_key,
       this.state.team_join_name,
@@ -287,15 +302,23 @@ class NoTeam extends Component {
   }
 
   joinCallback = (success) => {
-    if (success) this.props.updateBaseState();
-    else
+    if (success) {
+      this.setState({ join_status: "success" });
+      this.props.updateBaseState();
+    } else {
+      this.setState({ join_status: "failure" });
       this.setState({
         alert_message:
           "Sorry, that team name and join key combination is not valid.",
       });
+    }
+    setTimeout(() => {
+      this.setState({ join_status: "waiting" });
+    }, 2000);
   };
 
   createTeam() {
+    this.setState({ create_status: "loading" });
     Api.createTeam(
       this.state.team_name,
       this.props.episode,
@@ -304,11 +327,18 @@ class NoTeam extends Component {
   }
 
   createTeamCallback = (success) => {
-    if (success) this.props.updateBaseState();
-    else
+    if (success) {
+      this.setState({ create_status: "success" });
+      this.props.updateBaseState();
+    } else {
+      this.setState({ create_status: "failure" });
       this.setState({
         alert_message: "Sorry, this team name is already being used.",
       });
+    }
+    setTimeout(() => {
+      this.setState({ create_status: "waiting" });
+    }, 2000);
   };
 
   closeAlert = () => {
@@ -345,7 +375,10 @@ class NoTeam extends Component {
               className="btn btn-info btn-fill pull-right"
               onClick={this.createTeam}
             >
-              Create
+              <ActionMessage
+                default_message="Create Team"
+                status={this.state.create_status}
+              />
             </button>
             <div className="clearfix" />
           </div>
@@ -385,7 +418,10 @@ class NoTeam extends Component {
               className="btn btn-info btn-fill pull-right"
               onClick={this.joinTeam}
             >
-              Join
+              <ActionMessage
+                default_message="Join Team"
+                status={this.state.join_status}
+              />
             </button>
             <div className="clearfix" />
           </div>

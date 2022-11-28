@@ -6,6 +6,7 @@ import Country from "../components/country";
 import Gender from "../components/gender";
 import AvatarUpload from "../components/avatarUpload";
 import Alert from "../components/alert";
+import ActionMessage from "../components/actionMessage";
 import Floater from "react-floater";
 import { get_nested_profile_errors } from "../utils/error_handling";
 
@@ -19,9 +20,10 @@ class Account extends Component {
 
     this.state = {
       user: copied_user,
-      up: "Update Info",
       selectedResumeFile: null,
-      errors: [],
+      update_status: "waiting",
+      resume_status: "waiting",
+      alert_message: "",
     };
 
     this.changeHandler = this.changeHandler.bind(this);
@@ -69,23 +71,23 @@ class Account extends Component {
   };
 
   updateUser() {
-    this.setState({ up: '<i class="fa fa-circle-o-notch fa-spin"></i>' });
+    this.setState({ update_status: "loading" });
     Api.updateUser(
       this.state.user,
       function (response_json, success) {
         if (success) {
-          this.setState({ up: '<i class="fa fa-check"></i>' });
+          this.setState({ update_status: "success" });
           this.props.updateBaseState();
         } else {
-          this.setState({ up: '<i class="fa fa-times"></i>' });
-          this.setState({ errors: get_nested_profile_errors(response_json) });
+          this.setState({ update_status: "failure" });
+          const errors = get_nested_profile_errors(response_json);
+          const [first_field, first_error] = errors[0];
+          const alert_message = `Error in field ${first_field}: ${first_error}`;
+          this.setState({ alert_message });
         }
-        setTimeout(
-          function () {
-            this.setState({ up: "Update Info" });
-          }.bind(this),
-          2000
-        );
+        setTimeout(() => {
+          this.setState({ update_status: "waiting" });
+        }, 2000);
       }.bind(this)
     );
   }
@@ -102,13 +104,29 @@ class Account extends Component {
   }
 
   uploadResume = () => {
-    Api.resumeUpload(this.state.selectedResumeFile, () =>
-      this.props.updateBaseState()
-    );
+    this.setState({ resume_status: "loading" });
+    Api.resumeUpload(this.state.selectedResumeFile, (success) => {
+      if (success) {
+        this.props.updateBaseState();
+        this.setState({ resume_status: "success" });
+      } else {
+        this.setState({ resume_status: "failure" });
+      }
+      setTimeout(() => {
+        this.setState({ resume_status: "waiting" });
+      }, 2000);
+    });
   };
 
-  uploadAvatar = (selected_file) => {
-    Api.avatarUpload(selected_file, () => this.props.updateBaseState());
+  uploadAvatar = (selected_file, callback) => {
+    Api.avatarUpload(selected_file, (success) => {
+      if (success) {
+        this.props.updateBaseState();
+      } else {
+        this.setState({ alert_message: "Avatar upload was not successful." });
+      }
+      callback(success);
+    });
   };
 
   retrieveResume = () => {
@@ -116,7 +134,7 @@ class Account extends Component {
   };
 
   closeAlert = () => {
-    this.setState({ errors: [] });
+    this.setState({ alert_message: "" });
   };
 
   render() {
@@ -135,7 +153,10 @@ class Account extends Component {
         className={resume_btn_class}
       >
         {" "}
-        Upload Resume{" "}
+        <ActionMessage
+          default_message="Upload Resume"
+          status={this.state.resume_status}
+        />{" "}
       </button>
     );
 
@@ -173,19 +194,12 @@ class Account extends Component {
       );
     }
 
-    // Error reporting
-    const errors = this.state.errors;
-    let alert_message;
-    if (errors.length > 0) {
-      const [first_field, first_error] = errors[0];
-      alert_message = `Error in field ${first_field}: ${first_error}`;
-    } else {
-      alert_message = "";
-    }
-
     return (
       <div className="content">
-        <Alert alert_message={alert_message} closeAlert={this.closeAlert} />
+        <Alert
+          alert_message={this.state.alert_message}
+          closeAlert={this.closeAlert}
+        />
         <div className="content">
           <div className="container-fluid">
             <div className="row">
@@ -304,8 +318,12 @@ class Account extends Component {
                       type="button"
                       onClick={this.updateUser}
                       className="btn btn-info btn-fill pull-right"
-                      dangerouslySetInnerHTML={{ __html: this.state.up }}
-                    ></button>
+                    >
+                      <ActionMessage
+                        default_message="Update Info"
+                        status={this.state.update_status}
+                      />
+                    </button>
                     <div className="clearfix" />
                     <div className="row">
                       <AvatarUpload uploadAvatar={this.uploadAvatar} />
