@@ -15,8 +15,6 @@ class UserProfileInline(admin.StackedInline):
         "school",
         "kerberos",
         "biography",
-        "gender",
-        "gender_details",
         "country",
         "has_avatar",
         "has_resume",
