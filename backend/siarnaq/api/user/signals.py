@@ -34,7 +34,7 @@ def send_password_reset_token_email(
     email_html_message = render_to_string("password_reset.html", context)
 
     send_mail(
-        subject="Battlecode Password Reset Token",
+        subject="MIT Battlecode: Password Reset",
         # both message and html_message are necessary;
         # html_message renders as nice html
         # but message is required (by the email package and by protocol)
