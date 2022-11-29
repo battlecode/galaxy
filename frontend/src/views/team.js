@@ -136,7 +136,7 @@ class YesTeam extends Component {
               <p>
                 We need to know a little about your team in order to determine
                 which prizes your team is eligible for. Check all boxes that
-                apply to all members your team.
+                apply to ALL members of your team.
               </p>
               <EligibilityOptions
                 change={this.changeHandler}
