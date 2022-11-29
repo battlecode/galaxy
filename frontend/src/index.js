@@ -321,13 +321,20 @@ class App extends Component {
         (and so their corresponding routes are all in the fallback route's switch,
         and this fallback route includes a sidebar, etc) */}
         <Route path={`/login`} component={LoginRegister} />,
+        <Route path={`/login/`} component={LoginRegister} />,
         <Route path={`/logout`} component={LogOut} />,
+        <Route path={`/logout/`} component={LogOut} />,
         <Route path={`/register`} component={Register} />,
+        <Route path={`/register/`} component={Register} />,
         <Route path={`/multi-episode`} component={MultiEpisode} />,
+        <Route path={`/multi-episode/`} component={MultiEpisode} />,
         <Route path={`/password_forgot`} component={PasswordForgot} />,
+        <Route path={`/password_forgot/`} component={PasswordForgot} />,
         <Route path={`/password_change`} component={PasswordChange} />,
+        <Route path={`/password_change/`} component={PasswordChange} />,
         {/* To be able to render NotFound without a sidebar, etc */}
         <Route path={`/not-found`} component={NotFound} />,
+        <Route path={`/not-found/`} component={NotFound} />,
         {/* Fallback route if none of above: include sidebar, navbar, etc. */}
         <Route>
           <div className="wrapper">
