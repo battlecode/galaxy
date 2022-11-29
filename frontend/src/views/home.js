@@ -127,7 +127,13 @@ class InstrCard extends UpdateCard {
           <h4 className="title">Welcome to {this.props.episode_name_long}!</h4>
         </div>
         <div className="content">
-          {/* <p></p> */}
+          <p>
+            For official, up-to-date announcements, please join our{" "}
+            <a href="https://discordapp.com/channels/386965718572466197/650084292982079539">
+              Discord
+            </a>
+            ! (<a href="https://discord.gg/N86mxkH">invite</a>)
+          </p>
           {/* <p>
             Come to the Final Tournament,{" "}
             <b>at MIT in Stata (32-123) at 7pm on February 5</b>. You can still
@@ -160,7 +166,8 @@ class LinksCard extends Component {
               <a href="https://discordapp.com/channels/386965718572466197/650084292982079539">
                 Discord
               </a>{" "}
-              (<a href="https://discord.gg/N86mxkH">invite</a>)
+              (<a href="https://discord.gg/N86mxkH">invite</a>) -{" "}
+              <b>Our official source of announcements</b>
             </li>
             <li>
               <a href="https://github.com/battlecode">GitHub</a>
