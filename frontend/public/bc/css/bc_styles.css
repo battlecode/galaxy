@@ -226,3 +226,7 @@ ol {
 .sidebar .logo p {
   font-family: "Josefin Sans", sans-serif;
 }
+
+.alert {
+  z-index: 1030;
+}
