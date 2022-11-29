@@ -20,8 +20,6 @@ dependencies:
   - isort=5.10.1
   - mypy=0.942
   - nodejs=18.11.0
-  - numpy-base=1.23.4
-  - numpy=1.23.4
   - openssl=3.0.5
   - pillow=9.0.1
   - pip=22.3
