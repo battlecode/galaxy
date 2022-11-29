@@ -3,7 +3,6 @@ import random
 import uuid
 
 import google.cloud.storage as storage
-import numpy as np
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models, transaction
@@ -110,32 +109,9 @@ class UserProfile(models.Model):
 
         if not self.has_avatar:
 
-            def get_gradient_3d(
-                width, height, start_list, stop_list, is_horizontal_list
-            ):
-                """Generate a gradient image as a numpy array"""
-
-                def get_gradient_2d(start, stop, width, height, is_horizontal):
-                    if is_horizontal:
-                        return np.tile(np.linspace(start, stop, width), (height, 1))
-                    else:
-                        return np.tile(np.linspace(start, stop, height), (width, 1)).T
-
-                result = np.zeros((height, width, len(start_list)), dtype=np.float)
-
-                for i, (start, stop, is_horizontal) in enumerate(
-                    zip(start_list, stop_list, is_horizontal_list)
-                ):
-                    result[:, :, i] = get_gradient_2d(
-                        start, stop, width, height, is_horizontal
-                    )
-
-                return result
-
-            # generate a random avatar
             self.has_avatar = True
             self.avatar_uuid = uuid.uuid4()
-            self.save()
+            self.save(update_fields=["has_avatar", "avatar_uuid"])
 
             # generate a unique seed
             random.seed(self.avatar_uuid.int)
@@ -144,8 +120,25 @@ class UserProfile(models.Model):
             rgb1 = tuple(int(random.random() * 255) for _ in range(3))
             rgb2 = tuple(int(random.random() * 255) for _ in range(3))
 
-            array = get_gradient_3d(512, 256, rgb1, rgb2, (True, True, True))
-            avatar = Image.fromarray(np.uint8(array), mode="RGB")
+            imgsize = (250, 250)  # The size of the image
+
+            avatar = Image.new("RGB", imgsize)  # Create the image
+
+            leftColor = rgb1  # Color at the right
+            rightColor = rgb2  # Color at the left
+
+            for height in range(imgsize[1]):
+                for width in range(imgsize[0]):
+
+                    # Make it on a scale from 0 to 1
+                    dis = float(width) / imgsize[0]
+
+                    # Calculate r, g, and b values
+                    r = rightColor[0] * dis + leftColor[0] * (1 - dis)
+                    g = rightColor[1] * dis + leftColor[1] * (1 - dis)
+                    b = rightColor[2] * dis + leftColor[2] * (1 - dis)
+
+                    avatar.putpixel((width, height), (int(r), int(g), int(b)))
 
             titan.upload_image(avatar, self.get_avatar_path())
 
