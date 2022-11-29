@@ -129,10 +129,7 @@ class InstrCard extends UpdateCard {
         <div className="content">
           <p>
             For official, up-to-date announcements, please join our{" "}
-            <a href="https://discordapp.com/channels/386965718572466197/650084292982079539">
-              Discord
-            </a>
-            ! (<a href="https://discord.gg/N86mxkH">invite</a>)
+            <a href="https://discord.gg/N86mxkH">Discord</a>!
           </p>
           {/* <p>
             Come to the Final Tournament,{" "}
@@ -163,10 +160,7 @@ class LinksCard extends Component {
         <div className="content">
           <ul>
             <li>
-              <a href="https://discordapp.com/channels/386965718572466197/650084292982079539">
-                Discord
-              </a>{" "}
-              (<a href="https://discord.gg/N86mxkH">invite</a>) -{" "}
+              <a href="https://discord.gg/N86mxkH">Discord</a> -{" "}
               <b>Our official source of announcements</b>
             </li>
             <li>
