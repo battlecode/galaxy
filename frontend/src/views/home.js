@@ -128,8 +128,10 @@ class InstrCard extends UpdateCard {
         </div>
         <div className="content">
           <p>
-            For official, up-to-date announcements, please join our{" "}
-            <a href="https://discord.gg/N86mxkH">Discord</a>!
+            Please join our <a href="https://discord.gg/N86mxkH">Discord</a>,
+            and follow our{" "}
+            <a href="https://www.facebook.com/mitbattlecode">Facebook</a> and{" "}
+            <a href="https://www.instagram.com/mitbattlecode/">Instagram</a>!
           </p>
           {/* <p>
             Come to the Final Tournament,{" "}
@@ -161,7 +163,12 @@ class LinksCard extends Component {
           <ul>
             <li>
               <a href="https://discord.gg/N86mxkH">Discord</a> -{" "}
-              <b>Our official source of announcements</b>
+              <b>for all official announcements and our community</b>
+            </li>
+            <li>
+              <a href="https://www.facebook.com/mitbattlecode">Facebook</a> and{" "}
+              <a href="https://www.instagram.com/mitbattlecode/">Instagram</a> -{" "}
+              <b>for event announcements and photos</b>
             </li>
             <li>
               <a href="https://github.com/battlecode">GitHub</a>
