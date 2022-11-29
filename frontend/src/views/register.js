@@ -90,7 +90,7 @@ class Register extends Component {
         className="card"
         style={{
           padding: "20px",
-          width: "500px",
+          width: Math.min(window.innerWidth, 500),
           margin: "40px auto",
           marginBottom: "0px",
           fontSize: "1.1em",
@@ -105,7 +105,7 @@ class Register extends Component {
         className="card"
         style={{
           padding: "20px",
-          width: "350px",
+          width: Math.min(window.innerWidth, 350),
           margin: "40px auto",
           marginBottom: "0px",
           fontSize: "1.1em",
@@ -129,7 +129,10 @@ class Register extends Component {
       <div
         className="content"
         style={{
-          height: "100vh",
+          // Force page to be at least 1200px high.
+          // (Because scrollbars at the bottom of the register card go off the screen
+          // if the screen isn't big enough.)
+          height: Math.max(window.innerHeight, 1200),
           width: "100vw",
           position: "absolute",
           top: "0px",
@@ -139,7 +142,10 @@ class Register extends Component {
         <div
           className="dustBackground"
           style={{
-            height: "100vh",
+            // Force page to be at least 1200px high.
+            // (Because scrollbars at the bottom of the register card go off the screen
+            // if the screen isn't big enough.)
+            height: Math.max(window.innerHeight, 1200),
             width: "100vw",
             position: "fixed",
             top: "0px",
@@ -175,7 +181,9 @@ class Register extends Component {
           <div
             className="card"
             style={{
-              width: "600px",
+              // Bound the width of this div by screen width,
+              // so that on mobile, the div fits on screen without visual bugs or excessive scrolling.
+              width: Math.min(window.innerWidth, 600),
               margin: errors.length > 0 ? "20px auto" : "40px auto",
             }}
           >
@@ -215,7 +223,8 @@ class Register extends Component {
                   </div>
                   <div className="clearfix"></div>
                 </div>
-                <div className="col-xs-6">
+                {/* Needs to be sm, not xs, in order to properly take input and resize on small screens */}
+                <div className="col-sm-6">
                   <div className="form-group">
                     <label>First Name *</label>
                     <input
@@ -226,7 +235,8 @@ class Register extends Component {
                     />
                   </div>
                 </div>
-                <div className="col-xs-6">
+                {/* Needs to be sm, not xs, in order to properly take input and resize on small screens */}
+                <div className="col-sm-6">
                   <div className="form-group">
                     <label>Last Name *</label>
                     <input

@@ -54,7 +54,7 @@ class LoginRegister extends Component {
           className="card"
           style={{
             padding: "20px",
-            width: "350px",
+            width: Math.min(window.innerWidth, 350),
             margin: "40px auto",
             marginBottom: "0px",
             fontSize: "1.1em",
@@ -73,7 +73,7 @@ class LoginRegister extends Component {
           className="card"
           style={{
             padding: "20px",
-            width: "350px",
+            width: Math.min(window.innerWidth, 350),
             margin: "40px auto",
             marginBottom: "0px",
             fontSize: "1.1em",
@@ -141,7 +141,7 @@ class LoginRegister extends Component {
           <div
             className="card"
             style={{
-              width: "350px",
+              width: Math.min(window.innerWidth, 350),
               margin: error ? "20px auto" : "40px auto",
             }}
           >
