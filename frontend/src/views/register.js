@@ -68,7 +68,7 @@ class Register extends Component {
 
   blankGenderDetails = () => {
     this.setState(function (prevState, props) {
-      prevState.user.profilegender_details = "";
+      prevState.user.profile.gender_details = "";
       return prevState;
     });
   };
