@@ -90,9 +90,8 @@ def get_object(bucket: str, name: str, check_safety: bool) -> dict[str, str | bo
             raise ValueError("Unexpected state.")
 
 
-def upload_image(raw_image: Image, image_path):
+def upload_image(img: Image, image_path):
 
-    img = raw_image
     img.thumbnail(settings.GCLOUD_MAX_AVATAR_SIZE)
 
     # Prepare image bytes for upload to Google Cloud

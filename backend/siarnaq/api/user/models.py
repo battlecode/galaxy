@@ -120,25 +120,25 @@ class UserProfile(models.Model):
             rgb1 = tuple(int(random.random() * 255) for _ in range(3))
             rgb2 = tuple(int(random.random() * 255) for _ in range(3))
 
-            imgsize = (250, 250)  # The size of the image
+            imgsize = settings.GCLOUD_MAX_AVATAR_SIZE  # The size of the image
 
             avatar = Image.new("RGB", imgsize)  # Create the image
 
             leftColor = rgb1  # Color at the right
             rightColor = rgb2  # Color at the left
 
-            for height in range(imgsize[1]):
-                for width in range(imgsize[0]):
+            for pixel_y in range(imgsize[1]):
+                for pixel_x in range(imgsize[0]):
 
                     # Make it on a scale from 0 to 1
-                    dis = float(width) / imgsize[0]
+                    dis = float(pixel_x + pixel_y) / (imgsize[0] + imgsize[1])
 
                     # Calculate r, g, and b values
                     r = rightColor[0] * dis + leftColor[0] * (1 - dis)
                     g = rightColor[1] * dis + leftColor[1] * (1 - dis)
                     b = rightColor[2] * dis + leftColor[2] * (1 - dis)
 
-                    avatar.putpixel((width, height), (int(r), int(g), int(b)))
+                    avatar.putpixel((pixel_x, pixel_y), (int(r), int(g), int(b)))
 
             titan.upload_image(avatar, self.get_avatar_path())
 
