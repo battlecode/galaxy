@@ -206,9 +206,9 @@ class Home extends Component {
             </div>
             <div className="col-md-6">
               <div className="container-fluid">
-                <div className="row">
+                {/* <div className="row">
                   <DateCard />
-                </div>
+                </div> */}
                 <div className="row">
                   <LinksCard />
                 </div>
