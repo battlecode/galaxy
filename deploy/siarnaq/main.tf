@@ -140,10 +140,18 @@ resource "google_cloud_run_service" "this" {
 
   template {
     spec {
-      service_account_name = google_service_account.this.email
+      service_account_name  = google_service_account.this.email
+      container_concurrency = 16
 
       containers {
         image = var.image
+
+        resources {
+          limits = {
+            cpu    = "8000m"
+            memory = "4Gi"
+          }
+        }
 
         env {
           name = "SIARNAQ_SECRETS_JSON"
@@ -166,7 +174,8 @@ resource "google_cloud_run_service" "this" {
 
   metadata {
     annotations = {
-      "run.googleapis.com/ingress" = "internal-and-cloud-load-balancing"
+      "run.googleapis.com/launch-stage" = "BETA"
+      "run.googleapis.com/ingress"      = "internal-and-cloud-load-balancing"
     }
   }
 
