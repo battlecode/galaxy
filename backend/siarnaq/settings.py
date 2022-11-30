@@ -183,7 +183,7 @@ class Base(Configuration):
             "rest_framework.throttling.AnonRateThrottle",
             "rest_framework.throttling.UserRateThrottle",
         ],
-        "DEFAULT_THROTTLE_RATES": {"anon": "100/min", "user": "100/min"},
+        "DEFAULT_THROTTLE_RATES": {"anon": "400/min", "user": "400/min"},
     }
 
     SIMPLE_JWT = {
