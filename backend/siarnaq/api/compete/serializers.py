@@ -70,21 +70,19 @@ class FileValidator:
             "Ensure this file size is not greater than %(max_size)s."
             " Your file size is %(size)s."
         ),
-        "content_type": "Files of type %(content_type)s are not supported.",
     }
 
     def __init__(self, max_size=None):
         self.max_size = max_size
 
     def __call__(self, data):
+
         if self.max_size is not None and data.size > self.max_size:
             params = {
                 "max_size": filesizeformat(self.max_size),
                 "size": filesizeformat(data.size),
             }
-            raise serializers.ValidationError(
-                self.error_messages["max_size"], "max_size", params
-            )
+            raise serializers.ValidationError(self.error_messages["max_size"], params)
 
     def __eq__(self, other):
         return isinstance(other, FileValidator) and self.max_size == other.max_size
