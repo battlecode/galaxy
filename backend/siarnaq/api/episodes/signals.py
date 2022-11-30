@@ -1,3 +1,5 @@
+import json
+
 import google.cloud.scheduler as scheduler
 import structlog
 from django.conf import settings
@@ -58,7 +60,10 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
         http_target=scheduler.HttpTarget(
             uri=url,
             http_method=scheduler.HttpMethod.POST,
-            body=f"best_of={best_of}".encode(),
+            headers={
+                "Content-Type": "application/json; charset=utf-8",
+            },
+            body=json.dumps({"best_of": best_of}).encode(),
             oidc_token=scheduler.OidcToken(
                 service_account_email=settings.GCLOUD_SERVICE_EMAIL,
             ),
