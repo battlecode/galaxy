@@ -16,4 +16,4 @@ ENV SIARNAQ_BUILD=$BUILD
 
 COPY manage.py manage.py
 COPY siarnaq siarnaq
-CMD /env/bin/gunicorn --bind=:$PORT --workers=4 --threads=4 --pidfile=/run/gunicorn.pid --timeout=0 siarnaq.wsgi:application
+CMD /env/bin/gunicorn --bind=:$PORT --workers=4 --threads=4 --pid=/run/gunicorn.pid --timeout=0 siarnaq.wsgi:application
