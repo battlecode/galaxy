@@ -376,6 +376,7 @@ class Production(Base):
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
     GALAXY_ADMIN_EMAILS = [
         "production-siarnaq-agent@mitbattlecode.iam.gserviceaccount.com",
