@@ -14,6 +14,6 @@ WORKDIR $APP_HOME
 ARG BUILD=nightly
 ENV SIARNAQ_BUILD=$BUILD
 
-COPY manage.py uwsgi.ini ./
+COPY manage.py manage.py
 COPY siarnaq siarnaq
-CMD /env/bin/uwsgi --chdir=$APP_HOME --http=:$PORT --ini=uwsgi.ini
+CMD /env/bin/gunicorn --bind=:$PORT --workers=4 --threads=4 --pidfile=/run/gunicorn.pid --timeout=0 siarnaq.wsgi:application
