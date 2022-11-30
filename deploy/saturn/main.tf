@@ -90,6 +90,7 @@ resource "google_compute_instance_template" "this" {
     gce-container-declaration = module.container.metadata_value
     google-logging-enabled    = true
     google-monitoring-enabled = true
+    shutdown-script           = file("${path.module}/shutdown-script.sh")
   }
 
   lifecycle {
