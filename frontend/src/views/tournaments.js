@@ -195,8 +195,10 @@ class Tournaments extends Component {
 
                   </ul> */}
                   <p>
-                    Anyone can write a bot, create a team, and participate in scrimmage matches/rankings. 
-                    The Sprint Tournaments are open to everyone, but the other tournaments have stricter eligibility rules.
+                    Anyone can write a bot, create a team, and participate in
+                    scrimmage matches/rankings. The Sprint Tournaments are open
+                    to everyone, but the other tournaments have stricter
+                    eligibility rules.
                   </p>
                   <p>
                     Your team must meet <b>all three conditions</b> by a
