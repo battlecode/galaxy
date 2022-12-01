@@ -1,5 +1,5 @@
 locals {
-  subdomains = concat(["", "www.", "api."], [for b in var.additional_buckets : b.subdomain])
+  subdomains = concat(["api."], [for b in var.additional_buckets : b.subdomain])
 }
 
 resource "google_compute_region_network_endpoint_group" "serverless" {
@@ -152,12 +152,12 @@ resource "google_dns_record_set" "this" {
 }
 
 resource "google_dns_record_set" "additional" {
-  for_each = var.dns_additional_records
+  for_each = { for record in var.dns_additional_records : "${record.subdomain}/${record.type}" => record }
 
-  name = "${each.key}${data.google_dns_managed_zone.this.dns_name}"
-  type = "A"
+  name = "${each.value.subdomain}${data.google_dns_managed_zone.this.dns_name}"
+  type = each.value.type
   ttl  = 300
 
   managed_zone = data.google_dns_managed_zone.this.name
-  rrdatas      = [each.value]
+  rrdatas      = each.value.rrdatas
 }

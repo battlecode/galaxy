@@ -128,7 +128,26 @@ module "network" {
     }
   }
 
-  dns_additional_records = {
-    "db.staging." = module.staging.sql_instance_ip
-  }
+  dns_additional_records = [
+    {
+      type      = "a",
+      subdomain = "",
+      rrdatas   = [
+        "185.199.108.153",  # These are GH Pages
+        "185.199.109.153",
+        "185.199.110.153",
+        "185.199.111.153",
+      ],
+    },
+    {
+      type      = "cname",
+      subdomain = "www",
+      rrdatas   = ["battlecode.org."],
+    },
+    {
+      type      = "a",
+      subdomain = "db.staging.",
+      rrdatas   = [module.staging.sql_instance_ip],
+    },
+  ]
 }
