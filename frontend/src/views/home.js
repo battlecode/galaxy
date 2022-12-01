@@ -127,7 +127,12 @@ class InstrCard extends UpdateCard {
           <h4 className="title">Welcome to {this.props.episode_name_long}!</h4>
         </div>
         <div className="content">
-          {/* <p></p> */}
+          <p>
+            Please join our <a href="https://discord.gg/N86mxkH">Discord</a>,
+            and follow our{" "}
+            <a href="https://www.facebook.com/mitbattlecode">Facebook</a> and{" "}
+            <a href="https://www.instagram.com/mitbattlecode/">Instagram</a>!
+          </p>
           {/* <p>
             Come to the Final Tournament,{" "}
             <b>at MIT in Stata (32-123) at 7pm on February 5</b>. You can still
@@ -157,10 +162,13 @@ class LinksCard extends Component {
         <div className="content">
           <ul>
             <li>
-              <a href="https://discordapp.com/channels/386965718572466197/650084292982079539">
-                Discord
-              </a>{" "}
-              (<a href="https://discord.gg/N86mxkH">invite</a>)
+              <a href="https://discord.gg/N86mxkH">Discord</a> -{" "}
+              <b>for all official announcements and our community</b>
+            </li>
+            <li>
+              <a href="https://www.facebook.com/mitbattlecode">Facebook</a> and{" "}
+              <a href="https://www.instagram.com/mitbattlecode/">Instagram</a> -{" "}
+              <b>for event announcements and photos</b>
             </li>
             <li>
               <a href="https://github.com/battlecode">GitHub</a>
@@ -205,9 +213,9 @@ class Home extends Component {
             </div>
             <div className="col-md-6">
               <div className="container-fluid">
-                <div className="row">
+                {/* <div className="row">
                   <DateCard />
-                </div>
+                </div> */}
                 <div className="row">
                   <LinksCard />
                 </div>

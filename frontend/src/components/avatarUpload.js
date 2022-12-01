@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ActionMessage from "./actionMessage";
 
 class AvatarUpload extends Component {
   constructor(props) {
@@ -6,6 +7,7 @@ class AvatarUpload extends Component {
 
     this.state = {
       selectedAvatarFile: null,
+      status: "waiting",
     };
 
     this.uploadAvatar = this.uploadAvatar.bind(this);
@@ -19,7 +21,17 @@ class AvatarUpload extends Component {
   };
 
   uploadAvatar() {
-    this.props.uploadAvatar(this.state.selectedAvatarFile);
+    this.setState({ status: "loading" });
+    this.props.uploadAvatar(this.state.selectedAvatarFile, (success) => {
+      if (success) {
+        this.setState({ status: "success" });
+      } else {
+        this.setState({ status: "failure" });
+      }
+      setTimeout(() => {
+        this.setState({ status: "waiting" });
+      }, 2000);
+    });
   }
 
   render() {
@@ -30,15 +42,23 @@ class AvatarUpload extends Component {
       : this.state.selectedAvatarFile["name"];
     const avatar_btn_class =
       "btn btn" + (!avatar_uploaded ? "" : " btn-info btn-fill");
+
+    const avatar_btn_disabled =
+      !avatar_uploaded ||
+      ["success", "loading", "failure"].includes(this.state.status);
+
     const avatar_upload_button = (
       <button
-        disabled={!avatar_uploaded}
+        disabled={avatar_btn_disabled}
         style={{ float: "right" }}
         onClick={this.uploadAvatar}
         className={avatar_btn_class}
       >
         {" "}
-        Upload Avatar{" "}
+        <ActionMessage
+          default_message="Upload Avatar"
+          status={this.state.status}
+        />{" "}
       </button>
     );
 

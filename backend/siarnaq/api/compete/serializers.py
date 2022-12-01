@@ -399,6 +399,6 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
         ret.pop("map_names", None)
         return ret
 
-    @transaction.atomic()
-    def save(self, **kwargs):
-        super().save(**kwargs)
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)

@@ -37,7 +37,7 @@ class SaturnInvokableQuerySet(models.QuerySet):
         )
 
         publish_client = saturn.get_publish_client()
-        invocations = list(self.select_for_update().all())
+        invocations = list(self.select_for_update(of=("self",)).all())
         futures = [
             publish_client.publish(
                 topic=self._publish_topic,
@@ -149,7 +149,7 @@ class ScrimmageRequestQuerySet(models.QuerySet):
             requests = list(
                 self.filter(status=ScrimmageRequestStatus.PENDING)
                 .prefetch_related("maps")
-                .select_for_update(of=("self"))
+                .select_for_update(of=("self",))
             )
             self.filter(pk__in={request.pk for request in requests}).update(
                 status=ScrimmageRequestStatus.ACCEPTED

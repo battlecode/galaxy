@@ -79,6 +79,14 @@ resource "google_cloud_run_service" "this" {
     }
   }
 
+  metadata {
+    annotations = {
+      "run.googleapis.com/ingress" = "internal"
+    }
+  }
+
+  autogenerate_revision_name = true
+
   traffic {
     percent         = 100
     latest_revision = true

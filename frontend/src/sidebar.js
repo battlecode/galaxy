@@ -33,10 +33,13 @@ class SideBar extends Component {
         {/* data-color is defined in light-bootstrap-dashboard.css */}
         <div className="sidebar-wrapper">
           <div className="logo text">
-            <a href={`/${this.props.episode}/home`}>
+            <a href={`/${this.props.episode}/home/`}>
               <img src="/bc/img/logo.png" />
             </a>
-            <p>{this.props.episode.name_long.toUpperCase()}</p> 
+            <p>
+              {this.props.episode_info &&
+                this.props.episode_info.name_long.toUpperCase()}
+            </p>
           </div>
           {/* NOTE: this only controls what appears in the sidebars.
           Independent of this, users can still go to the links by typing it in their browser, etc.
@@ -46,17 +49,17 @@ class SideBar extends Component {
             {/* This invisible element is needed for proper spacing */}
             <NLink to={`#`} style={{ visibility: "hidden" }}></NLink>
             <NLink
-              to={`/${this.props.episode}/home`}
+              to={`/${this.props.episode}/home/`}
               icon={"pe-7s-home"}
               label="Home"
             />
             <NLink
-              to={`/${this.props.episode}/getting-started`}
+              to={`/${this.props.episode}/getting-started/`}
               icon={"pe-7s-sun"}
               label="Getting Started"
             />
             <NLink
-              to={`/${this.props.episode}/resources`}
+              to={`/${this.props.episode}/resources/`}
               icon={"pe-7s-note2"}
               label="Resources"
             />
@@ -70,16 +73,16 @@ class SideBar extends Component {
             <br />
 
             <NLink
-              to={`/${this.props.episode}/tournaments`}
+              to={`/${this.props.episode}/tournaments/`}
               icon={"pe-7s-medal"}
               label="Tournaments"
             />
 
-            {/* <NLink
-              to={`/${this.props.episode}/rankings`}
+            <NLink
+              to={`/${this.props.episode}/rankings/`}
               icon={"pe-7s-graph1"}
               label="Rankings"
-            /> */}
+            />
 
             {/* search bar link, unused since Search is broken
             Commented in case someone wants to bring it back in the future
@@ -91,7 +94,7 @@ class SideBar extends Component {
             {/* Only visible when logged in */}
             {this.props.logged_in && (
               <NLink
-                to={`/${this.props.episode}/team`}
+                to={`/${this.props.episode}/team/`}
                 icon={"pe-7s-users"}
                 label="Team"
               />
@@ -101,7 +104,7 @@ class SideBar extends Component {
             {/* Only visible when on a team AND game is released */}
             {this.props.on_team && this.props.is_game_released && (
               <NLink
-                to={`/${this.props.episode}/submissions`}
+                to={`/${this.props.episode}/submissions/`}
                 icon={"pe-7s-up-arrow"}
                 label="Submissions"
               />
@@ -114,7 +117,7 @@ class SideBar extends Component {
             - Nathan */}
             {this.props.on_team && this.props.is_game_released && (
               <NLink
-                to={`/${this.props.episode}/scrimmaging`}
+                to={`/${this.props.episode}/scrimmaging/`}
                 icon={"pe-7s-joy"}
                 label="Scrimmaging"
               />
@@ -125,7 +128,7 @@ class SideBar extends Component {
             {/* Only visible if a staff user. (No staff elements yet.) */}
             {/* {this.state.user.is_staff && (
               <NLink
-                to={`/${this.props.episode}/staff`}
+                to={`/${this.props.episode}/staff/`}
                 icon={"pe-7s-tools"}
                 label="Staff"
               />

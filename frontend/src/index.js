@@ -54,6 +54,17 @@ class App extends Component {
     Api.setLoginHeader();
   }
 
+  // This function, for mobile devices, moves the navbar into the sidebar and then
+  // collapses the sidebar. Better responsive display
+  // (Only call it when the entire DOM has fully loaded, since otherwise,
+  // the _incomplete_ navbar gets moved and is stuck there.)
+  // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
+  updateRightMenu = () => {
+    $(document).ready(function () {
+      window.init_right_menu();
+    });
+  };
+
   updateBaseState = (callback = () => {}) => {
     let fetched_logged_in, fetched_user, fetched_team, fetched_episode_info;
 
@@ -77,13 +88,16 @@ class App extends Component {
 
     // To be run when all AJAX queries are complete.
     const all_queries_finished = () => {
-      this.setState({
-        loaded: true,
-        logged_in: fetched_logged_in,
-        user: fetched_user,
-        team: fetched_team,
-        episode_info: fetched_episode_info,
-      });
+      this.setState(
+        {
+          loaded: true,
+          logged_in: fetched_logged_in,
+          user: fetched_user,
+          team: fetched_team,
+          episode_info: fetched_episode_info,
+        },
+        callback
+      );
     };
 
     // Modify each AJAX query to mark as completed, and run all queries finished logic when all completed.
@@ -97,15 +111,12 @@ class App extends Component {
 
   componentDidMount() {
     this.updateBaseState(() => {
-      // This function, for mobile devices, moves the navbar into the sidebar and then
-      // collapses the sidebar. Better responsive display
-      // (Only call it when the entire DOM has fully loaded, since otherwise,
-      // the _incomplete_ navbar gets moved and is stuck there.)
-      // See `light-bootstrap-dashboard.js`, and its `initRightMenu` method
-      $(document).ready(function () {
-        window.init_right_menu();
-      });
+      this.updateRightMenu();
     });
+  }
+
+  componentDidUpdate() {
+    this.updateRightMenu();
   }
 
   render() {
@@ -205,11 +216,21 @@ class App extends Component {
         key="resources"
       />,
       // <Route
-      //   path={`/:episode/rankings/:team_id`}
-      //   component={TeamInfo}
-      //   key="rankings-team"
+      //    path={`/:episode/rankings/:team_id`}
+      //    component={TeamInfo}
+      //    key="rankings-team"
       // />,
-      // <Route path={`/:episode/rankings`} component={Rankings} key="rankings" />,
+      <Route
+        path={`/:episode/rankings`}
+        component={(props) => (
+          <Rankings
+            {...props}
+            episode={this.state.episode}
+            episode_info={this.state.episode_info}
+          />
+        )}
+        key="rankings"
+      />,
     ];
 
     // should only be visible to logged in users
@@ -300,13 +321,20 @@ class App extends Component {
         (and so their corresponding routes are all in the fallback route's switch,
         and this fallback route includes a sidebar, etc) */}
         <Route path={`/login`} component={LoginRegister} />,
+        <Route path={`/login/`} component={LoginRegister} />,
         <Route path={`/logout`} component={LogOut} />,
+        <Route path={`/logout/`} component={LogOut} />,
         <Route path={`/register`} component={Register} />,
+        <Route path={`/register/`} component={Register} />,
         <Route path={`/multi-episode`} component={MultiEpisode} />,
+        <Route path={`/multi-episode/`} component={MultiEpisode} />,
         <Route path={`/password_forgot`} component={PasswordForgot} />,
+        <Route path={`/password_forgot/`} component={PasswordForgot} />,
         <Route path={`/password_change`} component={PasswordChange} />,
+        <Route path={`/password_change/`} component={PasswordChange} />,
         {/* To be able to render NotFound without a sidebar, etc */}
         <Route path={`/not-found`} component={NotFound} />,
+        <Route path={`/not-found/`} component={NotFound} />,
         {/* Fallback route if none of above: include sidebar, navbar, etc. */}
         <Route>
           <div className="wrapper">

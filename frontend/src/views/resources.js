@@ -43,7 +43,7 @@ class Resources extends Component {
                   <p>
                     If you're just starting out, check out the{" "}
                     <NavLink
-                      to={`/${this.props.episode}/getting-started`}
+                      to={`/${this.props.episode}/getting-started/`}
                       style={{ fontWeight: 700 }}
                     >
                       getting started

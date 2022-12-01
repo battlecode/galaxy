@@ -8,10 +8,10 @@ const EPISODES = ["bc23"];
 // and the code will treat them the same way
 const EPISODE_TO_EXTENSION = { bc23: ".bc23" };
 const EPISODE_TO_SCAFFOLD_LINK = {
-  2023: "https://github.com/battlecode/battlecode23-scaffold",
+  bc23: "https://github.com/battlecode/battlecode23-scaffold",
 };
 const EPISODE_TO_SCAFFOLD_NAME = {
-  2023: "battlecode23-scaffold",
+  bc23: "battlecode23-scaffold",
 };
 const DEFAULT_EPISODE = "bc23";
 
