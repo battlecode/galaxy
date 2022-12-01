@@ -15,23 +15,19 @@ class HasTeamSubmission(permissions.BasePermission):
         )
 
 
-class IsScrimmageRequestActor(permissions.BasePermission):
-    """Allows access to users of one team in a scrimmage request if it is pending."""
-
-    def __init__(self, side):
-        """
-        Initializes the permission.
-
-        Parameters
-        ----------
-        side : str
-            The side of the scrimmage request being granted access. Should be one of
-            "requested_to" or "requested_by".
-        """
-        self._side = side
+class IsScrimmageRequestSender(permissions.BasePermission):
+    """Allows access to users of a pending scrimmage request's sender."""
 
     def has_object_permission(self, request, view, obj):
         return obj.status == ScrimmageRequestStatus.PENDING and any(
-            member.pk == request.user.pk
-            for member in getattr(obj, self._side).members.all()
+            member.pk == request.user.pk for member in obj.requested_by.members.all()
+        )
+
+
+class IsScrimmageRequestRecipient(permissions.BasePermission):
+    """Allows access to users of a pending scrimmage request's recipient."""
+
+    def has_object_permission(self, request, view, obj):
+        return obj.status == ScrimmageRequestStatus.PENDING and any(
+            member.pk == request.user.pk for member in obj.requested_to.members.all()
         )
