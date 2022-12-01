@@ -50,5 +50,5 @@ variable "additional_buckets" {
 
 variable "dns_additional_records" {
   description = "Additional DNS A records for the zone"
-  type        = map(string)
+  type        = list(object({type=string, subdomain=string, rrdatas=list(string)}))
 }
