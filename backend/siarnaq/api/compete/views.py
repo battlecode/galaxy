@@ -376,17 +376,25 @@ class ScrimmageRequestViewSet(
         return queryset
 
     def get_permissions(self):
-        permissions = [IsAuthenticated()]
         match self.action:
             case "create":
-                permissions.append((IsEpisodeMutable | IsAdminUser)())
-                permissions.append(HasTeamSubmission())
+                return [
+                    IsAuthenticated(),
+                    IsOnTeam(),
+                    (IsEpisodeMutable | IsAdminUser)(),
+                    HasTeamSubmission(),
+                ]
             case "destroy":
-                permissions.append(IsEpisodeAvailable())
-                permissions.append(IsScrimmageRequestSender())
+                return [
+                    IsAuthenticated(),
+                    IsOnTeam(),
+                    IsEpisodeAvailable(),
+                    IsScrimmageRequestSender(),
+                ]
+            case "list" | "retrieve":
+                return [IsAuthenticated(), IsOnTeam(), IsEpisodeAvailable()]
             case _:
                 return super().get_permissions()
-        return permissions
 
     def create(self, request, *, episode_id):
         serializer = self.get_serializer(data=request.data)
@@ -449,6 +457,7 @@ class ScrimmageRequestViewSet(
         methods=["post"],
         permission_classes=(
             IsAuthenticated,
+            IsOnTeam,
             IsEpisodeMutable | IsAdminUser,
             IsScrimmageRequestRecipient,
             HasTeamSubmission,
@@ -474,6 +483,7 @@ class ScrimmageRequestViewSet(
         methods=["post"],
         permission_classes=(
             IsAuthenticated,
+            IsOnTeam,
             IsEpisodeAvailable,
             IsScrimmageRequestRecipient,
         ),
