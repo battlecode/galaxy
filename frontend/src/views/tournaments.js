@@ -195,9 +195,10 @@ class Tournaments extends Component {
 
                   </ul> */}
                   <p>
-                    Anyone is write a bot, create a team, and participate in
-                    scrimmage matches/rankings. However, only student teams are
-                    eligible for tournaments.
+                    Anyone can write a bot, create a team, and participate in
+                    scrimmage matches/rankings. The Sprint Tournaments are open
+                    to everyone, but the other tournaments have stricter
+                    eligibility rules.
                   </p>
                   <p>
                     Your team must meet <b>all three conditions</b> by a
@@ -220,8 +221,7 @@ class Tournaments extends Component {
                   </p>
                   <ul>
                     <li>
-                      <b>Sprint Tournament: </b> Teams must consist entirely of
-                      college or high school students.
+                      <b>Sprint Tournament: </b> All teams are eligible.
                     </li>
                     <li>
                       <b>US Qualifier:</b> Teams must{" "}
@@ -250,9 +250,6 @@ class Tournaments extends Component {
                       the final tournament.
                     </li>
                   </ul>
-                  <p>
-                    Only current full-time students are eligible for prizes.
-                  </p>
 
                   <p>
                     Contact us on{" "}
