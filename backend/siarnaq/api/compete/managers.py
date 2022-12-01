@@ -203,3 +203,10 @@ class ScrimmageRequestQuerySet(models.QuerySet):
         self.filter(status=ScrimmageRequestStatus.PENDING).update(
             status=ScrimmageRequestStatus.REJECTED
         )
+
+    def cancel(self):
+        """Cancel all pending scrimmage requests in this queryset."""
+        from siarnaq.api.compete.models import ScrimmageRequestStatus
+
+        logger.debug("scrimmage_cancel", message="Bulk-cancelling scrimmage requests.")
+        self.filter(status=ScrimmageRequestStatus.PENDING).delete()

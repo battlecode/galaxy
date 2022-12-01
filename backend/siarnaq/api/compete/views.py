@@ -12,13 +12,18 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
+from siarnaq.api.compete.filters import IsSubmissionCreatorFilterBackend
 from siarnaq.api.compete.models import (
     Match,
     ScrimmageRequest,
     ScrimmageRequestStatus,
     Submission,
 )
-from siarnaq.api.compete.permissions import HasTeamSubmission, IsScrimmageRequestActor
+from siarnaq.api.compete.permissions import (
+    HasTeamSubmission,
+    IsScrimmageRequestRecipient,
+    IsScrimmageRequestSender,
+)
 from siarnaq.api.compete.serializers import (
     MatchReportSerializer,
     MatchSerializer,
@@ -29,7 +34,7 @@ from siarnaq.api.compete.serializers import (
     TournamentSubmissionSerializer,
 )
 from siarnaq.api.episodes.models import ReleaseStatus, Tournament
-from siarnaq.api.episodes.permissions import IsEpisodeAvailable
+from siarnaq.api.episodes.permissions import IsEpisodeAvailable, IsEpisodeMutable
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.gcloud import titan
@@ -85,19 +90,17 @@ class SubmissionViewSet(
     serializer_class = SubmissionSerializer
     permission_classes = (
         IsAuthenticated,
-        IsEpisodeAvailable | IsAdminUser,
+        IsEpisodeMutable | IsAdminUser,
         IsOnTeam,
     )
+    filter_backends = [IsSubmissionCreatorFilterBackend]
 
     def get_queryset(self):
-        queryset = (
+        return (
             Submission.objects.filter(episode=self.kwargs["episode_id"])
             .select_related("team", "user")
             .order_by("-pk")
         )
-        if self.action != "report":
-            queryset = queryset.filter(team__members=self.request.user)
-        return queryset
 
     def create(self, request, *, episode_id):
         """
@@ -148,7 +151,9 @@ class SubmissionViewSet(
         tournaments = Tournament.objects.filter(
             episode_id=episode_id, submission_unfreeze__lte=timezone.now()
         ).visible_to_user(is_staff=request.user.is_staff)
-        queryset = self.get_queryset().for_tournaments(tournaments)
+        queryset = self.filter_queryset(self.get_queryset()).for_tournaments(
+            tournaments
+        )
         serializer = self.get_serializer(queryset, many=True)
         try:
             return Response(serializer.data)
@@ -185,6 +190,7 @@ class SubmissionViewSet(
         methods=["post"],
         permission_classes=(IsAdminUser,),
         serializer_class=SubmissionReportSerializer,
+        filter_backends=[],
     )
     def report(self, request, pk=None, *, episode_id):
         """
@@ -206,7 +212,7 @@ class MatchViewSet(
     """
 
     serializer_class = MatchSerializer
-    permission_classes = (IsEpisodeAvailable | IsAdminUser,)
+    permission_classes = (IsEpisodeMutable | IsAdminUser,)
 
     def get_queryset(self):
         queryset = (
@@ -244,7 +250,7 @@ class MatchViewSet(
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=(IsEpisodeAvailable,),
+        permission_classes=(IsEpisodeMutable,),
     )
     def tournament(self, request, *, episode_id):
         """List matches played in a tournament."""
@@ -291,7 +297,7 @@ class MatchViewSet(
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=(IsEpisodeAvailable,),
+        permission_classes=(IsEpisodeMutable,),
     )
     def scrimmage(self, request, pk=None, *, episode_id):
         """List all scrimmages that a particular team participated in."""
@@ -367,33 +373,28 @@ class ScrimmageRequestViewSet(
             .prefetch_related("requested_to__members", "requested_by__members", "maps")
             .order_by("-pk")
         )
-        if self.action in ("accept", "reject", "destroy"):
-            # Mutator operations require locks to prevent races
-            queryset = queryset.select_for_update(of=("self"))
         return queryset
 
     def get_permissions(self):
-        permissions = [IsAuthenticated()]
         match self.action:
             case "create":
-                # Episode must not be frozen in order to create new requests
-                permissions.append((IsEpisodeAvailable | IsAdminUser)())
-                permissions.append(HasTeamSubmission())
-            case "accept":
-                # Episode must not be frozen in order to allow new matches
-                permissions.append((IsEpisodeAvailable | IsAdminUser)())
-                permissions.append(IsScrimmageRequestActor("requested_to"))
-                permissions.append(HasTeamSubmission())
-            case "reject" | "destroy":
-                # Episode can be frozen, but use permission to ensure episode visible
-                # AllowAny will allow all access, and we just use the permission to
-                # raise a 404 if the user shouldn't know that the episode exists
-                permissions.append(IsEpisodeAvailable(allow_frozen=True))
-                permissions.append(IsScrimmageRequestActor("requested_by"))
+                return [
+                    IsAuthenticated(),
+                    IsOnTeam(),
+                    (IsEpisodeMutable | IsAdminUser)(),
+                    HasTeamSubmission(),
+                ]
+            case "destroy":
+                return [
+                    IsAuthenticated(),
+                    IsOnTeam(),
+                    IsEpisodeAvailable(),
+                    IsScrimmageRequestSender(),
+                ]
+            case "list" | "retrieve":
+                return [IsAuthenticated(), IsOnTeam(), IsEpisodeAvailable()]
             case _:
-                permissions.append((IsEpisodeAvailable | IsAdminUser)())
-                permissions.append(IsOnTeam())
-        return permissions
+                return super().get_permissions()
 
     def create(self, request, *, episode_id):
         serializer = self.get_serializer(data=request.data)
@@ -410,7 +411,11 @@ class ScrimmageRequestViewSet(
     @extend_schema(
         responses={status.HTTP_200_OK: ScrimmageRequestSerializer(many=True)}
     )
-    @action(detail=False, methods=["get"])
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=(IsAuthenticated, IsEpisodeAvailable, IsOnTeam),
+    )
     def inbox(self, request, *, episode_id):
         """Get all pending scrimmage requests received."""
         queryset = self.get_queryset().filter(
@@ -424,7 +429,11 @@ class ScrimmageRequestViewSet(
     @extend_schema(
         responses={status.HTTP_200_OK: ScrimmageRequestSerializer(many=True)}
     )
-    @action(detail=False, methods=["get"])
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=(IsAuthenticated, IsEpisodeAvailable, IsOnTeam),
+    )
     def outbox(self, request, *, episode_id):
         """Get all pending scrimmage requests sent."""
         queryset = self.get_queryset().filter(
@@ -443,7 +452,17 @@ class ScrimmageRequestViewSet(
             )
         },
     )
-    @action(detail=True, methods=["post"])
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(
+            IsAuthenticated,
+            IsOnTeam,
+            IsEpisodeMutable | IsAdminUser,
+            IsScrimmageRequestRecipient,
+            HasTeamSubmission,
+        ),
+    )
     @transaction.atomic
     def accept(self, request, pk=None, *, episode_id):
         """Accept a scrimmage request."""
@@ -459,15 +478,24 @@ class ScrimmageRequestViewSet(
             )
         },
     )
-    @action(detail=True, methods=["post"])
-    @transaction.atomic
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(
+            IsAuthenticated,
+            IsOnTeam,
+            IsEpisodeAvailable,
+            IsScrimmageRequestRecipient,
+        ),
+    )
     def reject(self, request, pk=None, *, episode_id):
         """Reject a scrimmage request."""
         self.get_object()  # Asserts permission
         self.get_queryset().filter(pk=pk).reject()
         return Response(None, status.HTTP_204_NO_CONTENT)
 
-    @transaction.atomic
     def destroy(self, request, pk=None, *, episode_id):
         """Cancel a scrimmage request."""
-        return super().destroy(request, pk=pk, episode_id=episode_id)
+        self.get_object()  # Asserts permission
+        self.get_queryset().filter(pk=pk).cancel()
+        return Response(None, status.HTTP_204_NO_CONTENT)
