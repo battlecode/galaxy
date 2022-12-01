@@ -257,7 +257,7 @@ class App extends Component {
         key="team"
       />,
       <Route
-        path={`/:episode/account`}
+        path={`/account`}
         component={(props) => (
           <Account
             {...props}
