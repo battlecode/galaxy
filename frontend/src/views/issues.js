@@ -201,7 +201,7 @@ class Issues extends Component {
                       <li>
                         Did you download the Oracle JDK 8 listed in{" "}
                         <NavLink
-                          to="getting-started/"
+                          to="getting-started"
                           style={{ fontWeight: 700 }}
                         >
                           the installation instructions
