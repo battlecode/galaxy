@@ -200,7 +200,7 @@ class App extends Component {
         key="debugging"
       />,
       <Route
-        path={`/:episode/codeofconduct`}
+        path={`/codeofconduct`}
         component={CodeOfConduct}
         key="codeofconduct"
       />,
