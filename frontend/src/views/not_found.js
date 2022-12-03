@@ -4,12 +4,12 @@ class NotFound extends Component {
   constructor(props) {
     super();
     this.state = {
-      pawn: "♟️",
+      pageError: "✖️",
     };
   }
 
   render() {
-    const pawnStyle = {
+    const pageErrorStyle = {
       paddingBottom: "0",
       fontSize: "100px",
       marginBottom: "-30px",
@@ -36,9 +36,9 @@ class NotFound extends Component {
 
     return (
       <div className="content">
-        <p className="text-center" style={pawnStyle}>
+        <p className="text-center" style={pageErrorStyle}>
           {" "}
-          {this.state.pawn}{" "}
+          {this.state.pageError}{" "}
         </p>
         <h1 className="text-center">404 error</h1>
         <h5 className="text-center">
