@@ -28,6 +28,9 @@ class UserCard extends Component {
               <br />
               <small>{user.username}</small> {staff_msg}{" "}
             </h4>
+            <h4 className="title">
+              <small>{user.profile.school}</small>
+            </h4>
           </div>
           <br />
           <p className="description text-center">{user.profile.biography}</p>
