@@ -94,6 +94,9 @@ class ScrimmageRequestor extends Component {
           </div>
         </div>
         <div className="col-md-12">
+          {/* TODO later
+          once we support Scrimmages, this RankingTeamList being consturcted should be updated
+          and include new props */}
           <RankingTeamList
             teams={state.teams}
             page={state.teamPage}
