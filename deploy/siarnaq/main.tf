@@ -140,10 +140,18 @@ resource "google_cloud_run_service" "this" {
 
   template {
     spec {
-      service_account_name = google_service_account.this.email
+      service_account_name  = google_service_account.this.email
+      container_concurrency = 16
 
       containers {
         image = var.image
+
+        resources {
+          limits = {
+            cpu    = "8000m"
+            memory = "4Gi"
+          }
+        }
 
         env {
           name = "SIARNAQ_SECRETS_JSON"
@@ -166,7 +174,8 @@ resource "google_cloud_run_service" "this" {
 
   metadata {
     annotations = {
-      "run.googleapis.com/ingress" = "internal-and-cloud-load-balancing"
+      "run.googleapis.com/launch-stage" = "BETA"
+      "run.googleapis.com/ingress"      = "internal-and-cloud-load-balancing"
     }
   }
 
@@ -189,6 +198,9 @@ resource "google_cloud_run_service" "this" {
 
   lifecycle {
     ignore_changes = [
+      metadata[0].annotations["client.knative.dev/user-image"],
+      metadata[0].annotations["run.googleapis.com/client-name"],
+      metadata[0].annotations["run.googleapis.com/client-version"],
       template[0].metadata[0].annotations["client.knative.dev/user-image"],
       template[0].metadata[0].annotations["run.googleapis.com/client-name"],
       template[0].metadata[0].annotations["run.googleapis.com/client-version"],

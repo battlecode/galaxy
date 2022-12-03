@@ -53,33 +53,30 @@ class TeamViewSet(
         match self.action:
             case "create":
                 return TeamCreateSerializer
-            case "me":
-                return TeamPrivateSerializer
             case "retrieve" | "list":
                 return TeamPublicSerializer
-            case "join":
-                return TeamJoinSerializer
-            case "leave":
-                return None
-            case "avatar":
-                return TeamAvatarSerializer
             case _:
-                raise RuntimeError("Unexpected action")
+                return super().get_serializer_class()
 
     def get_permissions(self):
         match self.action:
-            case "create" | "join":
+            case "create":
                 return (
                     IsAuthenticated(),
-                    IsEpisodeAvailable(allow_frozen=True),
+                    IsEpisodeAvailable(),
                     (~IsOnTeam)(),
                 )
             case "retrieve" | "list":
-                return (IsEpisodeAvailable(allow_frozen=True),)
-            case "me" | "leave" | "avatar":
-                return (IsAuthenticated(), IsEpisodeAvailable(allow_frozen=True))
+                return (IsEpisodeAvailable(),)
+            case _:
+                return super().get_permissions()
 
-    @action(detail=False, methods=["get", "put", "patch"])
+    @action(
+        detail=False,
+        methods=["get", "put", "patch"],
+        permission_classes=(IsAuthenticated, IsEpisodeAvailable),
+        serializer_class=TeamPrivateSerializer,
+    )
     def me(self, request, *, episode_id):
         """Retrieve or update information about the current team."""
         team = get_object_or_404(self.get_queryset(), members=request.user)
@@ -99,7 +96,12 @@ class TeamViewSet(
                 return Response(serializer.data)
 
     @extend_schema(request=None)
-    @action(detail=False, methods=["post"])
+    @action(
+        detail=False,
+        methods=["post"],
+        serializer_class=None,
+        permission_classes=(IsAuthenticated, IsEpisodeAvailable),
+    )
     def leave(self, request, *, episode_id):
         """Leave a team."""
         with transaction.atomic():
@@ -109,7 +111,12 @@ class TeamViewSet(
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
     @extend_schema(responses={status.HTTP_204_NO_CONTENT: None})
-    @action(detail=False, methods=["post"])
+    @action(
+        detail=False,
+        methods=["post"],
+        serializer_class=TeamJoinSerializer,
+        permission_classes=(IsAuthenticated, IsEpisodeAvailable, ~IsOnTeam),
+    )
     def join(self, request, pk=None, *, episode_id):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -134,7 +141,12 @@ class TeamViewSet(
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
     @extend_schema(responses={status.HTTP_204_NO_CONTENT: None})
-    @action(detail=False, methods=["post"])
+    @action(
+        detail=False,
+        methods=["post"],
+        serializer_class=TeamAvatarSerializer,
+        permission_classes=(IsAuthenticated, IsEpisodeAvailable),
+    )
     def avatar(self, request, pk=None, *, episode_id):
         """Update uploaded avatar."""
         team = get_object_or_404(self.get_queryset(), members=request.user)

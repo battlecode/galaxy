@@ -26,7 +26,7 @@ class NavBar extends Component {
             </button>
             <NavLink
               className="navbar-brand"
-              to={`/${this.props.episode}/home/`}
+              to={`/${this.props.episode}/home`}
             >
               {this.props.episode_name_long}
             </NavLink>
@@ -50,13 +50,13 @@ class NavBarAccount extends Component {
       return (
         <ul className="nav navbar-nav navbar-right">
           {/* <li>
-            <NavLink to={`/multi-episode/`}>Change Episode</NavLink>
+            <NavLink to={`/multi-episode`}>Change Episode</NavLink>
           </li> */}
           <li>
-            <NavLink to={`/${this.props.episode}/account/`}>Account</NavLink>
+            <NavLink to={`/${this.props.episode}/account`}>Account</NavLink>
           </li>
           <li>
-            <NavLink to={`/logout/`}>Log out</NavLink>
+            <NavLink to={`/logout`}>Log out</NavLink>
           </li>
         </ul>
       );
@@ -65,13 +65,13 @@ class NavBarAccount extends Component {
       return (
         <ul className="nav navbar-nav navbar-right">
           {/* <li>
-            <NavLink to={`/multi-episode/`}>Change Episode</NavLink>
+            <NavLink to={`/multi-episode`}>Change Episode</NavLink>
           </li> */}
           <li>
-            <NavLink to={`/register/`}>Register</NavLink>
+            <NavLink to={`/register`}>Register</NavLink>
           </li>
           <li>
-            <NavLink to={`/login/`}>Log in</NavLink>
+            <NavLink to={`/login`}>Log in</NavLink>
           </li>
         </ul>
       );
