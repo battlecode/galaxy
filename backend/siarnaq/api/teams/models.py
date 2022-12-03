@@ -1,15 +1,11 @@
-import posixpath
-import random
 import uuid
 
-import google.cloud.storage as storage
 from django.conf import settings
 from django.db import models, transaction
-from PIL import Image
 
 import siarnaq.api.refs as refs
 from siarnaq.api.teams.managers import TeamQuerySet
-from siarnaq.gcloud import titan
+from siarnaq.api.user import random_avatar
 
 
 class Rating(models.Model):
@@ -213,57 +209,6 @@ class TeamProfile(models.Model):
             self.rating = Rating.objects.create()
         super().save(*args, **kwargs)
 
-    def get_avatar_path(self):
-        """Return the path of the avatar on Google cloud storage."""
-        if not self.has_avatar:
-            return None
-        return posixpath.join("team", str(self.pk), "avatar.png")
-
     def get_avatar_url(self):
         """Return a cache-safe URL to the avatar."""
-        # To circumvent caching of old avatars, we append a UUID that changes on each
-        # update.
-        if not self.has_avatar:
-
-            self.has_avatar = True
-            self.avatar_uuid = uuid.uuid4()
-            self.save(update_fields=["has_avatar", "avatar_uuid"])
-
-            # generate a unique seed
-            random.seed(self.avatar_uuid.int)
-
-            # generate unique rgb
-            rgb1 = tuple(int(random.random() * 255) for _ in range(3))
-            rgb2 = tuple(int(random.random() * 255) for _ in range(3))
-
-            imgsize = settings.GCLOUD_MAX_AVATAR_SIZE  # The size of the image
-
-            avatar = Image.new("RGB", imgsize)  # Create the image
-
-            leftColor = rgb1  # Color at the right
-            rightColor = rgb2  # Color at the left
-
-            for pixel_y in range(imgsize[1]):
-                for pixel_x in range(imgsize[0]):
-
-                    # Make it on a scale from 0 to 1
-                    dis = float(pixel_x + pixel_y) / (imgsize[0] + imgsize[1])
-
-                    # Calculate r, g, and b values
-                    r = rightColor[0] * dis + leftColor[0] * (1 - dis)
-                    g = rightColor[1] * dis + leftColor[1] * (1 - dis)
-                    b = rightColor[2] * dis + leftColor[2] * (1 - dis)
-
-                    avatar.putpixel((pixel_x, pixel_y), (int(r), int(g), int(b)))
-
-            titan.upload_image(avatar, self.get_avatar_path())
-
-        client = storage.Client.create_anonymous_client()
-        public_url = (
-            client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
-            .blob(self.get_avatar_path())
-            .public_url
-        )
-
-        # Append UUID to public URL to prevent caching on avatar update
-        return f"{public_url}?{self.avatar_uuid}"
+        return random_avatar.get_avatar_url(self)

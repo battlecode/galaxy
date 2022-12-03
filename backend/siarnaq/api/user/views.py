@@ -1,3 +1,4 @@
+import posixpath
 import uuid
 
 import google.cloud.storage as storage
@@ -131,12 +132,13 @@ class UserViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         avatar = serializer.validated_data["avatar"]
+        path = posixpath.join("user", str(self.pk), "avatar.png")
 
         with transaction.atomic():
             profile.has_avatar = True
             profile.avatar_uuid = uuid.uuid4()
             profile.save(update_fields=["has_avatar", "avatar_uuid"])
             img = Image.open(avatar)
-            titan.upload_image(img, profile.get_avatar_path())
+            titan.upload_image(img, path)
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
