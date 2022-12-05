@@ -91,8 +91,9 @@ class FileValidator:
 class SubmissionSerializer(serializers.ModelSerializer):
     teamname = serializers.CharField(source="team.name", read_only=True)
     username = serializers.CharField(source="user.username", read_only=True)
-    validate_file = FileValidator(max_size=5 * 1024 * 1024)
-    source_code = serializers.FileField(write_only=True, validators=[validate_file])
+    source_code = serializers.FileField(
+        write_only=True, validators=[FileValidator(max_size=5 * 1024 * 1024)]
+    )
 
     class Meta:
         model = Submission
