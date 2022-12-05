@@ -1,6 +1,8 @@
 import structlog
 from django.conf import settings
 from django.db import transaction
+from django.template.defaultfilters import filesizeformat
+from django.utils.deconstruct import deconstructible
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, status
@@ -61,10 +63,37 @@ class SaturnInvocationSerializer(serializers.Serializer):
         return instance
 
 
+@deconstructible
+class FileValidator:
+    error_messages = {
+        "max_size": (
+            "Ensure this file size is not greater than %(max_size)s."
+            " Your file size is %(size)s."
+        ),
+    }
+
+    def __init__(self, max_size=None):
+        self.max_size = max_size
+
+    def __call__(self, data):
+
+        if self.max_size is not None and data.size > self.max_size:
+            params = {
+                "max_size": filesizeformat(self.max_size),
+                "size": filesizeformat(data.size),
+            }
+            raise serializers.ValidationError(self.error_messages["max_size"], params)
+
+    def __eq__(self, other):
+        return isinstance(other, FileValidator) and self.max_size == other.max_size
+
+
 class SubmissionSerializer(serializers.ModelSerializer):
     teamname = serializers.CharField(source="team.name", read_only=True)
     username = serializers.CharField(source="user.username", read_only=True)
-    source_code = serializers.FileField(write_only=True)
+    source_code = serializers.FileField(
+        write_only=True, validators=[FileValidator(max_size=5 * 1024 * 1024)]
+    )
 
     class Meta:
         model = Submission
