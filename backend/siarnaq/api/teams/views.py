@@ -43,11 +43,14 @@ class TeamViewSet(
     search_fields = ["name", "=members__username"]
 
     def get_queryset(self):
-        return (
+        queryset = (
             Team.objects.filter(episode=self.kwargs["episode_id"])
             .select_related("profile__rating")
             .prefetch_related("members")
         )
+        if not self.request.user.is_staff:
+            queryset = queryset.visible()
+        return queryset
 
     def get_serializer_class(self):
         match self.action:
