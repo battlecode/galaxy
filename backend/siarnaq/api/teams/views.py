@@ -101,6 +101,21 @@ class TeamViewSet(
     @extend_schema(request=None)
     @action(
         detail=False,
+        methods=["get"],
+        permission_classes=(IsAuthenticated,),
+        serializer_class=None,
+    )
+    def by_user(self, request, *, user_id):
+        """Find all existing teams associated with a user"""
+        teams = dict()
+        Team.objects.filter(lambda e: (user_id in e.members)).map(
+            lambda a: teams[a.episode].extend(a)
+        )
+        return teams
+
+    @extend_schema(request=None)
+    @action(
+        detail=False,
         methods=["post"],
         serializer_class=None,
         permission_classes=(IsAuthenticated, IsEpisodeAvailable),

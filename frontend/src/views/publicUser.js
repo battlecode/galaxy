@@ -15,8 +15,9 @@ class PublicUser extends Component {
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-4">
-              <UserCard user={this.props.user} />
-              <TeamCard team={this.props.team} />
+              <title>Placeholder</title>
+              {/* <UserCard user={this.props.user} /> */}
+              {/* <TeamCard team={this.props.team} /> */}
             </div>
           </div>
         </div>
