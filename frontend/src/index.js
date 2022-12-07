@@ -235,9 +235,7 @@ class App extends Component {
 
       <Route
         path={`/:episode/publicuser/:user_id`}
-        component={(props) => {
-          <PublicUser {...props} />;
-        }}
+        component={(props) => <PublicUser {...props} />}
         key="public-user"
       />,
     ];
