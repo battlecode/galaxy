@@ -18,6 +18,7 @@ import Debugging from "./views/debugging";
 import CodeOfConduct from "./views/codeofconduct";
 import Rankings from "./views/rankings";
 import Account from "./views/account";
+import PublicUser from "./views/publicUser";
 import Resources from "./views/resources";
 import LoginRegister from "./views/login";
 import Register from "./views/register";
@@ -230,6 +231,14 @@ class App extends Component {
           />
         )}
         key="rankings"
+      />,
+
+      <Route
+        path={`/:episode/publicuser/:user_id`}
+        component={(props) => {
+          <PublicUser {...props} />;
+        }}
+        key="public-user"
       />,
     ];
 
