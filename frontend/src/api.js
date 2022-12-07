@@ -267,7 +267,16 @@ class Api {
 
   // @Ellington: getUserTeamProfile URL/API call gives you the info for your team.
   // Make this generic (switch out "me" for a dynamic team episode)
-  static getTeamProfile(episode, teamId, callback) {}
+  static getTeamProfile(episode, teamId, callback) {
+    return $.get(`${URL}/api/team/${episode}/t/${teamId}/`)
+      .done((data, status) => {
+        callback(data);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting user's team profile", xhr, status, error);
+        callback(null);
+      });
+  }
 
   static getUserTeamProfile(episode, callback) {
     return $.get(`${URL}/api/team/${episode}/t/me/`)
