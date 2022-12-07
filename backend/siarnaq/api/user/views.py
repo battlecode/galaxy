@@ -19,6 +19,8 @@ from siarnaq.api.user.serializers import (
     UserPublicSerializer,
     UserResumeSerializer,
 )
+from siarnaq.api.teams.models import Team
+from siarnaq.api.teams.serializers import TeamPublicSerializer
 from siarnaq.gcloud import titan
 
 logger = structlog.get_logger(__name__)
@@ -143,3 +145,28 @@ class UserViewSet(
             titan.upload_image(avatar, profile.get_avatar_path())
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+class TeamByUserViewSet(
+    viewsets.GenericViewSet,
+):
+    """
+    A viewset for retrieving a user's associated teams.
+    """
+    permission_classes = (AllowAny,)
+    filter_backends = [filters.SearchFilter]
+
+    def get_queryset(self):
+        return Team.objects.all()
+
+    @action(
+        detail=False,
+        permission_classes=(IsAuthenticated,),
+        serializer_class=TeamPublicSerializer,
+    )
+    def teams(self, request, **kwargs):
+        """Retrieve all teams associated with a user."""
+        user_id = self.kwargs["id"]
+        teams = self.get_queryset()
+        serializer = self.get_serializer(teams)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
