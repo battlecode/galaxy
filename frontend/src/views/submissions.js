@@ -216,16 +216,15 @@ class Submissions extends Component {
 
   //----PERMISSIONS----
   isSubmissionEnabled() {
-    if (
+    // Submissions are only enabled when on a team, and game is released (or you are staff; note that this is included when deriving the is_game_released variable), and the episode is not frozen.
+
+    // NOTE: There is an edge case when in the backend, the episode is truly frozen since a submission deadline has passed, but the frontend may not know of that. So ensure that _independently of the frontend's stored value of frozen, submissions attempted during a submission freeze still fail gracefully_.
+
+    return (
       this.props.on_team &&
-      (this.props.is_staff || this.props.is_game_released)
-    ) {
-      return true;
-    }
-    // It would be great if this method could return false
-    // during submission freeze.
-    // See #386 (and #385) for tracking.
-    return false;
+      this.props.is_game_released &&
+      !this.props.episode.frozen
+    );
   }
 
   //----RENDERING----
