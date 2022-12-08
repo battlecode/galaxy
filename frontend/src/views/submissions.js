@@ -710,7 +710,8 @@ class Submissions extends Component {
               {this.renderHelperSubmissionForm()}
               {this.renderHelperSubmissionStatus()}
 
-              <div className="card">
+              {/* See #387 for tracking */}
+              {/* <div className="card">
                 <div className="header">
                   <h4 className="title">Latest Submission</h4>
                 </div>
@@ -721,14 +722,15 @@ class Submissions extends Component {
                   </h4>
                 </div>
                 <div className="content">{this.renderHelperLastTable()}</div>
-              </div>
+              </div> */}
 
-              <div className="card">
+              {/* See #78 for tracking */}
+              {/* <div className="card">
                 <div className="header">
                   <h4 className="title">Tournament Submissions</h4>
                 </div>
                 <div className="content">{this.renderHelperTourTable()}</div>
-              </div>
+              </div> */}
 
               {this.renderCompilingTips()}
             </div>
