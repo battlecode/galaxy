@@ -77,7 +77,7 @@ class Submissions extends Component {
         this.renderHelperSubmissionForm();
         this.renderHelperSubmissionStatus();
 
-        // refresh team submission tables, to display the submission that just occured
+        // refresh team submission tables, to display the submission that just occurred
         Api.getTeamSubmissions(this.gotSubmissions);
         this.renderHelperCurrentTable();
         this.renderHelperLastTable();
@@ -114,7 +114,7 @@ class Submissions extends Component {
 
   // called when submission data is initially received
   // this will be maps of the label of type of submission to submission id
-  // this function then makes calles to get the specific data for each submission
+  // this function then makes calls to get the specific data for each submission
   gotSubmissions = (data) => {
     this.setState({
       currentSubmission: new Array(
@@ -411,7 +411,7 @@ class Submissions extends Component {
     }
   }
 
-  //reder helper for table containing the team's latest submission
+  // render helper for table containing the team's latest submission
   renderHelperCurrentTable() {
     if (this.state.currentSubmission === null) {
       return (
@@ -530,7 +530,7 @@ class Submissions extends Component {
     }
   }
 
-  //reder helper for table containing the team's latest successfully compiled submissions
+  // render helper for table containing the team's latest successfully compiled submissions
   renderHelperLastTable() {
     if (this.state.lastSubmissions === null) {
       return (
@@ -596,7 +596,7 @@ class Submissions extends Component {
     }
   }
 
-  //reder helper for table containing the team's tournament submissions
+  // render helper for table containing the team's tournament submissions
   renderHelperTourTable() {
     if (this.state.tourSubmissions === null) {
       return (
