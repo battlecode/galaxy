@@ -298,7 +298,8 @@ class Submissions extends Component {
             <h4 className="title">Submit Code</h4>
           </div>
           <div className="content">
-            {this.state.tournamentInfo.does_tour_require_resume && (
+            {/* TODO this message should be moved into the countdown card */}
+            {/* {this.state.tournamentInfo.does_tour_require_resume && (
               <p>
                 Make sure to have indicated your eligibility on your Team
                 Profile page. Also make sure to have all members upload a
@@ -308,7 +309,7 @@ class Submissions extends Component {
                   info**
                 </b>
               </p>
-            )}
+            )} */}
             <p>
               Submit your code using the button below. For peace of mind, submit
               15 minutes before and make sure it compiles and shows up under
