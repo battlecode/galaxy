@@ -92,9 +92,7 @@ class TeamInfo extends Component {
     //get team info by id
     const teamId = this.props.match.params.team_id;
     const episode = this.props.match.params.episode;
-    // @Ellington switch this to getTeamProfile
-    // Note that this method will run the API call, then set the retrieved data into this.state.team
-    // which is the central source for all the data
+
     Api.getTeamProfile(episode, teamId, this.setTeam);
 
     // Commented out since we don't have scrimmages, records, etc.

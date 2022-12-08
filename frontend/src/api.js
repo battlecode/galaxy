@@ -161,11 +161,7 @@ class Api {
 
   //----TEAM STATS---
 
-  // @Ellington pretend this "TEAM STATS" section doesn't exist for now...
-  // any calls made here, ignore that for now, treat that as part 2
-  // (and we can help you when you get there)
-  // Some of these old API calls have direct translations to new ones
-  // Some of them don't (ie they were backend methods that no longer exist anymore) so...
+  // clean these calls, fix in #368
 
   // data from scrimmaging
   static getOwnTeamMuHistory(callback) {
@@ -265,8 +261,6 @@ class Api {
 
   //---TEAM INFO---
 
-  // @Ellington: getUserTeamProfile URL/API call gives you the info for your team.
-  // Make this generic (switch out "me" for a dynamic team episode)
   static getTeamProfile(episode, teamId, callback) {
     return $.get(`${URL}/api/team/${episode}/t/${teamId}/`)
       .done((data, status) => {
