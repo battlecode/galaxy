@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Api from "../api";
+import Countdown from "../components/countdown";
 import * as Cookies from "js-cookie";
 import { times } from "chartist";
 
@@ -292,28 +293,11 @@ class Submissions extends Component {
 
       return (
         <div className="card">
+          <Countdown> </Countdown>
           <div className="header">
             <h4 className="title">Submit Code</h4>
           </div>
           <div className="content">
-            <p>
-              <b>
-                The submission deadline for the{" "}
-                {this.state.tournamentInfo.tournament_name} is{" "}
-                {
-                  this.state.tournamentInfo.submission_deadline_strs
-                    .est_date_str
-                }
-                , which is{" "}
-                <b>
-                  {
-                    this.state.tournamentInfo.submission_deadline_strs
-                      .local_date_str
-                  }
-                </b>
-                .
-              </b>{" "}
-            </p>
             {this.state.tournamentInfo.does_tour_require_resume && (
               <p>
                 Make sure to have indicated your eligibility on your Team
