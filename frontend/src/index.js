@@ -195,7 +195,7 @@ class App extends Component {
       <Route
         path={`/:episode/debugging-tips`}
         component={(props) => (
-          <Issues {...props} episode={this.state.episode} />
+          <Debugging {...props} episode={this.state.episode} />
         )}
         key="debugging"
       />,
