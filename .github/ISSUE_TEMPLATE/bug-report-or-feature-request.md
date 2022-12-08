@@ -1,10 +1,14 @@
 ---
 name: Bug Report or Feature Request
 about: General Issue template for Galaxy.
-title: ''
+title: ""
 labels: triage
-assignees: ''
-
+assignees: ""
 ---
 
-Please **label** this with the corresponding module, type, and priority (or keep the "triage" label if you don't know any of these). Also, if a fix seems simple, please label with "good first issue".
+Although not required, these would be great if you can:
+
+- [ ] Assign a label for priority. (the red labels. or if you don't know the priority, "triage", the black label)
+- [ ] Assign a label (or labels) for module. (the green labels)
+- [ ] Assign a label (or labels) for type. (the yellow labels)
+- [ ] If this is a simple issue or fix, assign "good first issue". (the blue label)
