@@ -37,11 +37,6 @@ class Submissions extends Component {
 
   componentDidMount() {
     Api.getTeamSubmissions(this.gotSubmissions);
-    Api.getLeague(
-      function (l) {
-        this.setState({ league: l });
-      }.bind(this)
-    );
 
     // Set up submission deadline text
     Api.getNextTournament((tournamentInfo) => {
