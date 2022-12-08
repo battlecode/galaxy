@@ -709,32 +709,27 @@ class Submissions extends Component {
             <div className="col-md-12">
               {this.renderHelperSubmissionForm()}
               {this.renderHelperSubmissionStatus()}
+
               <div className="card">
                 <div className="header">
                   <h4 className="title">Latest Submission</h4>
                 </div>
-                <div className="content">
-                  {this.isSubmissionEnabled() &&
-                    this.renderHelperCurrentTable()}
-                </div>
-
+                <div className="content">{this.renderHelperCurrentTable()}</div>
                 <div className="header">
                   <h4 className="title">
                     Latest Successfully Compiled Submissions
                   </h4>
                 </div>
-                <div className="content">
-                  {this.isSubmissionEnabled() && this.renderHelperLastTable()}
-                </div>
+                <div className="content">{this.renderHelperLastTable()}</div>
               </div>
+
               <div className="card">
                 <div className="header">
                   <h4 className="title">Tournament Submissions</h4>
                 </div>
-                <div className="content">
-                  {this.isSubmissionEnabled() && this.renderHelperTourTable()}
-                </div>
+                <div className="content">{this.renderHelperTourTable()}</div>
               </div>
+
               {this.renderCompilingTips()}
             </div>
           </div>
