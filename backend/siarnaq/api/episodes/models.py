@@ -111,7 +111,10 @@ class Episode(models.Model):
         if self.submission_frozen or now < self.game_release:
             return True
         return Tournament.objects.filter(
-            episode=self, submission_freeze__lte=now, submission_unfreeze__gt=now
+            episode=self,
+            submission_freeze__lte=now,
+            submission_unfreeze__gt=now,
+            is_public=True,
         ).exists()
 
     def autoscrim(self, best_of):
