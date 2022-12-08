@@ -25,14 +25,8 @@ class Submissions extends Component {
       numLastLoaded: 0,
       numTourSubmissions: 0,
       numTourLoaded: 0,
-      user: {},
       upload_status: -1,
     };
-    Api.getUserProfile(
-      function (user_profile) {
-        this.setState({ user_profile });
-      }.bind(this)
-    );
   }
 
   componentDidMount() {
