@@ -1,3 +1,5 @@
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from siarnaq.api.episodes.models import (
@@ -23,6 +25,7 @@ class EligibilityCriterionSerializer(serializers.ModelSerializer):
 
 class EpisodeSerializer(serializers.ModelSerializer):
     eligibility_criteria = EligibilityCriterionSerializer(many=True)
+    frozen = serializers.SerializerMethodField()
 
     class Meta:
         model = Episode
@@ -34,7 +37,12 @@ class EpisodeSerializer(serializers.ModelSerializer):
             "language",
             "release_version",
             "eligibility_criteria",
+            "frozen",
         ]
+
+    @extend_schema_field(OpenApiTypes.BOOL)
+    def get_frozen(self, obj):
+        return obj.frozen()
 
 
 class MapSerializer(serializers.ModelSerializer):
