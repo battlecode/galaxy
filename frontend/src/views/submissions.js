@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Api from "../api";
 import * as Cookies from "js-cookie";
+import { times } from "chartist";
 
 const COMPILATION_STATUS = {
   PROGRESS: 0,
@@ -25,7 +26,6 @@ class Submissions extends Component {
       numTourSubmissions: 0,
       numTourLoaded: 0,
       user: {},
-      league: {},
       upload_status: -1,
     };
     Api.getUserProfile(
@@ -220,24 +220,16 @@ class Submissions extends Component {
   };
 
   //----PERMISSIONS----
-  // enable iff game active or user is staff
-  // Note that this duplicates a method in submissions.js;
-  // this will be cleaned up. See #74
   isSubmissionEnabled() {
     if (
-      // Short-circuit check for nested object,
-      // in case user_profile hasn't been set yet.
-      this.state.user_profile &&
-      this.state.user_profile.user.is_staff == true
+      this.props.on_team &&
+      (this.props.is_staff || this.props.is_game_released)
     ) {
       return true;
     }
-    if (
-      this.state.league.submissions_enabled == true &&
-      this.state.league.game_released == true
-    ) {
-      return true;
-    }
+    // It would be great if this method could return false
+    // during submission freeze.
+    // See #386 (and #385) for tracking.
     return false;
   }
 

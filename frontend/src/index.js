@@ -278,7 +278,15 @@ class App extends Component {
       />,
       <Route
         path={`/:episode/submissions`}
-        component={Submissions}
+        component={(props) => (
+          <Submissions
+            {...props}
+            episode={this.state.episode}
+            is_staff={is_staff}
+            on_team={on_team}
+            is_game_released={is_game_released}
+          />
+        )}
         key="submissions"
       />,
     ];
