@@ -215,11 +215,11 @@ class App extends Component {
         )}
         key="resources"
       />,
-      // <Route
-      //    path={`/:episode/rankings/:team_id`}
-      //    component={TeamInfo}
-      //    key="rankings-team"
-      // />,
+      <Route
+        path={`/:episode/rankings/:team_id`}
+        component={TeamInfo}
+        key="rankings-team"
+      />,
       <Route
         path={`/:episode/rankings`}
         component={(props) => (

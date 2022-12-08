@@ -76,6 +76,7 @@ class Rankings extends Component {
               onPageClick={this.getTeamPage}
               loading={this.state.loading}
               history={this.props.history}
+              episode={this.props.episode}
               episode_info={this.props.episode_info}
             />
           </div>
