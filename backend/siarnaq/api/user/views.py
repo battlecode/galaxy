@@ -11,6 +11,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from siarnaq.api.teams.models import Team
+from siarnaq.api.teams.serializers import TeamPublicSerializer
 from siarnaq.api.user.models import User
 from siarnaq.api.user.serializers import (
     UserAvatarSerializer,
@@ -19,8 +21,6 @@ from siarnaq.api.user.serializers import (
     UserPublicSerializer,
     UserResumeSerializer,
 )
-from siarnaq.api.teams.models import Team
-from siarnaq.api.teams.serializers import TeamPublicSerializer
 from siarnaq.gcloud import titan
 
 logger = structlog.get_logger(__name__)
@@ -146,12 +146,14 @@ class UserViewSet(
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+
 class TeamByUserViewSet(
     viewsets.GenericViewSet,
 ):
     """
     A viewset for retrieving a user's associated teams.
     """
+
     permission_classes = (AllowAny,)
     filter_backends = [filters.SearchFilter]
 
@@ -166,7 +168,9 @@ class TeamByUserViewSet(
     def teams(self, request, **kwargs):
         """Retrieve all teams associated with a user."""
         user_id = self.kwargs["id"]
-        teams = self.get_queryset()
-        serializer = self.get_serializer(teams)
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
+        teams_dict = {}
+        teams = self.get_queryset().all()
+        for team in teams:
+            if user_id not in team.members.all():
+                teams_dict[team.episode.name_short] = team
+        return Response(teams_dict)
