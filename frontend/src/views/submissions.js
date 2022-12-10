@@ -26,7 +26,7 @@ class Submissions extends Component {
       numLastLoaded: 0,
       numTourSubmissions: 0,
       numTourLoaded: 0,
-      upload_status: -1,
+      upload_status: null,
     };
   }
 
@@ -48,13 +48,19 @@ class Submissions extends Component {
 
   // makes an api call to upload the selected file
   uploadData = () => {
-    // 'upload_status_cookie' in Cookies is used to communicate between the functions in api.js and those in submissions.js. It lets us keep track of the upload process for submissions, and all the http requests involved. (Note that this is different than a submission's compile_status in the database.)
-    // A value of 0 indicates that the submission is still in progress.
-    // When a submission finishes, api.js changes this value to something else.
-    Cookies.set("upload_status_cookie", 10);
-    // The upload_status state is used internally by this component.
-    // (Currently, it mirrors upload_status_cookie, but is part of state to make working with React easier.)
-    this.setState({ upload_status: 10 });
+    // TODO pull in from better source eg acct page
+
+    this.setState({ upload_status: "loading" });
+    Api.resumeUpload(this.state.selectedFile, (success) => {
+      if (success) {
+        this.setState({ upload_status: "success" });
+      } else {
+        this.setState({ upload_status: "failure" });
+      }
+      setTimeout(() => {
+        this.setState({ upload_status: "waiting" });
+      }, 2000);
+    });
 
     // Concurrent upload processes can be problematic; we've made the decision to disable concurrency.
     // This is achieved by refreshing the submission upload components, which have buttons disabled while upload_status is 0.
@@ -62,30 +68,6 @@ class Submissions extends Component {
     this.renderHelperSubmissionStatus();
 
     Api.newSubmission(this.state.selectedFile, null);
-
-    // The method in api.js will change Cookies' upload_status_cookie during the process of an upload.
-    // To check changes, we poll periodically.
-    this.interval = setInterval(() => {
-      let upload_status_cookie_value = Cookies.get("upload_status_cookie");
-      if (upload_status_cookie_value != 10) {
-        // Submission process terminated (see api.js).
-
-        // refresh the submission status, for use on this component
-        this.setState({ upload_status: upload_status_cookie_value });
-
-        // refresh the submission button, etc, to allow for a new submission
-        this.renderHelperSubmissionForm();
-        this.renderHelperSubmissionStatus();
-
-        // refresh team submission tables, to display the submission that just occurred
-        Api.getTeamSubmissions(this.gotSubmissions);
-        this.renderHelperCurrentTable();
-        this.renderHelperLastTable();
-
-        // Done waiting for changes to upload_status_cookie, so stop polling.
-        clearInterval(this.interval);
-      }
-    }, 1000); // Poll every second
   };
 
   // change handler called when file is selected
