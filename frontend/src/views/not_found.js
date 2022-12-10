@@ -4,41 +4,22 @@ class NotFound extends Component {
   constructor(props) {
     super();
     this.state = {
-      pawn: "♟️",
+      pageError: "✖️",
     };
   }
 
   render() {
-    const pawnStyle = {
+    const pageErrorStyle = {
       paddingBottom: "0",
       fontSize: "100px",
       marginBottom: "-30px",
     };
 
-    // display one of three random soup emojis :)
-    // if (!this.state.soup) {
-    // 	const rand = Math.floor(Math.random() * 3)
-    // 	let soup_emoji = ""
-    // 	switch (rand) {
-    // 		case 0:
-    // 			soup_emoji = "🍲"
-    // 			break
-    // 		case 1:
-    // 			soup_emoji = "🥘"
-    // 			break
-    // 		default:
-    // 			soup_emoji = "🍜"
-
-    // 	}
-
-    // 	this.setState({soup: soup_emoji})
-    // }
-
     return (
       <div className="content">
-        <p className="text-center" style={pawnStyle}>
+        <p className="text-center" style={pageErrorStyle}>
           {" "}
-          {this.state.pawn}{" "}
+          {this.state.pageError}{" "}
         </p>
         <h1 className="text-center">404 error</h1>
         <h5 className="text-center">
