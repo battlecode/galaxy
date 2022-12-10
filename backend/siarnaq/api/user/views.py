@@ -168,9 +168,8 @@ class TeamByUserViewSet(
     def teams(self, request, **kwargs):
         """Retrieve all teams associated with a user."""
         user_id = self.kwargs["id"]
-        teams_dict = {}
-        teams = self.get_queryset().all()
-        for team in teams:
-            if user_id not in team.members.all():
-                teams_dict[team.episode.name_short] = team
+        teams = self.get_queryset().all().filter(members__pk=user_id)
+        serializer = self.get_serializer(teams, many=True)
+        # Return dict - {"episode": Team}
+        teams_dict = {team["episode"]: team for team in serializer.data}
         return Response(teams_dict)
