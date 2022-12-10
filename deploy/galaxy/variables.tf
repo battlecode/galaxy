@@ -38,6 +38,11 @@ variable "database_tier" {
   type        = string
 }
 
+variable "database_backup" {
+  description = "Whether to enable backups for the SQL database"
+  type        = bool
+}
+
 variable "database_authorized_networks" {
   description = "The IP CIDR ranges authorized to access the database via external IP"
   type        = list(string)

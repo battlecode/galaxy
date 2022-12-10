@@ -32,11 +32,14 @@ class SideBar extends Component {
         {" "}
         {/* data-color is defined in light-bootstrap-dashboard.css */}
         <div className="sidebar-wrapper">
-          <div className="logo">
+          <div className="logo text">
             <a href={`/${this.props.episode}/home`}>
               <img src="/bc/img/logo.png" />
             </a>
-            <p>{this.props.episode_name_long}</p>
+            <p>
+              {this.props.episode_info &&
+                this.props.episode_info.name_long.toUpperCase()}
+            </p>
           </div>
           {/* NOTE: this only controls what appears in the sidebars.
           Independent of this, users can still go to the links by typing it in their browser, etc.
@@ -75,11 +78,11 @@ class SideBar extends Component {
               label="Tournaments"
             />
 
-            {/* <NLink
+            <NLink
               to={`/${this.props.episode}/rankings`}
               icon={"pe-7s-graph1"}
               label="Rankings"
-            /> */}
+            />
 
             {/* search bar link, unused since Search is broken
             Commented in case someone wants to bring it back in the future

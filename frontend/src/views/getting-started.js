@@ -247,11 +247,11 @@ class GettingStarted extends Component {
                     overview of what Battlecode is, visit{" "}
                     <a href="https://battlecode.org">our landing page</a>.
                   </p>
-                  <p>
+                  {/* <p>
                     While the opportunity to compete in tournaments is over,{" "}
                     {this.props.episode_name_long} is still running! See below
                     for instructions on getting started.
-                  </p>
+                  </p> */}
                 </div>
               </div>
               <div className="card">
@@ -335,6 +335,9 @@ class GettingStarted extends Component {
                     Step 2: Download Battlecode
                   </h6>
                   <p>
+                    These instructions will be released when the season begins!
+                  </p>
+                  {/* <p>
                     Next, you should download the{" "}
                     <b>
                       <a
@@ -374,11 +377,11 @@ class GettingStarted extends Component {
                     created repo and invite your team members to collaborate on
                     it.
                   </p>
-                  {/* <h6 class="installation-steps">Step 3: Build the Game</h6>
-                                    <p>
-                                        Open a terminal in the scaffold you just downloaded. Run the commands <code>./gradlew update</code> and <code>./gradlew build</code>.
-                                        The client won't appear until you've run these two commands.
-                                    </p> */}
+                  <h6 class="installation-steps">Step 3: Build the Game</h6>
+                    <p>
+                        Open a terminal in the scaffold you just downloaded. Run the commands <code>./gradlew update</code> and <code>./gradlew build</code>.
+                        The client won't appear until you've run these two commands.
+                    </p>
                   <h6 className="installation-steps">Step 3: Local Setup</h6>
                   <p>
                     We recommend using an IDE like IntelliJ IDEA or Eclipse to
@@ -468,7 +471,7 @@ class GettingStarted extends Component {
                     will default to whatever is listed in{" "}
                     <code>gradle.properties</code>. Running the same gradle task
                     from you IDE will also work.
-                  </p>
+                  </p> */}
                 </div>
               </div>
 

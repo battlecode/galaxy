@@ -46,21 +46,16 @@ class UserViewSet(
         match self.action:
             case "create":
                 return UserCreateSerializer
-            case "me":
-                return UserPrivateSerializer
             case "retrieve":
                 return UserPublicSerializer
-            case "resume":
-                return UserResumeSerializer
-            case "avatar":
-                return UserAvatarSerializer
             case _:
-                raise RuntimeError("Unexpected action")
+                return super().get_serializer_class()
 
     @action(
         detail=False,
         methods=["get", "put", "patch"],
         permission_classes=(IsAuthenticated,),
+        serializer_class=UserPrivateSerializer,
     )
     def me(self, request):
         """Retrieve or update information about the logged-in user."""
@@ -80,7 +75,12 @@ class UserViewSet(
                 serializer.save()
                 return Response(serializer.data)
 
-    @action(detail=False, methods=["get", "put"], permission_classes=(IsAuthenticated,))
+    @action(
+        detail=False,
+        methods=["get", "put"],
+        permission_classes=(IsAuthenticated,),
+        serializer_class=UserResumeSerializer,
+    )
     def resume(self, request):
         """Retrieve or update the uploaded resume."""
         user = self.get_queryset().get(pk=request.user.pk)
@@ -124,7 +124,12 @@ class UserViewSet(
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
 
     @extend_schema(responses={status.HTTP_204_NO_CONTENT: None})
-    @action(detail=False, methods=["post"], permission_classes=(IsAuthenticated,))
+    @action(
+        detail=False,
+        methods=["post"],
+        permission_classes=(IsAuthenticated,),
+        serializer_class=UserAvatarSerializer,
+    )
     def avatar(self, request, pk=None):
         """Update uploaded avatar."""
         user = self.get_queryset().get(pk=request.user.pk)

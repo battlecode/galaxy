@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 // do not change URL here!! rather, for development, change it in ../.env.development
 const URL = process.env.REACT_APP_BACKEND_URL;
 const LEAGUE = 0;
-const PAGE_LIMIT = 10;
+const PAGE_SIZE = 10;
 const SCRIMMAGE_STATUS = {
   PENDING: 0,
   QUEUED: 1,
@@ -161,6 +161,8 @@ class Api {
 
   //----TEAM STATS---
 
+  // clean these calls, fix in #368
+
   // data from scrimmaging
   static getOwnTeamMuHistory(callback) {
     return Api.getTeamMuHistory(Cookies.get("team_id"), callback);
@@ -235,65 +237,14 @@ class Api {
 
   //----SEARCHING----
 
-  // Unused and deprecated.
-  // Kept in case we want to use it again; might require updates to code
-  // static search(query, callback) {
-  //   const encodedQuery = encodeURIComponent(query);
-  //   const teamUrl = `${URL}/api/${LEAGUE}/team/?search=${encodedQuery}&page=1`;
-  //   const userUrl = `${URL}/api/user/profile/?search=${encodedQuery}&page=1`;
-  //   $.get(teamUrl, (teamData) => {
-  //     $.get(userUrl, (userData) => {
-  //       const teamLimit =
-  //         parseInt(teamData.count / PAGE_LIMIT, 10) +
-  //         !!(teamData.count % PAGE_LIMIT);
-  //       const userLimit =
-  //         parseInt(userData.count / PAGE_LIMIT, 10) +
-  //         !!(userData.count % PAGE_LIMIT);
-  //       callback({
-  //         users: userData.results,
-  //         userLimit,
-  //         userPage: 1,
-  //         teams: teamData.results,
-  //         teamLimit,
-  //         teamPage: 1,
-  //       });
-  //     });
-  //   });
-  // }
-
-  static searchTeamRanking(query, page, callback) {
-    Api.searchRanking(`${URL}/api/${LEAGUE}/team`, query, page, callback);
-  }
-
-  static searchRanking(apiURL, query, page, callback) {
+  // Search teams, ordering result by ranking.
+  static searchTeam(query, page, episode, callback) {
+    const apiURL = `${URL}/api/team/${episode}/t`;
     const encQuery = encodeURIComponent(query);
-    const teamUrl = `${apiURL}/?ordering=-score,name&search=${encQuery}&page=${page}`;
+    const teamUrl = `${apiURL}/?ordering=-rating,name&search=${encQuery}&page=${page}`;
     $.get(teamUrl, (teamData) => {
-      const teamLimit =
-        parseInt(teamData.count / PAGE_LIMIT, 10) +
-        !!(teamData.count % PAGE_LIMIT);
-      callback({
-        query,
-        teams: teamData.results,
-        teamLimit,
-        teamPage: page,
-      });
-    });
-  }
-
-  static searchTeam(query, page, callback) {
-    const encQuery = encodeURIComponent(query);
-    const teamUrl = `${URL}/api/${LEAGUE}/team/?search=${encQuery}&page=${page}`;
-    $.get(teamUrl, (teamData) => {
-      const teamLimit =
-        parseInt(teamData.count / PAGE_LIMIT, 10) +
-        !!(teamData.count % PAGE_LIMIT);
-      callback({
-        query,
-        teams: teamData.results,
-        teamLimit,
-        teamPage: page,
-      });
+      const pageLimit = Math.ceil(teamData.count / PAGE_SIZE);
+      callback(teamData.results, pageLimit);
     });
   }
 
@@ -309,6 +260,17 @@ class Api {
   }
 
   //---TEAM INFO---
+
+  static getTeamProfile(episode, teamId, callback) {
+    return $.get(`${URL}/api/team/${episode}/t/${teamId}/`)
+      .done((data, status) => {
+        callback(data);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting user's team profile", xhr, status, error);
+        callback(null);
+      });
+  }
 
   static getUserTeamProfile(episode, callback) {
     return $.get(`${URL}/api/team/${episode}/t/me/`)

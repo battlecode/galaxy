@@ -78,7 +78,9 @@ resource "google_cloudbuild_trigger" "this" {
     step {
       name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
       entrypoint = "gsutil"
-      args = ["-m", "rsync", "-d", "-r", "build", "gs://${google_storage_bucket.frontend[count.index].name}"]
+      # Don't delete old files;
+      # those files may be requested by a user's cache or by CDN cache.
+      args = ["-m", "rsync", "-r", "build", "gs://${google_storage_bucket.frontend[count.index].name}"]
       dir = "frontend"
     }
   }
@@ -119,6 +121,7 @@ module "siarnaq" {
   database_tier                = var.database_tier
   database_name                = "battlecode"
   database_user                = "siarnaq"
+  database_backup              = var.database_backup
   database_authorized_networks = var.database_authorized_networks
   additional_secrets           = var.additional_secrets
 

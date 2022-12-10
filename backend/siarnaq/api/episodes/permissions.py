@@ -6,26 +6,26 @@ from siarnaq.api.episodes.models import Episode
 
 class IsEpisodeAvailable(permissions.BasePermission):
     """
-    Allows readonly access to visible episodes, and restricts mutation if configured to
-    check for frozen episodes. Episodes that are not visible will raise a 404.
+    Allows access to visible episodes. Episodes that are not visible will raise a 404.
     """
 
-    def __init__(self, *, allow_frozen=False):
-        """
-        Initializes the permission.
+    def has_permission(self, request, view):
+        get_object_or_404(
+            Episode.objects.visible_to_user(is_staff=request.user.is_staff),
+            pk=view.kwargs["episode_id"],
+        )
+        return True
 
-        Parameters
-        ----------
-        allow_frozen : bool
-            Whether to allow mutation to frozen episodes.
-        """
-        self._allow_frozen = allow_frozen
+
+class IsEpisodeMutable(permissions.BasePermission):
+    """
+    Allows mutation access to visible episodes iff it is not frozen. Episodes that are
+    not visible will raise a 404.
+    """
 
     def has_permission(self, request, view):
         episode = get_object_or_404(
             Episode.objects.visible_to_user(is_staff=request.user.is_staff),
             pk=view.kwargs["episode_id"],
         )
-        return request.method in permissions.SAFE_METHODS or (
-            self._allow_frozen or not episode.frozen()
-        )
+        return request.method in permissions.SAFE_METHODS or not episode.frozen()

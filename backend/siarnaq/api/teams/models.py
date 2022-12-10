@@ -3,6 +3,7 @@ import uuid
 
 import google.cloud.storage as storage
 from django.conf import settings
+from django.core.validators import RegexValidator
 from django.db import models, transaction
 
 import siarnaq.api.refs as refs
@@ -102,7 +103,10 @@ class Team(models.Model):
     )
     """The episode to which this team belongs."""
 
-    name = models.CharField(max_length=32)
+    name = models.CharField(
+        max_length=32,
+        validators=[RegexValidator(r"^[ -~]*$", message="Use ASCII characters only.")],
+    )
     """The name of the team."""
 
     members = models.ManyToManyField(
@@ -180,7 +184,11 @@ class TeamProfile(models.Model):
     )
     """The team being augmented by this profile."""
 
-    quote = models.CharField(max_length=80, blank=True)
+    quote = models.CharField(
+        max_length=80,
+        blank=True,
+        validators=[RegexValidator(r"^[ -~]*$", message="Use ASCII characters only.")],
+    )
     """The short quote written by the team, if any."""
 
     biography = models.TextField(max_length=1024, blank=True)

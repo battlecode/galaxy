@@ -55,6 +55,7 @@ module "production" {
   create_website               = true
   siarnaq_image                = module.cd.artifact_image["siarnaq"]
   database_tier                = "db-custom-1-3840"
+  database_backup              = true
   database_authorized_networks = []
   additional_secrets           = merge(var.additional_secrets_common, var.additional_secrets_production)
 
@@ -85,6 +86,7 @@ module "staging" {
   create_website               = false
   siarnaq_image                = null
   database_tier                = "db-f1-micro"
+  database_backup              = false
   database_authorized_networks = ["0.0.0.0/0"]
   additional_secrets           = merge(var.additional_secrets_common, var.additional_secrets_staging)
 
@@ -126,7 +128,26 @@ module "network" {
     }
   }
 
-  dns_additional_records = {
-    "db.staging." = module.staging.sql_instance_ip
-  }
+  dns_additional_records = [
+    {
+      type      = "A",
+      subdomain = "",
+      rrdatas   = [
+        "185.199.108.153",  # These are GH Pages
+        "185.199.109.153",
+        "185.199.110.153",
+        "185.199.111.153",
+      ],
+    },
+    {
+      type      = "CNAME",
+      subdomain = "www.",
+      rrdatas   = ["battlecode.org."],
+    },
+    {
+      type      = "A",
+      subdomain = "db.staging.",
+      rrdatas   = [module.staging.sql_instance_ip],
+    },
+  ]
 }

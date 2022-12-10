@@ -113,7 +113,7 @@ class SubmissionViewSetTestCase(APITestCase):
     @override_settings(GCLOUD_ENABLE_ACTIONS=True)
     def test_create_has_team_not_staff_not_frozen_large(self, enqueue, client):
         random.seed(1)
-        data = random.randbytes(2**27)  # 128MiB of stuff
+        data = random.randbytes(4 * 1024 * 1024)  # 4MiB of stuff
         writer = client().bucket().blob().open
         mock_open(writer)
 
