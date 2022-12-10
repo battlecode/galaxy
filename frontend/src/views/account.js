@@ -360,7 +360,7 @@ class Account extends Component {
                                     sponsors
                                   </a>
                                   . In the past, sponsors have offered our
-                                  competitors opprotunities based of their
+                                  competitors opportunities based of their
                                   resumes and performance in Battlecode!
                                 </p>
                               </div>
