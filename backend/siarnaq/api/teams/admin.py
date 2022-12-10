@@ -12,11 +12,11 @@ class TeamProfileInline(admin.StackedInline):
         "auto_accept_ranked",
         "auto_accept_unranked",
         "rating",
-        "has_avatar",
+        "has_uploaded_avatar",
         "eligible_for",
     )
     filter_horizontal = ("eligible_for",)
-    readonly_fields = ("rating", "has_avatar")
+    readonly_fields = ("rating", "has_uploaded_avatar")
 
     def get_queryset(self, request):
         return (

@@ -26,14 +26,14 @@ class TeamProfilePublicSerializer(serializers.ModelSerializer):
         fields = [
             "quote",
             "biography",
-            "has_avatar",
+            "has_uploaded_avatar",
             "avatar_url",
             "rating",
             "auto_accept_ranked",
             "auto_accept_unranked",
             "eligible_for",
         ]
-        read_only_fields = ["rating", "has_avatar", "avatar_url"]
+        read_only_fields = ["rating", "has_uploaded_avatar", "avatar_url"]
 
     def get_avatar_url(self, obj):
         return obj.get_avatar_url()
@@ -63,14 +63,14 @@ class TeamProfilePrivateSerializer(TeamProfilePublicSerializer):
         fields = [
             "quote",
             "biography",
-            "has_avatar",
+            "has_uploaded_avatar",
             "avatar_url",
             "rating",
             "auto_accept_ranked",
             "auto_accept_unranked",
             "eligible_for",
         ]
-        read_only_fields = ["rating", "has_avatar", "avatar_url"]
+        read_only_fields = ["rating", "has_uploaded_avatar", "avatar_url"]
 
     def create(self, validated_data):
         eligible_for = validated_data.pop("eligible_for", None)

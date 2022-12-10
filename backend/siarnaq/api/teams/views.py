@@ -146,9 +146,9 @@ class TeamViewSet(
         path = posixpath.join("team", str(self.pk), "avatar.png")
 
         with transaction.atomic():
-            profile.has_avatar = True
+            profile.has_uploaded_avatar = True
             profile.avatar_uuid = uuid.uuid4()
-            profile.save(update_fields=["has_avatar", "avatar_uuid"])
+            profile.save(update_fields=["has_uploaded_avatar", "avatar_uuid"])
             titan.upload_image(avatar, path)
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)

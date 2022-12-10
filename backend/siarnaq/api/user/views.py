@@ -135,9 +135,9 @@ class UserViewSet(
         path = posixpath.join("user", str(self.pk), "avatar.png")
 
         with transaction.atomic():
-            profile.has_avatar = True
+            profile.has_uploaded_avatar = True
             profile.avatar_uuid = uuid.uuid4()
-            profile.save(update_fields=["has_avatar", "avatar_uuid"])
+            profile.save(update_fields=["has_uploaded_avatar", "avatar_uuid"])
             img = Image.open(avatar)
             titan.upload_image(img, path)
 

@@ -1,13 +1,15 @@
 import posixpath
 import uuid
 
+import google.cloud.storage as storage
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
-from siarnaq.api.user import random_avatar
+from siarnaq.api.user.random_avatar import generate_avatar
+from siarnaq.gcloud import titan
 
 
 class User(AbstractUser):
@@ -77,10 +79,10 @@ class UserProfile(models.Model):
     kerberos = models.SlugField(max_length=16, blank=True)
     """The kerberos username of the user, if an MIT student."""
 
-    has_avatar = models.BooleanField(default=False)
+    has_uploaded_avatar = models.BooleanField(default=False)
     """Whether the user has an uploaded avatar."""
 
-    avatar_uuid = models.UUIDField(default=uuid.uuid4)
+    avatar_uuid = models.UUIDField(default=None, null=True)
     """A unique ID to identify each new avatar upload."""
 
     has_resume = models.BooleanField(default=False)
@@ -95,4 +97,19 @@ class UserProfile(models.Model):
 
     def get_avatar_url(self):
         """Return a cache-safe URL to the avatar."""
-        return random_avatar.get_avatar_url(self)
+
+        avatar_path = posixpath.join("user", str(self.pk), "avatar.png")
+        if not self.avatar_uuid:
+            self.avatar_uuid = uuid.uuid4()
+            self.save(update_fields=["has_uploaded_avatar", "avatar_uuid"])
+            avatar = generate_avatar(self.avatar_uuid.int)
+
+            titan.upload_image(avatar, avatar_path)
+
+        client = storage.Client.create_anonymous_client()
+        public_url = (
+            client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(avatar_path).public_url
+        )
+
+        # Append UUID to public URL to prevent caching on avatar update
+        return f"{public_url}?{self.avatar_uuid}"

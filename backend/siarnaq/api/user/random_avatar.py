@@ -1,12 +1,7 @@
-import posixpath
 import random
-import uuid
 
-import google.cloud.storage as storage
 from django.conf import settings
 from PIL import Image
-
-from siarnaq.gcloud import titan
 
 
 def generate_avatar(seed):
@@ -39,32 +34,3 @@ def generate_avatar(seed):
             avatar.putpixel((pixel_x, pixel_y), (int(r), int(g), int(b)))
 
     return avatar
-
-
-def get_avatar_url(entity):
-    """Return a cache-safe URL to the avatar."""
-    # To circumvent caching of old avatars, we append a UUID that changes on each
-    # update.
-
-    # check whether entity is user
-    if type(entity).__name__ == "User":
-        avatar_path = posixpath.join("user", str(entity.pk), "avatar.png")
-    else:
-        avatar_path = posixpath.join("team", str(entity.pk), "avatar.png")
-
-    if not entity.has_avatar:
-
-        entity.has_avatar = True
-        entity.avatar_uuid = uuid.uuid4()
-        entity.save(update_fields=["has_avatar", "avatar_uuid"])
-        avatar = generate_avatar(entity.avatar_uuid.int)
-
-        titan.upload_image(avatar, avatar_path)
-
-    client = storage.Client.create_anonymous_client()
-    public_url = (
-        client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(avatar_path).public_url
-    )
-
-    # Append UUID to public URL to prevent caching on avatar update
-    return f"{public_url}?{entity.avatar_uuid}"
