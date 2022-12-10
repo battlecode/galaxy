@@ -351,6 +351,16 @@ class Api {
       });
   }
 
+  static getUserTeams(user_id, callback) {
+    return $.get(`${URL}/api/user/u/${user_id}/teams/`)
+      .done((data, status) => {
+        callback(data);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting user's teams", xhr, status, error);
+      });
+  }
+
   static getUserProfile(callback) {
     return this.getProfileByUser("me", callback);
   }
