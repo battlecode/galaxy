@@ -15,25 +15,6 @@ class NotFound extends Component {
       marginBottom: "-30px",
     };
 
-    // display one of three random soup emojis :)
-    // if (!this.state.soup) {
-    // 	const rand = Math.floor(Math.random() * 3)
-    // 	let soup_emoji = ""
-    // 	switch (rand) {
-    // 		case 0:
-    // 			soup_emoji = "🍲"
-    // 			break
-    // 		case 1:
-    // 			soup_emoji = "🥘"
-    // 			break
-    // 		default:
-    // 			soup_emoji = "🍜"
-
-    // 	}
-
-    // 	this.setState({soup: soup_emoji})
-    // }
-
     return (
       <div className="content">
         <p className="text-center" style={pageErrorStyle}>
