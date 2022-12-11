@@ -1,21 +1,3 @@
-resource "google_storage_bucket" "home" {
-  name = "mitbattlecode-home"
-
-  location      = "US"
-  storage_class = "STANDARD"
-
-  website {
-    main_page_suffix = "index.html"
-    not_found_page   = "404.html"
-  }
-}
-
-resource "google_storage_bucket_iam_member" "home" {
-  bucket = google_storage_bucket.home.name
-  role   = "roles/storage.legacyObjectReader"
-  member = "allUsers"
-}
-
 module "cd" {
   source = "./cd"
 
@@ -117,7 +99,6 @@ module "network" {
   domain            = "battlecode.org."
 
   cloudrun_service_name = module.production.run_service_name
-  storage_home_name     = google_storage_bucket.home.name
 
   additional_buckets = {
     "production-frontend" = {

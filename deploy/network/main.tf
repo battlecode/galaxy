@@ -13,12 +13,6 @@ resource "google_compute_region_network_endpoint_group" "serverless" {
   }
 }
 
-resource "google_compute_backend_bucket" "home" {
-  name        = "${var.name}-home"
-  bucket_name = var.storage_home_name
-  enable_cdn  = true
-}
-
 resource "google_compute_backend_bucket" "buckets" {
   for_each = var.additional_buckets
 
@@ -103,12 +97,7 @@ module "lb" {
 resource "google_compute_url_map" "this" {
   name = var.name
 
-  default_service = google_compute_backend_bucket.home.self_link
-
-  host_rule {
-    hosts        = ["api.battlecode.org"]
-    path_matcher = "backend"
-  }
+  default_service = module.lb.backend_services["serverless"].self_link
 
   dynamic "host_rule" {
     for_each = var.additional_buckets
@@ -118,11 +107,6 @@ resource "google_compute_url_map" "this" {
       hosts        = ["${bucket.value.subdomain}battlecode.org"]
       path_matcher = bucket.key
     }
-  }
-
-  path_matcher {
-    name            = "backend"
-    default_service = module.lb.backend_services["serverless"].self_link
   }
 
   dynamic "path_matcher" {

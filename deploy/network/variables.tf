@@ -33,11 +33,6 @@ variable "cloudrun_service_name" {
   type        = string
 }
 
-variable "storage_home_name" {
-  description = "Name of Google Cloud Storage bucket resource for website homepage"
-  type        = string
-}
-
 variable "additional_buckets" {
   description = "Specifications for any additional buckets to be routed"
   type        = map(object({
