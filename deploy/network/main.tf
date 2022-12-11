@@ -2,8 +2,8 @@ locals {
   subdomains = concat(["api."], [for b in var.additional_buckets : b.subdomain])
 }
 
-resource "google_compute_region_network_endpoint_group" "serverless" {
-  name   = "${var.name}-serverless"
+resource "google_compute_region_network_endpoint_group" "siarnaq" {
+  name   = "${var.name}-siarnaq"
   region = var.gcp_region
 
   network_endpoint_type = "SERVERLESS"
@@ -46,8 +46,8 @@ module "lb" {
   managed_ssl_certificate_domains = [for subdomain in local.subdomains : "${subdomain}battlecode.org" ]
 
   backends = {
-    serverless = {
-      description = "Serverless backend"
+    siarnaq = {
+      description = "Siarnaq"
       protocol    = "HTTP"
       port        = 80
       port_name   = "http"
@@ -71,7 +71,7 @@ module "lb" {
 
       groups = [
         {
-          group                        = google_compute_region_network_endpoint_group.serverless.id
+          group                        = google_compute_region_network_endpoint_group.siarnaq.id
           balancing_mode               = null
           capacity_scaler              = null
           description                  = null
@@ -97,7 +97,7 @@ module "lb" {
 resource "google_compute_url_map" "this" {
   name = var.name
 
-  default_service = module.lb.backend_services["serverless"].self_link
+  default_service = module.lb.backend_services["siarnaq"].self_link
 
   dynamic "host_rule" {
     for_each = var.additional_buckets
