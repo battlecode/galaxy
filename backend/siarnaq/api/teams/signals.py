@@ -37,7 +37,7 @@ def make_empty_team_inactive(instance, action, **kwargs):
             )
             instance.status = TeamStatus.INACTIVE
             instance.save(update_fields=["status"])
-        if instance.members.count() == 0 and instance.has_active_submissions():
+        if instance.members.count() == 0 and not instance.has_active_submissions():
             instance.delete()
 
 
