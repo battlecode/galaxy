@@ -18,18 +18,18 @@ variable "gcp_zone" {
   type        = string
 }
 
-variable "managed_zone_name" {
-  description = "Name of the DNS managed zone that has already been provisioned"
-  type        = string
-}
-
-variable "domain" {
-  description = "Domain to be managed by the DNS"
+variable "subdomain" {
+  description = "Subomain under which all networking resources belong"
   type        = string
 }
 
 variable "cloudrun_service_name" {
   description = "The name of the Cloud Run service to be routed to"
+  type        = string
+}
+
+variable "sql_instance_ip" {
+  description = "The IP address of the Cloud SQL instance"
   type        = string
 }
 
@@ -39,11 +39,6 @@ variable "additional_buckets" {
     bucket_name=string,
     enable_cdn=bool,
     cdn_cache_ttl=number,
-    subdomain=string,
+    subsubdomain=string,
   }))
-}
-
-variable "dns_additional_records" {
-  description = "Additional DNS A records for the zone"
-  type        = list(object({type=string, subdomain=string, rrdatas=list(string)}))
 }

@@ -1,5 +1,6 @@
 locals {
-  subdomains = concat(["api."], [for b in var.additional_buckets : b.subdomain])
+  subsubdomains = concat(["api."], [for b in var.additional_buckets : b.subsubdomain])
+  subdomains = [ for subsubdomain in local.subsubdomains : "${subsubdomain}${var.subdomain}" ]
 }
 
 resource "google_compute_region_network_endpoint_group" "siarnaq" {
@@ -104,7 +105,7 @@ resource "google_compute_url_map" "this" {
     iterator = bucket
 
     content {
-      hosts        = ["${bucket.value.subdomain}battlecode.org"]
+      hosts        = ["${bucket.value.subsubdomain}battlecode.org"]
       path_matcher = bucket.key
     }
   }
@@ -118,30 +119,4 @@ resource "google_compute_url_map" "this" {
       default_service = google_compute_backend_bucket.buckets[bucket.key].self_link
     }
   }
-}
-
-data "google_dns_managed_zone" "this" {
-  name = var.managed_zone_name
-}
-
-resource "google_dns_record_set" "this" {
-  for_each = toset(local.subdomains)
-
-  name = "${each.value}${data.google_dns_managed_zone.this.dns_name}"
-  type = "A"
-  ttl  = 300
-
-  managed_zone = data.google_dns_managed_zone.this.name
-  rrdatas      = [module.lb.external_ip]
-}
-
-resource "google_dns_record_set" "additional" {
-  for_each = { for record in var.dns_additional_records : "${record.subdomain}/${record.type}" => record }
-
-  name = "${each.value.subdomain}${data.google_dns_managed_zone.this.dns_name}"
-  type = each.value.type
-  ttl  = 300
-
-  managed_zone = data.google_dns_managed_zone.this.name
-  rrdatas      = each.value.rrdatas
 }
