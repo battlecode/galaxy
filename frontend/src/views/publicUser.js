@@ -18,11 +18,9 @@ class PublicUser extends Component {
   }
 
   componentDidMount() {
-    // Get user info
     Api.getProfileByUser(this.state.user_id, (user) => {
       this.setUser(user);
     });
-    // Get user teams
     Api.getUserTeams(this.state.user_id, (teams_dict) => {
       this.setTeams(teams_dict);
     });
@@ -47,7 +45,12 @@ class PublicUser extends Component {
             <div className="col-md-4">
               {this.state.teams &&
                 Object.keys(this.state.teams).map((episode) => (
-                  <TeamCard key={episode} team={this.state.teams[episode]} />
+                  <TeamCard
+                    key={episode}
+                    team={this.state.teams[episode]}
+                    history={this.props.history}
+                    episode={this.props.match.params.episode}
+                  />
                 ))}
             </div>
           </div>
