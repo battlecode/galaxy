@@ -221,63 +221,42 @@ class Submissions extends Component {
   // return div for submitting files, should be able to disable this when submissions are not being accepts
   renderHelperSubmissionForm() {
     if (this.isSubmissionEnabled()) {
-      let status_str = "";
-      let btn_class = "btn btn";
-      let file_label = "No file chosen.";
-      let file_button_sub = <div> </div>;
-      let file_button = <div></div>;
-      let file_button_2 = <div></div>;
-
-      let button = (
-        <button disabled style={{ float: "right" }} className={btn_class}>
-          {" "}
-          Submit{" "}
-        </button>
+      // TODO should just turn this into a mini-component
+      let thing = (
+        <div className="row">
+          <div className="col-md-12">
+            <div className="form-group">
+              <label>Submission</label>
+              {/* TODO grab resume_status properly */}
+              {resume_status}
+              <br />
+              <label htmlFor="submission_file_upload">
+                <div className="btn"> Choose File </div>{" "}
+                <span
+                  style={{
+                    textTransform: "none",
+                    marginLeft: "10px",
+                    fontSize: "14px",
+                  }}
+                >
+                  {" "}
+                  {/* TODO set this properly */}
+                  {resume_file_label}{" "}
+                </span>
+              </label>
+              <input
+                id="submission_file_upload"
+                type="file"
+                accept=".zip"
+                onChange={this.fileChangeHandler}
+                style={{ display: "none" }}
+              />
+              {/* TODO set this properly */}
+              {resume_upload_button}
+            </div>
+          </div>
+        </div>
       );
-      if (this.state.selectedFile !== null) {
-        btn_class += " btn-info btn-fill";
-        file_label = this.state.selectedFile["name"];
-        if (this.state.upload_status != 10) {
-          button = (
-            <button
-              style={{ float: "right" }}
-              onClick={this.uploadData}
-              className={btn_class}
-            >
-              {" "}
-              Submit{" "}
-            </button>
-          );
-        }
-      }
-      // Make sure to disable concurrent submission uploads.
-      if (this.state.upload_status != 10) {
-        file_button_sub = <div className="btn"> Choose File </div>;
-        file_button = (
-          <label htmlFor="file_upload">
-            {file_button_sub}{" "}
-            <span
-              style={{
-                textTransform: "none",
-                marginLeft: "10px",
-                fontSize: "14px",
-              }}
-            >
-              {" "}
-              {file_label}{" "}
-            </span>{" "}
-          </label>
-        );
-        file_button_2 = (
-          <input
-            id="file_upload"
-            type="file"
-            accept=".zip"
-            onChange={this.onChangeHandler}
-            style={{ display: "none" }}
-          ></input>
-        );
-      }
 
       return (
         <div className="card">
@@ -333,11 +312,8 @@ class Submissions extends Component {
                 see the "Compiling Tips" section at the bottom of this page.
               </b>
             </p>
-            {file_button}
-            {file_button_2}
-            {button}
-            {/* <p id="upload_status" className="text-center category"> {status_str}</p> */}
           </div>
+          {thing}
         </div>
       );
     } else {
