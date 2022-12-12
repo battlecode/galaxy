@@ -48,7 +48,6 @@ class PublicUser extends Component {
                   <TeamCard
                     key={episode}
                     team={this.state.teams[episode]}
-                    history={this.props.history}
                     episode={this.props.match.params.episode}
                   />
                 ))}

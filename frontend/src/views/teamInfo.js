@@ -114,11 +114,7 @@ class TeamInfo extends Component {
         <div className="content">
           <div className="container-fluid">
             <div className="row">
-              <TeamCard
-                team={team}
-                history={this.props.history}
-                episode={this.props.match.params.episode}
-              />
+              <TeamCard team={team} episode={this.props.match.params.episode} />
             </div>
             {/* Commented out since we don't have scrimmages, records, etc.
             Work on this once we are ready to.

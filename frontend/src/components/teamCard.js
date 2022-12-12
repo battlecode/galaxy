@@ -28,7 +28,7 @@ class TeamCard extends Component {
   }
 
   redirectToUserPage = (user_id) => {
-    this.props.history.push(`/${this.props.episode}/user/${user_id}`);
+    window.location.replace(`/${this.props.episode}/user/${user_id}`);
   };
 
   // don't want to make ajax calls before component is mounted!
