@@ -72,25 +72,39 @@ class WinsCard extends Component {
   }
 }
 
+// This is the component in question being rendered
 class TeamInfo extends Component {
-  state = {
-    team: null,
-    wins: 0,
-    losses: 0,
-  };
-
-  componentDidMount() {
-    const teamId = this.props.match.params.team_id;
-    //get team info by id
-    Api.getTeamById(teamId, this.setTeam);
-
-    Api.getOtherTeamWinStats(teamId, (data) => {
-      this.setState({ wins: data[0], losses: data[1] });
-    });
+  constructor(props) {
+    super(props);
+    this.state = {
+      // Note that this prop comes from route-matching.
+      // (The route to make this is /:episode/rankings/:team_id
+      // and the :team_id part makes props.match.params.team_id
+      // whatever that id is)
+      id: this.props.match.params.team_id,
+      team: null,
+      wins: 0,
+      losses: 0,
+    };
   }
 
-  setTeam = (team_data) => {
-    this.setState({ team: team_data });
+  componentDidMount() {
+    //get team info by id
+    const teamId = this.props.match.params.team_id;
+    const episode = this.props.match.params.episode;
+
+    Api.getTeamProfile(episode, teamId, this.setTeam);
+
+    // Commented out since we don't have scrimmages, records, etc.
+    // Work on this once we are ready to.
+    // Track in #368.
+    // Api.getOtherTeamWinStats(teamId, (data) => {
+    //   this.setState({ wins: data[0], losses: data[1] });
+    // });
+  }
+
+  setTeam = (team) => {
+    this.setState({ team });
   };
 
   render() {
@@ -102,7 +116,10 @@ class TeamInfo extends Component {
             <div className="row">
               <TeamCard team={team} />
             </div>
-            <div className="row">
+            {/* Commented out since we don't have scrimmages, records, etc.
+            Work on this once we are ready to.
+            Do in #368 */}
+            {/* <div className="row">
               <div className="col-md-3">
                 <div className="container-fluid">
                   <div className="row">
@@ -127,7 +144,7 @@ class TeamInfo extends Component {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       );

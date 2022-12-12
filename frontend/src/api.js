@@ -161,6 +161,8 @@ class Api {
 
   //----TEAM STATS---
 
+  // clean these calls, fix in #368
+
   // data from scrimmaging
   static getOwnTeamMuHistory(callback) {
     return Api.getTeamMuHistory(Cookies.get("team_id"), callback);
@@ -258,6 +260,17 @@ class Api {
   }
 
   //---TEAM INFO---
+
+  static getTeamProfile(episode, teamId, callback) {
+    return $.get(`${URL}/api/team/${episode}/t/${teamId}/`)
+      .done((data, status) => {
+        callback(data);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting user's team profile", xhr, status, error);
+        callback(null);
+      });
+  }
 
   static getUserTeamProfile(episode, callback) {
     return $.get(`${URL}/api/team/${episode}/t/me/`)

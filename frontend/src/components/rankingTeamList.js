@@ -7,7 +7,7 @@ import Spinner from "./spinner";
 
 class RankingTeamList extends TeamList {
   redirectToTeamPage = (team_id) => {
-    // this.props.history.push(`/rankings/${team_id}`);
+    this.props.history.push(`/${this.props.episode}/rankings/${team_id}`);
   };
 
   render() {
