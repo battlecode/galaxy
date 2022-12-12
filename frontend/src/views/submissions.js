@@ -681,7 +681,8 @@ class Submissions extends Component {
           <div className="row">
             <div className="col-md-12">
               {this.renderHelperSubmissionForm()}
-              {this.renderHelperSubmissionStatus()}
+              {/* See #387 for tracking */}
+              {/* {this.renderHelperSubmissionStatus()} */}
 
               {/* See #387 for tracking */}
               {/* <div className="card">
