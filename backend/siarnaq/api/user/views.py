@@ -11,6 +11,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
+from siarnaq.api.teams.models import Team
+from siarnaq.api.teams.serializers import TeamPublicSerializer
 from siarnaq.api.user.models import User
 from siarnaq.api.user.serializers import (
     UserAvatarSerializer,
@@ -72,6 +74,19 @@ class UserViewSet(
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 return Response(serializer.data)
+
+    @action(
+        detail=True,
+        permission_classes=(AllowAny,),
+        serializer_class=TeamPublicSerializer,
+    )
+    def teams(self, request, pk=None):
+        """Retrieve all teams associated with a user."""
+        teams = Team.objects.filter(members__pk=pk)
+        serializer = self.get_serializer(teams, many=True)
+        # Return dict - {"episode": Team}
+        teams_dict = {team["episode"]: team for team in serializer.data}
+        return Response(teams_dict)
 
     @action(
         detail=False,

@@ -27,6 +27,10 @@ class TeamCard extends Component {
     }
   }
 
+  redirectToUserPage = (user_id) => {
+    window.location.replace(`/${this.props.episode}/user/${user_id}`);
+  };
+
   // don't want to make ajax calls before component is mounted!
   componentDidMount() {
     this.getUserData();
@@ -56,7 +60,9 @@ class TeamCard extends Component {
         <div className="small-user-list" key={user.username}>
           {" "}
           <Avatar data={user} />
-          <small>{user.username}</small>
+          <small onClick={() => this.redirectToUserPage(user.id)}>
+            {user.username}
+          </small>
         </div>
       ) : null;
     });

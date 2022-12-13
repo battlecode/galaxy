@@ -259,7 +259,9 @@ class YesTeam extends Component {
             </div>
           </div>
         </div>
-        <div className="col-md-4">{<TeamCard team={this.state.team} />}</div>
+        <div className="col-md-4">
+          {<TeamCard team={this.state.team} episode={this.props.episode} />}
+        </div>
       </div>
     );
   }
