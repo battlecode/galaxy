@@ -5,7 +5,6 @@ from siarnaq.api.user import views
 
 router = DefaultRouter()
 router.register("u", views.UserViewSet, basename="user")
-router.register(r"u/(?P<id>[^\/.]+)", views.TeamByUserViewSet, basename="user")
 
 urlpatterns = [
     path("", include(router.urls)),

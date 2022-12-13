@@ -76,6 +76,20 @@ class UserViewSet(
                 return Response(serializer.data)
 
     @action(
+        detail=True,
+        permission_classes=(AllowAny,),
+        serializer_class=TeamPublicSerializer,
+    )
+    def teams(self, request, **kwargs):
+        """Retrieve all teams associated with a user."""
+        user_id = kwargs["pk"]
+        teams = Team.objects.filter(members__pk=user_id)
+        serializer = self.get_serializer(teams, many=True)
+        # Return dict - {"episode": Team}
+        teams_dict = {team["episode"]: team for team in serializer.data}
+        return Response(teams_dict)
+
+    @action(
         detail=False,
         methods=["get", "put"],
         permission_classes=(IsAuthenticated,),
@@ -145,31 +159,3 @@ class UserViewSet(
             titan.upload_image(avatar, profile.get_avatar_path())
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
-
-
-class TeamByUserViewSet(
-    viewsets.GenericViewSet,
-):
-    """
-    A viewset for retrieving a user's associated teams.
-    """
-
-    permission_classes = (AllowAny,)
-    filter_backends = [filters.SearchFilter]
-
-    def get_queryset(self):
-        return Team.objects.all()
-
-    @action(
-        detail=False,
-        permission_classes=(IsAuthenticated,),
-        serializer_class=TeamPublicSerializer,
-    )
-    def teams(self, request, **kwargs):
-        """Retrieve all teams associated with a user."""
-        user_id = self.kwargs["id"]
-        teams = self.get_queryset().all().filter(members__pk=user_id)
-        serializer = self.get_serializer(teams, many=True)
-        # Return dict - {"episode": Team}
-        teams_dict = {team["episode"]: team for team in serializer.data}
-        return Response(teams_dict)
