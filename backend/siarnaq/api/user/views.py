@@ -80,10 +80,9 @@ class UserViewSet(
         permission_classes=(AllowAny,),
         serializer_class=TeamPublicSerializer,
     )
-    def teams(self, request, **kwargs):
+    def teams(self, request, pk=None):
         """Retrieve all teams associated with a user."""
-        user_id = kwargs["pk"]
-        teams = Team.objects.filter(members__pk=user_id)
+        teams = Team.objects.filter(members__pk=pk)
         serializer = self.get_serializer(teams, many=True)
         # Return dict - {"episode": Team}
         teams_dict = {team["episode"]: team for team in serializer.data}

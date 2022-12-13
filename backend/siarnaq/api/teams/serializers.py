@@ -54,6 +54,7 @@ class TeamPublicSerializer(serializers.ModelSerializer):
     def update(self, *args, **kwargs):
         raise RuntimeError("Operation disabled for public serializer")
 
+
 class TeamProfilePrivateSerializer(TeamProfilePublicSerializer):
     rating = RatingField(read_only=True)
 
