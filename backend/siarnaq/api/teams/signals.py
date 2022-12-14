@@ -31,14 +31,15 @@ def copy_rating_to_profile(instance, update_fields, **kwargs):
 @receiver(m2m_changed, sender=Team.members.through)
 def make_empty_team_inactive(instance, action, **kwargs):
     if action == "post_remove":
-        if instance.members.count() == 0 and instance.has_active_submissions():
-            logger.debug(
-                "team_inactive", message="Team is now inactive.", team=instance.pk
-            )
-            instance.status = TeamStatus.INACTIVE
-            instance.save(update_fields=["status"])
-        if instance.members.count() == 0 and not instance.has_active_submissions():
-            instance.delete()
+        if instance.members.count() == 0:
+            if not instance.has_active_submissions():
+                instance.delete()
+            else:
+                logger.debug(
+                    "team_inactive", message="Team is now inactive.", team=instance.pk
+                )
+                instance.status = TeamStatus.INACTIVE
+                instance.save(update_fields=["status"])
 
 
 @receiver(m2m_changed, sender=Team.members.through)
