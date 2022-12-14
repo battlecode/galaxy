@@ -285,12 +285,26 @@ class Account extends Component {
                           onChange={this.changeHandler}
                         />
                       </div>
+                      <div className="col-md-6">
+                        <div className="form-group">
+                          <label>Kerberos</label>
+                          <input
+                            type="text"
+                            id="profile-kerberos"
+                            className="form-control"
+                            onChange={this.changeHandler}
+                            value={this.state.user.profile.kerberos}
+                          />
+                        </div>
+                      </div>
+
                       <Gender
                         changeHandler={this.changeHandler}
                         gender={this.state.user.profile.gender}
                         gender_details={this.state.user.profile.gender_details}
                         blankGenderDetails={this.blankGenderDetails}
                       />
+
                       {/* <div className="row">
                       <div className="col-md-12">
                         <div className="form-group">
