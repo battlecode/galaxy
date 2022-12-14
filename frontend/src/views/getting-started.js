@@ -265,7 +265,10 @@ class GettingStarted extends Component {
                   </p>
                   <p>
                     Create an account on this website, and then go to the{" "}
-                    <NavLink to="team" style={{ fontWeight: 700 }}>
+                    <NavLink
+                      to={`/${this.props.episode}/team`}
+                      style={{ fontWeight: 700 }}
+                    >
                       team
                     </NavLink>{" "}
                     section to either create or join a team.
@@ -280,7 +283,10 @@ class GettingStarted extends Component {
                   <p>
                     <b>
                       Check{" "}
-                      <NavLink to="common-issues" style={{ fontWeight: 700 }}>
+                      <NavLink
+                        to={`/${this.props.episode}/common-issues`}
+                        style={{ fontWeight: 700 }}
+                      >
                         common issues
                       </NavLink>{" "}
                       if you experience problems with the instructions below,
@@ -442,7 +448,7 @@ class GettingStarted extends Component {
                   </p>
                   <p>
                     Check{" "}
-                    <NavLink to="debugging-tips" style={{ fontWeight: 700 }}>
+                    <NavLink to={`/${this.props.episode}/debugging-tips`} style={{ fontWeight: 700 }}>
                       debugging tips
                     </NavLink>{" "}
                     if you experience problems while developing, or ask on the

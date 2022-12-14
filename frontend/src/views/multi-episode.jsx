@@ -40,7 +40,12 @@ class MultiEpisode extends Component {
       if (forceRedirect) {
         window.location.replace("/not-found");
       } else {
-        return null;
+        // If the pathname doesn't have an episode in it,
+        // but an episode is needed for the page,
+        // assume the default episode.
+        // This is a better handler than, eg, null,
+        // which would break pages and show odd things in your routes.
+        return DEFAULT_EPISODE;
       }
     }
   }

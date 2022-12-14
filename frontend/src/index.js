@@ -195,12 +195,12 @@ class App extends Component {
       <Route
         path={`/:episode/debugging-tips`}
         component={(props) => (
-          <Issues {...props} episode={this.state.episode} />
+          <Debugging {...props} episode={this.state.episode} />
         )}
         key="debugging"
       />,
       <Route
-        path={`/:episode/codeofconduct`}
+        path={`/codeofconduct`}
         component={CodeOfConduct}
         key="codeofconduct"
       />,
@@ -257,7 +257,7 @@ class App extends Component {
         key="team"
       />,
       <Route
-        path={`/:episode/account`}
+        path={`/account`}
         component={(props) => (
           <Account
             {...props}

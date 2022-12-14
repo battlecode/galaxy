@@ -12,7 +12,7 @@ class Footer extends Component {
                 <a href="/">Home</a>
               </li>
               <li>
-                <NavLink to="codeofconduct">Code of Conduct</NavLink>
+                <NavLink to="/codeofconduct">Code of Conduct</NavLink>
               </li>
             </ul>
           </nav>

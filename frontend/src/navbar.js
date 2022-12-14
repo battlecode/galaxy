@@ -53,7 +53,7 @@ class NavBarAccount extends Component {
             <NavLink to={`/multi-episode`}>Change Episode</NavLink>
           </li> */}
           <li>
-            <NavLink to={`/${this.props.episode}/account`}>Account</NavLink>
+            <NavLink to={`/account`}>Account</NavLink>
           </li>
           <li>
             <NavLink to={`/logout`}>Log out</NavLink>
