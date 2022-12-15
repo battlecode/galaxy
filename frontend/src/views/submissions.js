@@ -334,8 +334,8 @@ class Submissions extends Component {
                 see the "Compiling Tips" section at the bottom of this page.
               </b>
             </p>
+            {thing}
           </div>
-          {thing}
         </div>
       );
     } else {
