@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import Api from "../api";
 import Countdown from "../components/countdown";
-import * as Cookies from "js-cookie";
-import { times } from "chartist";
+import ActionMessage from "../components/actionMessage";
 
 const COMPILATION_STATUS = {
   PROGRESS: 0,
@@ -26,7 +25,7 @@ class Submissions extends Component {
       numLastLoaded: 0,
       numTourSubmissions: 0,
       numTourLoaded: 0,
-      upload_status: null,
+      upload_status: "waiting",
     };
   }
 
@@ -221,14 +220,39 @@ class Submissions extends Component {
   // return div for submitting files, should be able to disable this when submissions are not being accepts
   renderHelperSubmissionForm() {
     if (this.isSubmissionEnabled()) {
+      // Submission upload button logic
+      const submission_inputted = this.state.selectedFile !== null;
+      const submission_file_label = !submission_inputted
+        ? "No file chosen."
+        : this.state.selectedFile["name"];
+      const submission_btn_class =
+        "btn btn" + (!submission_inputted ? "" : " btn-info btn-fill");
+
+      const submission_btn_disabled =
+        !submission_inputted ||
+        ["success", "loading", "failure"].includes(this.state.upload_status);
+
+      const submission_upload_button = (
+        <button
+          disabled={submission_btn_disabled}
+          style={{ float: "right" }}
+          onClick={this.uploadResume}
+          className={submission_btn_class}
+        >
+          {" "}
+          <ActionMessage
+            default_message="Upload Submission"
+            status={this.state.resume_status}
+          />{" "}
+        </button>
+      );
+
       // TODO should just turn this into a mini-component
       let thing = (
         <div className="row">
           <div className="col-md-12">
             <div className="form-group">
               <label>Submission</label>
-              {/* TODO grab resume_status properly */}
-              {resume_status}
               <br />
               <label htmlFor="submission_file_upload">
                 <div className="btn"> Choose File </div>{" "}
@@ -240,8 +264,7 @@ class Submissions extends Component {
                   }}
                 >
                   {" "}
-                  {/* TODO set this properly */}
-                  {resume_file_label}{" "}
+                  {submission_file_label}{" "}
                 </span>
               </label>
               <input
@@ -251,8 +274,7 @@ class Submissions extends Component {
                 onChange={this.fileChangeHandler}
                 style={{ display: "none" }}
               />
-              {/* TODO set this properly */}
-              {resume_upload_button}
+              {submission_upload_button}
             </div>
           </div>
         </div>
