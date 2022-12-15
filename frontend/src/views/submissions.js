@@ -74,10 +74,9 @@ class Submissions extends Component {
     this.setState({
       selectedFile: event.target.files[0],
       loaded: 0,
-      upload_status: -1,
     });
-    this.renderHelperSubmissionForm();
-    this.renderHelperSubmissionStatus();
+    // this.renderHelperSubmissionForm();
+    // this.renderHelperSubmissionStatus();
   };
 
   //---GETTING TEAMS SUBMISSION DATA----
