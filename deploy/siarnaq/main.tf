@@ -242,13 +242,11 @@ resource "google_cloudbuild_trigger" "this" {
     }
     step {
       name = "gcr.io/google-appengine/exec-wrapper"
-      args = ["-i", var.image, "-s", "${var.gcp_project}:${var.gcp_region}:${google_sql_database_instance.this.name}", "--", "/env/bin/python", "manage.py", "migrate"]
-      env  = ["DJANGO_CONFIGURATION=${var.configuration}"]
+      args = ["-i", var.image, "-e", "DJANGO_CONFIGURATION=${var.configuration}", "-s", "${var.gcp_project}:${var.gcp_region}:${google_sql_database_instance.this.name}", "--", "/env/bin/python", "manage.py", "migrate"]
     }
     step {
       name = "gcr.io/google-appengine/exec-wrapper"
-      args = ["-i", var.image, "-s", "${var.gcp_project}:${var.gcp_region}:${google_sql_database_instance.this.name}", "--", "/env/bin/python", "manage.py", "collectstatic", "--verbosity=2", "--no-input"]
-      env  = ["DJANGO_CONFIGURATION=${var.configuration}"]
+      args = ["-i", var.image, "-e", "DJANGO_CONFIGURATION=${var.configuration}", "-s", "${var.gcp_project}:${var.gcp_region}:${google_sql_database_instance.this.name}", "--", "/env/bin/python", "manage.py", "collectstatic", "--verbosity=2", "--no-input"]
     }
     step {
       name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
