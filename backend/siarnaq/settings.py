@@ -327,7 +327,7 @@ class Staging(Base):
     GCLOUD_ORDER_EXECUTE = "execute-order"
     GCLOUD_SCHEDULER_PREFIX = "staging"
 
-    DEBUG = True
+    DEBUG = False
     CORS_ALLOW_ALL_ORIGINS = True
 
     EMAIL_ENABLED = False
