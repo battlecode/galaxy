@@ -39,10 +39,10 @@ module "lb" {
 
   url_map           = google_compute_url_map.this.self_link
   create_url_map    = false
-  https_redirect    = true
+  https_redirect    = var.use_ssl
   firewall_networks = []
 
-  ssl                             = true
+  ssl                             = var.use_ssl
   use_ssl_certificates            = false
   managed_ssl_certificate_domains = [for subdomain in local.subdomains : "${subdomain}battlecode.org" ]
 

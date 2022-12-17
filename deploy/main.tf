@@ -95,6 +95,7 @@ module "production_network" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
+  use_ssl               = true
   subdomain             = ""
   cloudrun_service_name = module.production.run_service_name
   sql_instance_ip       = module.staging.sql_instance_ip
@@ -117,6 +118,7 @@ module "staging_network" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
+  use_ssl               = false
   subdomain             = "staging."
   cloudrun_service_name = module.staging.run_service_name
   sql_instance_ip       = module.staging.sql_instance_ip

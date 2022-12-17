@@ -23,6 +23,11 @@ variable "subdomain" {
   type        = string
 }
 
+variable "use_ssl" {
+  description = "Whether to use and redirect to SSL."
+  type        = bool
+}
+
 variable "cloudrun_service_name" {
   description = "The name of the Cloud Run service to be routed to"
   type        = string
