@@ -98,7 +98,7 @@ module "production_network" {
   use_ssl               = true
   subdomain             = ""
   cloudrun_service_name = module.production.run_service_name
-  sql_instance_ip       = module.staging.sql_instance_ip
+  sql_instance_ip       = module.production.sql_instance_ip
 
   additional_buckets = {
     "frontend" = {
@@ -155,7 +155,7 @@ locals {
   )
 }
 
-resource "google_dns_record_set" "additional" {
+resource "google_dns_record_set" "this" {
   for_each = { for record in local.dns_records : "${record.subdomain}/${record.type}" => record }
 
   name = "${each.value.subdomain}${data.google_dns_managed_zone.this.dns_name}"
