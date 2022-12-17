@@ -18,14 +18,14 @@ variable "gcp_zone" {
   type        = string
 }
 
-variable "managed_zone_name" {
-  description = "Name of the DNS managed zone that has already been provisioned"
+variable "subdomain" {
+  description = "Subomain under which all networking resources belong"
   type        = string
 }
 
-variable "domain" {
-  description = "Domain to be managed by the DNS"
-  type        = string
+variable "use_ssl" {
+  description = "Whether to use and redirect to SSL."
+  type        = bool
 }
 
 variable "cloudrun_service_name" {
@@ -33,8 +33,8 @@ variable "cloudrun_service_name" {
   type        = string
 }
 
-variable "storage_home_name" {
-  description = "Name of Google Cloud Storage bucket resource for website homepage"
+variable "sql_instance_ip" {
+  description = "The IP address of the Cloud SQL instance"
   type        = string
 }
 
@@ -44,11 +44,6 @@ variable "additional_buckets" {
     bucket_name=string,
     enable_cdn=bool,
     cdn_cache_ttl=number,
-    subdomain=string,
+    subsubdomain=string,
   }))
-}
-
-variable "dns_additional_records" {
-  description = "Additional DNS A records for the zone"
-  type        = list(object({type=string, subdomain=string, rrdatas=list(string)}))
 }

@@ -115,8 +115,8 @@ module "siarnaq" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
-  create_cloud_run = var.create_website
   image            = var.siarnaq_image
+  configuration    = var.siarnaq_configuration
 
   database_tier                = var.database_tier
   database_name                = "battlecode"

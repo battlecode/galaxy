@@ -1,21 +1,3 @@
-resource "google_storage_bucket" "home" {
-  name = "mitbattlecode-home"
-
-  location      = "US"
-  storage_class = "STANDARD"
-
-  website {
-    main_page_suffix = "index.html"
-    not_found_page   = "404.html"
-  }
-}
-
-resource "google_storage_bucket_iam_member" "home" {
-  bucket = google_storage_bucket.home.name
-  role   = "roles/storage.legacyObjectReader"
-  member = "allUsers"
-}
-
 module "cd" {
   source = "./cd"
 
@@ -54,6 +36,7 @@ module "production" {
 
   create_website               = true
   siarnaq_image                = module.cd.artifact_image["siarnaq"]
+  siarnaq_configuration        = "Production"
   database_tier                = "db-custom-1-3840"
   database_backup              = true
   database_authorized_networks = []
@@ -84,7 +67,8 @@ module "staging" {
   secure_lifecycle_rules = []
 
   create_website               = false
-  siarnaq_image                = null
+  siarnaq_image                = module.cd.artifact_image["siarnaq"]
+  siarnaq_configuration        = "Staging"
   database_tier                = "db-f1-micro"
   database_backup              = false
   database_authorized_networks = ["0.0.0.0/0"]
@@ -105,49 +89,81 @@ module "staging" {
   ]
 }
 
-module "network" {
+module "production_network" {
   source = "./network"
 
-  name        = "galaxy-network"
+  name        = "production"
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
-  managed_zone_name = "battlecode-dns-zone"
-  domain            = "battlecode.org."
-
+  use_ssl               = true
+  subdomain             = ""
   cloudrun_service_name = module.production.run_service_name
-  storage_home_name     = google_storage_bucket.home.name
+  sql_instance_ip       = module.production.sql_instance_ip
 
   additional_buckets = {
-    "production-frontend" = {
+    "frontend" = {
       bucket_name   = module.production.storage_frontend_name
       enable_cdn    = true
       cdn_cache_ttl = 60
-      subdomain     = "play."
+      subsubdomain  = "play."
     }
   }
+}
 
-  dns_additional_records = [
-    {
-      type      = "A",
-      subdomain = "",
-      rrdatas   = [
-        "185.199.108.153",  # These are GH Pages
-        "185.199.109.153",
-        "185.199.110.153",
-        "185.199.111.153",
-      ],
-    },
-    {
-      type      = "CNAME",
-      subdomain = "www.",
-      rrdatas   = ["battlecode.org."],
-    },
-    {
-      type      = "A",
-      subdomain = "db.staging.",
-      rrdatas   = [module.staging.sql_instance_ip],
-    },
-  ]
+module "staging_network" {
+  source = "./network"
+
+  name        = "staging"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+
+  use_ssl               = false
+  subdomain             = "staging."
+  cloudrun_service_name = module.staging.run_service_name
+  sql_instance_ip       = module.staging.sql_instance_ip
+
+  additional_buckets = {}
+}
+
+data "google_dns_managed_zone" "this" {
+  name = "battlecode-dns-zone"
+}
+
+
+locals {
+  dns_records = concat(
+    module.production_network.dns_records,
+    module.staging_network.dns_records,
+    [
+      {
+        type      = "A",
+        subdomain = "",
+        rrdatas   = [
+          "185.199.108.153",  # These are GH Pages
+          "185.199.109.153",
+          "185.199.110.153",
+          "185.199.111.153",
+        ],
+      },
+      {
+        type      = "CNAME",
+        subdomain = "www.",
+        rrdatas   = ["battlecode.org."],
+      },
+    ]
+  )
+}
+
+resource "google_dns_record_set" "this" {
+  for_each = { for record in local.dns_records : "${record.subdomain}/${record.type}" => record }
+
+  name = "${each.value.subdomain}${data.google_dns_managed_zone.this.dns_name}"
+  type = each.value.type
+  ttl  = 300
+
+  managed_zone = data.google_dns_managed_zone.this.name
+  rrdatas      = each.value.rrdatas
 }

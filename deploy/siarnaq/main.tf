@@ -39,8 +39,6 @@ resource "google_project_iam_member" "scheduler" {
 }
 
 resource "google_project_iam_member" "sql" {
-  count = var.create_cloud_run ? 1 : 0
-
   project = var.gcp_project
   role    = "roles/cloudsql.client"
   member  = "serviceAccount:${google_service_account.this.email}"
@@ -134,7 +132,6 @@ resource "google_secret_manager_secret_iam_member" "this" {
 }
 
 resource "google_cloud_run_service" "this" {
-  count    = var.create_cloud_run ? 1 : 0
   name     = var.name
   location = var.gcp_region
 
@@ -151,6 +148,11 @@ resource "google_cloud_run_service" "this" {
             cpu    = "8000m"
             memory = "4Gi"
           }
+        }
+
+        env {
+          name = "DJANGO_CONFIGURATION"
+          value = var.configuration
         }
 
         env {
@@ -209,18 +211,14 @@ resource "google_cloud_run_service" "this" {
 }
 
 resource "google_cloud_run_service_iam_member" "noauth" {
-  count = var.create_cloud_run ? 1 : 0
-
-  location = google_cloud_run_service.this[count.index].location
-  project  = google_cloud_run_service.this[count.index].project
-  service  = google_cloud_run_service.this[count.index].name
+  location = google_cloud_run_service.this.location
+  project  = google_cloud_run_service.this.project
+  service  = google_cloud_run_service.this.name
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
 
 resource "google_cloudbuild_trigger" "this" {
-  count = var.create_cloud_run ? 1 : 0
-
   name            = var.name
 
   github {
@@ -245,15 +243,17 @@ resource "google_cloudbuild_trigger" "this" {
     step {
       name = "gcr.io/google-appengine/exec-wrapper"
       args = ["-i", var.image, "-s", "${var.gcp_project}:${var.gcp_region}:${google_sql_database_instance.this.name}", "--", "/env/bin/python", "manage.py", "migrate"]
+      env  = ["DJANGO_CONFIGURATION=${var.configuration}"]
     }
     step {
       name = "gcr.io/google-appengine/exec-wrapper"
       args = ["-i", var.image, "-s", "${var.gcp_project}:${var.gcp_region}:${google_sql_database_instance.this.name}", "--", "/env/bin/python", "manage.py", "collectstatic", "--verbosity=2", "--no-input"]
+      env  = ["DJANGO_CONFIGURATION=${var.configuration}"]
     }
     step {
       name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
       entrypoint = "gcloud"
-      args = ["run", "deploy", google_cloud_run_service.this[count.index].name, "--image", var.image, "--region", var.gcp_region]
+      args = ["run", "deploy", google_cloud_run_service.this.name, "--image", var.image, "--region", var.gcp_region]
     }
   }
 }
