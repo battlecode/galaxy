@@ -23,6 +23,11 @@ variable "image" {
   type        = string
 }
 
+variable "configuration" {
+  description = "Configuration name to use"
+  type        = string
+}
+
 variable "database_tier" {
   description = "The tier of the SQL database instance"
   type        = string

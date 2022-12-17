@@ -36,6 +36,7 @@ module "production" {
 
   create_website               = true
   siarnaq_image                = module.cd.artifact_image["siarnaq"]
+  siarnaq_configuration        = "Production"
   database_tier                = "db-custom-1-3840"
   database_backup              = true
   database_authorized_networks = []
@@ -67,6 +68,7 @@ module "staging" {
 
   create_website               = false
   siarnaq_image                = module.cd.artifact_image["siarnaq"]
+  siarnaq_configuration        = "Staging"
   database_tier                = "db-f1-micro"
   database_backup              = false
   database_authorized_networks = ["0.0.0.0/0"]

@@ -33,6 +33,11 @@ variable "siarnaq_image" {
   type        = string
 }
 
+variable "siarnaq_configuration" {
+  description = "Configuration name to use for Siarnaq"
+  type        = string
+}
+
 variable "database_tier" {
   description = "The tier of the SQL database instance"
   type        = string
