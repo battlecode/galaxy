@@ -22,6 +22,7 @@ import google.cloud.secretmanager as secretmanager
 import structlog
 from configurations import Configuration, values
 from google.auth import impersonated_credentials
+from google.auth.compute_engine import credentials as gce_credentials
 from google.auth.credentials import Credentials
 
 
@@ -354,14 +355,17 @@ class Staging(Base):
     def pre_setup(cls):
         super().pre_setup()
         user_credentials, cls.GCLOUD_PROJECT = google.auth.default()
-        cls.GCLOUD_CREDENTIALS = impersonated_credentials.Credentials(
-            source_credentials=user_credentials,
-            target_principal=cls.GCLOUD_SERVICE_EMAIL,
-            target_scopes=[
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/userinfo.email",
-            ],
-        )
+        if isinstance(user_credentials, gce_credentials.Credentials):
+            cls.GCLOUD_CREDENTIALS = user_credentials
+        else:
+            cls.GCLOUD_CREDENTIALS = impersonated_credentials.Credentials(
+                source_credentials=user_credentials,
+                target_principal=cls.GCLOUD_SERVICE_EMAIL,
+                target_scopes=[
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/userinfo.email",
+                ],
+            )
         secrets = json.loads(
             _get_secret(
                 cls.GCLOUD_CREDENTIALS, cls.GCLOUD_PROJECT, "staging-siarnaq"
