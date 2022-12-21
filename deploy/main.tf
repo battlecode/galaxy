@@ -109,6 +109,12 @@ module "production_network" {
       cdn_cache_ttl = 60
       subsubdomain  = "play."
     }
+    "releases" = {
+      bucket_name   = module.releases.storage_bucket_name
+      enable_cdn    = true
+      cdn_cache_ttl = 60
+      subsubdomain  = "releases."
+    }
   }
 }
 
