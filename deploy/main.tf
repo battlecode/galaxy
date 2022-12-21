@@ -9,10 +9,10 @@ module "cd" {
   storage_frontend_name = module.production.storage_public_name
 }
 
-module "releases_maven" {
-  source = "./maven"
+module "releases" {
+  source = "./releases"
 
-  name        = "releases-maven"
+  name        = "releases"
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
@@ -108,6 +108,12 @@ module "production_network" {
       enable_cdn    = true
       cdn_cache_ttl = 60
       subsubdomain  = "play."
+    }
+    "releases" = {
+      bucket_name   = module.releases.storage_bucket_name
+      enable_cdn    = true
+      cdn_cache_ttl = 60
+      subsubdomain  = "releases."
     }
   }
 }
