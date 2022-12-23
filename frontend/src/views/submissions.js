@@ -58,7 +58,8 @@ class Submissions extends Component {
           this.setState({ upload_status: "success" });
         } else {
           this.setState({
-            alert_message: "Submission upload was not successful.",
+            alert_message:
+              "Submission upload was not successful, most likely due to a submission freeze.",
           });
           this.setState({ upload_status: "failure" });
         }
