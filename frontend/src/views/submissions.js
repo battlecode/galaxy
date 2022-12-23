@@ -47,26 +47,25 @@ class Submissions extends Component {
 
   // makes an api call to upload the selected file
   uploadData = () => {
-    // TODO pull in from better source eg acct page
-
     this.setState({ upload_status: "loading" });
-    Api.resumeUpload(this.state.selectedFile, (success) => {
-      if (success) {
-        this.setState({ upload_status: "success" });
-      } else {
-        this.setState({ upload_status: "failure" });
+    Api.newSubmission(
+      this.state.selectedFile,
+      this.props.episode,
+      (success) => {
+        if (success) {
+          this.setState({ upload_status: "success" });
+        } else {
+          // TODO display error message somewhere
+          this.setState({ upload_status: "failure" });
+        }
+        // TODO re-render submission table after;
+        // part of the overall table issue
+        // whose number I don't remember and I'm on a plane
+        setTimeout(() => {
+          this.setState({ upload_status: "waiting" });
+        }, 2000);
       }
-      setTimeout(() => {
-        this.setState({ upload_status: "waiting" });
-      }, 2000);
-    });
-
-    // Concurrent upload processes can be problematic; we've made the decision to disable concurrency.
-    // This is achieved by refreshing the submission upload components, which have buttons disabled while upload_status is 0.
-    this.renderHelperSubmissionForm();
-    this.renderHelperSubmissionStatus();
-
-    Api.newSubmission(this.state.selectedFile, null);
+    );
   };
 
   // change handler called when file is selected
@@ -75,8 +74,6 @@ class Submissions extends Component {
       selectedFile: event.target.files[0],
       loaded: 0,
     });
-    // this.renderHelperSubmissionForm();
-    // this.renderHelperSubmissionStatus();
   };
 
   //---GETTING TEAMS SUBMISSION DATA----
@@ -261,7 +258,7 @@ class Submissions extends Component {
         <button
           disabled={submission_upload_btn_disabled}
           style={{ float: "right" }}
-          onClick={this.uploadResume}
+          onClick={this.uploadData}
           className={submission_btn_class}
         >
           {" "}
