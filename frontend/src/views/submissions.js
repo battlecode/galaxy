@@ -70,7 +70,7 @@ class Submissions extends Component {
   };
 
   // change handler called when file is selected
-  onChangeHandler = (event) => {
+  fileChangeHandler = (event) => {
     this.setState({
       selectedFile: event.target.files[0],
       loaded: 0,
@@ -221,19 +221,45 @@ class Submissions extends Component {
     if (this.isSubmissionEnabled()) {
       // Submission upload button logic
       const submission_inputted = this.state.selectedFile !== null;
-      const submission_file_label = !submission_inputted
+      const submission_input_name = !submission_inputted
         ? "No file chosen."
         : this.state.selectedFile["name"];
       const submission_btn_class =
         "btn btn" + (!submission_inputted ? "" : " btn-info btn-fill");
 
-      const submission_btn_disabled =
+      const submission_input_label = (
+        <label htmlFor="submission_file_attach">
+          <div className="btn"> Choose File </div>{" "}
+          <span
+            style={{
+              textTransform: "none",
+              marginLeft: "10px",
+              fontSize: "14px",
+            }}
+          >
+            {" "}
+            {submission_input_name}{" "}
+          </span>
+        </label>
+      );
+
+      const submission_input = (
+        <input
+          id="submission_file_attach"
+          type="file"
+          accept=".zip"
+          onChange={this.fileChangeHandler}
+          style={{ display: "none" }}
+        />
+      );
+
+      const submission_upload_btn_disabled =
         !submission_inputted ||
         ["success", "loading", "failure"].includes(this.state.upload_status);
 
       const submission_upload_button = (
         <button
-          disabled={submission_btn_disabled}
+          disabled={submission_upload_btn_disabled}
           style={{ float: "right" }}
           onClick={this.uploadResume}
           className={submission_btn_class}
@@ -241,38 +267,19 @@ class Submissions extends Component {
           {" "}
           <ActionMessage
             default_message="Upload Submission"
-            status={this.state.resume_status}
+            status={this.state.upload_status}
           />{" "}
         </button>
       );
 
-      // TODO should just turn this into a mini-component
-      let thing = (
+      const submission_row = (
         <div className="row">
           <div className="col-md-12">
             <div className="form-group">
               <label>Submission</label>
               <br />
-              <label htmlFor="submission_file_upload">
-                <div className="btn"> Choose File </div>{" "}
-                <span
-                  style={{
-                    textTransform: "none",
-                    marginLeft: "10px",
-                    fontSize: "14px",
-                  }}
-                >
-                  {" "}
-                  {submission_file_label}{" "}
-                </span>
-              </label>
-              <input
-                id="submission_file_upload"
-                type="file"
-                accept=".zip"
-                onChange={this.fileChangeHandler}
-                style={{ display: "none" }}
-              />
+              {submission_input_label}
+              {submission_input}
               {submission_upload_button}
             </div>
           </div>
@@ -333,7 +340,7 @@ class Submissions extends Component {
                 see the "Compiling Tips" section at the bottom of this page.
               </b>
             </p>
-            {thing}
+            {submission_row}
           </div>
         </div>
       );
