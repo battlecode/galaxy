@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Api from "../api";
 import Countdown from "../components/countdown";
 import ActionMessage from "../components/actionMessage";
+import Alert from "../components/alert";
 
 const COMPILATION_STATUS = {
   PROGRESS: 0,
@@ -26,6 +27,7 @@ class Submissions extends Component {
       numTourSubmissions: 0,
       numTourLoaded: 0,
       upload_status: "waiting",
+      alert_message: "",
     };
   }
 
@@ -55,7 +57,9 @@ class Submissions extends Component {
         if (success) {
           this.setState({ upload_status: "success" });
         } else {
-          // TODO display error message somewhere
+          this.setState({
+            alert_message: "Submission upload was not successful.",
+          });
           this.setState({ upload_status: "failure" });
         }
         // TODO re-render submission table after;
@@ -212,6 +216,10 @@ class Submissions extends Component {
   }
 
   //----RENDERING----
+
+  closeAlert = () => {
+    this.setState({ alert_message: "" });
+  };
 
   // return div for submitting files, should be able to disable this when submissions are not being accepts
   renderHelperSubmissionForm() {
@@ -665,6 +673,10 @@ class Submissions extends Component {
   render() {
     return (
       <div className="content">
+        <Alert
+          alert_message={this.state.alert_message}
+          closeAlert={this.closeAlert}
+        />
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-12">
