@@ -285,23 +285,10 @@ class Submissions extends Component {
 
       return (
         <div className="card">
-          <Countdown> </Countdown>
           <div className="header">
             <h4 className="title">Submit Code</h4>
           </div>
           <div className="content">
-            {/* TODO this message should be moved into the countdown card */}
-            {/* {this.state.tournamentInfo.does_tour_require_resume && (
-              <p>
-                Make sure to have indicated your eligibility on your Team
-                Profile page. Also make sure to have all members upload a
-                resume, at your personal profile page.{" "}
-                <b>
-                  **See the Eligibility Rules in the Tournaments page for more
-                  info**
-                </b>
-              </p>
-            )} */}
             <p>
               Submit your code using the button below. For peace of mind, submit
               15 minutes before and make sure it compiles and shows up under
@@ -681,6 +668,7 @@ class Submissions extends Component {
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-12">
+              <Countdown> </Countdown>
               {this.renderHelperSubmissionForm()}
               {/* See #387 for tracking */}
               {/* {this.renderHelperSubmissionStatus()} */}

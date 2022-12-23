@@ -34,6 +34,9 @@ class Countdown extends Component {
       this.setState({
         has_next_tournament: tournament_info.has_next_tournament,
       });
+      this.setState({
+        does_tour_require_resume: tournament_info.does_tour_require_resume,
+      });
     });
   }
 
@@ -89,16 +92,16 @@ class Countdown extends Component {
     let tense_verb = this.state.did_submission_deadline_pass ? "was" : "is";
 
     let explanatoryText = this.state.has_next_tournament ? (
-      <div>
+      <p>
         The submission deadline for the <b>{this.state.tournament_name}</b>{" "}
         {tense_verb} at {this.state.text_submission_deadline.est_date_str},
         which {tense_verb}{" "}
         <b>{this.state.text_submission_deadline.local_date_str}</b>.
-      </div>
+      </p>
     ) : (
-      <div>
+      <p>
         The submission deadline for the next tournament has not been set yet.
-      </div>
+      </p>
     );
 
     let countdown = this.state.has_next_tournament ? (
@@ -135,6 +138,17 @@ class Countdown extends Component {
       </div>
     ) : undefined;
 
+    let eligibility_note = this.state.does_tour_require_resume ? (
+      <p>
+        Make sure to have indicated your eligibility on your Team Profile page.
+        Also make sure to have all members upload a resume, at your personal
+        profile page.{" "}
+        <b>
+          **See the Eligibility Rules in the Tournaments page for more info.**
+        </b>
+      </p>
+    ) : undefined;
+
     return (
       <div className="card">
         <div className="header">
@@ -143,6 +157,7 @@ class Countdown extends Component {
         <div className="content">
           {countdown}
           {explanatoryText}
+          {eligibility_note}
         </div>
       </div>
     );
