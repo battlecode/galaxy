@@ -36,7 +36,7 @@ class Tournaments extends Component {
                       and a chance to test your bot prototypes.
                     </li>
                     <li>
-                      <b>1/24/23, Sprint Tournament 2:</b> One week after the
+                      <b>1/24/23, Sprint 2 Tournament:</b> One week after the
                       Sprint 1 Tournament, you're given another chance to win
                       prizes, test the metagame, and make changes.
                     </li>
@@ -212,7 +212,7 @@ class Tournaments extends Component {
                     </li>
                     <li>
                       Have all members upload a resume, at your personal profile
-                      page.
+                      page (This condition does not apply to the Sprint Tournaments).
                     </li>
                   </ol>
                   <p>
