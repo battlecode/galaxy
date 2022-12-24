@@ -16,19 +16,6 @@ const SCRIMMAGE_STATUS = {
   CANCELLED: 7,
 };
 
-// NOTE: CHANGE THESE FOR EVERY UPCOMING TOURNAMENT AND DEADLINE
-// Note the UTC timezone, change for daylight savings, etc, as necessary
-// (UTC-5 is the usual timezone for Cambridge in January)
-const HAS_NEXT_TOUR = true;
-const NEXT_TOUR_SUBMISSION_DEADLINE = new Date(
-  "January 17, 2023 19:00:00-5:00"
-);
-// If there are two tournaments with the same deadline,
-// then on frontend, treat them as one tournament w a plural name, eg "Final Tournaments".
-// (This should get accounted for in #75)
-const NEXT_TOUR_NAME = "Sprint 1 Tournament";
-const DOES_TOUR_REQUIRE_RESUME = true;
-
 class Api {
   static testSetOutcome() {}
 
@@ -616,22 +603,6 @@ class Api {
         console.log("Error in getting next tournament", xhr, status, error);
         callback(null);
       });
-
-    // These dates are for submission deadlines, not tournaments!
-    // Will be made dynamic and better, see #75
-    callback({
-      has_next_tournament: HAS_NEXT_TOUR,
-      // for #75: API spec design notes: ^ should return false if there is no tour deadline in DB,
-      // or if the latest tour (/ all tour) deadlines have passed.
-      // Return true otherwise.
-      submission_deadline: NEXT_TOUR_SUBMISSION_DEADLINE,
-      submission_deadline_strs: this.getDateTimeText(
-        NEXT_TOUR_SUBMISSION_DEADLINE
-      ),
-      tournament_name: NEXT_TOUR_NAME,
-      does_tour_require_resume: DOES_TOUR_REQUIRE_RESUME,
-      // This should be included in the real API response, for #75
-    });
   }
 
   static getTournaments(callback) {
