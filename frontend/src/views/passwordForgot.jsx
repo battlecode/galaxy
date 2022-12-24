@@ -49,6 +49,25 @@ class PasswordForgot extends Component {
           left: "0px",
         }}
       >
+        <h1
+          style={{
+            textAlign: "center",
+            fontWeight: "bold",
+            color: "white",
+          }}
+        >
+          Battlecode
+        </h1>
+        <p
+          style={{
+            textAlign: "center",
+            fontWeight: "bold",
+            color: "white",
+          }}
+        >
+          {/* Note that this page does not change depending on episode */}
+          Enter your email below to receive a password reset email. Contact battlecode@mit.edu if you encounter any issues. 
+        </p>
         {error && (
           <div
             className="card"
@@ -85,7 +104,7 @@ class PasswordForgot extends Component {
           className="card"
           style={{
             width: Math.min(window.innerWidth, 350),
-            margin: error ? "20px auto" : "100px auto",
+            margin: error ? "20px auto" : "30px auto",
           }}
         >
           <div className="content">
