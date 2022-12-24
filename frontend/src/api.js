@@ -21,13 +21,13 @@ const SCRIMMAGE_STATUS = {
 // (UTC-5 is the usual timezone for Cambridge in January)
 const HAS_NEXT_TOUR = true;
 const NEXT_TOUR_SUBMISSION_DEADLINE = new Date(
-  "January 27, 2023 19:00:00-5:00"
+  "January 17, 2023 19:00:00-5:00"
 );
 // If there are two tournaments with the same deadline,
 // then on frontend, treat them as one tournament w a plural name, eg "Final Tournaments".
 // (This should get accounted for in #75)
-const NEXT_TOUR_NAME = "Final Tournaments";
-const DOES_TOUR_REQUIRE_RESUME = true;
+const NEXT_TOUR_NAME = "Sprint 1 Tournament";
+const DOES_TOUR_REQUIRE_RESUME = false;
 
 class Api {
   static testSetOutcome() {}
