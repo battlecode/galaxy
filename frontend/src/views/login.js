@@ -218,21 +218,12 @@ class LoginRegister extends Component {
                 </div>
               </div>
               {buttons}
-              <br />
-              <div className="row text-center">
+              <div className="row text-center" style={{ marginTop: "10px" }}>
                 <div className="col-xs-6">
-                  <a
-                    href={"/register"}
-                  >
-                    Register
-                  </a>
+                  <a href={"/register"}>Register</a>
                 </div>
                 <div className="col-xs-6 border-right">
-                  <a
-                    href={"/password_forgot"}
-                  >
-                    Forgot Password
-                  </a>
+                  <a href={"/password_forgot"}>Forgot Password</a>
                 </div>
               </div>
               <div className="clearfix" />

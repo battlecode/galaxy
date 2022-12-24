@@ -66,7 +66,8 @@ class PasswordForgot extends Component {
           }}
         >
           {/* Note that this page does not change depending on episode */}
-          Enter your email below to receive a password reset email. Contact battlecode@mit.edu if you encounter any issues. 
+          Enter your email below to receive a password reset email. Contact
+          battlecode@mit.edu if you encounter any issues.
         </p>
         {error && (
           <div
@@ -125,6 +126,14 @@ class PasswordForgot extends Component {
               >
                 Forgot Password
               </button>
+              <div className="row text-center" style={{ marginTop: "10px" }}>
+                <div className="col-xs-6 border-right">
+                  <a href={"/login"}>Log In</a>
+                </div>
+                <div className="col-xs-6">
+                  <a href={"/register"}>Register</a>
+                </div>
+              </div>
               <div className="clearfix" />
             </form>
           </div>
