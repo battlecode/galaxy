@@ -100,7 +100,7 @@ class Issues extends Component {
                     </ul>
                     If your error is not listed above, ask on{" "}
                     <a
-                      href="https://discordapp.com/channels/386965718572466197/662426611563626537"
+                      href="https://discord.gg/N86mxkH"
                       style={{ fontWeight: 700 }}
                     >
                       the Discord
