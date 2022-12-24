@@ -268,6 +268,15 @@ class Register extends Component {
                 />
               </div>
               {buttons}
+              <div className="row text-center" style={{ marginTop: "10px" }}>
+                <div className="col-xs-6">
+                  <a href={"/login"}>Log In</a>
+                </div>
+                <div className="col-xs-6">
+                  <a href={"/password_forgot"}>Forgot Password</a>
+                </div>
+              </div>
+              <div className="clearfix" />
             </div>
           </div>
         </form>
