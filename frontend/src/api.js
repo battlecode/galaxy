@@ -27,7 +27,7 @@ const NEXT_TOUR_SUBMISSION_DEADLINE = new Date(
 // then on frontend, treat them as one tournament w a plural name, eg "Final Tournaments".
 // (This should get accounted for in #75)
 const NEXT_TOUR_NAME = "Sprint 1 Tournament";
-const DOES_TOUR_REQUIRE_RESUME = false;
+const DOES_TOUR_REQUIRE_RESUME = true;
 
 class Api {
   static testSetOutcome() {}
