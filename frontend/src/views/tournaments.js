@@ -253,7 +253,7 @@ class Tournaments extends Component {
 
                   <p>
                     Contact us on{" "}
-                    <a href="https://discordapp.com/channels/386965718572466197/650097270804709436">
+                    <a href="https://discord.gg/N86mxkH">
                       Discord
                     </a>{" "}
                     or at{" "}

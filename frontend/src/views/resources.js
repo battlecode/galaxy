@@ -84,8 +84,8 @@ class Resources extends Component {
                   <p>
                     If you make a new tool that could be useful to others,
                     please post it in the{" "}
-                    <a href="https://discordapp.com/channels/386965718572466197/531960965240193024">
-                      #open-source-tools channel
+                    <a href="https://discord.gg/N86mxkH">
+                      #open-source channel
                     </a>{" "}
                     on the Discord. Everyone will love you!!
                   </p>
