@@ -154,7 +154,10 @@ class App extends Component {
           <Home
             {...props}
             on_team={on_team}
+            episode={this.state.episode}
             episode_name_long={episode_name_long}
+            episode_info={this.state.episode_info}
+            is_game_released={is_game_released}
           />
         )}
         key="home"

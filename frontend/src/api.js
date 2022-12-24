@@ -607,32 +607,18 @@ class Api {
 
   //----TOURNAMENTS----
 
-  static getDateTimeText(date) {
-    // Use US localization for standardization in date format
-    const est_string = date.toLocaleString("en-US", {
-      timeZone: "EST",
-    });
-    // need to pass weekday here, since weekday isn't shown by default
-    const est_day_of_week = date.toLocaleString("en-US", {
-      timeZone: "EST",
-      weekday: "short",
-    });
-    const est_date_str = `${est_day_of_week}, ${est_string} Eastern Time`;
+  static getNextTournament(episode, callback) {
+    return $.get(`${URL}/api/episode/${episode}/tournament/next/`)
+      .done((data, status) => {
+        callback(data);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting next tournament", xhr, status, error);
+        callback(null);
+      });
 
-    // Allow for localization here
-    const locale_string = date.toLocaleString();
-    const locale_day_of_week = date.toLocaleString([], {
-      weekday: "short",
-    });
-    const local_date_str = `${locale_day_of_week}, ${locale_string} in your locale and time zone`;
-
-    return { est_date_str: est_date_str, local_date_str: local_date_str };
-  }
-
-  static getNextTournament(callback) {
     // These dates are for submission deadlines, not tournaments!
     // Will be made dynamic and better, see #75
-
     callback({
       has_next_tournament: HAS_NEXT_TOUR,
       // for #75: API spec design notes: ^ should return false if there is no tour deadline in DB,
