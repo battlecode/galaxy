@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
 import Api from "../api";
 import Duration from "duration";
 
@@ -88,7 +89,7 @@ class Countdown extends Component {
   }
 
   render() {
-    let title = "Submission Deadline";
+    let title = "Next Submission Deadline";
     let tense_verb = this.state.did_submission_deadline_pass ? "was" : "is";
 
     let explanatoryText = this.state.has_next_tournament ? (
@@ -140,12 +141,12 @@ class Countdown extends Component {
 
     let eligibility_note = this.state.does_tour_require_resume ? (
       <p>
-        Make sure to have indicated your eligibility on your Team Profile page.
-        Also make sure to have all members upload a resume, at your personal
-        profile page.{" "}
-        <b>
-          **See the Eligibility Rules in the Tournaments page for more info.**
-        </b>
+        Make sure to have indicated your eligibility on your{" "}
+        <NavLink to="team">team profile page</NavLink>. Also make sure to have
+        all members upload a resume, at your{" "}
+        <NavLink to="account">personal profile page</NavLink>. See the
+        eligibility rules given in the{" "}
+        <NavLink to="team">tournament page</NavLink> for more info.
       </p>
     ) : undefined;
 
