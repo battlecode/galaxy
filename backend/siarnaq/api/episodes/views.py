@@ -91,7 +91,7 @@ class TournamentViewSet(viewsets.ReadOnlyModelViewSet):
         "Retrieve the next upcoming tournament, as ordered by submission freeze time."
         now = timezone.now()
         next_tournament = get_object_or_404(
-            self.get_queryset().filter(submission_freeze__gte=now)
+            self.get_queryset().filter(submission_freeze__gt=now)[:1]
         )
         serializer = self.get_serializer(next_tournament)
         return Response(serializer.data)
