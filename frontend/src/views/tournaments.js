@@ -253,10 +253,7 @@ class Tournaments extends Component {
 
                   <p>
                     Contact us on{" "}
-                    <a href="https://discord.gg/N86mxkH">
-                      Discord
-                    </a>{" "}
-                    or at{" "}
+                    <a href="https://discord.gg/N86mxkH">Discord</a> or at{" "}
                     <a href="mailto:battlecode@mit.edu">battlecode@mit.edu</a>{" "}
                     if you are unsure of your eligibility.
                   </p>

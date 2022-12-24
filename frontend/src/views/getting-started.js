@@ -264,7 +264,10 @@ class GettingStarted extends Component {
                     team. Each team can consist of 1 to 4 people.
                   </p>
                   <p>
-                    <NavLink to={`/register`} style={{fontWeight: 700}}>Create an account</NavLink> on this website, and then go to the{" "}
+                    <NavLink to={`/register`} style={{ fontWeight: 700 }}>
+                      Create an account
+                    </NavLink>{" "}
+                    on this website, and then go to the{" "}
                     <NavLink
                       to={`/${this.props.episode}/team`}
                       style={{ fontWeight: 700 }}
