@@ -63,9 +63,8 @@ class Submissions extends Component {
           });
           this.setState({ upload_status: "failure" });
         }
-        // TODO re-render submission table after;
-        // part of the overall table issue
-        // whose number I don't remember and I'm on a plane
+        // re-render submission table after;
+        // as part of #387 for tracking
         setTimeout(() => {
           this.setState({ upload_status: "waiting" });
         }, 2000);
