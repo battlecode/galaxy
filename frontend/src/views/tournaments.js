@@ -212,7 +212,8 @@ class Tournaments extends Component {
                     </li>
                     <li>
                       Have all members upload a resume, at your personal profile
-                      page (This condition does not apply to the Sprint Tournaments).
+                      page (This condition does not apply to the Sprint
+                      Tournaments).
                     </li>
                   </ol>
                   <p>
