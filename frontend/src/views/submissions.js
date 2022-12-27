@@ -49,7 +49,7 @@ class Submissions extends Component {
     Api.getTeamSubmissions(this.gotSubmissions);
 
     // Set up submission deadline text
-    Api.getNextTournament((tournamentInfo) => {
+    Api.getNextTournament(this.props.episode, (tournamentInfo) => {
       this.setState({ tournamentInfo });
     });
   }
