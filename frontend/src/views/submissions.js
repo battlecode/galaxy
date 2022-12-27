@@ -680,7 +680,13 @@ class Submissions extends Component {
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-12">
-              <Countdown> </Countdown>
+              <Countdown
+                game_release={this.props.episode_info.game_release}
+                episode={this.props.episode}
+                is_game_released={this.props.is_game_released}
+              >
+                {" "}
+              </Countdown>
               {this.renderHelperSubmissionForm()}
               {/* See #387 for tracking */}
               {/* {this.renderHelperSubmissionStatus()} */}

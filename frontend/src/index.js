@@ -288,6 +288,7 @@ class App extends Component {
             is_staff={is_staff}
             on_team={on_team}
             is_game_released={is_game_released}
+            episode_info={this.state.episode_info}
           />
         )}
         key="submissions"
