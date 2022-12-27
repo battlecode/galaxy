@@ -28,10 +28,15 @@ class Countdown extends Component {
             countdown_time: new Date(next_tournament.submission_freeze),
           });
         }
+        this.initializeRefresh();
       });
     } else {
       this.setState({ countdown_time: new Date(this.props.game_release) });
+      this.initializeRefresh();
     }
+  }
+
+  initializeRefresh() {
     this.refreshCountdown();
     this.interval = setInterval(() => {
       this.refreshCountdown();
