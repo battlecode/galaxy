@@ -66,7 +66,7 @@ class Submissions extends Component {
     this.setState({ upload_status: "loading" });
     Api.newSubmission(
       this.state.selectedFile,
-      this.state.package_name,
+      this.state.package,
       this.state.description,
       this.props.episode,
       (success) => {
