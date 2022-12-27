@@ -72,10 +72,8 @@ class Api {
       });
   }
 
-  static getTeamSubmissions(callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/teamsubmission/${Cookies.get("team_id")}/`
-    ).done((data, status) => {
+  static getSubmissions(episode, callback) {
+    $.get(`${URL}/api/compete/${episode}/submission/`).done((data, status) => {
       callback(data);
     });
   }

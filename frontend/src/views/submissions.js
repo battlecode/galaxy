@@ -3,6 +3,7 @@ import Api from "../api";
 import Countdown from "../components/countdown";
 import ActionMessage from "../components/actionMessage";
 import Alert from "../components/alert";
+import SubmissionList from "../components/submissionList";
 
 class Submissions extends Component {
   //----INITIALIZATION----
@@ -37,7 +38,7 @@ class Submissions extends Component {
   }
 
   componentDidMount() {
-    Api.getTeamSubmissions(this.gotSubmissions);
+    // Api.getTeamSubmissions(this.gotSubmissions);
 
     // Set up submission deadline text
     Api.getNextTournament(this.props.episode, (tournamentInfo) => {
@@ -92,8 +93,6 @@ class Submissions extends Component {
   };
 
   //---GETTING TEAMS SUBMISSION DATA----
-
-  // TODO
 
   // Downloads the file for given submission id
   onSubFileRequest = (subId, fileNameAddendum) => {
@@ -283,12 +282,7 @@ class Submissions extends Component {
               </Countdown>
               {this.renderHelperSubmissionForm()}
 
-              <div className="card">
-                <div className="header">
-                  <h4 className="title">Submission History</h4>
-                </div>
-                <div className="content">{/* TODO render a table here */}</div>
-              </div>
+              <SubmissionList episode={this.props.episode}></SubmissionList>
 
               {/* See #78 for tracking */}
               {/* <div className="card">

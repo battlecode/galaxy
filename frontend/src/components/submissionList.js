@@ -1,0 +1,72 @@
+import React, { Component } from "react";
+import Api from "../api";
+
+import PaginationControl from "./paginationControl";
+import Spinner from "./spinner";
+
+class SubmissionList extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      submissions: null,
+    };
+    Api.getSubmissions(this.props.episode, (data) => {
+      this.setState({ submissions: data.results });
+    });
+  }
+
+  renderTable() {
+    if (this.state.submissions === null) {
+      return (
+        <div className="content">
+          <Spinner />
+        </div>
+      );
+    } else if (this.state.submissions.length === 0) {
+      return (
+        <div className="content">
+          <h4 className="title">Your team has not made any submissions yet.</h4>
+        </div>
+      );
+    } else {
+      const rows = this.state.submissions.map((submission) => {
+        return (
+          <tr key={submission.id}>
+            <td>{submission.id} </td>
+          </tr>
+        );
+      });
+
+      return (
+        <div className="content">
+          <table className="table table-hover table-striped table-responsive table-full-width">
+            <thead>
+              <tr>
+                <th>ID</th>
+              </tr>
+            </thead>
+            <tbody>{rows}</tbody>
+          </table>
+          <PaginationControl
+          // page={props.page}
+          // pageLimit={props.pageLimit}
+          // onPageClick={props.onPageClick}
+          />
+        </div>
+      );
+    }
+  }
+
+  render() {
+    return (
+      <div className="card">
+        <div className="header">
+          <h4 className="title">Submission History</h4>
+        </div>
+        {this.renderTable()}
+      </div>
+    );
+  }
+}
+
+export default SubmissionList;
