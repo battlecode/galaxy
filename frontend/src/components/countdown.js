@@ -28,17 +28,6 @@ class Countdown extends Component {
             countdown_time: new Date(next_tournament.submission_freeze),
           });
         }
-        //   const has_next_tournament = next_tournament !== null;
-        //   this.setState({has_next_tournament});
-
-        //   if (has_next_tournament) {
-        //     this.setState({ countdown_time: new Date(next_tournament.submission_freeze) });
-
-        //     this.setState({ tournament_name: next_tournament.tournament_name });
-        //     this.setState({
-        //       does_tour_require_resume: next_tournament.does_tour_require_resume,
-        //     });
-        //   }
       });
     } else {
       this.setState({ countdown_time: new Date(this.props.game_release) });
@@ -100,7 +89,6 @@ class Countdown extends Component {
     let title = "";
     let extra_info = null;
     let show_countdown = false;
-    console.log("!!", this.state.countdown_time);
     const countdown_time_text = this.state.countdown_time
       ? getDateTimeText(this.state.countdown_time)
       : null;
