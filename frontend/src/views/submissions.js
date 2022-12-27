@@ -341,15 +341,7 @@ class Submissions extends Component {
             <h4 className="title">Submit Code</h4>
           </div>
           <div className="content">
-            <p>
-              Submit your code using the button below. For peace of mind, submit
-              15 minutes before and make sure it compiles and shows up under
-              "Latest Submissions." Unlike previous years,{" "}
-              <b>
-                we will not allow submissions sent through Discord. Please
-                submit early and check your submissions before the deadline!
-              </b>
-            </p>
+            <p>Submit your code using the button below.</p>
             <p>
               Create a <code>zip</code> file of your robot player, and submit it
               below. The submission format should be a zip file containing a
@@ -362,20 +354,6 @@ class Submissions extends Component {
                 RobotPlayer.java, FooBar.java
               </code>
             </pre>
-            <p>
-              Please{" "}
-              <b>
-                <i>stay on this page until the card below indicates success.</i>
-              </b>{" "}
-              To double-check that your code has been submitted, you can
-              download at "Latest Submissions".
-            </p>
-            <p>
-              If your bot does not compile,{" "}
-              <b>
-                see the "Compiling Tips" section at the bottom of this page.
-              </b>
-            </p>
             {submission_row}
             {submission_info_row}
           </div>
@@ -685,36 +663,6 @@ class Submissions extends Component {
     }
   }
 
-  renderCompilingTips() {
-    return (
-      <div className="card">
-        <div className="header">
-          <h4 className="title">Compiling Tips</h4>
-        </div>
-        <div className="content">
-          <ul>
-            <li>
-              Submission format: Check that your zip contains exactly one
-              directory, and your code is inside that directory.
-            </li>
-            <li>
-              Non-ASCII characters: Ensure your code is completely ASCII. In the
-              past we have had compile errors due to comments containing
-              diacritic characters (áéíóú).
-            </li>
-            <li>
-              Make sure you only import from your own bot, and from java.
-              packages. In particular, do not use javax, javafx, and watch out
-              for importing from other versions of your bot (which may work
-              locally, but will not work on our servers as you can only submit
-              one folder).
-            </li>
-          </ul>
-        </div>
-      </div>
-    );
-  }
-
   render() {
     return (
       <div className="content">
@@ -757,8 +705,6 @@ class Submissions extends Component {
                 </div>
                 <div className="content">{this.renderHelperTourTable()}</div>
               </div> */}
-
-              {this.renderCompilingTips()}
             </div>
           </div>
         </div>
