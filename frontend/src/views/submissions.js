@@ -20,6 +20,8 @@ class Submissions extends Component {
     this.state = {
       selectedFile: null,
       currentSubmission: null,
+      package: "",
+      description: "",
       lastSubmissions: null,
       tourSubmissions: null,
       numLastSubmissions: 0,
@@ -29,6 +31,18 @@ class Submissions extends Component {
       upload_status: "waiting",
       alert_message: "",
     };
+
+    this.changeHandler = this.changeHandler.bind(this);
+  }
+
+  changeHandler(e) {
+    const id = e.target.id;
+    const val = e.target.value;
+
+    this.setState(function (prevState, props) {
+      prevState[id] = val;
+      return prevState;
+    });
   }
 
   componentDidMount() {
@@ -291,6 +305,35 @@ class Submissions extends Component {
         </div>
       );
 
+      const submission_info_row = (
+        <div className="row">
+          <div className="col-md-2">
+            <div className="form-group">
+              <label>Package Name</label>
+              <input
+                type="text"
+                className="form-control"
+                id="package"
+                onChange={this.changeHandler}
+                value={this.state.package}
+              />
+            </div>
+          </div>
+          <div className="col-md-10">
+            <div className="form-group">
+              <label>Description</label>
+              <input
+                type="text"
+                className="form-control"
+                id="description"
+                onChange={this.changeHandler}
+                value={this.state.description}
+              />
+            </div>
+          </div>
+        </div>
+      );
+
       return (
         <div className="card">
           <div className="header">
@@ -333,6 +376,7 @@ class Submissions extends Component {
               </b>
             </p>
             {submission_row}
+            {submission_info_row}
           </div>
         </div>
       );
