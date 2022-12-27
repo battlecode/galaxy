@@ -22,9 +22,17 @@ class Api {
   //----SUBMISSIONS----
 
   //uploads a new submission to the google cloud bucket
-  static newSubmission(submission_file, episode, callback) {
+  static newSubmission(
+    submission_file,
+    package_name,
+    description,
+    episode,
+    callback
+  ) {
     const data = new FormData();
     data.append("source_code", submission_file);
+    data.append("package", package_name);
+    data.append("description", description);
     return $.ajax({
       url: `${URL}/api/compete/${episode}/submission/`,
       type: "POST",
