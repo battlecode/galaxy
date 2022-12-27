@@ -71,7 +71,7 @@ class Submissions extends Component {
       this.props.episode,
       (success) => {
         if (success) {
-          this.setState({ upload_status: "success" });
+          this.setState({ upload_status: "success", selectedFile: null });
         } else {
           this.setState({
             alert_message:
@@ -92,7 +92,6 @@ class Submissions extends Component {
   fileChangeHandler = (event) => {
     this.setState({
       selectedFile: event.target.files[0],
-      loaded: 0,
     });
   };
 
