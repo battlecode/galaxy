@@ -1,5 +1,4 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
 
 import TeamList from "./teamList";
 import PaginationControl from "./paginationControl";
@@ -49,7 +48,7 @@ class RankingTeamList extends TeamList {
               })}
             </td>
             {/* <td>{team.auto_accept_unranked ? "Yes" : "No"}</td> */}
-            {/* {props.canRequest && (
+            {true && (
               <td>
                 <button
                   className="btn btn-xs"
@@ -58,7 +57,7 @@ class RankingTeamList extends TeamList {
                   {buttonContent}
                 </button>{" "}
               </td>
-            )} */}
+            )}
           </tr>
         );
       });
@@ -78,7 +77,7 @@ class RankingTeamList extends TeamList {
                     <th>Members</th>
                     <th>Quote</th>
                     <th>Eligibility</th>
-                    {/* <th>Auto-Accept</th> */}
+                    <th>Auto-Accept</th>
                   </tr>
                 </thead>
                 <tbody>{!this.props.loading && teamRows}</tbody>

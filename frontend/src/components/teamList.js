@@ -26,7 +26,9 @@ class TeamList extends Component {
         },
       };
     });
-    Api.requestScrimmage(teamId, this.onRequestFinish);
+    Api.requestScrimmage(this.props.episode, teamId, (success) =>
+      this.onRequestFinish(teamId, success)
+    );
   };
 
   onRequestFinish = (teamId, success) => {

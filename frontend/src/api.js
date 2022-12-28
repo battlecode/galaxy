@@ -457,43 +457,46 @@ class Api {
       });
   }
 
-  static getScrimmageRequests(callback) {
-    this.getPendingScrimmages((scrimmages) => {
-      const requests = scrimmages.map((scrimmage) => {
-        const { blue_team, red_team } = scrimmage;
-        return {
-          id: scrimmage.id,
-          team_id: scrimmage.requested_by,
-          team: Cookies.get("team_name") === red_team ? blue_team : red_team,
-        };
+  static getScrimmageRequests(episode, callback) {
+    return $.get(`${URL}/api/compete/${episode}/request/inbox/`)
+      .done((data, status) => {
+        callback(data.results);
+      })
+      .fail((xhr, status, error) => {
+        console.log(
+          "Error in getting user's scrimmage requests",
+          xhr,
+          status,
+          error
+        );
+        callback(null);
       });
-      callback(requests);
-    });
   }
 
-  static requestScrimmage(teamId, callback) {
-    $.post(`${URL}/api/${LEAGUE}/scrimmage/`, {
-      red_team: Cookies.get("team_id"),
-      blue_team: teamId,
-      ranked: false,
+  static requestScrimmage(episode, requested_to, callback) {
+    const data = {
+      is_ranked: false,
+      requested_to: requested_to,
+      player_order: "+",
+      maps: "meow", // hardcode these
+    };
+    return $.ajax({
+      url: `${URL}/api/compete/${episode}/request/`,
+      data: JSON.stringify(data),
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
     })
       .done((data, status) => {
-        callback(teamId, true);
+        callback(true);
       })
-      .fail((jqXHR, status, error) => {
-        alert(JSON.parse(jqXHR.responseText).message);
-        callback(teamId, false);
+      .fail((xhr, status, error) => {
+        callback(false);
       });
   }
 
   static getAllTeamScrimmages(callback) {
     $.get(`${URL}/api/${LEAGUE}/scrimmage/`, (data, success) => {
-      callback(data);
-    });
-  }
-
-  static getPendingScrimmages(callback) {
-    $.get(`${URL}/api/${LEAGUE}/scrimmage/?pending=1`, (data, success) => {
       callback(data);
     });
   }
