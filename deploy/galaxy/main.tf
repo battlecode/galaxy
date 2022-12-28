@@ -18,6 +18,13 @@ resource "google_storage_bucket" "secure" {
   location      = var.gcp_region
   storage_class = "STANDARD"
 
+  cors {
+    origin          = ["*"]
+    method          = ["GET", "HEAD", "OPTIONS"]
+    response_header = ["*"]
+    max_age_seconds = 3600
+  }
+
   dynamic "lifecycle_rule" {
     for_each = var.secure_lifecycle_rules
 
