@@ -49,13 +49,17 @@ class Api {
       });
   }
 
-  static downloadSubmission(submissionId, fileNameAddendum, callback) {
-    $.get(`${URL}/api/${LEAGUE}/submission/${submissionId}/retrieve_file/`)
+  static downloadSubmission(submissionId, episode, fileNameAddendum, callback) {
+    $.get(`${URL}/api/compete/${episode}/submission/${submissionId}/download/`)
       .done((data, status) => {
         // have to use fetch instead of ajax here since we want to download file
-        fetch(data["download_url"])
-          .then((resp) => resp.blob())
+        fetch(data["url"])
+          .then((resp) => {
+            console.log(resp);
+            return resp.blob();
+          })
           .then((blob) => {
+            console.log(blob);
             //code to download the file given by the url
             const objUrl = window.URL.createObjectURL(blob);
             const aHelper = document.createElement("a");
@@ -74,40 +78,6 @@ class Api {
 
   static getSubmissions(episode, callback) {
     $.get(`${URL}/api/compete/${episode}/submission/`).done((data, status) => {
-      callback(data);
-    });
-  }
-
-  static getSubmission(id, callback, callback_data) {
-    $.get(`${URL}/api/${LEAGUE}/submission/${id}/`).done((data, status) => {
-      callback(callback_data, data);
-    });
-  }
-
-  static getCompilationStatus(callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/teamsubmission/${Cookies.get(
-        "team_id"
-      )}/team_compilation_status/`
-    ).done((data, status) => {
-      callback(data);
-    });
-  }
-
-  // note that this is a submission, not a teamsubmission, thing
-  static getSubmissionStatus(callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/submission/${Cookies.get(
-        "submission_id"
-      )}/get_status/`
-    ).done((data, status) => {
-      return data["compilation_status"];
-      // callback(data)
-    });
-  }
-
-  static getSubmissionLog(id, callback) {
-    $.get(`${URL}/api/${LEAGUE}/submission/${id}/log/`).done((data, status) => {
       callback(data);
     });
   }

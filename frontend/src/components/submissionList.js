@@ -30,9 +30,48 @@ class SubmissionList extends Component {
       );
     } else {
       const rows = this.state.submissions.map((submission) => {
+        console.log(submission);
         return (
           <tr key={submission.id}>
-            <td>{submission.id} </td>
+            <td> {submission.created}</td>
+            <td>{submission.status} </td>
+
+            <td>{submission.description} </td>
+            <td>{submission.username} </td>
+            <td>
+              {" "}
+              <a
+                style={{ cursor: "pointer" }}
+                onClick={($event) => {
+                  // Prevent default behavior when clicking a link
+                  $event.preventDefault();
+
+                  let fileURL = URL.createObjectURL(
+                    new Blob([submission.logs], { type: "text/plain" })
+                  );
+                  window.open(fileURL);
+                }}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View log
+              </a>{" "}
+            </td>
+            <td>
+              {" "}
+              <button
+                className="btn btn-xs"
+                onClick={() =>
+                  Api.downloadSubmission(
+                    submission.id,
+                    this.props.episode,
+                    "zip"
+                  )
+                }
+              >
+                Download
+              </button>
+            </td>
           </tr>
         );
       });
@@ -42,7 +81,12 @@ class SubmissionList extends Component {
           <table className="table table-hover table-striped table-responsive table-full-width">
             <thead>
               <tr>
-                <th>ID</th>
+                <th>Submitted at</th>
+                <th>Status</th>
+                <th>Description</th>
+                <th>Submitter</th>
+                <th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>{rows}</tbody>
