@@ -77,6 +77,7 @@ class RankingTeamSearch extends Component {
             history={this.props.history}
             episode={this.props.episode}
             episode_info={this.props.episode_info}
+            canRequest={this.props.canRequest}
           />
         </div>
       </div>

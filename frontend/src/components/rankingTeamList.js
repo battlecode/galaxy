@@ -117,7 +117,7 @@ class RankingTeamList extends Component {
               })}
             </td>
             <td>{team.auto_accept_unranked ? "Yes" : "No"}</td>
-            {true && (
+            {this.props.canRequest && (
               <td>
                 <button
                   className="btn btn-xs"

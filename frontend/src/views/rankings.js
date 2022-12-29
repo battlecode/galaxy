@@ -13,6 +13,7 @@ class Rankings extends Component {
             episode_info={this.props.episode_info}
             search_placeholder="Search for a Team or User..."
             history={this.props.history}
+            canRequest={false}
           />
         </div>
       </div>
