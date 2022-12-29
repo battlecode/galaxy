@@ -473,12 +473,30 @@ class Api {
       });
   }
 
-  static requestScrimmage(episode, requested_to, callback) {
+  static getMaps(episode, callback) {
+    return $.get(`${URL}/api/episode/${episode}/map/`)
+      .done((data, status) => {
+        callback(data);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting episode maps", xhr, status, error);
+        callback(null);
+      });
+  }
+
+  static requestScrimmage(
+    is_ranked,
+    requested_to,
+    player_order,
+    maps,
+    episode,
+    callback
+  ) {
     const data = {
-      is_ranked: false,
+      is_ranked: is_ranked,
       requested_to: requested_to,
-      player_order: "+",
-      maps: "meow", // hardcode these
+      player_order: player_order,
+      maps: maps,
     };
     return $.ajax({
       url: `${URL}/api/compete/${episode}/request/`,

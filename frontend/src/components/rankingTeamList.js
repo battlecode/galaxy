@@ -1,18 +1,29 @@
 import React, { Component } from "react";
+import Api from "../api";
 
 import PaginationControl from "./paginationControl";
 import Spinner from "./spinner";
+import ScrimmageRequestForm from "./scrimmageRequestForm";
 
 class RankingTeamList extends Component {
   state = {
     pendingRequests: {},
     successfulRequests: {},
+    requestMenuTeam: null,
     showTeamID: null,
   };
 
-  onTeamRequest = (teamId) => {
+  openRequestForm = (team) => {
+    this.setState({ requestMenuTeam: team });
+  };
+
+  closeRequestForm = (teamID) => {
+    this.setState({ requestMenuTeam: null });
+  };
+
+  onTeamRequest = (teamID, extra_info) => {
     const { state } = this;
-    if (state.pendingRequests[teamId]) {
+    if (state.pendingRequests[teamID]) {
       return;
     }
 
@@ -20,40 +31,40 @@ class RankingTeamList extends Component {
       return {
         pendingRequests: {
           ...prevState.pendingRequests,
-          [teamId]: true,
+          [teamID]: true,
         },
       };
     });
-    Api.requestScrimmage(this.props.episode, teamId, (success) =>
-      this.onRequestFinish(teamId, success)
+    Api.requestScrimmage(this.props.episode, teamID, (success) =>
+      this.onRequestFinish(teamID, success)
     );
   };
 
-  onRequestFinish = (teamId, success) => {
+  onRequestFinish = (teamID, success) => {
     this.setState((prevState) => {
       return {
         pendingRequests: {
           ...prevState.pendingRequests,
-          [teamId]: false,
+          [teamID]: false,
         },
         successfulRequests: success && {
           ...prevState.successfulRequests,
-          [teamId]: true,
+          [teamID]: true,
         },
       };
     });
     if (success) {
       this.props.onRequestSuccess();
-      setTimeout(() => this.successTimeoutRevert(teamId), SUCCESS_TIMEOUT);
+      setTimeout(() => this.successTimeoutRevert(teamID), SUCCESS_TIMEOUT);
     }
   };
 
-  successTimeoutRevert = (teamId) => {
+  successTimeoutRevert = (teamID) => {
     this.setState((prevState) => {
       return {
         successfulRequests: {
           ...prevState.successfulRequests,
-          [teamId]: false,
+          [teamID]: false,
         },
       };
     });
@@ -87,7 +98,7 @@ class RankingTeamList extends Component {
           <tr
             key={team.id}
             onClick={() => this.redirectToTeamPage(team.id)}
-            class="page-item"
+            className="page-item"
           >
             {<td>{Math.round(team.profile.rating)}</td>}
             <td>{team.name}</td>
@@ -112,7 +123,7 @@ class RankingTeamList extends Component {
                   className="btn btn-xs"
                   onClick={(event) => {
                     event.stopPropagation();
-                    this.onTeamRequest(team.id);
+                    this.openRequestForm(team);
                   }}
                 >
                   {buttonContent}
@@ -125,6 +136,11 @@ class RankingTeamList extends Component {
 
       return (
         <div>
+          <ScrimmageRequestForm
+            closeRequestForm={this.closeRequestForm}
+            team={this.state.requestMenuTeam}
+            episode={this.props.episode}
+          />
           <div className="card">
             <div className="header">
               <h4 className="title">Rankings</h4>
