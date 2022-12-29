@@ -61,7 +61,7 @@ class TeamCard extends Component {
           {" "}
           <Avatar data={user} />
           <small onClick={() => this.redirectToUserPage(user.id)}>
-            {user.username}
+            {user.username.slice(0, 20)}
           </small>
         </div>
       ) : null;
