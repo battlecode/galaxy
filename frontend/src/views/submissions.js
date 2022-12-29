@@ -262,7 +262,6 @@ class Submissions extends Component {
     }
   }
 
-
   render() {
     return (
       <div className="content">
