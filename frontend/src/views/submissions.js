@@ -71,7 +71,12 @@ class Submissions extends Component {
       this.props.episode,
       (success) => {
         if (success) {
-          this.setState({ upload_status: "success", selectedFile: null });
+          this.setState({
+            upload_status: "success",
+            package: "",
+            description: "",
+            selectedFile: null,
+          });
         } else {
           this.setState({
             alert_message:
