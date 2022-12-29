@@ -103,20 +103,29 @@ class RankingTeamList extends Component {
             {<td>{Math.round(team.profile.rating)}</td>}
             <td>{team.name}</td>
             <td>{team.members.map((member) => member.username).join(", ")}</td>
-            {<td>{team.profile.quote}</td>}
-            <td>
-              {this.props.episode_info.eligibility_criteria.map((criterion) => {
-                const eligible = team.profile.eligible_for.includes(
-                  criterion.id
-                );
-                return (
-                  <span key={criterion.id}>
-                    {eligible ? criterion.icon : ""}
-                  </span>
-                );
-              })}
-            </td>
-            <td>{team.auto_accept_unranked ? "Yes" : "No"}</td>
+            {!this.props.canRequest && <td>{team.profile.quote}</td>}
+            {!this.props.canRequest && (
+              <td>
+                {this.props.episode_info.eligibility_criteria.map(
+                  (criterion) => {
+                    const eligible = team.profile.eligible_for.includes(
+                      criterion.id
+                    );
+                    return (
+                      <span key={criterion.id}>
+                        {eligible ? criterion.icon : ""}
+                      </span>
+                    );
+                  }
+                )}
+              </td>
+            )}
+            {this.props.canRequest && (
+              <td>{team.profile.auto_accept_ranked ? "Yes" : "No"}</td>
+            )}
+            {this.props.canRequest && (
+              <td>{team.profile.auto_accept_unranked ? "Yes" : "No"}</td>
+            )}
             {this.props.canRequest && (
               <td>
                 <button
@@ -152,9 +161,10 @@ class RankingTeamList extends Component {
                     <th>Rating</th>
                     <th>Team</th>
                     <th>Members</th>
-                    <th>Quote</th>
-                    <th>Eligibility</th>
-                    <th>Auto-Accept</th>
+                    {!this.props.canRequest && <th>Quote</th>}
+                    {!this.props.canRequest && <th>Eligibility</th>}
+                    <th>Auto-Accept Ranked</th>
+                    <th>Auto-Accept Unranked</th>
                   </tr>
                 </thead>
                 <tbody>{!this.props.loading && teamRows}</tbody>
