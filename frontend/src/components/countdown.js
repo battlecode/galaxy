@@ -31,8 +31,10 @@ class Countdown extends Component {
         this.initializeRefresh();
       });
     } else {
-      this.setState({ countdown_time: new Date(this.props.game_release) });
-      this.initializeRefresh();
+      if (this.props.game_release) {
+        this.setState({ countdown_time: new Date(this.props.game_release) });
+        this.initializeRefresh();
+      }
     }
   }
 
@@ -101,14 +103,14 @@ class Countdown extends Component {
     if (!this.props.is_game_released) {
       title = "Game Release Countdown";
       show_countdown = true;
-      extra_info = (
+      extra_info = this.props.game_release ? (
         <p>
           The game will be released at{" "}
           {countdown_time_text && countdown_time_text.est_date_str}, which{" "}
           {tense_verb}{" "}
           <b>{countdown_time_text && countdown_time_text.local_date_str}</b>.
         </p>
-      );
+      ) : null;
     } else {
       title = "Next Submission Deadline";
       show_countdown =

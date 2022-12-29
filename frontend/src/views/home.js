@@ -207,7 +207,11 @@ class Home extends Component {
                 </div>
                 <div className="row">
                   <Countdown
-                    game_release={this.props.episode_info.game_release}
+                    game_release={
+                      this.props.episode_info
+                        ? this.props.episode_info.game_release
+                        : null
+                    }
                     episode={this.props.episode}
                     is_game_released={this.props.is_game_released}
                   />
