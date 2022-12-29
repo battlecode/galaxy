@@ -30,7 +30,11 @@ class RankingTeamList extends TeamList {
           buttonContent = <i className="fa fa-check"></i>;
         }
         return (
-          <tr key={team.id} onClick={() => this.redirectToTeamPage(team.id)}>
+          <tr
+            key={team.id}
+            onClick={() => this.redirectToTeamPage(team.id)}
+            class="page-item"
+          >
             {<td>{Math.round(team.profile.rating)}</td>}
             <td>{team.name}</td>
             <td>{team.members.map((member) => member.username).join(", ")}</td>
@@ -47,12 +51,15 @@ class RankingTeamList extends TeamList {
                 );
               })}
             </td>
-            {/* <td>{team.auto_accept_unranked ? "Yes" : "No"}</td> */}
+            <td>{team.auto_accept_unranked ? "Yes" : "No"}</td>
             {true && (
               <td>
                 <button
                   className="btn btn-xs"
-                  onClick={() => this.onTeamRequest(team.id)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    this.onTeamRequest(team.id);
+                  }}
                 >
                   {buttonContent}
                 </button>{" "}
