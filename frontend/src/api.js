@@ -72,10 +72,13 @@ class Api {
       });
   }
 
-  static getSubmissions(episode, callback) {
-    $.get(`${URL}/api/compete/${episode}/submission/`).done((data, status) => {
-      callback(data);
-    });
+  static getSubmissions(episode, page, callback) {
+    $.get(`${URL}/api/compete/${episode}/submission/?page=${page}`).done(
+      (data, status) => {
+        const pageLimit = Math.ceil(data.count / PAGE_SIZE);
+        callback(data, pageLimit);
+      }
+    );
   }
 
   //----TEAM STATS---

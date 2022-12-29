@@ -19,11 +19,20 @@ class SubmissionList extends Component {
     super(props);
     this.state = {
       submissions: null,
+      page: 1,
+      pageLimit: 1,
     };
-    Api.getSubmissions(this.props.episode, (data) => {
-      this.setState({ submissions: data.results });
-    });
   }
+
+  componentDidMount() {
+    this.getPage(this.state.page);
+  }
+
+  getPage = (page) => {
+    Api.getSubmissions(this.props.episode, page, (data, pageLimit) => {
+      this.setState({ submissions: data.results, page, pageLimit });
+    });
+  };
 
   renderTable() {
     if (this.state.submissions === null) {
@@ -97,9 +106,9 @@ class SubmissionList extends Component {
             <tbody>{rows}</tbody>
           </table>
           <PaginationControl
-          // page={props.page}
-          // pageLimit={props.pageLimit}
-          // onPageClick={props.onPageClick}
+            page={this.state.page}
+            pageLimit={this.state.pageLimit}
+            onPageClick={this.getPage}
           />
         </div>
       );
