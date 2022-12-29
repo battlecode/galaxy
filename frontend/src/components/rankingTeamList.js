@@ -1,10 +1,64 @@
-import React from "react";
+import React, { Component } from "react";
 
-import TeamList from "./teamList";
 import PaginationControl from "./paginationControl";
 import Spinner from "./spinner";
 
-class RankingTeamList extends TeamList {
+class RankingTeamList extends Component {
+  state = {
+    pendingRequests: {},
+    successfulRequests: {},
+    showTeamID: null,
+  };
+
+  onTeamRequest = (teamId) => {
+    const { state } = this;
+    if (state.pendingRequests[teamId]) {
+      return;
+    }
+
+    this.setState((prevState) => {
+      return {
+        pendingRequests: {
+          ...prevState.pendingRequests,
+          [teamId]: true,
+        },
+      };
+    });
+    Api.requestScrimmage(this.props.episode, teamId, (success) =>
+      this.onRequestFinish(teamId, success)
+    );
+  };
+
+  onRequestFinish = (teamId, success) => {
+    this.setState((prevState) => {
+      return {
+        pendingRequests: {
+          ...prevState.pendingRequests,
+          [teamId]: false,
+        },
+        successfulRequests: success && {
+          ...prevState.successfulRequests,
+          [teamId]: true,
+        },
+      };
+    });
+    if (success) {
+      this.props.onRequestSuccess();
+      setTimeout(() => this.successTimeoutRevert(teamId), SUCCESS_TIMEOUT);
+    }
+  };
+
+  successTimeoutRevert = (teamId) => {
+    this.setState((prevState) => {
+      return {
+        successfulRequests: {
+          ...prevState.successfulRequests,
+          [teamId]: false,
+        },
+      };
+    });
+  };
+
   redirectToTeamPage = (team_id) => {
     this.props.history.push(`/${this.props.episode}/rankings/${team_id}`);
   };
