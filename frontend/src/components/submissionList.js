@@ -62,11 +62,7 @@ class SubmissionList extends Component {
               <button
                 className="btn btn-xs"
                 onClick={() =>
-                  Api.downloadSubmission(
-                    submission.id,
-                    this.props.episode,
-                    "zip"
-                  )
+                  Api.downloadSubmission(submission.id, this.props.episode)
                 }
               >
                 Download

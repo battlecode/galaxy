@@ -54,18 +54,14 @@ class Api {
       .done((data, status) => {
         // have to use fetch instead of ajax here since we want to download file
         fetch(data["url"])
-          .then((resp) => {
-            console.log(resp);
-            return resp.blob();
-          })
+          .then((resp) => resp.blob())
           .then((blob) => {
-            console.log(blob);
             //code to download the file given by the url
             const objUrl = window.URL.createObjectURL(blob);
             const aHelper = document.createElement("a");
             aHelper.style.display = "none";
             aHelper.href = objUrl;
-            aHelper.download = `${fileNameAddendum}_battlecode_source.zip`;
+            aHelper.download = `battlecode_source_${submissionId}.zip`;
             document.body.appendChild(aHelper);
             aHelper.click();
             window.URL.revokeObjectURL(objUrl);
