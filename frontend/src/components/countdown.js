@@ -1,7 +1,10 @@
 import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
 import Api from "../api";
 import Duration from "duration";
+import { getDateTimeText } from "../utils/date";
 
+import Spinner from "./spinner";
 class Countdown extends Component {
   constructor() {
     super();
@@ -9,45 +12,48 @@ class Countdown extends Component {
     // Initialize defaults to render before API call finishes
     // Make sure this is as minimal as possible
     this.state = {
-      days: 0,
-      hours: 0,
-      min: 0,
-      sec: 0,
+      days: null,
+      hours: null,
+      min: null,
+      sec: null,
     };
   }
 
   componentDidMount() {
-    Api.getNextTournament((tournament_info) => {
-      // Note that state updates asynchronously, but we need it immediately for computation.
-      // So we can't only set state here
-      this.submission_deadline = tournament_info.submission_deadline;
-      this.setState({ submission_deadline: this.submission_deadline });
-      const text_submission_deadline = tournament_info.submission_deadline_strs;
-      this.setState({ text_submission_deadline });
-
-      this.refreshCountdown();
-      this.interval = setInterval(() => {
-        this.refreshCountdown();
-      }, 1000);
-
-      this.setState({ tournament_name: tournament_info.tournament_name });
-      this.setState({
-        has_next_tournament: tournament_info.has_next_tournament,
+    if (this.props.is_game_released) {
+      Api.getNextTournament(this.props.episode, (next_tournament) => {
+        this.setState({ next_tournament });
+        if (next_tournament) {
+          this.setState({
+            countdown_time: new Date(next_tournament.submission_freeze),
+          });
+        }
+        this.initializeRefresh();
       });
-    });
+    } else {
+      this.setState({ countdown_time: new Date(this.props.game_release) });
+      this.initializeRefresh();
+    }
+  }
+
+  initializeRefresh() {
+    this.refreshCountdown();
+    this.interval = setInterval(() => {
+      this.refreshCountdown();
+    }, 1000);
   }
 
   refreshCountdown() {
-    const countdownResult = this.calculateCountdown(this.submission_deadline);
+    const countdownResult = this.calculateCountdown(this.state.countdown_time);
     if (countdownResult !== false) {
       this.setState(countdownResult);
       this.setState({
-        did_submission_deadline_pass: false,
+        did_countdown_time_pass: false,
       });
     } else {
       this.stop();
       this.setState({
-        did_submission_deadline_pass: true,
+        did_countdown_time_pass: true,
       });
     }
   }
@@ -85,49 +91,105 @@ class Countdown extends Component {
   }
 
   render() {
-    let title = "Submission Deadline";
-    let tense_verb = this.state.did_submission_deadline_pass ? "was" : "is";
+    let title = "";
+    let extra_info = null;
+    let show_countdown = false;
+    const countdown_time_text = this.state.countdown_time
+      ? getDateTimeText(this.state.countdown_time)
+      : null;
+    const tense_verb = this.state.did_countdown_time_pass ? "was" : "is";
+    if (!this.props.is_game_released) {
+      title = "Game Release Countdown";
+      show_countdown = true;
+      extra_info = (
+        <p>
+          The game will be released at{" "}
+          {countdown_time_text && countdown_time_text.est_date_str}, which{" "}
+          {tense_verb}{" "}
+          <b>{countdown_time_text && countdown_time_text.local_date_str}</b>.
+        </p>
+      );
+    } else {
+      title = "Next Submission Deadline";
+      show_countdown =
+        this.state.next_tournament !== undefined &&
+        this.state.next_tournament !== null;
+      extra_info =
+        this.state.next_tournament !== undefined ? (
+          <div>
+            {this.state.next_tournament !== null ? (
+              <p>
+                The submission deadline for the{" "}
+                <b>{this.state.next_tournament.name_long}</b> {tense_verb} at{" "}
+                {countdown_time_text.est_date_str}, which {tense_verb}{" "}
+                <b>{countdown_time_text.local_date_str}</b>.
+              </p>
+            ) : (
+              <p>
+                The submission deadline for the next tournament has not been set
+                yet.
+              </p>
+            )}
+            {this.state.next_tournament !== null &&
+            this.state.next_tournament.require_resume ? (
+              <p>
+                Make sure to have indicated your eligibility on your{" "}
+                <NavLink to="team">team profile page</NavLink>. Also make sure
+                to have all members upload a resume, at your{" "}
+                <NavLink to="account">personal profile page</NavLink>. See the
+                eligibility rules given in the{" "}
+                <NavLink to="team">tournament page</NavLink> for more info.
+              </p>
+            ) : null}
+          </div>
+        ) : (
+          <Spinner />
+        );
+    }
 
-    let explanatoryText = this.state.has_next_tournament ? (
-      <div>
-        The submission deadline for the <b>{this.state.tournament_name}</b>{" "}
-        {tense_verb} at {this.state.text_submission_deadline.est_date_str},
-        which {tense_verb}{" "}
-        <b>{this.state.text_submission_deadline.local_date_str}</b>.
-      </div>
-    ) : (
-      <div>
-        The submission deadline for the next tournament has not been set yet.
-      </div>
-    );
-
-    let countdown = this.state.has_next_tournament ? (
+    let countdown = show_countdown ? (
       <div className="countdown-container">
         <div className="Countdown">
           <span className="Countdown-col">
             <span className="Countdown-col-element">
-              <strong>{this.addLeadingZeros(this.state.days)}</strong>
+              <strong>
+                {this.state.days !== null
+                  ? this.addLeadingZeros(this.state.days)
+                  : "-"}
+              </strong>
               <span>{this.state.days === 1 ? "Day" : "Days"}</span>
             </span>
           </span>
 
           <span className="Countdown-col">
             <span className="Countdown-col-element">
-              <strong>{this.addLeadingZeros(this.state.hours)}</strong>
+              <strong>
+                {this.state.hours !== null
+                  ? this.addLeadingZeros(this.state.hours)
+                  : "-"}
+              </strong>
               <span>{this.state.hours === 1 ? "Hour" : "Hours"}</span>
             </span>
           </span>
 
           <span className="Countdown-col">
             <span className="Countdown-col-element">
-              <strong>{this.addLeadingZeros(this.state.min)}</strong>
+              <strong>
+                {this.state.min !== null
+                  ? this.addLeadingZeros(this.state.min)
+                  : "-"}
+              </strong>
               <span>Min</span>
             </span>
           </span>
 
           <span className="Countdown-col">
             <span className="Countdown-col-element">
-              <strong>{this.addLeadingZeros(this.state.sec)}</strong>
+              <strong>
+                {this.state.sec !== null
+                  ? this.addLeadingZeros(this.state.sec)
+                  : "-"}
+              </strong>
               <span>Sec</span>
             </span>
           </span>
@@ -142,7 +204,7 @@ class Countdown extends Component {
         </div>
         <div className="content">
           {countdown}
-          {explanatoryText}
+          {extra_info}
         </div>
       </div>
     );

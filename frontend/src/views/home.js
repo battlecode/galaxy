@@ -206,7 +206,11 @@ class Home extends Component {
                   <InstrCard episode_name_long={this.props.episode_name_long} />
                 </div>
                 <div className="row">
-                  <Countdown />
+                  <Countdown
+                    game_release={this.props.episode_info.game_release}
+                    episode={this.props.episode}
+                    is_game_released={this.props.is_game_released}
+                  />
                 </div>
                 <div className="row">{this.props.on_team && <StatCard />}</div>
               </div>

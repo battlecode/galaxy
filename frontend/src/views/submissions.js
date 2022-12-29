@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import Api from "../api";
-import * as Cookies from "js-cookie";
+import Countdown from "../components/countdown";
+import ActionMessage from "../components/actionMessage";
+import Alert from "../components/alert";
 
 const COMPILATION_STATUS = {
   PROGRESS: 0,
@@ -18,33 +20,36 @@ class Submissions extends Component {
     this.state = {
       selectedFile: null,
       currentSubmission: null,
+      package: "",
+      description: "",
       lastSubmissions: null,
       tourSubmissions: null,
       numLastSubmissions: 0,
       numLastLoaded: 0,
       numTourSubmissions: 0,
       numTourLoaded: 0,
-      user: {},
-      league: {},
-      upload_status: -1,
+      upload_status: "waiting",
+      alert_message: "",
     };
-    Api.getUserProfile(
-      function (user_profile) {
-        this.setState({ user_profile });
-      }.bind(this)
-    );
+
+    this.changeHandler = this.changeHandler.bind(this);
+  }
+
+  changeHandler(e) {
+    const id = e.target.id;
+    const val = e.target.value;
+
+    this.setState(function (prevState, props) {
+      prevState[id] = val;
+      return prevState;
+    });
   }
 
   componentDidMount() {
     Api.getTeamSubmissions(this.gotSubmissions);
-    Api.getLeague(
-      function (l) {
-        this.setState({ league: l });
-      }.bind(this)
-    );
 
     // Set up submission deadline text
-    Api.getNextTournament((tournamentInfo) => {
+    Api.getNextTournament(this.props.episode, (tournamentInfo) => {
       this.setState({ tournamentInfo });
     });
   }
@@ -58,55 +63,41 @@ class Submissions extends Component {
 
   // makes an api call to upload the selected file
   uploadData = () => {
-    // 'upload_status_cookie' in Cookies is used to communicate between the functions in api.js and those in submissions.js. It lets us keep track of the upload process for submissions, and all the http requests involved. (Note that this is different than a submission's compile_status in the database.)
-    // A value of 0 indicates that the submission is still in progress.
-    // When a submission finishes, api.js changes this value to something else.
-    Cookies.set("upload_status_cookie", 10);
-    // The upload_status state is used internally by this component.
-    // (Currently, it mirrors upload_status_cookie, but is part of state to make working with React easier.)
-    this.setState({ upload_status: 10 });
-
-    // Concurrent upload processes can be problematic; we've made the decision to disable concurrency.
-    // This is achieved by refreshing the submission upload components, which have buttons disabled while upload_status is 0.
-    this.renderHelperSubmissionForm();
-    this.renderHelperSubmissionStatus();
-
-    Api.newSubmission(this.state.selectedFile, null);
-
-    // The method in api.js will change Cookies' upload_status_cookie during the process of an upload.
-    // To check changes, we poll periodically.
-    this.interval = setInterval(() => {
-      let upload_status_cookie_value = Cookies.get("upload_status_cookie");
-      if (upload_status_cookie_value != 10) {
-        // Submission process terminated (see api.js).
-
-        // refresh the submission status, for use on this component
-        this.setState({ upload_status: upload_status_cookie_value });
-
-        // refresh the submission button, etc, to allow for a new submission
-        this.renderHelperSubmissionForm();
-        this.renderHelperSubmissionStatus();
-
-        // refresh team submission tables, to display the submission that just occured
-        Api.getTeamSubmissions(this.gotSubmissions);
-        this.renderHelperCurrentTable();
-        this.renderHelperLastTable();
-
-        // Done waiting for changes to upload_status_cookie, so stop polling.
-        clearInterval(this.interval);
+    this.setState({ upload_status: "loading" });
+    Api.newSubmission(
+      this.state.selectedFile,
+      this.state.package,
+      this.state.description,
+      this.props.episode,
+      (success) => {
+        if (success) {
+          this.setState({
+            upload_status: "success",
+            package: "",
+            description: "",
+            selectedFile: null,
+          });
+        } else {
+          this.setState({
+            alert_message:
+              "Submission upload was not successful, most likely due to a submission freeze.",
+          });
+          this.setState({ upload_status: "failure" });
+        }
+        // re-render submission table after;
+        // as part of #387 for tracking
+        setTimeout(() => {
+          this.setState({ upload_status: "waiting" });
+        }, 2000);
       }
-    }, 1000); // Poll every second
+    );
   };
 
   // change handler called when file is selected
-  onChangeHandler = (event) => {
+  fileChangeHandler = (event) => {
     this.setState({
       selectedFile: event.target.files[0],
-      loaded: 0,
-      upload_status: -1,
     });
-    this.renderHelperSubmissionForm();
-    this.renderHelperSubmissionStatus();
   };
 
   //---GETTING TEAMS SUBMISSION DATA----
@@ -124,7 +115,7 @@ class Submissions extends Component {
 
   // called when submission data is initially received
   // this will be maps of the label of type of submission to submission id
-  // this function then makes calles to get the specific data for each submission
+  // this function then makes calls to get the specific data for each submission
   gotSubmissions = (data) => {
     this.setState({
       currentSubmission: new Array(
@@ -225,89 +216,129 @@ class Submissions extends Component {
   };
 
   //----PERMISSIONS----
-  // enable iff game active or user is staff
-  // Note that this duplicates a method in submissions.js;
-  // this will be cleaned up. See #74
   isSubmissionEnabled() {
-    if (
-      // Short-circuit check for nested object,
-      // in case user_profile hasn't been set yet.
-      this.state.user_profile &&
-      this.state.user_profile.user.is_staff == true
-    ) {
-      return true;
-    }
-    if (
-      this.state.league.submissions_enabled == true &&
-      this.state.league.game_released == true
-    ) {
-      return true;
-    }
-    return false;
+    // Submissions are only enabled when on a team,
+    // and game is released (or you are staff;
+    // note that this is included when deriving the is_game_released variable),
+    // and the episode is not frozen.
+
+    // NOTE: There is an edge case when in the backend,
+    // the episode is truly frozen since a submission deadline has passed,
+    // but the frontend may not know of that.
+    // So ensure that _independently of the frontend's stored value of frozen,
+    // submissions attempted during a submission freeze still fail gracefully_.
+
+    return (
+      this.props.on_team &&
+      this.props.is_game_released &&
+      !this.props.episode.frozen
+    );
   }
 
   //----RENDERING----
 
+  closeAlert = () => {
+    this.setState({ alert_message: "" });
+  };
+
   // return div for submitting files, should be able to disable this when submissions are not being accepts
   renderHelperSubmissionForm() {
     if (this.isSubmissionEnabled()) {
-      let status_str = "";
-      let btn_class = "btn btn";
-      let file_label = "No file chosen.";
-      let file_button_sub = <div> </div>;
-      let file_button = <div></div>;
-      let file_button_2 = <div></div>;
+      // Submission upload button logic
+      const submission_inputted = this.state.selectedFile !== null;
+      const submission_input_name = !submission_inputted
+        ? "No file chosen."
+        : this.state.selectedFile["name"];
+      const submission_btn_class =
+        "btn btn" + (!submission_inputted ? "" : " btn-info btn-fill");
 
-      let button = (
-        <button disabled style={{ float: "right" }} className={btn_class}>
+      const submission_input_label = (
+        <label htmlFor="submission_file_attach">
+          <div className="btn"> Choose File </div>{" "}
+          <span
+            style={{
+              textTransform: "none",
+              marginLeft: "10px",
+              fontSize: "14px",
+            }}
+          >
+            {" "}
+            {submission_input_name}{" "}
+          </span>
+        </label>
+      );
+
+      const submission_input = (
+        <input
+          id="submission_file_attach"
+          type="file"
+          accept=".zip"
+          onChange={this.fileChangeHandler}
+          style={{ display: "none" }}
+        />
+      );
+
+      const submission_upload_btn_disabled =
+        !submission_inputted ||
+        ["success", "loading", "failure"].includes(this.state.upload_status);
+
+      const submission_upload_button = (
+        <button
+          disabled={submission_upload_btn_disabled}
+          style={{ float: "right" }}
+          onClick={this.uploadData}
+          className={submission_btn_class}
+        >
           {" "}
-          Submit{" "}
+          <ActionMessage
+            default_message="Upload Submission"
+            status={this.state.upload_status}
+          />{" "}
         </button>
       );
-      if (this.state.selectedFile !== null) {
-        btn_class += " btn-info btn-fill";
-        file_label = this.state.selectedFile["name"];
-        if (this.state.upload_status != 10) {
-          button = (
-            <button
-              style={{ float: "right" }}
-              onClick={this.uploadData}
-              className={btn_class}
-            >
-              {" "}
-              Submit{" "}
-            </button>
-          );
-        }
-      }
-      // Make sure to disable concurrent submission uploads.
-      if (this.state.upload_status != 10) {
-        file_button_sub = <div className="btn"> Choose File </div>;
-        file_button = (
-          <label htmlFor="file_upload">
-            {file_button_sub}{" "}
-            <span
-              style={{
-                textTransform: "none",
-                marginLeft: "10px",
-                fontSize: "14px",
-              }}
-            >
-              {" "}
-              {file_label}{" "}
-            </span>{" "}
-          </label>
-        );
-        file_button_2 = (
-          <input
-            id="file_upload"
-            type="file"
-            accept=".zip"
-            onChange={this.onChangeHandler}
-            style={{ display: "none" }}
-          ></input>
-        );
-      }
+
+      const submission_row = (
+        <div className="row">
+          <div className="col-md-12">
+            <div className="form-group">
+              <label>Submission</label>
+              <br />
+              {submission_input_label}
+              {submission_input}
+              {submission_upload_button}
+            </div>
+          </div>
+        </div>
+      );
+
+      const submission_info_row = (
+        <div className="row">
+          <div className="col-md-2">
+            <div className="form-group">
+              <label>Package Name</label>
+              <input
+                type="text"
+                className="form-control"
+                id="package"
+                onChange={this.changeHandler}
+                value={this.state.package}
+              />
+            </div>
+          </div>
+          <div className="col-md-10">
+            <div className="form-group">
+              <label>Description</label>
+              <input
+                type="text"
+                className="form-control"
+                id="description"
+                onChange={this.changeHandler}
+                value={this.state.description}
+              />
+            </div>
+          </div>
+        </div>
+      );
 
       return (
         <div className="card">
@@ -315,44 +346,7 @@ class Submissions extends Component {
             <h4 className="title">Submit Code</h4>
           </div>
           <div className="content">
-            <p>
-              <b>
-                The submission deadline for the{" "}
-                {this.state.tournamentInfo.tournament_name} is{" "}
-                {
-                  this.state.tournamentInfo.submission_deadline_strs
-                    .est_date_str
-                }
-                , which is{" "}
-                <b>
-                  {
-                    this.state.tournamentInfo.submission_deadline_strs
-                      .local_date_str
-                  }
-                </b>
-                .
-              </b>{" "}
-            </p>
-            {this.state.tournamentInfo.does_tour_require_resume && (
-              <p>
-                Make sure to have indicated your eligibility on your Team
-                Profile page. Also make sure to have all members upload a
-                resume, at your personal profile page.{" "}
-                <b>
-                  **See the Eligibility Rules in the Tournaments page for more
-                  info**
-                </b>
-              </p>
-            )}
-            <p>
-              Submit your code using the button below. For peace of mind, submit
-              15 minutes before and make sure it compiles and shows up under
-              "Latest Submissions." Unlike previous years,{" "}
-              <b>
-                we will not allow submissions sent through Discord. Please
-                submit early and check your submissions before the deadline!
-              </b>
-            </p>
+            <p>Submit your code using the button below.</p>
             <p>
               Create a <code>zip</code> file of your robot player, and submit it
               below. The submission format should be a zip file containing a
@@ -365,24 +359,8 @@ class Submissions extends Component {
                 RobotPlayer.java, FooBar.java
               </code>
             </pre>
-            <p>
-              Please{" "}
-              <b>
-                <i>stay on this page until the card below indicates success.</i>
-              </b>{" "}
-              To double-check that your code has been submitted, you can
-              download at "Latest Submissions".
-            </p>
-            <p>
-              If your bot does not compile,{" "}
-              <b>
-                see the "Compiling Tips" section at the bottom of this page.
-              </b>
-            </p>
-            {file_button}
-            {file_button_2}
-            {button}
-            {/* <p id="upload_status" className="text-center category"> {status_str}</p> */}
+            {submission_row}
+            {submission_info_row}
           </div>
         </div>
       );
@@ -439,7 +417,7 @@ class Submissions extends Component {
     }
   }
 
-  //reder helper for table containing the team's latest submission
+  // render helper for table containing the team's latest submission
   renderHelperCurrentTable() {
     if (this.state.currentSubmission === null) {
       return (
@@ -558,7 +536,7 @@ class Submissions extends Component {
     }
   }
 
-  //reder helper for table containing the team's latest successfully compiled submissions
+  // render helper for table containing the team's latest successfully compiled submissions
   renderHelperLastTable() {
     if (this.state.lastSubmissions === null) {
       return (
@@ -624,7 +602,7 @@ class Submissions extends Component {
     }
   }
 
-  //reder helper for table containing the team's tournament submissions
+  // render helper for table containing the team's tournament submissions
   renderHelperTourTable() {
     if (this.state.tourSubmissions === null) {
       return (
@@ -690,71 +668,48 @@ class Submissions extends Component {
     }
   }
 
-  renderCompilingTips() {
-    return (
-      <div className="card">
-        <div className="header">
-          <h4 className="title">Compiling Tips</h4>
-        </div>
-        <div className="content">
-          <ul>
-            <li>
-              Submission format: Check that your zip contains exactly one
-              directory, and your code is inside that directory.
-            </li>
-            <li>
-              Non-ASCII characters: Ensure your code is completely ASCII. In the
-              past we have had compile errors due to comments containing
-              diacritic characters (áéíóú).
-            </li>
-            <li>
-              Make sure you only import from your own bot, and from java.
-              packages. In particular, do not use javax, javafx, and watch out
-              for importing from other versions of your bot (which may work
-              locally, but will not work on our servers as you can only submit
-              one folder).
-            </li>
-          </ul>
-        </div>
-      </div>
-    );
-  }
-
   render() {
     return (
       <div className="content">
+        <Alert
+          alert_message={this.state.alert_message}
+          closeAlert={this.closeAlert}
+        />
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-12">
+              <Countdown
+                game_release={this.props.episode_info.game_release}
+                episode={this.props.episode}
+                is_game_released={this.props.is_game_released}
+              >
+                {" "}
+              </Countdown>
               {this.renderHelperSubmissionForm()}
-              {this.renderHelperSubmissionStatus()}
-              <div className="card">
+              {/* See #387 for tracking */}
+              {/* {this.renderHelperSubmissionStatus()} */}
+
+              {/* See #387 for tracking */}
+              {/* <div className="card">
                 <div className="header">
                   <h4 className="title">Latest Submission</h4>
                 </div>
-                <div className="content">
-                  {this.isSubmissionEnabled() &&
-                    this.renderHelperCurrentTable()}
-                </div>
-
+                <div className="content">{this.renderHelperCurrentTable()}</div>
                 <div className="header">
                   <h4 className="title">
                     Latest Successfully Compiled Submissions
                   </h4>
                 </div>
-                <div className="content">
-                  {this.isSubmissionEnabled() && this.renderHelperLastTable()}
-                </div>
-              </div>
-              <div className="card">
+                <div className="content">{this.renderHelperLastTable()}</div>
+              </div> */}
+
+              {/* See #78 for tracking */}
+              {/* <div className="card">
                 <div className="header">
                   <h4 className="title">Tournament Submissions</h4>
                 </div>
-                <div className="content">
-                  {this.isSubmissionEnabled() && this.renderHelperTourTable()}
-                </div>
-              </div>
-              {this.renderCompilingTips()}
+                <div className="content">{this.renderHelperTourTable()}</div>
+              </div> */}
             </div>
           </div>
         </div>

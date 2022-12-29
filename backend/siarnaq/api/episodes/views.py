@@ -1,3 +1,5 @@
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -83,6 +85,16 @@ class TournamentViewSet(viewsets.ReadOnlyModelViewSet):
         if not self.request.user.is_staff:
             queryset = queryset.filter(is_public=True)
         return queryset
+
+    @action(detail=False, methods=["get"])
+    def next(self, request, episode_id):
+        "Retrieve the next upcoming tournament, as ordered by submission freeze time."
+        now = timezone.now()
+        next_tournament = get_object_or_404(
+            self.get_queryset().filter(submission_freeze__gt=now)[:1]
+        )
+        serializer = self.get_serializer(next_tournament)
+        return Response(serializer.data)
 
 
 class TournamentRoundViewSet(viewsets.ReadOnlyModelViewSet):
