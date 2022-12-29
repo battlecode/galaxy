@@ -34,7 +34,7 @@ class ScrimmageRequestForm extends Component {
   getMaps() {
     Api.getMaps(this.props.episode, (maps) => {
       const random_maps = [1, 2, 3].map(
-        () => maps[Math.floor(Math.random() * maps.length)].id
+        () => maps[Math.floor(Math.random() * maps.length)].name
       );
       this.setState({ available_maps: maps, maps: random_maps });
     });
@@ -92,7 +92,7 @@ class ScrimmageRequestForm extends Component {
     const maps = this.state.available_maps;
     const random_maps = [1, 2, 3].map(
       () =>
-        maps[Math.floor(Math.random() * this.state.available_maps.length)].id
+        maps[Math.floor(Math.random() * this.state.available_maps.length)].name
     );
     this.setState({
       is_ranked: false,
@@ -175,7 +175,7 @@ class ScrimmageRequestForm extends Component {
                       >
                         {this.state.available_maps.map((map) => {
                           return (
-                            <option value={map.id} key={map.id}>
+                            <option value={map.name} key={map.name}>
                               {map.name}
                             </option>
                           );

@@ -488,15 +488,15 @@ class Api {
     is_ranked,
     requested_to,
     player_order,
-    maps,
+    map_names,
     episode,
     callback
   ) {
     const data = {
-      is_ranked: is_ranked,
-      requested_to: requested_to,
-      player_order: player_order,
-      maps: maps,
+      is_ranked,
+      requested_to,
+      player_order,
+      map_names,
     };
     return $.ajax({
       url: `${URL}/api/compete/${episode}/request/`,
