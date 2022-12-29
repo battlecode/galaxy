@@ -14,15 +14,13 @@ class Submissions extends Component {
       currentSubmission: null,
       package: "",
       description: "",
-      lastSubmissions: null,
-      tourSubmissions: null,
-      numLastSubmissions: 0,
-      numLastLoaded: 0,
-      numTourSubmissions: 0,
-      numTourLoaded: 0,
       upload_status: "waiting",
       alert_message: "",
     };
+
+    this.submission_list = (
+      <SubmissionList episode={this.props.episode}> </SubmissionList>
+    );
 
     this.changeHandler = this.changeHandler.bind(this);
   }
@@ -76,8 +74,6 @@ class Submissions extends Component {
           });
           this.setState({ upload_status: "failure" });
         }
-        // re-render submission table after;
-        // as part of #387 for tracking
         setTimeout(() => {
           this.setState({ upload_status: "waiting" });
         }, 2000);
@@ -280,8 +276,7 @@ class Submissions extends Component {
                 {" "}
               </Countdown>
               {this.renderHelperSubmissionForm()}
-
-              <SubmissionList episode={this.props.episode}></SubmissionList>
+              {this.submission_list}
 
               {/* See #78 for tracking */}
               {/* <div className="card">
