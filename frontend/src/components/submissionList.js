@@ -4,6 +4,16 @@ import Api from "../api";
 import PaginationControl from "./paginationControl";
 import Spinner from "./spinner";
 
+const SUBMISSION_STATUS = {
+  NEW: "Created",
+  QUE: "Queued",
+  RUN: "Running",
+  TRY: "Will be retried",
+  "OK!": "Success",
+  ERR: "Failed",
+  CAN: "Cancelled",
+};
+
 class SubmissionList extends Component {
   constructor(props) {
     super(props);
@@ -34,7 +44,7 @@ class SubmissionList extends Component {
         return (
           <tr key={submission.id}>
             <td>{new Date(submission.created).toLocaleString()}</td>
-            <td>{submission.status} </td>
+            <td>{SUBMISSION_STATUS[submission.status]} </td>
             <td>{submission.description} </td>
             <td>{submission.username} </td>
             <td>
