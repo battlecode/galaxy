@@ -95,7 +95,11 @@ class SubmissionList extends Component {
 
       return (
         <div className="content">
-          <button className="btn btn-xs" onClick={this.refreshCurrentPage}>
+          <button
+            id="submission-table-refresh-button"
+            className="btn btn-xs"
+            onClick={this.refreshCurrentPage}
+          >
             Refresh
           </button>
           <table className="table table-hover table-striped table-responsive table-full-width">

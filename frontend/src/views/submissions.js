@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import $ from "jquery";
+
 import Api from "../api";
 import Countdown from "../components/countdown";
 import ActionMessage from "../components/actionMessage";
@@ -74,6 +76,7 @@ class Submissions extends Component {
           });
           this.setState({ upload_status: "failure" });
         }
+        $("#submission-table-refresh-button").click();
         setTimeout(() => {
           this.setState({ upload_status: "waiting" });
         }, 2000);
