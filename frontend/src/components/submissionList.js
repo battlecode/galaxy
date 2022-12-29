@@ -34,6 +34,10 @@ class SubmissionList extends Component {
     });
   };
 
+  refreshCurrentPage = () => {
+    this.getPage(this.state.page);
+  };
+
   renderTable() {
     if (this.state.submissions === null) {
       return (
@@ -49,7 +53,6 @@ class SubmissionList extends Component {
       );
     } else {
       const rows = this.state.submissions.map((submission) => {
-        console.log(submission);
         return (
           <tr key={submission.id}>
             <td>{new Date(submission.created).toLocaleString()}</td>
@@ -92,6 +95,9 @@ class SubmissionList extends Component {
 
       return (
         <div className="content">
+          <button className="btn btn-xs" onClick={this.refreshCurrentPage}>
+            Refresh
+          </button>
           <table className="table table-hover table-striped table-responsive table-full-width">
             <thead>
               <tr>
