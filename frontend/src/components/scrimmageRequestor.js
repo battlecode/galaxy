@@ -49,6 +49,7 @@ class ScrimmageRequestor extends Component {
         search_placeholder="Search for a Team to Scrimmage..."
         history={this.props.history}
         canRequest={true}
+        team={this.props.team}
       />
     );
   }

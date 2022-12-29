@@ -126,19 +126,21 @@ class RankingTeamList extends Component {
             {this.props.canRequest && (
               <td>{team.profile.auto_accept_unranked ? "Yes" : "No"}</td>
             )}
-            {this.props.canRequest && (
-              <td>
-                <button
-                  className="btn btn-xs"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    this.openRequestForm(team);
-                  }}
-                >
-                  {buttonContent}
-                </button>{" "}
-              </td>
-            )}
+            {this.props.canRequest &&
+              this.props.team &&
+              team.id !== this.props.team.id && (
+                <td>
+                  <button
+                    className="btn btn-xs"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      this.openRequestForm(team);
+                    }}
+                  >
+                    {buttonContent}
+                  </button>{" "}
+                </td>
+              )}
           </tr>
         );
       });

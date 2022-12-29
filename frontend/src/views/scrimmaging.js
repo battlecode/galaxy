@@ -267,6 +267,7 @@ class Scrimmaging extends Component {
                 episode={this.props.episode}
                 episode_info={this.props.episode_info}
                 history={this.props.history}
+                team={this.props.team}
               />
               {/* <ScrimmageHistory
                 ref={(history) => {
