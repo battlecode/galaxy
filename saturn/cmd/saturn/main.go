@@ -4,6 +4,7 @@ import (
 	"context"
 	"os/signal"
 
+	"github.com/battlecode/galaxy/saturn/pkg/run"
 	"github.com/battlecode/galaxy/saturn/pkg/saturn"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -15,6 +16,8 @@ const (
 	gcpTokenedReporterAudience  = "siarnaq"
 	gcpTokenedReporterUserAgent = "Galaxy-Saturn"
 	monitorAddress              = "127.0.0.1:8005"
+
+	scaffoldRoot = "/scaffolds"
 )
 
 func main() {
@@ -24,13 +27,14 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), unix.SIGINT, unix.SIGTERM)
 	defer stop()
 
+	multiplexer := run.NewScaffoldMultiplexer(scaffoldRoot)
 	app, err := saturn.New(
 		ctx,
 		saturn.WithMonitor(monitorAddress),
 		saturn.WithGcpPubsubSubcriber(gcpPubsubSubscriptionId),
 		saturn.WithGcpTokenedReporter(gcpTokenedReporterAudience, gcpTokenedReporterUserAgent),
-		saturn.WithRunner("compile", nil), // TODO add runner
-		saturn.WithRunner("execute", nil), // TODO add runner
+		saturn.WithRunner("compile", multiplexer.Compile),
+		saturn.WithRunner("execute", multiplexer.Execute),
 	)
 	if err != nil {
 		log.Ctx(ctx).Fatal().Err(err).Msg("Could not initialize Saturn.")
