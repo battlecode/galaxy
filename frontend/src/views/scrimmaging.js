@@ -254,14 +254,14 @@ class Scrimmaging extends Component {
         <div className="content">
           <div className="container-fluid">
             <div className="row">
-              <ScrimmageRequests
+              {/* <ScrimmageRequests
                 ref={(requests) => {
                   this.requests = requests;
                 }}
                 refresh={this.refresh}
                 episode={this.props.episode}
                 episode_info={this.props.episode_info}
-              />
+              /> */}
               <ScrimmageRequestor
                 refresh={this.refresh}
                 episode={this.props.episode}
