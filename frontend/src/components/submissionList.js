@@ -33,9 +33,8 @@ class SubmissionList extends Component {
         console.log(submission);
         return (
           <tr key={submission.id}>
-            <td> {submission.created}</td>
+            <td>{new Date(submission.created).toLocaleString()}</td>
             <td>{submission.status} </td>
-
             <td>{submission.description} </td>
             <td>{submission.username} </td>
             <td>
