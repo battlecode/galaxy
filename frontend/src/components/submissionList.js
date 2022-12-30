@@ -58,6 +58,7 @@ class SubmissionList extends Component {
             <td>{new Date(submission.created).toLocaleString()}</td>
             <td>{SUBMISSION_STATUS[submission.status]} </td>
             <td>{submission.description} </td>
+            <td>{submission.package}</td>
             <td>{submission.username} </td>
             <td>
               {" "}
@@ -108,6 +109,7 @@ class SubmissionList extends Component {
                 <th>Submitted at</th>
                 <th>Status</th>
                 <th>Description</th>
+                <th>Package Name</th>
                 <th>Submitter</th>
                 <th></th>
                 <th></th>
