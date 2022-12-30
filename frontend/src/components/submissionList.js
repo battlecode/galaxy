@@ -36,6 +36,7 @@ class SubmissionList extends Component {
 
   refreshCurrentPage = () => {
     this.getPage(this.state.page);
+    $("#submission-table-refresh-button").blur();
   };
 
   renderTable() {
