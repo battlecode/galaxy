@@ -176,7 +176,7 @@ class TeamProfile(models.Model):
 
     team = models.OneToOneField(
         Team,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         primary_key=True,
         related_name="profile",
     )
