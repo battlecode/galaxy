@@ -231,6 +231,6 @@ ol {
   z-index: 1030;
 }
 
-.alert-message {
+.error-message {
   white-space: pre-line;
 }
