@@ -1,34 +1,27 @@
-/**
- * Process the response JSON for all errors and produce
- * an array of [field, error message] pairs.
- * Handles a "profile" where the basic information is
- * assumed to be a nested field of this profile.
- * (For example, "user" inside a "UserProfile".)
- */
-function get_profile_errors(model, response_json) {
-  const errors = [];
-  if (response_json[model]) {
-    for (const [field, error_message] of Object.entries(response_json[model])) {
-      errors.push([field, error_message]);
+// Recursive parser for an error from the backend.
+// Assumes that errors are JS objects (dictionaries),
+// whose keys are fields,
+// and whose values are either list of strings, or another "error" (recursive).
+
+// Return a flat array of error "messages",
+// where a message is an object with keys of "field" and "msg".
+
+function parse_errors(input) {
+  result = [];
+  for (const [field, msg_list_or_error] of Object.entries(input)) {
+    if (Array.isArray(msg_list_or_error)) {
+      // is a list of messages
+      for (msg of msg_list_or_error) {
+        result.push({ field: field, msg: msg });
+      }
+    }
+
+    // If not array, then most likely another (recursive) error
+    else {
+      result = result.concat(parse_errors(msg_list_or_error));
     }
   }
-  for (const [field, error_message] of Object.entries(response_json)) {
-    if (field == model) continue;
-    errors.push([field, error_message]);
-  }
-  return errors;
+  return result;
 }
 
-function get_user_errors(response_json) {
-  return get_profile_errors("user", response_json);
-}
-
-function get_team_errors(response_json) {
-  return get_profile_errors("team", response_json);
-}
-
-function get_nested_profile_errors(response_json) {
-  return get_profile_errors("profile", response_json);
-}
-
-export { get_user_errors, get_team_errors, get_nested_profile_errors };
+export { parse_errors };
