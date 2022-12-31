@@ -50,6 +50,11 @@ function toHeaderCase(str) {
 }
 
 function print_errors(input) {
+  // Just in case...
+  if (!input) {
+    return `There was an error. See your browser console or ask Teh Devs for assistance.`;
+  }
+
   const errors = parse_errors(input);
 
   if (errors.length === 1) {
