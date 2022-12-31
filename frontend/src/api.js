@@ -679,7 +679,7 @@ class Api {
     $.post(`${URL}/api/user/password_reset/confirm/`, req, (data, success) => {
       callback(data, success);
     }).fail((xhr, status, error) => {
-      callback(xhr.responseJSON, false);
+      callback(xhr, false);
     });
   }
 
