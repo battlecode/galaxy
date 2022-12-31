@@ -45,7 +45,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 
@@ -218,7 +218,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 
@@ -312,7 +312,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 
@@ -331,7 +331,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 
@@ -669,7 +669,7 @@ class Api {
         this.login(user.username, user.password, callback);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 

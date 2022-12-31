@@ -49,7 +49,19 @@ function toHeaderCase(str) {
     );
 }
 
-function print_errors(input) {
+function print_errors(xhr) {
+  // For ease of debugging and customer service, dump to console.
+  // (So that Teh Devs can ask users to open console when things go wrong)
+  // This isn't a security hole; all info here is visible from the browser anyways,
+  // sometimes with some extra annoying clicks.
+  console.log("Error:");
+  console.log(xhr);
+  console.log("Error JSON, if exists:");
+  console.log(xhr.responseJSON);
+
+  // We parse errors from the response JSON.
+  input = xhr.responseJSON;
+
   // Just in case...
   if (!input) {
     return `There was an error. See your browser console or ask Teh Devs for assistance.`;
