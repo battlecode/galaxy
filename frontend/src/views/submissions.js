@@ -75,7 +75,7 @@ class Submissions extends Component {
           let alert_message = print_errors(response);
           // During submission freeze, backend gives an unhelpful error...
           // to mitigate:
-          if (response.detail) {
+          if (response.responseJSON && response.responseJSON.detail) {
             alert_message +=
               "\nThis is most likely due to a submission freeze.";
           }
