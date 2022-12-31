@@ -118,6 +118,10 @@ class YesTeam extends Component {
     );
   };
 
+  closeAlert = () => {
+    this.setState({ alert_message: "" });
+  };
+
   render() {
     return (
       <div>
