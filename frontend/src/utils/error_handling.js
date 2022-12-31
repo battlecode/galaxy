@@ -10,13 +10,13 @@
 // and adjusted and ported to JS.
 
 function parse_errors(input, parent_field = null) {
-  result = [];
-  for ([field, msg_list_or_error] of Object.entries(input)) {
+  let result = [];
+  for (let [field, msg_list_or_error] of Object.entries(input)) {
     field = toHeaderCase(field);
 
     if (Array.isArray(msg_list_or_error)) {
       // is a list of messages
-      for (msg of msg_list_or_error) {
+      for (const msg of msg_list_or_error) {
         field = parent_field ? `${parent_field} -> ${field}` : field;
         result.push({ field: field, msg: msg });
       }
@@ -50,9 +50,10 @@ function toHeaderCase(str) {
 }
 
 function print_errors(input) {
-  errors = parse_errors(input);
+  const errors = parse_errors(input);
 
   if (errors.length === 1) {
+    const error = errors[0];
     return `Error in field ${error.field}: ${error.msg}`;
   } else {
     return `Errors: \n${errors
