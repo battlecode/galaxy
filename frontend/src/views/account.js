@@ -74,13 +74,13 @@ class Account extends Component {
     this.setState({ update_status: "loading" });
     Api.updateUser(
       this.state.user,
-      function (response_json, success) {
+      function (response, success) {
         if (success) {
           this.setState({ update_status: "success" });
           this.props.updateBaseState();
         } else {
           this.setState({ update_status: "failure" });
-          const alert_message = print_errors(response_json);
+          const alert_message = print_errors(response);
           this.setState({ alert_message });
         }
         setTimeout(() => {
@@ -117,11 +117,11 @@ class Account extends Component {
   };
 
   uploadAvatar = (selected_file, callback) => {
-    Api.avatarUpload(selected_file, (response_json, success) => {
+    Api.avatarUpload(selected_file, (response, success) => {
       if (success) {
         this.props.updateBaseState();
       } else {
-        const alert_message = print_errors(response_json);
+        const alert_message = print_errors(response);
         this.setState({ alert_message: alert_message });
       }
       callback(success);

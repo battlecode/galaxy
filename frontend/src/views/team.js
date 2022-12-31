@@ -82,13 +82,13 @@ class YesTeam extends Component {
     Api.updateTeam(
       this.state.team,
       this.props.episode,
-      function (response_json, success) {
+      function (response, success) {
         if (success) {
           this.setState({ up: '<i class="fa fa-check"></i>' });
           this.props.updateBaseState();
         } else {
           this.setState({ up: '<i class="fa fa-times"></i>' });
-          const alert_message = print_errors(response_json);
+          const alert_message = print_errors(response);
           this.setState({ alert_message });
         }
         setTimeout(

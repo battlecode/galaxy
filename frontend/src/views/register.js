@@ -28,12 +28,12 @@ class Register extends Component {
     window.location.replace("/forgotPassword");
   };
 
-  callback = (response_json, success) => {
+  callback = (response, success) => {
     if (success) {
       window.location.assign("/");
     } else {
       this.setState({
-        errors: print_errors(response_json),
+        errors: print_errors(response),
       });
     }
   };
