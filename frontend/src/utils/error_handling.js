@@ -74,6 +74,13 @@ function print_errors(xhr) {
     return `Error: ${input.detail}`;
   }
 
+  // Similar for "non_field_errors"
+  // Note that doing this check for detail, non_field_errors, and many more
+  // can get repetitive...find a DRY way for this if needed later.
+  if (input.non_field_errors && Object.keys(input).length === 1) {
+    return `Error: ${input.non_field_errors}`;
+  }
+
   const errors = parse_errors(input);
 
   if (errors.length === 1) {
