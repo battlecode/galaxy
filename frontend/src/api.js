@@ -650,8 +650,6 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        // if responseJSON is undefined, it is probably because the API is not configured
-        // check that the API is indeed running on URL (localhost:8000 if local development)
         callback(xhr, false);
       });
   }

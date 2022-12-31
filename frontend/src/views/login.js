@@ -24,8 +24,13 @@ class LoginRegister extends Component {
     if (success) {
       window.location.assign("/");
     } else {
+      let error = print_errors(response);
+      if (!response.responseJSON) {
+        error +=
+          "\n(Check your internet connection, and check if the backend is indeed running.)";
+      }
       this.setState({
-        error: print_errors(response),
+        error: error,
       });
     }
   };
@@ -53,7 +58,7 @@ class LoginRegister extends Component {
     if (error) {
       errorDiv = (
         <div
-          className="card"
+          className="card error-message"
           style={{
             padding: "20px",
             width: Math.min(window.innerWidth, 350),
