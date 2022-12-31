@@ -24,4 +24,17 @@ function parse_errors(input) {
   return result;
 }
 
+// Copy-paste into console for convenient testing.
+// Add more test cases too, within the function, as desired.
+function test() {
+  error = {
+    profile: {
+      gender: ['"" is not a valid choice.'],
+      country: ['"" is not a valid choice.'],
+    },
+    last_name: ["This field may not be blank."],
+  };
+  return parse_errors(error);
+}
+
 export { parse_errors };
