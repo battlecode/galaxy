@@ -11,13 +11,14 @@
 
 function parse_errors(input, parent_field = null) {
   result = [];
-  for (const [field, msg_list_or_error] of Object.entries(input)) {
+  for ([field, msg_list_or_error] of Object.entries(input)) {
+    field = toHeaderCase(field);
+
     if (Array.isArray(msg_list_or_error)) {
       // is a list of messages
       for (msg of msg_list_or_error) {
-        // TODO convert field to uppercase, and possibly from snake case to regular uppercase too (no underscores)
-        result_field = parent_field ? `${parent_field} -> ${field}` : field;
-        result.push({ field: result_field, msg: msg });
+        field = parent_field ? `${parent_field} -> ${field}` : field;
+        result.push({ field: field, msg: msg });
       }
     }
 
@@ -27,6 +28,25 @@ function parse_errors(input, parent_field = null) {
     }
   }
   return result;
+}
+
+// Helper to convert snake_case to Header Case,
+// for prettier error messages.
+// Ripped from https://github.com/huynhsamha/js-convert-case/blob/master/src/modules/js-headercase/index.ts
+// of https://www.npmjs.com/package/js-convert-case
+
+function toHeaderCase(str) {
+  if (!str) return "";
+
+  return String(str)
+    .replace(/^[^A-Za-z0-9]*|[^A-Za-z0-9]*$/g, "")
+    .replace(/([a-z])([A-Z])/g, (m, a, b) => `${a}_${b.toLowerCase()}`)
+    .replace(/[^A-Za-z0-9]+|_+/g, " ")
+    .toLowerCase()
+    .replace(
+      /( ?)(\w+)( ?)/g,
+      (m, a, b, c) => a + b.charAt(0).toUpperCase() + b.slice(1) + c
+    );
 }
 
 // Copy-paste into console for convenient testing.
