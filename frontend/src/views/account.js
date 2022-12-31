@@ -117,11 +117,12 @@ class Account extends Component {
   };
 
   uploadAvatar = (selected_file, callback) => {
-    Api.avatarUpload(selected_file, (success) => {
+    Api.avatarUpload(selected_file, (response_json, success) => {
       if (success) {
         this.props.updateBaseState();
       } else {
-        this.setState({ alert_message: "Avatar upload was not successful." });
+        const alert_message = print_errors(response_json);
+        this.setState({ alert_message: alert_message });
       }
       callback(success);
     });
