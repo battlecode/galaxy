@@ -60,7 +60,7 @@ function print_errors(xhr) {
   console.log(xhr.responseJSON);
 
   // We parse errors from the response JSON.
-  input = xhr.responseJSON;
+  const input = xhr.responseJSON;
 
   // Just in case...
   if (!input) {
