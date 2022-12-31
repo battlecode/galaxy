@@ -49,6 +49,18 @@ function toHeaderCase(str) {
     );
 }
 
+function print_errors(input) {
+  errors = parse_errors(input);
+
+  if (errors.length === 1) {
+    return `Error in field ${error.field}: ${error.msg}`;
+  } else {
+    return `Errors: \n${errors
+      .map((error) => `In field ${error.field}: ${error.msg}`)
+      .join("\n")}`;
+  }
+}
+
 // Copy-paste into console for convenient testing.
 // Add more test cases too, within the function, as desired.
 function test() {
@@ -59,7 +71,14 @@ function test() {
     },
     last_name: ["This field may not be blank."],
   };
-  return parse_errors(error);
+  console.log(print_errors(error));
+
+  error = {
+    profile: {
+      gender: ['"" is not a valid choice.'],
+    },
+  };
+  console.log(print_errors(error));
 }
 
-export { parse_errors };
+export { print_errors };
