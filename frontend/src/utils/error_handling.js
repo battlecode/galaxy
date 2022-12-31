@@ -12,6 +12,7 @@ function parse_errors(input) {
     if (Array.isArray(msg_list_or_error)) {
       // is a list of messages
       for (msg of msg_list_or_error) {
+        // TODO convert field to uppercase, and possibly from snake case to regular uppercase too (no underscores)
         result.push({ field: field, msg: msg });
       }
     }
