@@ -59,10 +59,10 @@ function print_errors(input) {
 
   if (errors.length === 1) {
     const error = errors[0];
-    return `Error in field ${error.field}: ${error.msg}`;
+    return `Error in ${error.field}: ${error.msg}`;
   } else {
     return `Errors:\n${errors
-      .map((error) => `In field ${error.field}: ${error.msg}`)
+      .map((error) => `In ${error.field}: ${error.msg}`)
       .join("\n")}`;
   }
 }
