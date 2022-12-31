@@ -55,6 +55,13 @@ function print_errors(input) {
     return `There was an error. See your browser console or ask Teh Devs for assistance.`;
   }
 
+  // Most of the time, errors come from serializers, and the errors are large objects.
+  // However, the backend errors can be simple "{detail: ...}"
+  // Handle those.
+  if (input.detail && Object.keys(input).length === 1) {
+    return `Error: ${input.detail}`;
+  }
+
   const errors = parse_errors(input);
 
   if (errors.length === 1) {
