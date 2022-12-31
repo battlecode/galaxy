@@ -31,7 +31,15 @@ const Alert = (props) => {
       >
         <span aria-hidden="true">&times;</span>
       </button>
-      <div className="error-message">{props.alert_message}</div>
+      <div
+        className="error-message"
+        style={{
+          // Give some space between message and close-button
+          marginRight: "25px",
+        }}
+      >
+        {props.alert_message}
+      </div>
     </div>
   );
 };
