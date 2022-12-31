@@ -6,6 +6,9 @@
 // Return a flat array of error "messages",
 // where a message is an object with keys of "field" and "msg".
 
+// Inspired by https://stackoverflow.com/questions/32508521
+// and adjusted and ported to JS.
+
 function parse_errors(input, parent_field = null) {
   result = [];
   for (const [field, msg_list_or_error] of Object.entries(input)) {
