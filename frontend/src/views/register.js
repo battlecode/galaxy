@@ -3,7 +3,7 @@ import Api from "../api";
 
 import Country from "../components/country";
 import Gender from "../components/gender";
-import { get_nested_profile_errors } from "../utils/error_handling";
+import { print_errors } from "../utils/error_handling";
 
 class Register extends Component {
   state = {
@@ -33,7 +33,7 @@ class Register extends Component {
       window.location.assign("/");
     } else {
       this.setState({
-        errors: get_nested_profile_errors(response_json),
+        errors: print_errors(response_json),
       });
     }
   };

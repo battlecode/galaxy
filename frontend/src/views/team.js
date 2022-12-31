@@ -7,7 +7,7 @@ import Alert from "../components/alert";
 import MultiEpisode from "./multi-episode";
 import Floater from "react-floater";
 import ActionMessage from "../components/actionMessage";
-import { get_nested_profile_errors } from "../utils/error_handling";
+import { print_errors } from "../utils/error_handling";
 
 class YesTeam extends Component {
   constructor(props) {
@@ -88,9 +88,7 @@ class YesTeam extends Component {
           this.props.updateBaseState();
         } else {
           this.setState({ up: '<i class="fa fa-times"></i>' });
-          const errors = get_nested_profile_errors(response_json);
-          const [first_field, first_error] = errors[0];
-          const alert_message = `Error in field ${first_field}: ${first_error}`;
+          const alert_message = print_errors(response_json);
           this.setState({ alert_message });
         }
         setTimeout(

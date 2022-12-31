@@ -8,7 +8,7 @@ import AvatarUpload from "../components/avatarUpload";
 import Alert from "../components/alert";
 import ActionMessage from "../components/actionMessage";
 import Floater from "react-floater";
-import { get_nested_profile_errors } from "../utils/error_handling";
+import { print_errors } from "../utils/error_handling";
 
 class Account extends Component {
   constructor(props) {
@@ -80,9 +80,7 @@ class Account extends Component {
           this.props.updateBaseState();
         } else {
           this.setState({ update_status: "failure" });
-          const errors = get_nested_profile_errors(response_json);
-          const [first_field, first_error] = errors[0];
-          const alert_message = `Error in field ${first_field}: ${first_error}`;
+          const alert_message = print_errors(response_json);
           this.setState({ alert_message });
         }
         setTimeout(() => {
