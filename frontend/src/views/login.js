@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import Api from "../api";
 
+import { print_errors } from "../utils/error_handling";
+
 class LoginRegister extends Component {
   state = {
     email: "",
@@ -18,12 +20,12 @@ class LoginRegister extends Component {
     window.location.replace("/forgotPassword");
   };
 
-  callback = (message, success) => {
+  callback = (response, success) => {
     if (success) {
       window.location.assign("/");
     } else {
       this.setState({
-        error: message,
+        error: print_errors(response),
       });
     }
   };
@@ -60,7 +62,6 @@ class LoginRegister extends Component {
             fontSize: "1.1em",
           }}
         >
-          <b>Error: </b>
           {error}
         </div>
       );
