@@ -325,15 +325,14 @@ class NoTeam extends Component {
     );
   }
 
-  createTeamCallback = (success) => {
+  createTeamCallback = (response, success) => {
     if (success) {
       this.setState({ create_status: "success" });
       this.props.updateBaseState();
     } else {
       this.setState({ create_status: "failure" });
-      this.setState({
-        alert_message: "Sorry, this team name is already being used.",
-      });
+      const alert_message = print_errors(response);
+      this.setState({ alert_message: alert_message });
     }
     setTimeout(() => {
       this.setState({ create_status: "waiting" });
