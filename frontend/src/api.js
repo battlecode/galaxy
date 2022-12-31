@@ -42,10 +42,10 @@ class Api {
       contentType: false,
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr.responseJSON, false);
       });
   }
 
