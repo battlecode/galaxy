@@ -31,7 +31,7 @@ const Alert = (props) => {
       >
         <span aria-hidden="true">&times;</span>
       </button>
-      <span>{props.alert_message}</span>
+      <div className="alert-message">{props.alert_message}</div>
     </div>
   );
 };
