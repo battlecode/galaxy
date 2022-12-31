@@ -87,7 +87,9 @@ class Submissions extends Component {
   // change handler called when file is selected
   fileChangeHandler = (event) => {
     this.setState({
-      selectedFile: event.target.files[0],
+      // In case of a cancel, event.target.files[0] could be undefined.
+      // For type-safety and simplicity, we store a null instead.
+      selectedFile: event.target.files[0] ? event.target.files[0] : null,
     });
   };
 
