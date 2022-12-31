@@ -691,7 +691,7 @@ class Api {
         callback(data, success);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON.email, false);
+        callback(xhr, false);
       });
   }
 

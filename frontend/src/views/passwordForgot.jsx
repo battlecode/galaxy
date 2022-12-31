@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Api from "../api";
+import { print_errors } from "../utils/error_handling";
 
 class PasswordForgot extends Component {
   state = {
@@ -16,7 +17,7 @@ class PasswordForgot extends Component {
     }
   };
 
-  callback = (data, success) => {
+  callback = (response, success) => {
     if (success) {
       this.setState({
         success:
@@ -25,7 +26,7 @@ class PasswordForgot extends Component {
       });
     } else {
       this.setState({
-        error: data,
+        error: print_errors(response),
         success: false,
       });
     }
@@ -80,7 +81,6 @@ class PasswordForgot extends Component {
               fontSize: "1.1em",
             }}
           >
-            <b>Error. </b>
             {error}
           </div>
         )}
