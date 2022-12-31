@@ -95,7 +95,7 @@ function print_errors(xhr) {
 
 // Copy-paste into console for convenient testing.
 // Add more test cases too, within the function, as desired.
-function test() {
+function test_print_errors() {
   error = {
     profile: {
       gender: ['"" is not a valid choice.'],
