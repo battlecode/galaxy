@@ -31,13 +31,14 @@ class YesTeam extends Component {
 
   leaveTeam = () => {
     this.setState({ leave_status: "loading" });
-    Api.leaveTeam(this.props.episode, (success) => {
+    Api.leaveTeam(this.props.episode, (response, success) => {
       if (success) {
         this.setState({ leave_status: "success" });
         this.props.updateBaseState();
       } else {
         this.setState({ leave_status: "failure" });
-        this.setState({ alert_message: "Failed to leave team." });
+        const alert_message = print_errors(response);
+        this.setState({ alert_message });
       }
       setTimeout(() => {
         this.setState({ leave_status: "waiting" });
@@ -301,16 +302,14 @@ class NoTeam extends Component {
     );
   }
 
-  joinCallback = (success) => {
+  joinCallback = (response, success) => {
     if (success) {
       this.setState({ join_status: "success" });
       this.props.updateBaseState();
     } else {
       this.setState({ join_status: "failure" });
-      this.setState({
-        alert_message:
-          "Sorry, that team name and join key combination is not valid.",
-      });
+      const alert_message = print_errors(response);
+      this.setState({ alert_message: alert_message });
     }
     setTimeout(() => {
       this.setState({ join_status: "waiting" });
