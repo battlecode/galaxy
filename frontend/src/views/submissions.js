@@ -86,11 +86,22 @@ class Submissions extends Component {
 
   // change handler called when file is selected
   fileChangeHandler = (event) => {
-    this.setState({
-      // In case of a cancel, event.target.files[0] could be undefined.
-      // For type-safety and simplicity, we store a null instead.
-      selectedFile: event.target.files[0] ? event.target.files[0] : null,
-    });
+    this.setState(
+      {
+        // In case of a cancel, event.target.files[0] could be undefined.
+        // For type-safety and simplicity, we store a null instead.
+        selectedFile: event.target.files[0] ? event.target.files[0] : null,
+      },
+      () => {
+        // Clear the input element's stored file,
+        // so that uploading the same file again still fires the onChange handler.
+        // This allows for uploading the same file and re-setting the state,
+        // which is useful after we clear state on successful submission.
+        // (Note that we have saved this file in state anyways)
+        // See https://stackoverflow.com/a/42192710
+        event.target.value = null;
+      }
+    );
   };
 
   //---GETTING TEAMS SUBMISSION DATA----
