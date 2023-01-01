@@ -4,6 +4,7 @@ import Api from "../api";
 import Country from "../components/country";
 import Gender from "../components/gender";
 import { print_errors } from "../utils/error_handling";
+import ActionMessage from "../components/actionMessage";
 
 class Register extends Component {
   state = {
@@ -22,6 +23,7 @@ class Register extends Component {
     register: false,
     errors: "",
     success: "",
+    register_status: "waiting",
   };
 
   forgotPassword = () => {
@@ -30,12 +32,17 @@ class Register extends Component {
 
   callback = (response, success) => {
     if (success) {
+      this.setState({ register_status: "success" });
       window.location.assign("/");
     } else {
+      this.setState({ register_status: "failure" });
       this.setState({
         errors: print_errors(response),
       });
     }
+    setTimeout(() => {
+      this.setState({ register_status: "waiting" });
+    }, 2000);
   };
 
   formSubmit = (e) => {
@@ -44,7 +51,7 @@ class Register extends Component {
   };
 
   submitRegister = () => {
-    const user = this.state.user;
+    this.setState({ register_status: "loading" });
     Api.register(this.state.user, this.callback);
   };
 
@@ -112,7 +119,10 @@ class Register extends Component {
         value="submit"
         className="btn btn-primary btn-block btn-fill"
       >
-        Register
+        <ActionMessage
+          default_message="Register"
+          status={this.state.register_status}
+        />{" "}
       </button>
     );
 
