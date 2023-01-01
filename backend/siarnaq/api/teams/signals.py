@@ -33,6 +33,9 @@ def handle_empty_team(instance, action, **kwargs):
     if action == "post_remove":
         if instance.members.count() == 0:
             if not instance.has_active_submission():
+                logger.debug(
+                    "team_delete", message="Team is deleted.", team=instance.pk
+                )
                 instance.delete()
             else:
                 logger.debug(
