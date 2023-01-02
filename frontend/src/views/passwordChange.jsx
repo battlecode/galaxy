@@ -51,7 +51,7 @@ class PasswordChange extends Component {
         error_msg +=
           "\nThis is most likely because your password reset link has expired. Try resetting your password again.";
       }
-      this.setState({ error: error_msg , loading: false});
+      this.setState({ error: error_msg, loading: false });
     }
   };
 
