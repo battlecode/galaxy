@@ -55,19 +55,17 @@ class ScrimmageRequest extends Component {
 class ScrimmageRequests extends Component {
   constructor(props) {
     super(props);
-    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
 
     this.state = {
       requests: [],
-      episode: episode,
-      extension: MultiEpisode.getExtension(episode),
     };
   }
 
   refresh = () => {
     Api.getScrimmageRequests(
-      function (r) {
-        this.setState({ requests: r });
+      this.props.episode,
+      function (requests) {
+        this.setState({ requests });
       }.bind(this)
     );
   };
@@ -85,7 +83,7 @@ class ScrimmageRequests extends Component {
           refresh={this.props.refresh}
           key={r.id}
           id={r.id}
-          team={r.team}
+          team={r.requested_by}
         />
       ));
       alert = (
@@ -116,7 +114,6 @@ class ScrimmageHistory extends Component {
     scrimPage: 1,
     scrimLimit: 0,
     scrimmages: [],
-    episode: MultiEpisode.getEpisodeFromCurrentPathname(),
   };
 
   refresh = (page) => {
@@ -219,7 +216,7 @@ class ScrimmageHistory extends Component {
                         <td>
                           {/* domain is hardcoded, since visualizer and replays are only hosted on deployed site, not locally */}
                           <a
-                            href={`https://play.battlecode.org/clients/${this.state.episode}/visualizer.html?https://play.battlecode.org/replays/${s.replay}${this.state.extension}`}
+                            href={`https://play.battlecode.org/clients/${this.props.episode}/visualizer.html?https://play.battlecode.org/replays/${s.replay}${this.props.episode_info.name_short}`}
                             target="_blank"
                           >
                             Watch
@@ -257,19 +254,29 @@ class Scrimmaging extends Component {
         <div className="content">
           <div className="container-fluid">
             <div className="row">
-              <ScrimmageRequests
+              {/* <ScrimmageRequests
                 ref={(requests) => {
                   this.requests = requests;
                 }}
                 refresh={this.refresh}
+                episode={this.props.episode}
+                episode_info={this.props.episode_info}
+              /> */}
+              <ScrimmageRequestor
+                refresh={this.refresh}
+                episode={this.props.episode}
+                episode_info={this.props.episode_info}
+                history={this.props.history}
+                team={this.props.team}
               />
-              <ScrimmageRequestor refresh={this.refresh} />
-              <ScrimmageHistory
+              {/* <ScrimmageHistory
                 ref={(history) => {
                   this.history = history;
                 }}
                 refresh={this.refresh}
-              />
+                episode={this.props.episode}
+                episode_info={this.props.episode_info}
+              /> */}
             </div>
           </div>
         </div>

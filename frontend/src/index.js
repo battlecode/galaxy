@@ -229,6 +229,7 @@ class App extends Component {
         component={(props) => (
           <Rankings
             {...props}
+            team={this.state.team}
             episode={this.state.episode}
             episode_info={this.state.episode_info}
           />
@@ -276,8 +277,15 @@ class App extends Component {
     this.onTeamAndGameReleasedElems = [
       <Route
         path={`/:episode/scrimmaging`}
-        component={Scrimmaging}
-        key="scrimmaging"
+        component={(props) => (
+          <Scrimmaging
+            {...props}
+            team={this.state.team}
+            episode={this.state.episode}
+            episode_info={this.state.episode_info}
+          />
+        )}
+        key="submissions"
       />,
       <Route
         path={`/:episode/submissions`}
