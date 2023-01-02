@@ -8,6 +8,7 @@ class PasswordChange extends Component {
     passwordVerify: "",
     success: false,
     error: false,
+    loading: false,
   };
 
   changePassword = (e) => {
@@ -27,6 +28,7 @@ class PasswordChange extends Component {
       this.props.location.search && this.props.location.search.split("=");
     token = token.length > 1 && token[1];
 
+    this.setState({ loading: true });
     Api.doResetPassword(state.password, token, this.onApiReturn);
   };
 
@@ -38,7 +40,7 @@ class PasswordChange extends Component {
 
   onApiReturn = (response, success) => {
     if (success) {
-      this.setState({ success: true });
+      this.setState({ success: true, loading: false });
       const redirect = () => {
         this.props.history.push("/login");
       };
@@ -49,12 +51,12 @@ class PasswordChange extends Component {
         error_msg +=
           "\nThis is most likely because your password reset link has expired. Try resetting your password again.";
       }
-      this.setState({ error: error_msg });
+      this.setState({ error: error_msg , loading: false});
     }
   };
 
   render() {
-    const { error, success } = this.state;
+    const { error, success, loading } = this.state;
     return (
       <div
         className="content dustBackground"
@@ -66,6 +68,19 @@ class PasswordChange extends Component {
           left: "0px",
         }}
       >
+        {loading && (
+          <div
+            style={{
+              textAlign: "center",
+              fontWeight: "bold",
+              color: "white",
+              marginTop: "50px",
+            }}
+          >
+            <b>Loading . . . </b>
+          </div>
+        )}
+
         {error && (
           <div
             className="card error-message"
