@@ -3,7 +3,7 @@ import Api from "../api";
 
 import Country from "../components/country";
 import Gender from "../components/gender";
-import { get_nested_profile_errors } from "../utils/error_handling";
+import { print_errors } from "../utils/error_handling";
 
 class Register extends Component {
   state = {
@@ -20,7 +20,7 @@ class Register extends Component {
       },
     },
     register: false,
-    errors: [],
+    errors: "",
     success: "",
   };
 
@@ -28,12 +28,12 @@ class Register extends Component {
     window.location.replace("/forgotPassword");
   };
 
-  callback = (response_json, success) => {
+  callback = (response, success) => {
     if (success) {
       window.location.assign("/");
     } else {
       this.setState({
-        errors: get_nested_profile_errors(response_json),
+        errors: print_errors(response),
       });
     }
   };
@@ -76,27 +76,18 @@ class Register extends Component {
   render() {
     const { errors, success, register } = this.state;
 
-    const errorReports = errors.map(function (error, i) {
-      const [field, error_message] = error;
-      return (
-        <div key={i}>
-          Error in field <b>{field}</b>: {error_message}
-        </div>
-      );
-    });
-
-    const errorsDiv = errors.length > 0 && (
+    const errorsDiv = errors && (
       <div
-        className="card"
+        className="card error-message"
         style={{
           padding: "20px",
-          width: Math.min(window.innerWidth, 500),
+          width: Math.min(window.innerWidth, 350),
           margin: "40px auto",
           marginBottom: "0px",
           fontSize: "1.1em",
         }}
       >
-        {errorReports}
+        {errors}
       </div>
     );
 

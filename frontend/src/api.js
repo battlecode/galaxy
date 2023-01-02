@@ -42,10 +42,10 @@ class Api {
       contentType: false,
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr, false);
       });
   }
 
@@ -218,7 +218,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 
@@ -236,10 +236,10 @@ class Api {
       dataType: "json",
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr, false);
       });
   }
 
@@ -256,10 +256,10 @@ class Api {
       dataType: "json",
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr, false);
       });
   }
 
@@ -269,10 +269,10 @@ class Api {
       type: "POST",
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr, false);
       });
   }
 
@@ -312,7 +312,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 
@@ -328,10 +328,10 @@ class Api {
       contentType: false,
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr, false);
       });
   }
 
@@ -650,10 +650,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        console.log("Error in logging in: ", xhr, status, error);
-        // if responseJSON is undefined, it is probably because the API is not configured
-        // check that the API is indeed running on URL (localhost:8000 if local development)
-        callback(xhr.responseJSON.detail, false);
+        callback(xhr, false);
       });
   }
 
@@ -669,7 +666,7 @@ class Api {
         this.login(user.username, user.password, callback);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 
@@ -682,7 +679,7 @@ class Api {
     $.post(`${URL}/api/user/password_reset/confirm/`, req, (data, success) => {
       callback(data, success);
     }).fail((xhr, status, error) => {
-      callback(xhr.responseJSON, false);
+      callback(xhr, false);
     });
   }
 
@@ -694,7 +691,7 @@ class Api {
         callback(data, success);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON.email, false);
+        callback(xhr, false);
       });
   }
 

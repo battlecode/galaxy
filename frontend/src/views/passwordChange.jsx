@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Api from "../api";
+import { print_errors } from "../utils/error_handling";
 
 class PasswordChange extends Component {
   state = {
@@ -35,7 +36,7 @@ class PasswordChange extends Component {
     this.setState({ [id]: val });
   };
 
-  onApiReturn = (data, success) => {
+  onApiReturn = (response, success) => {
     if (success) {
       this.setState({ success: true });
       const redirect = () => {
@@ -43,7 +44,12 @@ class PasswordChange extends Component {
       };
       setTimeout(redirect.bind(this), 3000);
     } else {
-      this.setState({ error: "Password Reset Failed. Try Again Later" });
+      let error_msg = print_errors(response);
+      if (response.responseJSON && response.responseJSON.detail) {
+        error_msg +=
+          "\nThis is most likely because your password reset link has expired. Try resetting your password again.";
+      }
+      this.setState({ error: error_msg });
     }
   };
 
@@ -62,7 +68,7 @@ class PasswordChange extends Component {
       >
         {error && (
           <div
-            className="card"
+            className="card error-message"
             style={{
               padding: "20px",
               width: Math.min(window.innerWidth, 350),
@@ -71,7 +77,6 @@ class PasswordChange extends Component {
               fontSize: "1.1em",
             }}
           >
-            <b>Error: </b>
             {error}
           </div>
         )}

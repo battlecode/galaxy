@@ -7,7 +7,7 @@ import Alert from "../components/alert";
 import MultiEpisode from "./multi-episode";
 import Floater from "react-floater";
 import ActionMessage from "../components/actionMessage";
-import { get_nested_profile_errors } from "../utils/error_handling";
+import { print_errors } from "../utils/error_handling";
 
 class YesTeam extends Component {
   constructor(props) {
@@ -31,13 +31,14 @@ class YesTeam extends Component {
 
   leaveTeam = () => {
     this.setState({ leave_status: "loading" });
-    Api.leaveTeam(this.props.episode, (success) => {
+    Api.leaveTeam(this.props.episode, (response, success) => {
       if (success) {
         this.setState({ leave_status: "success" });
         this.props.updateBaseState();
       } else {
         this.setState({ leave_status: "failure" });
-        this.setState({ alert_message: "Failed to leave team." });
+        const alert_message = print_errors(response);
+        this.setState({ alert_message });
       }
       setTimeout(() => {
         this.setState({ leave_status: "waiting" });
@@ -82,15 +83,13 @@ class YesTeam extends Component {
     Api.updateTeam(
       this.state.team,
       this.props.episode,
-      function (response_json, success) {
+      function (response, success) {
         if (success) {
           this.setState({ up: '<i class="fa fa-check"></i>' });
           this.props.updateBaseState();
         } else {
           this.setState({ up: '<i class="fa fa-times"></i>' });
-          const errors = get_nested_profile_errors(response_json);
-          const [first_field, first_error] = errors[0];
-          const alert_message = `Error in field ${first_field}: ${first_error}`;
+          const alert_message = print_errors(response);
           this.setState({ alert_message });
         }
         setTimeout(
@@ -117,6 +116,10 @@ class YesTeam extends Component {
     Api.teamAvatarUpload(selected_file, this.props.episode, () =>
       this.props.updateBaseState()
     );
+  };
+
+  closeAlert = () => {
+    this.setState({ alert_message: "" });
   };
 
   render() {
@@ -303,16 +306,14 @@ class NoTeam extends Component {
     );
   }
 
-  joinCallback = (success) => {
+  joinCallback = (response, success) => {
     if (success) {
       this.setState({ join_status: "success" });
       this.props.updateBaseState();
     } else {
       this.setState({ join_status: "failure" });
-      this.setState({
-        alert_message:
-          "Sorry, that team name and join key combination is not valid.",
-      });
+      const alert_message = print_errors(response);
+      this.setState({ alert_message: alert_message });
     }
     setTimeout(() => {
       this.setState({ join_status: "waiting" });
@@ -328,15 +329,14 @@ class NoTeam extends Component {
     );
   }
 
-  createTeamCallback = (success) => {
+  createTeamCallback = (response, success) => {
     if (success) {
       this.setState({ create_status: "success" });
       this.props.updateBaseState();
     } else {
       this.setState({ create_status: "failure" });
-      this.setState({
-        alert_message: "Sorry, this team name is already being used.",
-      });
+      const alert_message = print_errors(response);
+      this.setState({ alert_message: alert_message });
     }
     setTimeout(() => {
       this.setState({ create_status: "waiting" });

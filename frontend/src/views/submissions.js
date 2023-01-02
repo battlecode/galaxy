@@ -7,6 +7,8 @@ import ActionMessage from "../components/actionMessage";
 import Alert from "../components/alert";
 import SubmissionList from "../components/submissionList";
 
+import { print_errors } from "../utils/error_handling";
+
 class Submissions extends Component {
   //----INITIALIZATION----
   constructor(props) {
@@ -61,7 +63,7 @@ class Submissions extends Component {
       this.state.package,
       this.state.description,
       this.props.episode,
-      (success) => {
+      (response, success) => {
         if (success) {
           this.setState({
             upload_status: "success",
@@ -70,9 +72,15 @@ class Submissions extends Component {
             selectedFile: null,
           });
         } else {
+          let alert_message = print_errors(response);
+          // During submission freeze, backend gives an unhelpful error...
+          // to mitigate:
+          if (response.responseJSON && response.responseJSON.detail) {
+            alert_message +=
+              "\nThis is most likely due to a submission freeze.";
+          }
           this.setState({
-            alert_message:
-              "Submission upload was not successful, most likely due to a submission freeze.",
+            alert_message,
           });
           this.setState({ upload_status: "failure" });
         }

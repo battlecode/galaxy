@@ -230,3 +230,7 @@ ol {
 .alert {
   z-index: 1030;
 }
+
+.error-message {
+  white-space: pre-line;
+}
