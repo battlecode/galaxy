@@ -1,17 +1,11 @@
 import React, { Component } from "react";
+import $ from "jquery";
+
 import Api from "../api";
 import Countdown from "../components/countdown";
 import ActionMessage from "../components/actionMessage";
 import Alert from "../components/alert";
-
-const COMPILATION_STATUS = {
-  PROGRESS: 0,
-  SUCCESS: 1,
-  FAIL: 2,
-  ERROR: 3,
-  UPLOADED: 4,
-  QUEUED: 5,
-};
+import SubmissionList from "../components/submissionList";
 
 class Submissions extends Component {
   //----INITIALIZATION----
@@ -22,15 +16,13 @@ class Submissions extends Component {
       currentSubmission: null,
       package: "",
       description: "",
-      lastSubmissions: null,
-      tourSubmissions: null,
-      numLastSubmissions: 0,
-      numLastLoaded: 0,
-      numTourSubmissions: 0,
-      numTourLoaded: 0,
       upload_status: "waiting",
       alert_message: "",
     };
+
+    this.submission_list = (
+      <SubmissionList episode={this.props.episode}> </SubmissionList>
+    );
 
     this.changeHandler = this.changeHandler.bind(this);
   }
@@ -46,7 +38,7 @@ class Submissions extends Component {
   }
 
   componentDidMount() {
-    Api.getTeamSubmissions(this.gotSubmissions);
+    // Api.getTeamSubmissions(this.gotSubmissions);
 
     // Set up submission deadline text
     Api.getNextTournament(this.props.episode, (tournamentInfo) => {
@@ -84,8 +76,7 @@ class Submissions extends Component {
           });
           this.setState({ upload_status: "failure" });
         }
-        // re-render submission table after;
-        // as part of #387 for tracking
+        $("#submission-table-refresh-button").click();
         setTimeout(() => {
           this.setState({ upload_status: "waiting" });
         }, 2000);
@@ -95,120 +86,25 @@ class Submissions extends Component {
 
   // change handler called when file is selected
   fileChangeHandler = (event) => {
-    this.setState({
-      selectedFile: event.target.files[0],
-    });
+    this.setState(
+      {
+        // In case of a cancel, event.target.files[0] could be undefined.
+        // For type-safety and simplicity, we store a null instead.
+        selectedFile: event.target.files[0] ? event.target.files[0] : null,
+      },
+      () => {
+        // Clear the input element's stored file,
+        // so that uploading the same file again still fires the onChange handler.
+        // This allows for uploading the same file and re-setting the state,
+        // which is useful after we clear state on successful submission.
+        // (Note that we have saved this file in state anyways)
+        // See https://stackoverflow.com/a/42192710
+        event.target.value = null;
+      }
+    );
   };
 
   //---GETTING TEAMS SUBMISSION DATA----
-  KEYS_CURRENT = ["compiling"];
-  KEYS_LAST = ["last_1", "last_2", "last_3"];
-  KEYS_TOUR = [
-    "tour_final",
-    "tour_qual",
-    "tour_seed",
-    "tour_sprint",
-    "tour_hs",
-    "tour_intl_qual",
-    "tour_newbie",
-  ];
-
-  // called when submission data is initially received
-  // this will be maps of the label of type of submission to submission id
-  // this function then makes calls to get the specific data for each submission
-  gotSubmissions = (data) => {
-    this.setState({
-      currentSubmission: new Array(
-        this.submissionHelper(this.KEYS_CURRENT, data)
-      ).fill({}),
-    });
-    this.setState({
-      lastSubmissions: new Array(
-        this.submissionHelper(this.KEYS_LAST, data)
-      ).fill({}),
-    });
-    this.setState({
-      tourSubmissions: new Array(
-        this.submissionHelper(this.KEYS_TOUR, data)
-      ).fill([]),
-    });
-  };
-
-  // makes api call for submission with each key in data, returns the number of submissions
-  // that actually exist in the data
-  submissionHelper(keys, data) {
-    let null_count = 0;
-    for (var i = 0; i < keys.length; i++) {
-      if (data[keys[i]] !== null && data[keys[i]] !== undefined) {
-        Api.getSubmission(data[keys[i]], this.setSubmissionData, keys[i]);
-        null_count++;
-      }
-    }
-
-    return null_count;
-  }
-
-  // sets submission data for the given key, if all submissions have been found force updates state
-  setSubmissionData = (key, data) => {
-    let index, add_data;
-    if (this.KEYS_CURRENT.includes(key)) {
-      index = 0;
-      const arr = this.state["currentSubmission"];
-      let newArr = arr.slice(0, index);
-      newArr.push(data);
-      this.setState({
-        ["currentSubmission"]: newArr.concat(arr.slice(index + 1)),
-      });
-    } else if (this.KEYS_LAST.includes(key)) {
-      switch (key) {
-        case "last_1":
-          index = 0;
-          break;
-        case "last_2":
-          index = 1;
-          break;
-        case "last_3":
-          index = 2;
-          break;
-      }
-
-      const arr = this.state["lastSubmissions"];
-      let newArr = arr.slice(0, index);
-      newArr.push(data);
-      this.setState({
-        ["lastSubmissions"]: newArr.concat(arr.slice(index + 1)),
-      });
-    } else {
-      switch (key) {
-        case "tour_sprint":
-          add_data = ["Sprint 1", data];
-          break;
-        case "tour_seed":
-          add_data = ["Sprint 2", data];
-          break;
-        case "tour_qual":
-          add_data = ["Qualifying", data];
-          break;
-        case "tour_final":
-          add_data = ["Final", data];
-          break;
-        case "tour_hs":
-          add_data = ["US High School", data];
-          break;
-        case "tour_intl_qual":
-          add_data = ["International Qualifying", data];
-          break;
-        case "tour_newbie":
-          add_data = ["Newbie", data];
-          break;
-      }
-
-      const arr = this.state["tourSubmissions"];
-      let end = arr.slice(1);
-      end.push(add_data);
-      this.setState({ ["tourSubmissions"]: end });
-    }
-  };
 
   // Downloads the file for given submission id
   onSubFileRequest = (subId, fileNameAddendum) => {
@@ -239,7 +135,7 @@ class Submissions extends Component {
     this.setState({ alert_message: "" });
   };
 
-  // return div for submitting files, should be able to disable this when submissions are not being accepts
+  // return div for submitting files
   renderHelperSubmissionForm() {
     if (this.isSubmissionEnabled()) {
       // Submission upload button logic
@@ -376,296 +272,6 @@ class Submissions extends Component {
     }
   }
 
-  // Shows the status of a current submission upload in progress.
-  // (see uploadData() for more explanation)
-  renderHelperSubmissionStatus() {
-    if (this.isSubmissionEnabled()) {
-      let status_str = "";
-      switch (this.state.upload_status) {
-        case -1:
-          status_str = "Waiting to start submission...";
-          break;
-        case 10:
-          status_str = "Currently submitting...";
-          break;
-        case 11:
-          status_str = "Successfully queued for compilation!";
-          break;
-        case 12:
-          status_str = "Files cannot be submitted without a team.";
-          break;
-        case 13:
-          status_str = "Submitting failed. Try re-submitting your code.";
-          break;
-        default:
-          status_str = "";
-          break;
-      }
-
-      return (
-        <div className="card">
-          <div className="content">
-            <p id="upload_status" className="text-center category">
-              {" "}
-              {status_str}
-            </p>
-          </div>
-        </div>
-      );
-    }
-  }
-
-  // render helper for table containing the team's latest submission
-  renderHelperCurrentTable() {
-    if (this.state.currentSubmission === null) {
-      return (
-        <p className="text-center category">
-          Loading submissions...
-          <br />
-          <br />
-        </p>
-      );
-    } else if (this.state.currentSubmission.length == 0) {
-      return <p>You haven't submitted any code yet!</p>;
-    } else {
-      const submissionRows = this.state.currentSubmission.map(
-        (submission, index) => {
-          if (Object.keys(submission).length === 0) {
-            return (
-              <tr key="current">
-                <td>
-                  {" "}
-                  <div className="btn btn-xs" style={{ visibility: "hidden" }}>
-                    Loading...
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-            );
-          } else {
-            let status_str = "";
-            let download_button = (
-              <button
-                className="btn btn-xs"
-                onClick={() => this.onSubFileRequest(submission.id, index + 1)}
-              >
-                Download
-              </button>
-            );
-            switch (submission.compilation_status) {
-              case COMPILATION_STATUS.PROGRESS:
-                status_str =
-                  "Submission initialized, but not yet uploaded... If this persists, try re-submitting your code. Also, make sure to stay on this page.";
-                download_button = "";
-                break;
-              case COMPILATION_STATUS.SUCCESS:
-                status_str = "Successfully submitted and compiled!";
-                break;
-              case COMPILATION_STATUS.FAIL:
-                status_str =
-                  "Submitted, but compiler threw a compile error. Fix and re-submit your code.";
-                break;
-              case COMPILATION_STATUS.ERROR:
-                status_str =
-                  "Internal server error. Try re-submitting your code. If this persists, try reading the compilation logs, checking your submission's structure, or asking a dev.";
-                break;
-              case COMPILATION_STATUS.UPLOADED:
-                status_str =
-                  "Code uploaded, but not yet queued for compilation... If this persists, try re-submitting your code.";
-                break;
-              case COMPILATION_STATUS.QUEUED:
-                // A dedicated refresh button, that refreshes only these tables, would be cool
-                // See #35 for tracking
-                status_str =
-                  "Code queued for compilation -- check back and refresh for updates.";
-                break;
-              default:
-                status_str = "";
-                break;
-            }
-            return (
-              <tr key={submission.id + "-current"}>
-                <td>{new Date(submission.submitted_at).toLocaleString()}</td>
-                <td>
-                  {status_str + " "}
-                  {submission.compilation_status === COMPILATION_STATUS.FAIL ||
-                  submission.compilation_status === COMPILATION_STATUS.ERROR ? (
-                    <a
-                      style={{ cursor: "pointer" }}
-                      onClick={($event) => {
-                        // Prevent default behavior when clicking a link
-                        $event.preventDefault();
-
-                        Api.getSubmissionLog(submission.id, function (data) {
-                          let fileURL = URL.createObjectURL(
-                            new Blob([data], { type: "text/plain" })
-                          );
-                          window.open(fileURL);
-                        });
-                      }}
-                      // href={submission.url + "log/"}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View log here
-                    </a>
-                  ) : (
-                    <div></div>
-                  )}
-                </td>
-                <td>{download_button} </td>
-              </tr>
-            );
-          }
-        }
-      );
-
-      return (
-        <table className="table table-hover table-striped">
-          <thead>
-            <tr>
-              <th>Submission at</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>{submissionRows}</tbody>
-        </table>
-      );
-    }
-  }
-
-  // render helper for table containing the team's latest successfully compiled submissions
-  renderHelperLastTable() {
-    if (this.state.lastSubmissions === null) {
-      return (
-        <p className="text-center category">
-          Loading submissions...
-          <br />
-          <br />
-        </p>
-      );
-    } else if (this.state.lastSubmissions.length == 0) {
-      return (
-        <p>
-          You haven't had any successful submissions yet! (If you have code
-          being submitted, you'll see it here if it finishes successfully.)
-        </p>
-      );
-    } else {
-      const submissionRows = this.state.lastSubmissions.map(
-        (submission, index) => {
-          if (Object.keys(submission).length === 0) {
-            return (
-              <tr key={"loading-last-" + index}>
-                <td>
-                  {" "}
-                  <div className="btn btn-xs" style={{ visibility: "hidden" }}>
-                    Loading...
-                  </div>
-                </td>
-                <td></td>
-              </tr>
-            );
-          } else {
-            return (
-              <tr key={submission.id + "-last"}>
-                <td>{new Date(submission.submitted_at).toLocaleString()}</td>
-                <td>
-                  {" "}
-                  <button
-                    className="btn btn-xs"
-                    onClick={() =>
-                      this.onSubFileRequest(submission.id, index + 1)
-                    }
-                  >
-                    Download
-                  </button>{" "}
-                </td>
-              </tr>
-            );
-          }
-        }
-      );
-
-      return (
-        <table className="table table-hover table-striped">
-          <thead>
-            <tr>
-              <th>Submission at</th>
-            </tr>
-          </thead>
-          <tbody>{submissionRows}</tbody>
-        </table>
-      );
-    }
-  }
-
-  // render helper for table containing the team's tournament submissions
-  renderHelperTourTable() {
-    if (this.state.tourSubmissions === null) {
-      return (
-        <p className="text-center category">
-          Loading submissions...
-          <br />
-          <br />
-        </p>
-      );
-    } else if (this.state.tourSubmissions.length === 0) {
-      return (
-        <p>
-          Code submitted to tournaments will appear here after the tournament.
-        </p>
-      );
-    } else {
-      let tourRows = this.state.tourSubmissions.map((submission, index) => {
-        if (submission.length === 0) {
-          return (
-            <tr key={index + "-tour-loading"}>
-              <td>
-                {" "}
-                <div className="btn btn-xs" style={{ visibility: "hidden" }}>
-                  Loading...
-                </div>
-              </td>
-              <td></td>
-              <td></td>
-            </tr>
-          );
-        } else {
-          return (
-            <tr key={submission[1].id + "-tour-" + submission[0]}>
-              <td>{submission[0]}</td>
-              <td>{new Date(submission[1].submitted_at).toLocaleString()}</td>
-              <td>
-                {" "}
-                <button
-                  className="btn btn-xs"
-                  onClick={() =>
-                    this.onSubFileRequest(submission[1].id, submission[0])
-                  }
-                >
-                  Download
-                </button>{" "}
-              </td>
-            </tr>
-          );
-        }
-      });
-
-      return (
-        <table className="table table-hover table-striped">
-          <thead>
-            <tr>
-              <th>Tournament</th>
-              <th>Submission Time</th>
-            </tr>
-          </thead>
-          <tbody>{tourRows}</tbody>
-        </table>
-      );
-    }
-  }
-
   render() {
     return (
       <div className="content">
@@ -684,22 +290,7 @@ class Submissions extends Component {
                 {" "}
               </Countdown>
               {this.renderHelperSubmissionForm()}
-              {/* See #387 for tracking */}
-              {/* {this.renderHelperSubmissionStatus()} */}
-
-              {/* See #387 for tracking */}
-              {/* <div className="card">
-                <div className="header">
-                  <h4 className="title">Latest Submission</h4>
-                </div>
-                <div className="content">{this.renderHelperCurrentTable()}</div>
-                <div className="header">
-                  <h4 className="title">
-                    Latest Successfully Compiled Submissions
-                  </h4>
-                </div>
-                <div className="content">{this.renderHelperLastTable()}</div>
-              </div> */}
+              {this.submission_list}
 
               {/* See #78 for tracking */}
               {/* <div className="card">

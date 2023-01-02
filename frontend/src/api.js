@@ -49,11 +49,11 @@ class Api {
       });
   }
 
-  static downloadSubmission(submissionId, fileNameAddendum, callback) {
-    $.get(`${URL}/api/${LEAGUE}/submission/${submissionId}/retrieve_file/`)
+  static downloadSubmission(submissionId, episode, fileNameAddendum, callback) {
+    $.get(`${URL}/api/compete/${episode}/submission/${submissionId}/download/`)
       .done((data, status) => {
         // have to use fetch instead of ajax here since we want to download file
-        fetch(data["download_url"])
+        fetch(data["url"])
           .then((resp) => resp.blob())
           .then((blob) => {
             //code to download the file given by the url
@@ -61,7 +61,7 @@ class Api {
             const aHelper = document.createElement("a");
             aHelper.style.display = "none";
             aHelper.href = objUrl;
-            aHelper.download = `${fileNameAddendum}_battlecode_source.zip`;
+            aHelper.download = `battlecode_source_${submissionId}.zip`;
             document.body.appendChild(aHelper);
             aHelper.click();
             window.URL.revokeObjectURL(objUrl);
@@ -72,46 +72,13 @@ class Api {
       });
   }
 
-  static getTeamSubmissions(callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/teamsubmission/${Cookies.get("team_id")}/`
-    ).done((data, status) => {
-      callback(data);
-    });
-  }
-
-  static getSubmission(id, callback, callback_data) {
-    $.get(`${URL}/api/${LEAGUE}/submission/${id}/`).done((data, status) => {
-      callback(callback_data, data);
-    });
-  }
-
-  static getCompilationStatus(callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/teamsubmission/${Cookies.get(
-        "team_id"
-      )}/team_compilation_status/`
-    ).done((data, status) => {
-      callback(data);
-    });
-  }
-
-  // note that this is a submission, not a teamsubmission, thing
-  static getSubmissionStatus(callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/submission/${Cookies.get(
-        "submission_id"
-      )}/get_status/`
-    ).done((data, status) => {
-      return data["compilation_status"];
-      // callback(data)
-    });
-  }
-
-  static getSubmissionLog(id, callback) {
-    $.get(`${URL}/api/${LEAGUE}/submission/${id}/log/`).done((data, status) => {
-      callback(data);
-    });
+  static getSubmissions(episode, page, callback) {
+    $.get(`${URL}/api/compete/${episode}/submission/?page=${page}`).done(
+      (data, status) => {
+        const pageLimit = Math.ceil(data.count / PAGE_SIZE);
+        callback(data, pageLimit);
+      }
+    );
   }
 
   //----TEAM STATS---
