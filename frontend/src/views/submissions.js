@@ -274,6 +274,12 @@ class Submissions extends Component {
           </div>
           <div className="content">
             <p>Submissions are currently disabled! Check back later.</p>
+            {this.props.episode_info.frozen && (
+              <p>
+                This is most likely due to a submission freeze for a tournament.
+                (If you think the freeze has passed, try refreshing the page.)
+              </p>
+            )}
           </div>
         </div>
       );
