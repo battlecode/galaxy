@@ -285,7 +285,7 @@ class App extends Component {
             episode_info={this.state.episode_info}
           />
         )}
-        key="submissions"
+        key="scrimmaging"
       />,
       <Route
         path={`/:episode/submissions`}
