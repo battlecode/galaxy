@@ -125,11 +125,15 @@ class ScrimmageHistory extends Component {
       this.props.team.id,
       this.props.episode,
       function (scrimmages, pageLimit) {
-        this.setState({
-          scrimmages,
-          pageLimit,
-          loading: false,
-        });
+        // This check handles the case where a new page is requested while a
+        // previous page was loading.
+        if (page == this.state.scrimPage) {
+          this.setState({
+            scrimmages,
+            pageLimit,
+            loading: false,
+          });
+        }
       }.bind(this),
       page
     );
@@ -280,14 +284,14 @@ class Scrimmaging extends Component {
         <div className="content">
           <div className="container-fluid">
             <div className="row">
-              {/* <ScrimmageRequests
+              <ScrimmageRequests
                 ref={(requests) => {
                   this.requests = requests;
                 }}
                 refresh={this.refresh}
                 episode={this.props.episode}
                 episode_info={this.props.episode_info}
-              /> */}
+              />
               <ScrimmageRequestor
                 refresh={this.refresh}
                 episode={this.props.episode}

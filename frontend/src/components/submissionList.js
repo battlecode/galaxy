@@ -31,7 +31,11 @@ class SubmissionList extends Component {
   getPage = (page) => {
     this.setState({ submissions: null, page });
     Api.getSubmissions(this.props.episode, page, (data, pageLimit) => {
-      this.setState({ submissions: data.results, pageLimit });
+      // This check handles the case where a new page is requested while a
+      // previous page was loading.
+      if (page == this.state.page) {
+        this.setState({ submissions: data.results, pageLimit });
+      }
     });
   };
 
