@@ -43,10 +43,18 @@ class ScrimmageRequest extends Component {
             Scrimmage request from {this.props.team}.
           </span>
           <span style={{ float: "right" }} className="pull-right">
-            <button onClick={this.accept} className="btn btn-success btn-xs">
+            <button
+              onClick={this.accept}
+              className="btn btn-success btn-xs"
+              disabled={this.props.episode_info.frozen}
+            >
               Accept
             </button>{" "}
-            <button onClick={this.reject} className="btn btn-danger btn-xs">
+            <button
+              onClick={this.reject}
+              className="btn btn-danger btn-xs"
+              disabled={this.props.episode_info.frozen}
+            >
               Reject
             </button>
           </span>
