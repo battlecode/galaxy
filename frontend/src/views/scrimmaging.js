@@ -16,6 +16,7 @@ class ScrimmageRequest extends Component {
   accept = () => {
     Api.acceptScrimmage(
       this.props.id,
+      this.props.episode,
       function () {
         this.setState({ open: false });
         this.props.refresh();
@@ -26,6 +27,7 @@ class ScrimmageRequest extends Component {
   reject = () => {
     Api.rejectScrimmage(
       this.props.id,
+      this.props.episode,
       function () {
         this.setState({ open: false });
         this.props.refresh();
@@ -86,6 +88,7 @@ class ScrimmageRequests extends Component {
           key={r.id}
           id={r.id}
           team={r.requested_by}
+          episode={this.props.episode}
         />
       ));
       alert = (
@@ -120,7 +123,7 @@ class ScrimmageHistory extends Component {
   };
 
   refresh = (page) => {
-    this.setState({ loading: true, scrimPage: page });
+    this.setState({ loading: true, scrimmages: [], scrimPage: 1 });
     Api.getTeamScrimmages(
       this.props.team.id,
       this.props.episode,
@@ -171,7 +174,7 @@ class ScrimmageHistory extends Component {
             <h4 className="title">
               Scrimmage History{" "}
               <button
-                onClick={this.props.refresh}
+                onClick={this.refresh}
                 style={{ marginLeft: "10px" }}
                 type="button"
                 className="btn btn-primary btn-sm"
@@ -284,14 +287,14 @@ class Scrimmaging extends Component {
         <div className="content">
           <div className="container-fluid">
             <div className="row">
-              {/* <ScrimmageRequests
+              <ScrimmageRequests
                 ref={(requests) => {
                   this.requests = requests;
                 }}
                 refresh={this.refresh}
                 episode={this.props.episode}
                 episode_info={this.props.episode_info}
-              /> */}
+              />
               <ScrimmageRequestor
                 refresh={this.refresh}
                 episode={this.props.episode}
