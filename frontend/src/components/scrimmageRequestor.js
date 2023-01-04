@@ -50,6 +50,7 @@ class ScrimmageRequestor extends Component {
         history={this.props.history}
         canRequest={true}
         team={this.props.team}
+        title="Find a team to scrimmage!"
       />
     );
   }

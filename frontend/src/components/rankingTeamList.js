@@ -150,7 +150,7 @@ class RankingTeamList extends Component {
           />
           <div className="card">
             <div className="header">
-              <h4 className="title">Rankings</h4>
+              <h4 className="title">{this.props.title}</h4>
             </div>
             <div className="content table-responsive table-full-width">
               <table className="table table-striped">
@@ -169,12 +169,12 @@ class RankingTeamList extends Component {
               </table>
               {this.props.loading && <Spinner />}
             </div>
+            <PaginationControl
+              page={props.page}
+              pageLimit={props.pageLimit}
+              onPageClick={props.onPageClick}
+            />
           </div>
-          <PaginationControl
-            page={props.page}
-            pageLimit={props.pageLimit}
-            onPageClick={props.onPageClick}
-          />
         </div>
       );
     }

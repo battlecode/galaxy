@@ -57,7 +57,11 @@ class PaginationControl extends Component {
       </li>
     );
 
-    return <ul className="pagination">{items}</ul>;
+    return (
+      <div className="pagination-control">
+        <ul className="pagination">{items}</ul>
+      </div>
+    );
   }
 }
 

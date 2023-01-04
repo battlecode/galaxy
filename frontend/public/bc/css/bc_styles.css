@@ -234,3 +234,8 @@ ol {
 .error-message {
   white-space: pre-line;
 }
+
+.pagination-control {
+  margin: auto;
+  width: fit-content;
+}

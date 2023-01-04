@@ -183,8 +183,8 @@ class Api {
 
   //---TEAM INFO---
 
-  static getTeamProfile(episode, teamId, callback) {
-    return $.get(`${URL}/api/team/${episode}/t/${teamId}/`)
+  static getTeamProfile(episode, team_id, callback) {
+    return $.get(`${URL}/api/team/${episode}/t/${team_id}/`)
       .done((data, status) => {
         callback(data);
       })
@@ -489,75 +489,25 @@ class Api {
   /* for some reason the data format from getAllTeamScrimmages and getTeamScrimmages
    are different; has to do with pagination but not sure how to make the same
   */
-  static getTeamScrimmages(callback, page) {
-    $.get(
-      `${URL}/api/${LEAGUE}/scrimmage/?page=${page}&pending=0`,
-      (data, success) => {
-        callback(data.results, data.count);
-      }
-    );
-  }
-
-  static getScrimmageHistory(callback, page) {
-    this.getTeamScrimmages((s, count) => {
-      const requests = [];
-      for (let i = 0; i < s.length; i++) {
-        const on_red = s[i].red_team === Cookies.get("team_name");
-
-        switch (s[i].status) {
-          case SCRIMMAGE_STATUS.BLUEWON:
-            s[i].status = on_red ? "Lost" : "Won";
-            s[i].score =
-              s[i].status === "Won"
-                ? `${s[i].winscore} - ${s[i].losescore}`
-                : `${s[i].losescore} - ${s[i].winscore}`;
-            break;
-          case SCRIMMAGE_STATUS.REDWON:
-            s[i].status = on_red ? "Won" : "Lost";
-            s[i].score =
-              s[i].status === "Won"
-                ? `${s[i].winscore} - ${s[i].losescore}`
-                : `${s[i].losescore} - ${s[i].winscore}`;
-            break;
-          case SCRIMMAGE_STATUS.QUEUED:
-            s[i].status = "Queued";
-            break;
-          case SCRIMMAGE_STATUS.REJECTED:
-            s[i].status = "Rejected";
-            break;
-          case SCRIMMAGE_STATUS.ERROR:
-            s[i].status = "Error";
-            break;
-          case SCRIMMAGE_STATUS.RUNNING:
-            s[i].status = "Running";
-            break;
-          case SCRIMMAGE_STATUS.CANCELLED:
-            s[i].status = "Cancelled";
-            break;
-          default:
-            // should not reach here, undefined status or pending
-            s[i].status = "";
-            break;
-        }
-
-        if (s[i].status !== "Won" && s[i].status !== "Lost") {
-          s[i].replay = undefined;
-          s[i].score = " - ";
-        }
-
-        s[i].date = new Date(s[i].updated_at).toLocaleDateString();
-        s[i].time = new Date(s[i].updated_at).toLocaleTimeString();
-
-        s[i].team = on_red ? s[i].blue_team : s[i].red_team;
-        s[i].color = on_red ? "Red" : "Blue";
-
-        requests.push(s[i]);
-      }
-      // scrimLimit for pagination
-      const scrimLimit =
-        parseInt(count / PAGE_LIMIT, 10) + !!(count % PAGE_LIMIT);
-      callback({ scrimmages: requests, scrimLimit });
-    }, page);
+  static getTeamScrimmages(team_id, episode, callback, page) {
+    const query_data = {
+      team_id,
+      page,
+    };
+    return $.get(`${URL}/api/compete/${episode}/match/scrimmage/`, query_data)
+      .done((data, status) => {
+        const pageLimit = Math.ceil(data.count / PAGE_SIZE);
+        callback(data.results, pageLimit);
+      })
+      .fail((xhr, status, error) => {
+        console.log(
+          "Error in getting team's scrimmage history",
+          xhr,
+          status,
+          error
+        );
+        callback(null);
+      });
   }
 
   //----REPLAYS?-----
