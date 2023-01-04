@@ -122,7 +122,6 @@ class ScrimmageHistory extends Component {
       this.props.team.id,
       this.props.episode,
       function (scrimmages, pageLimit) {
-        console.log("scrimmages:", scrimmages);
         this.setState({ scrimmages, pageLimit, scrimPage: page });
       }.bind(this),
       page
