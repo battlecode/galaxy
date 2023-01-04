@@ -346,6 +346,7 @@ class GettingStarted extends Component {
                   <p>
                     These instructions will be released when the season begins!
                   </p>
+                  {/* TODO conditional rendering plz */}
                   {/* <p>
                     Next, you should download the{" "}
                     <b>

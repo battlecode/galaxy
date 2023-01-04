@@ -18,6 +18,7 @@ class Resources extends Component {
                       <a
                         type="button"
                         className="btn btn-info btn-fill text-center"
+                        // TODO change link? ask jerry
                         href={`https://play.battlecode.org/specs/${this.props.episode}/specs.md.html`}
                       >
                         Specifications for {this.props.episode_name_long}!
@@ -27,6 +28,7 @@ class Resources extends Component {
                       <a
                         type="button"
                         className="btn btn-info btn-fill text-center"
+                        // TODO change link? ask jerry
                         href={`https://play.battlecode.org/javadocs/${this.props.episode}/index.html`}
                       >
                         Javadocs for {this.props.episode_name_long}!
