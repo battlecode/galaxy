@@ -5,6 +5,7 @@ import MultiEpisode from "./multi-episode";
 import { getDateTimeText } from "../utils/date";
 
 import ScrimmageRequestor from "../components/scrimmageRequestor";
+import Spinner from "../components/spinner";
 import PaginationControl from "../components/paginationControl";
 
 class ScrimmageRequest extends Component {
@@ -115,14 +116,21 @@ class ScrimmageHistory extends Component {
     scrimPage: 1,
     pageLimit: 0,
     scrimmages: [],
+    loading: true,
   };
 
   refresh = (page) => {
+    this.setState({ loading: true });
     Api.getTeamScrimmages(
       this.props.team.id,
       this.props.episode,
       function (scrimmages, pageLimit) {
-        this.setState({ scrimmages, pageLimit, scrimPage: page });
+        this.setState({
+          scrimmages,
+          pageLimit,
+          scrimPage: page,
+          loading: false,
+        });
       }.bind(this),
       page
     );
@@ -248,6 +256,7 @@ class ScrimmageHistory extends Component {
                 })}
               </tbody>
             </table>
+            {this.state.loading && <Spinner />}
           </div>
         </div>
         <PaginationControl
