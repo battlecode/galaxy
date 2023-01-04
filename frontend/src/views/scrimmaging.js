@@ -180,7 +180,6 @@ class ScrimmageHistory extends Component {
                   <th>Opponent</th>
                   <th>Ranked</th>
                   <th>Replay</th>
-                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -245,25 +244,6 @@ class ScrimmageHistory extends Component {
                       ) : (
                         <td>N/A</td>
                       )}
-                      <td>
-                        {" "}
-                        <a
-                          style={{ cursor: "pointer" }}
-                          onClick={($event) => {
-                            // Prevent default behavior when clicking a link
-                            $event.preventDefault();
-
-                            let fileURL = URL.createObjectURL(
-                              new Blob([s.logs], { type: "text/plain" })
-                            );
-                            window.open(fileURL);
-                          }}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          View log
-                        </a>{" "}
-                      </td>
                     </tr>
                   );
                 })}
