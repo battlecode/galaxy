@@ -50,7 +50,7 @@ class SubmissionList extends Component {
     } else if (this.state.submissions.length === 0) {
       return (
         <div className="content">
-          <h4 className="title">Your team has not made any submissions yet.</h4>
+          <p>Your team has not made any submissions yet.</p>
         </div>
       );
     } else {
