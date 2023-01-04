@@ -196,11 +196,11 @@ class ScrimmageHistory extends Component {
                 {this.state.scrimmages.map((s) => {
                   let stat_entry = <td>{s.status}</td>;
                   let participation =
-                    s.participants[0].id == this.props.team.id
+                    s.participants[0].team == this.props.team.id
                       ? s.participants[0]
                       : s.participants[1];
                   let opponent_participation =
-                    s.participants[0].id == this.props.team.id
+                    s.participants[0].team == this.props.team.id
                       ? s.participants[1]
                       : s.participants[0];
                   if (s.status == "ERR") {
