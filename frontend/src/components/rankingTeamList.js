@@ -122,7 +122,7 @@ class RankingTeamList extends Component {
             )}
             <td>{team.profile.auto_accept_ranked ? "Yes" : "No"}</td>
             <td>{team.profile.auto_accept_unranked ? "Yes" : "No"}</td>
-            {this.props.canRequest && (
+            {this.props.canRequest && !this.props.episode_info.frozen && (
               <td>
                 {this.props.team && team.id !== this.props.team.id && (
                   <button
@@ -152,6 +152,13 @@ class RankingTeamList extends Component {
             <div className="header">
               <h4 className="title">{this.props.title}</h4>
             </div>
+            {this.props.canRequest && this.props.episode_info.frozen && (
+              <div className="content">
+                Scrimmages may not be requested, due to a submission freeze for
+                a tournament. (If you think the freeze has passed, try
+                refreshing the page.)
+              </div>
+            )}
             <div className="content table-responsive table-full-width">
               <table className="table table-striped">
                 <thead>
