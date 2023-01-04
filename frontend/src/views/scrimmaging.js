@@ -50,11 +50,7 @@ class ScrimmageRequest extends Component {
             >
               Accept
             </button>{" "}
-            <button
-              onClick={this.reject}
-              className="btn btn-danger btn-xs"
-              disabled={this.props.episode_info.frozen}
-            >
+            <button onClick={this.reject} className="btn btn-danger btn-xs">
               Reject
             </button>
           </span>
