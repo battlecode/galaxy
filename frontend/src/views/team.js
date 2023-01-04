@@ -132,28 +132,6 @@ class YesTeam extends Component {
         <div className="col-md-8">
           <div className="card">
             <div className="header">
-              <h4 className="title">Tournament Eligibility</h4>
-            </div>
-            <div className="content">
-              {/* <ResumeStatus team={this.state.team} /> */}
-              <p>
-                We need to know a little about your team in order to determine
-                which prizes your team is eligible for. Check all boxes that
-                apply to ALL members of your team.
-              </p>
-              <EligibilityOptions
-                change={this.changeHandler}
-                team={this.state.team}
-                update={this.updateTeam}
-                up_but={this.state.up}
-                episode={this.props.episode}
-                episode_info={this.props.episode_info}
-              />{" "}
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="header">
               <h4 className="title">Team</h4>
             </div>
             <div className="content">
@@ -235,6 +213,22 @@ class YesTeam extends Component {
                       value={this.state.team.profile.biography}
                     />
                   </div>
+                </div>
+                <div className="col-md-12">
+                  <label>Tournament Eligibility</label>
+                  <p>
+                    We need to know a little about your team in order to
+                    determine which prizes your team is eligible for. Check all
+                    boxes that apply to ALL members of your team.
+                  </p>
+                  <EligibilityOptions
+                    change={this.changeHandler}
+                    team={this.state.team}
+                    update={this.updateTeam}
+                    up_but={this.state.up}
+                    episode={this.props.episode}
+                    episode_info={this.props.episode_info}
+                  />{" "}
                 </div>
               </div>
 
