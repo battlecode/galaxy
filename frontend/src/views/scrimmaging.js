@@ -233,8 +233,10 @@ class ScrimmageHistory extends Component {
                       {s.status == "OK!" ? (
                         <td>
                           {/* domain is hardcoded, since visualizer and replays are only hosted on deployed site, not locally */}
+                          {/* note that episode_info.name_long is not quite the correct thing to use below: this is pending a
+                            backend change */}
                           <a
-                            href={`https://play.battlecode.org/clients/${this.props.episode}/visualizer.html?https://play.battlecode.org/replays/${s.replay_url}`}
+                            href={`https://releases.battlecode.org/client/${this.props.episode_info.name_long}/1.0.0/visualizer.html`}
                             target="_blank"
                           >
                             Watch
