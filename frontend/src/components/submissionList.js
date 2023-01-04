@@ -29,9 +29,9 @@ class SubmissionList extends Component {
   }
 
   getPage = (page) => {
-    this.setState({ submissions: null });
+    this.setState({ submissions: null, page });
     Api.getSubmissions(this.props.episode, page, (data, pageLimit) => {
-      this.setState({ submissions: data.results, page, pageLimit });
+      this.setState({ submissions: data.results, pageLimit });
     });
   };
 

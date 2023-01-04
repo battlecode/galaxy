@@ -120,7 +120,7 @@ class ScrimmageHistory extends Component {
   };
 
   refresh = (page) => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, scrimPage: page });
     Api.getTeamScrimmages(
       this.props.team.id,
       this.props.episode,
@@ -128,7 +128,6 @@ class ScrimmageHistory extends Component {
         this.setState({
           scrimmages,
           pageLimit,
-          scrimPage: page,
           loading: false,
         });
       }.bind(this),

@@ -13,9 +13,9 @@ class RankingTeamSearch extends Component {
   };
 
   searchTeam(input, page) {
-    this.setState({ loading: true });
+    this.setState({ loading: true, teamPage: page });
     Api.searchTeam(input, page, this.props.episode, (teams, pageLimit) => {
-      this.setState({ teams, teamPage: page, pageLimit, loading: false });
+      this.setState({ teams, pageLimit, loading: false });
     });
   }
 
