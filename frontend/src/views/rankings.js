@@ -15,6 +15,7 @@ class Rankings extends Component {
             history={this.props.history}
             canRequest={false}
             team={this.props.team}
+            title="Rankings"
           />
         </div>
       </div>
