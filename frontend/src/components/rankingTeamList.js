@@ -152,6 +152,13 @@ class RankingTeamList extends Component {
             <div className="header">
               <h4 className="title">Rankings</h4>
             </div>
+            {this.props.episode_info.frozen && (
+              <div className="content">
+                Scrimmages may not be requested, due to a submission freeze for
+                a tournament. (If you think the freeze has passed, try
+                refreshing the page.)
+              </div>
+            )}
             <div className="content table-responsive table-full-width">
               <table className="table table-striped">
                 <thead>
