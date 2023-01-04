@@ -1,13 +1,20 @@
 package run
 
 import (
+	"bytes"
 	"context"
+	"errors"
 	"fmt"
+	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/battlecode/galaxy/saturn/pkg/saturn"
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/transport"
+	transportHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/mitchellh/mapstructure"
+	"github.com/rs/zerolog/log"
 )
 
 type Submission struct {
@@ -126,4 +133,64 @@ func NewScaffold(ctx context.Context, episode saturn.Episode, root string) (*Sca
 	default:
 		return nil, fmt.Errorf("no such language: %v", episode.Language)
 	}
+}
+
+func (s *Scaffold) RunCommand(ctx context.Context, name string, arg ...string) (string, error) {
+	log.Ctx(ctx).Debug().Msgf("Running command: %s %s", name, strings.Join(arg, " "))
+	procOutput := new(bytes.Buffer)
+	cmd := exec.CommandContext(ctx, name, arg...)
+	cmd.Dir = s.root
+	cmd.Stdout, cmd.Stderr = procOutput, procOutput
+	err := cmd.Run()
+	return procOutput.String(), err
+}
+
+func (s *Scaffold) Refresh(ctx context.Context) error {
+	wt, err := s.repo.Worktree()
+	if err != nil {
+		return fmt.Errorf("repo.Worktree: %v", err)
+	}
+
+	log.Ctx(ctx).Debug().Msg("Resetting scaffold.")
+	if err := wt.Reset(&git.ResetOptions{Mode: git.HardReset}); err != nil {
+		return fmt.Errorf("wt.Reset: %v", err)
+	}
+
+	log.Ctx(ctx).Debug().Msg("Cleaning scaffold.")
+	if err := wt.Clean(&git.CleanOptions{Dir: true}); err != nil {
+		return fmt.Errorf("wt.Clean: %v", err)
+	}
+
+	auth, err := getGitAuth(ctx)
+	if err != nil {
+		return fmt.Errorf("getGitAuth: %v", err)
+	}
+	log.Ctx(ctx).Debug().Msg("Pulling scaffold.")
+	switch err := wt.PullContext(ctx, &git.PullOptions{Auth: auth}); true {
+	case err == nil:
+		log.Ctx(ctx).Debug().Msg("New scaffold version downloaded.")
+	case errors.Is(err, git.NoErrAlreadyUpToDate):
+		log.Ctx(ctx).Debug().Msg("Already up to date.")
+	default:
+		return fmt.Errorf("wt.PullContext: %v", err)
+	}
+	return nil
+}
+
+func cloneGit(ctx context.Context, url, root string) (*git.Repository, error) {
+	auth, err := getGitAuth(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("getGitAuth: %v", err)
+	}
+	return git.PlainCloneContext(ctx, root, false, &git.CloneOptions{
+		URL:  url,
+		Auth: auth,
+	})
+}
+
+func getGitAuth(ctx context.Context) (transport.AuthMethod, error) {
+	return &transportHttp.BasicAuth{
+		Username: "ignored",
+		Password: "", // TODO!
+	}, nil
 }

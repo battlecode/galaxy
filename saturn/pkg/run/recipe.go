@@ -3,6 +3,7 @@ package run
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/battlecode/galaxy/saturn/pkg/saturn"
 	"github.com/rs/zerolog/log"
@@ -36,4 +37,14 @@ func (r Recipe) Run(ctx context.Context, arg *StepArguments) error {
 		}
 	}
 	return nil
+}
+
+var StateVersion = Step{
+	Name: "Hello world",
+	Callable: func(ctx context.Context, arg *StepArguments) error {
+		log.Ctx(ctx).Debug().Msg("Welcome to Saturn!")
+		log.Ctx(ctx).Debug().Msgf("Node: %s", os.Getenv("HOSTNAME"))
+		log.Ctx(ctx).Debug().Msgf("Build: %s", os.Getenv("SATURN_BUILD"))
+		return nil
+	},
 }
