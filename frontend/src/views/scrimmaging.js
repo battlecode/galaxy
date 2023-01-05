@@ -91,8 +91,9 @@ class ScrimmageRequests extends Component {
           refresh={this.props.refresh}
           key={r.id}
           id={r.id}
-          team={r.requested_by}
+          team={r.requested_by_name}
           episode={this.props.episode}
+          episode_info={this.props.episode_info}
         />
       ));
       alert = (
@@ -112,7 +113,7 @@ class ScrimmageRequests extends Component {
         {alert}
         <div className="collapse" id="scrimReqs">
           {this.props.episode_info.frozen && (
-            <div className="content">
+            <div className="alert alert-warning">
               Scrimmage requests may not be accepted, due to a freeze for a
               tournament. (If you think the freeze has passed, try refreshing
               the page.)
