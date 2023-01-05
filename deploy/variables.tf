@@ -22,17 +22,27 @@ variable "gcp_zone" {
   default     = "us-east1-b"
 }
 
-variable "additional_secrets_common" {
+variable "siarnaq_secrets_common" {
   description = "Additional secrets to inject into the secret manager"
   type        = map
 }
 
-variable "additional_secrets_production" {
+variable "siarnaq_secrets_production" {
   description = "Additional secrets to inject into the secret manager, in production"
   type        = map
 }
 
-variable "additional_secrets_staging" {
+variable "siarnaq_secrets_staging" {
+  description = "Additional secrets to inject into the secret manager, in staging"
+  type        = map
+}
+
+variable "saturn_secrets_production" {
+  description = "Additional secrets to inject into the secret manager, in production"
+  type        = map
+}
+
+variable "saturn_secrets_staging" {
   description = "Additional secrets to inject into the secret manager, in staging"
   type        = map
 }

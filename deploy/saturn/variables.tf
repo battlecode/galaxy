@@ -33,6 +33,11 @@ variable "storage_secure_name" {
   type        = string
 }
 
+variable "secret_id" {
+  description = "ID of the Secret resource"
+  type        = string
+}
+
 variable "network_vpc_id" {
   description = "ID of Google VPC network resource"
   type        = string
