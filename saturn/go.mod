@@ -4,11 +4,11 @@ go 1.18
 
 require (
 	cloud.google.com/go/pubsub v1.28.0
+	cloud.google.com/go/secretmanager v1.9.0
 	cloud.google.com/go/storage v1.27.0
 	github.com/go-git/go-git/v5 v5.5.1
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/rs/zerolog v1.28.0
-	golang.org/x/oauth2 v0.3.0
 	golang.org/x/sys v0.3.0
 	google.golang.org/api v0.105.0
 )
@@ -43,6 +43,7 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.3.0 // indirect
 	golang.org/x/net v0.3.0 // indirect
+	golang.org/x/oauth2 v0.3.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect

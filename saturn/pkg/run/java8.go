@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"github.com/battlecode/galaxy/saturn/pkg/saturn"
+	"github.com/go-git/go-git/v5"
 	"github.com/rs/zerolog/log"
 )
 
@@ -18,12 +19,7 @@ type Java8Scaffold struct {
 	matchOutputs map[*StepArguments]string
 }
 
-func NewJava8Scaffold(ctx context.Context, episode saturn.Episode, root string) (*Java8Scaffold, error) {
-	repo, err := cloneGit(ctx, episode.Scaffold, root)
-	if err != nil {
-		return nil, fmt.Errorf("cloneGit: %v", err)
-	}
-
+func NewJava8Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string) (*Java8Scaffold, error) {
 	s := new(Java8Scaffold)
 	s.root = root
 	s.repo = repo

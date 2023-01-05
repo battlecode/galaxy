@@ -7,7 +7,6 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/rs/zerolog/log"
-	"golang.org/x/oauth2/google"
 )
 
 type QueuedTaskHandler func(context.Context, TaskPayload) error
@@ -21,16 +20,8 @@ type GCPPubsubSubscriber struct {
 	subscription *pubsub.Subscription
 }
 
-func NewGCPPubsubSubscriber(
-	ctx context.Context,
-	subscriptionID string,
-) (*GCPPubsubSubscriber, error) {
-	credentials, err := google.FindDefaultCredentials(ctx, pubsub.ScopePubSub)
-	if err != nil {
-		return nil, fmt.Errorf("google.FindDefaultCredentials: %v", err)
-	}
-
-	client, err := pubsub.NewClient(ctx, credentials.ProjectID)
+func NewGCPPubsubSubscriber(ctx context.Context, projectID, subscriptionID string) (*GCPPubsubSubscriber, error) {
+	client, err := pubsub.NewClient(ctx, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("pubsub.NewClient: %v", err)
 	}

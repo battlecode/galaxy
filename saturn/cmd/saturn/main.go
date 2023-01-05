@@ -12,6 +12,10 @@ import (
 )
 
 const (
+	gcpProjectId = "mitbattlecode"
+
+	gcpSecretName = "staging-saturn"
+
 	gcpPubsubSubscriptionId     = "staging-saturn-compile"
 	gcpTokenedReporterAudience  = "siarnaq"
 	gcpTokenedReporterUserAgent = "Galaxy-Saturn"
@@ -27,11 +31,20 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), unix.SIGINT, unix.SIGTERM)
 	defer stop()
 
-	multiplexer := run.NewScaffoldMultiplexer(scaffoldRoot)
+	secret, err := saturn.ReadSecret(ctx, gcpProjectId, gcpSecretName)
+	if err != nil {
+		log.Ctx(ctx).Fatal().Err(err).Msg("Could not read secrets.")
+	}
+
+	multiplexer, err := run.NewScaffoldMultiplexer(scaffoldRoot, secret)
+	if err != nil {
+		log.Ctx(ctx).Fatal().Err(err).Msg("Could not initialize scaffold multiplexer.")
+	}
+
 	app, err := saturn.New(
 		ctx,
 		saturn.WithMonitor(monitorAddress),
-		saturn.WithGcpPubsubSubcriber(gcpPubsubSubscriptionId),
+		saturn.WithGcpPubsubSubcriber(gcpProjectId, gcpPubsubSubscriptionId),
 		saturn.WithGcpTokenedReporter(gcpTokenedReporterAudience, gcpTokenedReporterUserAgent),
 		saturn.WithRunner("compile", multiplexer.Compile),
 		saturn.WithRunner("execute", multiplexer.Execute),

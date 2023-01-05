@@ -37,13 +37,19 @@ type ExecuteRequest struct {
 type ScaffoldMultiplexer struct {
 	Root      string
 	scaffolds map[string]*Scaffold
+	gitAuth   transport.AuthMethod
 }
 
-func NewScaffoldMultiplexer(root string) *ScaffoldMultiplexer {
+func NewScaffoldMultiplexer(root string, secret *saturn.Secret) (*ScaffoldMultiplexer, error) {
+	gitAuth := &transportHttp.BasicAuth{
+		Username: "ignored",
+		Password: secret.GitToken,
+	}
 	return &ScaffoldMultiplexer{
 		Root:      root,
 		scaffolds: make(map[string]*Scaffold),
-	}
+		gitAuth:   gitAuth,
+	}, nil
 }
 
 func (m *ScaffoldMultiplexer) runTask(
@@ -51,13 +57,19 @@ func (m *ScaffoldMultiplexer) runTask(
 	payload saturn.TaskPayload,
 	runner func(ctx context.Context, scaffold *Scaffold) error,
 ) (err error) {
+	var repo *git.Repository
 	scaffold, ok := m.scaffolds[payload.Episode.Name]
 	if !ok {
 		root := filepath.Join(m.Root, payload.Episode.Name)
-		scaffold, err = NewScaffold(ctx, payload.Episode, root)
+		repo, err = cloneGit(ctx, payload.Episode.Scaffold, root, m.gitAuth)
 		if err != nil {
-			return
+			return fmt.Errorf("cloneGit: %v", err)
 		}
+		scaffold, err = NewScaffold(ctx, payload.Episode, repo, root)
+		if err != nil {
+			return fmt.Errorf("NewScaffold: %v", err)
+		}
+		scaffold.gitAuth = m.gitAuth
 		m.scaffolds[payload.Episode.Name] = scaffold
 	}
 	return runner(ctx, scaffold)
@@ -112,20 +124,21 @@ func (m *ScaffoldMultiplexer) Execute(
 type Scaffold struct {
 	root    string
 	repo    *git.Repository
+	gitAuth transport.AuthMethod
 	compile Recipe
 	execute Recipe
 }
 
-func NewScaffold(ctx context.Context, episode saturn.Episode, root string) (*Scaffold, error) {
+func NewScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string) (*Scaffold, error) {
 	switch episode.Language {
 	case saturn.Java8:
-		s, err := NewJava8Scaffold(ctx, episode, root)
+		s, err := NewJava8Scaffold(ctx, episode, repo, root)
 		if err != nil {
 			return nil, fmt.Errorf("NewJava8Scaffold: %v", err)
 		}
 		return &s.Scaffold, nil
 	case saturn.Python3:
-		s, err := NewPython3Scaffold(ctx, episode, root)
+		s, err := NewPython3Scaffold(ctx, episode, repo, root)
 		if err != nil {
 			return nil, fmt.Errorf("NewPython3Scaffold: %v", err)
 		}
@@ -161,12 +174,8 @@ func (s *Scaffold) Refresh(ctx context.Context) error {
 		return fmt.Errorf("wt.Clean: %v", err)
 	}
 
-	auth, err := getGitAuth(ctx)
-	if err != nil {
-		return fmt.Errorf("getGitAuth: %v", err)
-	}
 	log.Ctx(ctx).Debug().Msg("Pulling scaffold.")
-	switch err := wt.PullContext(ctx, &git.PullOptions{Auth: auth}); true {
+	switch err := wt.PullContext(ctx, &git.PullOptions{Auth: s.gitAuth}); true {
 	case err == nil:
 		log.Ctx(ctx).Debug().Msg("New scaffold version downloaded.")
 	case errors.Is(err, git.NoErrAlreadyUpToDate):
@@ -177,20 +186,9 @@ func (s *Scaffold) Refresh(ctx context.Context) error {
 	return nil
 }
 
-func cloneGit(ctx context.Context, url, root string) (*git.Repository, error) {
-	auth, err := getGitAuth(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("getGitAuth: %v", err)
-	}
+func cloneGit(ctx context.Context, url, root string, auth transport.AuthMethod) (*git.Repository, error) {
 	return git.PlainCloneContext(ctx, root, false, &git.CloneOptions{
 		URL:  url,
 		Auth: auth,
 	})
-}
-
-func getGitAuth(ctx context.Context) (transport.AuthMethod, error) {
-	return &transportHttp.BasicAuth{
-		Username: "ignored",
-		Password: "", // TODO!
-	}, nil
 }

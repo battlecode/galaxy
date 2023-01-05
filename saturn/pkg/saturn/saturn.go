@@ -72,13 +72,13 @@ func WithMonitor(address string) SaturnOption {
 	}
 }
 
-func WithGcpPubsubSubcriber(subscriptionID string) SaturnOption {
+func WithGcpPubsubSubcriber(projectID, subscriptionID string) SaturnOption {
 	return func(ctx context.Context, s *Saturn) (*Saturn, error) {
 		if s.queue != nil {
 			return nil, fmt.Errorf("queue client already exists")
 		}
 		log.Ctx(ctx).Debug().Msg("Initializing queue subscriber.")
-		queue, err := NewGCPPubsubSubscriber(ctx, subscriptionID)
+		queue, err := NewGCPPubsubSubscriber(ctx, projectID, subscriptionID)
 		if err != nil {
 			return nil, fmt.Errorf("NewGCPPubsubSubcriber: %v", err)
 		}
