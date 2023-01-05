@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
+from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
 from siarnaq.api.teams.filters import TeamOrderingFilter
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
@@ -133,13 +134,16 @@ class TeamViewSet(
                 join_key=serializer.validated_data["join_key"],
             )
 
-        with transaction.atomic():
-            team = get_object_or_404(
-                queryset,
-                name=serializer.validated_data["name"],
-                episode=self.kwargs["episode_id"],
-            )
-            team.members.add(request.user)
+        try:
+            with transaction.atomic():
+                team = get_object_or_404(
+                    queryset,
+                    name=serializer.validated_data["name"],
+                    episode=self.kwargs["episode_id"],
+                )
+                team.members.add(request.user)
+        except TeamMaxSizeExceeded:
+            return Response(None, status=status.HTTP_409_CONFLICT)
         logger.debug("team_join", message="User has joined team.", team=team.pk)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 

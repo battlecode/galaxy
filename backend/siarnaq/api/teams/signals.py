@@ -2,9 +2,9 @@ import structlog
 from django.conf import settings
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
-from rest_framework.exceptions import ValidationError
 
 from siarnaq.api.compete.models import MatchParticipant
+from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
 from siarnaq.api.teams.models import Team, TeamProfile, TeamStatus
 from siarnaq.api.user.models import User
 
@@ -53,4 +53,4 @@ def prevent_team_exceed_capacity(instance, action, pk_set, **kwargs):
             + User.objects.filter(pk__in=pk_set, is_staff=False).count()
             > settings.TEAMS_MAX_TEAM_SIZE
         ):
-            raise ValidationError("Maximum number of team members exceeded.")
+            raise TeamMaxSizeExceeded
