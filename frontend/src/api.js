@@ -398,10 +398,10 @@ class Api {
 
   //----SCRIMMAGING----
 
-  static acceptScrimmage(scrimmage_id, callback) {
+  static acceptScrimmage(scrimmage_id, episode, callback) {
     $.ajax({
-      url: `${URL}/api/${LEAGUE}/scrimmage/${scrimmage_id}/accept/`,
-      method: "PATCH",
+      url: `${URL}/api/compete/${episode}/request/${scrimmage_id}/accept/`,
+      method: "POST",
     })
       .done((data, status) => {
         callback(true);
@@ -411,10 +411,10 @@ class Api {
       });
   }
 
-  static rejectScrimmage(scrimmage_id, callback) {
+  static rejectScrimmage(scrimmage_id, episode, callback) {
     $.ajax({
-      url: `${URL}/api/${LEAGUE}/scrimmage/${scrimmage_id}/reject/`,
-      method: "PATCH",
+      url: `${URL}/api/compete/${episode}/request/${scrimmage_id}/reject/`,
+      method: "POST",
     })
       .done((data, status) => {
         callback(true);

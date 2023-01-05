@@ -122,7 +122,7 @@ class RankingTeamList extends Component {
             )}
             <td>{team.profile.auto_accept_ranked ? "Yes" : "No"}</td>
             <td>{team.profile.auto_accept_unranked ? "Yes" : "No"}</td>
-            {this.props.canRequest && !this.props.episode_info.frozen && (
+            {this.props.canRequest && (
               <td>
                 {this.props.team && team.id !== this.props.team.id && (
                   <button
@@ -131,6 +131,7 @@ class RankingTeamList extends Component {
                       event.stopPropagation();
                       this.openRequestForm(team);
                     }}
+                    disabled={this.props.episode_info.frozen}
                   >
                     {buttonContent}
                   </button>

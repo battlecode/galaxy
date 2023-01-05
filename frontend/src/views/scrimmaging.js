@@ -16,6 +16,7 @@ class ScrimmageRequest extends Component {
   accept = () => {
     Api.acceptScrimmage(
       this.props.id,
+      this.props.episode,
       function () {
         this.setState({ open: false });
         this.props.refresh();
@@ -26,6 +27,7 @@ class ScrimmageRequest extends Component {
   reject = () => {
     Api.rejectScrimmage(
       this.props.id,
+      this.props.episode,
       function () {
         this.setState({ open: false });
         this.props.refresh();
@@ -36,12 +38,14 @@ class ScrimmageRequest extends Component {
   render() {
     if (this.state.open)
       return (
-        <div className="alert alert-dark" style={{ height: "3em" }}>
-          <span style={{ float: "left" }}>
-            Scrimmage request from {this.props.team}.
-          </span>
+        <div className="alert alert-success">
+          Scrimmage request from {this.props.team}.
           <span style={{ float: "right" }} className="pull-right">
-            <button onClick={this.accept} className="btn btn-success btn-xs">
+            <button
+              onClick={this.accept}
+              className="btn btn-success btn-xs"
+              disabled={this.props.episode_info.frozen}
+            >
               Accept
             </button>{" "}
             <button onClick={this.reject} className="btn btn-danger btn-xs">
@@ -85,7 +89,9 @@ class ScrimmageRequests extends Component {
           refresh={this.props.refresh}
           key={r.id}
           id={r.id}
-          team={r.requested_by}
+          team={r.requested_by_name}
+          episode={this.props.episode}
+          episode_info={this.props.episode_info}
         />
       ));
       alert = (
@@ -104,6 +110,13 @@ class ScrimmageRequests extends Component {
       <div className="col-md-12">
         {alert}
         <div className="collapse" id="scrimReqs">
+          {this.props.episode_info.frozen && (
+            <div className="alert alert-warning">
+              Scrimmage requests may not be accepted, due to a freeze for a
+              tournament. (If you think the freeze has passed, try refreshing
+              the page.)
+            </div>
+          )}
           {requests}
         </div>
       </div>
@@ -120,7 +133,7 @@ class ScrimmageHistory extends Component {
   };
 
   refresh = (page) => {
-    this.setState({ loading: true, scrimPage: page });
+    this.setState({ loading: true, scrimmages: [], scrimPage: 1 });
     Api.getTeamScrimmages(
       this.props.team.id,
       this.props.episode,
@@ -171,7 +184,7 @@ class ScrimmageHistory extends Component {
             <h4 className="title">
               Scrimmage History{" "}
               <button
-                onClick={this.props.refresh}
+                onClick={this.refresh}
                 style={{ marginLeft: "10px" }}
                 type="button"
                 className="btn btn-primary btn-sm"
@@ -196,11 +209,11 @@ class ScrimmageHistory extends Component {
                 {this.state.scrimmages.map((s) => {
                   let stat_entry = <td>{s.status}</td>;
                   let participation =
-                    s.participants[0].id == this.props.team.id
+                    s.participants[0].team == this.props.team.id
                       ? s.participants[0]
                       : s.participants[1];
                   let opponent_participation =
-                    s.participants[0].id == this.props.team.id
+                    s.participants[0].team == this.props.team.id
                       ? s.participants[1]
                       : s.participants[0];
                   if (s.status == "ERR") {
@@ -284,14 +297,14 @@ class Scrimmaging extends Component {
         <div className="content">
           <div className="container-fluid">
             <div className="row">
-              {/* <ScrimmageRequests
+              <ScrimmageRequests
                 ref={(requests) => {
                   this.requests = requests;
                 }}
                 refresh={this.refresh}
                 episode={this.props.episode}
                 episode_info={this.props.episode_info}
-              /> */}
+              />
               <ScrimmageRequestor
                 refresh={this.refresh}
                 episode={this.props.episode}
