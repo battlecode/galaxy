@@ -146,6 +146,14 @@ class Episode(models.Model):
             log.warn("autoscrim_archived", message="Refusing to autoscrim: archived.")
         apps.get_model("teams", "Team").objects.autoscrim(episode=self, best_of=best_of)
 
+    def for_saturn(self):
+        """Return the representation of this object as expected by Saturn."""
+        return {
+            "name": self.name_short,
+            "language": self.language,
+            "scaffold": self.scaffold,
+        }
+
 
 class Map(models.Model):
     """

@@ -7,6 +7,7 @@ import structlog
 from django.apps import apps
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 from sortedm2m.fields import SortedManyToManyField
 
 import siarnaq.api.refs as refs
@@ -138,20 +139,35 @@ class Submission(SaturnInvocation):
     def get_binary_path(self):
         """Return the path of the binary code on Google cloud storage"""
         return posixpath.join(
-            self.episode.name_short, "submission", str(self.pk), "binary.zip"
+            "episode",
+            self.episode.name_short,
+            "submission",
+            str(self.pk),
+            "binary.zip",
         )
+
+    def for_saturn(self):
+        """Return the representation of this object as expected by Saturn."""
+        return {
+            "source-path": self.get_source_path(),
+            "binary-path": self.get_binary_path(),
+            "team-name": self.team.name,
+            "package": self.package,
+        }
 
     def enqueue_options(self):
         """Return the options to be submitted to the compilation queue."""
+        report_url = reverse(
+            "submission-report",
+            kwargs={"pk": self.pk, "episode_id": self.episode.pk},
+        )
         return {
-            "id": self.pk,
-            "episode": self.episode_id,
-            # ex: bc23/submission/12423/source.zip
-            "source-path": self.get_source_path(),
-            "binary": {
-                "path": self.get_binary_path(),
-                "options": "",
+            "episode": self.episode.for_saturn(),
+            "metadata": {
+                "report-url": report_url,
+                "task-type": "compile",
             },
+            "details": self.for_saturn(),
         }
 
 
@@ -200,6 +216,7 @@ class Match(SaturnInvocation):
     def get_replay_path(self):
         """Return the path to the replay file."""
         return posixpath.join(
+            "episode",
             self.episode.name_short,
             "replays",
             f"{self.replay}.{self.episode.name_short}",
@@ -214,17 +231,30 @@ class Match(SaturnInvocation):
             .public_url
         )
 
+    def for_saturn(self):
+        """Return the representation of this object as expected by Saturn."""
+        participants = {
+            chr(ord("a") + p.player_index): p.submission.for_saturn()
+            for p in self.participants.all()
+        }
+        return {
+            "replay-path": self.get_replay_path(),
+            **participants,
+        }
+
     def enqueue_options(self):
         """Return the options to be submitted to the execution queue."""
+        report_url = reverse(
+            "match-report",
+            kwargs={"pk": self.pk, "episode_id": self.episode.pk},
+        )
         return {
-            "id": self.pk,
-            "episode": self.episode_id,
-            "players": [
-                {"path": participant.submission.get_binary_path(), "options": ""}
-                for participant in self.participants.order_by("player_index").all()
-            ],
-            "replay-path": self.get_replay_path(),
-            "maps": [m.name for m in self.maps.all()],
+            "episode": self.episode.for_saturn(),
+            "metadata": {
+                "report-url": report_url,
+                "task-type": "execute",
+            },
+            "details": self.for_saturn(),
         }
 
     def try_finalize_ratings(self):
