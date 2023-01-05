@@ -77,7 +77,7 @@ class ScrimmageRequestForm extends Component {
           this.setState({ update_status: "failure" });
           this.setState({
             alert_message:
-              "Scrimmage request failed! Have you made a code submission yet?",
+              "Scrimmage request failed! Have you and the opponent both made successful code submissions yet?",
           });
         }
         setTimeout(() => {
