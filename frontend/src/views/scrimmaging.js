@@ -111,6 +111,13 @@ class ScrimmageRequests extends Component {
       <div className="col-md-12">
         {alert}
         <div className="collapse" id="scrimReqs">
+          {this.props.episode_info.frozen && (
+            <div className="content">
+              Scrimmage requests may not be accepted, due to a freeze for a
+              tournament. (If you think the freeze has passed, try refreshing
+              the page.)
+            </div>
+          )}
           {requests}
         </div>
       </div>
