@@ -14,17 +14,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-const (
-	SourceBucket = "mitbattlecode-secure"
-	BinaryBucket = "mitbattlecode-secure"
-	ReplayBucket = "mitbattlecode-secure"
-)
-
-type FileSpecification struct {
-	Bucket string `json:"bucket"`
-	Name   string `json:"name"`
-}
-
 type StorageClient interface {
 	GetFile(context.Context, FileSpecification, io.Writer) error
 	UploadFile(context.Context, FileSpecification, io.Reader) error

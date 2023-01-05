@@ -17,23 +17,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type Submission struct {
-	SourcePath string `mapstructure:"source-path"`
-	BinaryPath string `mapstructure:"binary-path"`
-	TeamName   string `mapstructure:"team-name"`
-	Package    string `mapstructure:"package"`
-}
-
-type CompileRequest struct {
-	Submission `mapstructure:"submission"`
-}
-
-type ExecuteRequest struct {
-	A          Submission `mapstructure:"a"`
-	B          Submission `mapstructure:"b"`
-	ReplayPath string     `mapstructure:"replay-path"`
-}
-
 type ScaffoldMultiplexer struct {
 	Root      string
 	scaffolds map[string]*Scaffold

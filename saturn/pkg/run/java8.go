@@ -70,12 +70,8 @@ func (s *Java8Scaffold) DownloadSource() *Step {
 	return &Step{
 		Name: "Download source code",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
-			spec := FileSpecification{
-				Bucket: SourceBucket,
-				Name:   arg.Details.(CompileRequest).SourcePath,
-			}
 			root := filepath.Join(s.Scaffold.root, "src")
-			return GetArchive(ctx, arg.Finisher, arg.StorageClient, spec, root)
+			return GetArchive(ctx, arg.Finisher, arg.StorageClient, arg.Details.(CompileRequest).Source, root)
 		},
 	}
 }
@@ -89,12 +85,8 @@ func (s *Java8Scaffold) DownloadBinaries() *Step {
 				"B": arg.Details.(ExecuteRequest).B,
 			}
 			for k, v := range submissions {
-				spec := FileSpecification{
-					Bucket: BinaryBucket,
-					Name:   v.BinaryPath,
-				}
 				root := filepath.Join(s.Scaffold.root, "data", k)
-				if err := GetArchive(ctx, arg.Finisher, arg.StorageClient, spec, root); err != nil {
+				if err := GetArchive(ctx, arg.Finisher, arg.StorageClient, v.Binary, root); err != nil {
 					return err
 				}
 			}
@@ -107,12 +99,8 @@ func (s *Java8Scaffold) UploadBinary() *Step {
 	return &Step{
 		Name: "Upload binary",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
-			spec := FileSpecification{
-				Bucket: BinaryBucket,
-				Name:   arg.Details.(CompileRequest).BinaryPath,
-			}
 			root := filepath.Join(s.Scaffold.root, "build", "classes")
-			return PutArchive(ctx, arg.Finisher, arg.StorageClient, spec, root)
+			return PutArchive(ctx, arg.Finisher, arg.StorageClient, arg.Details.(CompileRequest).Binary, root)
 		},
 	}
 }
@@ -121,15 +109,11 @@ func (s *Java8Scaffold) UploadReplay() *Step {
 	return &Step{
 		Name: "Upload replay",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
-			spec := FileSpecification{
-				Bucket: ReplayBucket,
-				Name:   arg.Details.(ExecuteRequest).ReplayPath,
-			}
 			f, err := os.Open(filepath.Join(s.Scaffold.root, "data", "replay.bin"))
 			if err != nil {
 				return fmt.Errorf("os.Open: %v", err)
 			}
-			return arg.StorageClient.UploadFile(ctx, spec, f)
+			return arg.StorageClient.UploadFile(ctx, arg.Details.(ExecuteRequest).Replay, f)
 		},
 	}
 }
