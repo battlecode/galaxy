@@ -13,9 +13,13 @@ class RankingTeamSearch extends Component {
   };
 
   searchTeam(input, page) {
-    this.setState({ loading: true });
+    this.setState({ loading: true, teamPage: page });
     Api.searchTeam(input, page, this.props.episode, (teams, pageLimit) => {
-      this.setState({ teams, teamPage: page, pageLimit, loading: false });
+      // This check handles the case where a new page is requested while a
+      // previous page was loading.
+      if (page == this.state.teamPage) {
+        this.setState({ teams, pageLimit, loading: false });
+      }
     });
   }
 

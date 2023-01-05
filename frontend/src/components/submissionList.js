@@ -18,9 +18,10 @@ class SubmissionList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      submissions: null,
+      submissions: [],
       page: 1,
       pageLimit: 1,
+      loading: true,
     };
   }
 
@@ -29,9 +30,13 @@ class SubmissionList extends Component {
   }
 
   getPage = (page) => {
-    this.setState({ submissions: null });
+    this.setState({ submissions: [], page, loading: true });
     Api.getSubmissions(this.props.episode, page, (data, pageLimit) => {
-      this.setState({ submissions: data.results, page, pageLimit });
+      // This check handles the case where a new page is requested while a
+      // previous page was loading.
+      if (page == this.state.page) {
+        this.setState({ submissions: data.results, pageLimit, loading: false });
+      }
     });
   };
 
@@ -41,92 +46,79 @@ class SubmissionList extends Component {
   };
 
   renderTable() {
-    if (this.state.submissions === null) {
+    const rows = this.state.submissions.map((submission) => {
       return (
-        <div className="content">
-          <Spinner />
-        </div>
-      );
-    } else if (this.state.submissions.length === 0) {
-      return (
-        <div className="content">
-          <p>Your team has not made any submissions yet.</p>
-        </div>
-      );
-    } else {
-      const rows = this.state.submissions.map((submission) => {
-        return (
-          <tr key={submission.id}>
-            <td>{new Date(submission.created).toLocaleString()}</td>
-            <td>{SUBMISSION_STATUS[submission.status]} </td>
-            <td>{submission.description} </td>
-            <td>{submission.package}</td>
-            <td>{submission.username} </td>
-            <td>
-              {" "}
-              <a
-                style={{ cursor: "pointer" }}
-                onClick={($event) => {
-                  // Prevent default behavior when clicking a link
-                  $event.preventDefault();
+        <tr key={submission.id}>
+          <td>{new Date(submission.created).toLocaleString()}</td>
+          <td>{SUBMISSION_STATUS[submission.status]} </td>
+          <td>{submission.description} </td>
+          <td>{submission.package}</td>
+          <td>{submission.username} </td>
+          <td>
+            {" "}
+            <a
+              style={{ cursor: "pointer" }}
+              onClick={($event) => {
+                // Prevent default behavior when clicking a link
+                $event.preventDefault();
 
-                  let fileURL = URL.createObjectURL(
-                    new Blob([submission.logs], { type: "text/plain" })
-                  );
-                  window.open(fileURL);
-                }}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View log
-              </a>{" "}
-            </td>
-            <td>
-              {" "}
-              <button
-                className="btn btn-xs"
-                onClick={() =>
-                  Api.downloadSubmission(submission.id, this.props.episode)
-                }
-              >
-                Download
-              </button>
-            </td>
-          </tr>
-        );
-      });
-
-      return (
-        <div className="content">
-          <button
-            id="submission-table-refresh-button"
-            className="btn btn-xs"
-            onClick={this.refreshCurrentPage}
-          >
-            Refresh
-          </button>
-          <table className="table table-hover table-striped table-responsive table-full-width">
-            <thead>
-              <tr>
-                <th>Submitted at</th>
-                <th>Status</th>
-                <th>Description</th>
-                <th>Package Name</th>
-                <th>Submitter</th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>{rows}</tbody>
-          </table>
-          <PaginationControl
-            page={this.state.page}
-            pageLimit={this.state.pageLimit}
-            onPageClick={this.getPage}
-          />
-        </div>
+                let fileURL = URL.createObjectURL(
+                  new Blob([submission.logs], { type: "text/plain" })
+                );
+                window.open(fileURL);
+              }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View log
+            </a>{" "}
+          </td>
+          <td>
+            {" "}
+            <button
+              className="btn btn-xs"
+              onClick={() =>
+                Api.downloadSubmission(submission.id, this.props.episode)
+              }
+            >
+              Download
+            </button>
+          </td>
+        </tr>
       );
-    }
+    });
+
+    return (
+      <div className="content">
+        <button
+          id="submission-table-refresh-button"
+          className="btn btn-xs"
+          onClick={this.refreshCurrentPage}
+        >
+          Refresh
+        </button>
+        <table className="table table-hover table-striped table-responsive table-full-width">
+          <thead>
+            <tr>
+              <th>Submitted at</th>
+              <th>Status</th>
+              <th>Description</th>
+              <th>Package Name</th>
+              <th>Submitter</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </table>
+        {this.state.loading && <Spinner />}
+        <PaginationControl
+          page={this.state.page}
+          pageLimit={this.state.pageLimit}
+          onPageClick={this.getPage}
+        />
+      </div>
+    );
   }
 
   render() {

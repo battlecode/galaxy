@@ -120,17 +120,20 @@ class ScrimmageHistory extends Component {
   };
 
   refresh = (page) => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, scrimPage: page });
     Api.getTeamScrimmages(
       this.props.team.id,
       this.props.episode,
       function (scrimmages, pageLimit) {
-        this.setState({
-          scrimmages,
-          pageLimit,
-          scrimPage: page,
-          loading: false,
-        });
+        // This check handles the case where a new page is requested while a
+        // previous page was loading.
+        if (page == this.state.scrimPage) {
+          this.setState({
+            scrimmages,
+            pageLimit,
+            loading: false,
+          });
+        }
       }.bind(this),
       page
     );
