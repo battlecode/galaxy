@@ -54,7 +54,7 @@ resource "google_storage_bucket" "frontend" {
   }
 }
 
-resource "google_cloudbuild_trigger" "this" {
+resource "google_cloudbuild_trigger" "frontend" {
   count = var.create_website ? 1 : 0
 
   name            = "${var.name}-frontend"
@@ -130,7 +130,7 @@ module "siarnaq" {
   database_user                = "siarnaq"
   database_backup              = var.database_backup
   database_authorized_networks = var.database_authorized_networks
-  additional_secrets           = var.additional_secrets
+  additional_secrets           = var.siarnaq_secrets
 
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name
@@ -149,6 +149,19 @@ module "titan" {
   storage_names = [google_storage_bucket.public.name, google_storage_bucket.secure.name]
 }
 
+resource "google_secret_manager_secret" "saturn" {
+  secret_id = "${var.name}-saturn"
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "saturn" {
+  secret      = google_secret_manager_secret.saturn.id
+  secret_data = jsonencode(var.saturn_secrets)
+}
+
 module "saturn_compile" {
   source = "../saturn"
 
@@ -160,6 +173,8 @@ module "saturn_compile" {
   pubsub_topic_name   = module.siarnaq.topic_compile_name
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name
+
+  secret_id = google_secret_manager_secret.saturn.secret_id
 
   network_vpc_id = google_compute_network.this.id
   subnetwork_ip_cidr = "172.16.0.0/16"
@@ -185,6 +200,8 @@ module "saturn_execute" {
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name
 
+  secret_id = google_secret_manager_secret.saturn.secret_id
+
   network_vpc_id = google_compute_network.this.id
   subnetwork_ip_cidr = "172.17.0.0/16"
 
@@ -195,4 +212,39 @@ module "saturn_execute" {
   max_instances = var.max_execute_instances
   min_instances = 0
   load_ratio    = 10
+}
+
+resource "google_cloudbuild_trigger" "saturn" {
+  name            = var.name
+
+  github {
+    owner = "battlecode"
+    name  = "galaxy"
+
+    push {
+      tag = "^saturn-.*"
+    }
+  }
+
+  build {
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = ["build", "--build-arg", "BUILD=$SHORT_SHA", "-t", var.saturn_image, "."]
+      dir  = "saturn"
+    }
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = ["push", var.saturn_image]
+    }
+    step {
+      name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+      entrypoint = "gcloud"
+      args = ["compute", "instance-groups", "managed", "rolling-action", "replace", module.saturn_compile.compute_group_name, "--region", var.gcp_region]
+    }
+    step {
+      name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+      entrypoint = "gcloud"
+      args = ["compute", "instance-groups", "managed", "rolling-action", "replace", module.saturn_execute.compute_group_name, "--region", var.gcp_region]
+    }
+  }
 }

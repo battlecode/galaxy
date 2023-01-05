@@ -34,6 +34,12 @@ resource "google_pubsub_subscription_iam_member" "queue" {
   member       = "serviceAccount:${google_service_account.this.email}"
 }
 
+resource "google_secret_manager_secret_iam_member" "this" {
+  secret_id = var.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.this.email}"
+}
+
 resource "google_compute_subnetwork" "this" {
   name = var.name
 
@@ -66,13 +72,9 @@ resource "google_compute_instance_template" "this" {
   }
 
   network_interface {
-    network = "default"
+    subnetwork = google_compute_subnetwork.this.name
 
     access_config {}
-  }
-
-  network_interface {
-    subnetwork = google_compute_subnetwork.this.name
   }
 
   service_account {
@@ -90,6 +92,7 @@ resource "google_compute_instance_template" "this" {
     gce-container-declaration = module.container.metadata_value
     google-logging-enabled    = true
     google-monitoring-enabled = true
+    shutdown-script           = file("${path.module}/shutdown-script.sh")
   }
 
   lifecycle {

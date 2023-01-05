@@ -40,13 +40,14 @@ module "production" {
   database_tier                = "db-custom-1-3840"
   database_backup              = true
   database_authorized_networks = []
-  additional_secrets           = merge(var.additional_secrets_common, var.additional_secrets_production)
+  siarnaq_secrets              = merge(var.siarnaq_secrets_common, var.siarnaq_secrets_production)
 
   titan_image = module.cd.artifact_image["titan"]
 
   saturn_image          = module.cd.artifact_image["saturn"]
   max_compile_instances = 10
   max_execute_instances = 10
+  saturn_secrets        = var.saturn_secrets_production
 
   depends_on = [
     google_project_service.artifactregistry,
@@ -72,13 +73,14 @@ module "staging" {
   database_tier                = "db-f1-micro"
   database_backup              = false
   database_authorized_networks = ["0.0.0.0/0"]
-  additional_secrets           = merge(var.additional_secrets_common, var.additional_secrets_staging)
+  siarnaq_secrets              = merge(var.siarnaq_secrets_common, var.siarnaq_secrets_staging)
 
   titan_image = module.cd.artifact_image["titan"]
 
   saturn_image          = module.cd.artifact_image["saturn"]
   max_compile_instances = 1
   max_execute_instances = 1
+  saturn_secrets        = var.saturn_secrets_staging
 
   depends_on = [
     google_project_service.artifactregistry,

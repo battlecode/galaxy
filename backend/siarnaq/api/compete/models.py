@@ -149,17 +149,26 @@ class Submission(SaturnInvocation):
     def for_saturn(self):
         """Return the representation of this object as expected by Saturn."""
         return {
-            "source-path": self.get_source_path(),
-            "binary-path": self.get_binary_path(),
+            "source": {
+                "bucket": settings.GCLOUD_BUCKET_SECURE,
+                "name": self.get_source_path(),
+            },
+            "binary": {
+                "bucket": settings.GCLOUD_BUCKET_SECURE,
+                "name": self.get_binary_path(),
+            },
             "team-name": self.team.name,
             "package": self.package,
         }
 
     def enqueue_options(self):
         """Return the options to be submitted to the compilation queue."""
-        report_url = reverse(
-            "submission-report",
-            kwargs={"pk": self.pk, "episode_id": self.episode.pk},
+        report_url = "https://{}{}".format(
+            settings.ALLOWED_HOSTS[0],
+            reverse(
+                "submission-report",
+                kwargs={"pk": self.pk, "episode_id": self.episode.pk},
+            ),
         )
         return {
             "episode": self.episode.for_saturn(),
@@ -238,15 +247,21 @@ class Match(SaturnInvocation):
             for p in self.participants.all()
         }
         return {
-            "replay-path": self.get_replay_path(),
+            "replay": {
+                "bucket": settings.GCLOUD_BUCKET_SECURE,
+                "name": self.get_replay_path(),
+            },
             **participants,
         }
 
     def enqueue_options(self):
         """Return the options to be submitted to the execution queue."""
-        report_url = reverse(
-            "match-report",
-            kwargs={"pk": self.pk, "episode_id": self.episode.pk},
+        report_url = "https://{}{}".format(
+            settings.ALLOWED_HOSTS[0],
+            reverse(
+                "match-report",
+                kwargs={"pk": self.pk, "episode_id": self.episode.pk},
+            ),
         )
         return {
             "episode": self.episode.for_saturn(),
