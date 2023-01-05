@@ -139,7 +139,11 @@ class Submission(SaturnInvocation):
     def get_binary_path(self):
         """Return the path of the binary code on Google cloud storage"""
         return posixpath.join(
-            self.episode.name_short, "submission", str(self.pk), "binary.zip"
+            "episode",
+            self.episode.name_short,
+            "submission",
+            str(self.pk),
+            "binary.zip",
         )
 
     def for_saturn(self):
@@ -212,6 +216,7 @@ class Match(SaturnInvocation):
     def get_replay_path(self):
         """Return the path to the replay file."""
         return posixpath.join(
+            "episode",
             self.episode.name_short,
             "replays",
             f"{self.replay}.{self.episode.name_short}",
