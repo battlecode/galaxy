@@ -38,10 +38,8 @@ class ScrimmageRequest extends Component {
   render() {
     if (this.state.open)
       return (
-        <div className="alert alert-dark" style={{ height: "3em" }}>
-          <span style={{ float: "left" }}>
-            Scrimmage request from {this.props.team}.
-          </span>
+        <div className="alert alert-success">
+          Scrimmage request from {this.props.team}.
           <span style={{ float: "right" }} className="pull-right">
             <button
               onClick={this.accept}
