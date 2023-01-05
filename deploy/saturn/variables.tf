@@ -58,11 +58,6 @@ variable "image" {
   type        = string
 }
 
-variable "command" {
-  description = "Arguments for the Docker entrypoint"
-  type        = string
-}
-
 variable "max_instances" {
   description = "Maximum allowable size of the worker pool"
   type        = number

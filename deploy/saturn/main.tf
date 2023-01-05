@@ -55,7 +55,11 @@ module "container" {
 
   container = {
     image = var.image
-    args = [var.command]
+    args  = [
+      "-project=${var.gcp_project}",
+      "-secret=${var.secret_id}",
+      "-subscription=${google_pubsub_subscription.queue.name}",
+    ]
   }
 }
 

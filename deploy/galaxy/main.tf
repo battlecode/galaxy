@@ -181,7 +181,6 @@ module "saturn_compile" {
 
   machine_type = "e2-medium"
   image        = var.saturn_image
-  command      = "compile"
 
   max_instances = var.max_compile_instances
   min_instances = 0
@@ -207,7 +206,6 @@ module "saturn_execute" {
 
   machine_type = "e2-highmem-2"
   image        = var.saturn_image
-  command      = "execute"
 
   max_instances = var.max_execute_instances
   min_instances = 0
@@ -215,7 +213,7 @@ module "saturn_execute" {
 }
 
 resource "google_cloudbuild_trigger" "saturn" {
-  name            = var.name
+  name            = "${var.name}-saturn"
 
   github {
     owner = "battlecode"
@@ -229,7 +227,7 @@ resource "google_cloudbuild_trigger" "saturn" {
   build {
     step {
       name = "gcr.io/cloud-builders/docker"
-      args = ["build", "--build-arg", "BUILD=$SHORT_SHA", "-t", var.saturn_image, "."]
+      args = ["build", "--build-arg", "REVISION_ARG=$TAG_NAME+$SHORT_SHA.$BUILD_ID", "-t", var.saturn_image, "."]
       dir  = "saturn"
     }
     step {
@@ -239,12 +237,12 @@ resource "google_cloudbuild_trigger" "saturn" {
     step {
       name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
       entrypoint = "gcloud"
-      args = ["compute", "instance-groups", "managed", "rolling-action", "replace", module.saturn_compile.compute_group_name, "--region", var.gcp_region]
+      args = ["compute", "instance-groups", "managed", "rolling-action", "replace", module.saturn_compile.compute_group_name, "--zone", var.gcp_zone]
     }
     step {
       name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
       entrypoint = "gcloud"
-      args = ["compute", "instance-groups", "managed", "rolling-action", "replace", module.saturn_execute.compute_group_name, "--region", var.gcp_region]
+      args = ["compute", "instance-groups", "managed", "rolling-action", "replace", module.saturn_execute.compute_group_name, "--zone", var.gcp_zone]
     }
   }
 }
