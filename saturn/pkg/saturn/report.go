@@ -46,7 +46,7 @@ func (r *GCPTokenedReporter) Report(ctx context.Context, t *Task) error {
 		return fmt.Errorf("json.Marshal: %v", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", t.Payload.Metadata.ReportURL, bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", t.Payload.Metadata.ReportURL, bytes.NewBuffer(body))
 	if err != nil {
 		return fmt.Errorf("http.NewRequestWithContext: %v", err)
 	}
