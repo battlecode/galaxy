@@ -16,6 +16,9 @@ class NullPublisher:
     def resume_publish(self, *args, **kwargs) -> None:
         pass
 
+    def topic_path(self, *args, **kwargs) -> str:
+        return "nowhere"
+
 
 def get_publish_client() -> pubsub.PublisherClient | NullPublisher:
     if not settings.GCLOUD_ENABLE_ACTIONS:
