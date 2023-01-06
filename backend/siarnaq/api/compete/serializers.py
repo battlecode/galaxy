@@ -30,7 +30,9 @@ class AlreadyFinalized(APIException):
 
 class SaturnInvocationSerializer(serializers.Serializer):
     status = serializers.ChoiceField(SaturnStatus.choices)
-    logs = serializers.CharField(required=False)
+    logs = serializers.CharField(
+        required=False, allow_blank=True, trim_whitespace=False
+    )
     interrupted = serializers.BooleanField(required=False)
 
     def update(self, instance, validated_data):
