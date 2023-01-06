@@ -36,6 +36,7 @@ func NewGCPPubsubSubscriber(ctx context.Context, projectID, subscriptionID strin
 func (c *GCPPubsubSubscriber) Subscribe(ctx context.Context, handler QueuedTaskHandler) error {
 	err := c.subscription.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		defer msg.Nack()
+		log.Ctx(ctx).Info().Bytes("message", msg.Data).Msg("Starting task.")
 		var task TaskPayload
 		if err := json.Unmarshal(msg.Data, &task); err != nil {
 			log.Ctx(ctx).Error().Err(err).Msg("Invalid message.")

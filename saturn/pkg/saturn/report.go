@@ -5,8 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
+	"github.com/rs/zerolog/log"
 	"google.golang.org/api/idtoken"
 )
 
@@ -41,12 +43,13 @@ func (r *GCPTokenedReporter) Report(ctx context.Context, t *Task) error {
 		"interrupted": t.status == TaskInterrupted,
 	}
 
-	body, err := json.Marshal(payload)
+	reqBody, err := json.Marshal(payload)
 	if err != nil {
 		return fmt.Errorf("json.Marshal: %v", err)
 	}
+	log.Ctx(ctx).Debug().RawJSON("payload", reqBody).Msg("Sending report.")
 
-	req, err := http.NewRequest("POST", t.Payload.Metadata.ReportURL, bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", t.Payload.Metadata.ReportURL, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return fmt.Errorf("http.NewRequestWithContext: %v", err)
 	}
@@ -58,6 +61,12 @@ func (r *GCPTokenedReporter) Report(ctx context.Context, t *Task) error {
 		return fmt.Errorf("r.client.Do: %v", err)
 	}
 	defer resp.Body.Close()
+
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("ioutil.ReadAll: %v", err)
+	}
+	log.Ctx(ctx).Debug().Bytes("response", respBody).Msg("Report sent.")
 
 	if resp.StatusCode == http.StatusConflict {
 		t.Finish(TaskAborted, nil)
