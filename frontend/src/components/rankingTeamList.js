@@ -74,6 +74,13 @@ class RankingTeamList extends Component {
     this.props.history.push(`/${this.props.episode}/rankings/${team_id}`);
   };
 
+  trimUsername = (username, length) => {
+    if (username.length > length) {
+      return username.slice(0, length - 1) + "...";
+    }
+    return username;
+  };
+
   render() {
     const { props, state } = this;
 
@@ -102,7 +109,11 @@ class RankingTeamList extends Component {
           >
             {<td>{Math.round(team.profile.rating)}</td>}
             <td>{team.name}</td>
-            <td>{team.members.map((member) => member.username).join(", ")}</td>
+            <td>
+              {team.members
+                .map((member) => this.trimUsername(member.username, 13))
+                .join(", ")}
+            </td>
             {!this.props.canRequest && <td>{team.profile.quote}</td>}
             {!this.props.canRequest && (
               <td>
