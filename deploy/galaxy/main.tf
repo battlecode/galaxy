@@ -174,6 +174,8 @@ module "saturn_compile" {
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name
 
+  artifact_registry_name = var.artifact_registry_name
+
   secret_id = google_secret_manager_secret.saturn.secret_id
 
   network_vpc_id = google_compute_network.this.id
@@ -198,6 +200,8 @@ module "saturn_execute" {
   pubsub_topic_name   = module.siarnaq.topic_execute_name
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name
+
+  artifact_registry_name = var.artifact_registry_name
 
   secret_id = google_secret_manager_secret.saturn.secret_id
 

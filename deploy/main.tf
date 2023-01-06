@@ -42,6 +42,8 @@ module "production" {
   database_authorized_networks = []
   siarnaq_secrets              = merge(var.siarnaq_secrets_common, var.siarnaq_secrets_production)
 
+  artifact_registry_name = module.cd.artifact_registry_name
+
   titan_image = module.cd.artifact_image["titan"]
 
   saturn_image          = module.cd.artifact_image["saturn"]
@@ -74,6 +76,8 @@ module "staging" {
   database_backup              = false
   database_authorized_networks = ["0.0.0.0/0"]
   siarnaq_secrets              = merge(var.siarnaq_secrets_common, var.siarnaq_secrets_staging)
+
+  artifact_registry_name = module.cd.artifact_registry_name
 
   titan_image = module.cd.artifact_image["titan"]
 

@@ -58,6 +58,11 @@ variable "siarnaq_secrets" {
   type        = map
 }
 
+variable "artifact_registry_name" {
+  description = "Name of the Artifact Registry where the build image can be found"
+  type        = string
+}
+
 variable "titan_image" {
   description = "Image for the Titan Docker container"
   type        = string
