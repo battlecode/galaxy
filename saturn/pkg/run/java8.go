@@ -39,6 +39,7 @@ func NewJava8Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Rep
 		s.UploadReplay(),
 		s.DetermineScores(),
 	}
+	s.matchOutputs = make(map[*StepArguments]string)
 	return s, nil
 }
 
