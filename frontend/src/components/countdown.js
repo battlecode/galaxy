@@ -106,9 +106,13 @@ class Countdown extends Component {
       extra_info = this.props.game_release ? (
         <p>
           The game will be released at{" "}
-          {countdown_time_text && countdown_time_text.est_date_str}, which{" "}
-          {tense_verb}{" "}
-          <b>{countdown_time_text && countdown_time_text.local_date_str}</b>.
+          {countdown_time_text && countdown_time_text.est_date_str} Eastern
+          Time, which {tense_verb}{" "}
+          <b>
+            {countdown_time_text && countdown_time_text.local_date_str} in your
+            locale and time zone
+          </b>
+          .
         </p>
       ) : null;
     } else {

@@ -2,9 +2,9 @@ import structlog
 from django.conf import settings
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
-from rest_framework.exceptions import ValidationError
 
 from siarnaq.api.compete.models import MatchParticipant
+from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
 from siarnaq.api.teams.models import Team, TeamProfile, TeamStatus
 from siarnaq.api.user.models import User
 
@@ -29,14 +29,20 @@ def copy_rating_to_profile(instance, update_fields, **kwargs):
 
 
 @receiver(m2m_changed, sender=Team.members.through)
-def make_empty_team_inactive(instance, action, **kwargs):
+def handle_empty_team(instance, action, **kwargs):
     if action == "post_remove":
         if instance.members.count() == 0:
-            logger.debug(
-                "team_inactive", message="Team is now inactive.", team=instance.pk
-            )
-            instance.status = TeamStatus.INACTIVE
-            instance.save(update_fields=["status"])
+            if not instance.has_active_submission():
+                logger.debug(
+                    "team_delete", message="Team is deleted.", team=instance.pk
+                )
+                instance.delete()
+            else:
+                logger.debug(
+                    "team_inactive", message="Team is now inactive.", team=instance.pk
+                )
+                instance.status = TeamStatus.INACTIVE
+                instance.save(update_fields=["status"])
 
 
 @receiver(m2m_changed, sender=Team.members.through)
@@ -47,4 +53,4 @@ def prevent_team_exceed_capacity(instance, action, pk_set, **kwargs):
             + User.objects.filter(pk__in=pk_set, is_staff=False).count()
             > settings.TEAMS_MAX_TEAM_SIZE
         ):
-            raise ValidationError("Maximum number of team members exceeded.")
+            raise TeamMaxSizeExceeded

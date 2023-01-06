@@ -1,11 +1,75 @@
-import React from "react";
-import { useHistory } from "react-router-dom";
+import React, { Component } from "react";
+import Api from "../api";
 
-import TeamList from "./teamList";
 import PaginationControl from "./paginationControl";
 import Spinner from "./spinner";
+import ScrimmageRequestForm from "./scrimmageRequestForm";
 
-class RankingTeamList extends TeamList {
+class RankingTeamList extends Component {
+  state = {
+    pendingRequests: {},
+    successfulRequests: {},
+    requestMenuTeam: null,
+    showTeamID: null,
+  };
+
+  openRequestForm = (team) => {
+    this.setState({ requestMenuTeam: team });
+  };
+
+  closeRequestForm = (teamID) => {
+    this.setState({ requestMenuTeam: null });
+  };
+
+  onTeamRequest = (teamID, extra_info) => {
+    const { state } = this;
+    if (state.pendingRequests[teamID]) {
+      return;
+    }
+
+    this.setState((prevState) => {
+      return {
+        pendingRequests: {
+          ...prevState.pendingRequests,
+          [teamID]: true,
+        },
+      };
+    });
+    Api.requestScrimmage(this.props.episode, teamID, (success) =>
+      this.onRequestFinish(teamID, success)
+    );
+  };
+
+  onRequestFinish = (teamID, success) => {
+    this.setState((prevState) => {
+      return {
+        pendingRequests: {
+          ...prevState.pendingRequests,
+          [teamID]: false,
+        },
+        successfulRequests: success && {
+          ...prevState.successfulRequests,
+          [teamID]: true,
+        },
+      };
+    });
+    if (success) {
+      this.props.onRequestSuccess();
+      setTimeout(() => this.successTimeoutRevert(teamID), SUCCESS_TIMEOUT);
+    }
+  };
+
+  successTimeoutRevert = (teamID) => {
+    this.setState((prevState) => {
+      return {
+        successfulRequests: {
+          ...prevState.successfulRequests,
+          [teamID]: false,
+        },
+      };
+    });
+  };
+
   redirectToTeamPage = (team_id) => {
     this.props.history.push(`/${this.props.episode}/rankings/${team_id}`);
   };
@@ -31,44 +95,71 @@ class RankingTeamList extends TeamList {
           buttonContent = <i className="fa fa-check"></i>;
         }
         return (
-          <tr key={team.id} onClick={() => this.redirectToTeamPage(team.id)}>
+          <tr
+            key={team.id}
+            onClick={() => this.redirectToTeamPage(team.id)}
+            className="page-item"
+          >
             {<td>{Math.round(team.profile.rating)}</td>}
             <td>{team.name}</td>
             <td>{team.members.map((member) => member.username).join(", ")}</td>
-            {<td>{team.profile.quote}</td>}
-            <td>
-              {this.props.episode_info.eligibility_criteria.map((criterion) => {
-                const eligible = team.profile.eligible_for.includes(
-                  criterion.id
-                );
-                return (
-                  <span key={criterion.id}>
-                    {eligible ? criterion.icon : ""}
-                  </span>
-                );
-              })}
-            </td>
-            {/* <td>{team.auto_accept_unranked ? "Yes" : "No"}</td> */}
-            {/* {props.canRequest && (
+            {!this.props.canRequest && <td>{team.profile.quote}</td>}
+            {!this.props.canRequest && (
               <td>
-                <button
-                  className="btn btn-xs"
-                  onClick={() => this.onTeamRequest(team.id)}
-                >
-                  {buttonContent}
-                </button>{" "}
+                {this.props.episode_info.eligibility_criteria.map(
+                  (criterion) => {
+                    const eligible = team.profile.eligible_for.includes(
+                      criterion.id
+                    );
+                    return (
+                      <span key={criterion.id}>
+                        {eligible ? criterion.icon : ""}
+                      </span>
+                    );
+                  }
+                )}
               </td>
-            )} */}
+            )}
+            <td>{team.profile.auto_accept_ranked ? "Yes" : "No"}</td>
+            <td>{team.profile.auto_accept_unranked ? "Yes" : "No"}</td>
+            {this.props.canRequest && (
+              <td>
+                {this.props.team && team.id !== this.props.team.id && (
+                  <button
+                    className="btn btn-xs"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      this.openRequestForm(team);
+                    }}
+                    disabled={this.props.episode_info.frozen}
+                  >
+                    {buttonContent}
+                  </button>
+                )}{" "}
+              </td>
+            )}
           </tr>
         );
       });
 
       return (
         <div>
+          <ScrimmageRequestForm
+            closeRequestForm={this.closeRequestForm}
+            team={this.state.requestMenuTeam}
+            episode={this.props.episode}
+          />
           <div className="card">
             <div className="header">
-              <h4 className="title">Rankings</h4>
+              <h4 className="title">{this.props.title}</h4>
             </div>
+            {this.props.canRequest && this.props.episode_info.frozen && (
+              <div className="content">
+                Scrimmages may not be requested, due to a submission freeze for
+                a tournament. (If you think the freeze has passed, try
+                refreshing the page.)
+              </div>
+            )}
             <div className="content table-responsive table-full-width">
               <table className="table table-striped">
                 <thead>
@@ -76,21 +167,22 @@ class RankingTeamList extends TeamList {
                     <th>Rating</th>
                     <th>Team</th>
                     <th>Members</th>
-                    <th>Quote</th>
-                    <th>Eligibility</th>
-                    {/* <th>Auto-Accept</th> */}
+                    {!this.props.canRequest && <th>Quote</th>}
+                    {!this.props.canRequest && <th>Eligibility</th>}
+                    <th>Auto-Accept Ranked</th>
+                    <th>Auto-Accept Unranked</th>
                   </tr>
                 </thead>
                 <tbody>{!this.props.loading && teamRows}</tbody>
               </table>
               {this.props.loading && <Spinner />}
             </div>
+            <PaginationControl
+              page={props.page}
+              pageLimit={props.pageLimit}
+              onPageClick={props.onPageClick}
+            />
           </div>
-          <PaginationControl
-            page={props.page}
-            pageLimit={props.pageLimit}
-            onPageClick={props.onPageClick}
-          />
         </div>
       );
     }

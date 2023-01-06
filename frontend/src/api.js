@@ -42,18 +42,18 @@ class Api {
       contentType: false,
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr, false);
       });
   }
 
-  static downloadSubmission(submissionId, fileNameAddendum, callback) {
-    $.get(`${URL}/api/${LEAGUE}/submission/${submissionId}/retrieve_file/`)
+  static downloadSubmission(submissionId, episode, fileNameAddendum, callback) {
+    $.get(`${URL}/api/compete/${episode}/submission/${submissionId}/download/`)
       .done((data, status) => {
         // have to use fetch instead of ajax here since we want to download file
-        fetch(data["download_url"])
+        fetch(data["url"])
           .then((resp) => resp.blob())
           .then((blob) => {
             //code to download the file given by the url
@@ -61,7 +61,7 @@ class Api {
             const aHelper = document.createElement("a");
             aHelper.style.display = "none";
             aHelper.href = objUrl;
-            aHelper.download = `${fileNameAddendum}_battlecode_source.zip`;
+            aHelper.download = `battlecode_source_${submissionId}.zip`;
             document.body.appendChild(aHelper);
             aHelper.click();
             window.URL.revokeObjectURL(objUrl);
@@ -72,46 +72,13 @@ class Api {
       });
   }
 
-  static getTeamSubmissions(callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/teamsubmission/${Cookies.get("team_id")}/`
-    ).done((data, status) => {
-      callback(data);
-    });
-  }
-
-  static getSubmission(id, callback, callback_data) {
-    $.get(`${URL}/api/${LEAGUE}/submission/${id}/`).done((data, status) => {
-      callback(callback_data, data);
-    });
-  }
-
-  static getCompilationStatus(callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/teamsubmission/${Cookies.get(
-        "team_id"
-      )}/team_compilation_status/`
-    ).done((data, status) => {
-      callback(data);
-    });
-  }
-
-  // note that this is a submission, not a teamsubmission, thing
-  static getSubmissionStatus(callback) {
-    $.get(
-      `${URL}/api/${LEAGUE}/submission/${Cookies.get(
-        "submission_id"
-      )}/get_status/`
-    ).done((data, status) => {
-      return data["compilation_status"];
-      // callback(data)
-    });
-  }
-
-  static getSubmissionLog(id, callback) {
-    $.get(`${URL}/api/${LEAGUE}/submission/${id}/log/`).done((data, status) => {
-      callback(data);
-    });
+  static getSubmissions(episode, page, callback) {
+    $.get(`${URL}/api/compete/${episode}/submission/?page=${page}`).done(
+      (data, status) => {
+        const pageLimit = Math.ceil(data.count / PAGE_SIZE);
+        callback(data, pageLimit);
+      }
+    );
   }
 
   //----TEAM STATS---
@@ -216,8 +183,8 @@ class Api {
 
   //---TEAM INFO---
 
-  static getTeamProfile(episode, teamId, callback) {
-    return $.get(`${URL}/api/team/${episode}/t/${teamId}/`)
+  static getTeamProfile(episode, team_id, callback) {
+    return $.get(`${URL}/api/team/${episode}/t/${team_id}/`)
       .done((data, status) => {
         callback(data);
       })
@@ -251,7 +218,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 
@@ -269,10 +236,10 @@ class Api {
       dataType: "json",
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr, false);
       });
   }
 
@@ -289,10 +256,10 @@ class Api {
       dataType: "json",
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr, false);
       });
   }
 
@@ -302,10 +269,10 @@ class Api {
       type: "POST",
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr, false);
       });
   }
 
@@ -345,7 +312,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 
@@ -361,10 +328,10 @@ class Api {
       contentType: false,
     })
       .done((data, status) => {
-        callback(true);
+        callback(data, true);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(xhr, false);
       });
   }
 
@@ -431,10 +398,10 @@ class Api {
 
   //----SCRIMMAGING----
 
-  static acceptScrimmage(scrimmage_id, callback) {
+  static acceptScrimmage(scrimmage_id, episode, callback) {
     $.ajax({
-      url: `${URL}/api/${LEAGUE}/scrimmage/${scrimmage_id}/accept/`,
-      method: "PATCH",
+      url: `${URL}/api/compete/${episode}/request/${scrimmage_id}/accept/`,
+      method: "POST",
     })
       .done((data, status) => {
         callback(true);
@@ -444,10 +411,10 @@ class Api {
       });
   }
 
-  static rejectScrimmage(scrimmage_id, callback) {
+  static rejectScrimmage(scrimmage_id, episode, callback) {
     $.ajax({
-      url: `${URL}/api/${LEAGUE}/scrimmage/${scrimmage_id}/reject/`,
-      method: "PATCH",
+      url: `${URL}/api/compete/${episode}/request/${scrimmage_id}/reject/`,
+      method: "POST",
     })
       .done((data, status) => {
         callback(true);
@@ -457,32 +424,59 @@ class Api {
       });
   }
 
-  static getScrimmageRequests(callback) {
-    this.getPendingScrimmages((scrimmages) => {
-      const requests = scrimmages.map((scrimmage) => {
-        const { blue_team, red_team } = scrimmage;
-        return {
-          id: scrimmage.id,
-          team_id: scrimmage.requested_by,
-          team: Cookies.get("team_name") === red_team ? blue_team : red_team,
-        };
+  static getScrimmageRequests(episode, callback) {
+    return $.get(`${URL}/api/compete/${episode}/request/inbox/`)
+      .done((data, status) => {
+        callback(data.results);
+      })
+      .fail((xhr, status, error) => {
+        console.log(
+          "Error in getting user's scrimmage requests",
+          xhr,
+          status,
+          error
+        );
+        callback(null);
       });
-      callback(requests);
-    });
   }
 
-  static requestScrimmage(teamId, callback) {
-    $.post(`${URL}/api/${LEAGUE}/scrimmage/`, {
-      red_team: Cookies.get("team_id"),
-      blue_team: teamId,
-      ranked: false,
+  static getMaps(episode, callback) {
+    return $.get(`${URL}/api/episode/${episode}/map/`)
+      .done((data, status) => {
+        callback(data);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting episode maps", xhr, status, error);
+        callback(null);
+      });
+  }
+
+  static requestScrimmage(
+    is_ranked,
+    requested_to,
+    player_order,
+    map_names,
+    episode,
+    callback
+  ) {
+    const data = {
+      is_ranked,
+      requested_to,
+      player_order,
+      map_names,
+    };
+    return $.ajax({
+      url: `${URL}/api/compete/${episode}/request/`,
+      data: JSON.stringify(data),
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
     })
       .done((data, status) => {
-        callback(teamId, true);
+        callback(true);
       })
-      .fail((jqXHR, status, error) => {
-        alert(JSON.parse(jqXHR.responseText).message);
-        callback(teamId, false);
+      .fail((xhr, status, error) => {
+        callback(false);
       });
   }
 
@@ -492,84 +486,28 @@ class Api {
     });
   }
 
-  static getPendingScrimmages(callback) {
-    $.get(`${URL}/api/${LEAGUE}/scrimmage/?pending=1`, (data, success) => {
-      callback(data);
-    });
-  }
-
   /* for some reason the data format from getAllTeamScrimmages and getTeamScrimmages
    are different; has to do with pagination but not sure how to make the same
   */
-  static getTeamScrimmages(callback, page) {
-    $.get(
-      `${URL}/api/${LEAGUE}/scrimmage/?page=${page}&pending=0`,
-      (data, success) => {
-        callback(data.results, data.count);
-      }
-    );
-  }
-
-  static getScrimmageHistory(callback, page) {
-    this.getTeamScrimmages((s, count) => {
-      const requests = [];
-      for (let i = 0; i < s.length; i++) {
-        const on_red = s[i].red_team === Cookies.get("team_name");
-
-        switch (s[i].status) {
-          case SCRIMMAGE_STATUS.BLUEWON:
-            s[i].status = on_red ? "Lost" : "Won";
-            s[i].score =
-              s[i].status === "Won"
-                ? `${s[i].winscore} - ${s[i].losescore}`
-                : `${s[i].losescore} - ${s[i].winscore}`;
-            break;
-          case SCRIMMAGE_STATUS.REDWON:
-            s[i].status = on_red ? "Won" : "Lost";
-            s[i].score =
-              s[i].status === "Won"
-                ? `${s[i].winscore} - ${s[i].losescore}`
-                : `${s[i].losescore} - ${s[i].winscore}`;
-            break;
-          case SCRIMMAGE_STATUS.QUEUED:
-            s[i].status = "Queued";
-            break;
-          case SCRIMMAGE_STATUS.REJECTED:
-            s[i].status = "Rejected";
-            break;
-          case SCRIMMAGE_STATUS.ERROR:
-            s[i].status = "Error";
-            break;
-          case SCRIMMAGE_STATUS.RUNNING:
-            s[i].status = "Running";
-            break;
-          case SCRIMMAGE_STATUS.CANCELLED:
-            s[i].status = "Cancelled";
-            break;
-          default:
-            // should not reach here, undefined status or pending
-            s[i].status = "";
-            break;
-        }
-
-        if (s[i].status !== "Won" && s[i].status !== "Lost") {
-          s[i].replay = undefined;
-          s[i].score = " - ";
-        }
-
-        s[i].date = new Date(s[i].updated_at).toLocaleDateString();
-        s[i].time = new Date(s[i].updated_at).toLocaleTimeString();
-
-        s[i].team = on_red ? s[i].blue_team : s[i].red_team;
-        s[i].color = on_red ? "Red" : "Blue";
-
-        requests.push(s[i]);
-      }
-      // scrimLimit for pagination
-      const scrimLimit =
-        parseInt(count / PAGE_LIMIT, 10) + !!(count % PAGE_LIMIT);
-      callback({ scrimmages: requests, scrimLimit });
-    }, page);
+  static getTeamScrimmages(team_id, episode, callback, page) {
+    const query_data = {
+      team_id,
+      page,
+    };
+    return $.get(`${URL}/api/compete/${episode}/match/scrimmage/`, query_data)
+      .done((data, status) => {
+        const pageLimit = Math.ceil(data.count / PAGE_SIZE);
+        callback(data.results, pageLimit);
+      })
+      .fail((xhr, status, error) => {
+        console.log(
+          "Error in getting team's scrimmage history",
+          xhr,
+          status,
+          error
+        );
+        callback(null);
+      });
   }
 
   //----REPLAYS?-----
@@ -683,10 +621,7 @@ class Api {
         callback(data, true);
       })
       .fail((xhr, status, error) => {
-        console.log("Error in logging in: ", xhr, status, error);
-        // if responseJSON is undefined, it is probably because the API is not configured
-        // check that the API is indeed running on URL (localhost:8000 if local development)
-        callback(xhr.responseJSON.detail, false);
+        callback(xhr, false);
       });
   }
 
@@ -702,7 +637,7 @@ class Api {
         this.login(user.username, user.password, callback);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON, false);
+        callback(xhr, false);
       });
   }
 
@@ -715,7 +650,7 @@ class Api {
     $.post(`${URL}/api/user/password_reset/confirm/`, req, (data, success) => {
       callback(data, success);
     }).fail((xhr, status, error) => {
-      callback(xhr.responseJSON, false);
+      callback(xhr, false);
     });
   }
 
@@ -727,7 +662,7 @@ class Api {
         callback(data, success);
       })
       .fail((xhr, status, error) => {
-        callback(xhr.responseJSON.email, false);
+        callback(xhr, false);
       });
   }
 

@@ -38,9 +38,10 @@ class SaturnInvokableQuerySet(models.QuerySet):
 
         publish_client = saturn.get_publish_client()
         invocations = list(self.select_for_update(of=("self",)).all())
+        topic = publish_client.topic_path(settings.GCLOUD_PROJECT, self._publish_topic)
         futures = [
             publish_client.publish(
-                topic=self._publish_topic,
+                topic=topic,
                 data=json.dumps(invocation.enqueue_options()).encode(),
                 ordering_key=self._publish_ordering_key,
             )
@@ -66,7 +67,7 @@ class SaturnInvokableQuerySet(models.QuerySet):
                 )
                 invocation.status = SaturnStatus.ERRORED
                 publish_client.resume_publish(
-                    topic=self._publish_topic,
+                    topic=topic,
                     ordering_key=self._publish_ordering_key,
                 )
                 invocation.logs = f"type: {type(err)} Exception message: {err}"

@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import Api from "../api";
 import Floater from "react-floater";
 import MultiEpisode from "./multi-episode";
+import { getDateTimeText } from "../utils/date";
 
 import ScrimmageRequestor from "../components/scrimmageRequestor";
+import Spinner from "../components/spinner";
 import PaginationControl from "../components/paginationControl";
 
 class ScrimmageRequest extends Component {
@@ -14,6 +16,7 @@ class ScrimmageRequest extends Component {
   accept = () => {
     Api.acceptScrimmage(
       this.props.id,
+      this.props.episode,
       function () {
         this.setState({ open: false });
         this.props.refresh();
@@ -24,6 +27,7 @@ class ScrimmageRequest extends Component {
   reject = () => {
     Api.rejectScrimmage(
       this.props.id,
+      this.props.episode,
       function () {
         this.setState({ open: false });
         this.props.refresh();
@@ -34,12 +38,14 @@ class ScrimmageRequest extends Component {
   render() {
     if (this.state.open)
       return (
-        <div className="alert alert-dark" style={{ height: "3em" }}>
-          <span style={{ float: "left" }}>
-            Scrimmage request from {this.props.team}.
-          </span>
+        <div className="alert alert-success">
+          Scrimmage request from {this.props.team}.
           <span style={{ float: "right" }} className="pull-right">
-            <button onClick={this.accept} className="btn btn-success btn-xs">
+            <button
+              onClick={this.accept}
+              className="btn btn-success btn-xs"
+              disabled={this.props.episode_info.frozen}
+            >
               Accept
             </button>{" "}
             <button onClick={this.reject} className="btn btn-danger btn-xs">
@@ -55,19 +61,17 @@ class ScrimmageRequest extends Component {
 class ScrimmageRequests extends Component {
   constructor(props) {
     super(props);
-    const episode = MultiEpisode.getEpisodeFromCurrentPathname();
 
     this.state = {
       requests: [],
-      episode: episode,
-      extension: MultiEpisode.getExtension(episode),
     };
   }
 
   refresh = () => {
     Api.getScrimmageRequests(
-      function (r) {
-        this.setState({ requests: r });
+      this.props.episode,
+      function (requests) {
+        this.setState({ requests });
       }.bind(this)
     );
   };
@@ -85,7 +89,9 @@ class ScrimmageRequests extends Component {
           refresh={this.props.refresh}
           key={r.id}
           id={r.id}
-          team={r.team}
+          team={r.requested_by_name}
+          episode={this.props.episode}
+          episode_info={this.props.episode_info}
         />
       ));
       alert = (
@@ -104,6 +110,13 @@ class ScrimmageRequests extends Component {
       <div className="col-md-12">
         {alert}
         <div className="collapse" id="scrimReqs">
+          {this.props.episode_info.frozen && (
+            <div className="alert alert-warning">
+              Scrimmage requests may not be accepted, due to a freeze for a
+              tournament. (If you think the freeze has passed, try refreshing
+              the page.)
+            </div>
+          )}
           {requests}
         </div>
       </div>
@@ -114,15 +127,26 @@ class ScrimmageRequests extends Component {
 class ScrimmageHistory extends Component {
   state = {
     scrimPage: 1,
-    scrimLimit: 0,
+    pageLimit: 0,
     scrimmages: [],
-    episode: MultiEpisode.getEpisodeFromCurrentPathname(),
+    loading: true,
   };
 
   refresh = (page) => {
-    Api.getScrimmageHistory(
-      function (s) {
-        this.setState({ ...s, scrimPage: page });
+    this.setState({ loading: true, scrimmages: [], scrimPage: 1 });
+    Api.getTeamScrimmages(
+      this.props.team.id,
+      this.props.episode,
+      function (scrimmages, pageLimit) {
+        // This check handles the case where a new page is requested while a
+        // previous page was loading.
+        if (page == this.state.scrimPage) {
+          this.setState({
+            scrimmages,
+            pageLimit,
+            loading: false,
+          });
+        }
       }.bind(this),
       page
     );
@@ -146,7 +170,7 @@ class ScrimmageHistory extends Component {
     if (
       page !== this.state.scrimPage &&
       page >= 0 &&
-      page <= this.state.scrimLimit
+      page <= this.state.pageLimit
     ) {
       this.refresh(page);
     }
@@ -160,7 +184,7 @@ class ScrimmageHistory extends Component {
             <h4 className="title">
               Scrimmage History{" "}
               <button
-                onClick={this.props.refresh}
+                onClick={this.refresh}
                 style={{ marginLeft: "10px" }}
                 type="button"
                 className="btn btn-primary btn-sm"
@@ -173,20 +197,27 @@ class ScrimmageHistory extends Component {
             <table className="table table-hover table-striped">
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Time</th>
+                  <th>Creation time</th>
                   <th>Status</th>
                   <th>Score</th>
-                  <th>Team</th>
+                  <th>Opponent</th>
                   <th>Ranked</th>
                   <th>Replay</th>
                 </tr>
               </thead>
               <tbody>
                 {this.state.scrimmages.map((s) => {
-                  let stat_row = <td>{s.status}</td>;
-                  if (s.status.toLowerCase() == "error") {
-                    stat_row = (
+                  let stat_entry = <td>{s.status}</td>;
+                  let participation =
+                    s.participants[0].team == this.props.team.id
+                      ? s.participants[0]
+                      : s.participants[1];
+                  let opponent_participation =
+                    s.participants[0].team == this.props.team.id
+                      ? s.participants[1]
+                      : s.participants[0];
+                  if (s.status == "ERR") {
+                    stat_entry = (
                       <td>
                         {s.status}
                         <Floater
@@ -197,7 +228,6 @@ class ScrimmageHistory extends Component {
                                 scrimmage. Don't worry, we're working on
                                 resolving it!
                               </p>
-                              <p>Error: {s.error_msg}</p>
                             </div>
                           }
                           showCloseButton={true}
@@ -207,19 +237,28 @@ class ScrimmageHistory extends Component {
                       </td>
                     );
                   }
+                  const score_string =
+                    s.status == "OK!"
+                      ? `${participation.score} - ${opponent_participation.score}`
+                      : "? - ?";
+                  const created_date_text = getDateTimeText(
+                    new Date(s.created)
+                  );
+                  const created_date_string = `${created_date_text.local_date_str} ${created_date_text.local_timezone}`;
                   return (
                     <tr key={s.id}>
-                      <td>{s.date}</td>
-                      <td>{s.time}</td>
-                      {stat_row}
-                      <td>{s.score}</td>
-                      <td>{s.team}</td>
-                      <td>{s.ranked ? "Ranked" : "Unranked"}</td>
-                      {s.replay ? (
+                      <td>{created_date_string}</td>
+                      {stat_entry}
+                      <td>{score_string}</td>
+                      <td>{opponent_participation.teamname}</td>
+                      <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
+                      {s.status == "OK!" ? (
                         <td>
                           {/* domain is hardcoded, since visualizer and replays are only hosted on deployed site, not locally */}
+                          {/* note that episode_info.name_long is not quite the correct thing to use below: this is pending a
+                            backend change */}
                           <a
-                            href={`https://play.battlecode.org/clients/${this.state.episode}/visualizer.html?https://play.battlecode.org/replays/${s.replay}${this.state.extension}`}
+                            href={`https://releases.battlecode.org/client/${this.props.episode_info.name_long}/1.0.0/visualizer.html`}
                             target="_blank"
                           >
                             Watch
@@ -233,12 +272,13 @@ class ScrimmageHistory extends Component {
                 })}
               </tbody>
             </table>
+            {this.state.loading && <Spinner />}
           </div>
         </div>
         <PaginationControl
           page={this.state.scrimPage}
-          pageLimit={this.state.scrimLimit}
-          onPageClick={(page) => this.getScrimPage(page)}
+          pageLimit={this.state.pageLimit}
+          onPageClick={this.getScrimPage}
         />
       </div>
     );
@@ -262,13 +302,24 @@ class Scrimmaging extends Component {
                   this.requests = requests;
                 }}
                 refresh={this.refresh}
+                episode={this.props.episode}
+                episode_info={this.props.episode_info}
               />
-              <ScrimmageRequestor refresh={this.refresh} />
+              <ScrimmageRequestor
+                refresh={this.refresh}
+                episode={this.props.episode}
+                episode_info={this.props.episode_info}
+                history={this.props.history}
+                team={this.props.team}
+              />
               <ScrimmageHistory
                 ref={(history) => {
                   this.history = history;
                 }}
                 refresh={this.refresh}
+                episode={this.props.episode}
+                episode_info={this.props.episode_info}
+                team={this.props.team}
               />
             </div>
           </div>

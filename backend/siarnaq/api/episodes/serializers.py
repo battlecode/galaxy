@@ -35,7 +35,10 @@ class EpisodeSerializer(serializers.ModelSerializer):
             "blurb",
             "game_release",
             "language",
-            "release_version",
+            "scaffold",
+            "artifact_name",
+            "release_version_public",
+            "release_version_saturn",
             "eligibility_criteria",
             "frozen",
         ]

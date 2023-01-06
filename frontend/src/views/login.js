@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import Api from "../api";
 
+import { print_errors } from "../utils/error_handling";
+
 class LoginRegister extends Component {
   state = {
     email: "",
@@ -18,12 +20,17 @@ class LoginRegister extends Component {
     window.location.replace("/forgotPassword");
   };
 
-  callback = (message, success) => {
+  callback = (response, success) => {
     if (success) {
       window.location.assign("/");
     } else {
+      let error = print_errors(response);
+      if (!response.responseJSON) {
+        error +=
+          "\n(Check your internet connection, and check if the backend is indeed running.)";
+      }
       this.setState({
-        error: message,
+        error: error,
       });
     }
   };
@@ -51,7 +58,7 @@ class LoginRegister extends Component {
     if (error) {
       errorDiv = (
         <div
-          className="card"
+          className="card error-message"
           style={{
             padding: "20px",
             width: Math.min(window.innerWidth, 350),
@@ -60,7 +67,6 @@ class LoginRegister extends Component {
             fontSize: "1.1em",
           }}
         >
-          <b>Error: </b>
           {error}
         </div>
       );

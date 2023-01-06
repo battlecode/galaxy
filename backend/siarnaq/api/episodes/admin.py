@@ -27,9 +27,19 @@ class EpisodeAdmin(admin.ModelAdmin):
                     "name_short",
                     "name_long",
                     "language",
-                    "release_version",
                     "blurb",
                     "eligibility_criteria",
+                ),
+            },
+        ),
+        (
+            "Distribution",
+            {
+                "fields": (
+                    "scaffold",
+                    "artifact_name",
+                    "release_version_public",
+                    "release_version_saturn",
                 ),
             },
         ),

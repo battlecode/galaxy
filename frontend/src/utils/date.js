@@ -8,16 +8,21 @@ function getDateTimeText(date) {
     timeZone: "EST",
     weekday: "short",
   });
-  const est_date_str = `${est_day_of_week}, ${est_string} Eastern Time`;
+  const est_date_str = `${est_day_of_week}, ${est_string}`;
 
   // Allow for localization here
   const locale_string = date.toLocaleString();
   const locale_day_of_week = date.toLocaleString([], {
     weekday: "short",
   });
-  const local_date_str = `${locale_day_of_week}, ${locale_string} in your locale and time zone`;
+  const local_date_str = `${locale_day_of_week}, ${locale_string}`;
 
-  return { est_date_str: est_date_str, local_date_str: local_date_str };
+  // See https://stackoverflow.com/questions/1954397/detect-timezone-abbreviation-using-javascript
+  const local_timezone = date
+    .toLocaleTimeString("en-us", { timeZoneName: "short" })
+    .split(" ")[2];
+
+  return { est_date_str, local_date_str, local_timezone };
 }
 
 export { getDateTimeText };

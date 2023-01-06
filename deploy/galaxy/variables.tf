@@ -53,6 +53,11 @@ variable "database_authorized_networks" {
   type        = list(string)
 }
 
+variable "siarnaq_secrets" {
+  description = "Secrets to inject into the Siarnaq secret manager"
+  type        = map
+}
+
 variable "titan_image" {
   description = "Image for the Titan Docker container"
   type        = string
@@ -73,7 +78,7 @@ variable "max_execute_instances" {
   type        = number
 }
 
-variable "additional_secrets" {
-  description = "Additional secrets to inject into the secret manager"
+variable "saturn_secrets" {
+  description = "Secrets to inject into the Saturn secret manager"
   type        = map
 }

@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import Api from "../api";
+import { print_errors } from "../utils/error_handling";
 
 class PasswordForgot extends Component {
   state = {
     success: false,
     error: false,
+    loading: false,
     email: "",
   };
 
@@ -12,21 +14,24 @@ class PasswordForgot extends Component {
     e.preventDefault();
     const { state } = this;
     if (state.email) {
+      this.setState({ loading: true });
       Api.forgotPassword(state.email, this.callback);
     }
   };
 
-  callback = (data, success) => {
+  callback = (response, success) => {
     if (success) {
       this.setState({
         success:
           "Email sent! Please wait a few minutes to receive. Don't forget to check your spam folder.",
         error: false,
+        loading: false,
       });
     } else {
       this.setState({
-        error: data,
+        error: print_errors(response),
         success: false,
+        loading: false,
       });
     }
   };
@@ -37,7 +42,7 @@ class PasswordForgot extends Component {
   };
 
   render() {
-    const { error, success } = this.state;
+    const { error, success, loading } = this.state;
     return (
       <div
         className="content dustBackground"
@@ -69,6 +74,17 @@ class PasswordForgot extends Component {
           Enter your email below to receive a password reset email. Contact
           battlecode@mit.edu if you encounter any issues.
         </p>
+        {loading && (
+          <div
+            style={{
+              textAlign: "center",
+              fontWeight: "bold",
+              color: "white",
+            }}
+          >
+            <b>Loading . . . </b>
+          </div>
+        )}
         {error && (
           <div
             className="card"
@@ -80,11 +96,9 @@ class PasswordForgot extends Component {
               fontSize: "1.1em",
             }}
           >
-            <b>Error. </b>
             {error}
           </div>
         )}
-
         {success && (
           <div
             className="card"

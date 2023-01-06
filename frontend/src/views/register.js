@@ -3,7 +3,8 @@ import Api from "../api";
 
 import Country from "../components/country";
 import Gender from "../components/gender";
-import { get_nested_profile_errors } from "../utils/error_handling";
+import { print_errors } from "../utils/error_handling";
+import ActionMessage from "../components/actionMessage";
 
 class Register extends Component {
   state = {
@@ -20,22 +21,28 @@ class Register extends Component {
       },
     },
     register: false,
-    errors: [],
+    errors: "",
     success: "",
+    register_status: "waiting",
   };
 
   forgotPassword = () => {
     window.location.replace("/forgotPassword");
   };
 
-  callback = (response_json, success) => {
+  callback = (response, success) => {
     if (success) {
+      this.setState({ register_status: "success" });
       window.location.assign("/");
     } else {
+      this.setState({ register_status: "failure" });
       this.setState({
-        errors: get_nested_profile_errors(response_json),
+        errors: print_errors(response),
       });
     }
+    setTimeout(() => {
+      this.setState({ register_status: "waiting" });
+    }, 2000);
   };
 
   formSubmit = (e) => {
@@ -44,7 +51,7 @@ class Register extends Component {
   };
 
   submitRegister = () => {
-    const user = this.state.user;
+    this.setState({ register_status: "loading" });
     Api.register(this.state.user, this.callback);
   };
 
@@ -76,27 +83,18 @@ class Register extends Component {
   render() {
     const { errors, success, register } = this.state;
 
-    const errorReports = errors.map(function (error, i) {
-      const [field, error_message] = error;
-      return (
-        <div key={i}>
-          Error in field <b>{field}</b>: {error_message}
-        </div>
-      );
-    });
-
-    const errorsDiv = errors.length > 0 && (
+    const errorsDiv = errors && (
       <div
-        className="card"
+        className="card error-message"
         style={{
           padding: "20px",
-          width: Math.min(window.innerWidth, 500),
+          width: Math.min(window.innerWidth, 350),
           margin: "40px auto",
           marginBottom: "0px",
           fontSize: "1.1em",
         }}
       >
-        {errorReports}
+        {errors}
       </div>
     );
 
@@ -121,7 +119,10 @@ class Register extends Component {
         value="submit"
         className="btn btn-primary btn-block btn-fill"
       >
-        Register
+        <ActionMessage
+          default_message="Register"
+          status={this.state.register_status}
+        />{" "}
       </button>
     );
 

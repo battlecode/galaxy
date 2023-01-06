@@ -16,7 +16,12 @@ class PaginationControl extends Component {
       <li className={isFirst ? "page-item disabled" : "page-item"} key="prev">
         <a
           className="page-link"
-          onClick={() => props.onPageClick(props.page - 1)}
+          onClick={() => {
+            if (!isFirst) {
+              props.onPageClick(props.page - 1);
+            }
+          }}
+          disabled={isFirst}
         >
           Previous
         </a>
@@ -40,14 +45,23 @@ class PaginationControl extends Component {
       <li className={isLast ? "page-item disabled" : "page-item"} key="next">
         <a
           className="page-link"
-          onClick={() => props.onPageClick(props.page + 1)}
+          onClick={() => {
+            if (!isLast) {
+              props.onPageClick(props.page + 1);
+            }
+          }}
+          disabled={isLast}
         >
           Next
         </a>
       </li>
     );
 
-    return <ul className="pagination">{items}</ul>;
+    return (
+      <div className="pagination-control">
+        <ul className="pagination">{items}</ul>
+      </div>
+    );
   }
 }
 
