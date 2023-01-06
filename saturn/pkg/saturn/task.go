@@ -60,6 +60,15 @@ func (s TaskStatus) String() string {
 	}
 }
 
+func (s TaskStatus) Retryable() bool {
+	switch s {
+	case TaskErrored, TaskInterrupted:
+		return true
+	default:
+		return false
+	}
+}
+
 type taskFinished struct{}
 
 type Finisher interface {
@@ -78,16 +87,18 @@ func (t *Task) Run(ctx context.Context, r Reporter) (err error) {
 	defer func() {
 		switch r := recover(); r {
 		case taskFinished{}, nil:
-			if err != nil {
-				log.Ctx(ctx).Warn().Stringer("status", t.status).Err(err).Msg("Task did not finish successfully.")
-			} else {
-				log.Ctx(ctx).Info().Stringer("status", t.status).Msg("Task finished successfully.")
-			}
+			log.Ctx(ctx).Info().Stringer("status", t.status).Msg("Task finished.")
 		default:
 			panic(r)
 		}
-		if tErr := t.FinalizeReport(ctx, r); tErr != nil {
-			err = fmt.Errorf("t.FinalizeReport: %v", tErr)
+		if err != nil {
+			// TODO: log a traceback
+		}
+		if err = t.FinalizeReport(ctx, r); err != nil {
+			err = fmt.Errorf("t.FinalizeReport: %v", err)
+		}
+		if t.status.Retryable() {
+			err = fmt.Errorf("task not complete: %v", err)
 		}
 	}()
 	defer t.Finish(TaskErrored, nil)
@@ -114,11 +125,15 @@ func (t *Task) Run(ctx context.Context, r Reporter) (err error) {
 }
 
 func (t *Task) Finish(status TaskStatus, details map[string]interface{}) {
-	if t.status != TaskRunning {
-		t.status = status
-		t.details = details
-		panic(taskFinished{})
+	if r := recover(); r != nil {
+		panic(r) // Don't clobber an existing panic
 	}
+	if t.status != TaskRunning {
+		return
+	}
+	t.status = status
+	t.details = details
+	panic(taskFinished{})
 }
 
 func (t *Task) FinalizeReport(ctx context.Context, r Reporter) error {
@@ -127,6 +142,7 @@ func (t *Task) FinalizeReport(ctx context.Context, r Reporter) error {
 	}
 	if ctx.Err() != nil {
 		t.status = TaskInterrupted
+		log.Ctx(ctx).Debug().Msg("This task was interrupted and will be retried soon.")
 	}
 	if err := r.Report(ctx, t); err != nil {
 		return fmt.Errorf("r.Report: %v", err)
