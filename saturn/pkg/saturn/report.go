@@ -37,7 +37,7 @@ func (r *GCPTokenedReporter) Report(ctx context.Context, t *Task) error {
 	}
 	payload["invocation"] = map[string]interface{}{
 		"status":      t.status.String(),
-		"logs":        t.logs,
+		"logs":        t.logs.String(),
 		"interrupted": t.status == TaskInterrupted,
 	}
 
