@@ -84,7 +84,7 @@ type Task struct {
 }
 
 func (t *Task) Run(ctx context.Context, r Reporter) (err error) {
-	defer func() {
+	defer func(ctx context.Context) {
 		switch r := recover(); r {
 		case taskFinished{}, nil:
 			log.Ctx(ctx).Info().Stringer("status", t.status).Msg("Task finished.")
@@ -100,8 +100,13 @@ func (t *Task) Run(ctx context.Context, r Reporter) (err error) {
 		if t.status.Retryable() {
 			err = fmt.Errorf("task not complete: %v", err)
 		}
-	}()
+	}(ctx)
 	defer t.Finish(TaskErrored, nil)
+
+	if err = r.Report(ctx, t); err != nil {
+		err = fmt.Errorf("r.Report: %v", err)
+		return
+	}
 
 	hook := zerolog.HookFunc(func(e *zerolog.Event, level zerolog.Level, message string) {
 		if _, err := t.logs.WriteString(message + "\n"); err != nil {
@@ -109,14 +114,6 @@ func (t *Task) Run(ctx context.Context, r Reporter) (err error) {
 		}
 	})
 	ctx = log.Ctx(ctx).Hook(hook).WithContext(ctx)
-
-	log.Ctx(ctx).Debug().Msg("Initializing task.")
-	if err = r.Report(ctx, t); err != nil {
-		err = fmt.Errorf("r.Report: %v", err)
-		return
-	}
-
-	log.Ctx(ctx).Debug().Msg("Running task.")
 	if err = t.Runner(ctx, t, t.Payload); err != nil {
 		err = fmt.Errorf("t.Runner: %v", err)
 		return
@@ -142,7 +139,7 @@ func (t *Task) FinalizeReport(ctx context.Context, r Reporter) error {
 	}
 	if ctx.Err() != nil {
 		t.status = TaskInterrupted
-		log.Ctx(ctx).Debug().Msg("This task was interrupted and will be retried soon.")
+		log.Ctx(ctx).Debug().Msg("System: This task was interrupted and will be retried soon.\n")
 	}
 	if err := r.Report(ctx, t); err != nil {
 		return fmt.Errorf("r.Report: %v", err)

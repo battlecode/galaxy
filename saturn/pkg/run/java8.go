@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/battlecode/galaxy/saturn/pkg/saturn"
 	"github.com/go-git/go-git/v5"
@@ -168,6 +169,7 @@ func (s *Java8Scaffold) RunMatch() *Step {
 				fmt.Sprintf("-PclassLocationB=%s", filepath.Join("data", "B")),
 				fmt.Sprintf("-PpackageNameA=%s", arg.Details.(ExecuteRequest).A.Package),
 				fmt.Sprintf("-PpackageNameB=%s", arg.Details.(ExecuteRequest).B.Package),
+				fmt.Sprintf("-Pmaps=%s", strings.Join(arg.Details.(ExecuteRequest).Maps, ",")),
 				fmt.Sprintf("-Preplay=%s", filepath.Join("data", "replay.bin")),
 				fmt.Sprintf("-PoutputVerbose=%t", false),
 				fmt.Sprintf("-PshowIndicators=%t", false),

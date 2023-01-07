@@ -22,7 +22,7 @@ type Step struct {
 
 func (s *Step) Run(ctx context.Context, desc string, arg *StepArguments) error {
 	log.Ctx(ctx).Debug().Msgf(">>> Starting %s: %s", desc, s.Name)
-	defer log.Ctx(ctx).Debug().Msgf(">>> Ending %s", desc)
+	defer log.Ctx(ctx).Debug().Msgf(">>> Ending %s\n", desc)
 	return s.Callable(ctx, arg)
 }
 

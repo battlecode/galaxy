@@ -37,9 +37,13 @@ func (r *GCPTokenedReporter) Report(ctx context.Context, t *Task) error {
 	for k, v := range t.details {
 		payload[k] = v
 	}
+	logs, err := ioutil.ReadAll(&t.logs)
+	if err != nil {
+		return fmt.Errorf("ioutil.ReadAll: %v", err)
+	}
 	payload["invocation"] = map[string]interface{}{
 		"status":      t.status.String(),
-		"logs":        t.logs.String(),
+		"logs":        string(logs),
 		"interrupted": t.status == TaskInterrupted,
 	}
 
