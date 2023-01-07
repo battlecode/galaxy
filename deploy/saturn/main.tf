@@ -16,6 +16,13 @@ resource "google_storage_bucket_iam_member" "secure" {
   member = "serviceAccount:${google_service_account.this.email}"
 }
 
+resource "google_artifact_registry_repository_iam_member" "this" {
+  location   = var.gcp_region
+  repository = var.artifact_registry_name
+  role       = "roles/artifactregistry.reader"
+  member     = "serviceAccount:${google_service_account.this.email}"
+}
+
 resource "google_pubsub_subscription" "queue" {
   name  = var.name
   topic = var.pubsub_topic_name
@@ -55,7 +62,11 @@ module "container" {
 
   container = {
     image = var.image
-    args = [var.command]
+    args  = [
+      "-project=${var.gcp_project}",
+      "-secret=${var.secret_id}",
+      "-subscription=${google_pubsub_subscription.queue.name}",
+    ]
   }
 }
 
@@ -132,7 +143,7 @@ resource "google_compute_autoscaler" "this" {
 
     metric {
       name                       = "pubsub.googleapis.com/subscription/num_undelivered_messages"
-      filter                     = "resource.type = pubsub_subscription AND resource.label.subscription_id = \"${google_pubsub_subscription.queue.id}\""
+      filter                     = "resource.type = pubsub_subscription AND resource.label.subscription_id = \"${google_pubsub_subscription.queue.name}\""
       single_instance_assignment = var.load_ratio
     }
   }

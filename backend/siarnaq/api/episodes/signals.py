@@ -50,7 +50,7 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
         f"{parent}/jobs/"
         f"{settings.GCLOUD_SCHEDULER_PREFIX}-autoscrim-{instance.name_short}"
     )
-    url = "https://{}{}".format(
+    url = "http://{}{}".format(
         settings.ALLOWED_HOSTS[0],
         reverse("episode-autoscrim", kwargs={"pk": instance.pk}),
     )

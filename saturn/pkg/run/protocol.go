@@ -8,7 +8,7 @@ type Submission struct {
 }
 
 type CompileRequest struct {
-	Submission `mapstructure:"submission"`
+	Submission `mapstructure:"submission,squash"`
 }
 
 type ExecuteRequest struct {

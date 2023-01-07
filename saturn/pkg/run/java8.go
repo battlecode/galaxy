@@ -39,6 +39,7 @@ func NewJava8Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Rep
 		s.UploadReplay(),
 		s.DetermineScores(),
 	}
+	s.matchOutputs = make(map[*StepArguments]string)
 	return s, nil
 }
 
@@ -163,8 +164,8 @@ func (s *Java8Scaffold) RunMatch() *Step {
 				fmt.Sprintf("-PonSaturn=%t", true),
 				fmt.Sprintf("-PteamA=%s", arg.Details.(ExecuteRequest).A.TeamName),
 				fmt.Sprintf("-PteamB=%s", arg.Details.(ExecuteRequest).B.TeamName),
-				fmt.Sprintf("-PclassLocationA=%s", filepath.Join("data", "a")),
-				fmt.Sprintf("-PclassLocationB=%s", filepath.Join("data", "b")),
+				fmt.Sprintf("-PclassLocationA=%s", filepath.Join("data", "A")),
+				fmt.Sprintf("-PclassLocationB=%s", filepath.Join("data", "B")),
 				fmt.Sprintf("-PpackageNameA=%s", arg.Details.(ExecuteRequest).A.Package),
 				fmt.Sprintf("-PpackageNameB=%s", arg.Details.(ExecuteRequest).B.Package),
 				fmt.Sprintf("-Preplay=%s", filepath.Join("data", "replay.bin")),

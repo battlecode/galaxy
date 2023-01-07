@@ -33,6 +33,11 @@ variable "storage_secure_name" {
   type        = string
 }
 
+variable "artifact_registry_name" {
+  description = "Name of the Artifact Registry where the build image can be found"
+  type        = string
+}
+
 variable "secret_id" {
   description = "ID of the Secret resource"
   type        = string
@@ -55,11 +60,6 @@ variable "machine_type" {
 
 variable "image" {
   description = "Image for the Docker container to be run"
-  type        = string
-}
-
-variable "command" {
-  description = "Arguments for the Docker entrypoint"
   type        = string
 }
 
