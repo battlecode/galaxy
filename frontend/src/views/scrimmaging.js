@@ -269,7 +269,7 @@ class ScrimmageHistory extends Component {
                       {s.status == "OK!" ? (
                         <td>
                           <a
-                            href={`https://releases.battlecode.org/client/${this.props.episode_info.artifact_name}/${this.props.episode_info.release_version_public}/visualizer.html`}
+                            href={`https://releases.battlecode.org/client/${this.props.episode_info.artifact_name}/${this.props.episode_info.release_version_public}/visualizer.html?${s.replay_url}`}
                             target="_blank"
                           >
                             Watch
