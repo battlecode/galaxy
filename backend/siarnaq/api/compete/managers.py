@@ -57,7 +57,6 @@ class SaturnInvokableQuerySet(models.QuerySet):
                     message_id=message_id,
                 )
                 invocation.status = SaturnStatus.QUEUED
-                invocation.logs = f"Enqueued with ID: {message_id}"
                 invocation.num_failures = 0
             except Exception as err:
                 log.error(
@@ -70,7 +69,9 @@ class SaturnInvokableQuerySet(models.QuerySet):
                     topic=topic,
                     ordering_key=self._publish_ordering_key,
                 )
-                invocation.logs = f"type: {type(err)} Exception message: {err}"
+                invocation.logs = (
+                    invocation.logs + f"Exception {type(err)} on enqueue!\n{err}\n"
+                )
         self.model.objects.bulk_update(invocations, ["status", "logs", "num_failures"])
 
 
