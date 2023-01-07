@@ -40,7 +40,6 @@ class SubmissionList extends Component {
       // This check handles the case where a new page is requested while a
       // previous page was loading.
       if (page == this.state.page) {
-        console.log(data);
         this.setState({ submissions: data.results, pageLimit, loading: false });
       }
     });
