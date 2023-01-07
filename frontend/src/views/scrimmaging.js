@@ -153,7 +153,7 @@ class ScrimmageHistory extends Component {
   };
 
   componentDidMount() {
-    this.refresh(this.state.scrimPage);
+    this.loadPage(this.state.scrimPage);
   }
 
   playReplay(e) {
@@ -172,8 +172,12 @@ class ScrimmageHistory extends Component {
       page >= 0 &&
       page <= this.state.pageLimit
     ) {
-      this.refresh(page);
+      this.loadPage(page);
     }
+  };
+
+  refresh = () => {
+    this.loadPage(1);
   };
 
   render() {
@@ -288,7 +292,7 @@ class ScrimmageHistory extends Component {
 class Scrimmaging extends Component {
   refresh = () => {
     this.requests.refresh();
-    this.history.refresh(1);
+    this.history.loadPage(1);
   };
 
   render() {
