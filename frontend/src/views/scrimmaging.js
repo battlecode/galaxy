@@ -268,11 +268,8 @@ class ScrimmageHistory extends Component {
                       <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
                       {s.status == "OK!" ? (
                         <td>
-                          {/* domain is hardcoded, since visualizer and replays are only hosted on deployed site, not locally */}
-                          {/* note that episode_info.name_long is not quite the correct thing to use below: this is pending a
-                            backend change */}
                           <a
-                            href={`https://releases.battlecode.org/client/${this.props.episode_info.name_long}/1.0.0/visualizer.html`}
+                            href={`https://releases.battlecode.org/client/${this.props.episode_info.artifact_name}/${this.props.episode_info.release_version_public}/visualizer.html`}
                             target="_blank"
                           >
                             Watch
