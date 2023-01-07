@@ -56,9 +56,9 @@ class SubmissionList extends Component {
         <tr key={submission.id}>
           <td>{new Date(submission.created).toLocaleString()}</td>
           <td>
-            {submission.status == "OK!" &&
-              SUBMISSION_ACCEPTED[submission.accepted]}
-            {submission.status != "OK!" && SUBMISSION_STATUS[submission.status]}
+            {submission.status == "OK!"
+              ? SUBMISSION_ACCEPTED[submission.accepted]
+              : SUBMISSION_STATUS[submission.status]}
           </td>
           <td>{submission.description} </td>
           <td>{submission.package}</td>
