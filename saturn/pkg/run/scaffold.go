@@ -160,9 +160,9 @@ func (s *Scaffold) Refresh(ctx context.Context) error {
 	log.Ctx(ctx).Debug().Msg("Pulling scaffold.")
 	switch err := wt.PullContext(ctx, &git.PullOptions{Auth: s.gitAuth}); true {
 	case err == nil:
-		log.Ctx(ctx).Debug().Msg("New scaffold version downloaded.")
+		log.Ctx(ctx).Debug().Msg("> New scaffold version downloaded.")
 	case errors.Is(err, git.NoErrAlreadyUpToDate):
-		log.Ctx(ctx).Debug().Msg("Already up to date.")
+		log.Ctx(ctx).Debug().Msg("> Already up to date.")
 	default:
 		return fmt.Errorf("wt.PullContext: %v", err)
 	}
