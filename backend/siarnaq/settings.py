@@ -337,9 +337,9 @@ class Staging(Base):
     LOGGING: dict[str, Any] = {
         **_LOGGING_COMMON,
         "loggers": {
-            "django": {"handlers": ["null"], "level": "INFO"},
-            "django_structlog": {"handlers": ["console"], "level": "DEBUG"},
-            "siarnaq": {"handlers": ["console"], "level": "DEBUG"},
+            "django": {"handlers": ["json"], "level": "INFO"},
+            "django_structlog": {"handlers": ["json"], "level": "DEBUG"},
+            "siarnaq": {"handlers": ["json"], "level": "DEBUG"},
         },
     }
 
