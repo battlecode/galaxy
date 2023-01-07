@@ -14,6 +14,11 @@ const SUBMISSION_STATUS = {
   CAN: "Cancelled",
 };
 
+const SUBMISSION_ACCEPTED = {
+  true: "Accepted",
+  false: "Rejected",
+};
+
 class SubmissionList extends Component {
   constructor(props) {
     super(props);
@@ -35,6 +40,7 @@ class SubmissionList extends Component {
       // This check handles the case where a new page is requested while a
       // previous page was loading.
       if (page == this.state.page) {
+        console.log(data);
         this.setState({ submissions: data.results, pageLimit, loading: false });
       }
     });
@@ -50,7 +56,11 @@ class SubmissionList extends Component {
       return (
         <tr key={submission.id}>
           <td>{new Date(submission.created).toLocaleString()}</td>
-          <td>{SUBMISSION_STATUS[submission.status]} </td>
+          <td>
+            {submission.status == "OK!" &&
+              SUBMISSION_ACCEPTED[submission.accecpted.toString()]}
+            {submission.status != "OK!" && SUBMISSION_STATUS[submission.status]}
+          </td>
           <td>{submission.description} </td>
           <td>{submission.package}</td>
           <td>{submission.username} </td>
