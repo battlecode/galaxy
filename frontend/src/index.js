@@ -10,8 +10,6 @@ import GettingStarted from "./views/getting-started";
 import Scrimmaging from "./views/scrimmaging";
 import Tournaments from "./views/tournaments";
 import Updates from "./views/updates";
-// commented but kept since we might use this later
-// import Search from "./views/search";
 import Team from "./views/team";
 import Issues from "./views/issues";
 import Debugging from "./views/debugging";
@@ -165,7 +163,6 @@ class App extends Component {
 
       // commented but kept since we might use this later
       // <Route path={`/:episode/updates`} component={Updates} key="updates" />,
-      // <Route path={`/search`} component={Search} key="search" />,
       <Route
         path={`/:episode/tournaments`}
         component={(props) => (
