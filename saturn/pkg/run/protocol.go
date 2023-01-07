@@ -14,6 +14,7 @@ type CompileRequest struct {
 type ExecuteRequest struct {
 	A      Submission        `mapstructure:"a"`
 	B      Submission        `mapstructure:"b"`
+	Maps   []string          `mapstructure:"maps"`
 	Replay FileSpecification `mapstructure:"replay"`
 }
 

@@ -247,6 +247,7 @@ class Match(SaturnInvocation):
             for p in self.participants.all()
         }
         return {
+            "maps": [m.name for m in self.maps.all()],
             "replay": {
                 "bucket": settings.GCLOUD_BUCKET_SECURE,
                 "name": self.get_replay_path(),
