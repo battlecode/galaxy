@@ -14,6 +14,11 @@ const SUBMISSION_STATUS = {
   CAN: "Cancelled",
 };
 
+const SUBMISSION_ACCEPTED = {
+  true: "Accepted",
+  false: "Rejected",
+};
+
 class SubmissionList extends Component {
   constructor(props) {
     super(props);
@@ -50,7 +55,11 @@ class SubmissionList extends Component {
       return (
         <tr key={submission.id}>
           <td>{new Date(submission.created).toLocaleString()}</td>
-          <td>{SUBMISSION_STATUS[submission.status]} </td>
+          <td>
+            {submission.status == "OK!"
+              ? SUBMISSION_ACCEPTED[submission.accepted]
+              : SUBMISSION_STATUS[submission.status]}
+          </td>
           <td>{submission.description} </td>
           <td>{submission.package}</td>
           <td>{submission.username} </td>
