@@ -23,6 +23,18 @@ resource "google_artifact_registry_repository_iam_member" "this" {
   member     = "serviceAccount:${google_service_account.this.email}"
 }
 
+resource "google_project_iam_member" "log" {
+  project = var.gcp_project
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.this.email}"
+}
+
+resource "google_project_iam_member" "monitoring" {
+  project = var.gcp_project
+  role    = "roles/monitoring.metricWriter"
+  member  = "serviceAccount:${google_service_account.this.email}"
+}
+
 resource "google_pubsub_subscription" "queue" {
   name  = var.name
   topic = var.pubsub_topic_name
