@@ -84,11 +84,6 @@ class SideBar extends Component {
               label="Rankings"
             />
 
-            {/* search bar link, unused since Search is broken
-            Commented in case someone wants to bring it back in the future
-            You'd have to refactor the code to match the other NLink's */}
-            {/* <NLink to={`/search`}><p style={{fontWeight: "inherit", textTransform: "none", fontSize: "inherit"}}><i className="pe-7s-search pe-fw" />Search</p></NLink> */}
-
             <br />
 
             {/* Only visible when logged in */}

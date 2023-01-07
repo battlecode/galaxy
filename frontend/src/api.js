@@ -170,17 +170,6 @@ class Api {
     });
   }
 
-  static searchUser(query, page, callback) {
-    const encQuery = encodeURIComponent(query);
-    const userUrl = `${URL}/api/user/profile/?search=${encQuery}&page=${page}`;
-    $.get(userUrl, (userData) => {
-      callback({
-        userPage: page,
-        users: userData.results,
-      });
-    });
-  }
-
   //---TEAM INFO---
 
   static getTeamProfile(episode, team_id, callback) {
