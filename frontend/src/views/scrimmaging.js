@@ -8,6 +8,16 @@ import ScrimmageRequestor from "../components/scrimmageRequestor";
 import Spinner from "../components/spinner";
 import PaginationControl from "../components/paginationControl";
 
+const MATCH_STATUS = {
+  NEW: "Created",
+  QUE: "Queued",
+  RUN: "Running",
+  TRY: "Will be retried",
+  "OK!": "Success",
+  ERR: "Failed",
+  CAN: "Cancelled",
+};
+
 class ScrimmageRequest extends Component {
   state = {
     open: true,
@@ -211,7 +221,7 @@ class ScrimmageHistory extends Component {
               </thead>
               <tbody>
                 {this.state.scrimmages.map((s) => {
-                  let stat_entry = <td>{s.status}</td>;
+                  let stat_entry = <td>{MATCH_STATUS[s.status]}</td>;
                   let participation =
                     s.participants[0].team == this.props.team.id
                       ? s.participants[0]

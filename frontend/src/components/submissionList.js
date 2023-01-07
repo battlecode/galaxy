@@ -7,7 +7,7 @@ import Spinner from "./spinner";
 const SUBMISSION_STATUS = {
   NEW: "Created",
   QUE: "Queued",
-  RUN: "Running",
+  RUN: "Verifying",
   TRY: "Will be retried",
   "OK!": "Success",
   ERR: "Failed",
