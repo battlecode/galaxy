@@ -27,7 +27,7 @@ class Resources extends Component {
                       <a
                         type="button"
                         className="btn btn-info btn-fill text-center"
-                        href={`https://releases.battlecode.org/javadocs/${this.props.episode_info.artifact_name}/${this.props.episode_info.release_version_public}/index.html`}
+                        href={`https://releases.battlecode.org/javadoc/${this.props.episode_info.artifact_name}/${this.props.episode_info.release_version_public}/index.html`}
                       >
                         Javadocs for {this.props.episode_name_long}!
                       </a>
