@@ -186,7 +186,7 @@ module "saturn_compile" {
 
   max_instances = var.max_compile_instances
   min_instances = 0
-  load_ratio    = 25
+  load_ratio    = 5
 }
 
 module "saturn_execute" {
