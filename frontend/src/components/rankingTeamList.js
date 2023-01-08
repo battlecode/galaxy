@@ -107,7 +107,7 @@ class RankingTeamList extends Component {
                     {trimUsername(member.username, 13)}
                   </NavLink>
                   {team.members.findIndex((m) => m.id === member.id) + 1 !==
-                    team.members.length && ","}
+                    team.members.length && ", "}
                 </span>
               ))}
             </td>
