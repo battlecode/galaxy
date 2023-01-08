@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
 import Api from "../api";
 
 import PaginationControl from "./paginationControl";
@@ -71,10 +72,6 @@ class RankingTeamList extends Component {
     });
   };
 
-  redirectToTeamPage = (team_id) => {
-    this.props.history.push(`/${this.props.episode}/rankings/${team_id}`);
-  };
-
   render() {
     const { props, state } = this;
 
@@ -96,17 +93,23 @@ class RankingTeamList extends Component {
           buttonContent = <i className="fa fa-check"></i>;
         }
         return (
-          <tr
-            key={team.id}
-            onClick={() => this.redirectToTeamPage(team.id)}
-            className="page-item"
-          >
-            {<td>{Math.round(team.profile.rating)}</td>}
-            <td>{team.name}</td>
+          <tr key={team.id} className="page-item">
+            <td>{Math.round(team.profile.rating)}</td>
             <td>
-              {team.members
-                .map((member) => trimUsername(member.username, 13))
-                .join(", ")}
+              <NavLink to={`/${this.props.episode}/rankings/${team.id}`}>
+                {team.name}
+              </NavLink>
+            </td>
+            <td>
+              {team.members.map((member) => (
+                <span>
+                  <NavLink to={`/${this.props.episode}/user/${member.id}`}>
+                    {trimUsername(member.username, 13)}
+                  </NavLink>
+                  {team.members.findIndex((m) => m.id === member.id) + 1 !==
+                    team.members.length && ","}
+                </span>
+              ))}
             </td>
             {!this.props.canRequest && <td>{team.profile.quote}</td>}
             {!this.props.canRequest && (

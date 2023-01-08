@@ -175,10 +175,6 @@ ol {
   }
 }
 
-.page-item:not(.disabled) {
-  cursor: pointer;
-}
-
 /* For the countdown display in `countdown.js` and the main page */
 .Countdown {
   margin: 10px auto;
