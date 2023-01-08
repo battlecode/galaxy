@@ -115,7 +115,7 @@ class Submission(SaturnInvocation):
     accepted = models.BooleanField(default=False)
     """Whether this submission compiled successfully and has been accepted."""
 
-    package = models.CharField(max_length=32)
+    package = models.CharField(max_length=32, blank=True)
     """The package name in which the main entrypoint of the submission can be found."""
 
     description = models.CharField(max_length=128, blank=True)
