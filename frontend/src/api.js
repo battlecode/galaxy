@@ -33,6 +33,10 @@ class Api {
     data.append("source_code", submission_file);
     data.append("package", package_name);
     data.append("description", description);
+    const fileSize = submission_file.size / 1024 / 1024; // in MiB
+    if (fileSize > 5) {
+      callback(data, false);
+    }
     return $.ajax({
       url: `${URL}/api/compete/${episode}/submission/`,
       type: "POST",

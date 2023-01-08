@@ -72,12 +72,15 @@ class Submissions extends Component {
             selectedFile: null,
           });
         } else {
-          let alert_message = print_errors(response);
+          let alert_message = "";
+
           // During submission freeze, backend gives an unhelpful error...
           // to mitigate:
           if (response.responseJSON && response.responseJSON.detail) {
             alert_message +=
               "\nThis is most likely due to a submission freeze.";
+          } else {
+            alert_message += "Ensure this file size is not greater than 5 MiB.";
           }
           this.setState({
             alert_message,
