@@ -39,7 +39,7 @@ resource "google_pubsub_subscription" "queue" {
   name  = var.name
   topic = var.pubsub_topic_name
 
-  ack_deadline_seconds    = 60
+  ack_deadline_seconds    = 20
   enable_message_ordering = true
 
   expiration_policy {
