@@ -74,6 +74,10 @@ class RankingTeamList extends Component {
     this.props.history.push(`/${this.props.episode}/rankings/${team_id}`);
   };
 
+  redirectToUserPage = (user_id) => {
+    window.location.replace(`/${this.props.episode}/user/${user_id}`);
+  };
+
   render() {
     const { props, state } = this;
 
@@ -95,14 +99,24 @@ class RankingTeamList extends Component {
           buttonContent = <i className="fa fa-check"></i>;
         }
         return (
-          <tr
-            key={team.id}
-            onClick={() => this.redirectToTeamPage(team.id)}
-            className="page-item"
-          >
-            {<td>{Math.round(team.profile.rating)}</td>}
-            <td>{team.name}</td>
-            <td>{team.members.map((member) => member.username).join(", ")}</td>
+          <tr key={team.id} className="page-item">
+            <td onClick={() => this.redirectToTeamPage(team.id)}>
+              {Math.round(team.profile.rating)}
+            </td>
+            <td onClick={() => this.redirectToTeamPage(team.id)}>
+              {team.name}
+            </td>
+            <td>
+              {team.members.map((member) => (
+                <span onClick={() => this.redirectToUserPage(member.id)}>
+                  {member.username}
+                  {team.members.length ===
+                  team.members.findIndex((m) => m.id === member.id) + 1
+                    ? ""
+                    : ", "}
+                </span>
+              ))}
+            </td>
             {!this.props.canRequest && <td>{team.profile.quote}</td>}
             {!this.props.canRequest && (
               <td>
