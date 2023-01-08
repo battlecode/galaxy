@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Avatar from "../components/avatar";
 import Api from "../api";
+import { trimUsername } from "../utils/misc";
 
 class TeamCard extends Component {
   constructor(props) {
@@ -26,13 +27,6 @@ class TeamCard extends Component {
       };
     }
   }
-
-  trimUsername = (username, length) => {
-    if (username.length > length) {
-      return username.slice(0, length - 1) + "...";
-    }
-    return username;
-  };
 
   redirectToUserPage = (user_id) => {
     window.location.replace(`/${this.props.episode}/user/${user_id}`);
@@ -68,7 +62,7 @@ class TeamCard extends Component {
           {" "}
           <Avatar data={user} />
           <small onClick={() => this.redirectToUserPage(user.id)}>
-            {this.trimUsername(user.username, 21)}
+            {trimUsername(user.username, 21)}
           </small>
         </div>
       ) : null;
