@@ -16,7 +16,7 @@ class ScrimmageRequestForm extends Component {
     super(props);
 
     this.state = {
-      is_ranked: false,
+      is_ranked: true,
       player_order: PLAYER_ORDERS[0].value,
       maps: ["", "", ""],
       available_maps: [],
@@ -107,7 +107,7 @@ class ScrimmageRequestForm extends Component {
     // Reset state
     const random_maps = this.getRandomMaps(this.state.available_maps);
     this.setState({
-      is_ranked: false,
+      is_ranked: true,
       player_order: PLAYER_ORDERS[0].value,
       maps: random_maps,
     });

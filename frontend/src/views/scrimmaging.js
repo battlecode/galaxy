@@ -142,6 +142,18 @@ class ScrimmageHistory extends Component {
     loading: true,
   };
 
+  static formatRatingDelta(participation) {
+    const old_rating = Math.round(participation.old_rating);
+    const rating = Math.round(participation.rating);
+    const color =
+      rating > old_rating ? "green" : rating < old_rating ? "red" : "grey";
+    return (
+      <span>
+        {old_rating} <b style={{ color }}>➞ {rating}</b>
+      </span>
+    );
+  }
+
   loadPage = (page) => {
     this.setState({ loading: true, scrimmages: [], scrimPage: page });
     Api.getTeamScrimmages(
@@ -211,12 +223,13 @@ class ScrimmageHistory extends Component {
             <table className="table table-hover table-striped">
               <thead>
                 <tr>
-                  <th>Creation time</th>
-                  <th>Status</th>
                   <th>Score</th>
-                  <th>Opponent</th>
+                  <th>Δ</th>
+                  <th>Opponent (Δ)</th>
                   <th>Ranked</th>
+                  <th>Status</th>
                   <th>Replay</th>
+                  <th>Creation time</th>
                 </tr>
               </thead>
               <tbody>
@@ -251,21 +264,44 @@ class ScrimmageHistory extends Component {
                       </td>
                     );
                   }
-                  const score_string =
-                    s.status == "OK!"
-                      ? `${participation.score} - ${opponent_participation.score}`
-                      : "? - ?";
+                  const score_class =
+                    s.status !== "OK!"
+                      ? ""
+                      : participation.score > opponent_participation.score
+                      ? "success"
+                      : "danger";
+                  const score_entry = (
+                    <td class={score_class}>
+                      {s.status == "OK!"
+                        ? `${participation.score} - ${opponent_participation.score}`
+                        : "? - ?"}
+                    </td>
+                  );
                   const created_date_text = getDateTimeText(
                     new Date(s.created)
                   );
                   const created_date_string = `${created_date_text.local_date_str} ${created_date_text.local_timezone}`;
+                  const show_deltas = s.status == "OK!" && s.is_ranked;
+
                   return (
                     <tr key={s.id}>
-                      <td>{created_date_string}</td>
-                      {stat_entry}
-                      <td>{score_string}</td>
-                      <td>{opponent_participation.teamname}</td>
+                      {score_entry}
+                      <td>
+                        {show_deltas
+                          ? ScrimmageHistory.formatRatingDelta(participation)
+                          : "N/A"}
+                      </td>
+                      <td>
+                        {opponent_participation.teamname} (
+                        {show_deltas
+                          ? ScrimmageHistory.formatRatingDelta(
+                              opponent_participation
+                            )
+                          : "N/A"}
+                        )
+                      </td>
                       <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
+                      {stat_entry}
                       {s.status == "OK!" ? (
                         <td>
                           <a
@@ -278,6 +314,7 @@ class ScrimmageHistory extends Component {
                       ) : (
                         <td>N/A</td>
                       )}
+                      <td>{created_date_string}</td>
                     </tr>
                   );
                 })}
