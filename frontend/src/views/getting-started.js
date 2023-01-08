@@ -343,145 +343,153 @@ class GettingStarted extends Component {
                   <h6 className="installation-steps">
                     Step 2: Download Battlecode
                   </h6>
-                  <p>
-                    These instructions will be released when the season begins!
-                  </p>
-                  {/* TODO conditional rendering plz */}
-                  {/* <p>
-                    Next, you should download the{" "}
-                    <b>
-                      <a
-                        href={this.state.scaffold_link}
-                        style={{ fontWeight: 700 }}
-                      >
-                        {this.props.episode_name_long} scaffold
-                      </a>
-                    </b>
-                    . To get up and running quickly, you can click "Clone or
-                    download" and then "Download ZIP," and move on to the next
-                    step.
-                  </p>
-                  <p>
-                    We recommend, however, that you instead use Git to organize
-                    your code. If you haven't used Git before, read{" "}
-                    <b>
-                      <a
-                        href="https://guides.github.com/introduction/git-handbook/"
-                        style={{ fontWeight: 700 }}
-                      >
-                        this guide
-                      </a>
-                    </b>{" "}
-                    (or wait for our lecture covering it). On the{" "}
-                    <b>
-                      <a
-                        href={this.state.scaffold_link}
-                        style={{ fontWeight: 700 }}
-                      >
-                        scaffold page
-                      </a>
-                    </b>
-                    , click "Use this template." Importantly, on the next page,
-                    make your new repo <b>private</b> (you don't want other
-                    teams to steal your code!). You can then clone your newly
-                    created repo and invite your team members to collaborate on
-                    it.
-                  </p>
-                  <h6 class="installation-steps">Step 3: Build the Game</h6>
+                  {!this.props.is_game_released && (
                     <p>
-                        Open a terminal in the scaffold you just downloaded. Run the commands <code>./gradlew update</code> and <code>./gradlew build</code>.
-                        The client won't appear until you've run these two commands.
+                      These instructions will be released when the season
+                      begins!
                     </p>
-                  <h6 className="installation-steps">Step 3: Local Setup</h6>
-                  <p>
-                    We recommend using an IDE like IntelliJ IDEA or Eclipse to
-                    work on Battlecode, but you can also use your favorite text
-                    editor combined with a terminal.{" "}
-                    {this.props.episode_name_long} uses Gradle to run tasks like{" "}
-                    <code>run</code>, <code>debug</code> and{" "}
-                    <code>jarForUpload</code> (but don't worry about that — you
-                    don't need to install it).
-                  </p>
-                  <p>
-                    View instructions for:
-                    <span
-                      className="btn-group"
-                      role="group"
-                      style={{ marginLeft: "10px" }}
-                    >
-                      <button
-                        type="button"
-                        className={this.getSelectionButtons("intellij")}
-                        onClick={this.intellijButton}
-                      >
-                        IntelliJ IDEA
-                      </button>
-                      <button
-                        type="button"
-                        className={this.getSelectionButtons("eclipse")}
-                        onClick={this.eclipseButton}
-                      >
-                        Eclipse
-                      </button>
-                      <button
-                        type="button"
-                        className={this.getSelectionButtons("terminal")}
-                        onClick={this.terminalButton}
-                      >
-                        Terminal
-                      </button>
-                    </span>
-                  </p>
-                  {this.getIDEInstallation()}
-                  <p>
-                    There should now be a folder called <code>client</code> in
-                    your scaffold folder; if you go in there, and double click
-                    the
-                    <code>Battlecode Client</code> application, you should be
-                    able to run and watch matches. (Please don't move that
-                    application, it will be sad.) If you're on Linux, navigate
-                    to the <code>client</code> folder and run{" "}
-                    <code>./battlecode-visualizer</code>
-                    to launch the client.
-                  </p>
-                  <h6 className="installation-steps">Developing your Bot</h6>
-                  <p>
-                    Place each version of your robot in a new subfolder in the{" "}
-                    <code>src</code> folder. Make sure every version has a{" "}
-                    <code>RobotPlayer.java</code>.
-                  </p>
-                  <p>
-                    Check{" "}
-                    <NavLink to={`/${this.props.episode}/debugging-tips`} style={{ fontWeight: 700 }}>
-                      debugging tips
-                    </NavLink>{" "}
-                    if you experience problems while developing, or ask on the
-                    Discord.
-                  </p>
-                  <h6 className="installation-steps">
-                    Running Battlecode from the Client
-                  </h6>
-                  <p>
-                    Open the client as described in Step 3. Navigate to the
-                    runner tab, select which bots and maps to run, and hit Run
-                    Game! Finally, click the play/pause button to view the
-                    replay.
-                  </p>
-                  <h6 className="installation-steps">
-                    Running Battlecode from the terminal or IDE
-                  </h6>
-                  <p>
-                    You can run games directly from the terminal with the gradle
-                    task{" "}
-                    <code>
-                      ./gradlew run -Pmaps=[map] -PteamA=[Team A] -PteamB=[Team
-                      B]
-                    </code>
-                    . If you don't include the map or team flags, Battlecode
-                    will default to whatever is listed in{" "}
-                    <code>gradle.properties</code>. Running the same gradle task
-                    from you IDE will also work.
-                  </p> */}
+                  )}
+                  {this.props.is_game_released && (
+                    <div>
+                      <p>
+                        Next, you should download the{" "}
+                        <b>
+                          <a
+                            href={this.state.scaffold_link}
+                            style={{ fontWeight: 700 }}
+                          >
+                            {this.props.episode_name_long} scaffold
+                          </a>
+                        </b>
+                        . To get up and running quickly, you can click "Clone or
+                        download" and then "Download ZIP," and move on to the
+                        next step.
+                      </p>
+                      <p>
+                        We recommend, however, that you instead use Git to
+                        organize your code. If you haven't used Git before, read{" "}
+                        <b>
+                          <a
+                            href="https://guides.github.com/introduction/git-handbook/"
+                            style={{ fontWeight: 700 }}
+                          >
+                            this guide
+                          </a>
+                        </b>{" "}
+                        (or wait for our lecture covering it). On the{" "}
+                        <b>
+                          <a
+                            href={this.state.scaffold_link}
+                            style={{ fontWeight: 700 }}
+                          >
+                            scaffold page
+                          </a>
+                        </b>
+                        , click "Use this template." Importantly, on the next
+                        page, make your new repo <b>private</b> (you don't want
+                        other teams to steal your code!). You can then clone
+                        your newly created repo and invite your team members to
+                        collaborate on it.
+                      </p>
+                      <h6 className="installation-steps">
+                        Step 3: Local Setup
+                      </h6>
+                      <p>
+                        We recommend using an IDE like IntelliJ IDEA or Eclipse
+                        to work on Battlecode, but you can also use your
+                        favorite text editor combined with a terminal.{" "}
+                        {this.props.episode_name_long} uses Gradle to run tasks
+                        like <code>run</code>, <code>debug</code> and{" "}
+                        <code>jarForUpload</code> (but don't worry about that —
+                        you don't need to install it).
+                      </p>
+                      <p>
+                        View instructions for:
+                        <span
+                          className="btn-group"
+                          role="group"
+                          style={{ marginLeft: "10px" }}
+                        >
+                          <button
+                            type="button"
+                            className={this.getSelectionButtons("intellij")}
+                            onClick={this.intellijButton}
+                          >
+                            IntelliJ IDEA
+                          </button>
+                          <button
+                            type="button"
+                            className={this.getSelectionButtons("eclipse")}
+                            onClick={this.eclipseButton}
+                          >
+                            Eclipse
+                          </button>
+                          <button
+                            type="button"
+                            className={this.getSelectionButtons("terminal")}
+                            onClick={this.terminalButton}
+                          >
+                            Terminal
+                          </button>
+                        </span>
+                      </p>
+                      {this.getIDEInstallation()}
+                      <p>
+                        There should now be a folder called <code>client</code>{" "}
+                        in your scaffold folder; if you go in there, and double
+                        click the
+                        <code>Battlecode Client</code> application, you should
+                        be able to run and watch matches. (Please don't move
+                        that application, it will be sad.) If you're on Linux,
+                        navigate to the <code>client</code> folder and run{" "}
+                        <code>./battlecode-visualizer</code>
+                        to launch the client.
+                      </p>
+                      <h6 className="installation-steps">
+                        Developing your Bot
+                      </h6>
+                      <p>
+                        Place each version of your robot in a new subfolder in
+                        the <code>src</code> folder. Make sure every version has
+                        a <code>RobotPlayer.java</code>.
+                      </p>
+                      <p>
+                        Check{" "}
+                        <NavLink
+                          to={`/${this.props.episode}/debugging-tips`}
+                          style={{ fontWeight: 700 }}
+                        >
+                          debugging tips
+                        </NavLink>{" "}
+                        if you experience problems while developing, or ask on
+                        the Discord.
+                      </p>
+                      <h6 className="installation-steps">
+                        Running Battlecode from the Client
+                      </h6>
+                      <p>
+                        Open the client as described in Step 3. Navigate to the
+                        runner tab, select which bots and maps to run, and hit
+                        Run Game! Finally, click the play/pause button to view
+                        the replay.
+                      </p>
+                      <h6 className="installation-steps">
+                        Running Battlecode from the terminal or IDE
+                      </h6>
+                      <p>
+                        You can run games directly from the terminal with the
+                        gradle task{" "}
+                        <code>
+                          ./gradlew run -Pmaps=[map] -PteamA=[Team A]
+                          -PteamB=[Team B]
+                        </code>
+                        . If you don't include the map or team flags, Battlecode
+                        will default to whatever is listed in{" "}
+                        <code>gradle.properties</code>. Running the same gradle
+                        task from you IDE will also work.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
