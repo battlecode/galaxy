@@ -84,6 +84,12 @@ class SideBar extends Component {
               label="Rankings"
             />
 
+            <NLink
+              to={`/${this.props.episode}/queue`}
+              icon={"pe-7s-timer"}
+              label="Queue"
+            />
+
             <br />
 
             {/* Only visible when logged in */}

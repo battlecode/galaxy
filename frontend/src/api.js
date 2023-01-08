@@ -499,6 +499,21 @@ class Api {
       });
   }
 
+  static getAllMatches(episode, callback, page) {
+    const query_data = {
+      page,
+    };
+    return $.get(`${URL}/api/compete/${episode}/match/`, query_data)
+      .done((data, status) => {
+        const pageLimit = Math.ceil(data.count / PAGE_SIZE);
+        callback(data.results, pageLimit);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting scrimmage history", xhr, status, error);
+        callback(null);
+      });
+  }
+
   //----REPLAYS?-----
 
   static getReplayFromURL(url, callback) {
