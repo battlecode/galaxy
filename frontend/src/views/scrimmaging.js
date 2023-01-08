@@ -270,7 +270,9 @@ class ScrimmageHistory extends Component {
                     );
                   }
                   const score_class =
-                    participation.score > opponent_participation.score
+                    s.status !== "OK!"
+                      ? ""
+                      : participation.score > opponent_participation.score
                       ? "success"
                       : "danger";
                   const score_entry = (
@@ -284,18 +286,23 @@ class ScrimmageHistory extends Component {
                     new Date(s.created)
                   );
                   const created_date_string = `${created_date_text.local_date_str} ${created_date_text.local_timezone}`;
+                  const show_deltas = s.status == "OK!" && s.is_ranked;
 
                   return (
                     <tr key={s.id}>
                       {score_entry}
                       <td>
-                        {ScrimmageHistory.formatRatingDelta(participation)}
+                        {show_deltas
+                          ? ScrimmageHistory.formatRatingDelta(participation)
+                          : "N/A"}
                       </td>
                       <td>
                         {opponent_participation.teamname} (
-                        {ScrimmageHistory.formatRatingDelta(
-                          opponent_participation
-                        )}
+                        {show_deltas
+                          ? ScrimmageHistory.formatRatingDelta(
+                              opponent_participation
+                            )
+                          : "N/A"}
                         )
                       </td>
                       <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
