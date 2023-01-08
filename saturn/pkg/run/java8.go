@@ -52,6 +52,11 @@ func (s *Java8Scaffold) Prepare() *Step {
 				return fmt.Errorf("Refresh: %v", err)
 			}
 
+			log.Ctx(ctx).Debug().Msg("Flushing build directory.")
+			if err := os.RemoveAll(filepath.Join(s.root, "build")); err != nil {
+				return fmt.Errorf("os.RemoveAll: %v", err)
+			}
+
 			log.Ctx(ctx).Debug().Msg("Updating distribution.")
 			out, err := s.Scaffold.RunCommand(
 				ctx,
