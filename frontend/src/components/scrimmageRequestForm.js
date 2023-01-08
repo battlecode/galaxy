@@ -208,7 +208,7 @@ class ScrimmageRequestForm extends Component {
                       margin: "0 0 0 10px",
                     }}
                     id="is_ranked"
-                    checked={this.props.is_ranked}
+                    checked={this.state.is_ranked}
                   />
                 </div>
               </div>
