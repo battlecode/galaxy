@@ -15,8 +15,8 @@ import (
 )
 
 type StorageClient interface {
-	GetFile(context.Context, FileSpecification, io.Writer) error
-	UploadFile(context.Context, FileSpecification, io.Reader) error
+	GetFile(ctx context.Context, spec FileSpecification, w io.Writer) error
+	UploadFile(ctx context.Context, spec FileSpecification, r io.Reader, public bool) error
 }
 
 func GetArchive(
@@ -91,6 +91,7 @@ func PutArchive(
 	c StorageClient,
 	spec FileSpecification,
 	root string,
+	public bool,
 ) error {
 	buf := new(bytes.Buffer)
 	zw := zip.NewWriter(buf)
@@ -124,7 +125,7 @@ func PutArchive(
 	}
 
 	zw.Close()
-	if err := c.UploadFile(ctx, spec, buf); err != nil {
+	if err := c.UploadFile(ctx, spec, buf, public); err != nil {
 		return fmt.Errorf("c.UploadFile: %v", err)
 	}
 	return nil

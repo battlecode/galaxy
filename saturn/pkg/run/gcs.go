@@ -37,12 +37,18 @@ func (c *GCSClient) GetFile(ctx context.Context, f FileSpecification, w io.Write
 	return nil
 }
 
-func (c *GCSClient) UploadFile(ctx context.Context, f FileSpecification, r io.Reader) error {
+func (c *GCSClient) UploadFile(ctx context.Context, f FileSpecification, r io.Reader, public bool) error {
 	object := c.c.Bucket(f.Bucket).Object(f.Name)
 	writer := object.NewWriter(ctx)
 	defer writer.Close()
 
 	writer.ContentType = "application/octet-stream"
+	if public {
+		writer.PredefinedACL = "publicRead"
+	} else {
+		writer.PredefinedACL = "projectPrivate"
+	}
+
 	written, err := io.Copy(writer, r)
 	if err != nil {
 		return fmt.Errorf("io.Copy: %v", err)
