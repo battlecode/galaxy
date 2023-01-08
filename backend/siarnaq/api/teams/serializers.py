@@ -42,10 +42,19 @@ class TeamProfilePublicSerializer(serializers.ModelSerializer):
 class TeamPublicSerializer(serializers.ModelSerializer):
     profile = TeamProfilePublicSerializer(required=False)
     members = UserPublicSerializer(many=True, read_only=True)
+    has_active_submission = serializers.SerializerMethodField()
 
     class Meta:
         model = Team
-        fields = ["id", "profile", "episode", "name", "members", "status"]
+        fields = [
+            "id",
+            "profile",
+            "episode",
+            "name",
+            "members",
+            "status",
+            "has_active_submission",
+        ]
         read_only_fields = ["id", "episode", "members", "status"]
 
     def create(self, *args, **kwargs):
@@ -53,6 +62,9 @@ class TeamPublicSerializer(serializers.ModelSerializer):
 
     def update(self, *args, **kwargs):
         raise RuntimeError("Operation disabled for public serializer")
+
+    def get_has_active_submission(self, obj):
+        return obj.has_active_submission()
 
 
 class TeamProfilePrivateSerializer(TeamProfilePublicSerializer):
