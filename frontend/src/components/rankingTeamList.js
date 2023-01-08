@@ -4,6 +4,7 @@ import Api from "../api";
 import PaginationControl from "./paginationControl";
 import Spinner from "./spinner";
 import ScrimmageRequestForm from "./scrimmageRequestForm";
+import { trimUsername } from "../utils/misc";
 
 class RankingTeamList extends Component {
   state = {
@@ -102,7 +103,11 @@ class RankingTeamList extends Component {
           >
             {<td>{Math.round(team.profile.rating)}</td>}
             <td>{team.name}</td>
-            <td>{team.members.map((member) => member.username).join(", ")}</td>
+            <td>
+              {team.members
+                .map((member) => trimUsername(member.username, 13))
+                .join(", ")}
+            </td>
             {!this.props.canRequest && <td>{team.profile.quote}</td>}
             {!this.props.canRequest && (
               <td>
