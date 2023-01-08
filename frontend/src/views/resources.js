@@ -8,7 +8,7 @@ class Resources extends Component {
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-12">
-              {this.props.is_game_released && (
+              {this.props.is_game_released && this.props.episode_info && (
                 <div className="card">
                   <div className="header">
                     <h4 className="title">Game Specifications</h4>
@@ -18,7 +18,7 @@ class Resources extends Component {
                       <a
                         type="button"
                         className="btn btn-info btn-fill text-center"
-                        href={`https://play.battlecode.org/specs/${this.props.episode}/specs.md.html`}
+                        href={`https://releases.battlecode.org/specs/${this.props.episode_info.artifact_name}/${this.props.episode_info.release_version_public}/specs.md.html`}
                       >
                         Specifications for {this.props.episode_name_long}!
                       </a>
@@ -27,7 +27,7 @@ class Resources extends Component {
                       <a
                         type="button"
                         className="btn btn-info btn-fill text-center"
-                        href={`https://play.battlecode.org/javadocs/${this.props.episode}/index.html`}
+                        href={`https://releases.battlecode.org/javadoc/${this.props.episode_info.artifact_name}/${this.props.episode_info.release_version_public}/index.html`}
                       >
                         Javadocs for {this.props.episode_name_long}!
                       </a>
