@@ -145,18 +145,13 @@ class ScrimmageHistory extends Component {
   static formatRatingDelta(participation) {
     const old_rating = Math.round(participation.old_rating);
     const rating = Math.round(participation.rating);
-    if (rating > old_rating)
-      return (
-        <span>
-          {old_rating} <b style={{ color: "green" }}>➞ {rating}</b>
-        </span>
-      );
-    else
-      return (
-        <span>
-          {old_rating} <b style={{ color: "red" }}>➞ {rating}</b>
-        </span>
-      );
+    const color =
+      rating > old_rating ? "green" : rating < old_rating ? "red" : "grey";
+    return (
+      <span>
+        {old_rating} <b style={{ color }}>➞ {rating}</b>
+      </span>
+    );
   }
 
   loadPage = (page) => {
