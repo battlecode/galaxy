@@ -212,6 +212,7 @@ class App extends Component {
             episode_name_long={episode_name_long}
             episode={this.state.episode}
             is_game_released={is_game_released}
+            episode_info={this.state.episode_info}
           />
         )}
         key="resources"
