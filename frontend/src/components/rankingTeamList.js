@@ -5,6 +5,7 @@ import Api from "../api";
 import PaginationControl from "./paginationControl";
 import Spinner from "./spinner";
 import ScrimmageRequestForm from "./scrimmageRequestForm";
+import { trimUsername } from "../utils/misc";
 
 class RankingTeamList extends Component {
   state = {
@@ -103,7 +104,7 @@ class RankingTeamList extends Component {
               {team.members.map((member) => (
                 <span>
                   <NavLink to={`/${this.props.episode}/user/${member.id}`}>
-                    {member.username}
+                    {trimUsername(member.username, 13)}
                   </NavLink>
                   {team.members.findIndex((m) => m.id === member.id) + 1 !==
                     team.members.length && ","}

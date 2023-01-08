@@ -325,6 +325,7 @@ class MatchReportSerializer(serializers.Serializer):
             participant.score = score
         MatchParticipant.objects.bulk_update(participants, ["score"])
 
+        self.instance.refresh_from_db()
         invocation_serializer = self.fields["invocation"]
         invocation_serializer.update(self.instance, self.validated_data["invocation"])
         return self.instance

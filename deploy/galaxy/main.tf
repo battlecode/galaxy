@@ -181,12 +181,12 @@ module "saturn_compile" {
   network_vpc_id = google_compute_network.this.id
   subnetwork_ip_cidr = "172.16.0.0/16"
 
-  machine_type = "e2-medium"
+  machine_type = "t2d-standard-2"
   image        = var.saturn_image
 
   max_instances = var.max_compile_instances
   min_instances = 0
-  load_ratio    = 25
+  load_ratio    = 5
 }
 
 module "saturn_execute" {
@@ -208,7 +208,7 @@ module "saturn_execute" {
   network_vpc_id = google_compute_network.this.id
   subnetwork_ip_cidr = "172.17.0.0/16"
 
-  machine_type = "e2-highmem-2"
+  machine_type = "t2d-standard-2"
   image        = var.saturn_image
 
   max_instances = var.max_execute_instances

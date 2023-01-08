@@ -52,6 +52,11 @@ func (s *Java8Scaffold) Prepare() *Step {
 				return fmt.Errorf("Refresh: %v", err)
 			}
 
+			log.Ctx(ctx).Debug().Msg("Flushing build directory.")
+			if err := os.RemoveAll(filepath.Join(s.root, "build")); err != nil {
+				return fmt.Errorf("os.RemoveAll: %v", err)
+			}
+
 			log.Ctx(ctx).Debug().Msg("Updating distribution.")
 			out, err := s.Scaffold.RunCommand(
 				ctx,
@@ -102,7 +107,7 @@ func (s *Java8Scaffold) UploadBinary() *Step {
 		Name: "Upload binary",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
 			root := filepath.Join(s.Scaffold.root, "build", "classes")
-			return PutArchive(ctx, arg.Finisher, arg.StorageClient, arg.Details.(CompileRequest).Binary, root)
+			return PutArchive(ctx, arg.Finisher, arg.StorageClient, arg.Details.(CompileRequest).Binary, root, false)
 		},
 	}
 }
@@ -115,7 +120,7 @@ func (s *Java8Scaffold) UploadReplay() *Step {
 			if err != nil {
 				return fmt.Errorf("os.Open: %v", err)
 			}
-			return arg.StorageClient.UploadFile(ctx, arg.Details.(ExecuteRequest).Replay, f)
+			return arg.StorageClient.UploadFile(ctx, arg.Details.(ExecuteRequest).Replay, f, true)
 		},
 	}
 }

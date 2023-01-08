@@ -47,8 +47,8 @@ module "production" {
   titan_image = module.cd.artifact_image["titan"]
 
   saturn_image          = module.cd.artifact_image["saturn"]
-  max_compile_instances = 10
-  max_execute_instances = 10
+  max_compile_instances = 5
+  max_execute_instances = 50
   saturn_secrets        = var.saturn_secrets_production
 
   depends_on = [

@@ -51,9 +51,9 @@ h5 {
 /* used to display little user icons on team page */
 .small-user-list {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
   padding-top: 10px;
+  padding-left: 20px;
 }
 
 .small-user-list .avatar {
@@ -69,7 +69,8 @@ h5 {
 /* flex box to display elements in a row with spacing, used in team card */
 .row-items-box {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: left;
 }
 
 .row-items-box > * {
