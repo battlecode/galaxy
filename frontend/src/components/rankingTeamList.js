@@ -128,22 +128,27 @@ class RankingTeamList extends Component {
                 )}
               </td>
             )}
+            {this.props.canRequest && (
+              <td>{team.has_active_submission ? "Yes" : "No"}</td>
+            )}
             <td>{team.profile.auto_accept_ranked ? "Yes" : "No"}</td>
             <td>{team.profile.auto_accept_unranked ? "Yes" : "No"}</td>
             {this.props.canRequest && (
               <td>
-                {this.props.team && team.id !== this.props.team.id && (
-                  <button
-                    className="btn btn-xs"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      this.openRequestForm(team);
-                    }}
-                    disabled={this.props.episode_info.frozen}
-                  >
-                    {buttonContent}
-                  </button>
-                )}{" "}
+                {this.props.team &&
+                  team.id !== this.props.team.id &&
+                  team.has_active_submission && (
+                    <button
+                      className="btn btn-xs"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        this.openRequestForm(team);
+                      }}
+                      disabled={this.props.episode_info.frozen}
+                    >
+                      {buttonContent}
+                    </button>
+                  )}{" "}
               </td>
             )}
           </tr>
@@ -177,6 +182,7 @@ class RankingTeamList extends Component {
                     <th>Members</th>
                     {!this.props.canRequest && <th>Quote</th>}
                     {!this.props.canRequest && <th>Eligibility</th>}
+                    {this.props.canRequest && <th>Submitted?</th>}
                     <th>Auto-Accept Ranked</th>
                     <th>Auto-Accept Unranked</th>
                   </tr>
