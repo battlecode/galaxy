@@ -31,12 +31,22 @@ class ScrimmageRequestForm extends Component {
     this.requestScrimmage = this.requestScrimmage.bind(this);
   }
 
+  getRandomMaps(available_maps) {
+    const possible_maps = available_maps.slice();
+    // Pick a random subset of 3 maps, assuming that there are at least 3 possible maps
+    const random_maps = [];
+    for (let i = 0; i < 3; i++) {
+      const map_index = Math.floor(Math.random() * possible_maps.length);
+      random_maps.push(possible_maps[map_index].name);
+      possible_maps.splice(map_index, 1);
+    }
+    return random_maps;
+  }
+
   getMaps() {
-    Api.getMaps(this.props.episode, (maps) => {
-      const random_maps = [1, 2, 3].map(
-        () => maps[Math.floor(Math.random() * maps.length)].name
-      );
-      this.setState({ available_maps: maps, maps: random_maps });
+    Api.getMaps(this.props.episode, (available_maps) => {
+      const random_maps = this.getRandomMaps(available_maps);
+      this.setState({ available_maps, maps: random_maps });
     });
   }
 
@@ -59,6 +69,12 @@ class ScrimmageRequestForm extends Component {
   }
 
   requestScrimmage() {
+    if (new Set(this.state.maps).size !== this.state.maps.length) {
+      this.setState({
+        alert_message: "Cannot have duplicate maps in scrimmage request.",
+      });
+      return;
+    }
     this.setState({ update_status: "loading" });
     Api.requestScrimmage(
       this.state.is_ranked,
@@ -89,11 +105,7 @@ class ScrimmageRequestForm extends Component {
 
   closeModal(e) {
     // Reset state
-    const maps = this.state.available_maps;
-    const random_maps = [1, 2, 3].map(
-      () =>
-        maps[Math.floor(Math.random() * this.state.available_maps.length)].name
-    );
+    const random_maps = this.getRandomMaps(this.state.available_maps);
     this.setState({
       is_ranked: false,
       player_order: PLAYER_ORDERS[0].value,
@@ -166,7 +178,7 @@ class ScrimmageRequestForm extends Component {
                 {this.state.maps.map((map_name, map_number) => {
                   return (
                     <div className="form-group" key={map_number}>
-                      <label>Map {map_number}</label>
+                      <label>Map {map_number + 1}</label>
                       <select
                         className="form-control"
                         id={`map_${map_number}`}
