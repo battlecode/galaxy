@@ -8,6 +8,7 @@ import Home from "./views/home";
 import NotFound from "./views/not_found";
 import GettingStarted from "./views/getting-started";
 import Scrimmaging from "./views/scrimmaging";
+import QueueHistory from "./views/queue";
 import Tournaments from "./views/tournaments";
 import Updates from "./views/updates";
 import Team from "./views/team";
@@ -232,6 +233,13 @@ class App extends Component {
             episode={this.state.episode}
             episode_info={this.state.episode_info}
           />
+        )}
+        key="rankings"
+      />,
+      <Route
+        path={`/:episode/queue`}
+        component={(props) => (
+          <QueueHistory {...props} episode={this.state.episode} />
         )}
         key="rankings"
       />,
