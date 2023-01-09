@@ -85,9 +85,12 @@ class RankingTeamList extends Component {
         </div>
       );
     } else {
-      const teamsToShow = props.teams.filter((team) => {
-        return team.has_active_submission || !this.props.canRequest;
-      });
+      // const teamsToShow = props.teams.filter((team) => {
+      //   return team.has_active_submission || !this.props.canRequest;
+      // });
+
+      // Note: this will look odd when this.props.canRequest is false. Doesn't matter for now...but test during a simulated freeze and fix before freeze.
+      const teamsToShow = props.teams;
       const teamRows = teamsToShow.map((team) => {
         let buttonContent = "Request";
         if (state.pendingRequests[team.id]) {
@@ -165,6 +168,11 @@ class RankingTeamList extends Component {
           <div className="card">
             <div className="header">
               <h4 className="title">{this.props.title}</h4>
+            </div>
+            <div className="content">
+              Teams that do not have already submitted code will not have
+              "request" buttons appear. Click around the pagination to find
+              them. (Enhanced filtering will be coming very soon!)
             </div>
             {this.props.canRequest && this.props.episode_info.frozen && (
               <div className="content">
