@@ -11,6 +11,9 @@ const PLAYER_ORDERS = [
   { value: "-", name: "Requester last" },
 ];
 
+// Team statuses that allow ranked matches.
+const ALLOWS_RANKED = ["R"];
+
 class ScrimmageRequestForm extends Component {
   constructor(props) {
     super(props);
@@ -29,6 +32,15 @@ class ScrimmageRequestForm extends Component {
     this.changeHandler = this.changeHandler.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.requestScrimmage = this.requestScrimmage.bind(this);
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.team !== this.props.team) {
+      let is_ranked =
+        this.props.team === null ||
+        ALLOWS_RANKED.includes(this.props.team.status);
+      this.setState({ is_ranked });
+    }
   }
 
   getRandomMaps(available_maps) {
@@ -209,6 +221,11 @@ class ScrimmageRequestForm extends Component {
                     }}
                     id="is_ranked"
                     checked={this.state.is_ranked}
+                    // Only regular teams get ranked matches
+                    disabled={
+                      this.props.team !== null &&
+                      !ALLOWS_RANKED.includes(this.props.team.status)
+                    }
                   />
                 </div>
               </div>
