@@ -16,7 +16,7 @@ class ScrimmageRequestForm extends Component {
     super(props);
 
     this.state = {
-      is_ranked: true,
+      is_ranked: false,
       player_order: PLAYER_ORDERS[0].value,
       maps: ["", "", ""],
       available_maps: [],
@@ -107,7 +107,7 @@ class ScrimmageRequestForm extends Component {
     // Reset state
     const random_maps = this.getRandomMaps(this.state.available_maps);
     this.setState({
-      is_ranked: true,
+      is_ranked: false,
       player_order: PLAYER_ORDERS[0].value,
       maps: random_maps,
     });
@@ -209,6 +209,10 @@ class ScrimmageRequestForm extends Component {
                     }}
                     id="is_ranked"
                     checked={this.state.is_ranked}
+                    // Only regular teams get ranked matches
+                    disabled={
+                      this.props.team !== null && this.props.team.status != "R"
+                    }
                   />
                 </div>
               </div>
