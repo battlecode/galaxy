@@ -175,6 +175,7 @@ module "saturn_compile" {
   storage_secure_name = google_storage_bucket.secure.name
 
   artifact_registry_name = var.artifact_registry_name
+  storage_releases_name  = var.storage_releases_name
 
   secret_id = google_secret_manager_secret.saturn.secret_id
 
@@ -202,6 +203,7 @@ module "saturn_execute" {
   storage_secure_name = google_storage_bucket.secure.name
 
   artifact_registry_name = var.artifact_registry_name
+  storage_releases_name  = var.storage_releases_name
 
   secret_id = google_secret_manager_secret.saturn.secret_id
 
