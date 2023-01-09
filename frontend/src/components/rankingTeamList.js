@@ -85,7 +85,10 @@ class RankingTeamList extends Component {
         </div>
       );
     } else {
-      const teamRows = props.teams.map((team) => {
+      const teamsToShow = props.teams.filter((team) => {
+        return team.has_active_submission || !this.props.canRequest;
+      });
+      const teamRows = teamsToShow.map((team) => {
         let buttonContent = "Request";
         if (state.pendingRequests[team.id]) {
           buttonContent = <i className="fa fa-circle-o-notch fa-spin"></i>;
@@ -127,9 +130,6 @@ class RankingTeamList extends Component {
                   }
                 )}
               </td>
-            )}
-            {this.props.canRequest && (
-              <td>{team.has_active_submission ? "Yes" : "No"}</td>
             )}
             <td>{team.profile.auto_accept_ranked ? "Yes" : "No"}</td>
             <td>{team.profile.auto_accept_unranked ? "Yes" : "No"}</td>
@@ -182,7 +182,6 @@ class RankingTeamList extends Component {
                     <th>Members</th>
                     {!this.props.canRequest && <th>Quote</th>}
                     {!this.props.canRequest && <th>Eligibility</th>}
-                    {this.props.canRequest && <th>Submitted?</th>}
                     <th>Auto-Accept Ranked</th>
                     <th>Auto-Accept Unranked</th>
                   </tr>
