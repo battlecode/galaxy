@@ -1,16 +1,18 @@
 import { Component } from "react";
 
 // NOTE: Save extensions as strings, not numbers, since episodes could be strings too (eg Battlehack)
-const EPISODES = ["bc23"];
+const EPISODES = ["bc22", "bc23"];
 
 // NOTE: dictionary keys that are strings-of-numbers can just be numbers.
 // The formatter will convert them as such,
 // and the code will treat them the same way
-const EPISODE_TO_EXTENSION = { bc23: ".bc23" };
+const EPISODE_TO_EXTENSION = { bc22: ".bc22", bc23: ".bc23" };
 const EPISODE_TO_SCAFFOLD_LINK = {
+  bc22: "https://github.com/battlecode/battlecode22-scaffold",
   bc23: "https://github.com/battlecode/battlecode23-scaffold",
 };
 const EPISODE_TO_SCAFFOLD_NAME = {
+  bc22: "battlecode22-scaffold",
   bc23: "battlecode23-scaffold",
 };
 const DEFAULT_EPISODE = "bc23";
