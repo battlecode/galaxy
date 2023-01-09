@@ -101,7 +101,6 @@ class SideBar extends Component {
               />
             )}
 
-            {/* #74 considers combining these two checks and &&, into one*/}
             {/* Only visible when on a team AND game is released */}
             {this.props.on_team && this.props.is_game_released && (
               <NLink
