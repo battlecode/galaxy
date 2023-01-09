@@ -1,4 +1,5 @@
 from django.contrib import admin
+from import_export.admin import ExportMixin
 
 from siarnaq.api.compete.models import MatchParticipant, Submission
 from siarnaq.api.teams.models import Team, TeamProfile
@@ -76,7 +77,7 @@ class MatchParticipantInline(admin.TabularInline):
 
 
 @admin.register(Team)
-class TeamAdmin(admin.ModelAdmin):
+class TeamAdmin(ExportMixin, admin.ModelAdmin):
     fields = ("name", "episode", "status", "members", "join_key")
     inlines = [TeamProfileInline, SubmissionInline, MatchParticipantInline]
     list_display = ("name", "episode", "rating", "status")

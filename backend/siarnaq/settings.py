@@ -102,6 +102,7 @@ class Base(Configuration):
         "drf_spectacular",
         "django_rest_passwordreset",
         "anymail",
+        "import_export",
         "sortedm2m",
         "siarnaq.api.user",
         "siarnaq.api.compete",
