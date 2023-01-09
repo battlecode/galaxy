@@ -35,10 +35,10 @@ class ScrimmageRequestForm extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    let is_ranked =
-      this.props.team === null ||
-      ALLOWS_RANKED.includes(this.props.team.status);
-    if (is_ranked != this.state.is_ranked) {
+    if (prevProps.team !== this.props.team) {
+      let is_ranked =
+        this.props.team === null ||
+        ALLOWS_RANKED.includes(this.props.team.status);
       this.setState({ is_ranked });
     }
   }
