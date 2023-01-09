@@ -114,7 +114,7 @@ class RankingTeamList extends Component {
                 </span>
               ))}
             </td>
-            {!this.props.canRequest && <td>{team.profile.quote}</td>}
+            <td>{team.profile.quote}</td>
             {!this.props.canRequest && (
               <td>
                 {this.props.episode_info.eligibility_criteria.map(
@@ -180,7 +180,7 @@ class RankingTeamList extends Component {
                     <th>Rating</th>
                     <th>Team</th>
                     <th>Members</th>
-                    {!this.props.canRequest && <th>Quote</th>}
+                    <th>Quote</th>
                     {!this.props.canRequest && <th>Eligibility</th>}
                     <th>Auto-Accept Ranked</th>
                     <th>Auto-Accept Unranked</th>
