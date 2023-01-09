@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django_rest_passwordreset.models import ResetPasswordToken
+from import_export.admin import ExportMixin
 
 from siarnaq.api.teams.models import Team
 from siarnaq.api.user.forms import UserCreationForm
@@ -48,7 +49,7 @@ class TeamInline(admin.TabularInline):
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(ExportMixin, BaseUserAdmin):
     add_form = UserCreationForm
     add_fieldsets = (
         (
