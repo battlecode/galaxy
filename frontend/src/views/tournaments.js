@@ -226,8 +226,8 @@ class Tournaments extends Component {
                     </li>
                     <li>
                       <b>US Qualifier:</b> Teams must{" "}
-                      <b>consist entirely of US students</b> studying full-time,
-                      or in a transition phase.
+                      <b>consist entirely of US college students</b> studying
+                      full-time, or in a transition phase.
                     </li>
                     <li>
                       <b>International Qualifier:</b> Teams must{" "}
@@ -242,7 +242,7 @@ class Tournaments extends Component {
                     </li>
                     <li>
                       <b>High School Tournament:</b> Teams must{" "}
-                      <b>consist entirely of US high school students</b>.
+                      <b>consist entirely of high school students</b>.
                     </li>
                     <li>
                       <b>Final Tournament:</b> Teams must have qualified via the
