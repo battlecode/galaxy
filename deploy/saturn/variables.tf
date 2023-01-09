@@ -38,6 +38,11 @@ variable "artifact_registry_name" {
   type        = string
 }
 
+variable "storage_releases_name" {
+  description = "Name of Google Cloud Storage bucket resource for game releases"
+  type        = string
+}
+
 variable "secret_id" {
   description = "ID of the Secret resource"
   type        = string

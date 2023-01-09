@@ -50,6 +50,7 @@ module "production" {
   max_compile_instances = 5
   max_execute_instances = 50
   saturn_secrets        = var.saturn_secrets_production
+  storage_releases_name = module.releases.storage_bucket_name
 
   depends_on = [
     google_project_service.artifactregistry,
@@ -85,6 +86,7 @@ module "staging" {
   max_compile_instances = 1
   max_execute_instances = 1
   saturn_secrets        = var.saturn_secrets_staging
+  storage_releases_name = module.releases.storage_bucket_name
 
   depends_on = [
     google_project_service.artifactregistry,

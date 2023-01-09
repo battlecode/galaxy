@@ -58,6 +58,11 @@ variable "siarnaq_secrets" {
   type        = map
 }
 
+variable "storage_releases_name" {
+  description = "Name of Google Cloud Storage bucket resource for game releases"
+  type        = string
+}
+
 variable "artifact_registry_name" {
   description = "Name of the Artifact Registry where the build image can be found"
   type        = string
