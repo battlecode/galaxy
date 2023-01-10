@@ -187,7 +187,6 @@ class Submissions extends Component {
       const submission_upload_button = (
         <button
           disabled={submission_upload_btn_disabled}
-          style={{ float: "right" }}
           onClick={this.uploadData}
           className={submission_btn_class}
         >
@@ -207,7 +206,6 @@ class Submissions extends Component {
               <br />
               {submission_input_label}
               {submission_input}
-              {submission_upload_button}
             </div>
           </div>
         </div>
@@ -217,7 +215,7 @@ class Submissions extends Component {
         <div className="row">
           <div className="col-md-4">
             <div className="form-group">
-              <label>Package Name</label>
+              <label>Package Name (where is RobotPlayer?)</label>
               <input
                 type="text"
                 className="form-control"
@@ -229,7 +227,7 @@ class Submissions extends Component {
           </div>
           <div className="col-md-8">
             <div className="form-group">
-              <label>Description</label>
+              <label>Description (for your reference)</label>
               <input
                 type="text"
                 className="form-control"
@@ -238,6 +236,9 @@ class Submissions extends Component {
                 value={this.state.description}
               />
             </div>
+          </div>
+          <div className="col-md-12">
+            <div className="form-group">{submission_upload_button}</div>
           </div>
         </div>
       );
