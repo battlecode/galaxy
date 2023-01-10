@@ -1471,7 +1471,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {},
             format="json",
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertFalse(Match.objects.exists())
 
     def test_accept_team_invalid(self):
@@ -1490,7 +1490,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {},
             format="json",
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertFalse(Match.objects.exists())
 
     def test_accept_episode_frozen(self):
@@ -1513,6 +1513,30 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(Match.objects.exists())
+
+    @patch(
+        "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
+    )
+    def test_regression_issue_516(self, enqueue):
+        self.teams[0].members.add(
+            User.objects.create_user(username="another", email="another@example.com")
+        )
+        self.client.force_authenticate(self.users[1])
+        r = ScrimmageRequest.objects.create(
+            episode=self.e1,
+            is_ranked=True,
+            requested_by=self.teams[0],
+            requested_to=self.teams[1],
+            player_order=PlayerOrder.REQUESTER_FIRST,
+        )
+        r.maps.add(*self.maps[:3])
+        response = self.client.post(
+            reverse("request-accept", kwargs={"episode_id": "e1", "pk": r.pk}),
+            {},
+            format="json",
+        )
+        self.assertTrue(status.is_success(response.status_code))
+        enqueue.assert_called()
 
     # Partitions for: destroy.
     # episode: frozen, not frozen
