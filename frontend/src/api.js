@@ -160,10 +160,12 @@ class Api {
   //----SEARCHING----
 
   // Search teams, ordering result by ranking.
-  static searchTeam(query, page, episode, callback) {
+  static searchTeam(query, page, episode, requireActiveSubmission, callback) {
     const apiURL = `${URL}/api/team/${episode}/t`;
     const encQuery = encodeURIComponent(query);
-    const teamUrl = `${apiURL}/?ordering=-rating,name&search=${encQuery}&page=${page}`;
+    const teamUrl =
+      `${apiURL}/?ordering=-rating,name&search=${encQuery}&page=${page}` +
+      (requireActiveSubmission ? `&has_active_submission=true` : ``);
     $.get(teamUrl, (teamData) => {
       const pageLimit = Math.ceil(teamData.count / PAGE_SIZE);
       callback(teamData.results, pageLimit);

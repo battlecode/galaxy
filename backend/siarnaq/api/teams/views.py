@@ -11,7 +11,7 @@ from rest_framework.response import Response
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
-from siarnaq.api.teams.filters import TeamOrderingFilter
+from siarnaq.api.teams.filters import TeamActiveSubmissionFilter, TeamOrderingFilter
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.api.teams.serializers import (
@@ -38,7 +38,11 @@ class TeamViewSet(
     When creating a team, add the logged in user as the sole member.
     """
 
-    filter_backends = [filters.SearchFilter, TeamOrderingFilter]
+    filter_backends = [
+        filters.SearchFilter,
+        TeamOrderingFilter,
+        TeamActiveSubmissionFilter,
+    ]
     ordering = "pk"
     ordering_fields = ["pk", "name"] + TeamOrderingFilter.ordering_fields
     search_fields = ["name", "=members__username"]

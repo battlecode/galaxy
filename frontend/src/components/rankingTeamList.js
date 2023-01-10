@@ -169,11 +169,6 @@ class RankingTeamList extends Component {
             <div className="header">
               <h4 className="title">{this.props.title}</h4>
             </div>
-            <div className="content">
-              Teams that do not have already submitted code will not have
-              "request" buttons appear. Click around the pagination to find
-              them. (Enhanced filtering will be coming very soon!)
-            </div>
             {this.props.canRequest && this.props.episode_info.frozen && (
               <div className="content">
                 Scrimmages may not be requested, due to a submission freeze for
