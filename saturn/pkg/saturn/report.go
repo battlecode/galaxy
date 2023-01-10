@@ -29,24 +29,6 @@ func NewGCPTokenedReporter(
 	if err != nil {
 		return nil, fmt.Errorf("idtoken.NewClient: %v", err)
 	}
-
-	// Allow following redirect for POST requests
-	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-		if len(via) >= 10 {
-			return fmt.Errorf("stopped after 10 redirects")
-		}
-		if via[0].GetBody == nil {
-			return fmt.Errorf("could not get original body")
-		}
-
-		var err error
-		req.Method = http.MethodPost
-		req.Body, err = via[0].GetBody()
-		if err != nil {
-			return fmt.Errorf("GetBody: %v", err)
-		}
-		return nil
-	}
 	return &GCPTokenedReporter{client, userAgent}, nil
 }
 
