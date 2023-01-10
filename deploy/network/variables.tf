@@ -23,8 +23,8 @@ variable "subdomain" {
   type        = string
 }
 
-variable "use_ssl" {
-  description = "Whether to use and redirect to SSL."
+variable "https_redirect" {
+  description = "Whether to redirect to SSL."
   type        = bool
 }
 
