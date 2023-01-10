@@ -24,3 +24,10 @@ class TeamOrderingFilter(filters.OrderingFilter):
         if term.startswith("-"):
             prefix, term = "-", term[1:]
         return prefix + self.FIELD_TRANSFORMS.get(term, term)
+
+
+class TeamActiveSubmissionFilter(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        if "has_active_submission" not in request.query_params:
+            return queryset
+        return queryset.filter(submissions__accepted=True).distinct()
