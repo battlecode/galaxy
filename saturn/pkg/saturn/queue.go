@@ -27,7 +27,6 @@ func NewGCPPubsubSubscriber(ctx context.Context, projectID, subscriptionID strin
 	}
 
 	subscription := client.Subscription(subscriptionID)
-	subscription.ReceiveSettings.Synchronous = true
 	subscription.ReceiveSettings.MaxOutstandingMessages = 1
 
 	return &GCPPubsubSubscriber{client, subscription}, nil
