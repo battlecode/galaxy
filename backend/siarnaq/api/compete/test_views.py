@@ -1471,7 +1471,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {},
             format="json",
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertFalse(Match.objects.exists())
 
     def test_accept_team_invalid(self):
@@ -1490,7 +1490,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {},
             format="json",
         )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertFalse(Match.objects.exists())
 
     def test_accept_episode_frozen(self):

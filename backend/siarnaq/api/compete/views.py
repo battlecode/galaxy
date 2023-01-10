@@ -19,11 +19,7 @@ from siarnaq.api.compete.models import (
     ScrimmageRequestStatus,
     Submission,
 )
-from siarnaq.api.compete.permissions import (
-    HasTeamSubmission,
-    IsScrimmageRequestRecipient,
-    IsScrimmageRequestSender,
-)
+from siarnaq.api.compete.permissions import HasTeamSubmission
 from siarnaq.api.compete.serializers import (
     MatchReportSerializer,
     MatchSerializer,
@@ -349,8 +345,6 @@ class MatchViewSet(
 class ScrimmageRequestViewSet(
     EpisodeTeamUserContextMixin,
     mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet,
 ):
@@ -361,18 +355,38 @@ class ScrimmageRequestViewSet(
     serializer_class = ScrimmageRequestSerializer
 
     def get_queryset(self):
-        queryset = (
-            ScrimmageRequest.objects.filter(
-                Q(requested_to__members=self.request.user)
-                | Q(requested_by__members=self.request.user),
-                episode=self.kwargs["episode_id"],
-            )
-            .select_related(
-                "requested_to__profile__rating", "requested_by__profile__rating"
-            )
-            .prefetch_related("requested_to__members", "requested_by__members", "maps")
-            .order_by("-pk")
-        )
+        queryset = ScrimmageRequest.objects.filter(episode=self.kwargs["episode_id"])
+        match self.action:
+            case "destroy":
+                queryset = queryset.filter(
+                    requested_by__members=self.request.user,
+                    status=ScrimmageRequestStatus.PENDING,
+                )
+            case "outbox":
+                queryset = (
+                    queryset.filter(
+                        requested_by__members=self.request.user,
+                        status=ScrimmageRequestStatus.PENDING,
+                    )
+                    .select_related("requested_to__profile__rating")
+                    .prefetch_related("requested_to__members", "maps")
+                    .order_by("-pk")
+                )
+            case "accept" | "reject":
+                queryset = queryset.filter(
+                    requested_to__members=self.request.user,
+                    status=ScrimmageRequestStatus.PENDING,
+                )
+            case "inbox":
+                queryset = (
+                    queryset.filter(
+                        requested_to__members=self.request.user,
+                        status=ScrimmageRequestStatus.PENDING,
+                    )
+                    .select_related("requested_by__profile__rating")
+                    .prefetch_related("requested_by__members", "maps")
+                    .order_by("-pk")
+                )
         return queryset
 
     def get_permissions(self):
@@ -389,7 +403,6 @@ class ScrimmageRequestViewSet(
                     IsAuthenticated(),
                     IsOnTeam(),
                     IsEpisodeAvailable(),
-                    IsScrimmageRequestSender(),
                 ]
             case "list" | "retrieve":
                 return [IsAuthenticated(), IsOnTeam(), IsEpisodeAvailable()]
@@ -459,7 +472,6 @@ class ScrimmageRequestViewSet(
             IsAuthenticated,
             IsOnTeam,
             IsEpisodeMutable | IsAdminUser,
-            IsScrimmageRequestRecipient,
             HasTeamSubmission,
         ),
     )
@@ -481,12 +493,7 @@ class ScrimmageRequestViewSet(
     @action(
         detail=True,
         methods=["post"],
-        permission_classes=(
-            IsAuthenticated,
-            IsOnTeam,
-            IsEpisodeAvailable,
-            IsScrimmageRequestRecipient,
-        ),
+        permission_classes=(IsAuthenticated, IsOnTeam, IsEpisodeAvailable),
     )
     def reject(self, request, pk=None, *, episode_id):
         """Reject a scrimmage request."""
