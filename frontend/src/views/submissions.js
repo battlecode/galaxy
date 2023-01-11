@@ -58,6 +58,22 @@ class Submissions extends Component {
   // makes an api call to upload the selected file
   uploadData = () => {
     this.setState({ upload_status: "loading" });
+    const fileSize = this.state.selectedFile.size / 1024 / 1024; // in MiB
+    if (fileSize > 5) {
+      let alert_message =
+        "Ensure this file size is not greater than 5 MiB. Your current file size is " +
+        Number(fileSize.toPrecision(3)) +
+        " MiB.";
+      this.setState({
+        alert_message,
+        upload_status: "failure",
+      });
+      $("#submission-table-refresh-button").click();
+      setTimeout(() => {
+        this.setState({ upload_status: "waiting" });
+      }, 2000);
+      return;
+    }
     Api.newSubmission(
       this.state.selectedFile,
       this.state.package,
@@ -72,15 +88,12 @@ class Submissions extends Component {
             selectedFile: null,
           });
         } else {
-          let alert_message = "";
-
+          let alert_message = print_errors(response);
           // During submission freeze, backend gives an unhelpful error...
           // to mitigate:
           if (response.responseJSON && response.responseJSON.detail) {
             alert_message +=
               "\nThis is most likely due to a submission freeze.";
-          } else {
-            alert_message += "Ensure this file size is not greater than 5 MiB.";
           }
           this.setState({
             alert_message,
@@ -190,7 +203,6 @@ class Submissions extends Component {
       const submission_upload_button = (
         <button
           disabled={submission_upload_btn_disabled}
-          style={{ float: "right" }}
           onClick={this.uploadData}
           className={submission_btn_class}
         >
@@ -210,7 +222,6 @@ class Submissions extends Component {
               <br />
               {submission_input_label}
               {submission_input}
-              {submission_upload_button}
             </div>
           </div>
         </div>
@@ -220,7 +231,7 @@ class Submissions extends Component {
         <div className="row">
           <div className="col-md-4">
             <div className="form-group">
-              <label>Package Name</label>
+              <label>Package Name (where is RobotPlayer?)</label>
               <input
                 type="text"
                 className="form-control"
@@ -232,7 +243,7 @@ class Submissions extends Component {
           </div>
           <div className="col-md-8">
             <div className="form-group">
-              <label>Description</label>
+              <label>Description (for your reference)</label>
               <input
                 type="text"
                 className="form-control"
@@ -241,6 +252,9 @@ class Submissions extends Component {
                 value={this.state.description}
               />
             </div>
+          </div>
+          <div className="col-md-12">
+            <div className="form-group">{submission_upload_button}</div>
           </div>
         </div>
       );
