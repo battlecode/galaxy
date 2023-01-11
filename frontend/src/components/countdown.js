@@ -109,8 +109,8 @@ class Countdown extends Component {
           {countdown_time_text && countdown_time_text.est_date_str} Eastern
           Time, which {tense_verb}{" "}
           <b>
-            {countdown_time_text && countdown_time_text.local_date_str} in your
-            locale and time zone
+            {countdown_time_text && countdown_time_text.local_full_string}{" "}
+            (formatted in your locale)
           </b>
           .
         </p>
@@ -130,8 +130,8 @@ class Countdown extends Component {
                 {countdown_time_text.est_date_str} Eastern Time, which{" "}
                 {tense_verb}{" "}
                 <b>
-                  {countdown_time_text.local_date_str} in your locale and time
-                  zone
+                  {countdown_time_text.local_full_string} (formatted in your
+                  locale)
                 </b>
                 .
               </p>
