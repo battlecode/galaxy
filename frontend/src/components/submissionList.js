@@ -3,6 +3,7 @@ import Api from "../api";
 
 import PaginationControl from "./paginationControl";
 import Spinner from "./spinner";
+import { getDateTimeText } from "../utils/date";
 
 const SUBMISSION_STATUS = {
   NEW: "Created",
@@ -52,9 +53,11 @@ class SubmissionList extends Component {
 
   renderTable() {
     const rows = this.state.submissions.map((submission) => {
+      const created_date_text = getDateTimeText(new Date(submission.created));
+      const created_date_string = created_date_text.local_full_string;
       return (
         <tr key={submission.id}>
-          <td>{new Date(submission.created).toLocaleString()}</td>
+          <td>{created_date_string}</td>
           <td>
             {submission.status == "OK!"
               ? SUBMISSION_ACCEPTED[submission.accepted]
