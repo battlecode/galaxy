@@ -127,8 +127,13 @@ class Countdown extends Component {
               <p>
                 The submission deadline for the{" "}
                 <b>{this.state.next_tournament.name_long}</b> {tense_verb} at{" "}
-                {countdown_time_text.est_date_str}, which {tense_verb}{" "}
-                <b>{countdown_time_text.local_date_str}</b>.
+                {countdown_time_text.est_date_str} Eastern Time, which{" "}
+                {tense_verb}{" "}
+                <b>
+                  {countdown_time_text.local_date_str} in your locale and time
+                  zone
+                </b>
+                .
               </p>
             ) : (
               <p>
