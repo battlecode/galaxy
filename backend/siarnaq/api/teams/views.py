@@ -1,3 +1,4 @@
+import posixpath
 import uuid
 
 import structlog
@@ -165,11 +166,12 @@ class TeamViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         avatar = serializer.validated_data["avatar"]
+        path = posixpath.join("team", str(self.pk), "avatar.png")
 
         with transaction.atomic():
-            profile.has_avatar = True
+            profile.has_uploaded_avatar = True
             profile.avatar_uuid = uuid.uuid4()
-            profile.save(update_fields=["has_avatar", "avatar_uuid"])
-            titan.upload_image(avatar, profile.get_avatar_path())
+            profile.save(update_fields=["has_uploaded_avatar", "avatar_uuid"])
+            titan.upload_image(avatar, path)
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)

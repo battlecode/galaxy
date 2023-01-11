@@ -1,3 +1,4 @@
+import posixpath
 import uuid
 
 import google.cloud.storage as storage
@@ -6,6 +7,7 @@ from django.conf import settings
 from django.db import transaction
 from django.http import Http404
 from drf_spectacular.utils import extend_schema
+from PIL import Image
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -150,11 +152,13 @@ class UserViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         avatar = serializer.validated_data["avatar"]
+        path = posixpath.join("user", str(self.pk), "avatar.png")
 
         with transaction.atomic():
-            profile.has_avatar = True
+            profile.has_uploaded_avatar = True
             profile.avatar_uuid = uuid.uuid4()
-            profile.save(update_fields=["has_avatar", "avatar_uuid"])
-            titan.upload_image(avatar, profile.get_avatar_path())
+            profile.save(update_fields=["has_uploaded_avatar", "avatar_uuid"])
+            img = Image.open(avatar)
+            titan.upload_image(img, path)
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)

@@ -17,10 +17,10 @@ class UserProfileInline(admin.StackedInline):
         "kerberos",
         "biography",
         "country",
-        "has_avatar",
+        "has_uploaded_avatar",
         "has_resume",
     )
-    readonly_fields = ("has_avatar", "has_resume")
+    readonly_fields = ("has_uploaded_avatar", "has_resume")
 
     def has_delete_permission(self, request, obj):
         return False

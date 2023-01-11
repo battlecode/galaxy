@@ -8,6 +8,8 @@ from django.db import models, transaction
 
 import siarnaq.api.refs as refs
 from siarnaq.api.teams.managers import TeamQuerySet
+from siarnaq.api.user.random_avatar import generate_avatar
+from siarnaq.gcloud import titan
 
 
 class Rating(models.Model):
@@ -192,10 +194,10 @@ class TeamProfile(models.Model):
     biography = models.TextField(max_length=1024, blank=True)
     """The biography provided by the team, if any."""
 
-    has_avatar = models.BooleanField(default=False)
+    has_uploaded_avatar = models.BooleanField(default=False)
     """Whether the team has an uploaded avatar."""
 
-    avatar_uuid = models.UUIDField(default=uuid.uuid4)
+    avatar_uuid = models.UUIDField(default=None, null=True)
     """A unique ID to identify each new avatar upload."""
 
     rating = models.OneToOneField(Rating, on_delete=models.PROTECT)
@@ -218,24 +220,23 @@ class TeamProfile(models.Model):
             self.rating = Rating.objects.create()
         super().save(*args, **kwargs)
 
-    def get_avatar_path(self):
-        """Return the path of the avatar on Google cloud storage."""
-        if not self.has_avatar:
-            return None
-        return posixpath.join("team", str(self.pk), "avatar.png")
-
     def get_avatar_url(self):
         """Return a cache-safe URL to the avatar."""
-        # To circumvent caching of old avatars, we append a UUID that changes on each
-        # update.
-        if not self.has_avatar:
-            return None
+
+        avatar_path = posixpath.join("team", str(self.pk), "avatar.png")
+
+        if not self.avatar_uuid:
+
+            self.avatar_uuid = uuid.uuid4()
+            self.save(update_fields=["has_uploaded_avatar", "avatar_uuid"])
+            avatar = generate_avatar(self.avatar_uuid.int)
+
+            titan.upload_image(avatar, avatar_path)
 
         client = storage.Client.create_anonymous_client()
         public_url = (
-            client.bucket(settings.GCLOUD_BUCKET_PUBLIC)
-            .blob(self.get_avatar_path())
-            .public_url
+            client.bucket(settings.GCLOUD_BUCKET_PUBLIC).blob(avatar_path).public_url
         )
+
         # Append UUID to public URL to prevent caching on avatar update
         return f"{public_url}?{self.avatar_uuid}"
