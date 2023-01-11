@@ -280,7 +280,8 @@ class ScrimmageHistory extends Component {
                   const created_date_text = getDateTimeText(
                     new Date(s.created)
                   );
-                  const created_date_string = `${created_date_text.local_date_str} ${created_date_text.local_timezone}`;
+                  const created_date_string =
+                    created_date_text.local_full_string;
                   const show_deltas = s.status == "OK!" && s.is_ranked;
 
                   return (
