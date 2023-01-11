@@ -63,7 +63,6 @@ class QueueHistory extends Component {
   }
 
   getMatchPage = (page) => {
-    console.log(page);
     if (
       page !== this.state.matchPage &&
       page >= 0 &&
@@ -87,7 +86,7 @@ class QueueHistory extends Component {
                 <div className="card">
                   <div className="header">
                     <h4 className="title">
-                      Queue{" "}
+                      Recent Queue{" "}
                       <button
                         onClick={this.refresh}
                         style={{ marginLeft: "10px" }}
@@ -199,7 +198,7 @@ class QueueHistory extends Component {
                 </div>
                 <PaginationControl
                   page={this.state.matchPage}
-                  pageLimit={this.state.pageLimit}
+                  pageLimit={Math.min(this.state.pageLimit, 25)}
                   onPageClick={this.getMatchPage}
                 />
               </div>
