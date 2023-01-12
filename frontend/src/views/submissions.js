@@ -57,7 +57,6 @@ class Submissions extends Component {
 
   // makes an api call to upload the selected file
   uploadData = () => {
-    this.setState({ upload_status: "loading" });
     const fileSize = this.state.selectedFile.size / 1024 / 1024; // in MiB
     if (fileSize > 5) {
       let alert_message =
@@ -66,14 +65,11 @@ class Submissions extends Component {
         " MiB.";
       this.setState({
         alert_message,
-        upload_status: "failure",
       });
-      $("#submission-table-refresh-button").click();
-      setTimeout(() => {
-        this.setState({ upload_status: "waiting" });
-      }, 2000);
+      this.setState({ upload_status: "waiting" });
       return;
     }
+    this.setState({ upload_status: "loading" });
     Api.newSubmission(
       this.state.selectedFile,
       this.state.package,
@@ -231,7 +227,7 @@ class Submissions extends Component {
         <div className="row">
           <div className="col-md-4">
             <div className="form-group">
-              <label>Package Name (where is RobotPlayer?)</label>
+              <label>Package Name (i.e. where is RobotPlayer?)</label>
               <input
                 type="text"
                 className="form-control"
