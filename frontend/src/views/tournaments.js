@@ -115,9 +115,10 @@ class Tournaments extends Component {
                       <a href="https://www.regression.gg/battlecode">
                         <b>Best Devlog Series Prize:</b>
                       </a>{" "}
-                      Prize given by our Gold Sponsor, Regression Games. The
-                      winners of this prize will get approximately $250 and a
-                      chance to interview for internships.
+                      Prize given by our Gold Sponsor,{" "}
+                      <a href="https://www.regression.gg">Regression Games</a>.
+                      First place will receive $250, and all winners will
+                      receive a chance to interview for internships.
                       <ul>
                         <li>
                           We want to see what you are building during the
@@ -131,6 +132,27 @@ class Tournaments extends Component {
                             regression.gg/battlecode
                           </a>{" "}
                           for more info, ideas, and social media handles).
+                          {/* Historically, we have given out prizes for creative
+                          strategies, major bugs found, and other game-specific
+                          topics. Have fun with your strategies, write-ups, and
+                          overall participation in Battlecode! */}
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <b>Best Strategy Report Prize: </b>
+                      Prize given by our Gold Sponsor,{" "}
+                      <a href="https://argus.gg/">Argus Labs</a>. First place
+                      will receive $250, and all winners will receive a chance
+                      to interview for internships and a swag box.
+                      <ul>
+                        <li>
+                          Submit a strategy report detailing the strategies you
+                          used to develop your bot! We'd love to see how you
+                          handled communication, resource allocation, battling,
+                          and more. Tell us what unique strategies your team
+                          came up with! A link for submitting reports will be
+                          provided later.
                           {/* Historically, we have given out prizes for creative
                           strategies, major bugs found, and other game-specific
                           topics. Have fun with your strategies, write-ups, and
