@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
 import Api from "../api";
 import Floater from "react-floater";
 import MultiEpisode from "./multi-episode";
@@ -145,11 +146,21 @@ class ScrimmageHistory extends Component {
   static formatRatingDelta(participation) {
     const old_rating = Math.round(participation.old_rating);
     const rating = Math.round(participation.rating);
+    const rating_diff = Math.abs(rating - old_rating);
+    const rating_diff_text =
+      rating > old_rating
+        ? " +" + rating_diff
+        : rating < old_rating
+        ? " –" + Math.abs(rating_diff)
+        : " ±0";
     const color =
       rating > old_rating ? "green" : rating < old_rating ? "red" : "grey";
     return (
       <span>
-        {old_rating} <b style={{ color }}>➞ {rating}</b>
+        {old_rating}
+        <small style={{ color }}>
+          {participation.rating !== null ? rating_diff_text : ""}
+        </small>
       </span>
     );
   }
@@ -282,23 +293,23 @@ class ScrimmageHistory extends Component {
                   );
                   const created_date_string =
                     created_date_text.local_full_string;
-                  const show_deltas = s.status == "OK!" && s.is_ranked;
 
                   return (
                     <tr key={s.id}>
                       {score_entry}
                       <td>
-                        {show_deltas
-                          ? ScrimmageHistory.formatRatingDelta(participation)
-                          : ""}
+                        {ScrimmageHistory.formatRatingDelta(participation)}
                       </td>
                       <td>
-                        {opponent_participation.teamname} (
-                        {show_deltas
-                          ? ScrimmageHistory.formatRatingDelta(
-                              opponent_participation
-                            )
-                          : ""}
+                        <NavLink
+                          to={`/${this.props.episode}/user/${opponent_participation.team}`}
+                        >
+                          {opponent_participation.teamname}
+                        </NavLink>{" "}
+                        (
+                        {ScrimmageHistory.formatRatingDelta(
+                          opponent_participation
+                        )}
                         )
                       </td>
                       <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
