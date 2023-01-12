@@ -6,17 +6,20 @@ import ActionMessage from "../components/actionMessage";
 import Alert from "../components/alert";
 
 const PLAYER_ORDERS = [
-  { value: "?", name: "Shuffled" },
+  // { value: "?", name: "Shuffled" },
   { value: "+", name: "Requester first" },
   { value: "-", name: "Requester last" },
 ];
+
+// Team statuses that allow ranked matches.
+const ALLOWS_RANKED = ["R"];
 
 class ScrimmageRequestForm extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      is_ranked: false,
+      is_ranked: true,
       player_order: PLAYER_ORDERS[0].value,
       maps: ["", "", ""],
       available_maps: [],
@@ -29,6 +32,15 @@ class ScrimmageRequestForm extends Component {
     this.changeHandler = this.changeHandler.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.requestScrimmage = this.requestScrimmage.bind(this);
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevProps.team !== this.props.team) {
+      let is_ranked =
+        this.props.team === null ||
+        ALLOWS_RANKED.includes(this.props.team.status);
+      this.setState({ is_ranked });
+    }
   }
 
   getRandomMaps(available_maps) {
@@ -107,7 +119,7 @@ class ScrimmageRequestForm extends Component {
     // Reset state
     const random_maps = this.getRandomMaps(this.state.available_maps);
     this.setState({
-      is_ranked: false,
+      is_ranked: true,
       player_order: PLAYER_ORDERS[0].value,
       maps: random_maps,
     });
@@ -208,7 +220,12 @@ class ScrimmageRequestForm extends Component {
                       margin: "0 0 0 10px",
                     }}
                     id="is_ranked"
-                    checked={this.props.is_ranked}
+                    checked={this.state.is_ranked}
+                    // Only regular teams get ranked matches
+                    disabled={
+                      this.props.team !== null &&
+                      !ALLOWS_RANKED.includes(this.props.team.status)
+                    }
                   />
                 </div>
               </div>

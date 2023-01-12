@@ -50,6 +50,7 @@ module "production" {
   max_compile_instances = 5
   max_execute_instances = 50
   saturn_secrets        = var.saturn_secrets_production
+  storage_releases_name = module.releases.storage_bucket_name
 
   depends_on = [
     google_project_service.artifactregistry,
@@ -85,6 +86,7 @@ module "staging" {
   max_compile_instances = 1
   max_execute_instances = 1
   saturn_secrets        = var.saturn_secrets_staging
+  storage_releases_name = module.releases.storage_bucket_name
 
   depends_on = [
     google_project_service.artifactregistry,
@@ -103,7 +105,7 @@ module "production_network" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
-  use_ssl               = true
+  https_redirect        = true
   subdomain             = ""
   cloudrun_service_name = module.production.run_service_name
   sql_instance_ip       = module.production.sql_instance_ip
@@ -132,7 +134,7 @@ module "staging_network" {
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
 
-  use_ssl               = false
+  https_redirect        = false
   subdomain             = "staging."
   cloudrun_service_name = module.staging.run_service_name
   sql_instance_ip       = module.staging.sql_instance_ip

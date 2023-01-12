@@ -129,11 +129,18 @@ func (s *Java8Scaffold) VerifySubmission() *Step {
 	return &Step{
 		Name: "Build source code",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
+			pkg := arg.Details.(CompileRequest).Package
+			if pkg == "" {
+				log.Ctx(ctx).Debug().Msg("Package name must not be empty.")
+				arg.Finisher.Finish(saturn.TaskCompleted, map[string]interface{}{
+					"accepted": false,
+				})
+			}
 			out, err := s.Scaffold.RunCommand(
 				ctx,
 				"./gradlew",
 				"verify",
-				fmt.Sprintf("-Pteam=%s", arg.Details.(CompileRequest).Package),
+				fmt.Sprintf("-Pteam=%s", pkg),
 				fmt.Sprintf("-PonSaturn=%t", true),
 			)
 			log.Ctx(ctx).Debug().Msg(out)

@@ -69,3 +69,7 @@ for help :)
 
 Initial deployments of permissions and a superuser were written in a data migration. See
 the migration `0002_add_superuser_and_groups.py` in the User app.
+
+## Operations
+
+You may have to perform operations (customer support) throughout the year, especially IAP. See [this document](docs/operations.md) for instructions on common tasks, such as emails.

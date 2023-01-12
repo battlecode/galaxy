@@ -85,7 +85,13 @@ class RankingTeamList extends Component {
         </div>
       );
     } else {
-      const teamRows = props.teams.map((team) => {
+      // const teamsToShow = props.teams.filter((team) => {
+      //   return team.has_active_submission || !this.props.canRequest;
+      // });
+
+      // Note: this will look odd when this.props.canRequest is false. Doesn't matter for now...but test during a simulated freeze and fix before freeze.
+      const teamsToShow = props.teams;
+      const teamRows = teamsToShow.map((team) => {
         let buttonContent = "Request";
         if (state.pendingRequests[team.id]) {
           buttonContent = <i className="fa fa-circle-o-notch fa-spin"></i>;
@@ -107,11 +113,11 @@ class RankingTeamList extends Component {
                     {trimUsername(member.username, 13)}
                   </NavLink>
                   {team.members.findIndex((m) => m.id === member.id) + 1 !==
-                    team.members.length && ","}
+                    team.members.length && ", "}
                 </span>
               ))}
             </td>
-            {!this.props.canRequest && <td>{team.profile.quote}</td>}
+            <td>{team.profile.quote}</td>
             {!this.props.canRequest && (
               <td>
                 {this.props.episode_info.eligibility_criteria.map(
@@ -132,18 +138,20 @@ class RankingTeamList extends Component {
             <td>{team.profile.auto_accept_unranked ? "Yes" : "No"}</td>
             {this.props.canRequest && (
               <td>
-                {this.props.team && team.id !== this.props.team.id && (
-                  <button
-                    className="btn btn-xs"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      this.openRequestForm(team);
-                    }}
-                    disabled={this.props.episode_info.frozen}
-                  >
-                    {buttonContent}
-                  </button>
-                )}{" "}
+                {this.props.team &&
+                  team.id !== this.props.team.id &&
+                  team.has_active_submission && (
+                    <button
+                      className="btn btn-xs"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        this.openRequestForm(team);
+                      }}
+                      disabled={this.props.episode_info.frozen}
+                    >
+                      {buttonContent}
+                    </button>
+                  )}{" "}
               </td>
             )}
           </tr>
@@ -175,7 +183,7 @@ class RankingTeamList extends Component {
                     <th>Rating</th>
                     <th>Team</th>
                     <th>Members</th>
-                    {!this.props.canRequest && <th>Quote</th>}
+                    <th>Quote</th>
                     {!this.props.canRequest && <th>Eligibility</th>}
                     <th>Auto-Accept Ranked</th>
                     <th>Auto-Accept Unranked</th>

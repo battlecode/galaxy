@@ -16,6 +16,12 @@ resource "google_storage_bucket_iam_member" "secure" {
   member = "serviceAccount:${google_service_account.this.email}"
 }
 
+resource "google_storage_bucket_iam_member" "releases" {
+  bucket = var.storage_releases_name
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.this.email}"
+}
+
 resource "google_artifact_registry_repository_iam_member" "this" {
   location   = var.gcp_region
   repository = var.artifact_registry_name
@@ -40,7 +46,7 @@ resource "google_pubsub_subscription" "queue" {
   topic = var.pubsub_topic_name
 
   ack_deadline_seconds    = 20
-  enable_message_ordering = true
+  enable_message_ordering = false  # Counterintuitive! See issue 514
 
   expiration_policy {
     ttl = ""

@@ -163,7 +163,7 @@ class Submission(SaturnInvocation):
 
     def enqueue_options(self):
         """Return the options to be submitted to the compilation queue."""
-        report_url = "http://{}{}".format(
+        report_url = "https://{}{}".format(
             settings.ALLOWED_HOSTS[0],
             reverse(
                 "submission-report",
@@ -257,7 +257,7 @@ class Match(SaturnInvocation):
 
     def enqueue_options(self):
         """Return the options to be submitted to the execution queue."""
-        report_url = "http://{}{}".format(
+        report_url = "https://{}{}".format(
             settings.ALLOWED_HOSTS[0],
             reverse(
                 "match-report",

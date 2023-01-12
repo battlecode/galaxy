@@ -22,7 +22,9 @@ function getDateTimeText(date) {
     .toLocaleTimeString("en-us", { timeZoneName: "short" })
     .split(" ")[2];
 
-  return { est_date_str, local_date_str, local_timezone };
+  const local_full_string = `${local_date_str} ${local_timezone}`;
+
+  return { est_date_str, local_date_str, local_timezone, local_full_string };
 }
 
 export { getDateTimeText };

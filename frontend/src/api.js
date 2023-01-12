@@ -160,10 +160,12 @@ class Api {
   //----SEARCHING----
 
   // Search teams, ordering result by ranking.
-  static searchTeam(query, page, episode, callback) {
+  static searchTeam(query, page, episode, requireActiveSubmission, callback) {
     const apiURL = `${URL}/api/team/${episode}/t`;
     const encQuery = encodeURIComponent(query);
-    const teamUrl = `${apiURL}/?ordering=-rating,name&search=${encQuery}&page=${page}`;
+    const teamUrl =
+      `${apiURL}/?ordering=-rating,name&search=${encQuery}&page=${page}` +
+      (requireActiveSubmission ? `&has_active_submission=true` : ``);
     $.get(teamUrl, (teamData) => {
       const pageLimit = Math.ceil(teamData.count / PAGE_SIZE);
       callback(teamData.results, pageLimit);
@@ -495,6 +497,21 @@ class Api {
           status,
           error
         );
+        callback(null);
+      });
+  }
+
+  static getAllMatches(episode, callback, page) {
+    const query_data = {
+      page,
+    };
+    return $.get(`${URL}/api/compete/${episode}/match/`, query_data)
+      .done((data, status) => {
+        const pageLimit = Math.ceil(data.count / PAGE_SIZE);
+        callback(data.results, pageLimit);
+      })
+      .fail((xhr, status, error) => {
+        console.log("Error in getting scrimmage history", xhr, status, error);
         callback(null);
       });
   }
