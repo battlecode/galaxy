@@ -118,7 +118,7 @@ resource "google_cloudbuild_trigger" "this" {
   build {
     step {
       name = "gcr.io/cloud-builders/docker"
-      args = ["build", "--build-arg", "BUILD=$SHORT_SHA", "-t", var.image, "."]
+      args = ["build", "--build-arg", "REVISION_ARG=$TAG_NAME+$SHORT_SHA.$BUILD_ID", "-t", var.image, "."]
       dir  = "titan"
     }
     step {
