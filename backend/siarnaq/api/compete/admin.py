@@ -24,9 +24,15 @@ def force_requeue(modeladmin, request, queryset):
     queryset.enqueue_all()
 
 
+@admin.action(description="Cancel tasks")
+def cancel(modeladmin, request, queryset):
+    logger.info("task_cancel", message="Cancelling tasks on Saturn.")
+    queryset.cancel()
+
+
 @admin.register(Submission)
 class SubmissionAdmin(admin.ModelAdmin):
-    actions = [enqueue, force_requeue]
+    actions = [enqueue, force_requeue, cancel]
     fieldsets = (
         (
             "General",
@@ -89,7 +95,7 @@ class MatchParticipantInline(admin.TabularInline):
 
 @admin.register(Match)
 class MatchAdmin(admin.ModelAdmin):
-    actions = [enqueue, force_requeue]
+    actions = [enqueue, force_requeue, cancel]
     fieldsets = (
         (
             "General",
