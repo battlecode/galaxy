@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Floater from "react-floater";
 import Api from "../api";
 
 import { getDateTimeText } from "../utils/date";
