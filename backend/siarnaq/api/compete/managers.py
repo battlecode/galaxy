@@ -21,6 +21,14 @@ class SaturnInvokableQuerySet(models.QuerySet):
         """The ordering key with which to ensure FIFO order of queued items."""
         raise NotImplementedError
 
+    def cancel(self):
+        """Cancel all items in this queryset that are not in COMPLETED state."""
+        from siarnaq.api.compete.models import SaturnStatus
+
+        for invocation in self.exclude(status=SaturnStatus.COMPLETED):
+            invocation.status = SaturnStatus.CANCELLED
+            invocation.save(update_fields=["status"])
+
     def enqueue(self):
         """Enqueue all unqueued items in this queryset for invocation on Saturn."""
         from siarnaq.api.compete.models import SaturnStatus
