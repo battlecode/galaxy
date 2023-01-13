@@ -252,6 +252,7 @@ class Match(SaturnInvocation):
                 "bucket": settings.GCLOUD_BUCKET_SECURE,
                 "name": self.get_replay_path(),
             },
+            "alternate-order": self.alternate_order,
             **participants,
         }
 
