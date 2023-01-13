@@ -187,7 +187,7 @@ module "saturn_compile" {
 
   max_instances = var.max_compile_instances
   min_instances = 0
-  load_ratio    = 5
+  load_ratio    = 10
 }
 
 module "saturn_execute" {
@@ -215,7 +215,7 @@ module "saturn_execute" {
 
   max_instances = var.max_execute_instances
   min_instances = 0
-  load_ratio    = 10
+  load_ratio    = 5
 }
 
 resource "google_cloudbuild_trigger" "saturn" {

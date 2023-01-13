@@ -138,15 +138,15 @@ resource "google_cloud_run_service" "this" {
   template {
     spec {
       service_account_name  = google_service_account.this.email
-      container_concurrency = 16
+      container_concurrency = 4
 
       containers {
         image = var.image
 
         resources {
           limits = {
-            cpu    = "8000m"
-            memory = "4Gi"
+            cpu    = "2000m"
+            memory = "1Gi"
           }
         }
 
