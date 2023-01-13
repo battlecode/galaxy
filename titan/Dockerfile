@@ -20,4 +20,4 @@ ENV TITAN_REVISION=$REVISION_ARG
 
 COPY --from=go /titan .
 COPY bootstrap.sh .
-ENTRYPOINT $APP_HOME/bootstrap.sh
+ENTRYPOINT ["./bootstrap.sh"]
