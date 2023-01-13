@@ -290,7 +290,7 @@ class ScrimmageHistory extends Component {
                       <td>
                         {show_deltas
                           ? ScrimmageHistory.formatRatingDelta(participation)
-                          : "N/A"}
+                          : ""}
                       </td>
                       <td>
                         {opponent_participation.teamname} (
@@ -298,7 +298,7 @@ class ScrimmageHistory extends Component {
                           ? ScrimmageHistory.formatRatingDelta(
                               opponent_participation
                             )
-                          : "N/A"}
+                          : ""}
                         )
                       </td>
                       <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
