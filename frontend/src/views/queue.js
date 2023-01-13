@@ -26,7 +26,7 @@ class QueueHistory extends Component {
 
   static formatRatingDelta(participation) {
     if (participation === null) {
-      return <span>N/A</span>;
+      return <span></span>;
     }
     const old_rating = Math.round(participation.old_rating);
     const rating = Math.round(participation.rating);
@@ -170,7 +170,7 @@ class QueueHistory extends Component {
                                   ? QueueHistory.formatRatingDelta(
                                       participation1
                                     )
-                                  : "N/A"}
+                                  : ""}
                                 )
                               </td>
                               {score_entry}
@@ -183,7 +183,7 @@ class QueueHistory extends Component {
                                   ? QueueHistory.formatRatingDelta(
                                       participation2
                                     )
-                                  : "N/A"}
+                                  : ""}
                                 )
                               </td>
                               <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
