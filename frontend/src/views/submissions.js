@@ -57,6 +57,18 @@ class Submissions extends Component {
 
   // makes an api call to upload the selected file
   uploadData = () => {
+    const fileSize = this.state.selectedFile.size / 1024 / 1024; // in MiB
+    if (fileSize > 5) {
+      let alert_message =
+        "Ensure this file size is not greater than 5 MiB. Your current file size is " +
+        Number(fileSize.toPrecision(3)) +
+        " MiB.";
+      this.setState({
+        alert_message,
+      });
+      this.setState({ upload_status: "waiting" });
+      return;
+    }
     this.setState({ upload_status: "loading" });
     Api.newSubmission(
       this.state.selectedFile,
@@ -215,7 +227,7 @@ class Submissions extends Component {
         <div className="row">
           <div className="col-md-4">
             <div className="form-group">
-              <label>Package Name (where is RobotPlayer?)</label>
+              <label>Package Name (i.e. where is RobotPlayer?)</label>
               <input
                 type="text"
                 className="form-control"
