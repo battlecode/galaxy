@@ -186,7 +186,7 @@ module "saturn_compile" {
   image        = var.saturn_image
 
   max_instances = var.max_compile_instances
-  min_instances = 0
+  min_instances = var.min_compile_instances
   load_ratio    = 10
 }
 
@@ -214,7 +214,7 @@ module "saturn_execute" {
   image        = var.saturn_image
 
   max_instances = var.max_execute_instances
-  min_instances = 0
+  min_instances = var.min_execute_instances
   load_ratio    = 5
 }
 

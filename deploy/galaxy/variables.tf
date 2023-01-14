@@ -78,8 +78,18 @@ variable "saturn_image" {
   type        = string
 }
 
+variable "min_compile_instances" {
+  description = "The minimum allowable number of Saturn compile instances"
+  type        = number
+}
+
 variable "max_compile_instances" {
   description = "The maximum allowable number of Saturn compile instances"
+  type        = number
+}
+
+variable "min_execute_instances" {
+  description = "The minimum allowable number of Saturn execute instances"
   type        = number
 }
 
