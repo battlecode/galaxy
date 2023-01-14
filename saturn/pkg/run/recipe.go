@@ -44,7 +44,7 @@ var StateVersion = Step{
 	Callable: func(ctx context.Context, arg *StepArguments) error {
 		log.Ctx(ctx).Debug().Msg("Welcome to Saturn!")
 		log.Ctx(ctx).Debug().Msgf("Node: %s", os.Getenv("HOSTNAME"))
-		log.Ctx(ctx).Debug().Msgf("Revision: %s", os.Getenv("REVISION"))
+		log.Ctx(ctx).Debug().Msgf("Revision: %s", os.Getenv("SATURN_REVISION"))
 		return nil
 	},
 }

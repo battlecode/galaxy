@@ -217,7 +217,7 @@ class Base(Configuration):
 
     # App version
 
-    SIARNAQ_BUILD = values.Value("unknown", environ=True, environ_prefix=None)
+    SIARNAQ_REVISION = values.Value("unknown", environ=True, environ_prefix=None)
 
     # Penalized Elo configuration
 

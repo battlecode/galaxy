@@ -42,5 +42,5 @@ urlpatterns = [
     ),
     # Misc:
     path("ping/", views.ping, name="ping"),
-    path("build/", views.build, name="build"),
+    path("revision/", views.revision, name="revision"),
 ]

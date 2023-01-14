@@ -80,7 +80,7 @@ resource "google_cloudbuild_trigger" "frontend" {
       entrypoint = "npm"
       args = ["run", "build"]
       dir = "frontend"
-      env = ["REACT_APP_REVISION=$SHORT_SHA"]
+      env = ["REACT_APP_REVISION=$TAG_NAME+$SHORT_SHA.$BUILD_ID"]
     }
     step {
       name = "gcr.io/google.com/cloudsdktool/cloud-sdk"

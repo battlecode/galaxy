@@ -7,6 +7,6 @@ def ping(request):
     return HttpResponse("pong")
 
 
-def build(request):
+def revision(request):
     """Return the current version of the server."""
-    return HttpResponse(settings.SIARNAQ_BUILD)
+    return HttpResponse(settings.SIARNAQ_REVISION)

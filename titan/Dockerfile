@@ -15,6 +15,9 @@ FROM clamav/clamav:0.105.1_base
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
+ARG REVISION_ARG=nightly
+ENV TITAN_REVISION=$REVISION_ARG
+
 COPY --from=go /titan .
 COPY bootstrap.sh .
-ENTRYPOINT $APP_HOME/bootstrap.sh
+ENTRYPOINT ["./bootstrap.sh"]
