@@ -302,7 +302,7 @@ class ScrimmageHistory extends Component {
                       </td>
                       <td>
                         <NavLink
-                          to={`/${this.props.episode}/user/${opponent_participation.team}`}
+                          to={`/${this.props.episode}/rankings/${opponent_participation.team}`}
                         >
                           {opponent_participation.teamname}
                         </NavLink>{" "}

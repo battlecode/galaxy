@@ -175,7 +175,7 @@ class QueueHistory extends Component {
                               <td>
                                 {participation1 !== null ? (
                                   <NavLink
-                                    to={`/${this.props.episode}/user/${participation1.team}`}
+                                    to={`/${this.props.episode}/rankings/${participation1.team}`}
                                   >
                                     {participation1.teamname}
                                   </NavLink>
@@ -190,7 +190,7 @@ class QueueHistory extends Component {
                               <td>
                                 {participation2 !== null ? (
                                   <NavLink
-                                    to={`/${this.props.episode}/user/${participation2.team}`}
+                                    to={`/${this.props.episode}/rankings/${participation2.team}`}
                                   >
                                     {participation2.teamname}
                                   </NavLink>
