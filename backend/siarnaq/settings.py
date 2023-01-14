@@ -121,6 +121,7 @@ class Base(Configuration):
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "django_structlog.middlewares.RequestMiddleware",
+        "siarnaq.middleware.TimezoneMiddleware",
     ]
 
     CORS_ALLOW_CREDENTIALS = True
