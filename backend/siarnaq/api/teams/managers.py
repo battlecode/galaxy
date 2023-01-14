@@ -3,7 +3,7 @@ import random
 import structlog
 from django.apps import apps
 from django.db import models, transaction
-from django.db.models import OuterRef
+from django.db.models import Count, OuterRef, Q
 
 logger = structlog.get_logger(__name__)
 
@@ -102,6 +102,38 @@ class TeamQuerySet(models.QuerySet):
         from siarnaq.api.teams.models import TeamStatus
 
         return self.filter(status__in=[TeamStatus.REGULAR, TeamStatus.STAFF])
+
+    def filter_eligible(self, tournament):
+        """Filter for teams that are eligible for a tournament."""
+        from siarnaq.api.teams.models import TeamStatus
+
+        teams = self.annotate(
+            includes_met=Count(
+                "profile__eligible_for",
+                filter=Q(
+                    profile__eligible_for__in=tournament.eligibility_includes.all()
+                ),
+            ),
+            excludes_met=Count(
+                "profile__eligible_for",
+                filter=Q(
+                    profile__eligible_for__in=tournament.eligibility_excludes.all()
+                ),
+            ),
+        ).filter(
+            episode=tournament.episode,
+            status=TeamStatus.REGULAR,
+            includes_met=tournament.eligibility_includes.count(),
+            excludes_met=0,
+        )
+        if tournament.require_resume:
+            teams = teams.annotate(
+                members_without_resume=Count(
+                    "members__profile__has_resume",
+                    filter=Q(members__profile__has_resume=False),
+                )
+            ).filter(members_without_resume=0)
+        return teams
 
     def with_active_submission(self):
         """Annotate and filter for teams with an active submission."""

@@ -56,6 +56,8 @@ class MapSerializer(serializers.ModelSerializer):
 
 
 class TournamentSerializer(serializers.ModelSerializer):
+    is_eligible = serializers.SerializerMethodField()
+
     class Meta:
         model = Tournament
         fields = [
@@ -71,7 +73,15 @@ class TournamentSerializer(serializers.ModelSerializer):
             "submission_freeze",
             "submission_unfreeze",
             "challonge_public",
+            "is_eligible",
         ]
+
+    @extend_schema_field(OpenApiTypes.BOOL)
+    def get_is_eligible(self, obj):
+        user = self.context["request"].user
+        if not user.is_authenticated:
+            return False
+        return user.teams.filter_eligible(obj).exists()
 
 
 class TournamentRoundSerializer(serializers.ModelSerializer):
