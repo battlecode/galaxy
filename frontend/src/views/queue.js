@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Floater from "react-floater";
+import { NavLink } from "react-router-dom";
 import Api from "../api";
 
 import { getDateTimeText } from "../utils/date";
@@ -31,11 +32,21 @@ class QueueHistory extends Component {
     }
     const old_rating = Math.round(participation.old_rating);
     const rating = Math.round(participation.rating);
+    const rating_diff = Math.abs(rating - old_rating);
+    const rating_diff_text =
+      rating > old_rating
+        ? " +" + rating_diff
+        : rating < old_rating
+        ? " –" + Math.abs(rating_diff)
+        : " ±0";
     const color =
       rating > old_rating ? "green" : rating < old_rating ? "red" : "grey";
     return (
       <span>
-        {old_rating} <b style={{ color }}>➞ {rating}</b>
+        {old_rating}
+        <small style={{ color }}>
+          {participation.rating !== null ? rating_diff_text : ""}
+        </small>
       </span>
     );
   }
@@ -158,33 +169,36 @@ class QueueHistory extends Component {
                           );
                           const created_date_string =
                             created_date_text.local_full_string;
-                          const show_deltas = s.status == "OK!" && s.is_ranked;
 
                           return (
                             <tr key={s.id}>
                               <td>
-                                {participation1 !== null
-                                  ? participation1.teamname
-                                  : "?"}{" "}
+                                {participation1 !== null ? (
+                                  <NavLink
+                                    to={`/${this.props.episode}/user/${participation1.team}`}
+                                  >
+                                    {participation1.teamname}
+                                  </NavLink>
+                                ) : (
+                                  "?"
+                                )}{" "}
                                 (
-                                {show_deltas
-                                  ? QueueHistory.formatRatingDelta(
-                                      participation1
-                                    )
-                                  : ""}
+                                {QueueHistory.formatRatingDelta(participation1)}
                                 )
                               </td>
                               {score_entry}
                               <td>
-                                {participation2 !== null
-                                  ? participation2.teamname
-                                  : "?"}{" "}
+                                {participation2 !== null ? (
+                                  <NavLink
+                                    to={`/${this.props.episode}/user/${participation2.team}`}
+                                  >
+                                    {participation2.teamname}
+                                  </NavLink>
+                                ) : (
+                                  "?"
+                                )}{" "}
                                 (
-                                {show_deltas
-                                  ? QueueHistory.formatRatingDelta(
-                                      participation2
-                                    )
-                                  : ""}
+                                {QueueHistory.formatRatingDelta(participation2)}
                                 )
                               </td>
                               <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
