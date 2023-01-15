@@ -6,7 +6,7 @@ import ActionMessage from "../components/actionMessage";
 import Alert from "../components/alert";
 
 const PLAYER_ORDERS = [
-  // { value: "?", name: "Shuffled" },
+  { value: "?", name: "Alternating" },
   { value: "+", name: "Requester first" },
   { value: "-", name: "Requester last" },
 ];
