@@ -23,7 +23,19 @@ class Submissions extends Component {
     };
 
     this.submission_list = (
-      <SubmissionList episode={this.props.episode}> </SubmissionList>
+      <SubmissionList episode={this.props.episode} tournament={false}>
+        {" "}
+      </SubmissionList>
+    );
+    this.tournament_submission_list = (
+      <SubmissionList
+        episode={this.props.episode}
+        tournament={true}
+        episode_info={this.props.episode_info}
+        tournament_info={this.props.tournament_info}
+      >
+        {" "}
+      </SubmissionList>
     );
 
     this.changeHandler = this.changeHandler.bind(this);
@@ -318,14 +330,7 @@ class Submissions extends Component {
               </Countdown>
               {this.renderHelperSubmissionForm()}
               {this.submission_list}
-
-              {/* See #78 for tracking */}
-              {/* <div className="card">
-                <div className="header">
-                  <h4 className="title">Tournament Submissions</h4>
-                </div>
-                <div className="content">{this.renderHelperTourTable()}</div>
-              </div> */}
+              {this.tournament_submission_list}
             </div>
           </div>
         </div>

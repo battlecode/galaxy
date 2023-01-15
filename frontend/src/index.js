@@ -44,6 +44,7 @@ class App extends Component {
       logged_in: null,
       episode: episode,
       episode_info: null,
+      tournament_info: null,
       user: null,
       team: null,
       loaded: false,
@@ -66,7 +67,11 @@ class App extends Component {
   };
 
   updateBaseState = (callback = () => {}) => {
-    let fetched_logged_in, fetched_user, fetched_team, fetched_episode_info;
+    let fetched_logged_in,
+      fetched_user,
+      fetched_team,
+      fetched_episode_info,
+      fetched_tournament_info;
 
     const ajax1 = Api.loginCheck((logged_in) => {
       fetched_logged_in = logged_in;
@@ -84,7 +89,11 @@ class App extends Component {
       fetched_episode_info = episode_info;
     });
 
-    const ajax_queries = [ajax1, ajax2, ajax3, ajax4];
+    const ajax5 = Api.getTournaments(this.state.episode, (tournament_info) => {
+      fetched_tournament_info = tournament_info;
+    });
+
+    const ajax_queries = [ajax1, ajax2, ajax3, ajax4, ajax5];
 
     // To be run when all AJAX queries are complete.
     const all_queries_finished = () => {
@@ -95,6 +104,7 @@ class App extends Component {
           user: fetched_user,
           team: fetched_team,
           episode_info: fetched_episode_info,
+          tournament_info: fetched_tournament_info,
         },
         callback
       );
@@ -304,6 +314,7 @@ class App extends Component {
             on_team={on_team}
             is_game_released={is_game_released}
             episode_info={this.state.episode_info}
+            tournament_info={this.state.tournament_info}
           />
         )}
         key="submissions"

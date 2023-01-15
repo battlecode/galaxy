@@ -81,6 +81,19 @@ class Api {
     );
   }
 
+  static getTournamentSubmissions(episode, page, callback) {
+    $.get(
+      `${URL}/api/compete/${episode}/submission/tournament/?page=${page}`
+    ).done((data, status) => {
+      data = {
+        count: data.length,
+        results: data,
+      };
+      const pageLimit = Math.ceil(data.count / PAGE_SIZE);
+      callback(data, pageLimit);
+    });
+  }
+
   //----TEAM STATS---
 
   // clean these calls, fix in #368
@@ -557,10 +570,12 @@ class Api {
       });
   }
 
-  static getTournaments(callback) {
-    $.get(`${URL}/api/${LEAGUE}/tournament/`).done((data, status) => {
-      callback(data.results);
-    });
+  static getTournaments(episode, callback) {
+    return $.get(`${URL}/api/episode/${episode}/tournament/`).done(
+      (data, status) => {
+        callback(data.results);
+      }
+    );
   }
 
   //----AUTHENTICATION----
