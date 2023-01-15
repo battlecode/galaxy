@@ -59,11 +59,11 @@ class WinsCard extends Component {
           <div className="col-2-row">
             <div className="row-items-box items-box-center items-box-skinny">
               <label>wins</label>
-              <h1>{this.props.wins}</h1>
+              <h1>{wins}</h1>
             </div>
             <div className="row-items-box items-box-center items-box-skinny">
               <label>losses</label>
-              <h1>{this.props.losses}</h1>
+              <h1>{losses}</h1>
             </div>
           </div>
         </div>
@@ -98,9 +98,9 @@ class TeamInfo extends Component {
     // Commented out since we don't have scrimmages, records, etc.
     // Work on this once we are ready to.
     // Track in #368.
-    // Api.getOtherTeamWinStats(teamId, (data) => {
-    //   this.setState({ wins: data[0], losses: data[1] });
-    // });
+    Api.getOtherTeamWinStats(teamId, (data) => {
+      this.setState({ wins: data[0], losses: data[1] });
+    });
   }
 
   setTeam = (team) => {
@@ -116,35 +116,34 @@ class TeamInfo extends Component {
             <div className="row">
               <TeamCard team={team} episode={this.props.match.params.episode} />
             </div>
-            {/* Commented out since we don't have scrimmages, records, etc.
-            Work on this once we are ready to.
-            Do in #368 */}
-            {/* <div className="row">
-              <div className="col-md-3">
-                <div className="container-fluid">
-                  <div className="row">
-                    <RankCard teamId={team.id} team={team} />
+            {
+              <div className="row">
+                <div className="col-md-3">
+                  <div className="container-fluid">
+                    <div className="row">
+                      <RankCard teamId={team.id} team={team} />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="container-fluid">
+                    <div className="row">
+                      <WinsCard
+                        wins={this.state.wins}
+                        losses={this.state.losses}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="container-fluid">
+                    <div className="row">
+                      <PerfCard team={team.id} />
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="col-md-3">
-                <div className="container-fluid">
-                  <div className="row">
-                    <WinsCard
-                      wins={this.state.wins}
-                      losses={this.state.losses}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-6">
-                <div className="container-fluid">
-                  <div className="row">
-                    <PerfCard team={team.id} />
-                  </div>
-                </div>
-              </div>
-            </div> */}
+            }
           </div>
         </div>
       );
