@@ -108,6 +108,7 @@ class ScrimmageRequestForm extends Component {
           this.setState({ update_status: "success" }, () => {
             setTimeout(() => {
               this.setState({ update_status: "waiting" });
+              this.props.requestRefresh();
               this.closeModal();
             }, 500);
           });
