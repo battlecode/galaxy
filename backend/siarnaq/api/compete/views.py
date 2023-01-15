@@ -11,6 +11,7 @@ from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from siarnaq.api.compete.serializers import HistoricalRankingSerializer
 
 from siarnaq.api.compete.filters import IsSubmissionCreatorFilterBackend
 from siarnaq.api.compete.models import (
@@ -279,6 +280,46 @@ class MatchViewSet(
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="team_id",
+                type=int,
+                description="A team to filter for. Defaults to your own team.",
+            ),
+        ],
+        responses={status.HTTP_200_OK: HistoricalRankingSerializer(many=True)},
+    )
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=(IsEpisodeMutable,),
+    )
+    def historical_ranking(self, request, *, episode_id):
+        """List the historical ranking of a team."""
+
+        queryset = self.get_queryset().filter(tournament_round__isnull=True)
+        team_id = parse_int(self.request.query_params.get("team_id"))
+
+        team_id = parse_int(self.request.query_params.get("team_id"))
+        if team_id is not None:
+            queryset = queryset.filter(participants__team=team_id)
+        else:
+            queryset = queryset.filter(participants__team__members=request.user.pk)
+
+        if not request.user.is_staff:
+            # Hide all matches with invisible teams.
+            has_invisible = self.get_queryset().filter(
+                participants__team__status=TeamStatus.INVISIBLE
+            )
+            # Hide all matches with invisible participants.
+            queryset = queryset.exclude(pk__in=Subquery(has_invisible.values("pk")))
+
+        serializer = self.get_serializer(queryset, many=True)
+        # participant = serializer.data.values('participants').filter(team=team_id)
+        # return self.get_paginated_response(serializer.data.values('created', 'participants__rating').filter(team=team_id))
+        return Response(serializer.data)
 
     @extend_schema(
         parameters=[
