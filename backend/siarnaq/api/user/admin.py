@@ -1,13 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django_rest_passwordreset.models import ResetPasswordToken
 from import_export.admin import ExportMixin
 
 from siarnaq.api.teams.models import Team
 from siarnaq.api.user.forms import UserCreationForm
 from siarnaq.api.user.models import User, UserProfile
-
-admin.site.unregister(ResetPasswordToken)
 
 
 class UserProfileInline(admin.StackedInline):
