@@ -178,6 +178,7 @@ class MatchInline(admin.TabularInline):
 class TournamentRoundAdmin(admin.ModelAdmin):
     fields = (
         "name",
+        "tournament",
         "challonge_id",
         "release_status",
         "maps",
