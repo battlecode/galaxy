@@ -66,6 +66,7 @@ class TournamentSerializer(serializers.ModelSerializer):
             "blurb",
             "episode",
             "style",
+            "display_date",
             "eligibility_includes",
             "eligibility_excludes",
             "require_resume",
