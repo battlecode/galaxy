@@ -2,6 +2,7 @@ import uuid
 
 import structlog
 from django.db import transaction
+from django.db.models import F, Max, Q
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters, mixins, status, viewsets
@@ -9,7 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from siarnaq.api.compete.models import MatchParticipant
+from siarnaq.api.compete.models import Match
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
 from siarnaq.api.teams.filters import TeamActiveSubmissionFilter, TeamOrderingFilter
@@ -183,26 +184,16 @@ class TeamViewSet(
     )
     def record(self, request, pk=None, *, episode_id):
         """Retrieve the win/loss record of a team"""
-        match_participations = MatchParticipant.objects.filter(
-            team_id=request.data["id"]
+        team = request.data["id"]
+        matches = Match.objects.filter(participants__team=team)
+
+        matches.annotate(
+            score_1=Max("participants__score", filter=Q(participants__team=team)),
+            score_2=Max("participants__score", filter=~Q(participants__team=team)),
         )
-        win_count = 0
-        loss_count = 0
-        for mp in match_participations:
-            match = mp.match
-            team_score = [
-                p.score
-                for p in match.participants.all()
-                if p.team.id == request.data["id"]
-            ]
-            opponent_score = [
-                p.score
-                for p in match.participants.all()
-                if p.team.id != request.data["id"]
-            ]
-            if team_score and opponent_score:
-                if team_score[0] > opponent_score[0]:
-                    win_count += 1
-                else:
-                    loss_count += 1
+
+        win_count = matches.filter(score_1__gt=F("score_2")).count()
+
+        loss_count = matches.filter(score_1__lt=F("score_2")).count()
+
         return Response({"wins": win_count, "losses": loss_count})
