@@ -6,21 +6,24 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
 from siarnaq.api.teams.filters import TeamActiveSubmissionFilter, TeamOrderingFilter
-from siarnaq.api.teams.models import Team, TeamStatus
+from siarnaq.api.teams.models import ClassRequirement, Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.api.teams.serializers import (
+    ClassRequirementSerializer,
     TeamAvatarSerializer,
     TeamCreateSerializer,
     TeamJoinSerializer,
     TeamPrivateSerializer,
     TeamPublicSerializer,
+    UserPassedSerializer,
 )
+from siarnaq.api.user.models import User
 from siarnaq.gcloud import titan
 
 logger = structlog.get_logger(__name__)
@@ -173,3 +176,39 @@ class TeamViewSet(
             titan.upload_image(avatar, profile.get_avatar_path())
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+
+class ClassRequirementViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    A viewset for retrieving and checking class requirements.
+    """
+
+    serializer_class = ClassRequirementSerializer
+    permission_classes = (IsEpisodeAvailable,)
+
+    def get_queryset(self):
+        return ClassRequirement.objects.filter(episode=self.kwargs["episode_id"])
+
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=(IsAuthenticated,),
+        serializer_class=UserPassedSerializer,
+    )
+    def check(self, request, pk=None, episode_id=None):
+        requirement = self.get_object()
+        user = User.objects.with_passed(requirement).get(pk=request.user.pk)
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
+
+    @action(
+        detail=True,
+        methods=["get"],
+        permission_classes=(IsAdminUser,),
+        serializer_class=UserPassedSerializer,
+    )
+    def compute(self, request, pk=None, episode_id=None):
+        requirement = self.get_object()
+        users = User.objects.with_passed(requirement).filter(teams__episode=episode_id)
+        serializer = self.get_serializer(users, many=True)
+        return Response(serializer.data)

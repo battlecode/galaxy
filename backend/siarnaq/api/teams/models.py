@@ -239,3 +239,28 @@ class TeamProfile(models.Model):
         )
         # Append UUID to public URL to prevent caching on avatar update
         return f"{public_url}?{self.avatar_uuid}"
+
+
+class ClassRequirement(models.Model):
+    """
+    A database model for the information regarding a reference player team that forms a
+    requirement for passing the Battlecode class. Each requirement is of the form, "the
+    student must be part of a team who has played a scrimmage against the reference
+    player on a precise set of maps S, and won on at least W of those maps."
+    """
+
+    episode = models.ForeignKey(
+        refs.EPISODE_MODEL,
+        on_delete=models.CASCADE,
+        related_name="reference_players",
+    )
+    """The episode this reference player is relevant to."""
+
+    reference_player = models.ForeignKey(Team, on_delete=models.CASCADE)
+    """The team of the reference player."""
+
+    maps = models.ManyToManyField(refs.MAP_MODEL)
+    """The maps involved in this requirement."""
+
+    min_score = models.PositiveSmallIntegerField()
+    """The minimum number of maps to be won."""

@@ -104,18 +104,6 @@ class Episode(models.Model):
     )
     """The eligibility criteria active in this episode."""
 
-    pass_requirement_win = models.PositiveSmallIntegerField(null=True, blank=True)
-    """
-    The minimum number of matches to be won within a specified window in order to pass
-    the Battlecode class.
-    """
-
-    pass_requirement_out_of = models.PositiveSmallIntegerField(null=True, blank=True)
-    """
-    The size of the window in which a minimum number of matches must be won in order to
-    pass the Battlecode class.
-    """
-
     objects = EpisodeQuerySet.as_manager()
 
     def __str__(self):

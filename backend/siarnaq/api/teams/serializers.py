@@ -4,7 +4,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, validators
 
 from siarnaq.api.episodes.models import Episode
-from siarnaq.api.teams.models import Team, TeamProfile
+from siarnaq.api.teams.models import ClassRequirement, Team, TeamProfile
 from siarnaq.api.user.serializers import UserPublicSerializer
 
 
@@ -163,3 +163,21 @@ class TeamJoinSerializer(serializers.Serializer):
 
 class TeamAvatarSerializer(serializers.Serializer):
     avatar = serializers.ImageField(write_only=True)
+
+
+class ClassRequirementSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassRequirement
+        fields = [
+            "episode",
+            "reference_player",
+            "maps",
+            "min_score",
+        ]
+
+
+class UserPassedSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    passed = serializers.BooleanField()

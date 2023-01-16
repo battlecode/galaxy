@@ -8,6 +8,8 @@ from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
+from siarnaq.api.user.managers import UserManager
+
 
 class User(AbstractUser):
     """
@@ -20,6 +22,8 @@ class User(AbstractUser):
     first_name = models.CharField(_("first name"), max_length=30, blank=False)
     last_name = models.CharField(_("last name"), max_length=30, blank=False)
     email = models.EmailField(_("email address"), blank=False, unique=True)
+
+    objects = UserManager()
 
     def __init__(self, *args, profile=None, **kwargs):
         """Create a user object, ensuring it has a profile."""
