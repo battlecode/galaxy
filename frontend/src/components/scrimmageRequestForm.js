@@ -1,6 +1,7 @@
 // Based on https://stackoverflow.com/a/67233977
 import React, { Component } from "react";
 import Api from "../api";
+import Select from "react-select";
 
 import ActionMessage from "../components/actionMessage";
 import Alert from "../components/alert";
@@ -21,8 +22,7 @@ class ScrimmageRequestForm extends Component {
     this.state = {
       is_ranked: true,
       player_order: PLAYER_ORDERS[0].value,
-      nmaps: 3,
-      maps: ["", "", ""],
+      maps: [],
       available_maps: [],
       update_status: "waiting",
       alert_message: "",
@@ -31,6 +31,7 @@ class ScrimmageRequestForm extends Component {
     this.getMaps();
 
     this.changeHandler = this.changeHandler.bind(this);
+    this.changeSelectHandler = this.changeSelectHandler.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.requestScrimmage = this.requestScrimmage.bind(this);
   }
@@ -44,11 +45,11 @@ class ScrimmageRequestForm extends Component {
     }
   }
 
-  getRandomMaps(available_maps, nmaps) {
+  getRandomMaps(available_maps) {
     const possible_maps = available_maps.slice();
     // Pick a random subset of 3 maps, assuming that there are at least 3 possible maps
     const random_maps = [];
-    for (let i = 0; i < nmaps; i++) {
+    for (let i = 0; i < 3; i++) {
       const map_index = Math.floor(Math.random() * possible_maps.length);
       random_maps.push(possible_maps[map_index].name);
       possible_maps.splice(map_index, 1);
@@ -58,7 +59,7 @@ class ScrimmageRequestForm extends Component {
 
   getMaps() {
     Api.getMaps(this.props.episode, (available_maps) => {
-      const random_maps = this.getRandomMaps(available_maps, this.state.nmaps);
+      const random_maps = this.getRandomMaps(available_maps);
       this.setState({ available_maps, maps: random_maps });
     });
   }
@@ -67,22 +68,14 @@ class ScrimmageRequestForm extends Component {
     const id = e.target.id;
     const val =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    if (id.startsWith("map")) {
-      this.setState(function (prevState, props) {
-        var map_number = id.split("_")[1];
-        prevState.maps[map_number] = val;
-        return prevState;
-      });
-    } else if (id == "nmaps") {
-      const nmaps = parseInt(val);
-      const random_maps = this.getRandomMaps(this.state.available_maps, nmaps);
-      this.setState({ maps: random_maps, nmaps });
-    } else {
-      this.setState(function (prevState, props) {
-        prevState[id] = val;
-        return prevState;
-      });
-    }
+    this.setState(function (prevState, props) {
+      prevState[id] = val;
+      return prevState;
+    });
+  }
+
+  changeSelectHandler(val) {
+    this.setState({ maps: val.map((obj) => obj.value) });
   }
 
   requestScrimmage() {
@@ -127,17 +120,6 @@ class ScrimmageRequestForm extends Component {
   }
 
   closeModal() {
-    // Reset state
-    const random_maps = this.getRandomMaps(
-      this.state.available_maps,
-      this.state.nmaps
-    );
-    this.setState({
-      is_ranked: true,
-      player_order: PLAYER_ORDERS[0].value,
-      maps: random_maps,
-    });
-
     this.props.closeRequestForm();
   }
 
@@ -147,8 +129,6 @@ class ScrimmageRequestForm extends Component {
 
   render() {
     const displayStyle = this.props.team !== null ? "show" : "fade";
-
-    const max_nmaps = Math.min(10, this.state.available_maps.length);
 
     /* Based on example in https://getbootstrap.com/docs/4.0/components/modal/#live-demo */
     return (
@@ -206,45 +186,32 @@ class ScrimmageRequestForm extends Component {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Number of maps</label>
-                  <select
-                    className="form-control"
-                    id="nmaps"
-                    onChange={this.changeHandler}
-                    value={this.state.nmaps}
-                  >
-                    {Array.from({ length: max_nmaps }, (_, i) => i + 1).map(
-                      (i) => {
-                        return (
-                          <option value={i} key={i}>
-                            {i}
-                          </option>
+                  <label>
+                    Maps{" "}
+                    <a
+                      onClick={() => {
+                        const random_maps = this.getRandomMaps(
+                          this.state.available_maps
                         );
-                      }
-                    )}
-                  </select>
+                        this.setState({ maps: random_maps });
+                      }}
+                    >
+                      (use random 3)
+                    </a>
+                  </label>
+                  <Select
+                    onChange={this.changeSelectHandler}
+                    isMulti={true}
+                    options={this.state.available_maps.map((map) => ({
+                      value: map.name,
+                      label: map.name,
+                    }))}
+                    value={this.state.maps.map((map_name) => ({
+                      value: map_name,
+                      label: map_name,
+                    }))}
+                  />
                 </div>
-                {this.state.maps.map((map_name, map_number) => {
-                  return (
-                    <div className="form-group" key={map_number}>
-                      <label>Map {map_number + 1}</label>
-                      <select
-                        className="form-control"
-                        id={`map_${map_number}`}
-                        onChange={this.changeHandler}
-                        value={map_name}
-                      >
-                        {this.state.available_maps.map((map) => {
-                          return (
-                            <option value={map.name} key={map.name}>
-                              {map.name}
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </div>
-                  );
-                })}
                 <div className="form-group" style={{ display: "flex" }}>
                   <label>Ranked?</label>
                   <input
