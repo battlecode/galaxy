@@ -102,6 +102,16 @@ class Account extends Component {
   }
 
   uploadResume = () => {
+    const fileSize = this.state.selectedResumeFile.size / 1024 / 1024; // in MiB
+    if (fileSize > 5) {
+      let alert_message =
+        "Ensure this file size is not greater than 5 MiB. Your current file size is " +
+        Number(fileSize.toPrecision(3)) +
+        " MiB.";
+      this.setState({ alert_message: alert_message });
+      this.setState({ resume_status: "waiting" });
+      return;
+    }
     this.setState({ resume_status: "loading" });
     Api.resumeUpload(this.state.selectedResumeFile, (success) => {
       if (success) {
@@ -117,6 +127,15 @@ class Account extends Component {
   };
 
   uploadAvatar = (selected_file, callback) => {
+    const fileSize = selected_file.size / 1024 / 1024; // in MiB
+    if (fileSize > 5) {
+      let alert_message =
+        "Ensure this file size is not greater than 5 MiB. Your current file size is " +
+        Number(fileSize.toPrecision(3)) +
+        " MiB.";
+      this.setState({ alert_message: alert_message });
+      return;
+    }
     Api.avatarUpload(selected_file, (response, success) => {
       if (success) {
         this.props.updateBaseState();

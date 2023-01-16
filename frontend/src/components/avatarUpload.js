@@ -28,10 +28,10 @@ class AvatarUpload extends Component {
       } else {
         this.setState({ status: "failure" });
       }
-      setTimeout(() => {
-        this.setState({ status: "waiting" });
-      }, 2000);
     });
+    setTimeout(() => {
+      this.setState({ status: "waiting" });
+    }, 2000);
   }
 
   render() {
