@@ -15,6 +15,9 @@ router.register(
     views.ScrimmageRequestViewSet,
     basename="request",
 )
+router.register(
+    r"(?P<episode_id>[^\/.]+)/matchParticipant", views.MatchViewSet, basename="match"
+)
 
 urlpatterns = [
     path("", include(router.urls)),

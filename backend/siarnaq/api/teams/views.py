@@ -9,6 +9,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from siarnaq.api.compete.models import MatchParticipant
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
 from siarnaq.api.teams.filters import TeamActiveSubmissionFilter, TeamOrderingFilter
@@ -173,3 +174,35 @@ class TeamViewSet(
             titan.upload_image(avatar, profile.get_avatar_path())
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        detail=False,
+        methods=["post"],
+        serializer_class=None,
+        permission_classes=(IsAuthenticated, IsEpisodeAvailable),
+    )
+    def record(self, request, pk=None, *, episode_id):
+        """Retrieve the win/loss record of a team"""
+        match_participations = MatchParticipant.objects.filter(
+            team_id=request.data["id"]
+        )
+        win_count = 0
+        loss_count = 0
+        for mp in match_participations:
+            match = mp.match
+            team_score = [
+                p.score
+                for p in match.participants.all()
+                if p.team.id == request.data["id"]
+            ]
+            opponent_score = [
+                p.score
+                for p in match.participants.all()
+                if p.team.id != request.data["id"]
+            ]
+            if team_score and opponent_score:
+                if team_score[0] > opponent_score[0]:
+                    win_count += 1
+                else:
+                    loss_count += 1
+        return Response({"wins": win_count, "losses": loss_count})
