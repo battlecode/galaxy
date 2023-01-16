@@ -14,7 +14,8 @@
     "react-floater": "^0.8.2",
     "react-router": "^5.3.3",
     "react-router-dom": "^5.3.3",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "react-select": "^5.7.0"
   },
   "scripts": {
     "start": "react-scripts start",
