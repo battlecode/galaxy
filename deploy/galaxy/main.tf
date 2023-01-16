@@ -210,7 +210,7 @@ module "saturn_execute" {
   network_vpc_id = google_compute_network.this.id
   subnetwork_ip_cidr = "172.17.0.0/16"
 
-  machine_type = "t2d-standard-2"
+  machine_type = "t2d-standard-4"
   image        = var.saturn_image
 
   max_instances = var.max_execute_instances
