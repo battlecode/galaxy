@@ -134,7 +134,8 @@ class RankingTeamList extends Component {
                 )}
               </td>
             )}
-            <td>{team.profile.auto_accept_ranked ? "Yes" : "No"}</td>
+            {/* <td>{team.profile.auto_accept_ranked ? "Yes" : "No"}</td> */}
+            <td>{(team.profile.auto_accept_ranked = "No")}</td>
             <td>{team.profile.auto_accept_unranked ? "Yes" : "No"}</td>
             {this.props.canRequest && (
               <td>
