@@ -6,20 +6,14 @@ import TeamCard from "../components/teamCard";
 import PerfCard from "../components/perfCard";
 
 class RankCard extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      ranking: null,
+      rating: this.props.team.profile.rating,
     };
   }
 
-  componentDidMount() {
-    Api.getTeamRanking(this.props.teamId, this.setRanking);
-  }
-
-  setRanking = (ranking_data) => {
-    this.setState({ ranking: ranking_data.ranking });
-  };
+  componentDidMount() {}
 
   render() {
     const { ranking } = this.state;
@@ -34,10 +28,10 @@ class RankCard extends Component {
           </div>
           <br></br>
           <p style={{ textAlign: "center" }}>
-            Score:{" "}
-            {this.props.team.score === -1000000
+            Rating:{" "}
+            {this.state.rating === -1000000
               ? "N/A"
-              : Math.round(this.props.team.score)}
+              : Math.round(this.state.rating)}
           </p>
         </div>
       </div>
@@ -52,18 +46,17 @@ class WinsCard extends Component {
   }
 
   render() {
-    const { wins, draws, losses } = this.state;
     return (
       <div className="card">
         <div className="content">
           <div className="col-2-row">
             <div className="row-items-box items-box-center items-box-skinny">
-              <label>wins</label>
-              <h1>{wins}</h1>
+              <label>Wins:</label>
+              <h1>{this.props.wins}</h1>
             </div>
             <div className="row-items-box items-box-center items-box-skinny">
-              <label>losses</label>
-              <h1>{losses}</h1>
+              <label>Losses:</label>
+              <h1>{this.props.losses}</h1>
             </div>
           </div>
         </div>
@@ -82,6 +75,7 @@ class TeamInfo extends Component {
       // and the :team_id part makes props.match.params.team_id
       // whatever that id is)
       id: this.props.match.params.team_id,
+      episode: this.props.match.params.episode,
       team: null,
       wins: 0,
       losses: 0,
@@ -98,13 +92,12 @@ class TeamInfo extends Component {
     // Commented out since we don't have scrimmages, records, etc.
     // Work on this once we are ready to.
     // Track in #368.
-    Api.getOtherTeamWinStats(teamId, (data) => {
-      this.setState({ wins: data[0], losses: data[1] });
-    });
   }
 
   setTeam = (team) => {
-    this.setState({ team });
+    Api.getTeamWinStats(team, this.state.episode, (data) => {
+      this.setState({ team: team, wins: data["wins"], losses: data["losses"] });
+    });
   };
 
   render() {
@@ -135,13 +128,14 @@ class TeamInfo extends Component {
                     </div>
                   </div>
                 </div>
-                <div className="col-md-6">
+
+                {/*<div className="col-md-6">
                   <div className="container-fluid">
                     <div className="row">
                       <PerfCard team={team.id} />
                     </div>
                   </div>
-                </div>
+            </div>*/}
               </div>
             }
           </div>
