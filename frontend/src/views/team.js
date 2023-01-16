@@ -166,11 +166,13 @@ class YesTeam extends Component {
                     <input
                       type="checkbox"
                       id="profile-auto_accept_ranked"
-                      checked={this.state.team.profile.auto_accept_ranked}
-                      onChange={this.changeHandler}
+                      // checked={this.state.team.profile.auto_accept_ranked}
+                      // onChange={this.changeHandler}
+                      class="lockedCbx"
                       className="form-control center-row-start"
+                      disabled
                     />{" "}
-                    Auto-accept ranked scrimmages.
+                    Auto-accept ranked scrimmages is currently disabled.
                   </label>
                 </div>
                 <div className="col-md-6">

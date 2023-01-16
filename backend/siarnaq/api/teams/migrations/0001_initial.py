@@ -92,7 +92,7 @@ class Migration(migrations.Migration):
                 ("biography", models.TextField(blank=True, max_length=1024)),
                 ("has_avatar", models.BooleanField(default=False)),
                 ("avatar_uuid", models.UUIDField(default=uuid.uuid4)),
-                ("auto_accept_ranked", models.BooleanField(default=True)),
+                ("auto_accept_ranked", models.BooleanField(default=False)),
                 ("auto_accept_unranked", models.BooleanField(default=True)),
             ],
         ),

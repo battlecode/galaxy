@@ -1162,7 +1162,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     )
     def test_create_autoaccept(self, enqueue):
         self.client.force_authenticate(self.users[0])
-        self.teams[1].profile.auto_accept_ranked = True
+        self.teams[1].profile.auto_accept_ranked = False
         self.teams[1].profile.save()
         response = self.client.post(
             reverse("request-list", kwargs={"episode_id": "e1"}),
