@@ -1,5 +1,6 @@
 import structlog
 from django.contrib import admin, messages
+from django.utils.html import format_html
 
 from siarnaq.api.compete.models import Match
 from siarnaq.api.episodes.models import (
@@ -172,7 +173,7 @@ class MatchInline(admin.TabularInline):
     model = Match
     classes = ("collapse",)
     extra = 0
-    fields = ("__str__", "created", "replay", "status")
+    fields = ("__str__", "created", "replay_link", "status")
     ordering = ("-pk",)
     readonly_fields = fields
 
@@ -184,6 +185,16 @@ class MatchInline(admin.TabularInline):
 
     def has_delete_permission(self, request, obj):
         return False
+
+    @admin.display(description="Replay link")
+    def replay_link(self, obj):
+        link = "https://releases.battlecode.org/client/{}/{}/visualizer.html?{}".format(
+            obj.episode.artifact_name,
+            obj.episode.release_version_public,
+            # Client should make this something urlencode-able, instead of the below...
+            "tournamentMode&" + obj.get_replay_url(),
+        )
+        return format_html('<a href="{}">Watch</a>', link)
 
 
 @admin.action(description="Create and enqueue matches of a tournament round")
@@ -213,6 +224,14 @@ class TournamentRoundAdmin(admin.ModelAdmin):
     list_select_related = ("tournament",)
     ordering = ("-tournament__submission_freeze", "challonge_id")
     readonly_fields = ("challonge_id", "in_progress")
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("tournament")
+            .prefetch_related("matches__episode")
+        )
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         pk = request.resolver_match.kwargs.get("object_id", None)
