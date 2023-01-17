@@ -239,3 +239,18 @@ class TeamProfile(models.Model):
         )
         # Append UUID to public URL to prevent caching on avatar update
         return f"{public_url}?{self.avatar_uuid}"
+
+
+class HistoricalRating(models.Model):
+    """
+    A database model for a historical rating of a team.
+    """
+
+    team = models.OneToOneField(
+        Team,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+
+    rating = models.OneToOneField(Rating, on_delete=models.PROTECT)
+    created = models.DateTimeField(auto_now_add=True)

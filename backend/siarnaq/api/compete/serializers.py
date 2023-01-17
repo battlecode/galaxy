@@ -186,33 +186,6 @@ class SubmissionReportSerializer(serializers.Serializer):
         invocation_serializer.update(self.instance, self.validated_data["invocation"])
         return self.instance
 
-class HistoricalRankingSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Match
-        fields = [
-            "id",
-            "status",
-            "episode",
-            "tournament_round",
-            "participants",
-            "maps",
-            "alternate_order",
-            "created",
-            "is_ranked",
-            # "replay_url",
-        ]
-        read_only_fields = fields
-
-    def to_representation(self, instance):
-        data = Match.objects.filter("participants__id")
-        data["participants"] = MatchParticipantSerializer(instance.participants.all(), many=True).data
-        
-        wanted = {}
-        for participant in data["participants"]:
-            wanted[participant["team"]] = participant["rating"], data["created"]
-
-        return wanted
 
 class MatchParticipantSerializer(serializers.ModelSerializer):
     teamname = serializers.CharField(source="team.name", read_only=True)
@@ -461,3 +434,8 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+
+class HistoricalRatingSerializer(serializers.Serializer):
+    rating = RatingField()
+    timestamp = serializers.DateTimeField()
