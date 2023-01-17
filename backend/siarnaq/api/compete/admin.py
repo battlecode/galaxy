@@ -81,11 +81,11 @@ class SubmissionAdmin(admin.ModelAdmin):
 class MatchParticipantInline(admin.TabularInline):
     model = MatchParticipant
     extra = 0
-    fields = ("team", "submission", "player_index", "score", "rating")
+    fields = ("team", "submission", "player_index", "score", "rating", "challonge_id")
     max_num = 2
     ordering = ("player_index",)
     raw_id_fields = ("team", "submission")
-    readonly_fields = ("rating",)
+    readonly_fields = ("rating", "challonge_id")
 
     def get_queryset(self, request):
         return (
@@ -102,7 +102,6 @@ class MatchAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "episode",
-                    "tournament_round",
                     "replay",
                     "alternate_order",
                     "is_ranked",
@@ -114,6 +113,12 @@ class MatchAdmin(admin.ModelAdmin):
             "Saturn metadata",
             {
                 "fields": ("status", "created", "num_failures", "logs"),
+            },
+        ),
+        (
+            "Tournament metadata",
+            {
+                "fields": ("tournament_round", "challonge_id"),
             },
         ),
     )
@@ -128,7 +133,15 @@ class MatchAdmin(admin.ModelAdmin):
     list_filter = ("episode", "status")
     ordering = ("-pk",)
     raw_id_fields = ("tournament_round",)
-    readonly_fields = ("replay", "status", "created", "num_failures", "logs")
+    readonly_fields = (
+        "replay",
+        "status",
+        "created",
+        "num_failures",
+        "logs",
+        "tournament_round",
+        "challonge_id",
+    )
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         pk = request.resolver_match.kwargs.get("object_id", None)

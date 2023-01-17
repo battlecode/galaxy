@@ -1,4 +1,5 @@
-from django.contrib import admin
+import structlog
+from django.contrib import admin, messages
 
 from siarnaq.api.compete.models import Match
 from siarnaq.api.episodes.models import (
@@ -8,6 +9,8 @@ from siarnaq.api.episodes.models import (
     Tournament,
     TournamentRound,
 )
+
+logger = structlog.get_logger(__name__)
 
 
 class MapInline(admin.TabularInline):
@@ -108,8 +111,16 @@ class TournamentRoundInline(admin.TabularInline):
         return super().get_queryset(request).prefetch_related("maps")
 
 
+@admin.action(description="Initialize a tournament")
+def initialize(modeladmin, request, queryset):
+    logger.info("initialize", message=f"Initializing tournaments in {queryset}")
+    for tournament in queryset:
+        tournament.initialize()
+
+
 @admin.register(Tournament)
 class TournamentAdmin(admin.ModelAdmin):
+    actions = [initialize]
     fieldsets = (
         (
             "General",
@@ -134,7 +145,10 @@ class TournamentAdmin(admin.ModelAdmin):
         (
             "Challonge configuration",
             {
-                "fields": ("challonge_private", "challonge_public", "in_progress"),
+                "fields": (
+                    "challonge_id_private",
+                    "challonge_id_public",
+                ),
             },
         ),
     )
@@ -146,12 +160,10 @@ class TournamentAdmin(admin.ModelAdmin):
         "episode",
         "submission_freeze",
         "is_public",
-        "in_progress",
     )
     list_filter = ("episode",)
     list_select_related = ("episode",)
     ordering = ("-episode__game_release", "-submission_freeze")
-    readonly_fields = ("in_progress",)
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
 
@@ -174,21 +186,33 @@ class MatchInline(admin.TabularInline):
         return False
 
 
+@admin.action(description="Create and enqueue matches of a tournament round")
+def enqueue(modeladmin, request, queryset):
+    logger.info("enqueue", message=f"Enqueueing tournament rounds {queryset}")
+    for round in queryset:
+        try:
+            round.enqueue()
+        except RuntimeError as e:
+            messages.error(request, str(e))
+
+
 @admin.register(TournamentRound)
 class TournamentRoundAdmin(admin.ModelAdmin):
+    actions = [enqueue]
     fields = (
         "name",
         "tournament",
         "challonge_id",
         "release_status",
         "maps",
+        "in_progress",
     )
     inlines = [MatchInline]
-    list_display = ("name", "tournament", "release_status")
+    list_display = ("name", "tournament", "release_status", "in_progress")
     list_filter = ("tournament", "release_status")
     list_select_related = ("tournament",)
     ordering = ("-tournament__submission_freeze", "challonge_id")
-    readonly_fields = ("challonge_id",)
+    readonly_fields = ("challonge_id", "in_progress")
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         pk = request.resolver_match.kwargs.get("object_id", None)
