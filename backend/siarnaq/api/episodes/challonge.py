@@ -95,6 +95,19 @@ def get_tournament(tournament_url):
     return r.json()
 
 
+def get_round_indexes(tournament_url):
+    tournament_data = get_tournament(tournament_url)
+
+    round_indexes = set()
+    for item in tournament_data["included"]:
+        match item:
+            case {"type": "match", "attributes": attributes}:
+                round_index = attributes["round"]
+                round_indexes.add(round_index)
+
+    return round_indexes
+
+
 def update_match(tournament_url, match_id, match):
     url = f"{URL_BASE}tournaments/{tournament_url}/matches/{match_id}.json"
 

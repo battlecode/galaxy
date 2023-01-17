@@ -330,29 +330,17 @@ class Tournament(models.Model):
         challonge.bulk_add_participants(challonge_id_private, participants)
         challonge.start_tournament(challonge_id_private)
 
-        tournament = challonge.get_tournament(challonge_id_private)
-        # Derive round IDs
-        # Takes some wrangling with API response format
-        # We should move this block later
-        # (to keep all code that directly hits challonge
-        # in its own module) Track in #549
-        rounds = set()
-        for item in tournament["included"]:
-            # Cleaner w match-case block
-            # Track in #549
-            if item["type"] == "match":
-                round_idx = item["attributes"]["round"]
-                rounds.add(round_idx)
+        round_indexes = challonge.get_round_indexes(challonge_id_private)
 
         # NOTE: rounds' order and indexes get weird in double elim.
         # Tracked in #548
         round_objects = [
             TournamentRound(
                 tournament=self,
-                challonge_id=round_idx,
-                name=f"{challonge_name_private} Round {round_idx}",
+                challonge_id=round_index,
+                name=f"{challonge_name_private} Round {round_index}",
             )
-            for round_idx in rounds
+            for round_index in round_indexes
         ]
         TournamentRound.objects.bulk_create(round_objects)
 
