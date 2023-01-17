@@ -346,9 +346,7 @@ class Tournament(models.Model):
 
         self.challonge_id_private = challonge_id_private
         self.challonge_id_public = challonge_id_public
-        # Optimize this save w the `update_fields` kwarg
-        # Tracked in #549
-        self.save()
+        self.save(update_fields=["challonge_id_private", "challonge_id_public"])
 
     def report_for_tournament(self, match: Match):
         """
@@ -591,4 +589,4 @@ class TournamentRound(models.Model):
         Match.objects.filter(pk__in=[match.pk for match in matches]).enqueue()
 
         self.in_progress = True
-        self.save()
+        self.save(update_fields=["in_progress"])
