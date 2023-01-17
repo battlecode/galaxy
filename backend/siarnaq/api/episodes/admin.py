@@ -130,7 +130,12 @@ class TournamentAdmin(admin.ModelAdmin):
         (
             "Release options",
             {
-                "fields": ("submission_freeze", "submission_unfreeze", "is_public"),
+                "fields": (
+                    "submission_freeze",
+                    "submission_unfreeze",
+                    "display_date",
+                    "is_public",
+                ),
             },
         ),
         (
@@ -159,6 +164,7 @@ class TournamentAdmin(admin.ModelAdmin):
         "name_short",
         "name_long",
         "episode",
+        "display_date",
         "submission_freeze",
         "is_public",
     )
