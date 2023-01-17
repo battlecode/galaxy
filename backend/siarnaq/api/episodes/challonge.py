@@ -6,6 +6,8 @@
 import requests
 from django.conf import settings
 
+from siarnaq.api.compete.models import Match
+
 _headers = {
     "Accept": "application/json",
     "Authorization-Type": "v1",
@@ -108,14 +110,42 @@ def get_round_indexes(tournament_url):
     return round_indexes
 
 
-def update_match(tournament_url, match_id, match):
+def update_match(tournament_url, match_id, match: Match):
     url = f"{URL_BASE}tournaments/{tournament_url}/matches/{match_id}.json"
+
+    # Wrangle the Match object into a format Challonge likes.
+    # In particular, Challonge wants an array of objects,
+    # each of which represents a participant's data.
+    # The data is id, score, and whether or not they advance.
+
+    participants_for_challonge = []
+
+    # Build this array while also tracking high score (for computing who advances).
+    high_score = -1
+    for participant in match.participants.all():
+        score = participant.score
+        participants_for_challonge.append(
+            {"participant_id": participant.challonge_id, "score": score}
+        )
+        if score >= high_score:
+            high_score = score
+
+    # Assign the "advance" flag, for those that have the high score.
+    for participant in participants_for_challonge:
+        participant["advancing"] = True if participant["score"] == high_score else False
+
+    # Convert "score" to a string for Challonge.
+    # (This is required because Challonge supports scores of sets,
+    # which are comma-delimited lists of numbers.
+    # We don't use this though)
+    for participant in participants_for_challonge:
+        participant["score"] = str(participant["score"])
 
     payload = {
         "data": {
             "type": "Match",
             "attributes": {
-                "match": match,
+                "match": participants_for_challonge,
             },
         }
     }

@@ -348,49 +348,13 @@ class Tournament(models.Model):
         self.challonge_id_public = challonge_id_public
         self.save(update_fields=["challonge_id_private", "challonge_id_public"])
 
-    def report_for_tournament(self, match: Match):
+    def report_for_tournament(self, match):
         """
         If a match is associated with a tournament bracket,
         update that tournament bracket.
         """
-        # NOTE this data format is ultra-specific to Challonge
-        # Make more general and modular, tracked in #549
-        scores_of_participants = dict()
 
-        for p in match.participants.all():
-            scores_of_participants[p.challonge_id] = {"score": p.score}
-
-        # Challonge needs to explicitly be told who advances.
-        # There's probably a better way to derive this...
-        # NOTE this part should definitely go into challonge.py
-        # tracked in #549
-        high_score = -1
-        # Better to use
-        # `key, val in dict.items() `
-        # track in #549
-        for p in scores_of_participants:
-            score = scores_of_participants[p]["score"]
-            if score >= high_score:
-                high_score = score
-
-        for p in scores_of_participants:
-            scores_of_participants[p]["advancing"] = (
-                True if scores_of_participants[p]["score"] == high_score else False
-            )
-
-        # Refold back into a data format Challonge likes
-        scores_for_challonge = [
-            {
-                "participant_id": p,
-                "score_set": str(scores_of_participants[p]["score"]),
-                "advancing": scores_of_participants[p]["advancing"],
-            }
-            for p in scores_of_participants
-        ]
-
-        challonge.update_match(
-            self.challonge_id_private, match.challonge_id, scores_for_challonge
-        )
+        challonge.update_match(self.challonge_id_private, match.challonge_id, match)
 
     # Consider dropping these stubs, cuz they're bloat.
     # We're not confident whether or not the stubs might actually be used,
