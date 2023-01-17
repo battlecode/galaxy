@@ -67,3 +67,12 @@ def bulk_add_participants(tournament_url, participants):
     r = requests.post(url, headers=_headers, json=payload)
     r.raise_for_status()
 
+
+def start_tournament(tournament_url):
+    url = f"{URL_BASE}tournaments/{tournament_url}/change_state.json"
+
+    payload = {"data": {"type": "TournamentState", "attributes": {"state": "start"}}}
+
+    r = requests.put(url, headers=_headers, json=payload)
+    r.raise_for_status()
+

@@ -331,6 +331,8 @@ class Tournament(models.Model):
             tournament_id_private, tournament_name_private, True, is_single_elim
         )
         challonge.bulk_add_participants(tournament_id_private, participants)
+        challonge.start_tournament(tournament_id_private)
+
     def start_progress(self):
         """Start or resume the tournament."""
         raise NotImplementedError
