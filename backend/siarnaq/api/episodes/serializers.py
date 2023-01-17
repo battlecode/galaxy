@@ -72,7 +72,6 @@ class TournamentSerializer(serializers.ModelSerializer):
             "is_public",
             "submission_freeze",
             "submission_unfreeze",
-            "challonge_public",
             "is_eligible",
         ]
 
