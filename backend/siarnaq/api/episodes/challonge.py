@@ -25,9 +25,19 @@ def set_api_key(api_key):
 
 
 def create_tournament(
-    tournament_url, tournament_name, is_private=True, is_single_elim=True
+    tournament_url,
+    tournament_name,
+    is_private,
+    style,
 ):
-    tournament_type = "single elimination" if is_single_elim else "double elimination"
+    from siarnaq.api.episodes.models import TournamentStyle
+
+    # Challonge wants a specific string for tournament type.
+    tournament_type = (
+        "single elimination"
+        if style == TournamentStyle.SINGLE_ELIMINATION
+        else "double elimination"
+    )
 
     url = f"{URL_BASE}tournaments.json"
 

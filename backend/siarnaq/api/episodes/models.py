@@ -309,9 +309,6 @@ class Tournament(models.Model):
         challonge_id_public = f"{self.name_short}_{key}".replace("-", "_")
         challonge_id_private = f"{challonge_id_public}_private"
 
-        # NOTE: We don't support double elim yet.
-        # Tracked in #548. (Also make sure to actually read the "style" field)
-        is_single_elim = True
         participants = self.get_potential_participants()
         # Parse into a format Challonge enjoys
         # 1-idx seed
@@ -327,11 +324,8 @@ class Tournament(models.Model):
 
         # First bracket made should be private,
         # to hide results and enable fixing accidents
-        # In #549 it would be nice to have the function
-        # take in the actual TournamentStyle value,
-        # and do some true/false check there
         challonge.create_tournament(
-            challonge_id_private, challonge_name_private, True, is_single_elim
+            challonge_id_private, challonge_name_private, True, self.style
         )
         challonge.bulk_add_participants(challonge_id_private, participants)
         challonge.start_tournament(challonge_id_private)
