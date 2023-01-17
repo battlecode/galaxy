@@ -272,7 +272,20 @@ class Tournament(models.Model):
     def __str__(self):
         return self.name_short
 
-    def seed_by_scrimmage(self):
+    def get_potential_participants(self):
+        """Returns the list of participants that would be entered in this tournament,
+        if it were to start right now."""
+        # NOTE: this hasn't really been tested well.
+        # Test all parts of eligibility filtering
+        # (includes, excludes, resume)
+        # Test also that special teams (eg devs) don't enter
+        # Track in #549
+        return (
+            Team.objects.with_active_submission()
+            .filter_eligible(self)
+            .all()
+            .order_by("-profile__rating__value")
+        )
         """
         Seed the tournament with eligible teamsn in order of decreasing rating, and
         populate the Challonge brackets.

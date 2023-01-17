@@ -104,7 +104,10 @@ class TeamQuerySet(models.QuerySet):
         return self.filter(status__in=[TeamStatus.REGULAR, TeamStatus.STAFF])
 
     def filter_eligible(self, tournament):
-        """Filter for teams that are eligible for a tournament."""
+        """
+        Filter for teams that are eligible for a tournament.
+        NOTE: Does not filter for having an active submission or not.
+        """
         from siarnaq.api.teams.models import TeamStatus
 
         teams = self.annotate(
