@@ -1,4 +1,4 @@
-import random
+import uuid
 
 import structlog
 from django.apps import apps
@@ -303,9 +303,7 @@ class Tournament(models.Model):
 
         # For security by obfuscation,
         # and to allow easy regeneration of bracket
-        # In #549, use letters (even capitals!)
-        # and use more characters (altho staying under the 32-char lim).
-        key = random.randint(1000, 9999)
+        key = uuid.uuid4()
         # Challonge does not allow hyphens in its IDs
         # so substitute them just in case
         tournament_id_public = f"{self.name_short}_{key}".replace("-", "_")
