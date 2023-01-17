@@ -47,3 +47,23 @@ def create_tournament(
     r.raise_for_status()
 
 
+def bulk_add_participants(tournament_url, participants):
+    """
+    Adds participants in bulk.
+    Expects `participants` to be formatted in the format Challonge expects.
+    Note especially that seeds must be 1-indexed.
+    """
+    url = f"{URL_BASE}tournaments/{tournament_url}/participants/bulk_add.json"
+
+    payload = {
+        "data": {
+            "type": "Participant",
+            "attributes": {
+                "participants": participants,
+            },
+        }
+    }
+
+    r = requests.post(url, headers=_headers, json=payload)
+    r.raise_for_status()
+
