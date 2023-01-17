@@ -23,3 +23,27 @@ def set_api_key(api_key):
     """Set the challonge.com api credentials to use."""
     _headers["Authorization"] = api_key
 
+
+def create_tournament(
+    tournament_url, tournament_name, is_private=True, is_single_elim=True
+):
+    tournament_type = "single elimination" if is_single_elim else "double elimination"
+
+    url = f"{URL_BASE}tournaments.json"
+
+    payload = {
+        "data": {
+            "type": "tournaments",
+            "attributes": {
+                "name": tournament_name,
+                "tournament_type": tournament_type,
+                "private": is_private,
+                "url": tournament_url,
+            },
+        }
+    }
+
+    r = requests.post(url, headers=_headers, json=payload)
+    r.raise_for_status()
+
+

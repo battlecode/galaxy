@@ -286,12 +286,50 @@ class Tournament(models.Model):
             .all()
             .order_by("-profile__rating__value")
         )
-        """
-        Seed the tournament with eligible teamsn in order of decreasing rating, and
-        populate the Challonge brackets.
-        """
-        raise NotImplementedError
 
+    def initialize(self):
+        """
+        Seed the tournament with eligible teams in order of decreasing rating,
+        populate the Challonge brackets, and create TournamentRounds.
+        """
+
+        tournament_name_public = self.name_long
+        tournament_name_private = tournament_name_public + " (private)"
+
+        # For security by obfuscation,
+        # and to allow easy regeneration of bracket
+        # In #549, use letters (even capitals!)
+        # and use more characters (altho staying under the 32-char lim).
+        key = random.randint(1000, 9999)
+        # Challonge does not allow hyphens in its IDs
+        # so substitute them just in case
+        tournament_id_public = f"{self.name_short}_{key}".replace("-", "_")
+        tournament_id_private = f"{tournament_id_public}_private"
+
+        # NOTE: We don't support double elim yet.
+        # Tracked in #548. (Also make sure to actually read the "style" field)
+        is_single_elim = True
+        participants = self.get_potential_participants()
+        # Parse into a format Challonge enjoys
+        # 1-idx seed
+        # Store team id in misc, for convenience (re-looking up is annoying)
+        # Store tournament submission in misc, for consistency and convenience
+        # Note that tournament submission should
+        # never change during a tournament anyways
+        # due to submission freeze. Bad things might happen if it does tho
+        participants = [
+            {"name": p.name, "seed": idx + 1, "misc": f"{p.id},{p.active_submission}"}
+            for (idx, p) in enumerate(participants)
+        ]
+
+        # First bracket made should be private,
+        # to hide results and enable fixing accidents
+        # In #549 it would be nice to have the function
+        # take in the actual TournamentStyle value,
+        # and do some true/false check there
+        challonge.create_tournament(
+            tournament_id_private, tournament_name_private, True, is_single_elim
+        )
     def start_progress(self):
         """Start or resume the tournament."""
         raise NotImplementedError
