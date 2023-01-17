@@ -321,10 +321,13 @@ class MatchViewSet(
             OpenApiParameter(
                 name="team_id",
                 type=int,
-                description="A team to filter for.",
+                description="A team to filter for. Defaults to your own team.",
             ),
         ],
-        responses={status.HTTP_200_OK: HistoricalRatingSerializer(many=True)},
+        responses={
+            status.HTTP_204_NO_CONTENT: "No ranked matches found.",
+            status.HTTP_200_OK: HistoricalRatingSerializer(many=True),
+        },
     )
     @action(
         detail=False,
@@ -333,27 +336,38 @@ class MatchViewSet(
     )
     def historical_ranking(self, request, pk=None, *, episode_id):
         """List the historical rating of a team."""
-        queryset = self.get_queryset().filter(tournament_round__isnull=True)
-        team_id = parse_int(self.request.query_params.get("team_id"))
+        queryset = Match.objects.all().filter(tournament_round__isnull=True)
 
-        queryset = queryset.filter(participants__team=team_id)
+        team_id = parse_int(self.request.query_params.get("team_id"))
+        if team_id is not None:
+            queryset = queryset.filter(participants__team=team_id)
+        else:
+            queryset = queryset.filter(participants__team__members=request.user.pk)
         has_invisible = self.get_queryset().filter(
             participants__team__status=TeamStatus.INVISIBLE
         )
         queryset = queryset.exclude(pk__in=Subquery(has_invisible.values("pk")))
-        timestamps = queryset.values("created")
-        participants = queryset.values("participants").filter(
-            participants__team__pk=team_id
-        )
+        queryset = queryset.filter(is_ranked=True)
 
-        send = [
-            {"timestamp": timestamp, "rating": participant.rating}
-            for timestamp, participant in zip(timestamps, participants)
+        if queryset.all().count() == 0:
+            return Response(None, status=status.HTTP_204_NO_CONTENT)
+        else:
+            matches = queryset.order_by("created")
+
+        ordered = [
+            {
+                "timestamp": match.created,
+                "rating": match.participants.get(team=team_id).rating
+                if team_id is not None
+                else match.participants.get(team__members__pk=request.user.pk).rating,
+            }
+            for match in matches
         ]
 
-        serializer = self.get_serializer(data=send, many=True)
-        serializer.is_valid(raise_exception=True)
-        return Response(serializer.data)
+        results = HistoricalRatingSerializer(
+            self.paginate_queryset(ordered), many=True
+        ).data
+        return self.get_paginated_response(results)
 
     @extend_schema(
         responses={
