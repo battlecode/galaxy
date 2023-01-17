@@ -247,6 +247,11 @@ class Tournament(models.Model):
     is_public = models.BooleanField()
     """Whether this tournament is included in the public index."""
 
+    display_date = models.DateField()
+    """
+    The official date of the tournament; that is, when it will be streamed.
+    """
+
     submission_freeze = models.DateTimeField()
     """
     The time at which submissions are frozen for the tournament.

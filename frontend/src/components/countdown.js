@@ -124,17 +124,27 @@ class Countdown extends Component {
         this.state.next_tournament !== undefined ? (
           <div>
             {this.state.next_tournament !== null ? (
-              <p>
-                The submission deadline for the{" "}
-                <b>{this.state.next_tournament.name_long}</b> {tense_verb} at{" "}
-                {countdown_time_text.est_date_str} Eastern Time, which{" "}
-                {tense_verb}{" "}
-                <b>
-                  {countdown_time_text.local_full_string} (formatted in your
-                  locale)
-                </b>
-                .
-              </p>
+              <div>
+                <p>
+                  The submission deadline for the{" "}
+                  <b>{this.state.next_tournament.name_long}</b> {tense_verb} at{" "}
+                  {countdown_time_text.est_date_str} Eastern Time, which{" "}
+                  {tense_verb}{" "}
+                  <b>
+                    {countdown_time_text.local_full_string} (formatted in your
+                    locale)
+                  </b>
+                  .
+                </p>
+                <p>
+                  Make sure you have{" "}
+                  <NavLink to="tournaments">
+                    checked your tournament eligibility
+                  </NavLink>{" "}
+                  prior to the deadline! You can indicate your eligibility on
+                  your <NavLink to="team">team profile page</NavLink>.
+                </p>
+              </div>
             ) : (
               <p>
                 The submission deadline for the next tournament has not been set
@@ -144,10 +154,8 @@ class Countdown extends Component {
             {this.state.next_tournament !== null &&
             this.state.next_tournament.require_resume ? (
               <p>
-                Make sure to have indicated your eligibility on your{" "}
-                <NavLink to="team">team profile page</NavLink>. Also make sure
-                to have all members upload a resume, at your{" "}
-                <NavLink to="account">personal profile page</NavLink>. See the
+                Also make sure to have all members upload a resume, at your{" "}
+                <NavLink to="/account">personal profile page</NavLink>. See the
                 eligibility rules given in the{" "}
                 <NavLink to="team">tournament page</NavLink> for more info.
               </p>

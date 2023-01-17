@@ -315,6 +315,7 @@ class MatchSerializerTestCase(TestCase):
             style=TournamentStyle.DOUBLE_ELIMINATION,
             require_resume=False,
             is_public=True,
+            display_date=timezone.now(),
             submission_freeze=timezone.now(),
             submission_unfreeze=timezone.now(),
         )
@@ -972,6 +973,7 @@ class MatchViewSetTestCase(APITestCase):
             style=TournamentStyle.DOUBLE_ELIMINATION,
             require_resume=False,
             is_public=True,
+            display_date=timezone.now(),
             submission_freeze=timezone.now(),
             submission_unfreeze=timezone.now(),
         )

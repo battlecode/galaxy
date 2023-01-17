@@ -179,8 +179,10 @@ class App extends Component {
         component={(props) => (
           <Tournaments
             {...props}
+            team={this.state.team}
             episode_name_long={episode_name_long}
             episode={this.state.episode}
+            tournament_info={this.state.tournament_info}
           />
         )}
         key="tournaments"

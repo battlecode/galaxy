@@ -1,15 +1,29 @@
 import React, { Component } from "react";
 import Api from "../api";
 class Tournaments extends Component {
-  componentDidMount() {
-    Api.getTournaments(
-      function (t) {
-        this.setState({ tournaments: t });
-      }.bind(this)
-    );
-  }
+  componentDidMount() {}
 
   render() {
+    const tournamentRows = this.props.tournament_info.map((tournament) => {
+      return (
+        <tr key={tournament.name_short} className="page-item">
+          <td>{tournament.name_long}</td>
+          <td>{new Date(tournament.display_date).toLocaleDateString()}</td>
+          {this.props.team !== null ? (
+            <td style={{ textAlign: "center" }}>
+              {tournament.is_eligible ? (
+                <i className="fa fa-check text-success" title="Yes"></i>
+              ) : (
+                <i className="fa fa-times text-danger" title="No"></i>
+              )}
+            </td>
+          ) : (
+            ""
+          )}
+          <td>{tournament.blurb}</td>
+        </tr>
+      );
+    });
     return (
       <div className="content">
         <div className="container-fluid">
@@ -27,58 +41,23 @@ class Tournaments extends Component {
                     throughout the month! We stream and commentate all
                     tournaments online.
                   </p>
-                  {/* This should eventually be dynamic. See #229 and #231 */}
-                  <ul>
-                    <li>
-                      <b>1/17/23, Sprint 1 Tournament:</b> One week after spec
-                      release, you're given a chance to win prizes in this
-                      tournament. The goal is to get an idea of the meta-game,
-                      and a chance to test your bot prototypes.
-                    </li>
-                    <li>
-                      <b>1/24/23, Sprint 2 Tournament:</b> One week after the
-                      Sprint 1 Tournament, you're given another chance to win
-                      prizes, test the metagame, and make changes.
-                    </li>
-                    <li>
-                      <b>1/28/23, International Qualifying Tournament:</b> This
-                      tournament determines the <i>4 international teams</i>{" "}
-                      that will qualify for the Final Tournament.
-                    </li>
-                    <li>
-                      <b>1/30/23, US Qualifying Tournament: </b>
-                      This tournament determines the <i>
-                        12 US-based teams
-                      </i>{" "}
-                      that will qualify for the Final Tournament.
-                    </li>
-                    <li>
-                      <b>2/1/23, MIT Newbie Tournament:</b> The top MIT newbie
-                      teams compete for a smaller prize pool. The final match
-                      between the top 2 teams will be run at the Final
-                      Tournament.
-                    </li>
-                    <li>
-                      <b>2/1/23, High School Tournament:</b> The top high school
-                      teams compete for a smaller prize pool. Like the Newbie
-                      Tournament, the final match will be run at the Final
-                      Tournament.
-                    </li>
-                    <li>
-                      <b>2/5/23, Final Tournament:</b> The top 16 teams, as
-                      determined by the qualifying tournaments, compete for
-                      glory, fame and a big prize pool. The tournament will take
-                      place live in the evening at MIT in 32-123 (and will of
-                      course be streamed online).{" "}
-                      <b>All finalist teams will be invited to MIT.</b>
-                    </li>
-                  </ul>
                   <p>
-                    {/* <b>
-                      The deadline to submit code for each non-final tournament
-                      is 7 pm EST <i>the day before</i> the tournament.
-                    </b> */}
+                    The deadline to submit code for each non-final tournament is
+                    usually 7 pm EST <i>the day before</i> the tournament.
                   </p>
+                  <div className="table-responsive table-full-width">
+                    <table className="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Tournament</th>
+                          <th>Date</th>
+                          {this.props.team !== null ? <th>Eligibility</th> : ""}
+                          <th>About</th>
+                        </tr>
+                      </thead>
+                      <tbody>{tournamentRows}</tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
 
