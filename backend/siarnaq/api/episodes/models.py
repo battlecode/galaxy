@@ -298,16 +298,16 @@ class Tournament(models.Model):
         populate the Challonge brackets, and create TournamentRounds.
         """
 
-        tournament_name_public = self.name_long
-        tournament_name_private = tournament_name_public + " (private)"
+        challonge_name_public = self.name_long
+        challonge_name_private = challonge_name_public + " (private)"
 
         # For security by obfuscation,
         # and to allow easy regeneration of bracket
         key = uuid.uuid4()
         # Challonge does not allow hyphens in its IDs
         # so substitute them just in case
-        tournament_id_public = f"{self.name_short}_{key}".replace("-", "_")
-        tournament_id_private = f"{tournament_id_public}_private"
+        challonge_id_public = f"{self.name_short}_{key}".replace("-", "_")
+        challonge_id_private = f"{challonge_id_public}_private"
 
         # NOTE: We don't support double elim yet.
         # Tracked in #548. (Also make sure to actually read the "style" field)
@@ -331,12 +331,12 @@ class Tournament(models.Model):
         # take in the actual TournamentStyle value,
         # and do some true/false check there
         challonge.create_tournament(
-            tournament_id_private, tournament_name_private, True, is_single_elim
+            challonge_id_private, challonge_name_private, True, is_single_elim
         )
-        challonge.bulk_add_participants(tournament_id_private, participants)
-        challonge.start_tournament(tournament_id_private)
+        challonge.bulk_add_participants(challonge_id_private, participants)
+        challonge.start_tournament(challonge_id_private)
 
-        tournament = challonge.get_tournament(tournament_id_private)
+        tournament = challonge.get_tournament(challonge_id_private)
         # Derive round IDs
         # Takes some wrangling with API response format
         # We should move this block later
@@ -356,14 +356,14 @@ class Tournament(models.Model):
             TournamentRound(
                 tournament=self,
                 challonge_id=round_idx,
-                name=f"{tournament_name_private} Round {round_idx}",
+                name=f"{challonge_name_private} Round {round_idx}",
             )
             for round_idx in rounds
         ]
         TournamentRound.objects.bulk_create(round_objects)
 
-        self.challonge_id_private = tournament_id_private
-        self.challonge_id_public = tournament_id_public
+        self.challonge_id_private = challonge_id_private
+        self.challonge_id_public = challonge_id_public
         # Optimize this save w the `update_fields` kwarg
         # Tracked in #549
         self.save()
