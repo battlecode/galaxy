@@ -333,6 +333,37 @@ class Tournament(models.Model):
         challonge.bulk_add_participants(tournament_id_private, participants)
         challonge.start_tournament(tournament_id_private)
 
+        tournament = challonge.get_tournament(tournament_id_private)
+        # Derive round IDs
+        # Takes some wrangling with API response format
+        # We should move this block later
+        # (to keep all code that directly hits challonge
+        # in its own module) Track in #549
+        rounds = set()
+        for item in tournament["included"]:
+            # Cleaner w match-case block
+            # Track in #549
+            if item["type"] == "match":
+                round_idx = item["attributes"]["round"]
+                rounds.add(round_idx)
+
+        # NOTE: rounds' order and indexes get weird in double elim.
+        # Tracked in #548
+        round_objects = [
+            TournamentRound(
+                tournament=self,
+                challonge_id=round_idx,
+                name=f"{tournament_name_private} Round {round_idx}",
+            )
+            for round_idx in rounds
+        ]
+        TournamentRound.objects.bulk_create(round_objects)
+
+        self.challonge_id_private = tournament_id_private
+        self.challonge_id_public = tournament_id_public
+        # Optimize this save w the `update_fields` kwarg
+        # Tracked in #549
+        self.save()
     def start_progress(self):
         """Start or resume the tournament."""
         raise NotImplementedError

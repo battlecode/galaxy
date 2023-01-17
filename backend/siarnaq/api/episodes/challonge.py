@@ -76,3 +76,11 @@ def start_tournament(tournament_url):
     r = requests.put(url, headers=_headers, json=payload)
     r.raise_for_status()
 
+
+def get_tournament(tournament_url):
+    url = f"{URL_BASE}tournaments/{tournament_url}.json"
+
+    r = requests.get(url, headers=_headers)
+    r.raise_for_status()
+    return r.json()
+
