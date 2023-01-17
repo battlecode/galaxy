@@ -84,3 +84,18 @@ def get_tournament(tournament_url):
     r.raise_for_status()
     return r.json()
 
+
+def update_match(tournament_url, match_id, match):
+    url = f"{URL_BASE}tournaments/{tournament_url}/matches/{match_id}.json"
+
+    payload = {
+        "data": {
+            "type": "Match",
+            "attributes": {
+                "match": match,
+            },
+        }
+    }
+
+    r = requests.put(url, headers=_headers, json=payload)
+    r.raise_for_status()
