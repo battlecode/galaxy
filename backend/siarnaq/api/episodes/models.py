@@ -1,10 +1,15 @@
+import random
+
 import structlog
 from django.apps import apps
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from sortedm2m.fields import SortedManyToManyField
 
+from siarnaq.api.compete.models import Match, MatchParticipant
+from siarnaq.api.episodes import challonge
 from siarnaq.api.episodes.managers import EpisodeQuerySet, TournamentQuerySet
+from siarnaq.api.teams.models import Team
 
 logger = structlog.get_logger(__name__)
 
@@ -256,14 +261,11 @@ class Tournament(models.Model):
     time.
     """
 
-    in_progress = models.BooleanField(default=False)
-    """Whether the tournament is currently being run on the Saturn compute cluster."""
+    challonge_id_private = models.SlugField(null=True, blank=True)
+    """The Challonge ID of the associated private bracket."""
 
-    challonge_private = models.URLField(null=True, blank=True)
-    """A private Challonge bracket showing matches in progress as they are run."""
-
-    challonge_public = models.URLField(null=True, blank=True)
-    """A public Challonge bracket showing match results as they are released."""
+    challonge_id_public = models.SlugField(null=True, blank=True)
+    """The Challonge ID of the associated private bracket."""
 
     objects = TournamentQuerySet.as_manager()
 
@@ -314,6 +316,15 @@ class TournamentRound(models.Model):
     )
     """The tournament to which this round belongs."""
 
+    # NOTE: this is not really an "ID" in the unique sense.
+    # Instead it is more like an index.
+    # (It takes on values of ints close to 0,
+    # and two rounds from the same Challonge bracket
+    # can have the same value here of course.)
+    # You could rename this field, but that's a
+    # very widespread code change and migration,
+    # with low probability of success and
+    # high impact of failure.
     challonge_id = models.SmallIntegerField(null=True, blank=True)
     """The ID of this round as referenced by Challonge."""
 
@@ -327,6 +338,9 @@ class TournamentRound(models.Model):
         choices=ReleaseStatus.choices, default=ReleaseStatus.HIDDEN
     )
     """THe degree to which matches in this round are released."""
+
+    in_progress = models.BooleanField(default=False)
+    """Whether the round is currently being run on the Saturn compute cluster."""
 
     class Meta:
         constraints = [

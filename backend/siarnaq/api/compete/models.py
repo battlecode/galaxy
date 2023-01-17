@@ -205,13 +205,21 @@ class Match(SaturnInvocation):
     """The maps to be played in this match."""
 
     alternate_order = models.BooleanField()
-    """Whether players should alternate orderGbetween successive games of this match."""
+    """Whether players should alternate order between successive games of this match."""
 
     is_ranked = models.BooleanField()
     """Whether this match counts for ranked ratings."""
 
     replay = models.UUIDField(default=uuid.uuid4)
     """The replay file of this match."""
+
+    # NOTE: I'm not sure if this field _has_ to be unique.
+    # Feel free to relax it later.
+    # (Not enforcing it now, and then enforcing it later
+    # when a duplicate may have snuck in, would be hard.)
+    challonge_id = models.IntegerField(blank=True, null=True, unique=True)
+    """If this match is referenced in a private Challonge bracket,
+    Challonge's internal ID of the match in the bracket."""
 
     objects = MatchQuerySet.as_manager()
 
@@ -343,6 +351,13 @@ class MatchParticipant(models.Model):
         related_name="next_participation",
     )
     """The team's previous participation, or null if there is none."""
+
+    challonge_id = models.CharField(null=True, blank=True, max_length=64)
+    """
+    If the associated match is in Challonge,
+    Challonge's internal ID of this participant.
+    (This saves many API calls.)
+    """
 
     objects = MatchParticipantManager()
 

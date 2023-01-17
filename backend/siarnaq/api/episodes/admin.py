@@ -134,7 +134,10 @@ class TournamentAdmin(admin.ModelAdmin):
         (
             "Challonge configuration",
             {
-                "fields": ("challonge_private", "challonge_public", "in_progress"),
+                "fields": (
+                    "challonge_id_private",
+                    "challonge_id_public",
+                ),
             },
         ),
     )
@@ -146,12 +149,10 @@ class TournamentAdmin(admin.ModelAdmin):
         "episode",
         "submission_freeze",
         "is_public",
-        "in_progress",
     )
     list_filter = ("episode",)
     list_select_related = ("episode",)
     ordering = ("-episode__game_release", "-submission_freeze")
-    readonly_fields = ("in_progress",)
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
 
@@ -182,13 +183,14 @@ class TournamentRoundAdmin(admin.ModelAdmin):
         "challonge_id",
         "release_status",
         "maps",
+        "in_progress",
     )
     inlines = [MatchInline]
-    list_display = ("name", "tournament", "release_status")
+    list_display = ("name", "tournament", "release_status", "in_progress")
     list_filter = ("tournament", "release_status")
     list_select_related = ("tournament",)
     ordering = ("-tournament__submission_freeze", "challonge_id")
-    readonly_fields = ("challonge_id",)
+    readonly_fields = ("challonge_id", "in_progress")
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         pk = request.resolver_match.kwargs.get("object_id", None)
