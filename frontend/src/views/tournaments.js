@@ -9,7 +9,11 @@ class Tournaments extends Component {
       return (
         <tr key={tournament.name_short} className="page-item">
           <td>{tournament.name_long}</td>
-          <td>{new Date(tournament.display_date).toLocaleDateString()}</td>
+          <td>
+            {new Date(tournament.display_date).toLocaleDateString([], {
+              timeZone: "UTC",
+            })}
+          </td>
           {this.props.team !== null ? (
             <td style={{ textAlign: "center" }}>
               {tournament.is_eligible ? (
