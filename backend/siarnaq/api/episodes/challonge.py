@@ -102,8 +102,7 @@ def get_round_indexes(tournament_url):
     round_indexes = set()
     for item in tournament_data["included"]:
         match item:
-            case {"type": "match", "attributes": attributes}:
-                round_index = attributes["round"]
+            case {"type": "match", "attributes": {"round": round_index}}:
                 round_indexes.add(round_index)
 
     return round_indexes
