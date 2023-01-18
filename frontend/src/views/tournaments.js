@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { NavLink } from "react-router-dom";
 import Api from "../api";
 class Tournaments extends Component {
   componentDidMount() {}
@@ -20,6 +21,13 @@ class Tournaments extends Component {
           ) : (
             ""
           )}
+          <td>
+            <NavLink
+              to={`/${this.props.episode}/tournament_matches/${tournament.name_short}`}
+            >
+              View
+            </NavLink>
+          </td>
           <td>{tournament.blurb}</td>
         </tr>
       );
@@ -52,6 +60,7 @@ class Tournaments extends Component {
                           <th>Tournament</th>
                           <th>Date</th>
                           {this.props.team !== null ? <th>Eligibility</th> : ""}
+                          <th>Results</th>
                           <th>About</th>
                         </tr>
                       </thead>

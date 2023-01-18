@@ -188,6 +188,13 @@ class App extends Component {
         key="tournaments"
       />,
       <Route
+        path={`/:episode/tournament_matches/:tournament_id`}
+        component={(props) => (
+          <QueueHistory {...props} episode={this.state.episode} />
+        )}
+        key="tournaments"
+      />,
+      <Route
         path={`/:episode/getting-started`}
         component={(props) => (
           <GettingStarted
@@ -251,7 +258,11 @@ class App extends Component {
       <Route
         path={`/:episode/queue`}
         component={(props) => (
-          <QueueHistory {...props} episode={this.state.episode} />
+          <QueueHistory
+            {...props}
+            episode={this.state.episode}
+            tournament_id={null}
+          />
         )}
         key="rankings"
       />,

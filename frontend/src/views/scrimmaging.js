@@ -135,7 +135,7 @@ class ScrimmageRequests extends Component {
   }
 }
 
-class ScrimmageHistory extends Component {
+class MatchHistory extends Component {
   state = {
     scrimPage: 1,
     pageLimit: 0,
@@ -167,7 +167,10 @@ class ScrimmageHistory extends Component {
 
   loadPage = (page) => {
     this.setState({ loading: true, scrimmages: [], scrimPage: page });
-    Api.getTeamScrimmages(
+    const apiFunc = this.props.show_tournament_matches
+      ? Api.getTeamTournamentMatches
+      : Api.getTeamScrimmages;
+    apiFunc(
       this.props.team.id,
       this.props.episode,
       function (scrimmages, pageLimit) {
@@ -219,7 +222,10 @@ class ScrimmageHistory extends Component {
         <div className="card">
           <div className="header">
             <h4 className="title">
-              Scrimmage History{" "}
+              {this.props.show_tournament_matches
+                ? "Tournament Match"
+                : "Scrimmage"}{" "}
+              History{" "}
               <button
                 onClick={this.refresh}
                 style={{ marginLeft: "10px" }}
@@ -235,9 +241,9 @@ class ScrimmageHistory extends Component {
               <thead>
                 <tr>
                   <th>Score</th>
-                  <th>Δ</th>
-                  <th>Opponent (Δ)</th>
-                  <th>Ranked</th>
+                  {!this.props.show_tournament_matches && <th>Δ</th>}
+                  <th>Opponent {!this.props.show_tournament_matches && "Δ"}</th>
+                  {!this.props.show_tournament_matches && <th>Ranked</th>}
                   <th>Status</th>
                   <th>Replay</th>
                   <th>Creation time</th>
@@ -297,9 +303,9 @@ class ScrimmageHistory extends Component {
                   return (
                     <tr key={s.id}>
                       {score_entry}
-                      <td>
-                        {ScrimmageHistory.formatRatingDelta(participation)}
-                      </td>
+                      {!this.props.show_tournament_matches && (
+                        <td>{MatchHistory.formatRatingDelta(participation)}</td>
+                      )}
                       <td>
                         <NavLink
                           to={`/${this.props.episode}/rankings/${opponent_participation.team}`}
@@ -307,12 +313,15 @@ class ScrimmageHistory extends Component {
                           {opponent_participation.teamname}
                         </NavLink>{" "}
                         (
-                        {ScrimmageHistory.formatRatingDelta(
-                          opponent_participation
-                        )}
+                        {!this.props.show_tournament_matches &&
+                          MatchHistory.formatRatingDelta(
+                            opponent_participation
+                          )}
                         )
                       </td>
-                      <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
+                      {!this.props.show_tournament_matches && (
+                        <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
+                      )}
                       {stat_entry}
                       {s.status == "OK!" ? (
                         <td>
@@ -334,12 +343,12 @@ class ScrimmageHistory extends Component {
             </table>
             {this.state.loading && <Spinner />}
           </div>
+          <PaginationControl
+            page={this.state.scrimPage}
+            pageLimit={this.state.pageLimit}
+            onPageClick={this.getScrimPage}
+          />
         </div>
-        <PaginationControl
-          page={this.state.scrimPage}
-          pageLimit={this.state.pageLimit}
-          onPageClick={this.getScrimPage}
-        />
       </div>
     );
   }
@@ -372,7 +381,7 @@ class Scrimmaging extends Component {
                 history={this.props.history}
                 team={this.props.team}
               />
-              <ScrimmageHistory
+              <MatchHistory
                 ref={(history) => {
                   this.history = history;
                 }}
@@ -380,6 +389,17 @@ class Scrimmaging extends Component {
                 episode={this.props.episode}
                 episode_info={this.props.episode_info}
                 team={this.props.team}
+                show_tournament_matches={false}
+              />
+              <MatchHistory
+                ref={(history) => {
+                  this.history = history;
+                }}
+                refresh={this.refresh}
+                episode={this.props.episode}
+                episode_info={this.props.episode_info}
+                team={this.props.team}
+                show_tournament_matches={true}
               />
             </div>
           </div>

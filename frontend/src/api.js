@@ -484,15 +484,6 @@ class Api {
       });
   }
 
-  static getAllTeamScrimmages(callback) {
-    $.get(`${URL}/api/${LEAGUE}/scrimmage/`, (data, success) => {
-      callback(data);
-    });
-  }
-
-  /* for some reason the data format from getAllTeamScrimmages and getTeamScrimmages
-   are different; has to do with pagination but not sure how to make the same
-  */
   static getTeamScrimmages(team_id, episode, callback, page) {
     const query_data = {
       team_id,
@@ -514,11 +505,36 @@ class Api {
       });
   }
 
-  static getAllMatches(episode, callback, page) {
+  static getTeamTournamentMatches(team_id, episode, callback, page) {
     const query_data = {
+      team_id,
       page,
     };
-    return $.get(`${URL}/api/compete/${episode}/match/`, query_data)
+    return $.get(`${URL}/api/compete/${episode}/match/tournament/`, query_data)
+      .done((data, status) => {
+        const pageLimit = Math.ceil(data.count / PAGE_SIZE);
+        callback(data.results, pageLimit);
+      })
+      .fail((xhr, status, error) => {
+        console.log(
+          "Error in getting team's tournament matches",
+          xhr,
+          status,
+          error
+        );
+        callback(null);
+      });
+  }
+
+  static getAllMatches(episode, tournament_id, callback, page) {
+    const query_data = {
+      page,
+      tournament_id,
+    };
+    const endpoint =
+      `${URL}/api/compete/${episode}/match/` +
+      (tournament_id !== null ? "tournament/" : "");
+    return $.get(endpoint, query_data)
       .done((data, status) => {
         const pageLimit = Math.ceil(data.count / PAGE_SIZE);
         callback(data.results, pageLimit);
