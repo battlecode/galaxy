@@ -318,8 +318,8 @@ class Tournament(models.Model):
 
         # Challonge does not allow hyphens in its IDs
         # so substitute them just in case
-        challonge_id_public = f"{self.name_short}_{key}".replace("-", "_")
-        challonge_id_private = f"{challonge_id_public}_priv"
+        challonge_id_public = f"{self.name_short}".replace("-", "_")
+        challonge_id_private = f"{challonge_id_public}_{key}_priv".replace("-", "_")
 
         participants = self.get_potential_participants()
         # Parse into a format Challonge enjoys
