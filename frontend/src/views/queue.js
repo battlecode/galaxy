@@ -126,6 +126,7 @@ class QueueHistory extends Component {
                           <th>Team (Δ)</th>
                           <th>Ranked</th>
                           <th>Status</th>
+                          {this.state.tournament_id !== null && <th>Replay</th>}
                           <th>Creation time</th>
                         </tr>
                       </thead>
@@ -137,6 +138,22 @@ class QueueHistory extends Component {
                           if (s.participants !== null) {
                             participation1 = s.participants[0];
                             participation2 = s.participants[1];
+                          }
+                          let replay_entry = <td></td>;
+                          if (
+                            this.state.tournament_id !== null &&
+                            s.replay_url !== null
+                          ) {
+                            replay_entry = (
+                              <td>
+                                <a
+                                  href={`https://releases.battlecode.org/client/${this.props.episode_info.artifact_name}/${this.props.episode_info.release_version_public}/visualizer.html?${s.replay_url}`}
+                                  target="_blank"
+                                >
+                                  Watch
+                                </a>
+                              </td>
+                            );
                           }
                           if (s.status == "ERR") {
                             stat_entry = (
@@ -211,6 +228,8 @@ class QueueHistory extends Component {
                               </td>
                               <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
                               {stat_entry}
+                              {this.state.tournament_id !== null &&
+                                replay_entry}
                               <td>{created_date_string}</td>
                             </tr>
                           );

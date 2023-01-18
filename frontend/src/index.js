@@ -190,7 +190,11 @@ class App extends Component {
       <Route
         path={`/:episode/tournament_matches/:tournament_id`}
         component={(props) => (
-          <QueueHistory {...props} episode={this.state.episode} />
+          <QueueHistory
+            {...props}
+            episode={this.state.episode}
+            episode_info={this.state.episode_info}
+          />
         )}
         key="tournaments"
       />,
