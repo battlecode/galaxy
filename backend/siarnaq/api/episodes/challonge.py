@@ -111,12 +111,10 @@ def get_round_indexes(tournament_url):
 def get_match_and_participant_objects_for_round(tournament_url, round):
     tournament_data = get_tournament_data(tournament_url)
     # Derive match dicts/JSON objects (that Challonge gives us) of this round
-    # NOTE this probably makes more sense (efficiency and consistency)
-    # as a dict. Track in #549
-    matches = []
+    challonge_matches = []
     # Also derive participant dicts/JSON objects that Challonge gives us,
     # and map them with IDs for easy lookup
-    participants = dict()
+    challonge_participants = dict()
 
     for item in tournament_data["included"]:
         match item:
@@ -141,56 +139,49 @@ def get_match_and_participant_objects_for_round(tournament_url, round):
                         "The bracket service's round does not only\
                             have matches that are ready."
                     )
-                matches.append(item)
+                challonge_matches.append(item)
 
             case {"type": "participant", "id": id}:
-                participants[id] = item
+                challonge_participants[id] = item
 
     match_objects = []
     match_participant_objects = []
 
-    for m in matches:
+    for challonge_match in challonge_matches:
         match_object = apps.get_model("compete", "Match")(
             episode=round.tournament.episode,
             tournament_round=round,
             alternate_order=True,
             is_ranked=False,
-            challonge_id=m["id"],
+            challonge_id=challonge_match["id"],
         )
         match_objects.append(match_object)
 
-        # NOTE the following code is ridiculously inherent to challonge model.
-        # Should probably get participants in away that's cleaner
-        # tracked in #549
-        # NOTE could prob wrap this in a for loop for partipant 1 and 2
-        # tracked in #549
-        p1_id = m["relationships"]["player1"]["data"]["id"]
-        p1_misc_key = participants[p1_id]["attributes"]["misc"]
-        team_id_1, submission_id_1 = (int(_) for _ in p1_misc_key.split(","))
-        match_participant_1_object = apps.get_model("compete", "MatchParticipant")(
-            team_id=team_id_1,
-            submission_id=submission_id_1,
-            match=match_object,
-            # Note that player_index is 0-indexed.
-            # This may be tricky if you optimize code in #549.
-            player_index=0,
-            challonge_id=p1_id,
-        )
-        match_participant_objects.append(match_participant_1_object)
+        # Note that Challonge 1-indexes its player indexes
+        # while Saturn 0-indexes.
+        for (challonge_player_index, saturn_player_index) in (
+            ("player1", 0),
+            ("player2", 1),
+        ):
+            # This looks ugly but it's how to parse through the Challonge-related data.
+            challonge_participant_id = challonge_match["relationships"][
+                challonge_player_index
+            ]["data"]["id"]
+            challonge_participant_misc_key = challonge_participants[
+                challonge_participant_id
+            ]["attributes"]["misc"]
+            team_id, submission_id = (
+                int(_) for _ in challonge_participant_misc_key.split(",")
+            )
 
-        p2_id = m["relationships"]["player2"]["data"]["id"]
-        p2_misc_key = participants[p2_id]["attributes"]["misc"]
-        team_id_2, submission_id_2 = (int(_) for _ in p2_misc_key.split(","))
-        match_participant_2_object = apps.get_model("compete", "MatchParticipant")(
-            team_id=team_id_2,
-            submission_id=submission_id_2,
-            match=match_object,
-            # Note that player_index is 0-indexed.
-            # This may be tricky if you optimize code in #549.
-            player_index=1,
-            challonge_id=p2_id,
-        )
-        match_participant_objects.append(match_participant_2_object)
+            match_participant_object = apps.get_model("compete", "MatchParticipant")(
+                team_id=team_id,
+                submission_id=submission_id,
+                match=match_object,
+                player_index=saturn_player_index,
+                challonge_id=challonge_participant_id,
+            )
+            match_participant_objects.append(match_participant_object)
 
     return match_objects, match_participant_objects
 
