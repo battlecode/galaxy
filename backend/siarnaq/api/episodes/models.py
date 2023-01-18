@@ -1,4 +1,5 @@
-import uuid
+import random
+import string
 
 import structlog
 from django.apps import apps
@@ -302,12 +303,23 @@ class Tournament(models.Model):
         challonge_name_private = challonge_name_public + " (private)"
 
         # For security by obfuscation,
-        # and to allow easy regeneration of bracket
-        key = uuid.uuid4()
+        # and to allow easy regeneration of bracket,
+        # create a random string to append to private bracket.
+        # Note that name_short can be up to 32 chars
+        # while challonge_id_private has a 50-char limit
+        # (the default for SlugField).
+        # "_priv" also takes some space too.
+        # Thus be careful with length of key.
+        key = "".join(
+            random.choices(
+                string.ascii_uppercase + string.ascii_lowercase + string.digits, k=12
+            )
+        )
+
         # Challonge does not allow hyphens in its IDs
         # so substitute them just in case
         challonge_id_public = f"{self.name_short}_{key}".replace("-", "_")
-        challonge_id_private = f"{challonge_id_public}_private"
+        challonge_id_private = f"{challonge_id_public}_priv"
 
         participants = self.get_potential_participants()
         # Parse into a format Challonge enjoys
