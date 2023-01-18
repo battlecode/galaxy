@@ -288,10 +288,14 @@ class MatchSerializer(serializers.ModelSerializer):
             data["replay_url"] = data["maps"] = None
             for p in data["participants"]:
                 p["score"] = None
-        elif instance.participants.filter(
-            team__members=self.context["user_id"]
-        ).exists():
-            # Clients can see everything about their own games
+        elif (
+            instance.tournament_round is not None
+            or instance.participants.filter(
+                team__members=self.context["user_id"]
+            ).exists()
+        ):
+            # Clients can see everything about their own games as well as released
+            # tournament matches
             pass
         elif instance.participants.filter(team__status=TeamStatus.STAFF).exists():
             # Matches with staff teams have scores redacted because they could be for
