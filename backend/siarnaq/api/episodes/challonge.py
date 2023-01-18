@@ -110,20 +110,20 @@ def get_round_indexes(tournament_url):
 
 def get_match_and_participant_objects_for_round(tournament_url, round):
     tournament_data = get_tournament_data(tournament_url)
-    # Derive matches of this round
+    # Derive match dicts/JSON objects (that Challonge gives us) of this round
     # NOTE this probably makes more sense (efficiency and consistency)
     # as a dict. Track in #549
     matches = []
-    # Takes some wrangling with API response format
-    # We should move this block later
-    # (to keep all code that directly hits challonge
-    # in its own module) Track in #549
+    # Also derive participant dicts/JSON objects that Challonge gives us,
+    # and map them with IDs for easy lookup
+    participants = dict()
+
     for item in tournament_data["included"]:
-        # Much cleaner w match-case and multiple keys.
-        # Track in #549
-        if item["type"] == "match":
-            round_idx = item["attributes"]["round"]
-            if round_idx == round.challonge_id:
+        match item:
+            case {
+                "type": "match",
+                "attributes": {"round": round.challonge_id, "state": state},
+            }:
                 # Only enqueue the round if all matches are "open".
                 # NOTE: it would be good to have a "force re-enqueue round",
                 # which re-enqueues matches even if matches or round
@@ -133,7 +133,7 @@ def get_match_and_participant_objects_for_round(tournament_url, round):
                 # !!! This is also _really hard_ right now
                 # cuz it involves match deletion which is really hard.
                 # Track in #549
-                if item["attributes"]["state"] != "open":
+                if state != "open":
                     # For later, have this raise a more specific exception.
                     # Then have the caller handle this return
                     # and translate it into an HTTP response.
@@ -143,15 +143,8 @@ def get_match_and_participant_objects_for_round(tournament_url, round):
                     )
                 matches.append(item)
 
-    # Map participant "objects" with IDs for easy lookup
-    participants = dict()
-    for item in tournament_data["included"]:
-        # Cleaner with match-case,
-        # and would also allow for just one iteration over tournament, not 2.
-        # Track in #549
-        if item["type"] == "participant":
-            id = item["id"]
-            participants[id] = item
+            case {"type": "participant", "id": id}:
+                participants[id] = item
 
     match_objects = []
     match_participant_objects = []
