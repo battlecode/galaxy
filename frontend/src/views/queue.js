@@ -126,7 +126,7 @@ class QueueHistory extends Component {
                           <th>Team (Δ)</th>
                           <th>Ranked</th>
                           <th>Status</th>
-                          <th>Replay</th>
+                          {this.state.tournament_id !== null && <th>Replay</th>}
                           <th>Creation time</th>
                         </tr>
                       </thead>
@@ -228,7 +228,8 @@ class QueueHistory extends Component {
                               </td>
                               <td>{s.is_ranked ? "Ranked" : "Unranked"}</td>
                               {stat_entry}
-                              {replay_entry}
+                              {this.state.tournament_id !== null &&
+                                replay_entry}
                               <td>{created_date_string}</td>
                             </tr>
                           );
