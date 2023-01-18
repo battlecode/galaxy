@@ -24,6 +24,7 @@ class QueueHistory extends Component {
     pageLimit: 0,
     matches: [],
     loading: true,
+    tournament_id: this.props.match.params.tournament_id ?? null,
   };
 
   static formatRatingDelta(participation) {
@@ -55,6 +56,7 @@ class QueueHistory extends Component {
     this.setState({ loading: true, matches: [], matchPage: page });
     Api.getAllMatches(
       this.props.episode,
+      this.state.tournament_id,
       function (matches, pageLimit) {
         // This check handles the case where a new page is requested while a
         // previous page was loading.
@@ -98,15 +100,21 @@ class QueueHistory extends Component {
                 <div className="card">
                   <div className="header">
                     <h4 className="title">
-                      Recent Queue{" "}
-                      <button
-                        onClick={this.refresh}
-                        style={{ marginLeft: "10px" }}
-                        type="button"
-                        className="btn btn-primary btn-sm"
-                      >
-                        Refresh
-                      </button>
+                      {this.state.tournament_id === null ? (
+                        <span>
+                          Recent Queue{" "}
+                          <button
+                            onClick={this.refresh}
+                            style={{ marginLeft: "10px" }}
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                          >
+                            Refresh
+                          </button>
+                        </span>
+                      ) : (
+                        <span>Tournament Matches</span>
+                      )}
                     </h4>
                   </div>
                   <div className="content table-responsive table-full-width">

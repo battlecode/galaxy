@@ -526,11 +526,15 @@ class Api {
       });
   }
 
-  static getAllMatches(episode, callback, page) {
+  static getAllMatches(episode, tournament_id, callback, page) {
     const query_data = {
       page,
+      tournament_id,
     };
-    return $.get(`${URL}/api/compete/${episode}/match/`, query_data)
+    const endpoint =
+      `${URL}/api/compete/${episode}/match/` +
+      (tournament_id !== null ? "tournament/" : "");
+    return $.get(endpoint, query_data)
       .done((data, status) => {
         const pageLimit = Math.ceil(data.count / PAGE_SIZE);
         callback(data.results, pageLimit);
