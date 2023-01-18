@@ -354,11 +354,12 @@ class Tournament(models.Model):
             )
             for round_index in round_indexes
         ]
-        TournamentRound.objects.bulk_create(round_objects)
 
-        self.challonge_id_private = challonge_id_private
-        self.challonge_id_public = challonge_id_public
-        self.save(update_fields=["challonge_id_private", "challonge_id_public"])
+        with transaction.atomic():
+            TournamentRound.objects.bulk_create(round_objects)
+            self.challonge_id_private = challonge_id_private
+            self.challonge_id_public = challonge_id_public
+            self.save(update_fields=["challonge_id_private", "challonge_id_public"])
 
     def report_for_tournament(self, match):
         """
