@@ -17,6 +17,12 @@ resource "google_storage_bucket_iam_member" "this" {
   member = "serviceAccount:${google_service_account.this.email}"
 }
 
+resource "google_storage_bucket_iam_member" "reader" {
+  bucket  = google_storage_bucket.this.name
+  role    = "roles/storage.legacyBucketReader"
+  member  = "serviceAccount:${google_service_account.this.email}"
+}
+
 resource "google_iam_workload_identity_pool" "this" {
   workload_identity_pool_id = var.name
   description               = "Workload identity for releases"
