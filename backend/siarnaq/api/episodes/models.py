@@ -369,22 +369,6 @@ class Tournament(models.Model):
 
         challonge.update_match(self.challonge_id_private, match.challonge_id, match)
 
-    # Consider dropping these stubs, cuz they're bloat.
-    # We're not confident whether or not the stubs might actually be used,
-    # and someone can always remake them.
-    # track in #549.
-    def start_progress(self):
-        """Start or resume the tournament."""
-        raise NotImplementedError
-
-    def stop_progress(self):
-        """Pause the tournament."""
-        raise NotImplementedError
-
-    def enqueue_open_matches(self):
-        """Find matches that are waiting to be run, and run them."""
-        raise NotImplementedError
-
 
 class ReleaseStatus(models.IntegerChoices):
     """

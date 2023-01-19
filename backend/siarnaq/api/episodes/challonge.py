@@ -20,11 +20,6 @@ AUTH_TYPE = "v1"
 URL_BASE = "https://api.challonge.com/v2/"
 
 
-def set_api_key(api_key):
-    """Set the challonge.com api credentials to use."""
-    _headers["Authorization"] = api_key
-
-
 def create_tournament(
     tournament_id,
     tournament_name,
