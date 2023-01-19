@@ -176,7 +176,6 @@ resource "google_cloud_run_service" "this" {
 
   metadata {
     annotations = {
-      "run.googleapis.com/launch-stage" = "BETA"
       "run.googleapis.com/ingress"      = "internal-and-cloud-load-balancing"
     }
   }
@@ -203,6 +202,7 @@ resource "google_cloud_run_service" "this" {
       metadata[0].annotations["client.knative.dev/user-image"],
       metadata[0].annotations["run.googleapis.com/client-name"],
       metadata[0].annotations["run.googleapis.com/client-version"],
+      metadata[0].annotations["run.googleapis.com/operation-id"],
       template[0].metadata[0].annotations["client.knative.dev/user-image"],
       template[0].metadata[0].annotations["run.googleapis.com/client-name"],
       template[0].metadata[0].annotations["run.googleapis.com/client-version"],

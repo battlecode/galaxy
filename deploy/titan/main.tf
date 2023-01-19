@@ -93,6 +93,12 @@ resource "google_cloud_run_service" "this" {
   }
 
   depends_on = [google_storage_bucket_iam_member.this]
+
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations["run.googleapis.com/operation-id"],
+    ]
+  }
 }
 
 resource "google_cloud_run_service_iam_member" "this" {
