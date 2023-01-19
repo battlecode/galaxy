@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/battlecode/galaxy/saturn/pkg/run"
 	"github.com/battlecode/galaxy/saturn/pkg/saturn"
@@ -27,6 +28,7 @@ var (
 func main() {
 	zerolog.DefaultContextLogger = &log.Logger
 	zerolog.LevelFieldName = "severity"
+	zerolog.TimeFieldFormat = time.RFC3339Nano
 	flag.Parse()
 
 	ctx, stop := signal.NotifyContext(context.Background(), unix.SIGINT, unix.SIGTERM)

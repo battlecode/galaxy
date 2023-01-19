@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"os"
+	"time"
 
 	"github.com/battlecode/galaxy/titan/pkg/titan"
 	"github.com/rs/zerolog"
@@ -12,6 +13,7 @@ import (
 func main() {
 	zerolog.DefaultContextLogger = &log.Logger
 	zerolog.LevelFieldName = "severity"
+	zerolog.TimeFieldFormat = time.RFC3339Nano
 
 	ctx := context.Background()
 
