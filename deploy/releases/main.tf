@@ -9,6 +9,7 @@ resource "google_storage_bucket" "this" {
 
   location      = "US"
   storage_class = "STANDARD"
+  labels        = var.labels
 }
 
 resource "google_storage_bucket_iam_member" "this" {

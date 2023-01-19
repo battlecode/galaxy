@@ -42,8 +42,9 @@ resource "google_project_iam_member" "monitoring" {
 }
 
 resource "google_pubsub_subscription" "queue" {
-  name  = var.name
-  topic = var.pubsub_topic_name
+  name   = var.name
+  topic  = var.pubsub_topic_name
+  labels = var.labels
 
   ack_deadline_seconds    = 20
   enable_message_ordering = false  # Counterintuitive! See issue 514
@@ -92,6 +93,7 @@ resource "google_compute_instance_template" "this" {
   name_prefix  = "${var.name}-"
   region       = var.gcp_region
   machine_type = var.machine_type
+  labels       = var.labels
 
   disk {
     boot         = true

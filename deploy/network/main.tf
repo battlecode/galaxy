@@ -36,6 +36,7 @@ module "lb" {
 
   project = var.gcp_project
   name    = var.name
+  labels  = var.labels
 
   url_map           = google_compute_url_map.this.self_link
   create_url_map    = false

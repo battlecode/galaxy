@@ -17,3 +17,8 @@ variable "gcp_zone" {
   description = "Google Cloud zone where all zonal resources are located"
   type        = string
 }
+
+variable "labels" {
+  description = "The labels to attach to resources created by this module"
+  type        = map(string)
+}
