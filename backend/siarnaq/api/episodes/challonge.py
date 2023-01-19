@@ -26,7 +26,7 @@ def set_api_key(api_key):
 
 
 def create_tournament(
-    tournament_url,
+    tournament_id,
     tournament_name,
     is_private,
     style,
@@ -49,7 +49,7 @@ def create_tournament(
                 "name": tournament_name,
                 "tournament_type": tournament_type,
                 "private": is_private,
-                "url": tournament_url,
+                "url": tournament_id,
             },
         }
     }
@@ -58,13 +58,13 @@ def create_tournament(
     r.raise_for_status()
 
 
-def bulk_add_participants(tournament_url, participants):
+def bulk_add_participants(tournament_id, participants):
     """
     Adds participants in bulk.
     Expects `participants` to be formatted in the format Challonge expects.
     Note especially that seeds must be 1-indexed.
     """
-    url = f"{URL_BASE}tournaments/{tournament_url}/participants/bulk_add.json"
+    url = f"{URL_BASE}tournaments/{tournament_id}/participants/bulk_add.json"
 
     payload = {
         "data": {
@@ -79,8 +79,8 @@ def bulk_add_participants(tournament_url, participants):
     r.raise_for_status()
 
 
-def start_tournament(tournament_url):
-    url = f"{URL_BASE}tournaments/{tournament_url}/change_state.json"
+def start_tournament(tournament_id):
+    url = f"{URL_BASE}tournaments/{tournament_id}/change_state.json"
 
     payload = {"data": {"type": "TournamentState", "attributes": {"state": "start"}}}
 
@@ -88,16 +88,16 @@ def start_tournament(tournament_url):
     r.raise_for_status()
 
 
-def get_tournament_data(tournament_url):
-    url = f"{URL_BASE}tournaments/{tournament_url}.json"
+def get_tournament_data(tournament_id):
+    url = f"{URL_BASE}tournaments/{tournament_id}.json"
 
     r = requests.get(url, headers=_headers)
     r.raise_for_status()
     return r.json()
 
 
-def get_round_indexes(tournament_url):
-    tournament_data = get_tournament_data(tournament_url)
+def get_round_indexes(tournament_id):
+    tournament_data = get_tournament_data(tournament_id)
 
     round_indexes = set()
     for item in tournament_data["included"]:
@@ -108,8 +108,8 @@ def get_round_indexes(tournament_url):
     return round_indexes
 
 
-def get_match_and_participant_objects_for_round(tournament_url, round):
-    tournament_data = get_tournament_data(tournament_url)
+def get_match_and_participant_objects_for_round(tournament_id, round):
+    tournament_data = get_tournament_data(tournament_id)
     # Derive match dicts/JSON objects (that Challonge gives us) of this round
     challonge_matches = []
     # Also derive participant dicts/JSON objects that Challonge gives us,
@@ -186,8 +186,8 @@ def get_match_and_participant_objects_for_round(tournament_url, round):
     return match_objects, match_participant_objects
 
 
-def update_match(tournament_url, match_id, match):
-    url = f"{URL_BASE}tournaments/{tournament_url}/matches/{match_id}.json"
+def update_match(tournament_id, match_id, match):
+    url = f"{URL_BASE}tournaments/{tournament_id}/matches/{match_id}.json"
 
     # Wrangle the Match object into a format Challonge likes.
     # In particular, Challonge wants an array of objects,
