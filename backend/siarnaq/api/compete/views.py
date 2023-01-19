@@ -325,8 +325,10 @@ class MatchViewSet(
             ),
         ],
         responses={
-            status.HTTP_204_NO_CONTENT: "No ranked matches found.",
-            status.HTTP_200_OK: HistoricalRatingSerializer(many=True),
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="No ranked matches found."
+            ),
+            status.HTTP_200_OK: HistoricalRatingSerializer(),
         },
     )
     @action(
@@ -334,7 +336,7 @@ class MatchViewSet(
         methods=["get"],
         permission_classes=(IsEpisodeMutable,),
     )
-    def historical_ranking(self, request, pk=None, *, episode_id):
+    def historical_rating(self, request, pk=None, *, episode_id):
         """List the historical rating of a team."""
         queryset = Match.objects.all().filter(tournament_round__isnull=True)
 
@@ -364,10 +366,8 @@ class MatchViewSet(
             for match in matches
         ]
 
-        results = HistoricalRatingSerializer(
-            self.paginate_queryset(ordered), many=True
-        ).data
-        return self.get_paginated_response(results)
+        results = HistoricalRatingSerializer(ordered, many=True).data
+        return Response(results, status=status.HTTP_200_OK)
 
     @extend_schema(
         responses={
