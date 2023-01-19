@@ -185,15 +185,13 @@ class TeamViewSet(
     def record(self, request, pk=None, *, episode_id):
         """Retrieve the win/loss record of a team"""
         team = request.data["id"]
-        matches = Match.objects.filter(participants__team=team)
+        matches = Match.objects.filter(participants__team=team, status="OK!")
 
-        matches.annotate(
+        matches = matches.annotate(
             score_1=Max("participants__score", filter=Q(participants__team=team)),
-            score_2=Max("participants__score", filter=~Q(participants__team=team)),
+            score_2=Max("participants__score", exclude=Q(participants__team=team)),
         )
-
         win_count = matches.filter(score_1__gt=F("score_2")).count()
-
         loss_count = matches.filter(score_1__lt=F("score_2")).count()
 
         return Response({"wins": win_count, "losses": loss_count})
