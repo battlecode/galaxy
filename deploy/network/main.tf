@@ -105,7 +105,7 @@ resource "google_compute_url_map" "this" {
     iterator = bucket
 
     content {
-      hosts        = ["${bucket.value.subsubdomain}battlecode.org"]
+      hosts        = ["${bucket.value.subsubdomain}${var.subdomain}battlecode.org"]
       path_matcher = bucket.key
     }
   }
