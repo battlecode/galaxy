@@ -125,7 +125,7 @@ def get_match_and_participant_objects_for_round(tournament_id, round):
                 # matches could be open _or done_.
                 # !!! This is also _really hard_ right now
                 # cuz it involves match deletion which is really hard.
-                # Track in #549
+                # Track in #594
                 if state != "open":
                     # For later, have this raise a more specific exception.
                     # Then have the caller handle this return
