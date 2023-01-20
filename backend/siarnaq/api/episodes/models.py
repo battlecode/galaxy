@@ -350,7 +350,7 @@ class Tournament(models.Model):
             TournamentRound(
                 tournament=self,
                 challonge_id=round_index,
-                name=f"{challonge_name_private} Round {round_index}",
+                name=f"Round {round_index}",
             )
             for round_index in round_indexes
         ]
