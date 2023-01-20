@@ -189,28 +189,24 @@ def update_match(tournament_id, match_id, match):
     # each of which represents a participant's data.
     # The data is id, score, and whether or not they advance.
 
-    participants_for_challonge = []
+    # To assign the "advance" flag, compute the high score,
+    # and then set the flag for those that have the high score.
 
-    # Build this array while also tracking high score (for computing who advances).
-    high_score = -1
-    for participant in match.participants.all():
-        score = participant.score
-        participants_for_challonge.append(
-            {"participant_id": participant.challonge_id, "score": score}
-        )
-        if score >= high_score:
-            high_score = score
-
-    # Assign the "advance" flag, for those that have the high score.
-    for participant in participants_for_challonge:
-        participant["advancing"] = True if participant["score"] == high_score else False
-
-    # Convert "score" to a string for Challonge.
+    # Also, we convert "score" to a string for Challonge.
     # (This is required because Challonge supports scores of sets,
     # which are comma-delimited lists of numbers.
     # We don't use this though)
-    for participant in participants_for_challonge:
-        participant["score"] = str(participant["score"])
+
+    participants = match.participants.all()
+    high_score = max(participant.score for participant in participants)
+    participants_for_challonge = [
+        {
+            "participant_id": participant.challonge_id,
+            "score": str(participant.score),
+            "advancing": True if participant["score"] == high_score else False,
+        }
+        for participant in participants
+    ]
 
     payload = {
         "data": {
