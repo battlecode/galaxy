@@ -5,6 +5,7 @@ module "cd" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {environment="shared", component="cd"})
 
   storage_frontend_name = module.production.storage_public_name
 }
@@ -16,6 +17,7 @@ module "releases" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {environment="shared", component="releases"})
 
   depends_on = [
     google_project_service.artifactregistry,
@@ -28,6 +30,7 @@ module "production" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {environment="production"})
 
   secure_lifecycle_rules = [
     { age = 60, storage_class = "COLDLINE" },
@@ -69,6 +72,7 @@ module "staging" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {environment="staging"})
 
   secure_lifecycle_rules = []
 
@@ -108,6 +112,7 @@ module "production_network" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {environment="production", component="network"})
 
   https_redirect        = true
   subdomain             = ""
@@ -137,6 +142,7 @@ module "staging_network" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {environment="staging", component="network"})
 
   https_redirect        = false
   subdomain             = "staging."

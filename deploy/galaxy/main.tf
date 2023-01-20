@@ -3,6 +3,7 @@ resource "google_storage_bucket" "public" {
 
   location      = var.gcp_region
   storage_class = "STANDARD"
+  labels        = merge(var.labels, {component="storage"})
 
   cors {
     origin          = ["*"]
@@ -17,6 +18,7 @@ resource "google_storage_bucket" "secure" {
 
   location      = var.gcp_region
   storage_class = "STANDARD"
+  labels        = merge(var.labels, {component="storage"})
 
   cors {
     origin          = ["*"]
@@ -47,6 +49,7 @@ resource "google_storage_bucket" "frontend" {
 
   location      = "US"
   storage_class = "STANDARD"
+  labels        = merge(var.labels, {component="frontend"})
 
   website {
     main_page_suffix = "index.html"
@@ -121,6 +124,7 @@ module "siarnaq" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {component="siarnaq"})
 
   image            = var.siarnaq_image
   configuration    = var.siarnaq_configuration
@@ -144,6 +148,7 @@ module "titan" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {component="titan"})
 
   image         = var.titan_image
   storage_names = [google_storage_bucket.public.name, google_storage_bucket.secure.name]
@@ -151,6 +156,7 @@ module "titan" {
 
 resource "google_secret_manager_secret" "saturn" {
   secret_id = "${var.name}-saturn"
+  labels        = merge(var.labels, {component="saturn"})
 
   replication {
     automatic = true
@@ -169,6 +175,7 @@ module "saturn_compile" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {component="saturn"})
 
   pubsub_topic_name   = module.siarnaq.topic_compile_name
   storage_public_name = google_storage_bucket.public.name
@@ -197,6 +204,7 @@ module "saturn_execute" {
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {component="saturn"})
 
   pubsub_topic_name   = module.siarnaq.topic_execute_name
   storage_public_name = google_storage_bucket.public.name
@@ -215,7 +223,7 @@ module "saturn_execute" {
 
   max_instances = var.max_execute_instances
   min_instances = var.min_execute_instances
-  load_ratio    = 5
+  load_ratio    = 2
 }
 
 resource "google_cloudbuild_trigger" "saturn" {

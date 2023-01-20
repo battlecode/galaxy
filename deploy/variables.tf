@@ -22,6 +22,12 @@ variable "gcp_zone" {
   default     = "us-east1-b"
 }
 
+variable "labels" {
+  description = "The labels to attach to all resources"
+  type        = map(string)
+  default     = {}
+}
+
 variable "siarnaq_secrets_common" {
   description = "Additional secrets to inject into the secret manager"
   type        = map

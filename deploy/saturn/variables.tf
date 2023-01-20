@@ -18,6 +18,11 @@ variable "gcp_zone" {
   type        = string
 }
 
+variable "labels" {
+  description = "The labels to attach to resources created by this module"
+  type        = map(string)
+}
+
 variable "pubsub_topic_name" {
   description = "Name of Google Cloud Pubsub resource where tasks are pushed"
   type        = string

@@ -47,7 +47,8 @@ resource "google_project_iam_member" "sql" {
 resource "google_pubsub_topic" "this" {
   for_each = local.pubsub_topics
 
-  name = "${var.name}-${each.value}"
+  name   = "${var.name}-${each.value}"
+  labels = var.labels
 }
 
 resource "google_pubsub_topic_iam_member" "this" {
@@ -64,7 +65,8 @@ resource "google_sql_database_instance" "this" {
   database_version = "POSTGRES_14"
 
   settings {
-    tier = var.database_tier
+    user_labels = var.labels
+    tier        = var.database_tier
 
     backup_configuration {
       enabled = var.database_backup
@@ -110,6 +112,7 @@ resource "google_sql_user" "this" {
 
 resource "google_secret_manager_secret" "this" {
   secret_id = var.name
+  labels    = var.labels
 
   replication {
     automatic = true
@@ -171,12 +174,12 @@ resource "google_cloud_run_service" "this" {
         "run.googleapis.com/cloudsql-instances" = google_sql_database_instance.this.connection_name
         "run.googleapis.com/client-name"        = "terraform"
       }
+      labels = var.labels
     }
   }
 
   metadata {
     annotations = {
-      "run.googleapis.com/launch-stage" = "BETA"
       "run.googleapis.com/ingress"      = "internal-and-cloud-load-balancing"
     }
   }
@@ -203,6 +206,7 @@ resource "google_cloud_run_service" "this" {
       metadata[0].annotations["client.knative.dev/user-image"],
       metadata[0].annotations["run.googleapis.com/client-name"],
       metadata[0].annotations["run.googleapis.com/client-version"],
+      metadata[0].annotations["run.googleapis.com/operation-id"],
       template[0].metadata[0].annotations["client.knative.dev/user-image"],
       template[0].metadata[0].annotations["run.googleapis.com/client-name"],
       template[0].metadata[0].annotations["run.googleapis.com/client-version"],

@@ -33,6 +33,7 @@ resource "google_eventarc_trigger" "this" {
   name            = "${var.name}-${each.value}"
   location        = "us"
   service_account = google_service_account.this.email
+  labels          = var.labels
 
   matching_criteria {
     attribute = "type"
@@ -77,6 +78,9 @@ resource "google_cloud_run_service" "this" {
         }
       }
     }
+    metadata {
+      labels = var.labels
+    }
   }
 
   metadata {
@@ -93,6 +97,12 @@ resource "google_cloud_run_service" "this" {
   }
 
   depends_on = [google_storage_bucket_iam_member.this]
+
+  lifecycle {
+    ignore_changes = [
+      metadata[0].annotations["run.googleapis.com/operation-id"],
+    ]
+  }
 }
 
 resource "google_cloud_run_service_iam_member" "this" {

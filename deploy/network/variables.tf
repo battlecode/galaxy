@@ -18,6 +18,11 @@ variable "gcp_zone" {
   type        = string
 }
 
+variable "labels" {
+  description = "The labels to attach to resources created by this module"
+  type        = map(string)
+}
+
 variable "subdomain" {
   description = "Subomain under which all networking resources belong"
   type        = string
