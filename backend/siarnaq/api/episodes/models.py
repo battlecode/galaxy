@@ -7,10 +7,8 @@ from django.db import models, transaction
 from django.utils import timezone
 from sortedm2m.fields import SortedManyToManyField
 
-from siarnaq.api.compete.models import Match, MatchParticipant
 from siarnaq.api.episodes import challonge
 from siarnaq.api.episodes.managers import EpisodeQuerySet, TournamentQuerySet
-from siarnaq.api.teams.models import Team
 
 logger = structlog.get_logger(__name__)
 
@@ -287,7 +285,8 @@ class Tournament(models.Model):
         # Test also that special teams (eg devs) don't enter
         # Track in #549
         return (
-            Team.objects.with_active_submission()
+            apps.get_model("teams", "Team")
+            .objects.with_active_submission()
             .filter_eligible(self)
             .all()
             .order_by("-profile__rating__value")
@@ -451,6 +450,8 @@ class TournamentRound(models.Model):
             self.tournament.challonge_id_private, self
         )
 
+        Match = apps.get_model("compete", "Match")
+
         with transaction.atomic():
             matches = Match.objects.bulk_create(match_objects)
             # Can only create these objects after matches are saved,
@@ -461,7 +462,9 @@ class TournamentRound(models.Model):
                 for map in self.maps.all()
             ]
             Match.maps.through.objects.bulk_create(maps_for_match_objects)
-            MatchParticipant.objects.bulk_create(match_participant_objects)
+            apps.get_model("compete", "MatchParticipant").objects.bulk_create(
+                match_participant_objects
+            )
 
         Match.objects.filter(pk__in=[match.pk for match in matches]).enqueue()
 
