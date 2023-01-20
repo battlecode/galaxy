@@ -85,17 +85,19 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
         client.update_job(request=dict(job=job))
 
 
-# Note that if a match is already finalized, and Saturn tries to report it again,
-# the match will not save.
-# Thus the call to Challonge API will not be made.
-# No need to worry about redundant calls to their API (and thus
-# blowing thru our api usage limits).
 @receiver(pre_save, sender=Match)
 def report_for_tournament(instance, **kwargs):
     """
     If a match is associated with a tournament bracket,
     update that tournament bracket.
     """
+
+    # Note that if a match is already finalized, and Saturn tries to report it again,
+    # the match will not save.
+    # Thus the call to Challonge API will not be made.
+    # No need to worry about redundant calls to their API (and thus
+    # blowing thru our api usage limits).
+
     if instance.status == SaturnStatus.COMPLETED and instance.challonge_id is not None:
         # NOTE: not sure where the code that derives the match's tournament
         # should live. Question of abstraction?
