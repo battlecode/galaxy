@@ -222,6 +222,23 @@ resource "google_cloud_run_service_iam_member" "noauth" {
   member   = "allUsers"
 }
 
+resource "google_cloud_tasks_queue" "rating" {
+  name     = "${var.name}-rating"
+  location = var.gcp_region
+
+  rate_limits {
+    max_concurrent_dispatches = 3
+    max_dispatches_per_second = 10
+  }
+}
+
+resource "google_cloud_tasks_queue_iam_member" "rating" {
+  location = var.gcp_region
+  name     = google_cloud_tasks_queue.rating.name
+  role     = "roles/cloudtasks.enqueuer"
+  member   = "serviceAccount:${google_service_account.this.email}"
+}
+
 resource "google_cloudbuild_trigger" "this" {
   name            = var.name
 

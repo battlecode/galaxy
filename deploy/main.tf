@@ -19,9 +19,7 @@ module "releases" {
   gcp_zone    = var.gcp_zone
   labels      = merge(var.labels, {environment="shared", component="releases"})
 
-  depends_on = [
-    google_project_service.artifactregistry,
-  ]
+  depends_on = [null_resource.apis]
 }
 
 module "production" {
@@ -57,13 +55,7 @@ module "production" {
   saturn_secrets        = var.saturn_secrets_production
   storage_releases_name = module.releases.storage_bucket_name
 
-  depends_on = [
-    google_project_service.artifactregistry,
-    google_project_service.eventarc,
-    google_project_service.run,
-    google_project_service.secretmanager,
-    google_project_service.sqladmin,
-  ]
+  depends_on = [null_resource.apis]
 }
 
 module "staging" {
@@ -96,13 +88,7 @@ module "staging" {
   saturn_secrets        = var.saturn_secrets_staging
   storage_releases_name = module.releases.storage_bucket_name
 
-  depends_on = [
-    google_project_service.artifactregistry,
-    google_project_service.eventarc,
-    google_project_service.run,
-    google_project_service.secretmanager,
-    google_project_service.sqladmin,
-  ]
+  depends_on = [null_resource.apis]
 }
 
 module "production_network" {
