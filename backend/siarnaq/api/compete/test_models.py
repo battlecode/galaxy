@@ -214,6 +214,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
 
         m2.status = SaturnStatus.COMPLETED
         m2.save()
+        m2.try_rating_update()
         red.refresh_from_db()
         t1.refresh_from_db()
         # Expect rating increase after win
@@ -248,6 +249,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
 
         m2.status = SaturnStatus.COMPLETED
         m2.save()
+        m2.try_rating_update()
         red.refresh_from_db()
         # Expect no rating because previous not ready
         self.assertIsNone(red.rating)
@@ -269,6 +271,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
 
         m1.status = SaturnStatus.COMPLETED
         m1.save()
+        m1.try_rating_update()
         red.refresh_from_db()
         t1.refresh_from_db()
         # Expect rating increase after win
@@ -307,6 +310,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
 
         m2.status = SaturnStatus.ERRORED
         m2.save()
+        m2.try_rating_update()
         red1.refresh_from_db()
         red2.refresh_from_db()
         # Expect no change because no result
@@ -336,6 +340,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
 
         m2.status = SaturnStatus.ERRORED
         m2.save()
+        m2.try_rating_update()
         red.refresh_from_db()
         # Expect no rating because previous not ready
         self.assertIsNone(red.rating)
@@ -370,6 +375,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
 
         m2.status = SaturnStatus.RUNNING
         m2.save()
+        m2.try_rating_update()
         red.refresh_from_db()
         # Expect no rating because no result
         self.assertIsNone(red.rating)
@@ -406,6 +412,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
 
         m2.status = SaturnStatus.COMPLETED
         m2.save()
+        m2.try_rating_update()
         red1.refresh_from_db()
         red2.refresh_from_db()
         t1.refresh_from_db()
@@ -439,6 +446,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
 
         m2.status = SaturnStatus.COMPLETED
         m2.save()
+        m2.try_rating_update()
         red.refresh_from_db()
         # Expect no rating because previous not ready
         self.assertIsNone(red.rating)
@@ -460,6 +468,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
 
         m1.status = SaturnStatus.COMPLETED
         m1.save()
+        m1.try_rating_update()
         red.refresh_from_db()
         t1.refresh_from_db()
         # Expect no change because unranked
@@ -467,114 +476,6 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         self.assertEqual(red.rating.value, red.get_old_rating().value)
         self.assertEqual(red.rating.n, 0)
         self.assertEqual(t1.profile.rating.value, red.rating.value)
-
-    # Partitions for: finalize chaining. Testing finalizations propagate correctly.
-    # - chain has finalized opponent
-    # - chain has unfinalized opponent
-
-    def test_chain_opponent_unfinalized(self):
-        e1 = Episode.objects.get(name_short="e1")
-        t1 = Team.objects.get(name="team1")
-        t2 = Team.objects.get(name="team2")
-        t3 = Team.objects.get(name="team3")
-        m1 = Match.objects.create(
-            episode=e1,
-            alternate_order=True,
-            is_ranked=True,
-            status=SaturnStatus.RUNNING,
-        )
-        red1 = MatchParticipant.objects.create(team=t1, match=m1, player_index=0)
-        blue1 = MatchParticipant.objects.create(team=t2, match=m1, player_index=1)
-        m2 = Match.objects.create(
-            episode=e1,
-            alternate_order=True,
-            is_ranked=True,
-            status=SaturnStatus.RUNNING,
-        )
-        MatchParticipant.objects.create(team=t2, match=m2, player_index=0)
-        MatchParticipant.objects.create(team=t3, match=m2, player_index=1)
-        m3 = Match.objects.create(
-            episode=e1,
-            alternate_order=True,
-            is_ranked=True,
-            status=SaturnStatus.COMPLETED,
-        )
-        red3 = MatchParticipant.objects.create(
-            team=t1, match=m3, player_index=0, score=1
-        )
-        blue3 = MatchParticipant.objects.create(
-            team=t3, match=m3, player_index=1, score=0
-        )
-
-        m1.status, red1.score, blue1.score = SaturnStatus.COMPLETED, 1, 0
-        red1.save()
-        blue1.save()
-        m1.save()
-        red1.refresh_from_db()
-        red3.refresh_from_db()
-        blue3.refresh_from_db()
-        t1.refresh_from_db()
-        # Expect m3 red to not be finalized yet, because t3 is not finalized
-        self.assertIsNotNone(red1.rating)
-        self.assertGreater(red1.rating.mean, red1.get_old_rating().mean)
-        self.assertEqual(red1.rating.n, 1)
-        self.assertEqual(t1.profile.rating, red1.rating)
-        self.assertIsNone(red3.rating)
-        self.assertIsNone(blue3.rating)
-
-    def test_chain_opponent_finalized(self):
-        e1 = Episode.objects.get(name_short="e1")
-        t1 = Team.objects.get(name="team1")
-        t2 = Team.objects.get(name="team2")
-        t3 = Team.objects.get(name="team3")
-        r1 = Rating.objects.create(n=10)
-        r2 = Rating.objects.create(n=20)
-        m1 = Match.objects.create(
-            episode=e1,
-            alternate_order=True,
-            is_ranked=True,
-            status=SaturnStatus.RUNNING,
-        )
-        red1 = MatchParticipant.objects.create(team=t1, match=m1, player_index=0)
-        blue1 = MatchParticipant.objects.create(team=t2, match=m1, player_index=1)
-        m2 = Match.objects.create(
-            episode=e1,
-            alternate_order=True,
-            is_ranked=True,
-            status=SaturnStatus.COMPLETED,
-        )
-        MatchParticipant.objects.create(
-            team=t2, match=m2, player_index=0, score=1, rating=r1
-        )
-        MatchParticipant.objects.create(
-            team=t3, match=m2, player_index=1, score=0, rating=r2
-        )
-        m3 = Match.objects.create(
-            episode=e1,
-            alternate_order=True,
-            is_ranked=True,
-            status=SaturnStatus.COMPLETED,
-        )
-        red3 = MatchParticipant.objects.create(
-            team=t1, match=m3, player_index=0, score=1
-        )
-        blue3 = MatchParticipant.objects.create(
-            team=t3, match=m3, player_index=1, score=0
-        )
-
-        m1.status, red1.score, blue1.score = SaturnStatus.COMPLETED, 1, 0
-        red1.save()
-        blue1.save()
-        m1.save()
-        red3.refresh_from_db()
-        blue3.refresh_from_db()
-        # Expect m3 red and blue to be both finalized
-        self.assertIsNotNone(red3.rating)
-        self.assertGreater(red3.rating.mean, red3.get_old_rating().mean)
-        self.assertEqual(red3.rating.n, 2)
-        self.assertIsNotNone(blue3.rating)
-        self.assertLess(blue3.rating.mean, blue3.get_old_rating().mean)
-        self.assertEqual(blue3.rating.n, r2.n + 1)
 
 
 class ScrimmageRequestQuerySetTestCase(TestCase):
