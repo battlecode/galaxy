@@ -338,7 +338,7 @@ class Match(SaturnInvocation):
         update that tournament bracket.
         """
 
-        bracket.update_match(self, is_private)
+        bracket.update_match(self, is_private=is_private)
 
 
 class MatchParticipant(models.Model):

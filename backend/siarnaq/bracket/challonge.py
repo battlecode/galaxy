@@ -28,10 +28,7 @@ AUTH_TYPE = "v1"
 URL_BASE = "https://api.challonge.com/v2/"
 
 
-def create_tournament(
-    tournament: Tournament,
-    is_private,
-):
+def create_tournament(tournament: Tournament, *, is_private: bool):
     from siarnaq.api.episodes.models import TournamentStyle
 
     # Challonge wants a specific string for tournament type.
@@ -67,7 +64,7 @@ def create_tournament(
 
 
 def bulk_add_participants(
-    tournament: Tournament, participants: Iterable[Team], is_private
+    tournament: Tournament, participants: Iterable[Team], *, is_private: bool
 ):
     """
     Adds participants in bulk.
@@ -101,7 +98,7 @@ def bulk_add_participants(
     r.raise_for_status()
 
 
-def start_tournament(tournament: Tournament, is_private):
+def start_tournament(tournament: Tournament, *, is_private: bool):
     tournament_challonge_id = (
         tournament.bracket_id_private if is_private else tournament.bracket_id_public
     )
@@ -114,7 +111,7 @@ def start_tournament(tournament: Tournament, is_private):
     r.raise_for_status()
 
 
-def get_tournament_data(tournament: Tournament, is_private):
+def get_tournament_data(tournament: Tournament, *, is_private: bool):
     tournament_challonge_id = (
         tournament.bracket_id_private if is_private else tournament.bracket_id_public
     )
@@ -126,8 +123,8 @@ def get_tournament_data(tournament: Tournament, is_private):
     return r.json()
 
 
-def get_round_indexes(tournament: Tournament, is_private):
-    tournament_data = get_tournament_data(tournament, is_private)
+def get_round_indexes(tournament: Tournament, *, is_private: bool):
+    tournament_data = get_tournament_data(tournament, is_private=is_private)
 
     round_indexes = set()
     for item in tournament_data["included"]:
@@ -138,8 +135,10 @@ def get_round_indexes(tournament: Tournament, is_private):
     return round_indexes
 
 
-def get_match_and_participant_objects_for_round(round: TournamentRound, is_private):
-    tournament_data = get_tournament_data(round.tournament, is_private)
+def get_match_and_participant_objects_for_round(
+    round: TournamentRound, *, is_private: bool
+):
+    tournament_data = get_tournament_data(round.tournament, is_private=is_private)
     # Derive match dicts/JSON objects (that Challonge gives us) of this round
     challonge_matches = []
     # Also derive participant dicts/JSON objects that Challonge gives us,
@@ -212,7 +211,7 @@ def get_match_and_participant_objects_for_round(round: TournamentRound, is_priva
     return match_objects, match_participant_objects
 
 
-def update_match(match: Match, is_private):
+def update_match(match: Match, *, is_private: bool):
     tournament: Tournament = match.tournament_round.tournament
 
     tournament_challonge_id = (

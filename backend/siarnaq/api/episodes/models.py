@@ -307,14 +307,14 @@ class Tournament(models.Model):
 
         # First bracket made should be private,
         # to hide results and enable fixing accidents
-        bracket.create_tournament(self, True)
+        bracket.create_tournament(self, is_private=True)
 
         participants = self.get_potential_participants()
 
-        bracket.bulk_add_participants(self, participants, True)
-        bracket.start_tournament(self, True)
+        bracket.bulk_add_participants(self, participants, is_private=True)
+        bracket.start_tournament(self, is_private=True)
 
-        round_indexes = bracket.get_round_indexes(self, True)
+        round_indexes = bracket.get_round_indexes(self, is_private=True)
 
         # NOTE: rounds' order and indexes get weird in double elim.
         # Tracked in #548
@@ -407,7 +407,7 @@ class TournamentRound(models.Model):
         (
             match_objects,
             match_participant_objects,
-        ) = bracket.get_match_and_participant_objects_for_round(self, True)
+        ) = bracket.get_match_and_participant_objects_for_round(self, is_private=True)
 
         Match = apps.get_model("compete", "Match")
 
