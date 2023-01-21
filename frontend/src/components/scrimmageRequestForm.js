@@ -15,6 +15,8 @@ const PLAYER_ORDERS = [
 // Team statuses that allow ranked matches.
 const ALLOWS_RANKED = ["R"];
 
+const MAX_MAPS_PER_SCRIMMAGE = 10;
+
 class ScrimmageRequestForm extends Component {
   constructor(props) {
     super(props);
@@ -206,6 +208,9 @@ class ScrimmageRequestForm extends Component {
                       value: map.name,
                       label: map.name,
                     }))}
+                    isOptionDisabled={() =>
+                      this.state.maps.length >= MAX_MAPS_PER_SCRIMMAGE
+                    }
                     value={this.state.maps.map((map_name) => ({
                       value: map_name,
                       label: map_name,
