@@ -48,7 +48,7 @@ def auto_accept_scrimmage(instance, created, **kwargs):
 
 
 @receiver(pre_save, sender=Match)
-def report_to_bracket(instance, update_fields, **kwargs):
+def report_to_bracket(instance: Match, update_fields, **kwargs):
     """
     If a match is associated with a tournament bracket,
     update that tournament bracket.
@@ -62,7 +62,7 @@ def report_to_bracket(instance, update_fields, **kwargs):
     if update_fields is not None and "status" not in update_fields:
         return
 
-    if instance.status != SaturnStatus.COMPLETED or instance.external_id is None:
+    if instance.status != SaturnStatus.COMPLETED or instance.tournament_round is None:
         return
 
     instance.report_to_bracket(instance, True)
