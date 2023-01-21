@@ -266,11 +266,11 @@ class Tournament(models.Model):
     time.
     """
 
-    challonge_id_private = models.SlugField(null=True, blank=True)
-    """The Challonge ID of the associated private bracket."""
+    bracket_id_private = models.SlugField(blank=True)
+    """The ID of the associated private bracket, in the bracket service."""
 
-    challonge_id_public = models.SlugField(null=True, blank=True)
-    """The Challonge ID of the associated private bracket."""
+    bracket_id_public = models.SlugField(blank=True)
+    """The ID of the associated public bracket, in the bracket service."""
 
     objects = TournamentQuerySet.as_manager()
 
@@ -291,17 +291,17 @@ class Tournament(models.Model):
     def initialize(self):
         """
         Seed the tournament with eligible teams in order of decreasing rating,
-        populate the Challonge brackets, and create TournamentRounds.
+        populate the brackets in the bracket service, and create TournamentRounds.
         """
 
-        challonge_name_public = self.name_long
-        challonge_name_private = challonge_name_public + " (private)"
+        bracket_name_public = self.name_long
+        bracket_name_private = bracket_name_public + " (private)"
 
         # For security by obfuscation,
         # and to allow easy regeneration of bracket,
         # create a random string to append to private bracket.
         # Note that name_short can be up to 32 chars
-        # while challonge_id_private has a 50-char limit
+        # while bracket_id_private has a 50-char limit
         # (the default for SlugField).
         # "_priv" also takes some space too.
         # Thus be careful with length of key.
@@ -311,20 +311,13 @@ class Tournament(models.Model):
             )
         )
 
-        # Challonge does not allow hyphens in its IDs
+        # Some bracket servers, such as Challonge, do not allow hyphens in IDs
         # so substitute them just in case
-        challonge_id_public = f"{self.name_short}".replace("-", "_")
-        challonge_id_private = f"{challonge_id_public}_{key}_priv".replace("-", "_")
+        bracket_id_public = f"{self.name_short}".replace("-", "_")
+        bracket_id_private = f"{bracket_id_public}_{key}_priv".replace("-", "_")
 
         participants = self.get_potential_participants()
-        # Parse into a format Challonge enjoys.
-        # (1-idx seed)
-        # Store team id in misc, for convenience (re-looking up is annoying).
-        # Store tournament submission in misc, for consistency and convenience.
-        # Note that tournament submission should never change
-        # during a tournament's run, anyways, due to submission freeze.
-        # Bad things might happen if it does tho.
-
+        # TODO abstract this into bulk_add_participants
         participants = [
             {
                 "name": p.name,
@@ -339,19 +332,19 @@ class Tournament(models.Model):
         # First bracket made should be private,
         # to hide results and enable fixing accidents
         bracket.create_tournament(
-            challonge_id_private, challonge_name_private, True, self.style
+            bracket_id_private, bracket_name_private, True, self.style
         )
-        bracket.bulk_add_participants(challonge_id_private, participants)
-        bracket.start_tournament(challonge_id_private)
+        bracket.bulk_add_participants(bracket_id_private, participants)
+        bracket.start_tournament(bracket_id_private)
 
-        round_indexes = bracket.get_round_indexes(challonge_id_private)
+        round_indexes = bracket.get_round_indexes(bracket_id_private)
 
         # NOTE: rounds' order and indexes get weird in double elim.
         # Tracked in #548
         round_objects = [
             TournamentRound(
                 tournament=self,
-                challonge_id=round_index,
+                bracket_id=round_index,
                 name=f"Round {round_index}",
             )
             for round_index in round_indexes
@@ -359,9 +352,9 @@ class Tournament(models.Model):
 
         with transaction.atomic():
             TournamentRound.objects.bulk_create(round_objects)
-            self.challonge_id_private = challonge_id_private
-            self.challonge_id_public = challonge_id_public
-            self.save(update_fields=["challonge_id_private", "challonge_id_public"])
+            self.bracket_id_private = bracket_id_private
+            self.bracket_id_public = bracket_id_public
+            self.save(update_fields=["bracket_id_private", "bracket_id_public"])
 
     def report_for_tournament(self, match):
         """
@@ -369,7 +362,7 @@ class Tournament(models.Model):
         update that tournament bracket.
         """
 
-        bracket.update_match(self.challonge_id_private, match.challonge_id, match)
+        bracket.update_match(self.bracket_id_private, match.bracket_id, match)
 
 
 class ReleaseStatus(models.IntegerChoices):
@@ -397,16 +390,12 @@ class TournamentRound(models.Model):
     """The tournament to which this round belongs."""
 
     # NOTE: this is not really an "ID" in the unique sense.
-    # Instead it is more like an index.
-    # (It takes on values of ints close to 0,
-    # and two rounds from the same Challonge bracket
-    # can have the same value here of course.)
-    # You could rename this field, but that's a
-    # very widespread code change and migration,
-    # with low probability of success and
-    # high impact of failure.
-    challonge_id = models.SmallIntegerField(null=True, blank=True)
-    """The ID of this round as referenced by Challonge."""
+    # **It is not necessarily unique across all tournaments.**
+    # You could rename this field,
+    # but that's a very widespread code change and migration,
+    # with low probability of success and high impact of failure.
+    bracket_id = models.SmallIntegerField(null=True, blank=True)
+    """The ID of this round as referenced by the bracket service."""
 
     name = models.CharField(max_length=64)
     """The name of this round in human-readable form, such as "Round 1"."""
@@ -425,8 +414,8 @@ class TournamentRound(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["tournament", "challonge_id"],
-                name="round-unique-tournament-challonge",
+                fields=["tournament", "bracket_id"],
+                name="round-unique-tournament-bracket",
             )
         ]
 
@@ -450,7 +439,7 @@ class TournamentRound(models.Model):
             match_objects,
             match_participant_objects,
         ) = bracket.get_match_and_participant_objects_for_round(
-            self.tournament.challonge_id_private, self
+            self.tournament.bracket_id_private, self
         )
 
         Match = apps.get_model("compete", "Match")

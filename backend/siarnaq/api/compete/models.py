@@ -219,9 +219,9 @@ class Match(SaturnInvocation):
     # Feel free to relax it later.
     # (Not enforcing it now, and then enforcing it later
     # when a duplicate may have snuck in, would be hard.)
-    challonge_id = models.IntegerField(blank=True, null=True, unique=True)
-    """If this match is referenced in a private Challonge bracket,
-    Challonge's internal ID of the match in the bracket."""
+    bracket_id = models.IntegerField(blank=True, null=True, unique=True)
+    """If this match is referenced in a private bracket service,
+    the internal ID of the match in the bracket."""
 
     objects = MatchQuerySet.as_manager()
 
@@ -389,11 +389,13 @@ class MatchParticipant(models.Model):
     )
     """The team's previous participation, or null if there is none."""
 
-    challonge_id = models.CharField(null=True, blank=True, max_length=64)
+    bracket_id = models.CharField(null=True, blank=True, max_length=64)
     """
-    If the associated match is in Challonge,
-    Challonge's internal ID of this participant.
-    (This saves many API calls.)
+    If the associated match is in a bracket service,
+    the service's internal ID of this participant.
+    (No need to use if the bracket service
+    doesn't have internal IDs for participants.)
+    (For Challonge, this saves many API calls.)
     """
 
     objects = MatchParticipantManager()

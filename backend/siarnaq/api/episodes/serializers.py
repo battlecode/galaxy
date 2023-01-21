@@ -90,7 +90,7 @@ class TournamentRoundSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "tournament",
-            "challonge_id",
+            "bracket_id",
             "name",
             "maps",
             "release_status",
