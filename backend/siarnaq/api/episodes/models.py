@@ -294,9 +294,6 @@ class Tournament(models.Model):
         populate the brackets in the bracket service, and create TournamentRounds.
         """
 
-        bracket_name_public = self.name_long
-        bracket_name_private = bracket_name_public + " (private)"
-
         # For security by obfuscation,
         # and to allow easy regeneration of bracket,
         # create a random string to append to private bracket.
@@ -315,6 +312,12 @@ class Tournament(models.Model):
         # so substitute them just in case
         bracket_id_public = f"{self.name_short}".replace("-", "_")
         bracket_id_private = f"{bracket_id_public}_{key}_priv".replace("-", "_")
+        self.bracket_id_private = bracket_id_private
+        self.bracket_id_public = bracket_id_public
+
+        # First bracket made should be private,
+        # to hide results and enable fixing accidents
+        bracket.create_tournament(self, True)
 
         participants = self.get_potential_participants()
         # TODO abstract this into bulk_add_participants
@@ -329,11 +332,6 @@ class Tournament(models.Model):
             for (idx, p) in enumerate(participants)
         ]
 
-        # First bracket made should be private,
-        # to hide results and enable fixing accidents
-        bracket.create_tournament(
-            bracket_id_private, bracket_name_private, True, self.style
-        )
         bracket.bulk_add_participants(bracket_id_private, participants)
         bracket.start_tournament(bracket_id_private)
 
@@ -352,8 +350,6 @@ class Tournament(models.Model):
 
         with transaction.atomic():
             TournamentRound.objects.bulk_create(round_objects)
-            self.bracket_id_private = bracket_id_private
-            self.bracket_id_public = bracket_id_public
             self.save(update_fields=["bracket_id_private", "bracket_id_public"])
 
     def report_for_tournament(self, match):

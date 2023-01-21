@@ -3,11 +3,18 @@
 # and are instead tailored to Battlecode's specific usage,
 # to improve dev efficiency
 
+from __future__ import annotations
+
 import json
+from typing import TYPE_CHECKING
 
 import requests
 from django.apps import apps
 from django.conf import settings
+
+if TYPE_CHECKING:
+    from siarnaq.api.episodes.models import Tournament
+
 
 _headers = {
     "Accept": "application/json",
@@ -23,21 +30,24 @@ URL_BASE = "https://api.challonge.com/v2/"
 
 
 def create_tournament(
-    tournament_id,
-    tournament_name,
+    tournament: Tournament,
     is_private,
-    style,
 ):
     from siarnaq.api.episodes.models import TournamentStyle
 
     # Challonge wants a specific string for tournament type.
-    match style:
+    match tournament.style:
         case TournamentStyle.SINGLE_ELIMINATION:
-            tournament_type = "single elimination"
+            challonge_type = "single elimination"
         case TournamentStyle.DOUBLE_ELIMINATION:
-            tournament_type = "double elimination"
+            challonge_type = "double elimination"
         case _:
             raise Exception
+
+    challonge_id = (
+        tournament.bracket_id_private if is_private else tournament.bracket_id_public
+    )
+    challonge_name = f"{tournament.name_long}{' (Private)' if is_private else ''}"
 
     url = f"{URL_BASE}tournaments.json"
 
@@ -45,10 +55,10 @@ def create_tournament(
         "data": {
             "type": "tournaments",
             "attributes": {
-                "name": tournament_name,
-                "tournament_type": tournament_type,
+                "name": challonge_name,
+                "tournament_type": challonge_type,
                 "private": is_private,
-                "url": tournament_id,
+                "url": challonge_id,
             },
         }
     }
