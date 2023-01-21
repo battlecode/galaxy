@@ -267,6 +267,7 @@ class Local(Base):
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
     GCLOUD_SCHEDULER_PREFIX = "nothing"
+    GCLOUD_RATING_QUEUE = "nowhere-siarnaq-rating"
 
     DEBUG = True
     CORS_ALLOW_ALL_ORIGINS = True
@@ -330,6 +331,7 @@ class Staging(Base):
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
     GCLOUD_SCHEDULER_PREFIX = "staging"
+    GCLOUD_RATING_QUEUE = "staging-siarnaq-rating"
 
     DEBUG = False
     CORS_ALLOW_ALL_ORIGINS = True
@@ -423,6 +425,7 @@ class Production(Base):
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
     GCLOUD_SCHEDULER_PREFIX = "production"
+    GCLOUD_RATING_QUEUE = "production-siarnaq-rating"
 
     DEBUG = False
     CORS_ALLOWED_ORIGIN_REGEXES = [r"^https://\w+\.battlecode\.org$"]

@@ -3,6 +3,7 @@ import random
 import uuid
 
 import google.cloud.storage as storage
+import google.cloud.tasks_v2 as tasks_v2
 import structlog
 from django.apps import apps
 from django.conf import settings
@@ -17,6 +18,7 @@ from siarnaq.api.compete.managers import (
     ScrimmageRequestQuerySet,
     SubmissionQuerySet,
 )
+from siarnaq.gcloud import tasks
 
 logger = structlog.get_logger(__name__)
 
@@ -282,8 +284,44 @@ class Match(SaturnInvocation):
             "details": self.for_saturn(),
         }
 
-    def try_finalize_ratings(self):
-        """Try to finalize the ratings of the participations if possible."""
+    def request_rating_update(self):
+        """Request a match update to occur asynchronously."""
+        tasks_client = tasks.get_task_client()
+        parent = tasks_client.queue_path(
+            settings.GCLOUD_PROJECT,
+            settings.GCLOUD_LOCATION,
+            settings.GCLOUD_RATING_QUEUE,
+        )
+        url = "https://{}{}".format(
+            settings.ALLOWED_HOSTS[0],
+            reverse(
+                "match-rating-update",
+                kwargs={"pk": self.pk, "episode_id": self.episode.pk},
+            ),
+        )
+        task = tasks_v2.Task(
+            http_request=tasks_v2.HttpRequest(
+                http_method=tasks_v2.HttpMethod.POST,
+                url=url,
+                oidc_token=tasks_v2.OidcToken(
+                    service_account_email=settings.GCLOUD_SERVICE_EMAIL,
+                ),
+            ),
+        )
+        logger.info(
+            "rating_request",
+            message="Requesting rating update for match.",
+            match=self.pk,
+        )
+        tasks_client.create_task(request=dict(parent=parent, task=task))
+
+    def try_rating_update(self):
+        """
+        Try to finalize the ratings of the participations if possible.
+
+        This method runs sequentially; you should use request_rating_update to invoke
+        this asynchronously instead.
+        """
         log = logger.bind(match=self.pk)
         if self.is_ranked and not self.is_finalized():
             log.debug(
@@ -291,10 +329,9 @@ class Match(SaturnInvocation):
             )
             return
 
-        log.debug("match_finalize", message="Attempting to finalize ratings for match.")
         participants = self.participants.all()
         for i, participant in enumerate(participants):
-            participant.try_finalize_rating(
+            participant.try_rating_update(
                 opponents=[o for o in participants if o is not participant]
             )
 
@@ -389,7 +426,7 @@ class MatchParticipant(models.Model):
             return None
         return self.rating.value - self.get_old_rating().value
 
-    def try_finalize_rating(self, *, opponents):
+    def try_rating_update(self, *, opponents):
         """
         Attempt to finalize the rating for this participation if ready.
 
@@ -416,10 +453,6 @@ class MatchParticipant(models.Model):
             match.get_opponent(self)
         """
         log = logger.bind(match=self.match_id, team=self.team_id, participant=self.pk)
-        log.debug(
-            "participant_finalize",
-            message="Attempting to finalize match participant rating",
-        )
         if self.rating is not None:
             log.debug(
                 "participant_noop", message="Participant rating is already finalized."
@@ -464,6 +497,11 @@ class MatchParticipant(models.Model):
                     old_rating=old_rating.value,
                     new_rating=self.rating.value,
                 )
+            else:
+                log.debug(
+                    "opponent_not_ready",
+                    message="Opponent rating blocks participant from finalize.",
+                )
 
         if self.rating is not None:
             self.save(update_fields=["rating"])
@@ -474,18 +512,9 @@ class MatchParticipant(models.Model):
                     "participants__rating",
                 ).get(participants__previous_participation=self)
             except Match.DoesNotExist:
-                log.info(
-                    "participant_chain_end",
-                    message="No further updates after this participant.",
-                )
                 pass  # No more matches to do
             else:
-                log.debug(
-                    "participant_chain_next",
-                    message="Inspecting next match for finalization.",
-                    match=next_match.pk,
-                )
-                next_match.try_finalize_ratings()
+                next_match.request_rating_update()
 
 
 class ScrimmageRequestStatus(models.TextChoices):

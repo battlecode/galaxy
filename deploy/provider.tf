@@ -54,3 +54,20 @@ resource "google_project_service" "sqladmin" {
   service = "sqladmin.googleapis.com"
   disable_dependent_services = true
 }
+
+resource "google_project_service" "cloudtasks" {
+  project = var.gcp_project
+  service = "cloudtasks.googleapis.com"
+  disable_dependent_services = true
+}
+
+resource "null_resource" "apis" {
+  depends_on = [
+    google_project_service.artifactregistry,
+    google_project_service.eventarc,
+    google_project_service.run,
+    google_project_service.secretmanager,
+    google_project_service.sqladmin,
+    google_project_service.cloudtasks,
+  ]
+}
