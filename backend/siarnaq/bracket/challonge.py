@@ -13,7 +13,10 @@ from django.apps import apps
 from django.conf import settings
 
 if TYPE_CHECKING:
+    from typing import Iterable
+
     from siarnaq.api.episodes.models import Tournament
+    from siarnaq.api.teams.models import Team
 
 
 _headers = {
@@ -67,19 +70,33 @@ def create_tournament(
     r.raise_for_status()
 
 
-def bulk_add_participants(tournament_id, participants):
+def bulk_add_participants(
+    tournament: Tournament, participants: Iterable[Team], is_private
+):
     """
     Adds participants in bulk.
-    Expects `participants` to be formatted in the format Challonge expects.
-    Note especially that seeds must be 1-indexed.
+    Expects `participants` to have active_submission included.
     """
-    url = f"{URL_BASE}tournaments/{tournament_id}/participants/bulk_add.json"
+    tournament_challonge_id = (
+        tournament.bracket_id_private if is_private else tournament.bracket_id_public
+    )
+
+    url = f"{URL_BASE}tournaments/{tournament_challonge_id}/participants/bulk_add.json"
+
+    participants_for_challonge = [
+        {
+            "name": p.name,
+            "seed": idx + 1,
+            "misc": json.dumps({"team_id": p.id, "submission_id": p.active_submission}),
+        }
+        for (idx, p) in enumerate(participants)
+    ]
 
     payload = {
         "data": {
             "type": "Participant",
             "attributes": {
-                "participants": participants,
+                "participants": participants_for_challonge,
             },
         }
     }

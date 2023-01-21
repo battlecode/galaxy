@@ -1,4 +1,3 @@
-import json
 import random
 import string
 
@@ -320,19 +319,8 @@ class Tournament(models.Model):
         bracket.create_tournament(self, True)
 
         participants = self.get_potential_participants()
-        # TODO abstract this into bulk_add_participants
-        participants = [
-            {
-                "name": p.name,
-                "seed": idx + 1,
-                "misc": json.dumps(
-                    {"team_id": p.id, "submission_id": p.active_submission}
-                ),
-            }
-            for (idx, p) in enumerate(participants)
-        ]
 
-        bracket.bulk_add_participants(bracket_id_private, participants)
+        bracket.bulk_add_participants(self, participants, True)
         bracket.start_tournament(bracket_id_private)
 
         round_indexes = bracket.get_round_indexes(bracket_id_private)
