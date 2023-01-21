@@ -103,10 +103,10 @@ class EligibilityCriterionAdmin(admin.ModelAdmin):
 class TournamentRoundInline(admin.TabularInline):
     model = TournamentRound
     extra = 0
-    fields = ("name", "maps", "bracket_id", "release_status")
-    ordering = ("bracket_id",)
+    fields = ("name", "maps", "external_id", "release_status")
+    ordering = ("external_id",)
     raw_id_fields = ("maps",)
-    readonly_fields = ("bracket_id",)
+    readonly_fields = ("external_id",)
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related("maps")
@@ -152,8 +152,8 @@ class TournamentAdmin(admin.ModelAdmin):
             "Bracket service configuration",
             {
                 "fields": (
-                    "bracket_id_private",
-                    "bracket_id_public",
+                    "external_id_private",
+                    "external_id_public",
                 ),
             },
         ),
@@ -219,7 +219,7 @@ class TournamentRoundAdmin(admin.ModelAdmin):
     fields = (
         "name",
         "tournament",
-        "bracket_id",
+        "external_id",
         "release_status",
         "maps",
         "in_progress",
@@ -228,8 +228,8 @@ class TournamentRoundAdmin(admin.ModelAdmin):
     list_display = ("name", "tournament", "release_status", "in_progress")
     list_filter = ("tournament", "release_status")
     list_select_related = ("tournament",)
-    ordering = ("-tournament__submission_freeze", "bracket_id")
-    readonly_fields = ("bracket_id", "in_progress")
+    ordering = ("-tournament__submission_freeze", "external_id")
+    readonly_fields = ("external_id", "in_progress")
 
     def get_queryset(self, request):
         return (

@@ -81,11 +81,11 @@ class SubmissionAdmin(admin.ModelAdmin):
 class MatchParticipantInline(admin.TabularInline):
     model = MatchParticipant
     extra = 0
-    fields = ("team", "submission", "player_index", "score", "rating", "bracket_id")
+    fields = ("team", "submission", "player_index", "score", "rating", "external_id")
     max_num = 2
     ordering = ("player_index",)
     raw_id_fields = ("team", "submission")
-    readonly_fields = ("rating", "bracket_id")
+    readonly_fields = ("rating", "external_id")
 
     def get_queryset(self, request):
         return (
@@ -118,7 +118,7 @@ class MatchAdmin(admin.ModelAdmin):
         (
             "Tournament metadata",
             {
-                "fields": ("tournament_round", "bracket_id"),
+                "fields": ("tournament_round", "external_id"),
             },
         ),
     )
@@ -139,7 +139,7 @@ class MatchAdmin(admin.ModelAdmin):
         "created",
         "num_failures",
         "logs",
-        "bracket_id",
+        "external_id",
     )
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):

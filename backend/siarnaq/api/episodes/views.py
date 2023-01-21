@@ -112,7 +112,7 @@ class TournamentRoundViewSet(viewsets.ReadOnlyModelViewSet):
                 tournament=self.kwargs["tournament"],
             )
             .prefetch_related("maps")
-            .order_by("bracket_id")
+            .order_by("external_id")
         )
         if not self.request.user.is_staff:
             queryset = queryset.filter(tournament__is_public=True)

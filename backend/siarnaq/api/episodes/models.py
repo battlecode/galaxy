@@ -264,11 +264,11 @@ class Tournament(models.Model):
     time.
     """
 
-    bracket_id_private = models.SlugField(blank=True)
-    """The ID of the associated private bracket, in the bracket service."""
+    external_id_private = models.SlugField(blank=True)
+    """The bracket service's ID of the associated private bracket."""
 
-    bracket_id_public = models.SlugField(blank=True)
-    """The ID of the associated public bracket, in the bracket service."""
+    external_id_public = models.SlugField(blank=True)
+    """The bracket service's ID of the associated public bracket."""
 
     objects = TournamentQuerySet.as_manager()
 
@@ -294,11 +294,11 @@ class Tournament(models.Model):
         # For security by obfuscation, and to allow easy regeneration of bracket,
         # create a random string to append to private bracket.
         # Note that name_short can be up to 32 chars
-        # while bracket_id_private has a 50-char limit (the default for SlugField).
+        # while external_id_private has a 50-char limit (the default for SlugField).
         # "_priv" also takes some space too. Thus be careful with length of key.
         key = str(uuid.uuid4())[:12]
-        self.bracket_id_public = f"{self.name_short}"
-        self.bracket_id_private = f"{self.bracket_id_public}_{key}_priv"
+        self.external_id_public = f"{self.name_short}"
+        self.external_id_private = f"{self.external_id_public}_{key}_priv"
 
         # First bracket made should be private,
         # to hide results and enable fixing accidents
@@ -316,7 +316,7 @@ class Tournament(models.Model):
         round_objects = [
             TournamentRound(
                 tournament=self,
-                bracket_id=round_index,
+                external_id=round_index,
                 name=f"Round {round_index}",
             )
             for round_index in round_indexes
@@ -324,7 +324,7 @@ class Tournament(models.Model):
 
         with transaction.atomic():
             TournamentRound.objects.bulk_create(round_objects)
-            self.save(update_fields=["bracket_id_private", "bracket_id_public"])
+            self.save(update_fields=["external_id_private", "external_id_public"])
 
 
 class ReleaseStatus(models.IntegerChoices):
@@ -351,14 +351,9 @@ class TournamentRound(models.Model):
     )
     """The tournament to which this round belongs."""
 
-    bracket_id = models.SmallIntegerField(null=True, blank=True)
+    external_id = models.SmallIntegerField(null=True, blank=True)
     """
-    The ID of this round as referenced by the bracket service.
-    NOTE: this is not really an "ID" in the unique sense.
-    **It is not necessarily unique across all tournaments.**
-    You could rename this field,
-    but that's a very widespread code change and migration,
-    with low probability of success and high impact of failure.
+    The bracket service's internal ID of this round.
     """
 
     name = models.CharField(max_length=64)
@@ -378,7 +373,7 @@ class TournamentRound(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["tournament", "bracket_id"],
+                fields=["tournament", "external_id"],
                 name="round-unique-tournament-bracket",
             )
         ]

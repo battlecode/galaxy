@@ -32,8 +32,8 @@ def create_tournament(tournament: Tournament, *, is_private: bool):
     from siarnaq.api.episodes.models import TournamentStyle
 
     # Challonge does not allow hyphens in IDs, so substitute just in case
-    tournament.bracket_id_public = tournament.bracket_id_public.replace("-", "_")
-    tournament.bracket_id_private = tournament.bracket_id_private.replace("-", "_")
+    tournament.external_id_public = tournament.external_id_public.replace("-", "_")
+    tournament.external_id_private = tournament.external_id_private.replace("-", "_")
 
     # Challonge wants a specific string for tournament type.
     match tournament.style:
@@ -45,7 +45,7 @@ def create_tournament(tournament: Tournament, *, is_private: bool):
             raise ValueError
 
     challonge_id = (
-        tournament.bracket_id_private if is_private else tournament.bracket_id_public
+        tournament.external_id_private if is_private else tournament.external_id_public
     )
     challonge_name = f"{tournament.name_long}{' (Private)' if is_private else ''}"
 
@@ -75,7 +75,7 @@ def bulk_add_participants(
     Expects `participants` to have active_submission included.
     """
     tournament_challonge_id = (
-        tournament.bracket_id_private if is_private else tournament.bracket_id_public
+        tournament.external_id_private if is_private else tournament.external_id_public
     )
 
     url = f"{URL_BASE}tournaments/{tournament_challonge_id}/participants/bulk_add.json"
@@ -104,7 +104,7 @@ def bulk_add_participants(
 
 def start_tournament(tournament: Tournament, *, is_private: bool):
     tournament_challonge_id = (
-        tournament.bracket_id_private if is_private else tournament.bracket_id_public
+        tournament.external_id_private if is_private else tournament.external_id_public
     )
 
     url = f"{URL_BASE}tournaments/{tournament_challonge_id}/change_state.json"
@@ -117,7 +117,7 @@ def start_tournament(tournament: Tournament, *, is_private: bool):
 
 def get_tournament_data(tournament: Tournament, *, is_private: bool):
     tournament_challonge_id = (
-        tournament.bracket_id_private if is_private else tournament.bracket_id_public
+        tournament.external_id_private if is_private else tournament.external_id_public
     )
 
     url = f"{URL_BASE}tournaments/{tournament_challonge_id}.json"
@@ -153,7 +153,7 @@ def get_match_and_participant_objects_for_round(
         match item:
             case {
                 "type": "match",
-                "attributes": {"round": round.bracket_id, "state": state},
+                "attributes": {"round": round.external_id, "state": state},
             }:
                 # Only enqueue the round if all matches are "open".
                 # NOTE: it would be good to have a "force re-enqueue round",
@@ -219,10 +219,10 @@ def update_match(match: Match, *, is_private: bool):
     tournament: Tournament = match.tournament_round.tournament
 
     tournament_challonge_id = (
-        tournament.bracket_id_private if is_private else tournament.bracket_id_public
+        tournament.external_id_private if is_private else tournament.external_id_public
     )
 
-    match_challonge_id = match.bracket_id_private if is_private else None
+    match_challonge_id = match.external_id_private if is_private else None
 
     url = f"{URL_BASE}tournaments/{tournament_challonge_id}/\
         matches/{match_challonge_id}.json"

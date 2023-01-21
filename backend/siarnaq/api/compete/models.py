@@ -216,9 +216,9 @@ class Match(SaturnInvocation):
     replay = models.UUIDField(default=uuid.uuid4)
     """The replay file of this match."""
 
-    bracket_id_private = models.IntegerField(blank=True, null=True, unique=True)
-    """If this match is referenced in a private bracket service,
-    the internal ID of the match in the bracket."""
+    external_id_private = models.IntegerField(blank=True, null=True, unique=True)
+    """If this match is in a tournament,
+    the bracket service's internal ID of the match in that private bracket."""
 
     objects = MatchQuerySet.as_manager()
 
@@ -394,8 +394,11 @@ class MatchParticipant(models.Model):
     )
     """The team's previous participation, or null if there is none."""
 
-    bracket_id = models.CharField(null=True, blank=True, max_length=64)
-    """A bracket service's internal ID of this participant, if any."""
+    external_id = models.CharField(null=True, blank=True, max_length=64)
+    """
+    If this match is in a tournament,
+    the bracket service's internal ID of this participant.
+    """
 
     objects = MatchParticipantManager()
 

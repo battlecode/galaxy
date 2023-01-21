@@ -62,7 +62,7 @@ def report_to_bracket(instance, update_fields, **kwargs):
     if update_fields is not None and "status" not in update_fields:
         return
 
-    if instance.status != SaturnStatus.COMPLETED or instance.bracket_id is None:
+    if instance.status != SaturnStatus.COMPLETED or instance.external_id is None:
         return
 
     instance.report_to_bracket(instance, True)
