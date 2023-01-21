@@ -118,7 +118,7 @@ class MatchAdmin(admin.ModelAdmin):
         (
             "Tournament metadata",
             {
-                "fields": ("tournament_round", "external_id"),
+                "fields": ("tournament_round", "external_id_private"),
             },
         ),
     )
@@ -139,7 +139,7 @@ class MatchAdmin(admin.ModelAdmin):
         "created",
         "num_failures",
         "logs",
-        "external_id",
+        "external_id_private",
     )
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
