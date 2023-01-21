@@ -188,10 +188,9 @@ def get_match_and_participant_objects_for_round(
         match_objects.append(match_object)
 
         # Note that Challonge 1-indexes its player indexes
-        # while Saturn 0-indexes.
-        for (challonge_player_index, saturn_player_index) in (
-            ("player1", 0),
-            ("player2", 1),
+        # while our internal data model (in Siarnaq) 0-indexes.
+        for (challonge_player_index, siarnaq_player_index) in enumerate(
+            ["player1", "player2"]
         ):
             # This looks ugly but it's how to parse through the Challonge-related data.
             challonge_participant_id = challonge_match["relationships"][
@@ -207,7 +206,7 @@ def get_match_and_participant_objects_for_round(
                 team_id=team_id,
                 submission_id=submission_id,
                 match=match_object,
-                player_index=saturn_player_index,
+                player_index=siarnaq_player_index,
                 challonge_id=challonge_participant_id,
             )
             match_participant_objects.append(match_participant_object)
