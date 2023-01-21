@@ -1,5 +1,4 @@
-import random
-import string
+import uuid
 
 import structlog
 from django.apps import apps
@@ -292,19 +291,12 @@ class Tournament(models.Model):
         populate the brackets in the bracket service, and create TournamentRounds.
         """
 
-        # For security by obfuscation,
-        # and to allow easy regeneration of bracket,
+        # For security by obfuscation, and to allow easy regeneration of bracket,
         # create a random string to append to private bracket.
         # Note that name_short can be up to 32 chars
-        # while bracket_id_private has a 50-char limit
-        # (the default for SlugField).
-        # "_priv" also takes some space too.
-        # Thus be careful with length of key.
-        key = "".join(
-            random.choices(
-                string.ascii_uppercase + string.ascii_lowercase + string.digits, k=12
-            )
-        )
+        # while bracket_id_private has a 50-char limit (the default for SlugField).
+        # "_priv" also takes some space too. Thus be careful with length of key.
+        key = str(uuid.uuid4())[:12]
 
         # Some bracket servers, such as Challonge, do not allow hyphens in IDs
         # so substitute them just in case
