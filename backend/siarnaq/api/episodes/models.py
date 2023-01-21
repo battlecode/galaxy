@@ -8,7 +8,7 @@ from django.db import models, transaction
 from django.utils import timezone
 from sortedm2m.fields import SortedManyToManyField
 
-from siarnaq.api.episodes import challonge
+from siarnaq import bracket
 from siarnaq.api.episodes.managers import EpisodeQuerySet, TournamentQuerySet
 
 logger = structlog.get_logger(__name__)
@@ -338,13 +338,13 @@ class Tournament(models.Model):
 
         # First bracket made should be private,
         # to hide results and enable fixing accidents
-        challonge.create_tournament(
+        bracket.create_tournament(
             challonge_id_private, challonge_name_private, True, self.style
         )
-        challonge.bulk_add_participants(challonge_id_private, participants)
-        challonge.start_tournament(challonge_id_private)
+        bracket.bulk_add_participants(challonge_id_private, participants)
+        bracket.start_tournament(challonge_id_private)
 
-        round_indexes = challonge.get_round_indexes(challonge_id_private)
+        round_indexes = bracket.get_round_indexes(challonge_id_private)
 
         # NOTE: rounds' order and indexes get weird in double elim.
         # Tracked in #548
@@ -369,7 +369,7 @@ class Tournament(models.Model):
         update that tournament bracket.
         """
 
-        challonge.update_match(self.challonge_id_private, match.challonge_id, match)
+        bracket.update_match(self.challonge_id_private, match.challonge_id, match)
 
 
 class ReleaseStatus(models.IntegerChoices):
@@ -449,7 +449,7 @@ class TournamentRound(models.Model):
         (
             match_objects,
             match_participant_objects,
-        ) = challonge.get_match_and_participant_objects_for_round(
+        ) = bracket.get_match_and_participant_objects_for_round(
             self.tournament.challonge_id_private, self
         )
 
