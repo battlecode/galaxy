@@ -3,6 +3,8 @@
 # and are instead tailored to Battlecode's specific usage,
 # to improve dev efficiency
 
+import json
+
 import requests
 from django.apps import apps
 from django.conf import settings
@@ -162,12 +164,11 @@ def get_match_and_participant_objects_for_round(tournament_id, round):
             challonge_participant_id = challonge_match["relationships"][
                 challonge_player_index
             ]["data"]["id"]
-            challonge_participant_misc_key = challonge_participants[
-                challonge_participant_id
-            ]["attributes"]["misc"]
-            team_id, submission_id = (
-                int(_) for _ in challonge_participant_misc_key.split(",")
+            misc_key = json.loads(
+                challonge_participants[challonge_participant_id]["attributes"]["misc"]
             )
+            team_id = misc_key["team_id"]
+            submission_id = misc_key["submission_id"]
 
             match_participant_object = apps.get_model("compete", "MatchParticipant")(
                 team_id=team_id,

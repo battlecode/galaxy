@@ -1,3 +1,4 @@
+import json
 import random
 import string
 
@@ -321,15 +322,22 @@ class Tournament(models.Model):
         challonge_id_private = f"{challonge_id_public}_{key}_priv".replace("-", "_")
 
         participants = self.get_potential_participants()
-        # Parse into a format Challonge enjoys
-        # 1-idx seed
-        # Store team id in misc, for convenience (re-looking up is annoying)
-        # Store tournament submission in misc, for consistency and convenience
-        # Note that tournament submission should
-        # never change during a tournament anyways
-        # due to submission freeze. Bad things might happen if it does tho
+        # Parse into a format Challonge enjoys.
+        # (1-idx seed)
+        # Store team id in misc, for convenience (re-looking up is annoying).
+        # Store tournament submission in misc, for consistency and convenience.
+        # Note that tournament submission should never change
+        # during a tournament's run, anyways, due to submission freeze.
+        # Bad things might happen if it does tho.
+
         participants = [
-            {"name": p.name, "seed": idx + 1, "misc": f"{p.id},{p.active_submission}"}
+            {
+                "name": p.name,
+                "seed": idx + 1,
+                "misc": json.dumps(
+                    {"team_id": p.id, "submission_id": p.active_submission}
+                ),
+            }
             for (idx, p) in enumerate(participants)
         ]
 
