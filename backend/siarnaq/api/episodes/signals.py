@@ -7,7 +7,6 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 
-from siarnaq.api.compete.models import Match, SaturnStatus
 from siarnaq.api.episodes.models import Episode
 
 logger = structlog.get_logger(__name__)
@@ -83,23 +82,3 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
     else:
         log.info("autoscrim_modify", message="Updating autoscrim schedule.")
         client.update_job(request=dict(job=job))
-
-
-@receiver(pre_save, sender=Match)
-def report_for_bracket(instance, **kwargs):
-    """
-    If a match is associated with a tournament bracket,
-    update that tournament bracket.
-    """
-
-    # Note that if a match is already finalized, and Saturn tries to report it again,
-    # the match will not save.
-    # Thus the call to the bracket service will not be made.
-    # No need to worry about redundant calls to an API (and thus
-    # blowing thru api usage limits, if those exist).
-
-    if instance.status == SaturnStatus.COMPLETED and instance.bracket_id is not None:
-        # NOTE: not sure where the code that derives the match's tournament
-        # should live. Question of abstraction?
-        # Open to suggestions, track in #549
-        instance.tournament_round.tournament.report_for_bracket(instance, True)

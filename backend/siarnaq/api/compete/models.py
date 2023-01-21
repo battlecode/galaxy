@@ -12,6 +12,7 @@ from django.urls import reverse
 from sortedm2m.fields import SortedManyToManyField
 
 import siarnaq.api.refs as refs
+from siarnaq import bracket
 from siarnaq.api.compete.managers import (
     MatchParticipantManager,
     MatchQuerySet,
@@ -334,6 +335,14 @@ class Match(SaturnInvocation):
             participant.try_rating_update(
                 opponents=[o for o in participants if o is not participant]
             )
+
+    def report_for_bracket(self, is_private):
+        """
+        If a match is associated with a tournament bracket,
+        update that tournament bracket.
+        """
+
+        bracket.update_match(self, is_private)
 
 
 class MatchParticipant(models.Model):

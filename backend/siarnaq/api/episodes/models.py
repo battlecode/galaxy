@@ -340,14 +340,6 @@ class Tournament(models.Model):
             TournamentRound.objects.bulk_create(round_objects)
             self.save(update_fields=["bracket_id_private", "bracket_id_public"])
 
-    def report_for_bracket(self, match, is_private):
-        """
-        If a match is associated with a tournament bracket,
-        update that tournament bracket.
-        """
-
-        bracket.update_match(self, match, is_private)
-
 
 class ReleaseStatus(models.IntegerChoices):
     """

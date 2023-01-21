@@ -220,7 +220,9 @@ def get_match_and_participant_objects_for_round(round: TournamentRound, is_priva
     return match_objects, match_participant_objects
 
 
-def update_match(tournament: Tournament, match: Match, is_private):
+def update_match(match: Match, is_private):
+    tournament: Tournament = match.tournament_round.tournament
+
     tournament_challonge_id = (
         tournament.bracket_id_private if is_private else tournament.bracket_id_public
     )
