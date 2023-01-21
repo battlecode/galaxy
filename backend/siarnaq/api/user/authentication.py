@@ -20,7 +20,11 @@ class GoogleCloudAuthentication(authentication.BaseAuthentication):
     Google Cloud service account identity, which we verify here.
     """
 
-    INTERNAL_API_USER_AGENTS = ["Google-Cloud-Scheduler", "Galaxy-Saturn"]
+    INTERNAL_API_USER_AGENTS = [
+        "Google-Cloud-Scheduler",
+        "Google-Cloud-Tasks",
+        "Galaxy-Saturn",
+    ]
     """
     User agents from which an internal API call could originate. Requests with one of
     these user agent headers will be authenticated with this method, and denied access
