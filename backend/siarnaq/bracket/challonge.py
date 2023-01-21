@@ -1,8 +1,3 @@
-# An API-esque module for our usage.
-# Commands here are not very generic (like a good API),
-# and are instead tailored to Battlecode's specific usage,
-# to improve dev efficiency
-
 from __future__ import annotations
 
 import json
@@ -46,7 +41,7 @@ def create_tournament(
         case TournamentStyle.DOUBLE_ELIMINATION:
             challonge_type = "double elimination"
         case _:
-            raise Exception
+            raise ValueError
 
     challonge_id = (
         tournament.bracket_id_private if is_private else tournament.bracket_id_public
@@ -167,9 +162,6 @@ def get_match_and_participant_objects_for_round(round: TournamentRound, is_priva
                 # cuz it involves match deletion which is really hard.
                 # Track in #594
                 if state != "open":
-                    # For later, have this raise a more specific exception.
-                    # Then have the caller handle this return
-                    # and translate it into an HTTP response.
                     raise RuntimeError(
                         "The bracket service's round does not only\
                             have matches that are ready."
@@ -245,7 +237,7 @@ def update_match(match: Match, is_private):
     # which are comma-delimited lists of numbers.
     # We don't use this though)
 
-    participants = match.participants.all()
+    participants = list(match.participants.all())
     high_score = max(participant.score for participant in participants)
     participants_for_challonge = [
         {

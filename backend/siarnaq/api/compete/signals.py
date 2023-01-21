@@ -48,7 +48,7 @@ def auto_accept_scrimmage(instance, created, **kwargs):
 
 
 @receiver(pre_save, sender=Match)
-def report_for_bracket(instance, **kwargs):
+def report_to_bracket(instance, **kwargs):
     """
     If a match is associated with a tournament bracket,
     update that tournament bracket.
@@ -61,4 +61,4 @@ def report_for_bracket(instance, **kwargs):
     # blowing thru api usage limits, if those exist).
 
     if instance.status == SaturnStatus.COMPLETED and instance.bracket_id is not None:
-        instance.report_for_bracket(instance, True)
+        instance.report_to_bracket(instance, True)

@@ -283,7 +283,6 @@ class Tournament(models.Model):
             apps.get_model("teams", "Team")
             .objects.with_active_submission()
             .filter_eligible(self)
-            .all()
             .order_by("-profile__rating__value")
         )
 
@@ -321,9 +320,9 @@ class Tournament(models.Model):
         participants = self.get_potential_participants()
 
         bracket.bulk_add_participants(self, participants, True)
-        bracket.start_tournament(bracket_id_private, True)
+        bracket.start_tournament(self, True)
 
-        round_indexes = bracket.get_round_indexes(bracket_id_private, True)
+        round_indexes = bracket.get_round_indexes(self, True)
 
         # NOTE: rounds' order and indexes get weird in double elim.
         # Tracked in #548
@@ -365,13 +364,15 @@ class TournamentRound(models.Model):
     )
     """The tournament to which this round belongs."""
 
-    # NOTE: this is not really an "ID" in the unique sense.
-    # **It is not necessarily unique across all tournaments.**
-    # You could rename this field,
-    # but that's a very widespread code change and migration,
-    # with low probability of success and high impact of failure.
     bracket_id = models.SmallIntegerField(null=True, blank=True)
-    """The ID of this round as referenced by the bracket service."""
+    """
+    The ID of this round as referenced by the bracket service.
+    NOTE: this is not really an "ID" in the unique sense.
+    **It is not necessarily unique across all tournaments.**
+    You could rename this field,
+    but that's a very widespread code change and migration,
+    with low probability of success and high impact of failure.
+    """
 
     name = models.CharField(max_length=64)
     """The name of this round in human-readable form, such as "Round 1"."""
@@ -405,9 +406,9 @@ class TournamentRound(models.Model):
         if self.in_progress:
             raise RuntimeError("The round's matches are already running in Saturn.")
 
-        num_maps = len(self.maps.all())
-        # Sure, matches with even number of maps won't run.
-        # But might as well fail fast.
+        num_maps = self.maps.count()
+        # Game runner allows for even number of maps.
+        # But we can't allow this for tournaments, since this would result in ties.
         if num_maps % 2 == 0:
             raise RuntimeError("The round does not have an odd number of maps.")
 

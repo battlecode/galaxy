@@ -216,10 +216,6 @@ class Match(SaturnInvocation):
     replay = models.UUIDField(default=uuid.uuid4)
     """The replay file of this match."""
 
-    # NOTE: I'm not sure if this field _has_ to be unique.
-    # Feel free to relax it later.
-    # (Not enforcing it now, and then enforcing it later
-    # when a duplicate may have snuck in, would be hard.)
     bracket_id_private = models.IntegerField(blank=True, null=True, unique=True)
     """If this match is referenced in a private bracket service,
     the internal ID of the match in the bracket."""
@@ -336,7 +332,7 @@ class Match(SaturnInvocation):
                 opponents=[o for o in participants if o is not participant]
             )
 
-    def report_for_bracket(self, is_private):
+    def report_to_bracket(self, is_private):
         """
         If a match is associated with a tournament bracket,
         update that tournament bracket.
@@ -399,13 +395,7 @@ class MatchParticipant(models.Model):
     """The team's previous participation, or null if there is none."""
 
     bracket_id = models.CharField(null=True, blank=True, max_length=64)
-    """
-    If the associated match is in a bracket service,
-    the service's internal ID of this participant.
-    (No need to use if the bracket service
-    doesn't have internal IDs for participants.)
-    (For Challonge, this saves many API calls.)
-    """
+    """A bracket service's internal ID of this participant, if any."""
 
     objects = MatchParticipantManager()
 

@@ -114,7 +114,7 @@ class TournamentRoundInline(admin.TabularInline):
 
 @admin.action(description="Initialize a tournament")
 def initialize(modeladmin, request, queryset):
-    logger.info("initialize", message=f"Initializing tournaments in {queryset}")
+    logger.info("initialize", message="Initializing tournaments.")
     for tournament in queryset:
         tournament.initialize()
 
@@ -205,7 +205,7 @@ class MatchInline(admin.TabularInline):
 
 @admin.action(description="Create and enqueue matches of a tournament round")
 def enqueue(modeladmin, request, queryset):
-    logger.info("enqueue", message=f"Enqueueing tournament rounds {queryset}")
+    logger.info("enqueue", message="Enqueueing tournament rounds.")
     for round in queryset:
         try:
             round.enqueue()

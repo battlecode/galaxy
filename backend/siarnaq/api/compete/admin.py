@@ -139,7 +139,6 @@ class MatchAdmin(admin.ModelAdmin):
         "created",
         "num_failures",
         "logs",
-        "tournament_round",
         "bracket_id",
     )
 
