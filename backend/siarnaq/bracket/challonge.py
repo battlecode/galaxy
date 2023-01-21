@@ -67,26 +67,28 @@ def create_tournament(tournament: Tournament, *, is_private: bool):
     r.raise_for_status()
 
 
-def bulk_add_participants(
-    tournament: Tournament, participants: Iterable[Team], *, is_private: bool
-):
+def bulk_add_teams(tournament: Tournament, teams: Iterable[Team], *, is_private: bool):
     """
-    Adds participants in bulk.
-    Expects `participants` to have active_submission included.
+    Adds teams in bulk to a bracket.
+    Expects `teams` to have active_submission included.
     """
     tournament_challonge_id = (
         tournament.external_id_private if is_private else tournament.external_id_public
     )
 
+    # Challonge calls them "participants",
+    # and expects data to be formatted in a particular way
     url = f"{URL_BASE}tournaments/{tournament_challonge_id}/participants/bulk_add.json"
 
     participants_for_challonge = [
         {
-            "name": p.name,
+            "name": team.name,
             "seed": idx + 1,
-            "misc": json.dumps({"team_id": p.id, "submission_id": p.active_submission}),
+            "misc": json.dumps(
+                {"team_id": team.id, "submission_id": team.active_submission}
+            ),
         }
-        for (idx, p) in enumerate(participants)
+        for (idx, team) in enumerate(teams)
     ]
 
     payload = {

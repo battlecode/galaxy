@@ -275,8 +275,8 @@ class Tournament(models.Model):
     def __str__(self):
         return self.name_short
 
-    def get_potential_participants(self):
-        """Returns the list of participants that would be entered in this tournament,
+    def get_eligible_teams(self):
+        """Returns the list of teams that would be entered in this tournament,
         if it were to start right now."""
         return (
             apps.get_model("teams", "Team")
@@ -304,9 +304,9 @@ class Tournament(models.Model):
         # to hide results and enable fixing accidents
         bracket.create_tournament(self, is_private=True)
 
-        participants = self.get_potential_participants()
+        teams = self.get_eligible_teams()
 
-        bracket.bulk_add_participants(self, participants, is_private=True)
+        bracket.bulk_add_teams(self, teams, is_private=True)
         bracket.start_tournament(self, is_private=True)
 
         round_indexes = bracket.get_round_indexes(self, is_private=True)
