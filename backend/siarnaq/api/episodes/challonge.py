@@ -31,11 +31,13 @@ def create_tournament(
     from siarnaq.api.episodes.models import TournamentStyle
 
     # Challonge wants a specific string for tournament type.
-    tournament_type = (
-        "single elimination"
-        if style == TournamentStyle.SINGLE_ELIMINATION
-        else "double elimination"
-    )
+    match style:
+        case TournamentStyle.SINGLE_ELIMINATION:
+            tournament_type = "single elimination"
+        case TournamentStyle.DOUBLE_ELIMINATION:
+            tournament_type = "double elimination"
+        case _:
+            raise Exception
 
     url = f"{URL_BASE}tournaments.json"
 
