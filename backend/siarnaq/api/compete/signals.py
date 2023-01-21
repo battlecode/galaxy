@@ -48,17 +48,21 @@ def auto_accept_scrimmage(instance, created, **kwargs):
 
 
 @receiver(pre_save, sender=Match)
-def report_to_bracket(instance, **kwargs):
+def report_to_bracket(instance, update_fields, **kwargs):
     """
     If a match is associated with a tournament bracket,
     update that tournament bracket.
     """
 
     # Note that if a match is already finalized, and Saturn tries to report it again,
-    # the match will not save.
-    # Thus the call to the bracket service will not be made.
-    # No need to worry about redundant calls to an API (and thus
-    # blowing thru api usage limits, if those exist).
+    # the match will not save, and this signal is never run.
+    # Still, we include other checks to eliminate redundant
+    # calls to our bracket service, especially to conserve API usage limits.
 
-    if instance.status == SaturnStatus.COMPLETED and instance.bracket_id is not None:
-        instance.report_to_bracket(instance, True)
+    if update_fields is not None and "status" not in update_fields:
+        return
+
+    if instance.status != SaturnStatus.COMPLETED or instance.bracket_id is None:
+        return
+
+    instance.report_to_bracket(instance, True)
