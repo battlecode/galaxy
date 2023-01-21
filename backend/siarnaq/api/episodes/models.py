@@ -297,13 +297,8 @@ class Tournament(models.Model):
         # while bracket_id_private has a 50-char limit (the default for SlugField).
         # "_priv" also takes some space too. Thus be careful with length of key.
         key = str(uuid.uuid4())[:12]
-
-        # Some bracket servers, such as Challonge, do not allow hyphens in IDs
-        # so substitute them just in case
-        bracket_id_public = f"{self.name_short}".replace("-", "_")
-        bracket_id_private = f"{bracket_id_public}_{key}_priv".replace("-", "_")
-        self.bracket_id_private = bracket_id_private
-        self.bracket_id_public = bracket_id_public
+        self.bracket_id_public = f"{self.name_short}"
+        self.bracket_id_private = f"{self.bracket_id_public}_{key}_priv"
 
         # First bracket made should be private,
         # to hide results and enable fixing accidents

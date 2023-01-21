@@ -31,6 +31,10 @@ URL_BASE = "https://api.challonge.com/v2/"
 def create_tournament(tournament: Tournament, *, is_private: bool):
     from siarnaq.api.episodes.models import TournamentStyle
 
+    # Challonge does not allow hyphens in IDs, so substitute just in case
+    tournament.bracket_id_public = tournament.bracket_id_public.replace("-", "_")
+    tournament.bracket_id_private = tournament.bracket_id_private.replace("-", "_")
+
     # Challonge wants a specific string for tournament type.
     match tournament.style:
         case TournamentStyle.SINGLE_ELIMINATION:
