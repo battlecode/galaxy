@@ -264,10 +264,10 @@ class Tournament(models.Model):
     time.
     """
 
-    external_id_private = models.SlugField(blank=True)
+    external_id_private = models.SlugField(max_length=128, blank=True)
     """The bracket service's ID of the associated private bracket."""
 
-    external_id_public = models.SlugField(blank=True)
+    external_id_public = models.SlugField(max_length=128, blank=True)
     """The bracket service's ID of the associated public bracket."""
 
     objects = TournamentQuerySet.as_manager()
@@ -293,12 +293,9 @@ class Tournament(models.Model):
 
         # For security by obfuscation, and to allow easy regeneration of bracket,
         # create a random string to append to private bracket.
-        # Note that name_short can be up to 32 chars
-        # while external_id_private has a 50-char limit (the default for SlugField).
-        # "_priv" also takes some space too. Thus be careful with length of key.
-        key = str(uuid.uuid4())[:12]
+        key = str(uuid.uuid4())
         self.external_id_public = f"{self.name_short}"
-        self.external_id_private = f"{self.external_id_public}_{key}_priv"
+        self.external_id_private = f"private_{self.external_id_public}_{key}"
 
         # First bracket made should be private,
         # to hide results and enable fixing accidents
