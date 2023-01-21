@@ -86,7 +86,7 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
 
 
 @receiver(pre_save, sender=Match)
-def report_for_tournament(instance, **kwargs):
+def report_for_bracket(instance, **kwargs):
     """
     If a match is associated with a tournament bracket,
     update that tournament bracket.
@@ -102,4 +102,4 @@ def report_for_tournament(instance, **kwargs):
         # NOTE: not sure where the code that derives the match's tournament
         # should live. Question of abstraction?
         # Open to suggestions, track in #549
-        instance.tournament_round.tournament.report_for_tournament(instance)
+        instance.tournament_round.tournament.report_for_bracket(instance, True)

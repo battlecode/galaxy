@@ -321,9 +321,9 @@ class Tournament(models.Model):
         participants = self.get_potential_participants()
 
         bracket.bulk_add_participants(self, participants, True)
-        bracket.start_tournament(bracket_id_private)
+        bracket.start_tournament(bracket_id_private, True)
 
-        round_indexes = bracket.get_round_indexes(bracket_id_private)
+        round_indexes = bracket.get_round_indexes(bracket_id_private, True)
 
         # NOTE: rounds' order and indexes get weird in double elim.
         # Tracked in #548
@@ -340,13 +340,13 @@ class Tournament(models.Model):
             TournamentRound.objects.bulk_create(round_objects)
             self.save(update_fields=["bracket_id_private", "bracket_id_public"])
 
-    def report_for_tournament(self, match):
+    def report_for_bracket(self, match, is_private):
         """
         If a match is associated with a tournament bracket,
         update that tournament bracket.
         """
 
-        bracket.update_match(self.bracket_id_private, match.bracket_id, match)
+        bracket.update_match(self, match, is_private)
 
 
 class ReleaseStatus(models.IntegerChoices):
@@ -422,9 +422,7 @@ class TournamentRound(models.Model):
         (
             match_objects,
             match_participant_objects,
-        ) = bracket.get_match_and_participant_objects_for_round(
-            self.tournament.bracket_id_private, self
-        )
+        ) = bracket.get_match_and_participant_objects_for_round(self, True)
 
         Match = apps.get_model("compete", "Match")
 

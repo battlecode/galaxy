@@ -15,7 +15,8 @@ from django.conf import settings
 if TYPE_CHECKING:
     from typing import Iterable
 
-    from siarnaq.api.episodes.models import Tournament
+    from siarnaq.api.compete.models import Match
+    from siarnaq.api.episodes.models import Tournament, TournamentRound
     from siarnaq.api.teams.models import Team
 
 
@@ -105,8 +106,12 @@ def bulk_add_participants(
     r.raise_for_status()
 
 
-def start_tournament(tournament_id):
-    url = f"{URL_BASE}tournaments/{tournament_id}/change_state.json"
+def start_tournament(tournament: Tournament, is_private):
+    tournament_challonge_id = (
+        tournament.bracket_id_private if is_private else tournament.bracket_id_public
+    )
+
+    url = f"{URL_BASE}tournaments/{tournament_challonge_id}/change_state.json"
 
     payload = {"data": {"type": "TournamentState", "attributes": {"state": "start"}}}
 
@@ -114,16 +119,20 @@ def start_tournament(tournament_id):
     r.raise_for_status()
 
 
-def get_tournament_data(tournament_id):
-    url = f"{URL_BASE}tournaments/{tournament_id}.json"
+def get_tournament_data(tournament: Tournament, is_private):
+    tournament_challonge_id = (
+        tournament.bracket_id_private if is_private else tournament.bracket_id_public
+    )
+
+    url = f"{URL_BASE}tournaments/{tournament_challonge_id}.json"
 
     r = requests.get(url, headers=_headers)
     r.raise_for_status()
     return r.json()
 
 
-def get_round_indexes(tournament_id):
-    tournament_data = get_tournament_data(tournament_id)
+def get_round_indexes(tournament: Tournament, is_private):
+    tournament_data = get_tournament_data(tournament, is_private)
 
     round_indexes = set()
     for item in tournament_data["included"]:
@@ -134,8 +143,8 @@ def get_round_indexes(tournament_id):
     return round_indexes
 
 
-def get_match_and_participant_objects_for_round(tournament_id, round):
-    tournament_data = get_tournament_data(tournament_id)
+def get_match_and_participant_objects_for_round(round: TournamentRound, is_private):
+    tournament_data = get_tournament_data(round.tournament, is_private)
     # Derive match dicts/JSON objects (that Challonge gives us) of this round
     challonge_matches = []
     # Also derive participant dicts/JSON objects that Challonge gives us,
@@ -146,7 +155,7 @@ def get_match_and_participant_objects_for_round(tournament_id, round):
         match item:
             case {
                 "type": "match",
-                "attributes": {"round": round.challonge_id, "state": state},
+                "attributes": {"round": round.bracket_id, "state": state},
             }:
                 # Only enqueue the round if all matches are "open".
                 # NOTE: it would be good to have a "force re-enqueue round",
@@ -211,8 +220,15 @@ def get_match_and_participant_objects_for_round(tournament_id, round):
     return match_objects, match_participant_objects
 
 
-def update_match(tournament_id, match_id, match):
-    url = f"{URL_BASE}tournaments/{tournament_id}/matches/{match_id}.json"
+def update_match(tournament: Tournament, match: Match, is_private):
+    tournament_challonge_id = (
+        tournament.bracket_id_private if is_private else tournament.bracket_id_public
+    )
+
+    match_challonge_id = match.bracket_id_private if is_private else None
+
+    url = f"{URL_BASE}tournaments/{tournament_challonge_id}/\
+        matches/{match_challonge_id}.json"
 
     # Wrangle the Match object into a format Challonge likes.
     # In particular, Challonge wants an array of objects,

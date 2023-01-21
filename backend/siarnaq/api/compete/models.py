@@ -219,7 +219,7 @@ class Match(SaturnInvocation):
     # Feel free to relax it later.
     # (Not enforcing it now, and then enforcing it later
     # when a duplicate may have snuck in, would be hard.)
-    bracket_id = models.IntegerField(blank=True, null=True, unique=True)
+    bracket_id_private = models.IntegerField(blank=True, null=True, unique=True)
     """If this match is referenced in a private bracket service,
     the internal ID of the match in the bracket."""
 
