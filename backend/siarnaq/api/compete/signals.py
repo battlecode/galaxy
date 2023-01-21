@@ -22,7 +22,7 @@ def connect_linked_list(instance, created, **kwargs):
 @receiver(post_save, sender=Match)
 def update_match_ratings(instance, **kwargs):
     """Try to finalize ratings for participations whenever a match is updated."""
-    instance.try_finalize_ratings()
+    instance.request_rating_update()
 
 
 @receiver(post_save, sender=ScrimmageRequest)

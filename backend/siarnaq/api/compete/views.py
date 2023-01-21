@@ -341,6 +341,20 @@ class MatchViewSet(
         serializer.save()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(IsAdminUser,),
+        serializer_class=None,
+    )
+    def rating_update(self, request, pk=None, *, episode_id):
+        """
+        Try to finalize the rating of this match.
+        """
+        instance = self.get_object()
+        instance.try_rating_update()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
 
 class ScrimmageRequestViewSet(
     EpisodeTeamUserContextMixin,
