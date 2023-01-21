@@ -280,11 +280,6 @@ class Tournament(models.Model):
     def get_potential_participants(self):
         """Returns the list of participants that would be entered in this tournament,
         if it were to start right now."""
-        # NOTE: this hasn't really been tested well.
-        # Test all parts of eligibility filtering
-        # (includes, excludes, resume)
-        # Test also that special teams (eg devs) don't enter
-        # Track in #549
         return (
             apps.get_model("teams", "Team")
             .objects.with_active_submission()
