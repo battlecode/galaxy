@@ -185,7 +185,7 @@ def get_match_and_participant_objects_for_round(
             tournament_round=round,
             alternate_order=True,
             is_ranked=False,
-            challonge_id=challonge_match["id"],
+            external_id_private=challonge_match["id"],
         )
         match_objects.append(match_object)
 
@@ -209,7 +209,7 @@ def get_match_and_participant_objects_for_round(
                 submission_id=submission_id,
                 match=match_object,
                 player_index=siarnaq_player_index,
-                challonge_id=challonge_participant_id,
+                external_id=challonge_participant_id,
             )
             match_participant_objects.append(match_participant_object)
 
