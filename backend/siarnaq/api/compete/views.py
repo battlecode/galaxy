@@ -187,6 +187,7 @@ class SubmissionViewSet(
         methods=["post"],
         permission_classes=(IsAdminUser,),
         serializer_class=SubmissionReportSerializer,
+        throttle_classes=(),
         filter_backends=[],
     )
     def report(self, request, pk=None, *, episode_id):
@@ -383,6 +384,7 @@ class MatchViewSet(
         methods=["post"],
         permission_classes=(IsAdminUser,),
         serializer_class=MatchReportSerializer,
+        throttle_classes=(),
     )
     def report(self, request, pk=None, *, episode_id):
         """
@@ -399,6 +401,7 @@ class MatchViewSet(
         methods=["post"],
         permission_classes=(IsAdminUser,),
         serializer_class=None,
+        throttle_classes=(),
     )
     def rating_update(self, request, pk=None, *, episode_id):
         """
