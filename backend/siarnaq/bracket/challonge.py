@@ -225,8 +225,10 @@ def update_match(match: Match, *, is_private: bool):
 
     match_challonge_id = match.external_id_private if is_private else None
 
-    url = f"{URL_BASE}tournaments/{tournament_challonge_id}/\
-        matches/{match_challonge_id}.json"
+    url = (
+        f"{URL_BASE}tournaments/{tournament_challonge_id}/"
+        f"matches/{match_challonge_id}.json"
+    )
 
     # Wrangle the Match object into a format Challonge likes.
     # In particular, Challonge wants an array of objects,
