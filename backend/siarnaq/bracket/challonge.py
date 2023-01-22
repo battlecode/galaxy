@@ -247,7 +247,7 @@ def update_match(match: Match, *, is_private: bool):
         {
             "participant_id": participant.external_id,
             "score": str(participant.score),
-            "advancing": True if participant["score"] == high_score else False,
+            "advancing": True if participant.score == high_score else False,
         }
         for participant in participants
     ]
