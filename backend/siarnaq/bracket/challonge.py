@@ -241,14 +241,15 @@ def update_match(match: Match, *, is_private: bool):
     # Also, we convert "score" to a string for Challonge.
     # (This is required because Challonge supports scores of sets,
     # which are comma-delimited lists of numbers.
-    # We don't use this though)
+    # We don't use scores of sets in Challonge though, so we format our score
+    # as a one-item set.)
 
     participants: list[MatchParticipant] = list(match.participants.all())
     high_score = max(participant.score for participant in participants)
     participants_for_challonge = [
         {
             "participant_id": participant.external_id,
-            "score": str(participant.score),
+            "score_set": str(participant.score),
             "advancing": True if participant.score == high_score else False,
         }
         for participant in participants
@@ -262,6 +263,8 @@ def update_match(match: Match, *, is_private: bool):
             },
         }
     }
+
+    print(payload)
 
     r = requests.put(url, headers=_headers, json=payload)
     r.raise_for_status()
