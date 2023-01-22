@@ -343,18 +343,17 @@ class MatchViewSet(
         team_id = parse_int(self.request.query_params.get("team_id"))
         if team_id is not None:
             queryset = queryset.filter(participants__team=team_id)
-        else:
+        elif request.user.pk is not None:
             queryset = queryset.filter(participants__team__members=request.user.pk)
+        else:
+            return Response([])
         has_invisible = self.get_queryset().filter(
             participants__team__status=TeamStatus.INVISIBLE
         )
         queryset = queryset.exclude(pk__in=Subquery(has_invisible.values("pk")))
         queryset = queryset.filter(is_ranked=True)
 
-        if queryset.all().count() == 0:
-            return Response(None, status=status.HTTP_204_NO_CONTENT)
-        else:
-            matches = queryset.order_by("created")
+        matches = queryset.all().order_by("created")
 
         ordered = [
             {
