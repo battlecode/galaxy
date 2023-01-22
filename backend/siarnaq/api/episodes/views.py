@@ -42,6 +42,7 @@ class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
         methods=["post"],
         permission_classes=(IsAdminUser,),
         serializer_class=AutoscrimSerializer,
+        throttle_classes=(),
     )
     def autoscrim(self, request, pk=None):
         """Trigger a round of autoscrimmages."""
