@@ -191,7 +191,7 @@ def get_match_and_participant_objects_for_round(
 
         # Note that Challonge 1-indexes its player indexes
         # while our internal data model (in Siarnaq) 0-indexes.
-        for (challonge_player_index, siarnaq_player_index) in enumerate(
+        for (siarnaq_player_index, challonge_player_index) in enumerate(
             ["player1", "player2"]
         ):
             # This looks ugly but it's how to parse through the Challonge-related data.
