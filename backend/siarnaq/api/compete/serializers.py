@@ -349,7 +349,12 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
         source="requested_to.profile.rating", read_only=True
     )
     maps = serializers.SerializerMethodField()
-    map_names = serializers.ListField(child=serializers.CharField(), write_only=True)
+    map_names = serializers.ListField(
+        child=serializers.CharField(),
+        write_only=True,
+        min_length=1,
+        max_length=settings.MAX_MAPS_PER_SCRIMMAGE,
+    )
 
     class Meta:
         model = ScrimmageRequest

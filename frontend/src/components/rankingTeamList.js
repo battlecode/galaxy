@@ -164,6 +164,7 @@ class RankingTeamList extends Component {
             closeRequestForm={this.closeRequestForm}
             team={this.state.requestMenuTeam}
             episode={this.props.episode}
+            requestRefresh={this.props.requestRefresh}
           />
           <div className="card">
             <div className="header">

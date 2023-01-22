@@ -230,6 +230,10 @@ class Base(Configuration):
 
     TEAMS_MAX_TEAM_SIZE = 4
 
+    # Match size limits
+
+    MAX_MAPS_PER_SCRIMMAGE = 10
+
     # Avatar settings
 
     GCLOUD_MAX_AVATAR_SIZE = (512, 512)

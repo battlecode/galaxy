@@ -1,6 +1,7 @@
 // Based on https://stackoverflow.com/a/67233977
 import React, { Component } from "react";
 import Api from "../api";
+import Select from "react-select";
 
 import ActionMessage from "../components/actionMessage";
 import Alert from "../components/alert";
@@ -14,6 +15,8 @@ const PLAYER_ORDERS = [
 // Team statuses that allow ranked matches.
 const ALLOWS_RANKED = ["R"];
 
+const MAX_MAPS_PER_SCRIMMAGE = 10;
+
 class ScrimmageRequestForm extends Component {
   constructor(props) {
     super(props);
@@ -21,7 +24,7 @@ class ScrimmageRequestForm extends Component {
     this.state = {
       is_ranked: true,
       player_order: PLAYER_ORDERS[0].value,
-      maps: ["", "", ""],
+      maps: [],
       available_maps: [],
       update_status: "waiting",
       alert_message: "",
@@ -30,6 +33,7 @@ class ScrimmageRequestForm extends Component {
     this.getMaps();
 
     this.changeHandler = this.changeHandler.bind(this);
+    this.changeSelectHandler = this.changeSelectHandler.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.requestScrimmage = this.requestScrimmage.bind(this);
   }
@@ -66,18 +70,14 @@ class ScrimmageRequestForm extends Component {
     const id = e.target.id;
     const val =
       e.target.type === "checkbox" ? e.target.checked : e.target.value;
-    if (id.startsWith("map")) {
-      this.setState(function (prevState, props) {
-        var map_number = id.split("_")[1];
-        prevState.maps[map_number] = val;
-        return prevState;
-      });
-    } else {
-      this.setState(function (prevState, props) {
-        prevState[id] = val;
-        return prevState;
-      });
-    }
+    this.setState(function (prevState, props) {
+      prevState[id] = val;
+      return prevState;
+    });
+  }
+
+  changeSelectHandler(val) {
+    this.setState({ maps: val.map((obj) => obj.value) });
   }
 
   requestScrimmage() {
@@ -100,31 +100,28 @@ class ScrimmageRequestForm extends Component {
                    and the backend doesn't yet give useful messages anyway.
                 */
         if (success) {
-          this.setState({ update_status: "success" });
+          this.setState({ update_status: "success" }, () => {
+            setTimeout(() => {
+              this.setState({ update_status: "waiting" });
+              this.props.requestRefresh();
+              this.closeModal();
+            }, 500);
+          });
         } else {
           this.setState({ update_status: "failure" });
           this.setState({
             alert_message:
               "Scrimmage request failed! Have you and the opponent both made successful code submissions yet?",
           });
+          setTimeout(() => {
+            this.setState({ update_status: "waiting" });
+          }, 2000);
         }
-        setTimeout(() => {
-          this.setState({ update_status: "waiting" });
-        }, 2000);
       }
     );
   }
 
-  closeModal(e) {
-    // Reset state
-    const random_maps = this.getRandomMaps(this.state.available_maps);
-    this.setState({
-      is_ranked: true,
-      player_order: PLAYER_ORDERS[0].value,
-      maps: random_maps,
-    });
-
-    e.stopPropagation();
+  closeModal() {
     this.props.closeRequestForm();
   }
 
@@ -160,7 +157,10 @@ class ScrimmageRequestForm extends Component {
                   type="button"
                   className="close"
                   aria-label="Close"
-                  onClick={this.closeModal}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    this.closeModal();
+                  }}
                   style={{ fontSize: "3em", marginTop: "-32px" }}
                 >
                   <span aria-hidden="true">&times;</span>
@@ -187,27 +187,36 @@ class ScrimmageRequestForm extends Component {
                     })}
                   </select>
                 </div>
-                {this.state.maps.map((map_name, map_number) => {
-                  return (
-                    <div className="form-group" key={map_number}>
-                      <label>Map {map_number + 1}</label>
-                      <select
-                        className="form-control"
-                        id={`map_${map_number}`}
-                        onChange={this.changeHandler}
-                        value={map_name}
-                      >
-                        {this.state.available_maps.map((map) => {
-                          return (
-                            <option value={map.name} key={map.name}>
-                              {map.name}
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </div>
-                  );
-                })}
+                <div className="form-group">
+                  <label>
+                    Maps{" "}
+                    <a
+                      onClick={() => {
+                        const random_maps = this.getRandomMaps(
+                          this.state.available_maps
+                        );
+                        this.setState({ maps: random_maps });
+                      }}
+                    >
+                      (use random 3)
+                    </a>
+                  </label>
+                  <Select
+                    onChange={this.changeSelectHandler}
+                    isMulti={true}
+                    options={this.state.available_maps.map((map) => ({
+                      value: map.name,
+                      label: map.name,
+                    }))}
+                    isOptionDisabled={() =>
+                      this.state.maps.length >= MAX_MAPS_PER_SCRIMMAGE
+                    }
+                    value={this.state.maps.map((map_name) => ({
+                      value: map_name,
+                      label: map_name,
+                    }))}
+                  />
+                </div>
                 <div className="form-group" style={{ display: "flex" }}>
                   <label>Ranked?</label>
                   <input

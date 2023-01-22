@@ -90,6 +90,7 @@ class RankingTeamSearch extends Component {
             canRequest={this.props.canRequest}
             team={this.props.team}
             title={this.props.title}
+            requestRefresh={this.props.requestRefresh}
           />
         </div>
       </div>

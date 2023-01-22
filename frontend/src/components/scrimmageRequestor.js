@@ -51,6 +51,7 @@ class ScrimmageRequestor extends Component {
         canRequest={true}
         requireActiveSubmission={true}
         team={this.props.team}
+        requestRefresh={this.props.refresh}
         title="Find a team to scrimmage!"
       />
     );
