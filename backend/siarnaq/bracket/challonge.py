@@ -10,7 +10,7 @@ from django.conf import settings
 if TYPE_CHECKING:
     from typing import Iterable
 
-    from siarnaq.api.compete.models import Match
+    from siarnaq.api.compete.models import Match, MatchParticipant
     from siarnaq.api.episodes.models import Tournament, TournamentRound
     from siarnaq.api.teams.models import Team
 
@@ -241,11 +241,11 @@ def update_match(match: Match, *, is_private: bool):
     # which are comma-delimited lists of numbers.
     # We don't use this though)
 
-    participants = list(match.participants.all())
+    participants: list[MatchParticipant] = list(match.participants.all())
     high_score = max(participant.score for participant in participants)
     participants_for_challonge = [
         {
-            "participant_id": participant.challonge_id,
+            "participant_id": participant.external_id,
             "score": str(participant.score),
             "advancing": True if participant["score"] == high_score else False,
         }
