@@ -1,4 +1,4 @@
-import random
+import uuid
 
 import structlog
 from django.apps import apps
@@ -6,10 +6,8 @@ from django.db import models, transaction
 from django.utils import timezone
 from sortedm2m.fields import SortedManyToManyField
 
-from siarnaq.api.compete.models import Match, MatchParticipant
-from siarnaq.api.episodes import challonge
+from siarnaq import bracket
 from siarnaq.api.episodes.managers import EpisodeQuerySet, TournamentQuerySet
-from siarnaq.api.teams.models import Team
 
 logger = structlog.get_logger(__name__)
 
@@ -266,169 +264,64 @@ class Tournament(models.Model):
     time.
     """
 
-    challonge_id_private = models.SlugField(null=True, blank=True)
-    """The Challonge ID of the associated private bracket."""
+    external_id_private = models.SlugField(max_length=128, blank=True)
+    """The bracket service's ID of the associated private bracket."""
 
-    challonge_id_public = models.SlugField(null=True, blank=True)
-    """The Challonge ID of the associated private bracket."""
+    external_id_public = models.SlugField(max_length=128, blank=True)
+    """The bracket service's ID of the associated public bracket."""
 
     objects = TournamentQuerySet.as_manager()
 
     def __str__(self):
         return self.name_short
 
-    def get_potential_participants(self):
-        """Returns the list of participants that would be entered in this tournament,
+    def get_eligible_teams(self):
+        """Returns the list of teams that would be entered in this tournament,
         if it were to start right now."""
-        # NOTE: this hasn't really been tested well.
-        # Test all parts of eligibility filtering
-        # (includes, excludes, resume)
-        # Test also that special teams (eg devs) don't enter
-        # Track in #549
         return (
-            Team.objects.with_active_submission()
+            apps.get_model("teams", "Team")
+            .objects.with_active_submission()
             .filter_eligible(self)
-            .all()
             .order_by("-profile__rating__value")
         )
 
     def initialize(self):
         """
         Seed the tournament with eligible teams in order of decreasing rating,
-        populate the Challonge brackets, and create TournamentRounds.
+        populate the brackets in the bracket service, and create TournamentRounds.
         """
 
-        tournament_name_public = self.name_long
-        tournament_name_private = tournament_name_public + " (private)"
-
-        # For security by obfuscation,
-        # and to allow easy regeneration of bracket
-        # In #549, use letters (even capitals!)
-        # and use more characters (altho staying under the 32-char lim).
-        key = random.randint(1000, 9999)
-        # Challonge does not allow hyphens in its IDs
-        # so substitute them just in case
-        tournament_id_public = f"{self.name_short}_{key}".replace("-", "_")
-        tournament_id_private = f"{tournament_id_public}_private"
-
-        # NOTE: We don't support double elim yet.
-        # Tracked in #548. (Also make sure to actually read the "style" field)
-        is_single_elim = True
-        participants = self.get_potential_participants()
-        # Parse into a format Challonge enjoys
-        # 1-idx seed
-        # Store team id in misc, for convenience (re-looking up is annoying)
-        # Store tournament submission in misc, for consistency and convenience
-        # Note that tournament submission should
-        # never change during a tournament anyways
-        # due to submission freeze. Bad things might happen if it does tho
-        participants = [
-            {"name": p.name, "seed": idx + 1, "misc": f"{p.id},{p.active_submission}"}
-            for (idx, p) in enumerate(participants)
-        ]
+        # For security by obfuscation, and to allow easy regeneration of bracket,
+        # create a random string to append to private bracket.
+        key = str(uuid.uuid4())
+        self.external_id_public = f"{self.name_short}"
+        self.external_id_private = f"private_{self.external_id_public}_{key}"
 
         # First bracket made should be private,
         # to hide results and enable fixing accidents
-        # In #549 it would be nice to have the function
-        # take in the actual TournamentStyle value,
-        # and do some true/false check there
-        challonge.create_tournament(
-            tournament_id_private, tournament_name_private, True, is_single_elim
-        )
-        challonge.bulk_add_participants(tournament_id_private, participants)
-        challonge.start_tournament(tournament_id_private)
+        bracket.create_tournament(self, is_private=True)
 
-        tournament = challonge.get_tournament(tournament_id_private)
-        # Derive round IDs
-        # Takes some wrangling with API response format
-        # We should move this block later
-        # (to keep all code that directly hits challonge
-        # in its own module) Track in #549
-        rounds = set()
-        for item in tournament["included"]:
-            # Cleaner w match-case block
-            # Track in #549
-            if item["type"] == "match":
-                round_idx = item["attributes"]["round"]
-                rounds.add(round_idx)
+        teams = self.get_eligible_teams()
+
+        bracket.bulk_add_teams(self, teams, is_private=True)
+        bracket.start_tournament(self, is_private=True)
+
+        round_indexes = bracket.get_round_indexes(self, is_private=True)
 
         # NOTE: rounds' order and indexes get weird in double elim.
         # Tracked in #548
         round_objects = [
             TournamentRound(
                 tournament=self,
-                challonge_id=round_idx,
-                name=f"{tournament_name_private} Round {round_idx}",
+                external_id=round_index,
+                name=f"Round {round_index}",
             )
-            for round_idx in rounds
-        ]
-        TournamentRound.objects.bulk_create(round_objects)
-
-        self.challonge_id_private = tournament_id_private
-        self.challonge_id_public = tournament_id_public
-        # Optimize this save w the `update_fields` kwarg
-        # Tracked in #549
-        self.save()
-
-    def report_for_tournament(self, match: Match):
-        """
-        If a match is associated with a tournament bracket,
-        update that tournament bracket.
-        """
-        # NOTE this data format is ultra-specific to Challonge
-        # Make more general and modular, tracked in #549
-        scores_of_participants = dict()
-
-        for p in match.participants.all():
-            scores_of_participants[p.challonge_id] = {"score": p.score}
-
-        # Challonge needs to explicitly be told who advances.
-        # There's probably a better way to derive this...
-        # NOTE this part should definitely go into challonge.py
-        # tracked in #549
-        high_score = -1
-        # Better to use
-        # `key, val in dict.items() `
-        # track in #549
-        for p in scores_of_participants:
-            score = scores_of_participants[p]["score"]
-            if score >= high_score:
-                high_score = score
-
-        for p in scores_of_participants:
-            scores_of_participants[p]["advancing"] = (
-                True if scores_of_participants[p]["score"] == high_score else False
-            )
-
-        # Refold back into a data format Challonge likes
-        scores_for_challonge = [
-            {
-                "participant_id": p,
-                "score_set": str(scores_of_participants[p]["score"]),
-                "advancing": scores_of_participants[p]["advancing"],
-            }
-            for p in scores_of_participants
+            for round_index in round_indexes
         ]
 
-        challonge.update_match(
-            self.challonge_id_private, match.challonge_id, scores_for_challonge
-        )
-
-    # Consider dropping these stubs, cuz they're bloat.
-    # We're not confident whether or not the stubs might actually be used,
-    # and someone can always remake them.
-    # track in #549.
-    def start_progress(self):
-        """Start or resume the tournament."""
-        raise NotImplementedError
-
-    def stop_progress(self):
-        """Pause the tournament."""
-        raise NotImplementedError
-
-    def enqueue_open_matches(self):
-        """Find matches that are waiting to be run, and run them."""
-        raise NotImplementedError
+        with transaction.atomic():
+            TournamentRound.objects.bulk_create(round_objects)
+            self.save(update_fields=["external_id_private", "external_id_public"])
 
 
 class ReleaseStatus(models.IntegerChoices):
@@ -455,17 +348,10 @@ class TournamentRound(models.Model):
     )
     """The tournament to which this round belongs."""
 
-    # NOTE: this is not really an "ID" in the unique sense.
-    # Instead it is more like an index.
-    # (It takes on values of ints close to 0,
-    # and two rounds from the same Challonge bracket
-    # can have the same value here of course.)
-    # You could rename this field, but that's a
-    # very widespread code change and migration,
-    # with low probability of success and
-    # high impact of failure.
-    challonge_id = models.SmallIntegerField(null=True, blank=True)
-    """The ID of this round as referenced by Challonge."""
+    external_id = models.SmallIntegerField(null=True, blank=True)
+    """
+    The bracket service's internal ID of this round.
+    """
 
     name = models.CharField(max_length=64)
     """The name of this round in human-readable form, such as "Round 1"."""
@@ -484,8 +370,8 @@ class TournamentRound(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["tournament", "challonge_id"],
-                name="round-unique-tournament-challonge",
+                fields=["tournament", "external_id"],
+                name="round-unique-tournament-bracket",
             )
         ]
 
@@ -499,102 +385,18 @@ class TournamentRound(models.Model):
         if self.in_progress:
             raise RuntimeError("The round's matches are already running in Saturn.")
 
-        num_maps = len(self.maps.all())
-        # Sure, matches with even number of maps won't run.
-        # But might as well fail fast.
+        num_maps = self.maps.count()
+        # Game runner allows for even number of maps.
+        # But we can't allow this for tournaments, since this would result in ties.
         if num_maps % 2 == 0:
             raise RuntimeError("The round does not have an odd number of maps.")
 
-        tournament = challonge.get_tournament(self.tournament.challonge_id_private)
-        # Derive matches of this round
-        # NOTE this probably makes more sense (efficiency and consistency)
-        # as a dict. Track in #549
-        matches = []
-        # Takes some wrangling with API response format
-        # We should move this block later
-        # (to keep all code that directly hits challonge
-        # in its own module) Track in #549
-        for item in tournament["included"]:
-            # Much cleaner w match-case and multiple keys.
-            # Track in #549
-            if item["type"] == "match":
-                round_idx = item["attributes"]["round"]
-                if round_idx == self.challonge_id:
-                    # Only enqueue the round if all matches are "open".
-                    # NOTE: it would be good to have a "force re-enqueue round",
-                    # which re-enqueues matches even if matches or round
-                    # already in progress.
-                    # This would change the following check --
-                    # matches could be open _or done_.
-                    # !!! This is also _really hard_ right now
-                    # cuz it involves match deletion which is really hard.
-                    # Track in #549
-                    if item["attributes"]["state"] != "open":
-                        # For later, have this raise a more specific exception.
-                        # Then have the caller handle this return
-                        # and translate it into an HTTP response.
-                        raise RuntimeError(
-                            "The bracket service's round does not only\
-                                have matches that are ready."
-                        )
-                    matches.append(item)
+        (
+            match_objects,
+            match_participant_objects,
+        ) = bracket.get_match_and_participant_objects_for_round(self, is_private=True)
 
-        # Map participant "objects" with IDs for easy lookup
-        participants = dict()
-        for item in tournament["included"]:
-            # Cleaner with match-case,
-            # and would also allow for just one iteration over tournament, not 2.
-            # Track in #549
-            if item["type"] == "participant":
-                id = item["id"]
-                participants[id] = item
-
-        match_objects = []
-        maps_for_match_objects = []
-        match_participant_objects = []
-
-        for m in matches:
-            match_object = Match(
-                episode=self.tournament.episode,
-                tournament_round=self,
-                alternate_order=True,
-                is_ranked=False,
-                challonge_id=m["id"],
-            )
-            match_objects.append(match_object)
-
-            # NOTE the following code is ridiculously inherent to challonge model.
-            # Should probably get participants in away that's cleaner
-            # tracked in #549
-            # NOTE could prob wrap this in a for loop for partipant 1 and 2
-            # tracked in #549
-            p1_id = m["relationships"]["player1"]["data"]["id"]
-            p1_misc_key = participants[p1_id]["attributes"]["misc"]
-            team_id_1, submission_id_1 = (int(_) for _ in p1_misc_key.split(","))
-            match_participant_1_object = MatchParticipant(
-                team_id=team_id_1,
-                submission_id=submission_id_1,
-                match=match_object,
-                # Note that player_index is 0-indexed.
-                # This may be tricky if you optimize code in #549.
-                player_index=0,
-                challonge_id=p1_id,
-            )
-            match_participant_objects.append(match_participant_1_object)
-
-            p2_id = m["relationships"]["player2"]["data"]["id"]
-            p2_misc_key = participants[p2_id]["attributes"]["misc"]
-            team_id_2, submission_id_2 = (int(_) for _ in p2_misc_key.split(","))
-            match_participant_2_object = MatchParticipant(
-                team_id=team_id_2,
-                submission_id=submission_id_2,
-                match=match_object,
-                # Note that player_index is 0-indexed.
-                # This may be tricky if you optimize code in #549.
-                player_index=1,
-                challonge_id=p2_id,
-            )
-            match_participant_objects.append(match_participant_2_object)
+        Match = apps.get_model("compete", "Match")
 
         with transaction.atomic():
             matches = Match.objects.bulk_create(match_objects)
@@ -606,9 +408,11 @@ class TournamentRound(models.Model):
                 for map in self.maps.all()
             ]
             Match.maps.through.objects.bulk_create(maps_for_match_objects)
-            MatchParticipant.objects.bulk_create(match_participant_objects)
+            apps.get_model("compete", "MatchParticipant").objects.bulk_create(
+                match_participant_objects
+            )
 
         Match.objects.filter(pk__in=[match.pk for match in matches]).enqueue()
 
         self.in_progress = True
-        self.save()
+        self.save(update_fields=["in_progress"])

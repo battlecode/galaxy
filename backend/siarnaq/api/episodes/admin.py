@@ -103,10 +103,10 @@ class EligibilityCriterionAdmin(admin.ModelAdmin):
 class TournamentRoundInline(admin.TabularInline):
     model = TournamentRound
     extra = 0
-    fields = ("name", "maps", "challonge_id", "release_status")
-    ordering = ("challonge_id",)
+    fields = ("name", "maps", "external_id", "release_status")
+    ordering = ("external_id",)
     raw_id_fields = ("maps",)
-    readonly_fields = ("challonge_id",)
+    readonly_fields = ("external_id",)
 
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related("maps")
@@ -114,7 +114,7 @@ class TournamentRoundInline(admin.TabularInline):
 
 @admin.action(description="Initialize a tournament")
 def initialize(modeladmin, request, queryset):
-    logger.info("initialize", message=f"Initializing tournaments in {queryset}")
+    logger.info("initialize", message="Initializing tournaments.")
     for tournament in queryset:
         tournament.initialize()
 
@@ -149,11 +149,11 @@ class TournamentAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Challonge configuration",
+            "Bracket service configuration",
             {
                 "fields": (
-                    "challonge_id_private",
-                    "challonge_id_public",
+                    "external_id_private",
+                    "external_id_public",
                 ),
             },
         ),
@@ -205,7 +205,7 @@ class MatchInline(admin.TabularInline):
 
 @admin.action(description="Create and enqueue matches of a tournament round")
 def enqueue(modeladmin, request, queryset):
-    logger.info("enqueue", message=f"Enqueueing tournament rounds {queryset}")
+    logger.info("enqueue", message="Enqueueing tournament rounds.")
     for round in queryset:
         try:
             round.enqueue()
@@ -219,7 +219,7 @@ class TournamentRoundAdmin(admin.ModelAdmin):
     fields = (
         "name",
         "tournament",
-        "challonge_id",
+        "external_id",
         "release_status",
         "maps",
         "in_progress",
@@ -228,8 +228,8 @@ class TournamentRoundAdmin(admin.ModelAdmin):
     list_display = ("name", "tournament", "release_status", "in_progress")
     list_filter = ("tournament", "release_status")
     list_select_related = ("tournament",)
-    ordering = ("-tournament__submission_freeze", "challonge_id")
-    readonly_fields = ("challonge_id", "in_progress")
+    ordering = ("-tournament__submission_freeze", "external_id")
+    readonly_fields = ("external_id", "in_progress")
 
     def get_queryset(self, request):
         return (

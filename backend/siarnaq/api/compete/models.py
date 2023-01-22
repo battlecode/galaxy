@@ -12,6 +12,7 @@ from django.urls import reverse
 from sortedm2m.fields import SortedManyToManyField
 
 import siarnaq.api.refs as refs
+from siarnaq import bracket
 from siarnaq.api.compete.managers import (
     MatchParticipantManager,
     MatchQuerySet,
@@ -215,13 +216,9 @@ class Match(SaturnInvocation):
     replay = models.UUIDField(default=uuid.uuid4)
     """The replay file of this match."""
 
-    # NOTE: I'm not sure if this field _has_ to be unique.
-    # Feel free to relax it later.
-    # (Not enforcing it now, and then enforcing it later
-    # when a duplicate may have snuck in, would be hard.)
-    challonge_id = models.IntegerField(blank=True, null=True, unique=True)
-    """If this match is referenced in a private Challonge bracket,
-    Challonge's internal ID of the match in the bracket."""
+    external_id_private = models.IntegerField(blank=True, null=True, unique=True)
+    """If this match is in a tournament,
+    the bracket service's internal ID of the match in that private bracket."""
 
     objects = MatchQuerySet.as_manager()
 
@@ -335,6 +332,14 @@ class Match(SaturnInvocation):
                 opponents=[o for o in participants if o is not participant]
             )
 
+    def report_to_bracket(self, *, is_private):
+        """
+        If a match is associated with a tournament bracket,
+        update that tournament bracket.
+        """
+
+        bracket.update_match(self, is_private=is_private)
+
 
 class MatchParticipant(models.Model):
     """
@@ -389,11 +394,10 @@ class MatchParticipant(models.Model):
     )
     """The team's previous participation, or null if there is none."""
 
-    challonge_id = models.CharField(null=True, blank=True, max_length=64)
+    external_id = models.CharField(null=True, blank=True, max_length=64)
     """
-    If the associated match is in Challonge,
-    Challonge's internal ID of this participant.
-    (This saves many API calls.)
+    If this match is in a tournament,
+    the bracket service's internal ID of this participant.
     """
 
     objects = MatchParticipantManager()

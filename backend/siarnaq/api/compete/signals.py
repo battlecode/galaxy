@@ -1,8 +1,13 @@
 from django.db import transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from siarnaq.api.compete.models import Match, MatchParticipant, ScrimmageRequest
+from siarnaq.api.compete.models import (
+    Match,
+    MatchParticipant,
+    SaturnStatus,
+    ScrimmageRequest,
+)
 
 
 @receiver(post_save, sender=MatchParticipant)
@@ -40,3 +45,24 @@ def auto_accept_scrimmage(instance, created, **kwargs):
         transaction.on_commit(
             lambda: ScrimmageRequest.objects.filter(pk=instance.pk).accept()
         )
+
+
+@receiver(pre_save, sender=Match)
+def report_to_bracket(instance: Match, update_fields, **kwargs):
+    """
+    If a match is associated with a tournament bracket,
+    update that tournament bracket.
+    """
+
+    # Note that if a match is already finalized, and Saturn tries to report it again,
+    # the match will not save, and this signal is never run.
+    # Still, we include other checks to eliminate redundant
+    # calls to our bracket service, especially to conserve API usage limits.
+
+    if update_fields is not None and "status" not in update_fields:
+        return
+
+    if instance.status != SaturnStatus.COMPLETED or instance.tournament_round is None:
+        return
+
+    instance.report_to_bracket(is_private=True)

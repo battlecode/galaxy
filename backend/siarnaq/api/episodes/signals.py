@@ -7,7 +7,6 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.urls import reverse
 
-from siarnaq.api.compete.models import Match, SaturnStatus
 from siarnaq.api.episodes.models import Episode
 
 logger = structlog.get_logger(__name__)
@@ -83,31 +82,3 @@ def update_autoscrim_schedule(instance, update_fields, **kwargs):
     else:
         log.info("autoscrim_modify", message="Updating autoscrim schedule.")
         client.update_job(request=dict(job=job))
-
-
-@receiver(pre_save, sender=Match)
-def report_for_tournament(instance, **kwargs):
-    """
-    If a match is associated with a tournament bracket,
-    update that tournament bracket.
-    """
-    if instance.status == SaturnStatus.COMPLETED and instance.challonge_id is not None:
-        # NOTE: the following is a _draft_ code block that ensures that
-        # matches aren't unnecessarily reported due to Saturn health-checks.
-        # I'm not actually sure if it's useful but it might be
-        # so keeping around to not reinvent the wheel.
-        # If this check is useful, then implement this and test fully.
-        # Debate this in #549.
-
-        # # Check that the match has gone from not completed to completed.
-        # # This protects against reporting to the bracket service _twice_
-        # if instance.id: # (to check if the instance has already been saved before)
-        #     original_status = Match.objects.get(pk=instance.pk).status
-        #     if original_status != SaturnStatus.COMPLETED:
-        #         # Do the thing here:
-        #         pass
-
-        # NOTE: not sure where the code that derives the match's tournament
-        # should live. Question of abstraction?
-        # Open to suggestions, track in #549
-        instance.tournament_round.tournament.report_for_tournament(instance)

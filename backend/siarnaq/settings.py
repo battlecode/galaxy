@@ -386,9 +386,6 @@ class Staging(Base):
             "MAILJET_API_KEY": secrets["mailjet-api-key"],
             "MAILJET_SECRET_KEY": secrets["mailjet-api-secret"],
         }
-        # Right now this is Nathan's personal key.
-        # This should become a dedicated alternate account for us
-        # Track in #549
         cls.CHALLONGE_API_KEY = secrets["challonge-api-key"]
         cls.DATABASES = {
             "default": {
