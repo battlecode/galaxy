@@ -65,4 +65,4 @@ def report_to_bracket(instance: Match, update_fields, **kwargs):
     if instance.status != SaturnStatus.COMPLETED or instance.tournament_round is None:
         return
 
-    instance.report_to_bracket(True)
+    instance.report_to_bracket(is_private=True)

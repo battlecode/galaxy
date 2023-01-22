@@ -332,7 +332,7 @@ class Match(SaturnInvocation):
                 opponents=[o for o in participants if o is not participant]
             )
 
-    def report_to_bracket(self, is_private):
+    def report_to_bracket(self, *, is_private):
         """
         If a match is associated with a tournament bracket,
         update that tournament bracket.
