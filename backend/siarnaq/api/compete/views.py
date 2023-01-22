@@ -21,6 +21,7 @@ from siarnaq.api.compete.models import (
 )
 from siarnaq.api.compete.permissions import HasTeamSubmission
 from siarnaq.api.compete.serializers import (
+    HistoricalRatingSerializer,
     MatchReportSerializer,
     MatchSerializer,
     ScrimmageRequestSerializer,
@@ -314,6 +315,58 @@ class MatchViewSet(
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="team_id",
+                type=int,
+                description="A team to filter for. Defaults to your own team.",
+            ),
+        ],
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="No ranked matches found."
+            ),
+            status.HTTP_200_OK: HistoricalRatingSerializer(),
+        },
+    )
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=(IsEpisodeMutable,),
+    )
+    def historical_rating(self, request, pk=None, *, episode_id):
+        """List the historical rating of a team."""
+        queryset = Match.objects.all().filter(tournament_round__isnull=True)
+
+        team_id = parse_int(self.request.query_params.get("team_id"))
+        if team_id is not None:
+            queryset = queryset.filter(participants__team=team_id)
+        elif request.user.pk is not None:
+            queryset = queryset.filter(participants__team__members=request.user.pk)
+        else:
+            return Response([])
+        has_invisible = self.get_queryset().filter(
+            participants__team__status=TeamStatus.INVISIBLE
+        )
+        queryset = queryset.exclude(pk__in=Subquery(has_invisible.values("pk")))
+        queryset = queryset.filter(is_ranked=True)
+
+        matches = queryset.all().order_by("created")
+
+        ordered = [
+            {
+                "timestamp": match.created,
+                "rating": match.participants.get(team=team_id).rating
+                if team_id is not None
+                else match.participants.get(team__members__pk=request.user.pk).rating,
+            }
+            for match in matches
+        ]
+
+        results = HistoricalRatingSerializer(ordered, many=True).data
+        return Response(results, status=status.HTTP_200_OK)
 
     @extend_schema(
         responses={

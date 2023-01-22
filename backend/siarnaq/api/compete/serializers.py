@@ -443,3 +443,8 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+
+class HistoricalRatingSerializer(serializers.Serializer):
+    rating = RatingField()
+    timestamp = serializers.DateTimeField()
