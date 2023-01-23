@@ -35,12 +35,9 @@ def auto_accept_scrimmage(instance, created, **kwargs):
     """Automatically accept a scrimmage request if the team prefers to do so."""
     if not created:
         return
-    # if (instance.is_ranked and instance.requested_to.profile.auto_accept_ranked) or (
-    #     not instance.is_ranked and instance.requested_to.profile.auto_accept_unranked
-    # ):
-    # NOTE: we disable auto-accept for ranked scrimmages for now.
-    # Is a hotfix patch, can figure out better solution later.
-    if not instance.is_ranked and instance.requested_to.profile.auto_accept_unranked:
+    if (instance.is_ranked and instance.requested_to.profile.auto_accept_ranked) or (
+        not instance.is_ranked and instance.requested_to.profile.auto_accept_unranked
+    ):
         # Must wait for transaction to complete, so that maps are inserted.
         transaction.on_commit(
             lambda: ScrimmageRequest.objects.filter(pk=instance.pk).accept()

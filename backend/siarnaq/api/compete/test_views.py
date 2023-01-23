@@ -1,7 +1,6 @@
 import io
 import random
 from datetime import timedelta
-from unittest import skip
 from unittest.mock import mock_open, patch
 
 from django.test import TestCase, override_settings
@@ -1163,11 +1162,6 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
-    @skip("Code behavior has changed temporarily")
-    # Skipped for now, as ranked scrimmage requests are never auto-accepted
-    # regardless of user setting.
-    # Is a quick fix and subject to change on further discussion.
-    # See #565.
     def test_create_autoaccept(self, enqueue):
         self.client.force_authenticate(self.users[0])
         self.teams[1].profile.auto_accept_ranked = True
