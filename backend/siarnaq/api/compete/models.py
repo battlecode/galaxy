@@ -218,7 +218,11 @@ class Match(SaturnInvocation):
 
     external_id_private = models.IntegerField(blank=True, null=True, unique=True)
     """If this match is in a tournament,
-    the bracket service's internal ID of the match in that private bracket."""
+    the bracket service's internal ID of the match in the private bracket."""
+
+    external_id_public = models.IntegerField(blank=True, null=True, unique=True)
+    """If this match is in a tournament,
+    the bracket service's internal ID of the match in the public bracket."""
 
     objects = MatchQuerySet.as_manager()
 
