@@ -177,14 +177,18 @@ def _pair_public_private_challonge_ids(tournament: Tournament):
     matches_private.sort(key=lambda i: i["id"])
     matches_public.sort(key=lambda i: i["id"])
     matches_private_to_public = dict()
-    for c1, c2 in zip(matches_private, matches_public):
-        matches_private_to_public[c1] = c2
+    for match_private, match_public in zip(matches_private, matches_public):
+        id_private = match_private["id"]
+        id_public = match_public["id"]
+        matches_private_to_public[id_private] = id_public
 
     teams_private.sort(key=lambda i: i["id"])
     teams_public.sort(key=lambda i: i["id"])
     teams_private_to_public = dict()
-    for c1, c2 in zip(teams_private, teams_public):
-        teams_private_to_public[c1] = c2
+    for team_private, team_public in zip(teams_private, teams_public):
+        id_private = team_private["id"]
+        id_public = team_public["id"]
+        teams_private_to_public[id_private] = id_public
 
     return matches_private_to_public, teams_private_to_public
 
