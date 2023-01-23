@@ -1,7 +1,6 @@
 import io
 import random
 from datetime import timedelta
-from unittest import skip
 from unittest.mock import mock_open, patch
 
 from django.test import TestCase, override_settings
@@ -1163,11 +1162,6 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     @patch(
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
-    @skip("Code behavior has changed temporarily")
-    # Skipped for now, as ranked scrimmage requests are never auto-accepted
-    # regardless of user setting.
-    # Is a quick fix and subject to change on further discussion.
-    # See #565.
     def test_create_autoaccept(self, enqueue):
         self.client.force_authenticate(self.users[0])
         self.teams[1].profile.auto_accept_ranked = True
@@ -1177,8 +1171,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
-                "map_names": ["map0", "map1", "map2"],
+                "player_order": PlayerOrder.SHUFFLED,
+                "map_names": [],
             },
             format="json",
         )
@@ -1196,8 +1190,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
-                "map_names": ["map0", "map1", "map2"],
+                "player_order": PlayerOrder.SHUFFLED,
+                "map_names": [],
             },
             format="json",
         )
@@ -1208,7 +1202,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         self.assertEqual(r.is_ranked, True)
         self.assertEqual(r.requested_by, self.teams[0])
         self.assertEqual(r.requested_to, self.teams[1])
-        self.assertEqual(r.player_order, PlayerOrder.REQUESTER_FIRST)
+        self.assertEqual(r.player_order, PlayerOrder.SHUFFLED)
         self.assertEqual(r.maps.count(), 3)
         self.assertFalse(Match.objects.exists())
 
@@ -1221,8 +1215,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
-                "map_names": ["map0", "map1", "map2"],
+                "player_order": PlayerOrder.SHUFFLED,
+                "map_names": [],
             },
             format="json",
         )
@@ -1238,8 +1232,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
-                "map_names": ["map0", "map1", "map2"],
+                "player_order": PlayerOrder.SHUFFLED,
+                "map_names": [],
             },
             format="json",
         )
@@ -1274,8 +1268,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
-                "map_names": ["map0", "map1", "map2"],
+                "player_order": PlayerOrder.SHUFFLED,
+                "map_names": [],
             },
             format="json",
         )
@@ -1289,8 +1283,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[0].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
-                "map_names": ["map0", "map1", "map2"],
+                "player_order": PlayerOrder.SHUFFLED,
+                "map_names": [],
             },
             format="json",
         )
@@ -1306,8 +1300,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
-                "map_names": ["map0", "map1", "map2"],
+                "player_order": PlayerOrder.SHUFFLED,
+                "map_names": [],
             },
             format="json",
         )
@@ -1325,8 +1319,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[1].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
-                "map_names": ["map0", "map1", "map2"],
+                "player_order": PlayerOrder.SHUFFLED,
+                "map_names": [],
             },
             format="json",
         )
@@ -1340,8 +1334,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             {
                 "is_ranked": True,
                 "requested_to": self.teams[2].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
-                "map_names": ["map0", "map1", "map2"],
+                "player_order": PlayerOrder.SHUFFLED,
+                "map_names": [],
             },
             format="json",
         )
@@ -1353,9 +1347,9 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         response = self.client.post(
             reverse("request-list", kwargs={"episode_id": "e1"}),
             {
-                "is_ranked": True,
+                "is_ranked": False,
                 "requested_to": self.teams[1].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
+                "player_order": PlayerOrder.SHUFFLED,
                 "map_names": ["map0", "map1", "map3"],
             },
             format="json",
@@ -1368,9 +1362,9 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         response = self.client.post(
             reverse("request-list", kwargs={"episode_id": "e1"}),
             {
-                "is_ranked": True,
+                "is_ranked": False,
                 "requested_to": self.teams[1].pk,
-                "player_order": PlayerOrder.REQUESTER_FIRST,
+                "player_order": PlayerOrder.SHUFFLED,
                 "map_names": ["map0", "map1", "map4"],
             },
             format="json",

@@ -22,7 +22,7 @@ class ScrimmageRequestForm extends Component {
     super(props);
 
     this.state = {
-      is_ranked: true,
+      is_ranked: false,
       player_order: PLAYER_ORDERS[0].value,
       maps: [],
       available_maps: [],
@@ -40,10 +40,17 @@ class ScrimmageRequestForm extends Component {
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevProps.team !== this.props.team) {
-      let is_ranked =
-        this.props.team === null ||
-        ALLOWS_RANKED.includes(this.props.team.status);
-      this.setState({ is_ranked });
+      this.setState({ is_ranked: false });
+    }
+    if (
+      this.state.is_ranked &&
+      (this.state.maps.length != 0 ||
+        this.state.player_order != PLAYER_ORDERS[0].value)
+    ) {
+      this.setState({
+        maps: [],
+        player_order: PLAYER_ORDERS[0].value,
+      });
     }
   }
 
@@ -94,11 +101,7 @@ class ScrimmageRequestForm extends Component {
       this.state.player_order,
       this.state.maps,
       this.props.episode,
-      (success) => {
-        /* Being lazy about error handling since in theory frontend
-                   form validation should eliminate chance of user errors,
-                   and the backend doesn't yet give useful messages anyway.
-                */
+      (success, errors) => {
         if (success) {
           this.setState({ update_status: "success" }, () => {
             setTimeout(() => {
@@ -108,11 +111,12 @@ class ScrimmageRequestForm extends Component {
             }, 500);
           });
         } else {
+          const alert_message =
+            errors.responseJSON["detail"] ??
+            "Your scrimmage request was invalid.";
+          console.log(errors);
           this.setState({ update_status: "failure" });
-          this.setState({
-            alert_message:
-              "Scrimmage request failed! Have you and the opponent both made successful code submissions yet?",
-          });
+          this.setState({ alert_message });
           setTimeout(() => {
             this.setState({ update_status: "waiting" });
           }, 2000);
@@ -173,6 +177,7 @@ class ScrimmageRequestForm extends Component {
                     className="form-control"
                     id="player_order"
                     onChange={this.changeHandler}
+                    disabled={this.state.is_ranked}
                     value={this.state.player_order}
                   >
                     {PLAYER_ORDERS.map((player_order) => {
@@ -204,6 +209,7 @@ class ScrimmageRequestForm extends Component {
                   <Select
                     onChange={this.changeSelectHandler}
                     isMulti={true}
+                    isDisabled={this.state.is_ranked}
                     options={this.state.available_maps.map((map) => ({
                       value: map.name,
                       label: map.name,

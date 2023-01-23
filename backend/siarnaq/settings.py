@@ -230,9 +230,10 @@ class Base(Configuration):
 
     TEAMS_MAX_TEAM_SIZE = 4
 
-    # Match size limits
+    # Match limits
 
     MAX_MAPS_PER_SCRIMMAGE = 10
+    MAX_SCRIMMAGES_AGAINST_TEAM = 3
 
     # Avatar settings
 
