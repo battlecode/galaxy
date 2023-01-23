@@ -2,7 +2,7 @@ import uuid
 
 import structlog
 from django.db import transaction
-from django.db.models import F, Max, Q
+from django.db.models import F, OuterRef, Subquery
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters, mixins, status, viewsets
@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from siarnaq.api.compete.models import Match
+from siarnaq.api.compete.models import Match, MatchParticipant
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
 from siarnaq.api.teams.filters import TeamActiveSubmissionFilter, TeamOrderingFilter
@@ -187,11 +187,21 @@ class TeamViewSet(
         team = request.data["id"]
         matches = Match.objects.filter(participants__team=team, status="OK!")
 
-        matches = matches.annotate(
-            score_1=Max("participants__score", filter=Q(participants__team=team)),
-            score_2=Max("participants__score", exclude=Q(participants__team=team)),
+        matches = Match.objects.annotate(
+            my_score=Subquery(
+                MatchParticipant.objects.filter(match=OuterRef("pk"))
+                .filter(team=team)
+                .values("score")
+            ),
+            opponent_score=Subquery(
+                MatchParticipant.objects.filter(match=OuterRef("pk"))
+                .exclude(team=team)
+                .values("score")[:1]
+            ),
+        ).filter(
+            my_score__isnull=False,
         )
-        win_count = matches.filter(score_1__gt=F("score_2")).count()
-        loss_count = matches.filter(score_1__lt=F("score_2")).count()
+        win_count = matches.filter(my_score__gt=F("opponent_score")).count()
+        loss_count = matches.filter(my_score__lt=F("opponent_score")).count()
 
         return Response({"wins": win_count, "losses": loss_count})
