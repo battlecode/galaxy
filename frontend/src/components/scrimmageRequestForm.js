@@ -22,7 +22,7 @@ class ScrimmageRequestForm extends Component {
     super(props);
 
     this.state = {
-      is_ranked: true,
+      is_ranked: false,
       player_order: PLAYER_ORDERS[0].value,
       maps: [],
       available_maps: [],
@@ -44,6 +44,16 @@ class ScrimmageRequestForm extends Component {
         this.props.team === null ||
         ALLOWS_RANKED.includes(this.props.team.status);
       this.setState({ is_ranked });
+    }
+    if (
+      this.state.is_ranked &&
+      (this.state.maps.length != 0 ||
+        this.state.player_order != PLAYER_ORDERS[0].value)
+    ) {
+      this.setState({
+        maps: [],
+        player_order: PLAYER_ORDERS[0].value,
+      });
     }
   }
 
@@ -173,6 +183,7 @@ class ScrimmageRequestForm extends Component {
                     className="form-control"
                     id="player_order"
                     onChange={this.changeHandler}
+                    disabled={this.state.is_ranked}
                     value={this.state.player_order}
                   >
                     {PLAYER_ORDERS.map((player_order) => {
@@ -204,6 +215,7 @@ class ScrimmageRequestForm extends Component {
                   <Select
                     onChange={this.changeSelectHandler}
                     isMulti={true}
+                    isDisabled={this.state.is_ranked}
                     options={this.state.available_maps.map((map) => ({
                       value: map.name,
                       label: map.name,
