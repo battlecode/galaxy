@@ -141,36 +141,52 @@ def get_round_indexes(tournament: Tournament, *, is_private: bool):
     return round_indexes
 
 
-def _pair_public_private_challonge_ids(tournament_data_private, tournament_data_public):
-    # Collect the challonge JSONs of private matches
+def _pair_public_private_challonge_ids(tournament: Tournament):
+    """
+    Returns two dictionaries. The former maps private to public IDs of rounds;
+    the latter maps private to public IDs of participants in the bracket.
+    """
+    tournament_data_private = get_tournament_data(tournament, is_private=False)
+    tournament_data_public = get_tournament_data(tournament, is_private=False)
+
+    # Collect the challonge JSONs of private matches and participants
     matches_private = []
+    teams_private = []
     for item in tournament_data_private["included"]:
         match item:
-            case {
-                "type": "match",
-            }:
+            case {"type": "match"}:
                 matches_private.append(item)
+            case {"type": "participant"}:
+                teams_private.append(item)
 
     # Same for public
     matches_public = []
+    teams_public = []
     for item in tournament_data_public["included"]:
         match item:
-            case {
-                "type": "match",
-            }:
+            case {"type": "match"}:
                 matches_public.append(item)
+            case {"type": "participant"}:
+                teams_public.append(item)
 
     # Compute a correspondence between the two.
     # Currently, we use the fact that IDs are in the same order for all tournaments.
-    # You could also use other fields, such as Challonge's
-    # `identifier` or `suggested_play_order` which are equal across brackets.
-    matches_private = matches_private.sort(key=lambda i: i["id"])
-    matches_public = matches_public.sort(key=lambda i: i["id"])
-
-    priv_to_pub = dict()
+    # You could also use other fields, such as Challonge's `identifier` or
+    # `suggested_play_order` for matches; these are equal across brackets.
+    # Similarly you could use `seed` for teams.
+    matches_private.sort(key=lambda i: i["id"])
+    matches_public.sort(key=lambda i: i["id"])
+    matches_private_to_public = dict()
     for c1, c2 in zip(matches_private, matches_public):
-        priv_to_pub[c1] = c2
-    return priv_to_pub
+        matches_private_to_public[c1] = c2
+
+    teams_private.sort(key=lambda i: i["id"])
+    teams_public.sort(key=lambda i: i["id"])
+    teams_private_to_public = dict()
+    for c1, c2 in zip(teams_private, teams_public):
+        teams_private_to_public[c1] = c2
+
+    return matches_private_to_public, teams_private_to_public
 
 
 def get_match_and_participant_objects_for_round(round: TournamentRound):
@@ -206,10 +222,12 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
             case {"type": "participant", "id": id}:
                 challonge_participants[id] = item
 
-    tournament_data_public = get_tournament_data(round.tournament, is_private=False)
-    challonge_ids_private_to_public = _pair_public_private_challonge_ids(
-        tournament_data_private, tournament_data_public
-    )
+    # We also want to associate our match objects
+    # with the _public_ version of their external ID.
+    (
+        challonge_match_ids_private_to_public,
+        challonge_team_ids_private_to_public,
+    ) = _pair_public_private_challonge_ids(round.tournament)
 
     match_objects = []
     match_participant_objects = []
@@ -222,7 +240,9 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
             alternate_order=True,
             is_ranked=False,
             external_id_private=challonge_id_private,
-            external_id_public=challonge_ids_private_to_public[challonge_id_private],
+            external_id_public=challonge_match_ids_private_to_public[
+                challonge_id_private
+            ],
         )
         match_objects.append(match_object)
 
@@ -235,6 +255,9 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
             challonge_participant_id = challonge_match["relationships"][
                 challonge_player_index
             ]["data"]["id"]
+            challonge_participant_id_public = challonge_team_ids_private_to_public[
+                challonge_participant_id
+            ]
             misc_key = json.loads(
                 challonge_participants[challonge_participant_id]["attributes"]["misc"]
             )
@@ -246,7 +269,8 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
                 submission_id=submission_id,
                 match=match_object,
                 player_index=siarnaq_player_index,
-                external_id=challonge_participant_id,
+                external_id_private=challonge_participant_id,
+                external_id_public=challonge_participant_id_public,
             )
             match_participant_objects.append(match_participant_object)
 
