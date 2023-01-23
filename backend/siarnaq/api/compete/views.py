@@ -4,17 +4,20 @@ import google.cloud.storage as storage
 import structlog
 from django.conf import settings
 from django.db import NotSupportedError, transaction
-from django.db.models import Q, Subquery
+from django.db.models import Exists, OuterRef, Q, Subquery
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from siarnaq.api.compete.filters import IsSubmissionCreatorFilterBackend
 from siarnaq.api.compete.models import (
     Match,
+    MatchParticipant,
+    SaturnStatus,
     ScrimmageRequest,
     ScrimmageRequestStatus,
     Submission,
@@ -44,6 +47,12 @@ def parse_int(v: str) -> Optional[int]:
         return int(v)
     except (ValueError, TypeError):
         return None
+
+
+class TooManyScrimmages(APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = "You have too many running scrimmages or requests with this team."
+    default_code = "too_many_scrimmages"
 
 
 class EpisodeTeamUserContextMixin:
@@ -482,6 +491,49 @@ class ScrimmageRequestViewSet(
     def create(self, request, *, episode_id):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        if serializer.validated_data["is_ranked"]:
+            active_statuses = {
+                SaturnStatus.CREATED,
+                SaturnStatus.QUEUED,
+                SaturnStatus.RUNNING,
+                SaturnStatus.RETRY,
+            }
+            existing_requests = ScrimmageRequest.objects.filter(
+                requested_by=serializer.validated_data["requested_by_id"],
+                requested_to=serializer.validated_data["requested_to"],
+                is_ranked=True,
+                status=ScrimmageRequestStatus.PENDING,
+            ).count()
+            existing_matches = (
+                Match.objects.annotate(
+                    has_requester=Exists(
+                        MatchParticipant.objects.filter(
+                            match=OuterRef("pk"),
+                            team=serializer.validated_data["requested_by_id"],
+                        )
+                    ),
+                    has_requestee=Exists(
+                        MatchParticipant.objects.filter(
+                            match=OuterRef("pk"),
+                            team=serializer.validated_data["requested_to"],
+                        )
+                    ),
+                )
+                .filter(
+                    has_requester=True,
+                    has_requestee=True,
+                    status__in=active_statuses,
+                    is_ranked=True,
+                )
+                .count()
+            )
+            if (
+                existing_requests + existing_matches
+                >= settings.MAX_SCRIMMAGES_AGAINST_TEAM
+            ):
+                raise TooManyScrimmages
+
         serializer.save()
         # Generate the Location header, as supplied by CreateModelMixin
         headers = self.get_success_headers(serializer.data)

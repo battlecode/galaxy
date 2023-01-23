@@ -1,3 +1,5 @@
+import random
+
 import structlog
 from django.conf import settings
 from django.db import transaction
@@ -11,6 +13,7 @@ from rest_framework.exceptions import APIException
 from siarnaq.api.compete.models import (
     Match,
     MatchParticipant,
+    PlayerOrder,
     SaturnStatus,
     ScrimmageRequest,
     Submission,
@@ -352,7 +355,7 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
     map_names = serializers.ListField(
         child=serializers.CharField(),
         write_only=True,
-        min_length=1,
+        allow_empty=True,
         max_length=settings.MAX_MAPS_PER_SCRIMMAGE,
     )
 
@@ -390,10 +393,19 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
         return [m.name for m in obj.maps.all()]
 
     def validate(self, data):
-        if data["is_ranked"] and self.context["team_is_staff"]:
-            raise serializers.ValidationError("Staff can only have unranked matches")
-        if data["is_ranked"] and data["requested_to"].is_staff():
-            raise serializers.ValidationError("Matches against staff must be unranked")
+        if data["is_ranked"]:
+            if self.context["team_is_staff"]:
+                raise serializers.ValidationError(
+                    "Staff can only have unranked matches"
+                )
+            if data["requested_to"].is_staff():
+                raise serializers.ValidationError(
+                    "Matches against staff must be unranked"
+                )
+            if data["player_order"] != PlayerOrder.SHUFFLED:
+                raise serializers.ValidationError(
+                    "Ranked matches must use shuffled order"
+                )
         return data
 
     def validate_requested_to(self, value):
@@ -417,11 +429,18 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
             Map.objects.filter(
                 episode=self.context["episode_id"],
                 is_public=True,
-                name__in=data["map_names"],
             )
             .values_list("name", "pk")
             .all()
         )
+        if ret["is_ranked"] and data["map_names"]:
+            raise serializers.ValidationError({"map_names": "must be empty for ranked"})
+        elif ret["is_ranked"]:
+            # Ranked matches default to best-of-3.
+            # One could make this configurable if they wish, along with autoscrims.
+            data["map_names"] = random.sample(maps.keys(), 3)
+        if not data["map_names"]:
+            raise serializers.ValidationError({"map_names": "must not be empty"})
         try:
             map_ids = [maps[name] for name in data["map_names"]]
         except KeyError:
