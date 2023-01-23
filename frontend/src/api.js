@@ -477,10 +477,10 @@ class Api {
       dataType: "json",
     })
       .done((data, status) => {
-        callback(true);
+        callback(true, null);
       })
       .fail((xhr, status, error) => {
-        callback(false);
+        callback(false, xhr);
       });
   }
 

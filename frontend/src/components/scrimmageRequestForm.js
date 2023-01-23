@@ -104,11 +104,7 @@ class ScrimmageRequestForm extends Component {
       this.state.player_order,
       this.state.maps,
       this.props.episode,
-      (success) => {
-        /* Being lazy about error handling since in theory frontend
-                   form validation should eliminate chance of user errors,
-                   and the backend doesn't yet give useful messages anyway.
-                */
+      (success, errors) => {
         if (success) {
           this.setState({ update_status: "success" }, () => {
             setTimeout(() => {
@@ -118,11 +114,12 @@ class ScrimmageRequestForm extends Component {
             }, 500);
           });
         } else {
+          const alert_message =
+            errors.responseJSON["detail"] ??
+            "Your scrimmage request was invalid.";
+          console.log(errors);
           this.setState({ update_status: "failure" });
-          this.setState({
-            alert_message:
-              "Scrimmage request failed! Have you and the opponent both made successful code submissions yet?",
-          });
+          this.setState({ alert_message });
           setTimeout(() => {
             this.setState({ update_status: "waiting" });
           }, 2000);
