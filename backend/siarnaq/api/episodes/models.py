@@ -299,8 +299,6 @@ class Tournament(models.Model):
 
         teams = self.get_eligible_teams()
         for is_private in [False, True]:
-            # First bracket made should be private,
-            # to hide results and enable fixing accidents
             bracket.create_tournament(self, is_private=is_private)
             bracket.bulk_add_teams(self, teams, is_private=is_private)
             bracket.start_tournament(self, is_private=is_private)

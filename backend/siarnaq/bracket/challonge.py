@@ -150,16 +150,12 @@ def _pair_public_private_challonge_ids(tournament: Tournament, type: str):
     tournament_data_public = get_tournament_data(tournament, is_private=False)
 
     # Collect the challonge JSONs of private items
-    items_private = []
-    for item in tournament_data_private["included"]:
-        if item["type"] == type:
-            items_private.append(item)
-
-    # Same for public
-    items_public = []
-    for item in tournament_data_public["included"]:
-        if item["type"] == type:
-            items_public.append(item)
+    items_private = [
+        item for item in tournament_data_private["included"] if item["type"] == type
+    ]
+    items_public = [
+        item for item in tournament_data_public["included"] if item["type"] == type
+    ]
 
     # Compute a correspondence between the two.
     # Currently, we use the fact that IDs are in the same order for all tournaments.
