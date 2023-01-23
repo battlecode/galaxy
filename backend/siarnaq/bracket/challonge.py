@@ -296,7 +296,9 @@ def update_match(match: Match, *, is_private: bool):
     high_score = max(participant.score for participant in participants)
     participants_for_challonge = [
         {
-            "participant_id": participant.external_id,
+            "participant_id": participant.external_id_private
+            if is_private
+            else participant.external_id_public,
             "score_set": str(participant.score),
             "advancing": True if participant.score == high_score else False,
         }
@@ -311,8 +313,6 @@ def update_match(match: Match, *, is_private: bool):
             },
         }
     }
-
-    print(payload)
 
     r = requests.put(url, headers=_headers, json=payload)
     r.raise_for_status()
