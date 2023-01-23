@@ -302,10 +302,17 @@ class Tournament(models.Model):
         bracket.create_tournament(self, is_private=True)
 
         teams = self.get_eligible_teams()
-
         bracket.bulk_add_teams(self, teams, is_private=True)
+
         bracket.start_tournament(self, is_private=True)
 
+        # Also create a bracket for public display
+        # Make sure teams stay the same for consistency!
+        bracket.create_tournament(self, is_private=False)
+        bracket.bulk_add_teams(self, teams, is_private=False)
+        bracket.start_tournament(self, is_private=False)
+
+        # Create TournamentRound objects
         round_indexes = bracket.get_round_indexes(self, is_private=True)
 
         # NOTE: rounds' order and indexes get weird in double elim.
