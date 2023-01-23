@@ -398,10 +398,16 @@ class MatchParticipant(models.Model):
     )
     """The team's previous participation, or null if there is none."""
 
-    external_id = models.CharField(null=True, blank=True, max_length=64)
+    external_id_private = models.CharField(null=True, blank=True, max_length=64)
     """
     If this match is in a tournament,
-    the bracket service's internal ID of this participant.
+    the bracket service's internal ID of this participant in the private bracket.
+    """
+
+    external_id_public = models.CharField(null=True, blank=True, max_length=64)
+    """
+    If this match is in a tournament,
+    the bracket service's internal ID of this participant in the public bracket.
     """
 
     objects = MatchParticipantManager()
