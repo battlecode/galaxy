@@ -256,14 +256,16 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
             ["player1", "player2"]
         ):
             # This looks ugly but it's how to parse through the Challonge-related data.
-            challonge_participant_id = challonge_match["relationships"][
+            challonge_participant_id_private = challonge_match["relationships"][
                 challonge_player_index
             ]["data"]["id"]
             challonge_participant_id_public = challonge_team_ids_private_to_public[
-                challonge_participant_id
+                challonge_participant_id_private
             ]
             misc_key = json.loads(
-                challonge_participants[challonge_participant_id]["attributes"]["misc"]
+                challonge_participants[challonge_participant_id_private]["attributes"][
+                    "misc"
+                ]
             )
             team_id = misc_key["team_id"]
             submission_id = misc_key["submission_id"]
@@ -273,7 +275,7 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
                 submission_id=submission_id,
                 match=match_object,
                 player_index=siarnaq_player_index,
-                external_id_private=challonge_participant_id,
+                external_id_private=challonge_participant_id_private,
                 external_id_public=challonge_participant_id_public,
             )
             match_participant_objects.append(match_participant_object)

@@ -297,20 +297,13 @@ class Tournament(models.Model):
         self.external_id_public = f"{self.name_short}"
         self.external_id_private = f"private_{self.external_id_public}_{key}"
 
-        # First bracket made should be private,
-        # to hide results and enable fixing accidents
-        bracket.create_tournament(self, is_private=True)
-
         teams = self.get_eligible_teams()
-        bracket.bulk_add_teams(self, teams, is_private=True)
-
-        bracket.start_tournament(self, is_private=True)
-
-        # Also create a bracket for public display
-        # Make sure teams stay the same for consistency!
-        bracket.create_tournament(self, is_private=False)
-        bracket.bulk_add_teams(self, teams, is_private=False)
-        bracket.start_tournament(self, is_private=False)
+        for is_private in [False, True]:
+            # First bracket made should be private,
+            # to hide results and enable fixing accidents
+            bracket.create_tournament(self, is_private=is_private)
+            bracket.bulk_add_teams(self, teams, is_private=is_private)
+            bracket.start_tournament(self, is_private=is_private)
 
         # Create TournamentRound objects
         round_indexes = bracket.get_round_indexes(self, is_private=True)
