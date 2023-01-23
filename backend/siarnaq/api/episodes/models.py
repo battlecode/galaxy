@@ -298,7 +298,7 @@ class Tournament(models.Model):
         self.external_id_private = f"private_{self.external_id_public}_{key}"
 
         teams = self.get_eligible_teams()
-        for is_private in [False, True]:
+        for is_private in [True, False]:
             bracket.create_tournament(self, is_private=is_private)
             bracket.bulk_add_teams(self, teams, is_private=is_private)
             bracket.start_tournament(self, is_private=is_private)
@@ -392,7 +392,7 @@ class TournamentRound(models.Model):
         (
             match_objects,
             match_participant_objects,
-        ) = bracket.get_match_and_participant_objects_for_round(self, is_private=True)
+        ) = bracket.get_match_and_participant_objects_for_round(self)
 
         Match = apps.get_model("compete", "Match")
 

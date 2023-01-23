@@ -141,12 +141,12 @@ def get_round_indexes(tournament: Tournament, *, is_private: bool):
     return round_indexes
 
 
-def _pair_public_private_challonge_ids(tournament: Tournament, type: str):
+def _pair_private_public_challonge_ids(tournament: Tournament, type: str):
     """
     Returns a dictionary, mapping private IDs to public IDs,
     for all items of a given type in Challonge.
     """
-    tournament_data_private = get_tournament_data(tournament, is_private=False)
+    tournament_data_private = get_tournament_data(tournament, is_private=True)
     tournament_data_public = get_tournament_data(tournament, is_private=False)
 
     # Collect the challonge JSONs of private items
@@ -207,10 +207,10 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
 
     # We also want to associate our objects
     # with the _public_ version of their external ID.
-    challonge_match_ids_private_to_public = _pair_public_private_challonge_ids(
+    challonge_match_ids_private_to_public = _pair_private_public_challonge_ids(
         round.tournament, "match"
     )
-    challonge_team_ids_private_to_public = _pair_public_private_challonge_ids(
+    challonge_team_ids_private_to_public = _pair_private_public_challonge_ids(
         round.tournament, "participant"
     )
 
