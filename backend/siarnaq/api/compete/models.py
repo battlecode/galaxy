@@ -370,7 +370,7 @@ class MatchParticipant(models.Model):
 
     match = models.ForeignKey(
         Match,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="participants",
     )
     """The match to which this participant belongs."""
@@ -391,7 +391,7 @@ class MatchParticipant(models.Model):
 
     previous_participation = models.OneToOneField(
         "self",
-        on_delete=models.PROTECT,
+        on_delete=models.RESTRICT,
         null=True,
         blank=True,
         related_name="next_participation",
