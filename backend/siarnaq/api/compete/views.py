@@ -420,6 +420,19 @@ class MatchViewSet(
         instance.try_rating_update()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(IsAdminUser,),
+        serializer_class=None,
+        throttle_classes=(),
+    )
+    def publish_public_bracket(self, request, pk=None, *, episode_id):
+        """Publish the result of a tournament match to the public bracket."""
+        instance = self.get_object()
+        instance.report_to_bracket(is_private=False)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
 
 class ScrimmageRequestViewSet(
     EpisodeTeamUserContextMixin,

@@ -239,6 +239,23 @@ resource "google_cloud_tasks_queue_iam_member" "rating" {
   member   = "serviceAccount:${google_service_account.this.email}"
 }
 
+resource "google_cloud_tasks_queue" "bracket" {
+  name     = "${var.name}-bracket"
+  location = var.gcp_region
+
+  rate_limits {
+    max_concurrent_dispatches = 3
+    max_dispatches_per_second = 10
+  }
+}
+
+resource "google_cloud_tasks_queue_iam_member" "bracket" {
+  location = var.gcp_region
+  name     = google_cloud_tasks_queue.bracket.name
+  role     = "roles/cloudtasks.enqueuer"
+  member   = "serviceAccount:${google_service_account.this.email}"
+}
+
 resource "google_cloudbuild_trigger" "this" {
   name            = var.name
 

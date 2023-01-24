@@ -203,9 +203,9 @@ class MatchInline(admin.TabularInline):
         return format_html('<a href="{}">Watch</a>', link)
 
 
-@admin.action(description="Create and enqueue matches of a tournament round")
+@admin.action(description="Create and enqueue matches")
 def enqueue(modeladmin, request, queryset):
-    logger.info("enqueue", message="Enqueueing tournament rounds.")
+    logger.info("round_enqueue", message="Enqueueing tournament rounds.")
     for round in queryset:
         try:
             round.enqueue()
@@ -213,9 +213,16 @@ def enqueue(modeladmin, request, queryset):
             messages.error(request, str(e))
 
 
+@admin.action(description="Release results to public bracket service")
+def release_to_public_bracket(modeladmin, request, queryset):
+    logger.info("round_release", message="Releasing to public bracket.")
+    for round in queryset:
+        round.request_publish_to_bracket(is_public=False)
+
+
 @admin.register(TournamentRound)
 class TournamentRoundAdmin(admin.ModelAdmin):
-    actions = [enqueue]
+    actions = [enqueue, release_to_public_bracket]
     fields = (
         "name",
         "tournament",

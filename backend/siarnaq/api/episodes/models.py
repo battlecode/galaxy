@@ -1,13 +1,17 @@
 import uuid
 
+import google.cloud.tasks_v2 as tasks_v2
 import structlog
 from django.apps import apps
+from django.conf import settings
 from django.db import models, transaction
+from django.urls import reverse
 from django.utils import timezone
 from sortedm2m.fields import SortedManyToManyField
 
 from siarnaq import bracket
 from siarnaq.api.episodes.managers import EpisodeQuerySet, TournamentQuerySet
+from siarnaq.gcloud import tasks
 
 logger = structlog.get_logger(__name__)
 
@@ -414,3 +418,34 @@ class TournamentRound(models.Model):
 
         self.in_progress = True
         self.save(update_fields=["in_progress"])
+
+    def request_publish_to_bracket(self, *, is_public):
+        """Request that the match results are published asynchronously."""
+
+        tasks_client = tasks.get_task_client()
+        parent = tasks_client.queue_path(
+            settings.GCLOUD_PROJECT,
+            settings.GCLOUD_LOCATION,
+            settings.GCLOUD_BRACKET_QUEUE,
+        )
+        for match in self.matches.all():
+            url = "https://{}{}".format(
+                settings.ALLOWED_HOSTS[0],
+                reverse(
+                    "match-publish-public-bracket",
+                    kwargs={"pk": self.pk, "episode_id": self.episode.pk},
+                ),
+            )
+            task = tasks_v2.Task(
+                http_request=tasks_v2.HttpRequest(
+                    http_method=tasks_v2.HttpMethod.POST,
+                    url=url,
+                    oidc_token=tasks_v2.OidcToken(
+                        service_account_email=settings.GCLOUD_SERVICE_EMAIL,
+                    ),
+                ),
+            )
+            tasks_client.create_task(request=dict(parent=parent, task=task))
+
+        self.release_status = ReleaseStatus.RESULTS
+        self.save(update_fields=["release_status"])
