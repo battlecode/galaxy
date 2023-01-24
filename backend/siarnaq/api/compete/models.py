@@ -199,7 +199,7 @@ class Match(SaturnInvocation):
         refs.TOURNAMENT_ROUND_MODEL,
         null=True,
         blank=True,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="matches",
     )
     """The tournament round to which this match belongs, if any."""
