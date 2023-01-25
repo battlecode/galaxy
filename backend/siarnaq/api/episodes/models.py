@@ -433,7 +433,7 @@ class TournamentRound(models.Model):
                 settings.ALLOWED_HOSTS[0],
                 reverse(
                     "match-publish-public-bracket",
-                    kwargs={"pk": self.pk, "episode_id": self.episode.pk},
+                    kwargs={"pk": self.pk, "episode_id": self.tournament.episode.pk},
                 ),
             )
             task = tasks_v2.Task(
