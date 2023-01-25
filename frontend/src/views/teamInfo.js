@@ -23,16 +23,15 @@ class RankCard extends Component {
       <div className="card">
         <div className="content">
           <div className="col-2-row col-2-row-skinny">
-            <label>rank</label>
-            <h1 style={rankStyle}>{rankStr}</h1>
+            <label>Rating</label>
+            <h1>
+              {this.state.rating === -1000000
+                ? "N/A"
+                : Math.round(this.state.rating)}
+            </h1>
           </div>
           <br></br>
-          <p style={{ textAlign: "center" }}>
-            Rating:{" "}
-            {this.state.rating === -1000000
-              ? "N/A"
-              : Math.round(this.state.rating)}
-          </p>
+          <p style={{ textAlign: "center" }}></p>
         </div>
       </div>
     );
@@ -51,11 +50,11 @@ class WinsCard extends Component {
         <div className="content">
           <div className="col-2-row">
             <div className="row-items-box items-box-center items-box-skinny">
-              <label>Wins:</label>
+              <label>Wins</label>
               <h1>{this.props.wins}</h1>
             </div>
             <div className="row-items-box items-box-center items-box-skinny">
-              <label>Losses:</label>
+              <label>Losses</label>
               <h1>{this.props.losses}</h1>
             </div>
           </div>
