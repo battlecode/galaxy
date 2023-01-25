@@ -185,9 +185,6 @@ class TeamViewSet(
     def record(self, request, pk=None, *, episode_id):
         """Retrieve the win/loss record of a team"""
         team = request.data["id"]
-        matches = Match.objects.filter(tournament_round__isnull=True).filter(
-            participants__team=team, status="OK!"
-        )
 
         matches = Match.objects.annotate(
             my_score=Subquery(
@@ -200,9 +197,7 @@ class TeamViewSet(
                 .exclude(team=team)
                 .values("score")[:1]
             ),
-        ).filter(
-            my_score__isnull=False,
-        )
+        ).filter(my_score__isnull=False, tournament_round__isnull=True, status="OK!")
         win_count = matches.filter(my_score__gt=F("opponent_score")).count()
         loss_count = matches.filter(my_score__lt=F("opponent_score")).count()
 
