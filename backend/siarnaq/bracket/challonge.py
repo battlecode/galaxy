@@ -271,7 +271,9 @@ def update_match(match: Match, *, is_private: bool):
         tournament.external_id_private if is_private else tournament.external_id_public
     )
 
-    match_challonge_id = match.external_id_private if is_private else None
+    match_challonge_id = (
+        match.external_id_private if is_private else match.external_id_public
+    )
 
     url = (
         f"{URL_BASE}tournaments/{tournament_challonge_id}/"

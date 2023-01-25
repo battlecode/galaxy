@@ -272,6 +272,7 @@ class Local(Base):
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
     GCLOUD_SCHEDULER_PREFIX = "nothing"
+    GCLOUD_BRACKET_QUEUE = "nowhere-siarnaq-bracket"
     GCLOUD_RATING_QUEUE = "nowhere-siarnaq-rating"
 
     DEBUG = True
@@ -336,6 +337,7 @@ class Staging(Base):
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
     GCLOUD_SCHEDULER_PREFIX = "staging"
+    GCLOUD_BRACKET_QUEUE = "staging-siarnaq-bracket"
     GCLOUD_RATING_QUEUE = "staging-siarnaq-rating"
 
     DEBUG = False
@@ -427,6 +429,7 @@ class Production(Base):
     GCLOUD_ORDER_COMPILE = "compile-order"
     GCLOUD_ORDER_EXECUTE = "execute-order"
     GCLOUD_SCHEDULER_PREFIX = "production"
+    GCLOUD_BRACKET_QUEUE = "production-siarnaq-bracket"
     GCLOUD_RATING_QUEUE = "production-siarnaq-rating"
 
     DEBUG = False
