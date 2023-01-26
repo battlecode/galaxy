@@ -24,7 +24,8 @@ class CodeOfConduct extends Component {
                     </a>{" "}
                     on responsible and ethical conduct. If someone makes you or
                     anyone else feel unsafe or unwelcome, please report it to
-                    Teh Devs as soon as possible at battlecode@mit.edu.
+                    Teh Devs as soon as possible at{" "}
+                    <a href="mailto:battlecode@mit.edu">battlecode@mit.edu</a>.
                     Harassment and other code of conduct violations reduce the
                     value of the competition for everyone. People like you make
                     our community a better place, and we want you to be happy
@@ -77,7 +78,8 @@ class CodeOfConduct extends Component {
                   </p>
                   <p>
                     If anything in this policy is unclear, please reach out to
-                    us at <code>battlecode@mit.edu</code>.
+                    us at{" "}
+                    <a href="mailto:battlecode@mit.edu">battlecode@mit.edu</a>.
                   </p>
                 </div>
               </div>
