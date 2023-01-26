@@ -8,7 +8,6 @@ import (
 )
 
 type Saturn struct {
-	monitor *Monitor
 	queue   QueueClient
 	report  Reporter
 	runners map[string]Runner
@@ -28,11 +27,6 @@ func New(ctx context.Context, options ...SaturnOption) (s *Saturn, err error) {
 }
 
 func (s *Saturn) Start(ctx context.Context) error {
-	if s.monitor != nil {
-		go s.monitor.Start()
-		defer s.monitor.Close()
-		ctx = s.monitor.WithContext(ctx)
-	}
 	log.Ctx(ctx).Info().Msg("Starting server.")
 	if err := s.queue.Subscribe(ctx, s.Handle); err != nil {
 		return fmt.Errorf("queue.Subscribe: %v", err)
@@ -56,21 +50,6 @@ func (s *Saturn) Handle(ctx context.Context, payload TaskPayload) error {
 }
 
 type SaturnOption func(context.Context, *Saturn) (*Saturn, error)
-
-func WithMonitor(address string) SaturnOption {
-	return func(ctx context.Context, s *Saturn) (*Saturn, error) {
-		if s.monitor != nil {
-			return nil, fmt.Errorf("monitor already exists")
-		}
-		log.Ctx(ctx).Debug().Msg("Initializing monitor.")
-		monitor, err := NewMonitor(address)
-		if err != nil {
-			return nil, fmt.Errorf("NewMonitor: %v", err)
-		}
-		s.monitor = monitor
-		return s, nil
-	}
-}
 
 func WithGcpPubsubSubcriber(projectID, subscriptionID string) SaturnOption {
 	return func(ctx context.Context, s *Saturn) (*Saturn, error) {
