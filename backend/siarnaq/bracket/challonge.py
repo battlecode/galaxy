@@ -148,7 +148,7 @@ def get_tournament_data(tournament: Tournament, *, is_private: bool):
 
 # TODO should this be private-only, and thus should I drop the is_private flag?
 # Could use help/opinions
-def get_round_indexes(tournament: Tournament, *, is_private: bool):
+def _get_round_indexes(tournament: Tournament, *, is_private: bool):
     """
     Returns round indexes of the tournament,
     in order of Challonge's suggested play order.
@@ -176,7 +176,7 @@ def _get_round_indexes_and_names(tournament: Tournament, *, is_private=bool):
     """
     from siarnaq.api.episodes.models import TournamentStyle
 
-    round_indexes = get_round_indexes(tournament, is_private=is_private)
+    round_indexes = _get_round_indexes(tournament, is_private=is_private)
 
     round_indexes_and_names = []
 
