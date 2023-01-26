@@ -149,7 +149,7 @@ resource "google_cloud_run_service" "this" {
         resources {
           limits = {
             cpu    = "2000m"
-            memory = "1Gi"
+            memory = "2Gi"
           }
         }
 
