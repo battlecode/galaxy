@@ -358,6 +358,11 @@ class TournamentRound(models.Model):
     name = models.CharField(max_length=64)
     """The name of this round in human-readable form, such as "Round 1"."""
 
+    display_order = models.PositiveSmallIntegerField()
+    """
+    The order (within the tournament) to display this round in user-facing interfaces.
+    """
+
     maps = SortedManyToManyField(Map, related_name="tournament_rounds", blank=True)
     """The maps to be used in this round."""
 
