@@ -85,6 +85,7 @@ module "container" {
       "-project=${var.gcp_project}",
       "-secret=${var.secret_id}",
       "-subscription=${google_pubsub_subscription.queue.name}",
+      "-parallel=${var.parallelism}",
     ]
   }
 }
