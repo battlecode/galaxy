@@ -168,6 +168,52 @@ def get_round_indexes(tournament: Tournament, *, is_private: bool):
     return round_indexes
 
 
+def _get_round_indexes_and_names(tournament: Tournament, *, is_private=bool):
+    """
+    Based on empirical observation and design principles,
+    we declare any losers' rounds to be part of the same "overall" round
+    that
+    """
+    from siarnaq.api.episodes.models import TournamentStyle
+
+    round_indexes = get_round_indexes(tournament, is_private=is_private)
+
+    round_indexes_and_names = []
+
+    if tournament.style == TournamentStyle.SINGLE_ELIMINATION:
+        for round_index in round_indexes:
+            round_indexes_and_names.append((round_index, f"Round {round_index}"))
+        return round_indexes_and_names
+
+    # Otherwise, we are in double elimination
+    current_winners_round_number = None
+    for position in range(len(round_indexes)):
+        round_index = round_indexes[position]
+
+        if round_index > 0:
+            current_winners_round_number = round_index
+            round_type = "(Winners)"
+        else:
+            # We are processing losers' rounds.
+            # Use the same round "number" as the most recent winners round.
+            is_next_round_winners = round_indexes[position + 1] > 0
+
+            if is_next_round_winners:
+                # The next round is a winners' round
+                # so this round is a "major" losers' round.
+                round_type = "(Losers Major)"
+            else:
+                # The next round is a losers' round,
+                # so this round is a "minor" losers' round.
+                round_type = "(Losers Minor)"
+
+        round_indexes_and_names.append(
+            (round_index, f"Round {current_winners_round_number} {round_type}")
+        )
+
+    return round_indexes_and_names
+
+
 def _pair_private_public_challonge_ids(tournament: Tournament, type: str):
     """
     Returns a dictionary, mapping private IDs to public IDs,
