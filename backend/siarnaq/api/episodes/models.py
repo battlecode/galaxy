@@ -308,18 +308,7 @@ class Tournament(models.Model):
             bracket.start_tournament(self, is_private=is_private)
 
         # Create TournamentRound objects
-        round_indexes = bracket.get_round_indexes(self, is_private=True)
-
-        # NOTE: rounds' order and indexes get weird in double elim.
-        # Tracked in #548
-        round_objects = [
-            TournamentRound(
-                tournament=self,
-                external_id=round_index,
-                name=f"Round {round_index}",
-            )
-            for round_index in round_indexes
-        ]
+        round_objects = bracket.create_round_objects(self, is_private=True)
 
         with transaction.atomic():
             TournamentRound.objects.bulk_create(round_objects)

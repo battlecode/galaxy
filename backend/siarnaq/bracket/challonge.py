@@ -214,6 +214,30 @@ def _get_round_indexes_and_names(tournament: Tournament, *, is_private=bool):
     return round_indexes_and_names
 
 
+# TODO should this be private-only, and thus should I drop the is_private flag?
+# Could use help/opinions
+def create_round_objects(tournament: Tournament, *, is_private: bool):
+    from siarnaq.api.episodes.models import TournamentRound
+
+    round_indexes_and_names = _get_round_indexes_and_names(
+        tournament, is_private=is_private
+    )
+
+    round_objects = [
+        TournamentRound(
+            tournament=tournament,
+            external_id=round_index,
+            name=round_name,
+            display_order=display_order,
+        )
+        for display_order, (round_index, round_name) in enumerate(
+            round_indexes_and_names
+        )
+    ]
+
+    return round_objects
+
+
 def _pair_private_public_challonge_ids(tournament: Tournament, type: str):
     """
     Returns a dictionary, mapping private IDs to public IDs,
