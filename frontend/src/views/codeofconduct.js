@@ -24,10 +24,11 @@ class CodeOfConduct extends Component {
                     </a>{" "}
                     on responsible and ethical conduct. If someone makes you or
                     anyone else feel unsafe or unwelcome, please report it to
-                    Teh Devs as soon as possible. Harassment and other code of
-                    conduct violations reduce the value of the competition for
-                    everyone. People like you make our community a better place,
-                    and we want you to be happy here.
+                    Teh Devs as soon as possible at battlecode@mit.edu.
+                    Harassment and other code of conduct violations reduce the
+                    value of the competition for everyone. People like you make
+                    our community a better place, and we want you to be happy
+                    here.
                   </p>
                   <p>
                     <ul>
@@ -37,7 +38,16 @@ class CodeOfConduct extends Component {
                         gender, gender identity and expression, sexual
                         orientation, disability, physical appearance, body size,
                         race, age, religion, or nationality. We do not tolerate
-                        harassment of competitors in any form.
+                        harassment of competitors in any form. Participants
+                        asked to stop any harassing behavior are expected to
+                        comply immediately. If you are being harassed, notice
+                        that someone else is being harassed, or have any other
+                        concerns, please contact Teh Devs immediately.
+                        <br />
+                        If a participant engages in harassing behavior, Teh Devs
+                        may take any action they deem appropriate. This includes
+                        warning the offender and expulsion from the event with
+                        no prize (if applicable).
                       </li>
                       <li>
                         <b>Bug Exploitation:</b> Battlecode is a rapidly-growing
@@ -67,7 +77,7 @@ class CodeOfConduct extends Component {
                   </p>
                   <p>
                     If anything in this policy is unclear, please reach out to
-                    us at <code>battlecode@mit.edu</code>, or on Discord.
+                    us at <code>battlecode@mit.edu</code>.
                   </p>
                 </div>
               </div>
