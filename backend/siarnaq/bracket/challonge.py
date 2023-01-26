@@ -146,14 +146,24 @@ def get_tournament_data(tournament: Tournament, *, is_private: bool):
     return data
 
 
+# TODO should this be private-only, and thus should I drop the is_private flag?
+# Could use help/opinions
 def get_round_indexes(tournament: Tournament, *, is_private: bool):
+    """
+    Returns round indexes of the tournament,
+    in order of Challonge's suggested play order.
+    """
     tournament_data = get_tournament_data(tournament, is_private=is_private)
 
-    round_indexes = set()
-    for item in tournament_data["included"]:
-        match item:
-            case {"type": "match", "attributes": {"round": round_index}}:
-                round_indexes.add(round_index)
+    round_indexes = list()
+
+    matches = [item for item in tournament_data["included"] if item["type"] == "match"]
+    matches.sort(key=lambda i: i["attributes"]["suggestedPlayOrder"])
+
+    for match in matches:
+        round_index = match["attributes"]["round"]
+        if round_index not in round_indexes:
+            round_indexes.append(round_index)
 
     return round_indexes
 
