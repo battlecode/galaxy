@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"strconv"
+	"sync"
 	"time"
 
 	"github.com/battlecode/galaxy/saturn/pkg/run"
@@ -23,6 +26,7 @@ var (
 	gcpTokenedReporterUserAgent *string = flag.String("useragent", "Galaxy-Saturn", "the user agent for reporting")
 	monitorPort                 *uint   = flag.Uint("port", 8005, "the port for monitoring shutdowns")
 	scaffoldRoot                *string = flag.String("scaffold", "/scaffolds", "the root directory for saving scaffolds")
+	parallelism                 *uint   = flag.Uint("parallel", 1, "the number of scaffolds to run in parallel")
 )
 
 func main() {
@@ -39,26 +43,46 @@ func main() {
 		log.Ctx(ctx).Fatal().Err(err).Msg("Could not read secrets.")
 	}
 
-	multiplexer, err := run.NewScaffoldMultiplexer(*scaffoldRoot, secret)
+	monitor, err := saturn.NewMonitor(fmt.Sprintf("127.0.0.1:%d", *monitorPort))
 	if err != nil {
-		log.Ctx(ctx).Fatal().Err(err).Msg("Could not initialize scaffold multiplexer.")
+		log.Ctx(ctx).Fatal().Err(err).Msg("Could not initialize monitor.")
 	}
+	go monitor.Start()
+	defer monitor.Close()
+	ctx = monitor.WithContext(ctx)
 
-	app, err := saturn.New(
-		ctx,
-		saturn.WithMonitor(fmt.Sprintf("127.0.0.1:%d", *monitorPort)),
-		saturn.WithGcpPubsubSubcriber(*gcpProjectID, *gcpPubsubSubscriptionID),
-		saturn.WithGcpTokenedReporter(*gcpTokenedReporterAudience, *gcpTokenedReporterUserAgent),
-		saturn.WithRunner("compile", multiplexer.Compile),
-		saturn.WithRunner("execute", multiplexer.Execute),
+	var (
+		i  uint
+		wg sync.WaitGroup
 	)
-	if err != nil {
-		log.Ctx(ctx).Fatal().Err(err).Msg("Could not initialize Saturn.")
+	for i = 0; i < *parallelism; i++ {
+		root := filepath.Join(*scaffoldRoot, strconv.FormatUint(uint64(i), 10))
+		multiplexer, err := run.NewScaffoldMultiplexer(root, secret)
+		if err != nil {
+			log.Ctx(ctx).Fatal().Err(err).Msg("Could not initialize scaffold multiplexer.")
+		}
+
+		app, err := saturn.New(
+			ctx,
+			saturn.WithGcpPubsubSubcriber(*gcpProjectID, *gcpPubsubSubscriptionID),
+			saturn.WithGcpTokenedReporter(*gcpTokenedReporterAudience, *gcpTokenedReporterUserAgent),
+			saturn.WithRunner("compile", multiplexer.Compile),
+			saturn.WithRunner("execute", multiplexer.Execute),
+		)
+		if err != nil {
+			log.Ctx(ctx).Fatal().Err(err).Msg("Could not initialize Saturn.")
+		}
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if err := app.Start(ctx); err != nil {
+				// TODO: log a traceback
+				log.Ctx(ctx).Fatal().Err(err).Msg("System shut down abnormally.")
+			}
+		}()
 	}
 
-	if err := app.Start(ctx); err != nil {
-		// TODO: log a traceback
-		log.Ctx(ctx).Fatal().Err(err).Msg("System shut down abnormally.")
-	}
+	wg.Wait()
 	log.Ctx(ctx).Info().Msg("System shut down normally.")
 }

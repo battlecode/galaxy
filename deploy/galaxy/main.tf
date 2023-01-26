@@ -184,7 +184,8 @@ module "saturn_compile" {
   artifact_registry_name = var.artifact_registry_name
   storage_releases_name  = var.storage_releases_name
 
-  secret_id = google_secret_manager_secret.saturn.secret_id
+  secret_id   = google_secret_manager_secret.saturn.secret_id
+  parallelism = 1
 
   network_vpc_id = google_compute_network.this.id
   subnetwork_ip_cidr = "172.16.0.0/16"
@@ -213,7 +214,8 @@ module "saturn_execute" {
   artifact_registry_name = var.artifact_registry_name
   storage_releases_name  = var.storage_releases_name
 
-  secret_id = google_secret_manager_secret.saturn.secret_id
+  secret_id   = google_secret_manager_secret.saturn.secret_id
+  parallelism = 2
 
   network_vpc_id = google_compute_network.this.id
   subnetwork_ip_cidr = "172.17.0.0/16"

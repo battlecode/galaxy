@@ -53,6 +53,11 @@ variable "secret_id" {
   type        = string
 }
 
+variable "parallelism" {
+  description = "Number of jobs to run simultaneously per machine"
+  type        = number
+}
+
 variable "network_vpc_id" {
   description = "ID of Google VPC network resource"
   type        = string
