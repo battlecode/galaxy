@@ -126,7 +126,24 @@ def get_tournament_data(tournament: Tournament, *, is_private: bool):
 
     r = requests.get(url, headers=_headers)
     r.raise_for_status()
-    return r.json()
+    data = r.json()
+
+    # Handle bracket-reset finals by internally splitting it up into two rounds,
+    # which Challonge does not do by default.
+    from siarnaq.api.episodes.models import TournamentStyle
+
+    if tournament.style == TournamentStyle.DOUBLE_ELIMINATION:
+        # Find the very last match (by play order),
+        # which is the second match of finals
+        # in case of bracket reset
+        matches = [item for item in data["included"] if item["type"] == "match"]
+        match_last = max(
+            matches, key=lambda match: match["attributes"]["suggestedPlayOrder"]
+        )
+        # Give it its own round
+        match_last["attributes"]["round"] += 1
+
+    return data
 
 
 def get_round_indexes(tournament: Tournament, *, is_private: bool):
