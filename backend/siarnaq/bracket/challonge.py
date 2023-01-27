@@ -126,19 +126,110 @@ def get_tournament_data(tournament: Tournament, *, is_private: bool):
 
     r = requests.get(url, headers=_headers)
     r.raise_for_status()
-    return r.json()
+    data = r.json()
+
+    # Handle bracket-reset finals by internally splitting it up into two rounds,
+    # which Challonge does not do by default.
+    from siarnaq.api.episodes.models import TournamentStyle
+
+    if tournament.style == TournamentStyle.DOUBLE_ELIMINATION:
+        # Find the very last match (by play order),
+        # which is the second match of finals
+        # in case of bracket reset
+        matches = [item for item in data["included"] if item["type"] == "match"]
+        match_last = max(
+            matches, key=lambda match: match["attributes"]["suggestedPlayOrder"]
+        )
+        # Give it its own round
+        match_last["attributes"]["round"] += 1
+
+    return data
 
 
-def get_round_indexes(tournament: Tournament, *, is_private: bool):
+def _get_round_indexes(tournament: Tournament, *, is_private: bool):
+    """
+    Returns round indexes of the tournament,
+    in order of Challonge's suggested play order.
+    """
     tournament_data = get_tournament_data(tournament, is_private=is_private)
 
-    round_indexes = set()
-    for item in tournament_data["included"]:
-        match item:
-            case {"type": "match", "attributes": {"round": round_index}}:
-                round_indexes.add(round_index)
+    round_indexes = list()
+
+    matches = [item for item in tournament_data["included"] if item["type"] == "match"]
+    matches.sort(key=lambda i: i["attributes"]["suggestedPlayOrder"])
+
+    for match in matches:
+        round_index = match["attributes"]["round"]
+        if round_index not in round_indexes:
+            round_indexes.append(round_index)
 
     return round_indexes
+
+
+def _get_round_indexes_and_names(tournament: Tournament, *, is_private: bool):
+    """
+    Based on empirical observation and design principles,
+    we declare any losers' rounds to be part of the same "overall" round
+    that
+    """
+    from siarnaq.api.episodes.models import TournamentStyle
+
+    round_indexes = _get_round_indexes(tournament, is_private=is_private)
+
+    round_indexes_and_names = []
+
+    if tournament.style == TournamentStyle.SINGLE_ELIMINATION:
+        for round_index in round_indexes:
+            round_indexes_and_names.append((round_index, f"Round {round_index}"))
+        return round_indexes_and_names
+
+    if tournament.style != TournamentStyle.DOUBLE_ELIMINATION:
+        raise NotImplementedError("Unsupported tournament style")
+
+    current_winners_round_number = None
+    for position, round_index in enumerate(round_indexes):
+        if round_index > 0:
+            current_winners_round_number = round_index
+            round_type = "(Winners)"
+        else:
+            # We are processing losers' rounds.
+            # Use the same round "number" as the most recent winners round.
+            is_next_round_winners = round_indexes[position + 1] > 0
+
+            if is_next_round_winners:
+                # The next round is a winners' round
+                # so this round is a "major" losers' round.
+                round_type = "(Losers Major)"
+            else:
+                # The next round is a losers' round,
+                # so this round is a "minor" losers' round.
+                round_type = "(Losers Minor)"
+
+        round_indexes_and_names.append(
+            (round_index, f"Round {current_winners_round_number} {round_type}")
+        )
+
+    return round_indexes_and_names
+
+
+def create_round_objects(tournament: Tournament):
+    from siarnaq.api.episodes.models import TournamentRound
+
+    round_indexes_and_names = _get_round_indexes_and_names(tournament, is_private=True)
+
+    round_objects = [
+        TournamentRound(
+            tournament=tournament,
+            external_id=round_index,
+            name=round_name,
+            display_order=display_order,
+        )
+        for display_order, (round_index, round_name) in enumerate(
+            round_indexes_and_names
+        )
+    ]
+
+    return round_objects
 
 
 def _pair_private_public_challonge_ids(tournament: Tournament, type: str):
@@ -160,7 +251,7 @@ def _pair_private_public_challonge_ids(tournament: Tournament, type: str):
     # Compute a correspondence between the two.
     # Currently, we use the fact that IDs are in the same order for all tournaments.
     # You could also use other fields, such as Challonge's `identifier` or
-    # `suggested_play_order` for matches; these are equal across brackets.
+    # `suggestedPlayOrder` for matches; these are equal across brackets.
     # Similarly you could use `seed` for teams.
     items_private.sort(key=lambda i: i["id"])
     items_public.sort(key=lambda i: i["id"])

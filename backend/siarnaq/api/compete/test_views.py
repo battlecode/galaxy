@@ -319,13 +319,15 @@ class MatchSerializerTestCase(TestCase):
             submission_unfreeze=timezone.now(),
         )
         self.r_hidden = TournamentRound.objects.create(
-            tournament=tournament, release_status=ReleaseStatus.HIDDEN
+            tournament=tournament, release_status=ReleaseStatus.HIDDEN, display_order=0
         )
         self.r_participants = TournamentRound.objects.create(
-            tournament=tournament, release_status=ReleaseStatus.PARTICIPANTS
+            tournament=tournament,
+            release_status=ReleaseStatus.PARTICIPANTS,
+            display_order=1,
         )
         self.r_results = TournamentRound.objects.create(
-            tournament=tournament, release_status=ReleaseStatus.RESULTS
+            tournament=tournament, release_status=ReleaseStatus.RESULTS, display_order=2
         )
 
         self.users, self.teams, self.submissions = [], [], []
@@ -977,10 +979,10 @@ class MatchViewSetTestCase(APITestCase):
             submission_unfreeze=timezone.now(),
         )
         self.r_results = TournamentRound.objects.create(
-            tournament=tournament, release_status=ReleaseStatus.RESULTS
+            tournament=tournament, release_status=ReleaseStatus.RESULTS, display_order=0
         )
         self.r_hidden = TournamentRound.objects.create(
-            tournament=tournament, release_status=ReleaseStatus.HIDDEN
+            tournament=tournament, release_status=ReleaseStatus.HIDDEN, display_order=1
         )
 
         self.users, self.teams, self.submissions = [], [], []

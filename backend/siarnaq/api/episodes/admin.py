@@ -104,7 +104,10 @@ class TournamentRoundInline(admin.TabularInline):
     model = TournamentRound
     extra = 0
     fields = ("name", "maps", "external_id", "release_status")
-    ordering = ("external_id",)
+    ordering = (
+        "display_order",
+        "external_id",
+    )
     raw_id_fields = ("maps",)
     readonly_fields = ("external_id",)
 
@@ -232,10 +235,16 @@ class TournamentRoundAdmin(admin.ModelAdmin):
         "in_progress",
     )
     inlines = [MatchInline]
-    list_display = ("name", "tournament", "release_status", "in_progress")
+    list_display = (
+        "name",
+        "external_id",
+        "tournament",
+        "release_status",
+        "in_progress",
+    )
     list_filter = ("tournament", "release_status")
     list_select_related = ("tournament",)
-    ordering = ("-tournament__submission_freeze", "external_id")
+    ordering = ("-tournament__submission_freeze", "display_order", "external_id")
     readonly_fields = ("external_id", "in_progress")
 
     def get_queryset(self, request):

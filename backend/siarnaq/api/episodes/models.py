@@ -308,18 +308,7 @@ class Tournament(models.Model):
             bracket.start_tournament(self, is_private=is_private)
 
         # Create TournamentRound objects
-        round_indexes = bracket.get_round_indexes(self, is_private=True)
-
-        # NOTE: rounds' order and indexes get weird in double elim.
-        # Tracked in #548
-        round_objects = [
-            TournamentRound(
-                tournament=self,
-                external_id=round_index,
-                name=f"Round {round_index}",
-            )
-            for round_index in round_indexes
-        ]
+        round_objects = bracket.create_round_objects(self)
 
         with transaction.atomic():
             TournamentRound.objects.bulk_create(round_objects)
@@ -357,6 +346,11 @@ class TournamentRound(models.Model):
 
     name = models.CharField(max_length=64)
     """The name of this round in human-readable form, such as "Round 1"."""
+
+    display_order = models.PositiveSmallIntegerField()
+    """
+    The order (within the tournament) to display this round in user-facing interfaces.
+    """
 
     maps = SortedManyToManyField(Map, related_name="tournament_rounds", blank=True)
     """The maps to be used in this round."""
