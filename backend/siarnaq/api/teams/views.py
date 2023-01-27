@@ -2,6 +2,7 @@ import uuid
 
 import structlog
 from django.db import transaction
+from django.db.models import F, OuterRef, Subquery
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters, mixins, status, viewsets
@@ -9,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from siarnaq.api.compete.models import Match, MatchParticipant
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
 from siarnaq.api.teams.filters import TeamActiveSubmissionFilter, TeamOrderingFilter
@@ -173,3 +175,30 @@ class TeamViewSet(
             titan.upload_image(avatar, profile.get_avatar_path())
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        detail=False,
+        methods=["post"],
+        serializer_class=None,
+        permission_classes=(IsAuthenticated, IsEpisodeAvailable),
+    )
+    def record(self, request, pk=None, *, episode_id):
+        """Retrieve the win/loss record of a team"""
+        team = request.data["id"]
+
+        matches = Match.objects.annotate(
+            my_score=Subquery(
+                MatchParticipant.objects.filter(match=OuterRef("pk"))
+                .filter(team=team)
+                .values("score")
+            ),
+            opponent_score=Subquery(
+                MatchParticipant.objects.filter(match=OuterRef("pk"))
+                .exclude(team=team)
+                .values("score")[:1]
+            ),
+        ).filter(my_score__isnull=False, tournament_round__isnull=True, status="OK!")
+        win_count = matches.filter(my_score__gt=F("opponent_score")).count()
+        loss_count = matches.filter(my_score__lt=F("opponent_score")).count()
+
+        return Response({"wins": win_count, "losses": loss_count})

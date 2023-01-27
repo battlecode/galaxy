@@ -99,34 +99,21 @@ class Api {
   // clean these calls, fix in #368
 
   // data from scrimmaging
-  static getOwnTeamMuHistory(callback) {
-    return Api.getTeamMuHistory(Cookies.get("team_id"), callback);
-  }
 
-  static getTeamMuHistory(team, callback) {
-    $.get(`${URL}/api/${LEAGUE}/team/${team}/history/`).done((data, status) => {
-      callback(data);
-    });
-  }
-
-  static getTeamWinStats(callback) {
-    return Api.getOtherTeamWinStats(Cookies.get("team_id"), callback);
-  }
-
-  static getOtherTeamWinStats(team, callback) {
-    this.getTeamMuHistory(team, (data) => {
-      let wins = 0;
-      let losses = 0;
-      data.forEach((entry) => {
-        if (entry.won === true) {
-          wins++;
-        } else if (entry.won === false) {
-          losses++;
-        } // entry.won can be null when errors occur, doesn't contribute to win/loss
+  static getTeamWinStats(team, episode, callback) {
+    $.ajax({
+      url: `${URL}/api/team/${episode}/t/record/`,
+      data: JSON.stringify(team),
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
+    })
+      .done((data) => {
+        callback(data);
+      })
+      .fail((xhr, status, error) => {
+        callback(xhr, false);
       });
-
-      callback([wins, losses]);
-    });
   }
 
   //get data for team with team_id
