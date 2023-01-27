@@ -59,12 +59,6 @@ class EpisodeAdmin(admin.ModelAdmin):
                 "fields": ("submission_frozen", "autoscrim_schedule"),
             },
         ),
-        (
-            "Academic requirements",
-            {
-                "fields": ("pass_requirement_win", "pass_requirement_out_of"),
-            },
-        ),
     )
     filter_horizontal = ("eligibility_criteria",)
     inlines = [MapInline]
