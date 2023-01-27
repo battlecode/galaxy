@@ -257,7 +257,7 @@ def _pair_private_public_challonge_ids(tournament: Tournament, type: str):
     # Compute a correspondence between the two.
     # Currently, we use the fact that IDs are in the same order for all tournaments.
     # You could also use other fields, such as Challonge's `identifier` or
-    # `suggested_play_order` for matches; these are equal across brackets.
+    # `suggestedPlayOrder` for matches; these are equal across brackets.
     # Similarly you could use `seed` for teams.
     items_private.sort(key=lambda i: i["id"])
     items_public.sort(key=lambda i: i["id"])
