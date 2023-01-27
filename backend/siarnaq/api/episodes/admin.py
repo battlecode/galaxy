@@ -235,7 +235,13 @@ class TournamentRoundAdmin(admin.ModelAdmin):
         "in_progress",
     )
     inlines = [MatchInline]
-    list_display = ("name", "tournament", "release_status", "in_progress")
+    list_display = (
+        "name",
+        "external_id",
+        "tournament",
+        "release_status",
+        "in_progress",
+    )
     list_filter = ("tournament", "release_status")
     list_select_related = ("tournament",)
     ordering = ("-tournament__submission_freeze", "display_order", "external_id")
