@@ -308,7 +308,7 @@ class Tournament(models.Model):
             bracket.start_tournament(self, is_private=is_private)
 
         # Create TournamentRound objects
-        round_objects = bracket.create_round_objects(self, is_private=True)
+        round_objects = bracket.create_round_objects(self)
 
         with transaction.atomic():
             TournamentRound.objects.bulk_create(round_objects)

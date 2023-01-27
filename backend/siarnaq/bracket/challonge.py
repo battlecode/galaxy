@@ -146,8 +146,6 @@ def get_tournament_data(tournament: Tournament, *, is_private: bool):
     return data
 
 
-# TODO should this be private-only, and thus should I drop the is_private flag?
-# Could use help/opinions
 def _get_round_indexes(tournament: Tournament, *, is_private: bool):
     """
     Returns round indexes of the tournament,
@@ -168,7 +166,7 @@ def _get_round_indexes(tournament: Tournament, *, is_private: bool):
     return round_indexes
 
 
-def _get_round_indexes_and_names(tournament: Tournament, *, is_private=bool):
+def _get_round_indexes_and_names(tournament: Tournament, *, is_private: bool):
     """
     Based on empirical observation and design principles,
     we declare any losers' rounds to be part of the same "overall" round
@@ -185,11 +183,11 @@ def _get_round_indexes_and_names(tournament: Tournament, *, is_private=bool):
             round_indexes_and_names.append((round_index, f"Round {round_index}"))
         return round_indexes_and_names
 
-    # Otherwise, we are in double elimination
-    current_winners_round_number = None
-    for position in range(len(round_indexes)):
-        round_index = round_indexes[position]
+    if tournament.style != TournamentStyle.DOUBLE_ELIMINATION:
+        raise NotImplementedError("Unsupported tournament style")
 
+    current_winners_round_number = None
+    for position, round_index in enumerate(round_indexes):
         if round_index > 0:
             current_winners_round_number = round_index
             round_type = "(Winners)"
@@ -214,14 +212,10 @@ def _get_round_indexes_and_names(tournament: Tournament, *, is_private=bool):
     return round_indexes_and_names
 
 
-# TODO should this be private-only, and thus should I drop the is_private flag?
-# Could use help/opinions
-def create_round_objects(tournament: Tournament, *, is_private: bool):
+def create_round_objects(tournament: Tournament):
     from siarnaq.api.episodes.models import TournamentRound
 
-    round_indexes_and_names = _get_round_indexes_and_names(
-        tournament, is_private=is_private
-    )
+    round_indexes_and_names = _get_round_indexes_and_names(tournament, is_private=True)
 
     round_objects = [
         TournamentRound(
