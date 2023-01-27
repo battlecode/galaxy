@@ -187,6 +187,9 @@ class LinksCard extends Component {
                 </li>
               </ul>
             </li>
+            <li>
+              <NavLink to="/codeofconduct">Code of Conduct</NavLink>
+            </li>
           </ul>
         </div>
       </div>

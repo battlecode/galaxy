@@ -175,11 +175,9 @@ class Tournaments extends Component {
                     most games will advance.
                   </p>
                   <p>
-                    Scrimmage rankings will be used to determine seeds for the
-                    Sprint Tournaments. For all other tournaments, results from
-                    the previous tournament will be used to seed teams (where
-                    ties will be broken by the scrimmage ranking right before
-                    the tournament).
+                    Scrimmage rankings will be used to determine seeds for all
+                    tournaments. Ties will be broken by Sprint tournament
+                    rankings.
                   </p>
                   <p>
                     Tournaments will be in a double elimination format, with the
