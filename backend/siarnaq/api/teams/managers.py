@@ -129,6 +129,14 @@ class TeamQuerySet(models.QuerySet):
             includes_met=tournament.eligibility_includes.count(),
             excludes_met=0,
         )
+
+        # Convert to a queryset with just a filter, not annotation
+        # Hacky cuz it runs the full query now and reconstructs a new one
+        # that explicitly filters a full list...but
+        teams = apps.get_model("teams", "Team").objects.filter(
+            id__in={team.id for team in teams}
+        )
+
         if tournament.require_resume:
             teams = teams.annotate(
                 members_without_resume=Count(
@@ -136,6 +144,11 @@ class TeamQuerySet(models.QuerySet):
                     filter=Q(members__profile__has_resume=False),
                 )
             ).filter(members_without_resume=0)
+
+            # Hack again, for proper chaining with `with_active_submission`
+            teams = apps.get_model("teams", "Team").objects.filter(
+                id__in={team.id for team in teams}
+            )
         return teams
 
     def with_active_submission(self):
