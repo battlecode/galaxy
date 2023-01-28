@@ -272,8 +272,11 @@ class Tournament(models.Model):
         if it were to start right now."""
         return (
             apps.get_model("teams", "Team")
-            .objects.with_active_submission()
-            .filter_eligible(self)
+            .objects.filter_eligible(self)
+            # Run `with_active_submission` last,
+            # so that the annotation still is included.
+            # (With hack set strat, annotations go away)
+            .with_active_submission()
             .order_by("-profile__rating__value")
         )
 
