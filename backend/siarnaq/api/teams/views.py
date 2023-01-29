@@ -244,6 +244,7 @@ class ClassRequirementViewSet(viewsets.ReadOnlyModelViewSet):
                 serializer = self.get_serializer(data=request.data)
                 serializer.is_valid(raise_exception=True)
                 report = serializer.validated_data["report"]
+                profile
                 client = storage.Client(credentials=settings.GCLOUD_CREDENTIALS)
                 blob = client.bucket(settings.GCLOUD_BUCKET_SECURE).blob(
                     profile.get_report_path()
@@ -252,4 +253,9 @@ class ClassRequirementViewSet(viewsets.ReadOnlyModelViewSet):
                     for chunk in report.chunks():
                         f.write(chunk)
                 titan.request_scan(blob)
+
+                with transaction.atomic():
+                    profile.has_report = True
+                    profile.save(update_fields=["has_report"])
+
                 return Response(None, status=status.HTTP_204_NO_CONTENT)
