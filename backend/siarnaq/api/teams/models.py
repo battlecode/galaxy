@@ -198,6 +198,9 @@ class TeamProfile(models.Model):
     avatar_uuid = models.UUIDField(default=uuid.uuid4)
     """A unique ID to identify each new avatar upload."""
 
+    has_report = models.BooleanField(default=False)
+    """Whether the team has an uploaded report."""
+
     rating = models.OneToOneField(Rating, on_delete=models.PROTECT)
     """The current rating of the team."""
 
