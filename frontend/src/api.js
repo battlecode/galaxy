@@ -418,7 +418,6 @@ class Api {
         callback(false);
       });
   }
-  static reportRetrieve(callback) {}
 
   //----SCRIMMAGING----
 
