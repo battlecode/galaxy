@@ -182,7 +182,6 @@ func (s *Java8Scaffold) RunMatch() *Step {
 				fmt.Sprintf("-PpackageNameA=%s", arg.Details.(ExecuteRequest).A.Package),
 				fmt.Sprintf("-PpackageNameB=%s", arg.Details.(ExecuteRequest).B.Package),
 				fmt.Sprintf("-Pmaps=%s", strings.Join(arg.Details.(ExecuteRequest).Maps, ",")),
-				fmt.Sprintf("-PvalidateMaps=%t", false),
 				fmt.Sprintf("-Preplay=%s", filepath.Join("data", "replay.bin")),
 				fmt.Sprintf("-PalternateOrder=%t", arg.Details.(ExecuteRequest).AlternateOrder),
 				fmt.Sprintf("-PoutputVerbose=%t", false),
