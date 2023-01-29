@@ -3,6 +3,7 @@ import Api from "../api";
 
 import TeamCard from "../components/teamCard";
 import AvatarUpload from "../components/avatarUpload";
+import ReportUpload from "../components/ReportUpload";
 import Alert from "../components/alert";
 import MultiEpisode from "./multi-episode";
 import Floater from "react-floater";
@@ -114,6 +115,12 @@ class YesTeam extends Component {
 
   uploadAvatar = (selected_file) => {
     Api.teamAvatarUpload(selected_file, this.props.episode, () =>
+      this.props.updateBaseState()
+    );
+  };
+
+  uploadReport = (selected_file) => {
+    Api.teamReportUpload(selected_file, this.props.episode, () =>
       this.props.updateBaseState()
     );
   };
@@ -252,6 +259,9 @@ class YesTeam extends Component {
               <div className="clearfix" />
               <div className="row">
                 <AvatarUpload uploadAvatar={this.uploadAvatar} />
+              </div>
+              <div className="row">
+                <ReportUpload uploadReport={this.uploadReport} />
               </div>
             </div>
           </div>
