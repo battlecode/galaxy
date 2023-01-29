@@ -400,6 +400,25 @@ class Api {
       });
   }
 
+  static teamReportUpload(report_file, episode, callback) {
+    const data = new FormData();
+    data.append("report", report_file);
+    return $.ajax({
+      url: `${URL}/api/team/${episode}/requirement/report/`,
+      type: "PUT",
+      data: data,
+      dataType: "json",
+      processData: false,
+      contentType: false,
+    })
+      .done((data, status) => {
+        callback(true);
+      })
+      .fail((xhr, status, error) => {
+        callback(false);
+      });
+  }
+
   //----SCRIMMAGING----
 
   static acceptScrimmage(scrimmage_id, episode, callback) {

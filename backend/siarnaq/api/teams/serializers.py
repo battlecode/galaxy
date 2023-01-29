@@ -76,6 +76,7 @@ class TeamProfilePrivateSerializer(TeamProfilePublicSerializer):
             "quote",
             "biography",
             "has_avatar",
+            "has_report",
             "avatar_url",
             "rating",
             "auto_accept_ranked",
@@ -181,3 +182,7 @@ class UserPassedSerializer(serializers.Serializer):
     username = serializers.CharField()
     email = serializers.EmailField()
     passed = serializers.BooleanField()
+
+
+class TeamReportSerializer(serializers.Serializer):
+    report = serializers.FileField(write_only=True)

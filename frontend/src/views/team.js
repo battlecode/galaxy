@@ -3,6 +3,7 @@ import Api from "../api";
 
 import TeamCard from "../components/teamCard";
 import AvatarUpload from "../components/avatarUpload";
+import ReportUpload from "../components/ReportUpload";
 import Alert from "../components/alert";
 import MultiEpisode from "./multi-episode";
 import Floater from "react-floater";
@@ -118,11 +119,24 @@ class YesTeam extends Component {
     );
   };
 
+  uploadReport = (selected_file) => {
+    Api.teamReportUpload(selected_file, this.props.episode, () =>
+      this.props.updateBaseState()
+    );
+  };
+
   closeAlert = () => {
     this.setState({ alert_message: "" });
   };
 
   render() {
+    let report_status = null;
+    if (this.state.team.profile.has_report === false) {
+      report_status = false;
+    } else {
+      report_status = true;
+    }
+
     return (
       <div>
         <Alert
@@ -252,6 +266,12 @@ class YesTeam extends Component {
               <div className="clearfix" />
               <div className="row">
                 <AvatarUpload uploadAvatar={this.uploadAvatar} />
+              </div>
+              <div className="row">
+                <ReportUpload
+                  uploadReport={this.uploadReport}
+                  report_uploaded={report_status}
+                />
               </div>
             </div>
           </div>

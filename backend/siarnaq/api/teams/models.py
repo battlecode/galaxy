@@ -198,6 +198,9 @@ class TeamProfile(models.Model):
     avatar_uuid = models.UUIDField(default=uuid.uuid4)
     """A unique ID to identify each new avatar upload."""
 
+    has_report = models.BooleanField(default=False)
+    """Whether the team has an uploaded report."""
+
     rating = models.OneToOneField(Rating, on_delete=models.PROTECT)
     """The current rating of the team."""
 
@@ -217,6 +220,10 @@ class TeamProfile(models.Model):
         if self._state.adding and self.rating_id is None:
             self.rating = Rating.objects.create()
         super().save(*args, **kwargs)
+
+    def get_report_path(self):
+        """Return the path of the strategy report on Google cloud storage."""
+        return posixpath.join("team", str(self.pk), "report.pdf")
 
     def get_avatar_path(self):
         """Return the path of the avatar on Google cloud storage."""
