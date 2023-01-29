@@ -62,7 +62,7 @@ class ReportUpload extends Component {
       </button>
     );
     let report_status = null;
-    if (this.props.uploaded === false) {
+    if (this.props.report_uploaded === false) {
       report_status = (
         <label style={{ float: "right" }}>
           {" "}

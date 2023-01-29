@@ -76,6 +76,7 @@ class TeamProfilePrivateSerializer(TeamProfilePublicSerializer):
             "quote",
             "biography",
             "has_avatar",
+            "has_report",
             "avatar_url",
             "rating",
             "auto_accept_ranked",
