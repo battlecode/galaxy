@@ -221,6 +221,10 @@ class TeamProfile(models.Model):
             self.rating = Rating.objects.create()
         super().save(*args, **kwargs)
 
+    def get_report_path(self):
+        """Return the path of the strategy report on Google cloud storage."""
+        return posixpath.join("team", str(self.pk), "report.pdf")
+
     def get_avatar_path(self):
         """Return the path of the avatar on Google cloud storage."""
         if not self.has_avatar:

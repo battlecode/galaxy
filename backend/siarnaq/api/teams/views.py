@@ -1,7 +1,10 @@
 import uuid
 
+import google.cloud.storage as storage
 import structlog
+from django.conf import settings
 from django.db import transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters, mixins, status, viewsets
@@ -21,6 +24,7 @@ from siarnaq.api.teams.serializers import (
     TeamJoinSerializer,
     TeamPrivateSerializer,
     TeamPublicSerializer,
+    TeamReportSerializer,
     UserPassedSerializer,
 )
 from siarnaq.api.user.models import User
@@ -212,3 +216,40 @@ class ClassRequirementViewSet(viewsets.ReadOnlyModelViewSet):
         users = User.objects.with_passed(requirement).filter(teams__episode=episode_id)
         serializer = self.get_serializer(users, many=True)
         return Response(serializer.data)
+
+    @extend_schema(responses={status.HTTP_204_NO_CONTENT: None})
+    @action(
+        detail=False,
+        methods=["get", "put"],
+        serializer_class=TeamReportSerializer,
+        permission_classes=(IsAuthenticated, IsEpisodeAvailable),
+    )
+    def report(self, request, pk=None, *, episode_id):
+        """Retrieve or update team strategy report"""
+        team = Team.objects.filter(members=request.user).get()
+        profile = team.profile
+        match request.method.lower():
+            case "get":
+                if not profile.has_report:
+                    raise Http404
+                data = titan.get_object(
+                    bucket=settings.GCLOUD_BUCKET_SECURE,
+                    name=profile.get_report_path(),
+                    check_safety=True,
+                )
+                serializer = self.get_serializer(data)
+                return Response(serializer.data)
+
+            case "put":
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                report = serializer.validated_data["report"]
+                client = storage.Client(credentials=settings.GCLOUD_CREDENTIALS)
+                blob = client.bucket(settings.GCLOUD_BUCKET_SECURE).blob(
+                    profile.get_report_path()
+                )
+                with blob.open("wb", content_type="application/pdf") as f:
+                    for chunk in report.chunks():
+                        f.write(chunk)
+                titan.request_scan(blob)
+                return Response(None, status=status.HTTP_204_NO_CONTENT)
