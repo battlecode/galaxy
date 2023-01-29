@@ -79,7 +79,7 @@ class MatchParticipantInline(admin.TabularInline):
 @admin.register(Team)
 class TeamAdmin(ExportMixin, admin.ModelAdmin):
     fields = ("name", "episode", "status", "members", "join_key")
-    inlines = [TeamProfileInline, SubmissionInline, MatchParticipantInline]
+    inlines = [TeamProfileInline]
     list_display = ("name", "episode", "rating", "status")
     list_filter = ("episode",)
     list_select_related = ("episode", "profile__rating")
