@@ -24,6 +24,7 @@ class ReportUpload extends Component {
     this.setState({ status: "loading" });
     this.props.uploadReport(this.state.selectedReportFile, (success) => {
       if (success) {
+        this.props.updateBaseState();
         this.setState({ status: "success" });
       } else {
         this.setState({ status: "failure" });
