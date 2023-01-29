@@ -130,6 +130,13 @@ class YesTeam extends Component {
   };
 
   render() {
+    let report_status = null;
+    if (this.state.team.profile.has_report === false) {
+      report_status = false;
+    } else {
+      report_status = true;
+    }
+
     return (
       <div>
         <Alert
@@ -261,7 +268,10 @@ class YesTeam extends Component {
                 <AvatarUpload uploadAvatar={this.uploadAvatar} />
               </div>
               <div className="row">
-                <ReportUpload uploadReport={this.uploadReport} />
+                <ReportUpload
+                  uploadReport={this.uploadReport}
+                  report_uploaded={report_status}
+                />
               </div>
             </div>
           </div>

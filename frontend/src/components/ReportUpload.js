@@ -61,11 +61,25 @@ class ReportUpload extends Component {
         />{" "}
       </button>
     );
+    let report_status = null;
+    if (this.props.uploaded === false) {
+      report_status = (
+        <label style={{ float: "right" }}>
+          {" "}
+          You have not uploaded a report.
+        </label>
+      );
+    } else {
+      report_status = (
+        <label style={{ float: "right" }}>report uploaded!</label>
+      );
+    }
 
     return (
       <div className="col-md-12">
         <div className="form-group">
           <label>Report</label>
+          {report_status}
           <br />
           <label htmlFor="report_file_upload">
             <div className="btn"> Choose File </div>{" "}
