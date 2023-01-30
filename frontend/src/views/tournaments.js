@@ -92,24 +92,24 @@ class Tournaments extends Component {
                   </p>
                   <ul>
                     <li>
-                      <b>Final Tournament prizes:</b> Prizes will likely range
-                      from $4000 for 1st place to $500 for 16th place.
+                      <b>Final Tournament prizes:</b> Prizes will range from
+                      $5000 for 1st place to $600 for 16th place.
                     </li>
                     <li>
-                      <b>Sprint prizes:</b> Prizes will likely be around $250
-                      per team for the top team.
+                      <b>Sprint prizes:</b> Winner of each tournament will
+                      receive $250.
                     </li>
                     <li>
-                      <b>Newbie, High School prizes:</b> Prizes will likely be
-                      around $400/team for the top 2 teams.
+                      <b>Newbie, High School prizes:</b> Prizes will range from
+                      $700 to $200 for the top 4 teams.
                     </li>
                     <li>
                       <a href="https://www.regression.gg/battlecode">
                         <b>Best Devlog Series Prize:</b>
                       </a>{" "}
-                      Prize given by our Gold Sponsor,{" "}
+                      $800 prize given by our Gold Sponsor,{" "}
                       <a href="https://www.regression.gg">Regression Games</a>.
-                      First place will receive $250, and all winners will
+                      First place will receive $800, and all winners will
                       receive a chance to interview for internships.
                       <ul>
                         <li>
@@ -133,9 +133,9 @@ class Tournaments extends Component {
                     </li>
                     <li>
                       <b>Best Strategy Report Prize: </b>
-                      Prize given by our Gold Sponsor,{" "}
+                      $800 prize given by our Gold Sponsor,{" "}
                       <a href="https://argus.gg/">Argus Labs</a>. First place
-                      will receive $250, and all winners will receive a chance
+                      will receive $800, and all winners will receive a chance
                       to interview for internships and a swag box.
                       <ul>
                         <li>
