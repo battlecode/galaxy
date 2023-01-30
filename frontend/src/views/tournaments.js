@@ -107,9 +107,9 @@ class Tournaments extends Component {
                       <a href="https://www.regression.gg/battlecode">
                         <b>Best Devlog Series Prize:</b>
                       </a>{" "}
-                      $400 prize given by our Gold Sponsor,{" "}
+                      $800 prize given by our Gold Sponsor,{" "}
                       <a href="https://www.regression.gg">Regression Games</a>.
-                      First place will receive $400, and all winners will
+                      First place will receive $800, and all winners will
                       receive a chance to interview for internships.
                       <ul>
                         <li>
@@ -133,9 +133,9 @@ class Tournaments extends Component {
                     </li>
                     <li>
                       <b>Best Strategy Report Prize: </b>
-                      $400 prize given by our Gold Sponsor,{" "}
+                      $800 prize given by our Gold Sponsor,{" "}
                       <a href="https://argus.gg/">Argus Labs</a>. First place
-                      will receive $400, and all winners will receive a chance
+                      will receive $800, and all winners will receive a chance
                       to interview for internships and a swag box.
                       <ul>
                         <li>
