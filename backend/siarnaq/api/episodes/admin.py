@@ -1,5 +1,6 @@
 import structlog
 from django.contrib import admin, messages
+from django.http import HttpResponseRedirect
 from django.utils.html import format_html
 
 from siarnaq.api.compete.models import Match
@@ -10,8 +11,14 @@ from siarnaq.api.episodes.models import (
     Tournament,
     TournamentRound,
 )
+from siarnaq.api.user.models import User
 
 logger = structlog.get_logger(__name__)
+
+
+@admin.action(description="Export all submitted resumes")
+def export_resumes(modeladmin, request, queryset):
+    return HttpResponseRedirect(User.objects.export_resumes(episodes=queryset))
 
 
 class MapInline(admin.TabularInline):
@@ -23,6 +30,7 @@ class MapInline(admin.TabularInline):
 
 @admin.register(Episode)
 class EpisodeAdmin(admin.ModelAdmin):
+    actions = [export_resumes]
     fieldsets = (
         (
             "General",
