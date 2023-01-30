@@ -19,7 +19,9 @@ def request_scan(blob: storage.Blob) -> None:
     blob.patch()
 
 
-def get_object(bucket: str, name: str, check_safety: bool) -> dict[str, str | bool]:
+def get_object(
+    bucket: str, name: str, check_safety: bool, get_raw: bool = False
+) -> dict[str, str | bytes | bool]:
     """
     Retrieve a file from storage, performing safety checks if required.
 
@@ -31,14 +33,21 @@ def get_object(bucket: str, name: str, check_safety: bool) -> dict[str, str | bo
         The name (full path) of the object in the bucket.
     check_safety : bool
         Whether the object should only be returned if verified by Titan.
+    get_raw : bool
+        Whether to return the raw file contents instead of a URL.
 
     Returns
     -------
     dict[str, str]
         A dictionary consisting of a boolean field "ready" indicating whether the file
-        has passed any requested safety checks. If this is true, then an additional
-        field "url" is supplied with a signed download link. Otherwise, a field "reason"
-        is available explaining why the file cannot be downloaded.
+        has passed any requested safety checks.
+
+        If this is true, then an additional field will be available for retrieving the
+        file: either a field "url" with a signed download link, or "data" with the raw
+        data.
+
+        Otherwise, a field "reason" is available explaining why the file cannot be
+        downloaded.
     """
     log = logger.bind(bucket=bucket, name=name)
     if not settings.GCLOUD_ENABLE_ACTIONS:
@@ -49,6 +58,11 @@ def get_object(bucket: str, name: str, check_safety: bool) -> dict[str, str | bo
     blob = client.bucket(bucket).get_blob(name)
     match (check_safety, blob.metadata):
         case (False, _) | (True, {"Titan-Status": "Verified"}):
+            if get_raw:
+                return {
+                    "ready": True,
+                    "data": blob.download_as_bytes(),
+                }
             # Signing is complicated due to an issue with the Google Auth library.
             # See: https://github.com/googleapis/google-auth-library-python/issues/50
             signing_credentials = impersonated_credentials.Credentials(

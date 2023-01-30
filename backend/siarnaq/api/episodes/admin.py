@@ -1,5 +1,11 @@
+import tempfile
+from zipfile import ZipFile
+
 import structlog
+from django.conf import settings
 from django.contrib import admin, messages
+from django.db.models import Max, Q
+from django.http import HttpResponse
 from django.utils.html import format_html
 
 from siarnaq.api.compete.models import Match
@@ -10,8 +16,47 @@ from siarnaq.api.episodes.models import (
     Tournament,
     TournamentRound,
 )
+from siarnaq.api.user.models import User
+from siarnaq.gcloud import titan
 
 logger = structlog.get_logger(__name__)
+
+
+@admin.action(description="Export all submitted resumes")
+def export_resumes(modeladmin, request, queryset):
+    users = list(
+        User.objects.annotate(
+            rating=Max(
+                "teams__profile__rating__value", filter=Q(teams__episode__in=queryset)
+            )
+        )
+        .filter(profile__has_resume=True, rating__isnull=False)
+        .order_by("-rating")
+    )
+    rank_len = len(str(len({user.rating for user in users})))
+    with tempfile.SpooledTemporaryFile() as f:
+        with ZipFile(f, "w") as archive:
+            rank, last_rating = 0, None
+            for user in users:
+                if user.rating != last_rating:
+                    rank, last_rating = rank + 1, user.rating
+                rank_str = "rank-" + str(rank).zfill(rank_len)
+                user_str = user.first_name + "-" + user.last_name
+                if not user_str.isascii():
+                    user_str = "nonascii-user"
+                fname = f"{rank_str}-{user_str}.pdf"
+                resume = titan.get_object(
+                    bucket=settings.GCLOUD_BUCKET_SECURE,
+                    name=user.profile.get_resume_path(),
+                    check_safety=False,  # TODO: actually check safety, see #628
+                    get_raw=True,
+                )
+                if resume["ready"]:
+                    archive.writestr(fname, resume["data"])
+        f.seek(0)
+        response = HttpResponse(f.read(), content_type="application/x-zip-compressed")
+        response["Content-Disposition"] = "attachment; filename=resumes.zip"
+        return response
 
 
 class MapInline(admin.TabularInline):
@@ -23,6 +68,7 @@ class MapInline(admin.TabularInline):
 
 @admin.register(Episode)
 class EpisodeAdmin(admin.ModelAdmin):
+    actions = [export_resumes]
     fieldsets = (
         (
             "General",
