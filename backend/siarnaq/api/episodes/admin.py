@@ -238,7 +238,12 @@ class TournamentRoundAdmin(admin.ModelAdmin):
     )
     list_filter = ("tournament", "release_status")
     list_select_related = ("tournament",)
-    ordering = ("-tournament__submission_freeze", "display_order", "external_id")
+    ordering = (
+        "-tournament__submission_freeze",
+        "tournament__name_short",
+        "display_order",
+        "external_id",
+    )
     readonly_fields = ("external_id", "in_progress")
 
     def get_queryset(self, request):
