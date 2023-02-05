@@ -253,7 +253,6 @@ class TournamentRoundAdmin(admin.ModelAdmin):
         "display_order",
         "external_id",
     )
-    readonly_fields = ("in_progress",)
 
     def get_queryset(self, request):
         return (
