@@ -231,6 +231,7 @@ class TournamentRoundAdmin(admin.ModelAdmin):
     fields = (
         "name",
         "tournament",
+        "display_order",
         "external_id",
         "release_status",
         "maps",
@@ -252,7 +253,7 @@ class TournamentRoundAdmin(admin.ModelAdmin):
         "display_order",
         "external_id",
     )
-    readonly_fields = ("external_id", "in_progress")
+    readonly_fields = ("in_progress",)
 
     def get_queryset(self, request):
         return (
