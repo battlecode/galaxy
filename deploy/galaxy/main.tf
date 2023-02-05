@@ -42,6 +42,23 @@ resource "google_storage_bucket" "secure" {
   }
 }
 
+resource "google_storage_bucket" "ephemeral" {
+  name = "mitbattlecode-${var.name}-ephemeral"
+
+  location      = var.gcp_region
+  storage_class = "STANDARD"
+  labels        = merge(var.labels, {component="storage"})
+
+  lifecycle_rule {
+    condition {
+      age = 1
+    }
+    action {
+      type = "Delete"
+    }
+  }
+}
+
 resource "google_storage_bucket" "frontend" {
   count = var.create_website ? 1 : 0
 
@@ -138,7 +155,7 @@ module "siarnaq" {
 
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name
-
+  storage_ephemeral_name = google_storage_bucket.ephemeral.name
 }
 
 module "titan" {

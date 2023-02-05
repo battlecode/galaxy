@@ -68,6 +68,11 @@ variable "storage_secure_name" {
   type        = string
 }
 
+variable "storage_ephemeral_name" {
+  description = "Name of Google Cloud Storage bucket resource for ephemeral artifacts"
+  type        = string
+}
+
 variable "additional_secrets" {
   description = "Additional secrets to inject into the secret manager"
   type        = map

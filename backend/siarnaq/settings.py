@@ -267,6 +267,7 @@ class Local(Base):
 
     GCLOUD_BUCKET_PUBLIC = "nowhere-public"
     GCLOUD_BUCKET_SECURE = "nowhere-secure"
+    GCLOUD_BUCKET_EPHEMERAL = "nowhere-ephemeral"
     GCLOUD_TOPIC_COMPILE = "nowhere-siarnaq-compile"
     GCLOUD_TOPIC_EXECUTE = "nowhere-siarnaq-execute"
     GCLOUD_ORDER_COMPILE = "compile-order"
@@ -332,6 +333,7 @@ class Staging(Base):
 
     GCLOUD_BUCKET_PUBLIC = "mitbattlecode-staging-public"
     GCLOUD_BUCKET_SECURE = "mitbattlecode-staging-secure"
+    GCLOUD_BUCKET_EPHEMERAL = "mitbattlecode-staging-ephemeral"
     GCLOUD_TOPIC_COMPILE = "staging-siarnaq-compile"
     GCLOUD_TOPIC_EXECUTE = "staging-siarnaq-execute"
     GCLOUD_ORDER_COMPILE = "compile-order"
@@ -424,6 +426,7 @@ class Production(Base):
 
     GCLOUD_BUCKET_PUBLIC = "mitbattlecode-production-public"
     GCLOUD_BUCKET_SECURE = "mitbattlecode-production-secure"
+    GCLOUD_BUCKET_EPHEMERAL = "mitbattlecode-production-ephemeral"
     GCLOUD_TOPIC_COMPILE = "production-siarnaq-compile"
     GCLOUD_TOPIC_EXECUTE = "production-siarnaq-execute"
     GCLOUD_ORDER_COMPILE = "compile-order"

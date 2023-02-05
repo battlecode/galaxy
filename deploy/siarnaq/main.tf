@@ -32,6 +32,12 @@ resource "google_storage_bucket_iam_member" "secure" {
   member = "serviceAccount:${google_service_account.this.email}"
 }
 
+resource "google_storage_bucket_iam_member" "ephemeral" {
+  bucket = var.storage_ephemeral_name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.this.email}"
+}
+
 resource "google_project_iam_member" "scheduler" {
   project = var.gcp_project
   role    = "roles/cloudscheduler.admin"
