@@ -48,9 +48,9 @@ module "production" {
   titan_image = module.cd.artifact_image["titan"]
 
   saturn_image          = module.cd.artifact_image["saturn"]
-  min_compile_instances = 1
+  min_compile_instances = 0
   max_compile_instances = 5
-  min_execute_instances = 1
+  min_execute_instances = 0
   max_execute_instances = 50
   saturn_secrets        = var.saturn_secrets_production
   storage_releases_name = module.releases.storage_bucket_name
