@@ -19,7 +19,7 @@ module.exports = {
     "tailwind.config.js",
   ],
   parserOptions: {
-    project: "frontend2/tsconfig.json",
+    project: "tsconfig.json",
     parser: "@typescript-eslint/parser",
     ecmaVersion: "latest",
     sourceType: "module",
