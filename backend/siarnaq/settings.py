@@ -16,7 +16,6 @@ import sys
 from datetime import timedelta
 from pathlib import Path
 from typing import Any
-
 import google.auth
 import google.cloud.secretmanager as secretmanager
 import structlog
@@ -96,6 +95,7 @@ class Base(Configuration):
         "django.contrib.sessions",
         "django.contrib.messages",
         "django.contrib.staticfiles",
+        "django-typomatic",
         "corsheaders",
         "rest_framework",
         "rest_framework_simplejwt",
