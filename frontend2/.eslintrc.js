@@ -26,7 +26,7 @@ module.exports = {
   },
   plugins: ["react"],
   rules: {
-    "indent": ["error", 2],
+    indent: ["error", 2],
   },
   settings: {
     react: {
