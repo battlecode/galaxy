@@ -25,7 +25,9 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["react"],
-  rules: {},
+  rules: {
+    "indent": ["error", 2],
+  },
   settings: {
     react: {
       createClass: "createReactClass", // Regex for Component Factory to use,
