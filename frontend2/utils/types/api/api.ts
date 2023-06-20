@@ -1,5 +1,6 @@
 export * from './ApiApi';
 import { ApiApi } from './ApiApi';
-export const APIS = [ApiApi];
 
-// make changes here... not sure what to add...
+// TODO: add safe vs unsafe api classes here!
+
+export const APIS = [ApiApi];
