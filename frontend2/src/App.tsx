@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import Home from './views/Home';
+import Home from "./views/Home";
 import Logout from "./views/Logout";
 import Register from "./views/Register";
 import PasswordForgot from "./views/PasswordForgot";
 import PasswordChange from "./views/PasswordChange";
-import { RouterProvider, createBrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 import { AppModules } from "./episodeData";
 import EpisodeLayout from "./components/EpisodeLayout";
 import Account from "./views/Account";
@@ -32,7 +38,8 @@ const router = createBrowserRouter([
   { path: "/password_change", element: <PasswordChange /> },
   // Pages that will contain the episode specific sidebar and navbar
   {
-    element: <EpisodeLayout />, children: [
+    element: <EpisodeLayout />,
+    children: [
       // Pages that should always be visible
       // TODO: /:episode/resources, /:episode/tournaments, /:episode/rankings, /:episode/queue
       { path: "/:episode/home", element: <Home /> },
@@ -40,9 +47,9 @@ const router = createBrowserRouter([
 
       // Pages that should only be visible when logged in
       // TODO: /:episode/team, /:episode/submissions, /:episode/scrimmaging
-      { path: "/account", element: <Account /> }
+      { path: "/account", element: <Account /> },
       // etc
-    ]
+    ],
   },
   // Pages that should redirect
   { path: "/", element: <Navigate to={`/${DEFAULT_EPISODE}/home`} /> },
