@@ -1,9 +1,14 @@
 import React from "react";
-import { ApiUnsafe, Auth } from "./utils/types";
+import { ApiSafe, ApiUnsafe, Auth } from "./utils/api";
 
 async function getId() {
-  const res = await ApiUnsafe.getCurrentUser();
-  return res.body.id
+  const res = await ApiUnsafe.getUserProfile();
+  return res.id;
+}
+
+async function getLoggedIn() {
+  const res = await Auth.loginCheck();
+  return res;
 }
 
 const App: React.FC = () => {
@@ -22,11 +27,17 @@ const App: React.FC = () => {
           Learn React
         </a>
       </header>
-      <button onClick={async () => {
-        await Auth.login("lmtorola_test", "pass")
-        Auth.setLoginHeader()
-      }}>Login!</button>
-      <button onClick={ () => console.log(getId()) }>ID</button>
+      <button
+        onClick={async () => {
+          await Auth.login("lmtorola_test", "pass");
+          ApiSafe.setLoginHeader();
+          console.log("Logged in!");
+        }}
+      >
+        Login!
+      </button>
+      <button onClick={() => console.log(getId())}>ID</button>
+      <button onClick={() => console.log(getLoggedIn())}>Logged In?</button>
     </div>
   );
 };

@@ -10,7 +10,8 @@ const API = new ApiApi(
 );
 
 export class ApiSafe {
-  //-- Token Generation: ../../../__test__/utils.test.ts Authentication TEST 1 --//
+  //-- TOKEN HANDLING --//
+
   /**
    * Takes a set of user credentials and returns an access and refresh JSON web token pair to prove the authentication of those credentials.
    *  - TODO: Rework cookie policy - https://github.com/battlecode/galaxy/issues/647
@@ -19,15 +20,45 @@ export class ApiSafe {
   public static getApiTokens = async (credentials: models.TokenObtainPair) => {
     return API.apiTokenCreate(credentials);
   };
+
+  /**
+   * Set authorization header based on the current cookie state, which is provided by
+   * default for all subsequent requests. The header is a JWT token: see
+   * https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+   */
+  public static setLoginHeader = () => {
+    const accessToken = Cookies.get("access");
+    if (accessToken) {
+      $.ajaxSetup({
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+    }
+  };
+
+  /**
+   * Checks whether the current access token in the browser's cookies is valid.
+   * Returns a promise that resolves to true if the token is valid, and false otherwise.
+   */
+  public static verifyCurrentToken = async (): Promise<boolean> => {
+    const accessToken = Cookies.get("access");
+    if (accessToken) {
+      return (
+        (await API.apiTokenVerifyCreate({ token: accessToken })).response
+          .status === 200
+      );
+    } else {
+      return false;
+    }
+  };
 }
 
 export class ApiUnsafe {
-  //-- EPISODE FUNCTIONS --//
+  //-- EPISODES --//
   /**
    * getMapsByEpisode (getMaps)
    */
 
-  //-- TEAM FUNCTIONS --//
+  //-- TEAMS --//
 
   /**
    * Creates a new team.
@@ -76,7 +107,17 @@ export class ApiUnsafe {
     await API.apiTeamTLeaveCreate(episodeId);
   };
 
-  //-- USER FUNCTIONS --//
+  //-- SUBMISSIONS --//
+
+  //-- USERS --//
+
+  /**
+   * Create a new user.
+   * @param user The user's info.
+   */
+  public static createUser = async (user: models.UserCreate) => {
+    return (await API.apiUserUCreate(user)).body;
+  };
 
   /**
    * Get a user's profile.
@@ -136,7 +177,7 @@ export class ApiUnsafe {
    * teamReportUpload
    */
 
-  //-- SCRIMMAGE/MATCH FUNCTIONS --//
+  //-- SCRIMMAGES/MATCHES --//
 
   /**
    * Accept a scrimmage invitation.
@@ -276,7 +317,7 @@ export class ApiUnsafe {
    * @param episodeId The current episode's ID.
    * @param page The page of matches to get.
    */
-  public static getMatchesByEpisode = async (
+  public static getAllMatches = async (
     episodeId: string,
     page?: number
   ): Promise<models.PaginatedMatchList> => {
@@ -288,7 +329,7 @@ export class ApiUnsafe {
    * @param episodeId The current episode's ID.
    * @param page The page of scrimmages to get.
    */
-  public static getScrimmagesByEpisode = async (
+  public static getAllScrimmages = async (
     episodeId: string,
     page?: number
   ): Promise<models.PaginatedMatchList> => {
@@ -306,10 +347,44 @@ export class ApiUnsafe {
   ): Promise<models.PaginatedMatchList> => {
     return (await API.apiCompeteMatchList(episodeId, page)).body;
   };
+
+  //-- TOURNAMENTS --//
+  /**
+   * Get the next tournament occurring during the given episode, as ordered by submission freeze time.
+   * @param episodeId The current episode's ID.
+   */
+  public static getNextTournament = async (
+    episodeId: string
+  ): Promise<models.Tournament> => {
+    return (await API.apiEpisodeTournamentNextRetrieve(episodeId)).body;
+  };
+
+  /**
+   * Get all of the tournaments occurring during the given episode.
+   * @param episodeId The current episode's ID.
+   * @param page The page of tournaments to get.
+   */
+  public static getAllTournaments = async (
+    episodeId: string,
+    page?: number
+  ): Promise<models.PaginatedTournamentList> => {
+    return (await API.apiEpisodeTournamentList(episodeId, page)).body;
+  };
 }
 
 /** This class contains all frontend authentication functions. Responsible for interacting with Cookies and expiring/setting JWT tokens. */
 export class Auth {
+  /**
+   * Clear the access and refresh tokens from the browser's cookies.
+   * UNSAFE!!! Needs to be tested.
+   */
+  public static logout = () => {
+    Cookies.set("access", "");
+    Cookies.set("refresh", "");
+    ApiSafe.setLoginHeader();
+    window.location.replace("/");
+  };
+
   /**
    * Set the access and refresh tokens in the browser's cookies.
    * @param username The username of the user.
@@ -344,34 +419,24 @@ export class Auth {
   };
 
   /**
-   * Set authorization header based on the current cookie state, which is provided by
-   * default for all subsequent requests. The header is a JWT token: see
-   * https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+   * Checks whether the currently held JWT access token is still valid (by posting it to the verify endpoint),
+   * hence whether or not the frontend still has logged-in access.
+   * @returns true or false
+   * Callers of this method should check this, before rendering their logged-in or un-logged-in versions.
+   * If not logged in, then api calls will give 403s, and the website will tell you to log in anyways.
    */
-  public static setLoginHeader = () => {
-    const access_token = Cookies.get("access");
-    if (access_token) {
-      $.ajaxSetup({
-        headers: { Authorization: `Bearer ${access_token}` },
-      });
-    }
+  public static loginCheck = async (): Promise<boolean> => {
+    return await ApiSafe.verifyCurrentToken();
   };
 
   /**
-   * logout
+   * Register a new user.
+   * @param user The user to register.
    */
-
-  /**
-   * setLoginHeader
-   */
-
-  /**
-   * loginCheck
-   */
-
-  /**
-   * register
-   */
+  public static register = async (user: models.UserCreate): Promise<void> => {
+    const newUser = await ApiUnsafe.createUser(user);
+    return await Auth.login(user.username, user.password);
+  };
 
   /**
    * doResetPassword
