@@ -17,13 +17,13 @@ export interface TournamentRound {
 
     tournament: string;
 
-    external_id?: number;
+    externalId?: number;
 
     name: string;
 
     maps?: Array<number>;
 
-    release_status?: models.ReleaseStatusEnum;
+    releaseStatus?: models.ReleaseStatusEnum;
 
 }
 export namespace TournamentRound {

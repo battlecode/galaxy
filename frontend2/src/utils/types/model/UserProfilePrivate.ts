@@ -15,7 +15,7 @@ import * as models from './models';
 export interface UserProfilePrivate {
     gender: models.GenderEnum;
 
-    gender_details?: string;
+    genderDetails?: string;
 
     school?: string;
 
@@ -23,11 +23,11 @@ export interface UserProfilePrivate {
 
     kerberos?: string;
 
-    avatar_url: string;
+    avatarUrl: string;
 
-    has_avatar: boolean;
+    hasAvatar: boolean;
 
-    has_resume: boolean;
+    hasResume: boolean;
 
     country: models.CountryEnum;
 

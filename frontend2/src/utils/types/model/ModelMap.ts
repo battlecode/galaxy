@@ -19,6 +19,6 @@ export interface ModelMap {
 
     name: string;
 
-    is_public: boolean;
+    isPublic: boolean;
 
 }

@@ -17,8 +17,8 @@ export interface UserProfilePublic {
 
     biography?: string;
 
-    avatar_url: string;
+    avatarUrl: string;
 
-    has_avatar: boolean;
+    hasAvatar: boolean;
 
 }

@@ -13,25 +13,25 @@
 import * as models from './models';
 
 export interface Episode {
-    name_short: string;
+    nameShort: string;
 
-    name_long: string;
+    nameLong: string;
 
     blurb?: string;
 
-    game_release: string;
+    gameRelease: string;
 
     language: models.LanguageEnum;
 
     scaffold?: string;
 
-    artifact_name?: string;
+    artifactName?: string;
 
-    release_version_public?: string;
+    releaseVersionPublic?: string;
 
-    release_version_saturn?: string;
+    releaseVersionSaturn?: string;
 
-    eligibility_criteria: Array<models.EligibilityCriterion>;
+    eligibilityCriteria: Array<models.EligibilityCriterion>;
 
     frozen: boolean;
 

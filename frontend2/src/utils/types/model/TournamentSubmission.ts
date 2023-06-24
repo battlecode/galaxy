@@ -37,7 +37,7 @@ export interface TournamentSubmission {
 
     description: string;
 
-    source_code: string;
+    sourceCode: string;
 
     tournament: string;
 

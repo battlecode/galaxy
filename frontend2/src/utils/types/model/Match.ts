@@ -19,19 +19,19 @@ export interface Match {
 
     episode: string;
 
-    tournament_round: number;
+    tournamentRound: number;
 
     participants: Array<models.MatchParticipant>;
 
     maps: Array<string>;
 
-    alternate_order: boolean;
+    alternateOrder: boolean;
 
     created: string;
 
-    is_ranked: boolean;
+    isRanked: boolean;
 
-    replay_url: string;
+    replayUrl: string;
 
 }
 export namespace Match {

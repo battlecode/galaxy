@@ -21,25 +21,25 @@ export interface ScrimmageRequest {
 
     status: models.ScrimmageRequestStatusEnum;
 
-    is_ranked: boolean;
+    isRanked: boolean;
 
-    requested_by: number;
+    requestedBy: number;
 
-    requested_by_name: string;
+    requestedByName: string;
 
-    requested_by_rating: number;
+    requestedByRating: number;
 
-    requested_to: number;
+    requestedTo: number;
 
-    requested_to_name: string;
+    requestedToName: string;
 
-    requested_to_rating: number;
+    requestedToRating: number;
 
-    player_order: models.PlayerOrderEnum;
+    playerOrder: models.PlayerOrderEnum;
 
     maps: Array<string>;
 
-    map_names: Array<string>;
+    mapNames: Array<string>;
 
 }
 export namespace ScrimmageRequest {

@@ -1,4 +1,10 @@
 import React from "react";
+import { ApiUnsafe, Auth } from "./utils/types";
+
+async function getId() {
+  const res = await ApiUnsafe.getCurrentUser();
+  return res.body.id
+}
 
 const App: React.FC = () => {
   return (
@@ -16,6 +22,11 @@ const App: React.FC = () => {
           Learn React
         </a>
       </header>
+      <button onClick={async () => {
+        await Auth.login("lmtorola_test", "pass")
+        Auth.setLoginHeader()
+      }}>Login!</button>
+      <button onClick={ () => console.log(getId()) }>ID</button>
     </div>
   );
 };

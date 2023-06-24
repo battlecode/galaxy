@@ -17,18 +17,18 @@ export interface TeamProfilePrivate {
 
     biography?: string;
 
-    has_avatar: boolean;
+    hasAvatar: boolean;
 
-    has_report?: boolean;
+    hasReport?: boolean;
 
-    avatar_url: string;
+    avatarUrl: string;
 
     rating: number;
 
-    auto_accept_ranked?: boolean;
+    autoAcceptRanked?: boolean;
 
-    auto_accept_unranked?: boolean;
+    autoAcceptUnranked?: boolean;
 
-    eligible_for?: Array<number>;
+    eligibleFor?: Array<number>;
 
 }

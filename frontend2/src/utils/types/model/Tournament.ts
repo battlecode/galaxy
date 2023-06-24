@@ -13,9 +13,9 @@
 import * as models from './models';
 
 export interface Tournament {
-    name_short: string;
+    nameShort: string;
 
-    name_long: string;
+    nameLong: string;
 
     blurb?: string;
 
@@ -23,21 +23,21 @@ export interface Tournament {
 
     style: models.StyleEnum;
 
-    display_date: string;
+    displayDate: string;
 
-    eligibility_includes?: Array<number>;
+    eligibilityIncludes?: Array<number>;
 
-    eligibility_excludes?: Array<number>;
+    eligibilityExcludes?: Array<number>;
 
-    require_resume: boolean;
+    requireResume: boolean;
 
-    is_public: boolean;
+    isPublic: boolean;
 
-    submission_freeze: string;
+    submissionFreeze: string;
 
-    submission_unfreeze: string;
+    submissionUnfreeze: string;
 
-    is_eligible: boolean;
+    isEligible: boolean;
 
 }
 export namespace Tournament {

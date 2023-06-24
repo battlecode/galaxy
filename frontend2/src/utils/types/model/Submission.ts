@@ -37,7 +37,7 @@ export interface Submission {
 
     description?: string;
 
-    source_code: string;
+    sourceCode: string;
 
 }
 export namespace Submission {

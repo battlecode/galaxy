@@ -8,4 +8,4 @@ python backend/manage.py spectacular --file schema.yml
 :: npm install @openapitools/openapi-generator-cli -g
 :: if you have a java error, just install java 8 and reload terminal
 echo "Generate typescript types from schema"
-npx @openapitools/openapi-generator-cli generate -i schema.yml -o frontend2/src/utils/types -g typescript-jquery
+npx @openapitools/openapi-generator-cli generate -i schema.yml -o frontend2/src/utils/types -g typescript-jquery --additional-properties=modelPropertyNaming=camelCase --additional-properties=disallowAdditionalPropertiesIfNotPresent=false

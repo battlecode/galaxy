@@ -15,10 +15,10 @@ import * as models from './models';
 export interface ClassRequirement {
     episode: string;
 
-    reference_player: number;
+    referencePlayer: number;
 
     maps: Array<number>;
 
-    min_score: number;
+    minScore: number;
 
 }

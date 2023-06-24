@@ -23,7 +23,7 @@ export interface TeamPrivate {
 
     members: Array<models.UserPublic>;
 
-    join_key: string;
+    joinKey: string;
 
     status: models.Status526Enum;
 

@@ -25,7 +25,7 @@ export interface TeamPublic {
 
     status: models.Status526Enum;
 
-    has_active_submission: string;
+    hasActiveSubmission: string;
 
 }
 export namespace TeamPublic {

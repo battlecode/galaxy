@@ -1,30 +1,29 @@
-import {describe, expect, test} from '@jest/globals'
-import { ApiApi } from '../utils/types';
-import { Auth } from '../utils/types';
+import { describe, expect, test } from "@jest/globals";
+import { ApiApi } from "../utils/types";
+import { Auth } from "../utils/api";
 
-const API = new ApiApi()
+const API = new ApiApi("http://localhost:8000");
 
 //---- AUTHORIZATION ----//
 // TEST 1: Generate/Verify API Access Token
 // This test should work, called "login" in safe API //
-test('Generate/Verify API Access Token (STABLE)', async () => {
+test("API: Generate/Verify API Access Token (STABLE)", async () => {
   const request = {
-    username: 'lmtorola_test',
-    password: 'pass',
-    access: '',
-    refresh: '',
-  }
-  expect(API.apiTokenCreate(request).then((res) => {
-    return API.apiTokenVerifyCreate({token: res.body.access})
-  })).toBeTruthy()
-})
+    username: "lmtorola_test",
+    password: "pass",
+    access: "",
+    refresh: "",
+  };
+  expect(
+    API.apiTokenCreate(request).then((res) => {
+      return API.apiTokenVerifyCreate({ token: res.body.access });
+    })
+  ).toBeTruthy();
+});
 
 //---- SUBMISSIONS ----//
 // TEST 1: Upload a new submission
-// TODO: once we have routing and submissions page, we can test this
-// test('Upload a new submission (UNSTABLE)', async () => {
-//   await Auth.login('lmtorola_test', 'pass')
-// })
+// Located at frontend2\src\__test__\App.test.tsx
 
 // TEST 2: Get a submission
 // TODO: how???
@@ -42,6 +41,13 @@ test('Generate/Verify API Access Token (STABLE)', async () => {
 
 //---- USER ----//
 // TEST 1: Get current user's info (authed)
+test("API: Get current user's info (authed) (UNSTABLE)", async () => {
+  await Auth.login("lmtorola_test", "pass");
+  Auth.setLoginHeader();
+  await new Promise((r) => setTimeout(r, 2000));
+  const id = (await API.apiUserUMeRetrieve()).body.id;
+  expect(id).toEqual(43);
+});
 
 // TEST 2: Get current user's info (unauthed)
 

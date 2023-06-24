@@ -13,7 +13,7 @@
 import * as models from './models';
 
 export interface TeamJoin {
-    join_key: string;
+    joinKey: string;
 
     name: string;
 

@@ -13,6 +13,6 @@
 import * as models from './models';
 
 export interface Autoscrim {
-    best_of: number;
+    bestOf: number;
 
 }

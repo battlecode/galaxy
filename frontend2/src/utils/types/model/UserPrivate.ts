@@ -24,13 +24,13 @@ export interface UserPrivate {
 
     email: string;
 
-    first_name: string;
+    firstName: string;
 
-    last_name: string;
+    lastName: string;
 
     /**
      * Designates whether the user can log into this admin site.
      */
-    is_staff: boolean;
+    isStaff: boolean;
 
 }

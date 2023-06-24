@@ -21,12 +21,12 @@ export interface MatchParticipant {
 
     match: number;
 
-    player_index: number;
+    playerIndex: number;
 
     score: number;
 
     rating: number;
 
-    old_rating: number;
+    oldRating: number;
 
 }

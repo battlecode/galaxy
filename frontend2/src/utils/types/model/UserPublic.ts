@@ -25,6 +25,6 @@ export interface UserPublic {
     /**
      * Designates whether the user can log into this admin site.
      */
-    is_staff: boolean;
+    isStaff: boolean;
 
 }
