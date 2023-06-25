@@ -30,7 +30,7 @@ const App: React.FC = () => {
       <button
         onClick={async () => {
           await Auth.login("lmtorola_test", "pass");
-          ApiSafe.setLoginHeader();
+          Auth.setLoginHeader();
           console.log("Logged in!");
         }}
       >

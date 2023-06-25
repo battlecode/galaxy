@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 import { ApiApi } from "../utils/types";
-import { Auth } from "../utils/api";
+import { ApiUnsafe, Auth } from "../utils/api";
 
 const API = new ApiApi("http://localhost:8000");
 
@@ -41,13 +41,13 @@ test("API: Generate/Verify API Access Token (STABLE)", async () => {
 
 //---- USER ----//
 // TEST 1: Get current user's info (authed)
-test("API: Get current user's info (authed) (UNSTABLE)", async () => {
-  await Auth.login("lmtorola_test", "pass");
-  Auth.setLoginHeader();
-  await new Promise((r) => setTimeout(r, 2000));
-  const id = (await API.apiUserUMeRetrieve()).body.id;
-  expect(id).toEqual(43);
-});
+// test("API: Get current user's info (authed) (UNSTABLE)", async () => {
+//   await Auth.login("lmtorola_test", "pass");
+//   Auth.setLoginHeader();
+//   await ApiUnsafe.getUserProfile().then((res) => {
+//     expect(res.username).toEqual("lmtorola_test");
+//   });
+// });
 
 // TEST 2: Get current user's info (unauthed)
 

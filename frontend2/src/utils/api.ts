@@ -3,11 +3,13 @@ import Cookies from "js-cookie";
 import * as $ from "jquery";
 import * as models from "./types/model/models";
 
+// hacky, fall back to localhost for now
+const baseUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
+const LEAGUE = 0;
+
 // Safe vs. unsafe APIs... safe API has been tested, unsafe has NOT
 // TODO: how does url work? @index.tsx?
-const API = new ApiApi(
-  process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"
-);
+const API = new ApiApi(baseUrl);
 
 export class ApiSafe {
   //-- TOKEN HANDLING --//
@@ -19,20 +21,6 @@ export class ApiSafe {
    */
   public static getApiTokens = async (credentials: models.TokenObtainPair) => {
     return API.apiTokenCreate(credentials);
-  };
-
-  /**
-   * Set authorization header based on the current cookie state, which is provided by
-   * default for all subsequent requests. The header is a JWT token: see
-   * https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
-   */
-  public static setLoginHeader = () => {
-    const accessToken = Cookies.get("access");
-    if (accessToken) {
-      $.ajaxSetup({
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-    }
   };
 
   /**
@@ -119,6 +107,66 @@ export class ApiUnsafe {
     return (await API.apiTeamTMePartialUpdate(episodeId, { joinKey })).body;
   };
 
+  //-- TEAM STATS --//
+
+  // TODO: unsure of how this is supposed to work
+  // /**
+  //  * Get the Mu history of the given team.
+  //  * @param teamId The team's ID.
+  //  */
+  // public static getTeamMuHistoryByTeam = async (teamId: number) => {
+  //   return await $.get(`${baseUrl}/api/${LEAGUE}/team/${teamId}/history/`);
+  // };
+
+  // /**
+  //  * Get the Mu history of the currently logged in user's team.
+  //  */
+  // public static getUserTeamMuHistory = async () => {
+  // };
+
+  /**
+   * getTeamWinStatsByTeam
+   */
+
+  /**
+   * getUserTeamWinStats
+   */
+
+  /**
+   * getTeamInfoByTeam
+   */
+
+  /**
+   * getTeamRankingByTeam
+   */
+
+  //-- GENERAL INFO --//
+
+  /**
+   * Get the current episode's info.
+   * @param episodeId The current episode's ID.
+   */
+  public static getEpisodeInfo = async (
+    episodeId: string
+  ): Promise<models.Episode> => {
+    return (await API.apiEpisodeERetrieve(episodeId)).body;
+  };
+
+  /**
+   * Get updates about the current league.
+   * TODO: No idea how this is supposed to work!
+   */
+  public static getUpdates = async () => {
+    $.get(`${URL}/api/league/${LEAGUE}/`, (data) => {
+      for (let i = 0; i < data.updates.length; i++) {
+        const d = new Date(data.updates[i].time);
+        data.updates[i].dateObj = d;
+        data.updates[i].date = d.toLocaleDateString();
+        data.updates[i].time = d.toLocaleTimeString();
+      }
+    });
+  };
+
   //-- SUBMISSIONS --//
 
   /**
@@ -139,9 +187,7 @@ export class ApiUnsafe {
     fileData.append("package", submission.packageName);
     fileData.append("description", submission.description);
     await $.ajax({
-      url: `${
-        process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"
-      }/api/episode/${episodeId}/submission/`,
+      url: `${baseUrl}/api/episode/${episodeId}/submission/`,
       type: "POST",
       data: fileData,
       dataType: "json",
@@ -483,7 +529,7 @@ export class Auth {
   public static logout = () => {
     Cookies.set("access", "");
     Cookies.set("refresh", "");
-    ApiSafe.setLoginHeader();
+    Auth.setLoginHeader();
     window.location.replace("/");
   };
 
@@ -518,6 +564,20 @@ export class Auth {
       .catch((res) => {
         if (callback) callback(res.response, false);
       });
+  };
+
+  /**
+   * Set authorization header based on the current cookie state, which is provided by
+   * default for all subsequent requests. The header is a JWT token: see
+   * https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+   */
+  public static setLoginHeader = () => {
+    const accessToken = Cookies.get("access");
+    if (accessToken) {
+      $.ajaxSetup({
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+    }
   };
 
   /**
