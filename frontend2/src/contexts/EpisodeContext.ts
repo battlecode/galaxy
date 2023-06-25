@@ -3,8 +3,8 @@ import { DEFAULT_EPISODE } from "../utils/constants";
 
 export const EpisodeContext = createContext({
   // the default episode.
-  episode: DEFAULT_EPISODE,
-  setEpisode: (episode: string) => {
+  episodeId: DEFAULT_EPISODE,
+  setEpisodeId: (episodeId: string) => {
     console.log("default episode");
   },
 });

@@ -16,8 +16,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   collapsed
 }) => {
   collapsed = collapsed ?? false;
-  const { episode } = useContext(EpisodeContext);
-  const linkBase = `/${episode}/`;
+  const { episodeId } = useContext(EpisodeContext);
+  const linkBase = `/${episodeId}/`;
 
   return (
     collapsed ? null : (

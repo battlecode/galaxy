@@ -8,9 +8,9 @@ import { EpisodeContext } from "../contexts/EpisodeContext";
 // Child route components are rendered with <Outlet />
 const EpisodeLayout: React.FC = () => {
   const episodeContext = useContext(EpisodeContext);
-  const { episode } = useParams();
-  if (episode !== undefined && episode !== episodeContext.episode) {
-    episodeContext.setEpisode(episode);
+  const { episodeId } = useParams();
+  if (episodeId !== undefined && episodeId !== episodeContext.episodeId) {
+    episodeContext.setEpisodeId(episodeId);
   }
   return (
     <div className="h-screen">

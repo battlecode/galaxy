@@ -18,9 +18,9 @@ import { DEFAULT_EPISODE } from "./utils/constants";
 import NotFound from "./views/NotFound";
 
 const App: React.FC = () => {
-  const [episode, setEpisode] = useState(DEFAULT_EPISODE);
+  const [episodeId, setEpisodeId] = useState(DEFAULT_EPISODE);
   return (
-    <EpisodeContext.Provider value={{ episode, setEpisode }}>
+    <EpisodeContext.Provider value={{ episodeId, setEpisodeId }}>
       <RouterProvider router={router} />
     </EpisodeContext.Provider>
   );
@@ -38,12 +38,12 @@ const router = createBrowserRouter([
     element: <EpisodeLayout />,
     children: [
       // Pages that should always be visible
-      // TODO: /:episode/resources, /:episode/tournaments, /:episode/rankings, /:episode/queue
-      { path: "/:episode/home", element: <Home /> },
-      { path: "/:episode/quickstart", element: <QuickStart /> },
-      { path: "/:episode/*", element: <NotFound /> },
+      // TODO: /:episodeId/resources, /:episodeId/tournaments, /:episodeId/rankings, /:episodeId/queue
+      { path: "/:episodeId/home", element: <Home /> },
+      { path: "/:episodeId/quickstart", element: <QuickStart /> },
+      { path: "/:episodeId/*", element: <NotFound /> },
       // Pages that should only be visible when logged in
-      // TODO: /:episode/team, /:episode/submissions, /:episode/scrimmaging
+      // TODO: /:episodeId/team, /:episodeId/submissions, /:episodeId/scrimmaging
       { path: "/account", element: <Account /> },
       // etc
     ],
