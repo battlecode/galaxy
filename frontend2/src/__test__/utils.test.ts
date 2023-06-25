@@ -41,13 +41,11 @@ test("API: Generate/Verify API Access Token (STABLE)", async () => {
 
 //---- USER ----//
 // TEST 1: Get current user's info (authed)
-// test("API: Get current user's info (authed) (UNSTABLE)", async () => {
-//   await Auth.login("lmtorola_test", "pass");
-//   Auth.setLoginHeader();
-//   await ApiUnsafe.getUserProfile().then((res) => {
-//     expect(res.username).toEqual("lmtorola_test");
-//   });
-// });
+test("API: Get current user's info (authed) (UNSTABLE)", async () => {
+  await Auth.login("lmtorola_test", "pass");
+  Auth.setLoginHeader();
+  expect(API.apiUserUMeRetrieve().then((res) => res.body.id)).toBeTruthy();
+});
 
 // TEST 2: Get current user's info (unauthed)
 

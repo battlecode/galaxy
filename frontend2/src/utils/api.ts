@@ -6,6 +6,7 @@ import * as models from "./types/model/models";
 // hacky, fall back to localhost for now
 const baseUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
 const LEAGUE = 0;
+const PAGE_SIZE = 10;
 
 // Safe vs. unsafe APIs... safe API has been tested, unsafe has NOT
 // TODO: how does url work? @index.tsx?
@@ -50,7 +51,7 @@ export class ApiUnsafe {
     episodeId: string
   ): Promise<models.ModelMap[]> => {
     return (
-      (await $.get(`${URL}/api/episode/${episodeId}/map/`)) ??
+      (await $.get(`${baseUrl}/api/episode/${episodeId}/map/`)) ??
       ([] as models.ModelMap[])
     );
   };
@@ -127,11 +128,16 @@ export class ApiUnsafe {
   //   return await $.get(`${baseUrl}/api/${LEAGUE}/team/${teamId}/history/`);
   // };
 
-  // /**
-  //  * Get the Mu history of the currently logged in user's team.
-  //  */
-  // public static getUserTeamMuHistory = async () => {
-  // };
+  /**
+   * Get the Mu history of the currently logged in user's team.
+   */
+  public static getTeamMuHistoryByTeam = async (teamId: number) => {
+    $.get(`${baseUrl}/api/${LEAGUE}/team/${teamId}/history/`).done(
+      (data, status) => {
+        console.log(data);
+      }
+    );
+  };
 
   /**
    * getTeamWinStatsByTeam
@@ -148,6 +154,32 @@ export class ApiUnsafe {
   /**
    * getTeamRankingByTeam
    */
+
+  //-- SEARCHING --//
+
+  /**
+   * Search team, ordering the result by ranking.
+   * @param episodeId The current episode's ID.
+   * @param searchQuery The search query.
+   * @param requireActiveSubmission Whether to require an active submission.
+   * @param page The page number.
+   */
+  public static searchTeams = async (
+    episodeId: string,
+    searchQuery: string,
+    requireActiveSubmission: boolean,
+    page?: number
+  ): Promise<models.PaginatedTeamPublicList> => {
+    const apiURL = `${baseUrl}/api/team/${episodeId}/t`;
+    const encQuery = encodeURIComponent(searchQuery);
+    const teamUrl =
+      `${apiURL}/?ordering=-rating,name&search=${encQuery}&page=${page ?? 1}` +
+      (requireActiveSubmission ? `&has_active_submission=true` : ``);
+    // return (await $.get(teamUrl, (teamData) => {
+    //   const pageLimit = Math.ceil(teamData.count / PAGE_SIZE);
+    // }));
+    return await $.get(teamUrl);
+  };
 
   //-- GENERAL INFO --//
 
@@ -166,7 +198,7 @@ export class ApiUnsafe {
    * TODO: No idea how this is supposed to work!
    */
   public static getUpdates = async () => {
-    $.get(`${URL}/api/league/${LEAGUE}/`, (data) => {
+    $.get(`${baseUrl}/api/league/${LEAGUE}/`, (data) => {
       for (let i = 0; i < data.updates.length; i++) {
         const d = new Date(data.updates[i].time);
         data.updates[i].dateObj = d;
@@ -258,7 +290,7 @@ export class ApiUnsafe {
     page?: number
   ): Promise<models.PaginatedSubmissionList> => {
     const res = await $.get(
-      `${URL}/api/compete/${episodeId}/submission/tournament/?page=${page}`
+      `${baseUrl}/api/compete/${episodeId}/submission/tournament/?page=${page}`
     );
     return {
       count: parseInt(res.length ?? "0"),
@@ -610,7 +642,6 @@ export class ApiUnsafe {
 export class Auth {
   /**
    * Clear the access and refresh tokens from the browser's cookies.
-   * UNSAFE!!! Needs to be tested.
    */
   public static logout = () => {
     Cookies.set("access", "");

@@ -11,6 +11,11 @@ async function getLoggedIn() {
   return res;
 }
 
+async function searchTeams() {
+  const res = await ApiUnsafe.searchTeams("bc22", "team", false, 1);
+  return res;
+}
+
 const App: React.FC = () => {
   return (
     <div className="App">
@@ -36,8 +41,13 @@ const App: React.FC = () => {
       >
         Login!
       </button>
-      <button onClick={() => console.log(getId())}>ID</button>
-      <button onClick={() => console.log(getLoggedIn())}>Logged In?</button>
+      <button onClick={async () => console.log(getId())}>ID</button>
+      <button onClick={async () => console.log(getLoggedIn())}>
+        Logged In?
+      </button>
+      <button onClick={async () => console.log(searchTeams())}>
+        Search Teams
+      </button>
     </div>
   );
 };
