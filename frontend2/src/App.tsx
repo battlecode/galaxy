@@ -1,24 +1,21 @@
 import React, { useState } from "react";
+import EpisodeLayout from "./components/EpisodeLayout";
 import Home from "./views/Home";
 import Logout from "./views/Logout";
 import Register from "./views/Register";
 import PasswordForgot from "./views/PasswordForgot";
 import PasswordChange from "./views/PasswordChange";
+import Account from "./views/Account";
+import Login from "./views/Login";
+import QuickStart from "./views/QuickStart";
+import { EpisodeContext } from "./contexts/EpisodeContext";
 import {
   RouterProvider,
   createBrowserRouter,
   Navigate,
-  Route,
-  Routes,
 } from "react-router-dom";
-import { AppModules } from "./episodeData";
-import EpisodeLayout from "./components/EpisodeLayout";
-import Account from "./views/Account";
-import { EpisodeContext } from "./contexts/EpisodeContext";
-import Login from "./views/Login";
-import QuickStart from "./views/QuickStart";
-
-const DEFAULT_EPISODE = "bc23";
+import { DEFAULT_EPISODE } from "./utils/constants";
+import NotFound from "./views/NotFound";
 
 const App: React.FC = () => {
   const [episode, setEpisode] = useState(DEFAULT_EPISODE);
@@ -44,7 +41,7 @@ const router = createBrowserRouter([
       // TODO: /:episode/resources, /:episode/tournaments, /:episode/rankings, /:episode/queue
       { path: "/:episode/home", element: <Home /> },
       { path: "/:episode/quickstart", element: <QuickStart /> },
-
+      { path: "/:episode/*", element: <NotFound /> },
       // Pages that should only be visible when logged in
       // TODO: /:episode/team, /:episode/submissions, /:episode/scrimmaging
       { path: "/account", element: <Account /> },
@@ -52,8 +49,7 @@ const router = createBrowserRouter([
     ],
   },
   // Pages that should redirect
-  { path: "/", element: <Navigate to={`/${DEFAULT_EPISODE}/home`} /> },
-  { path: "*", element: <Navigate to={`/${DEFAULT_EPISODE}/home`} /> },
+  { path: "/*", element: <Navigate to={`/${DEFAULT_EPISODE}/home`} /> },
 ]);
 
 export default App;

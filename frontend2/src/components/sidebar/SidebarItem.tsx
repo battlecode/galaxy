@@ -5,27 +5,23 @@ interface SidebarItemProps {
   icon: React.ReactNode;
   text: string;
   linkTo: string;
-  selected: boolean;
 }
 
 const SidebarItem: React.FC<SidebarItemProps> = ({
   icon,
   text,
   linkTo,
-  selected,
 }) => {
   const baseStyle =
-    "text-base flex gap-4 hover:text-gray-100 hover:bg-teal p-2 ";
+    "text-base flex items-center gap-3 ";
   const colorVariants = {
-    gray: "text-gray-700",
+    gray: "text-gray-800 hover:text-gray-400",
     color: "text-teal",
   };
   return (
-    // TODO:  use Navlink instead, with activeclassname
     <NavLink
-      // todo: use activeClassName
-      className={
-        baseStyle + (selected ? colorVariants.color : colorVariants.gray)
+      className={({ isActive }) =>
+        baseStyle + (isActive ? colorVariants.color : colorVariants.gray)
       }
       to={linkTo}
     >
