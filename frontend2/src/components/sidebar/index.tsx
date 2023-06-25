@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import SidebarSection from "./SidebarSection";
 import SidebarItem from "./SidebarItem";
 import {
@@ -6,8 +6,7 @@ import {
   TrophyIcon, ChartBarIcon, ClockIcon,
   UserGroupIcon, ArrowUpTrayIcon, PlayCircleIcon,
 } from "@heroicons/react/24/outline";
-import { useParams } from "react-router-dom";
-import { DEFAULT_EPISODE } from "../../utils/constants";
+import { EpisodeContext } from "../../contexts/EpisodeContext";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -17,8 +16,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   collapsed
 }) => {
   collapsed = collapsed ?? false;
-  const { episode } = useParams();
-  const linkBase = `/${episode ?? DEFAULT_EPISODE}/`;
+  const { episode } = useContext(EpisodeContext);
+  const linkBase = `/${episode}/`;
 
   return (
     collapsed ? null : (
