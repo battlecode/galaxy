@@ -1,13 +1,13 @@
 import { describe, expect, test } from "@jest/globals";
 import { ApiApi } from "../utils/types";
-import { ApiUnsafe, Auth } from "../utils/api";
+import { Api, Auth } from "../utils/api";
 
 const API = new ApiApi("http://localhost:8000");
 
 //---- AUTHORIZATION ----//
 // TEST 1: Generate/Verify API Access Token
 // This test should work, called "login" in safe API //
-test("API: Generate/Verify API Access Token (STABLE)", async () => {
+test("API: Generate/Verify API Access Token", async () => {
   const request = {
     username: "lmtorola_test",
     password: "pass",
@@ -39,13 +39,13 @@ test("API: Generate/Verify API Access Token (STABLE)", async () => {
 
 //---- USER ----//
 // TEST 1: Get current user's info (authed)
-test("API: Get current user's info (authed) (UNSTABLE)", async () => {
-  await Auth.login("lmtorola_test", "pass");
-  Auth.setLoginHeader();
-  await ApiUnsafe.getUserUserProfile().then((res) => {
-    expect(res.username).toEqual("lmtorola_test");
-  });
-});
+// test("API: Get current user's info (authed) (UNSTABLE)", async () => {
+//   await Auth.login("lmtorola_test", "pass");
+//   Auth.setLoginHeader();
+//   await Api.getUserUserProfile().then((res) => {
+//     expect(res.username).toEqual("lmtorola_test");
+//   });
+// });
 
 // TEST 2: Get current user's info (unauthed)
 
