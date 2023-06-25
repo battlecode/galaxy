@@ -1,55 +1,55 @@
-import React from "react";
-import { ApiSafe, ApiUnsafe, Auth } from "./utils/api";
-
-async function getId() {
-  const res = await ApiUnsafe.getUserUserProfile();
-  return res.id;
-}
-
-async function getLoggedIn() {
-  const res = await Auth.loginCheck();
-  return res;
-}
-
-async function searchTeams() {
-  const res = await ApiUnsafe.searchTeams("bc22", "team", false, 1);
-  return res;
-}
+import React, { useState } from "react";
+import EpisodeLayout from "./components/EpisodeLayout";
+import Home from "./views/Home";
+import Logout from "./views/Logout";
+import Register from "./views/Register";
+import PasswordForgot from "./views/PasswordForgot";
+import PasswordChange from "./views/PasswordChange";
+import Account from "./views/Account";
+import Login from "./views/Login";
+import QuickStart from "./views/QuickStart";
+import { EpisodeContext } from "./contexts/EpisodeContext";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Navigate,
+} from "react-router-dom";
+import { DEFAULT_EPISODE } from "./utils/constants";
+import NotFound from "./views/NotFound";
 
 const App: React.FC = () => {
+  const [episode, setEpisode] = useState(DEFAULT_EPISODE);
   return (
-    <div className="App">
-      <header className="App-header text-3xl font-bold underline">
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      <button
-        onClick={async () => {
-          await Auth.login("lmtorola_test", "pass");
-          Auth.setLoginHeader();
-          console.log("Logged in!");
-        }}
-      >
-        Login!
-      </button>
-      <button onClick={async () => console.log(getId())}>ID</button>
-      <button onClick={async () => console.log(getLoggedIn())}>
-        Logged In?
-      </button>
-      <button onClick={async () => console.log(searchTeams())}>
-        Search Teams
-      </button>
-    </div>
+    <EpisodeContext.Provider value={{ episode, setEpisode }}>
+      <RouterProvider router={router} />
+    </EpisodeContext.Provider>
   );
 };
+
+const router = createBrowserRouter([
+  // Pages that should render without a sidebar/navbar
+  { path: "/login", element: <Login /> },
+  { path: "/logout", element: <Logout /> },
+  { path: "/register", element: <Register /> },
+  { path: "/password_forgot", element: <PasswordForgot /> },
+  { path: "/password_change", element: <PasswordChange /> },
+  // Pages that will contain the episode specific sidebar and navbar
+  {
+    element: <EpisodeLayout />,
+    children: [
+      // Pages that should always be visible
+      // TODO: /:episode/resources, /:episode/tournaments, /:episode/rankings, /:episode/queue
+      { path: "/:episode/home", element: <Home /> },
+      { path: "/:episode/quickstart", element: <QuickStart /> },
+      { path: "/:episode/*", element: <NotFound /> },
+      // Pages that should only be visible when logged in
+      // TODO: /:episode/team, /:episode/submissions, /:episode/scrimmaging
+      { path: "/account", element: <Account /> },
+      // etc
+    ],
+  },
+  // Pages that should redirect
+  { path: "/*", element: <Navigate to={`/${DEFAULT_EPISODE}/home`} /> },
+]);
 
 export default App;
