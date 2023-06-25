@@ -107,7 +107,109 @@ export class ApiUnsafe {
     await API.apiTeamTLeaveCreate(episodeId);
   };
 
+  /**
+   * Updates the current user's team's join key.
+   * @param episodeId The current episode's ID.
+   * @param joinKey The new team join key.
+   */
+  public static updateUserTeamCode = async (
+    episodeId: string,
+    joinKey: string
+  ): Promise<models.TeamPrivate> => {
+    return (await API.apiTeamTMePartialUpdate(episodeId, { joinKey })).body;
+  };
+
   //-- SUBMISSIONS --//
+
+  /**
+   * Uploads a new submission to the Google Cloud Storage bucket.
+   * @param episodeId The current episode's ID.
+   * @param submission The submission's info.
+   */
+  public static uploadSubmission = async (
+    episodeId: string,
+    submission: {
+      file: File;
+      packageName: string;
+      description: string;
+    }
+  ): Promise<void> => {
+    const fileData = new FormData();
+    fileData.append("source_code", submission.file);
+    fileData.append("package", submission.packageName);
+    fileData.append("description", submission.description);
+    await $.ajax({
+      url: `${
+        process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"
+      }/api/episode/${episodeId}/submission/`,
+      type: "POST",
+      data: fileData,
+      dataType: "json",
+      processData: false,
+      contentType: false,
+    });
+  };
+
+  /**
+   * Download a submission from the Google Cloud Storage bucket.
+   * @param episodeId The current episode's ID.
+   * @param submissionId The submission's ID.
+   */
+  public static downloadSubmission = async (
+    episodeId: string,
+    submissionId: number
+  ): Promise<void> => {
+    const url: string = (
+      await API.apiCompeteSubmissionDownloadRetrieve(
+        episodeId,
+        submissionId.toString()
+      )
+    ).body.url;
+
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        // code to download the file given by the URL
+        const objUrl = window.URL.createObjectURL(blob);
+        const aHelper = document.createElement("a");
+        aHelper.style.display = "none";
+        aHelper.href = objUrl;
+        aHelper.download = `battlecode_source_${submissionId}.zip`;
+        document.body.appendChild(aHelper);
+        aHelper.click();
+        window.URL.revokeObjectURL(objUrl);
+      });
+  };
+
+  /**
+   * Get all submissions.
+   * @param episodeId The current episode's ID.
+   * @param page The page number.
+   */
+  public static getAllSubmissions = async (
+    episodeId: string,
+    page?: number
+  ): Promise<models.PaginatedSubmissionList> => {
+    return (await API.apiCompeteSubmissionList(episodeId, page)).body;
+  };
+
+  /**
+   * Get all tournament Submissions for the currently logged in user's team.
+   * @param episodeId The current episode's ID.
+   * @param page The page number.
+   */
+  public static getAllUserTournamentSubmissions = async (
+    episodeId: string,
+    page?: number
+  ): Promise<models.PaginatedSubmissionList> => {
+    const res = await $.get(
+      `${URL}/api/compete/${episodeId}/submission/tournament/?page=${page}`
+    );
+    return {
+      count: parseInt(res.length ?? "0"),
+      results: res ?? [],
+    };
+  };
 
   //-- USERS --//
 
@@ -439,14 +541,21 @@ export class Auth {
   };
 
   /**
-   * doResetPassword
+   * Confirm resetting a user's password.
+   * @param password The new password.
+   * @param token The password reset token.
    */
+  public static doResetPassword = async (
+    password: string,
+    token: string
+  ): Promise<void> => {
+    await API.apiUserPasswordResetConfirmCreate({ password, token });
+  };
 
   /**
-   * forgotPassword
+   * Request a password reset token to be sent to the provided email.
    */
-
-  /**
-   * pushTeamCode
-   */
+  public static forgotPassword = async (email: string): Promise<void> => {
+    await API.apiUserPasswordResetCreate({ email: email });
+  };
 }
