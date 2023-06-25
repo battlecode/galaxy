@@ -2,7 +2,7 @@ import React from "react";
 import { ApiSafe, ApiUnsafe, Auth } from "./utils/api";
 
 async function getId() {
-  const res = await ApiUnsafe.getUserProfile();
+  const res = await ApiUnsafe.getUserUserProfile();
   return res.id;
 }
 

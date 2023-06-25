@@ -43,8 +43,17 @@ export class ApiSafe {
 export class ApiUnsafe {
   //-- EPISODES --//
   /**
-   * getMapsByEpisode (getMaps)
+   * Get all maps for the provided episode.
+   * @param episodeId The current episode's ID.
    */
+  public static getAllMaps = async (
+    episodeId: string
+  ): Promise<models.ModelMap[]> => {
+    return (
+      (await $.get(`${URL}/api/episode/${episodeId}/map/`)) ??
+      ([] as models.ModelMap[])
+    );
+  };
 
   //-- TEAMS --//
 
@@ -278,6 +287,13 @@ export class ApiUnsafe {
   };
 
   /**
+   * Get the currently logged in user's profile.
+   */
+  public static getUserUserProfile = async (): Promise<models.UserPrivate> => {
+    return (await API.apiUserUMeRetrieve()).body;
+  };
+
+  /**
    * Get all teams associated with a user.
    * @param userId The user's ID.
    */
@@ -285,13 +301,6 @@ export class ApiUnsafe {
     userId: number
   ): Promise<models.TeamPublic> => {
     return (await API.apiUserUTeamsRetrieve(userId)).body;
-  };
-
-  /**
-   * Get the currently logged in user's profile.
-   */
-  public static getUserProfile = async (): Promise<models.UserPrivate> => {
-    return (await API.apiUserUMeRetrieve()).body;
   };
 
   /**
@@ -306,24 +315,101 @@ export class ApiUnsafe {
   //-- AVATARS/RESUMES/REPORTS --//
 
   /**
-   * avatarUpload
+   * Upload a new avatar for the currently logged in user.
+   * @param avatarFile The avatar file.
    */
+  public static avatarUpload = async (avatarFile: File): Promise<void> => {
+    const data = new FormData();
+    data.append("avatar", avatarFile);
+    await $.ajax({
+      url: `${baseUrl}/api/user/u/avatar/`,
+      type: "POST",
+      data: data,
+      dataType: "json",
+      processData: false,
+      contentType: false,
+    });
+  };
 
   /**
-   * teamAvatarUpload
+   * Upload a new avatar for the currently logged in user's team.
+   * @param episodeId The current episode's ID.
+   * @param avatarFile The avatar file.
    */
+  public static teamAvatarUpload = async (
+    episodeId: string,
+    avatarFile: File
+  ): Promise<void> => {
+    const data = new FormData();
+    data.append("avatar", avatarFile);
+    await $.ajax({
+      url: `${baseUrl}/api/team/${episodeId}/t/avatar/`,
+      type: "POST",
+      data: data,
+      dataType: "json",
+      processData: false,
+      contentType: false,
+    });
+  };
 
   /**
-   * resumeUpload
+   * Upload a resume for the currently logged in user.
+   * @param resumeFile The resume file.
    */
+  public static resumeUpload = async (resumeFile: File): Promise<void> => {
+    const data = new FormData();
+    data.append("resume", resumeFile);
+    await $.ajax({
+      url: `${baseUrl}/api/user/u/resume/`,
+      type: "PUT",
+      data: data,
+      dataType: "json",
+      processData: false,
+      contentType: false,
+    });
+  };
 
   /**
-   * resumeRetrieve
+   * Download the resume of the currently logged in user.
    */
+  public static downloadResume = async (): Promise<void> => {
+    await $.ajax({
+      url: `${baseUrl}/api/user/u/resume/`,
+      type: "GET",
+    }).done((data) => {
+      const blob = new Blob([data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      // See https://stackoverflow.com/a/9970672 for file download logic
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = "resume.pdf";
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+    });
+  };
 
   /**
-   * teamReportUpload
+   * Upload a new report for the currently logged in user's team.
+   * @param episodeId The current episode's ID.
+   * @param reportFile The report file.
    */
+  public static uploadUserTeamReport = async (
+    episodeId: string,
+    reportFile: File
+  ): Promise<void> => {
+    const data = new FormData();
+    data.append("report", reportFile);
+    await $.ajax({
+      url: `${baseUrl}/api/team/${episodeId}/requirement/report/`,
+      type: "PUT",
+      data: data,
+      dataType: "json",
+      processData: false,
+      contentType: false,
+    });
+  };
 
   //-- SCRIMMAGES/MATCHES --//
 
@@ -596,7 +682,7 @@ export class Auth {
    * @param user The user to register.
    */
   public static register = async (user: models.UserCreate): Promise<void> => {
-    const newUser = await ApiUnsafe.createUser(user);
+    await ApiUnsafe.createUser(user);
     return await Auth.login(user.username, user.password);
   };
 
@@ -616,6 +702,6 @@ export class Auth {
    * Request a password reset token to be sent to the provided email.
    */
   public static forgotPassword = async (email: string): Promise<void> => {
-    await API.apiUserPasswordResetCreate({ email: email });
+    await API.apiUserPasswordResetCreate({ email });
   };
 }
