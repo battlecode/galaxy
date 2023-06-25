@@ -26,13 +26,11 @@ test("API: Generate/Verify API Access Token (STABLE)", async () => {
 // Located at frontend2\src\__test__\App.test.tsx
 
 // TEST 2: Get a submission
-// TODO: how???
 // test('Download a submission (UNSTABLE)', async () => {
 //   await Auth.login('lmtorola_test', 'pass')
 // })
 
 // TEST 3: Get a page of submissions
-// TODO: ahhhhhhhh
 // test('Get a page of submissions (UNSTABLE)', async () => {
 //   expect(API.apiCompeteSubmissionList('bc22', 1)
 //     .done((res) => { return res.body.count }))
@@ -44,7 +42,9 @@ test("API: Generate/Verify API Access Token (STABLE)", async () => {
 test("API: Get current user's info (authed) (UNSTABLE)", async () => {
   await Auth.login("lmtorola_test", "pass");
   Auth.setLoginHeader();
-  expect(API.apiUserUMeRetrieve().then((res) => res.body.id)).toBeTruthy();
+  await ApiUnsafe.getUserUserProfile().then((res) => {
+    expect(res.username).toEqual("lmtorola_test");
+  });
 });
 
 // TEST 2: Get current user's info (unauthed)

@@ -12,7 +12,7 @@ const PAGE_SIZE = 10;
 // TODO: how does url work? @index.tsx?
 const API = new ApiApi(baseUrl);
 
-export class ApiSafe {
+export class Api {
   //-- TOKEN HANDLING --//
 
   /**
@@ -39,9 +39,7 @@ export class ApiSafe {
       return false;
     }
   };
-}
 
-export class ApiUnsafe {
   //-- EPISODES --//
   /**
    * Get all maps for the provided episode.
@@ -129,15 +127,8 @@ export class ApiUnsafe {
   // };
 
   /**
-   * Get the Mu history of the currently logged in user's team.
+   * getTeamMuHistoryByTeam
    */
-  public static getTeamMuHistoryByTeam = async (teamId: number) => {
-    $.get(`${baseUrl}/api/${LEAGUE}/team/${teamId}/history/`).done(
-      (data, status) => {
-        console.log(data);
-      }
-    );
-  };
 
   /**
    * getTeamWinStatsByTeam
@@ -671,7 +662,7 @@ export class Auth {
       refresh: "",
     };
 
-    return await ApiSafe.getApiTokens(credentials)
+    return await Api.getApiTokens(credentials)
       .then((res) => {
         Cookies.set("access", res.body.access);
         Cookies.set("refresh", res.body.refresh);
@@ -705,7 +696,7 @@ export class Auth {
    * If not logged in, then api calls will give 403s, and the website will tell you to log in anyways.
    */
   public static loginCheck = async (): Promise<boolean> => {
-    return await ApiSafe.verifyCurrentToken();
+    return await Api.verifyCurrentToken();
   };
 
   /**
@@ -713,7 +704,7 @@ export class Auth {
    * @param user The user to register.
    */
   public static register = async (user: models.UserCreate): Promise<void> => {
-    await ApiUnsafe.createUser(user);
+    await Api.createUser(user);
     return await Auth.login(user.username, user.password);
   };
 
