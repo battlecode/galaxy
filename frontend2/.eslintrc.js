@@ -17,6 +17,7 @@ module.exports = {
     "*.json",
     ".eslintrc.js",
     "tailwind.config.js",
+    "**/types/**",
   ],
   parserOptions: {
     project: "tsconfig.json",

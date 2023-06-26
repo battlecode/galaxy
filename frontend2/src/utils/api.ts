@@ -4,24 +4,26 @@ import * as $ from "jquery";
 import * as models from "./types/model/models";
 
 // hacky, fall back to localhost for now
-const baseUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
-const LEAGUE = 0;
-const PAGE_SIZE = 10;
+const baseUrl = process.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000";
+// const LEAGUE = 0; // To be used later for rating history
 
-// Safe vs. unsafe APIs... safe API has been tested, unsafe has NOT
 // TODO: how does url work? @index.tsx?
+// This is an instance of the auto-generated API class.
+// The "ApiApi" class should not be imported/used anywhere but this file!
 const API = new ApiApi(baseUrl);
 
 export class Api {
-  //-- TOKEN HANDLING --//
+  // -- TOKEN HANDLING --//
 
   /**
    * Takes a set of user credentials and returns an access and refresh JSON web token pair to prove the authentication of those credentials.
    *  - TODO: Rework cookie policy - https://github.com/battlecode/galaxy/issues/647
    * @param credentials The user's credentials.
    */
-  public static getApiTokens = async (credentials: models.TokenObtainPair) => {
-    return API.apiTokenCreate(credentials);
+  public static getApiTokens = async (
+    credentials: models.TokenObtainPair
+  ): Promise<models.TokenObtainPair> => {
+    return (await API.apiTokenCreate(credentials)).body;
   };
 
   /**
@@ -30,7 +32,7 @@ export class Api {
    */
   public static verifyCurrentToken = async (): Promise<boolean> => {
     const accessToken = Cookies.get("access");
-    if (accessToken) {
+    if (accessToken !== undefined) {
       return (
         (await API.apiTokenVerifyCreate({ token: accessToken })).response
           .status === 200
@@ -40,7 +42,7 @@ export class Api {
     }
   };
 
-  //-- EPISODES --//
+  // -- EPISODES --//
   /**
    * Get all maps for the provided episode.
    * @param episodeId The current episode's ID.
@@ -54,7 +56,7 @@ export class Api {
     );
   };
 
-  //-- TEAMS --//
+  // -- TEAMS --//
 
   /**
    * Creates a new team.
@@ -90,7 +92,7 @@ export class Api {
   ): Promise<void> => {
     const teamInfo = {
       name: teamName,
-      joinKey: joinKey,
+      joinKey,
     };
     await API.apiTeamTJoinCreate(episodeId, teamInfo);
   };
@@ -115,9 +117,9 @@ export class Api {
     return (await API.apiTeamTMePartialUpdate(episodeId, { joinKey })).body;
   };
 
-  //-- TEAM STATS --//
+  // -- TEAM STATS --//
 
-  // TODO: unsure of how this is supposed to work
+  // TODO: implement rankings history
   // /**
   //  * Get the Mu history of the given team.
   //  * @param teamId The team's ID.
@@ -146,7 +148,7 @@ export class Api {
    * getTeamRankingByTeam
    */
 
-  //-- SEARCHING --//
+  // -- SEARCHING --//
 
   /**
    * Search team, ordering the result by ranking.
@@ -166,13 +168,10 @@ export class Api {
     const teamUrl =
       `${apiURL}/?ordering=-rating,name&search=${encQuery}&page=${page ?? 1}` +
       (requireActiveSubmission ? `&has_active_submission=true` : ``);
-    // return (await $.get(teamUrl, (teamData) => {
-    //   const pageLimit = Math.ceil(teamData.count / PAGE_SIZE);
-    // }));
     return await $.get(teamUrl);
   };
 
-  //-- GENERAL INFO --//
+  // -- GENERAL INFO --//
 
   /**
    * Get the current episode's info.
@@ -188,18 +187,18 @@ export class Api {
    * Get updates about the current league.
    * TODO: No idea how this is supposed to work!
    */
-  public static getUpdates = async () => {
-    $.get(`${baseUrl}/api/league/${LEAGUE}/`, (data) => {
-      for (let i = 0; i < data.updates.length; i++) {
-        const d = new Date(data.updates[i].time);
-        data.updates[i].dateObj = d;
-        data.updates[i].date = d.toLocaleDateString();
-        data.updates[i].time = d.toLocaleTimeString();
-      }
-    });
-  };
+  // public static getUpdates = async (): Promise<any> => {
+  //   return await $.get(`${baseUrl}/api/league/${LEAGUE}/`, (data) => {
+  //     for (let i = 0; i < data.updates.length; i++) {
+  //       const d = new Date(data.updates[i].time);
+  //       data.updates[i].dateObj = d;
+  //       data.updates[i].date = d.toLocaleDateString();
+  //       data.updates[i].time = d.toLocaleTimeString();
+  //     }
+  //   });
+  // };
 
-  //-- SUBMISSIONS --//
+  // -- SUBMISSIONS --//
 
   /**
    * Uploads a new submission to the Google Cloud Storage bucket.
@@ -244,8 +243,8 @@ export class Api {
       )
     ).body.url;
 
-    fetch(url)
-      .then((response) => response.blob())
+    await fetch(url)
+      .then(async (response) => await response.blob())
       .then((blob) => {
         // code to download the file given by the URL
         const objUrl = window.URL.createObjectURL(blob);
@@ -281,7 +280,9 @@ export class Api {
     page?: number
   ): Promise<models.PaginatedSubmissionList> => {
     const res = await $.get(
-      `${baseUrl}/api/compete/${episodeId}/submission/tournament/?page=${page}`
+      `${baseUrl}/api/compete/${episodeId}/submission/tournament/?page=${
+        page ?? 1
+      }`
     );
     return {
       count: parseInt(res.length ?? "0"),
@@ -289,13 +290,15 @@ export class Api {
     };
   };
 
-  //-- USERS --//
+  // -- USERS --//
 
   /**
    * Create a new user.
    * @param user The user's info.
    */
-  public static createUser = async (user: models.UserCreate) => {
+  public static createUser = async (
+    user: models.UserCreate
+  ): Promise<models.UserCreate> => {
     return (await API.apiUserUCreate(user)).body;
   };
 
@@ -335,7 +338,7 @@ export class Api {
     await API.apiUserUMePartialUpdate(user);
   };
 
-  //-- AVATARS/RESUMES/REPORTS --//
+  // -- AVATARS/RESUMES/REPORTS --//
 
   /**
    * Upload a new avatar for the currently logged in user.
@@ -347,7 +350,7 @@ export class Api {
     await $.ajax({
       url: `${baseUrl}/api/user/u/avatar/`,
       type: "POST",
-      data: data,
+      data,
       dataType: "json",
       processData: false,
       contentType: false,
@@ -368,7 +371,7 @@ export class Api {
     await $.ajax({
       url: `${baseUrl}/api/team/${episodeId}/t/avatar/`,
       type: "POST",
-      data: data,
+      data,
       dataType: "json",
       processData: false,
       contentType: false,
@@ -385,7 +388,7 @@ export class Api {
     await $.ajax({
       url: `${baseUrl}/api/user/u/resume/`,
       type: "PUT",
-      data: data,
+      data,
       dataType: "json",
       processData: false,
       contentType: false,
@@ -427,14 +430,14 @@ export class Api {
     await $.ajax({
       url: `${baseUrl}/api/team/${episodeId}/requirement/report/`,
       type: "PUT",
-      data: data,
+      data,
       dataType: "json",
       processData: false,
       contentType: false,
     });
   };
 
-  //-- SCRIMMAGES/MATCHES --//
+  // -- SCRIMMAGES/MATCHES --//
 
   /**
    * Accept a scrimmage invitation.
@@ -495,9 +498,9 @@ export class Api {
       isRanked: boolean;
       requestedTo: number;
       playerOrder: models.PlayerOrderEnum;
-      mapNames: Array<string>;
+      mapNames: string[];
     }
-  ) => {
+  ): Promise<void> => {
     // Once again, the important values are params, we can just throw in the rest here to make the type happy
     const scrimRequest: models.ScrimmageRequest = {
       ...request,
@@ -605,7 +608,7 @@ export class Api {
     return (await API.apiCompeteMatchList(episodeId, page)).body;
   };
 
-  //-- TOURNAMENTS --//
+  // -- TOURNAMENTS --//
   /**
    * Get the next tournament occurring during the given episode, as ordered by submission freeze time.
    * @param episodeId The current episode's ID.
@@ -634,7 +637,7 @@ export class Auth {
   /**
    * Clear the access and refresh tokens from the browser's cookies.
    */
-  public static logout = () => {
+  public static logout = (): void => {
     Cookies.set("access", "");
     Cookies.set("refresh", "");
     Auth.setLoginHeader();
@@ -648,13 +651,8 @@ export class Auth {
    */
   public static login = async (
     username: string,
-    password: string,
-    callback?: (
-      response: JQueryXHR,
-      success: boolean,
-      body?: models.TokenObtainPair
-    ) => void
-  ) => {
+    password: string
+  ): Promise<void> => {
     const credentials = {
       username,
       password,
@@ -662,16 +660,10 @@ export class Auth {
       refresh: "",
     };
 
-    return await Api.getApiTokens(credentials)
-      .then((res) => {
-        Cookies.set("access", res.body.access);
-        Cookies.set("refresh", res.body.refresh);
+    const res = await Api.getApiTokens(credentials);
 
-        if (callback) callback(res.response, true, res.body);
-      })
-      .catch((res) => {
-        if (callback) callback(res.response, false);
-      });
+    Cookies.set("access", res.access);
+    Cookies.set("refresh", res.refresh);
   };
 
   /**
@@ -679,9 +671,9 @@ export class Auth {
    * default for all subsequent requests. The header is a JWT token: see
    * https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
    */
-  public static setLoginHeader = () => {
+  public static setLoginHeader = (): void => {
     const accessToken = Cookies.get("access");
-    if (accessToken) {
+    if (accessToken !== undefined) {
       $.ajaxSetup({
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -705,7 +697,7 @@ export class Auth {
    */
   public static register = async (user: models.UserCreate): Promise<void> => {
     await Api.createUser(user);
-    return await Auth.login(user.username, user.password);
+    await Auth.login(user.username, user.password);
   };
 
   /**
