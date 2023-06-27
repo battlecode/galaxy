@@ -18,6 +18,7 @@ env:
 
 jobs:
   unit-test-frontend:
+    name: Frontend linting / unit tests
     # Defines the type of runner the job runs on
     runs-on: ubuntu-latest
     steps:
@@ -73,7 +74,7 @@ jobs:
           pre-commit install
           pre-commit run -a
   unit-test-backend:
-    name: Unit tests (django)
+    name: Backend unit tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
