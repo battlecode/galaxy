@@ -43,13 +43,16 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - name: Install package dependencies
-        run: cd frontend2 && npm install
+        run: npm install
+        working-directory: ./frontend2
       - name: Check linting and formatting
         # Custom script for checking the linting and formatting being in place
-        run: cd frontend2 && npm run lint
+        run: npm run lint
+        working-directory: ./frontend2
       # Run test cases and this could ensure minimum coverage as well if set
       - name: Execute test cases
-        run: cd frontend2 && npm run test
+        run: npm run test
+        working-directory: ./frontend2
   lint:
     name: Linter (pre-commit)
     runs-on: ubuntu-latest
