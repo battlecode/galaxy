@@ -10,6 +10,7 @@ module.exports = {
     "plugin:react/recommended",
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier",
   ],
   ignorePatterns: [
@@ -28,6 +29,7 @@ module.exports = {
   plugins: ["react"],
   rules: {
     indent: ["error", 2],
+    semi: "error", // require semicolons ending statements
   },
   settings: {
     react: {
