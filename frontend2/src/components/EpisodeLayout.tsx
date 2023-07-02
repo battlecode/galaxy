@@ -14,7 +14,7 @@ const EpisodeLayout: React.FC = () => {
   }
   return (
     <div className="h-screen">
-      <Navbar/>
+      <Navbar />
       <div className="flex flex-row h-full">
         <Sidebar />
         <Outlet />

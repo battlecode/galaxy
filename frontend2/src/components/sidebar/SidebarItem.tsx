@@ -7,13 +7,8 @@ interface SidebarItemProps {
   linkTo: string;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({
-  icon,
-  text,
-  linkTo,
-}) => {
-  const baseStyle =
-    "text-base flex items-center gap-3 ";
+const SidebarItem: React.FC<SidebarItemProps> = ({ icon, text, linkTo }) => {
+  const baseStyle = "text-base flex items-center gap-3 ";
   const colorVariants = {
     gray: "text-gray-800 hover:text-gray-400",
     color: "text-teal",
