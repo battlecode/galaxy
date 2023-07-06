@@ -16,6 +16,7 @@ import {
 } from "react-router-dom";
 import { DEFAULT_EPISODE } from "./utils/constants";
 import NotFound from "./views/NotFound";
+import Rankings from "./views/Rankings";
 
 const App: React.FC = () => {
   const [episodeId, setEpisodeId] = useState(DEFAULT_EPISODE);
@@ -38,10 +39,11 @@ const router = createBrowserRouter([
     element: <EpisodeLayout />,
     children: [
       // Pages that should always be visible
-      // TODO: /:episodeId/resources, /:episodeId/tournaments, /:episodeId/rankings, /:episodeId/queue
+      // TODO: /:episodeId/resources, /:episodeId/tournaments, /:episodeId/queue
       { path: "/:episodeId/home", element: <Home /> },
       { path: "/:episodeId/quickstart", element: <QuickStart /> },
       { path: "/:episodeId/*", element: <NotFound /> },
+      { path: "/:episodeId/rankings", element: <Rankings /> },
       // Pages that should only be visible when logged in
       // TODO: /:episodeId/team, /:episodeId/submissions, /:episodeId/scrimmaging
       { path: "/account", element: <Account /> },
