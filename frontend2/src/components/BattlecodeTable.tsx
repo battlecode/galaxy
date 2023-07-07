@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 
 interface Column<T> {
   header: React.ReactNode;
@@ -7,7 +7,7 @@ interface Column<T> {
 
 interface TableProps<T> {
   data: T[];
-  columns: Column<T>[];
+  columns: Array<Column<T>>;
   onRowClick?: (data: T) => void;
   bottomElement?: JSX.Element;
 }
@@ -23,9 +23,9 @@ function BattlecodeTable<T>({
   bottomElement,
 }: TableProps<T>) {
   return (
-    <div className="relative overflow-x-auto">
-      <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <div className="w-4/5 pl-50 ml-10">
+      <table className="w-full text-sm text-left text-gray-500">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             {columns.map((col, idx) => (
               <th key={idx} scope="col" className="px-6 py-3">
@@ -39,20 +39,18 @@ function BattlecodeTable<T>({
             <tr
               key={idx}
               onClick={(ev) => {
-                ev.stopPropagation();
-                onRowClick?.(row);
+                ev.stopPropagation()
+                onRowClick?.(row)
               }}
               className={
-                idx % 2 === 0
-                  ? "bg-white border-b dark:bg-gray-900 dark:border-gray-700"
-                  : "bg-gray-50 border-b dark:bg-gray-800 dark:border-gray-700"
+                idx % 2 === 0 ? "bg-white border-b" : "bg-gray-50 border-b"
               }
             >
               {columns.map((col, idx) => (
                 <th
                   key={idx}
                   scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                 >
                   {col.value(row)}
                 </th>
@@ -61,9 +59,9 @@ function BattlecodeTable<T>({
           ))}
         </tbody>
       </table>
-      {bottomElement}
+      <div className="mx-10 text-center">{bottomElement}</div>
     </div>
-  );
+  )
 }
 
-export default BattlecodeTable;
+export default BattlecodeTable
