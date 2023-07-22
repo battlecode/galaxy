@@ -1,65 +1,54 @@
-import { useContext, useEffect, useState } from "react"
-import { EpisodeContext } from "../contexts/EpisodeContext"
-import { Api } from "../utils/api"
-import BattlecodeTable from "../components/BattlecodeTable"
-import { type PaginatedTeamPublicList } from "../utils/types/model/PaginatedTeamPublicList"
-import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement"
-import { NavLink, useNavigate } from "react-router-dom"
+import { useContext, useEffect, useState } from "react";
+import { EpisodeContext } from "../contexts/EpisodeContext";
+import { Api } from "../utils/api";
+import BattlecodeTable from "../components/BattlecodeTable";
+import { type PaginatedTeamPublicList } from "../utils/types/model/PaginatedTeamPublicList";
+import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
+import { NavLink, useNavigate } from "react-router-dom";
 
 function trimString(str: string, maxLength: number) {
   if (str.length > maxLength) {
-    return str.slice(0, maxLength - 1) + "..."
+    return str.slice(0, maxLength - 1) + "...";
   }
-  return str
+  return str;
 }
 
 const Rankings: React.FC = () => {
-  const episodeId = useContext(EpisodeContext).episodeId
+  const episodeId = useContext(EpisodeContext).episodeId;
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [page, setPage] = useState<number>(1)
-  const [searchQuery, setSearchQuery] = useState<string>("")
+  const [page, setPage] = useState<number>(1);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [requireActiveSubmission, setRequireActiveSubmission] =
-    useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(true)
+    useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [data, setData] = useState<PaginatedTeamPublicList | undefined>(
     undefined
-  )
-
-  const queryVars = {
-    episodeId,
-    searchQuery,
-    requireActiveSubmission: false,
-    page,
-  }
+  );
 
   function handlePage(page: number) {
     if (!loading) {
-      setPage(page)
+      setPage(page);
     }
   }
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
+    setData({ ...data, results: [] });
 
-    Api.searchTeams(
-      queryVars.episodeId,
-      queryVars.searchQuery,
-      queryVars.requireActiveSubmission,
-      queryVars.page
-    ).then((res) => {
-      setData(res)
-      setLoading(false)
-    })
+    Api.searchTeams(episodeId, searchQuery, requireActiveSubmission, page).then(
+      (res) => {
+        setData(res);
+        setLoading(false);
+      }
+    );
 
-    return () => { setLoading(false) }
-  }, [searchQuery, page])
-
-  if (data == null) {
-    return <>Loading...</>
-  }
+    return () => {
+      setLoading(false);
+    };
+  }, [searchQuery, page]);
 
   return (
     <div className="flex flex-col w-full">
@@ -70,16 +59,21 @@ const Rankings: React.FC = () => {
 
       <div style={{ height: 40 }} />
       <BattlecodeTable
-        data={data.results ?? []}
+        data={data?.results ?? []}
+        loading={loading}
         bottomElement={
           <BattlecodeTableBottomElement
-            totalCount={data.count ?? 0}
+            totalCount={data?.count ?? 0}
             pageSize={10}
             currentPage={page}
-            onPage={(page) => { handlePage(page) }}
+            onPage={(page) => {
+              handlePage(page);
+            }}
           />
         }
-        onRowClick={(r) => { navigate(`/team/${r.id}`) }}
+        onRowClick={(r) => {
+          navigate(`/team/${r.id}`);
+        }}
         columns={[
           {
             header: "Rating",
@@ -121,7 +115,7 @@ const Rankings: React.FC = () => {
         ]}
       />
     </div>
-  )
-}
+  );
+};
 
-export default Rankings
+export default Rankings;
