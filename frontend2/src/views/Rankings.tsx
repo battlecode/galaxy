@@ -34,6 +34,8 @@ const Rankings: React.FC = () => {
     }
   }
 
+  console.log(data);
+
   useEffect(() => {
     setLoading(true);
     setData({ ...data, results: [] });
@@ -55,9 +57,7 @@ const Rankings: React.FC = () => {
       <h1 className="ml-10 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
         Rankings
       </h1>
-      <div style={{ height: 40 }} />
-
-      <div style={{ height: 40 }} />
+      <div className="h-10" />
       <BattlecodeTable
         data={data?.results ?? []}
         loading={loading}
@@ -77,7 +77,7 @@ const Rankings: React.FC = () => {
         columns={[
           {
             header: "Rating",
-            value: (team) => team.profile?.rating.toFixed(0) ?? 0,
+            value: (team) => Math.round(team.profile?.rating ?? 0),
           },
           {
             header: "Team",
@@ -102,7 +102,9 @@ const Rankings: React.FC = () => {
           {
             header: "Eligibility",
             value: (team) =>
-              team.profile?.eligibleFor?.map((e) => e).join(", ") ?? "",
+              (team.profile?.eligibleFor ?? [])
+                .map((e) => e.toString())
+                .join(", "),
           },
           {
             header: "Auto-Accept Ranked",
