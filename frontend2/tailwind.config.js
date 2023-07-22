@@ -8,7 +8,10 @@ module.exports = {
       colors: {
         teal: "#00A28E",
       },
+      container: {
+        center: true,
+      },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/forms")],
 };
