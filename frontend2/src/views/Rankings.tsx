@@ -4,7 +4,7 @@ import { Api } from "../utils/api";
 import BattlecodeTable from "../components/BattlecodeTable";
 import { type PaginatedTeamPublicList } from "../utils/types/model/PaginatedTeamPublicList";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
-import { NavLink } from "react-router-dom";
+import { NavLink, useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 
@@ -18,24 +18,32 @@ function trimString(str: string, maxLength: number) {
 const Rankings: React.FC = () => {
   const episodeId = useContext(EpisodeContext).episodeId;
 
-  const [page, setPage] = useState<number>(1);
   const [searchText, setSearchText] = useState<string>("");
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
-
   const [data, setData] = useState<PaginatedTeamPublicList | undefined>(
     undefined
   );
 
+  const [queryParams, setQueryParams] = useSearchParams({
+    page: "1",
+    search: "",
+  });
+  const page = parseInt(queryParams.get("page") ?? "1");
+  const searchQuery = queryParams.get("search") ?? "";
+
   function handlePage(page: number) {
     if (!loading) {
-      setPage(page);
+      queryParams.set("page", page.toString());
+      setQueryParams(queryParams);
     }
   }
 
   useEffect(() => {
+    if (searchQuery !== searchText) {
+      setSearchText(searchQuery);
+    }
+
     setLoading(true);
-    setData({ ...data, results: [] });
 
     Api.searchTeams(episodeId, searchQuery, false, page).then((res) => {
       setData(res);
@@ -61,6 +69,12 @@ const Rankings: React.FC = () => {
             onChange={(ev) => {
               setSearchText(ev.target.value);
             }}
+            onKeyDown={(ev) => {
+              if (ev.key === "Enter") {
+                queryParams.set("search", searchText);
+                setQueryParams(queryParams);
+              }
+            }}
           />
         </div>
         <div className="w-10" />
@@ -68,7 +82,10 @@ const Rankings: React.FC = () => {
           <Button
             label="Search!"
             variant="dark"
-            onClick={() => setSearchQuery(searchText)}
+            onClick={() => {
+              queryParams.set("search", searchText);
+              setQueryParams(queryParams);
+            }}
           />
         </div>
       </div>

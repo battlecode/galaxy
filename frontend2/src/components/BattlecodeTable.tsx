@@ -37,38 +37,39 @@ function BattlecodeTable<T>({
           </tr>
         </thead>
         <tbody>
-          {data.map((row, idx) => (
-            <tr
-              key={idx}
-              onClick={(ev) => {
-                ev.stopPropagation();
-                onRowClick?.(row);
-              }}
-              className={
-                idx % 2 === 0
-                  ? `bg-white border-b ${
-                      onRowClick !== undefined
-                        ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
-                        : ""
-                    }}`
-                  : `bg-gray-50 border-b ${
-                      onRowClick !== undefined
-                        ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
-                        : ""
-                    }`
-              }
-            >
-              {columns.map((col, idx) => (
-                <th
-                  key={idx}
-                  scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-                >
-                  {col.value(row)}
-                </th>
-              ))}
-            </tr>
-          ))}
+          {!loading &&
+            data.map((row, idx) => (
+              <tr
+                key={idx}
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  onRowClick?.(row);
+                }}
+                className={
+                  idx % 2 === 0
+                    ? `bg-white border-b ${
+                        onRowClick !== undefined
+                          ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+                          : ""
+                      }}`
+                    : `bg-gray-50 border-b ${
+                        onRowClick !== undefined
+                          ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+                          : ""
+                      }`
+                }
+              >
+                {columns.map((col, idx) => (
+                  <th
+                    key={idx}
+                    scope="row"
+                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                  >
+                    {col.value(row)}
+                  </th>
+                ))}
+              </tr>
+            ))}
         </tbody>
       </table>
       {loading && (
