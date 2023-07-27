@@ -5,6 +5,8 @@ import BattlecodeTable from "../components/BattlecodeTable";
 import { type PaginatedTeamPublicList } from "../utils/types/model/PaginatedTeamPublicList";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
 import { NavLink } from "react-router-dom";
+import Input from "../components/elements/Input";
+import Button from "../components/elements/Button";
 
 function trimString(str: string, maxLength: number) {
   if (str.length > maxLength) {
@@ -17,6 +19,7 @@ const Rankings: React.FC = () => {
   const episodeId = useContext(EpisodeContext).episodeId;
 
   const [page, setPage] = useState<number>(1);
+  const [searchText, setSearchText] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -45,11 +48,31 @@ const Rankings: React.FC = () => {
   }, [searchQuery, page]);
 
   return (
-    <div className="flex flex-col w-full">
-      <h1 className="ml-10 text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
+    <div className="ml-10 flex flex-col w-full">
+      <h1 className="mb-10 text-3xl font-bold leading-7 text-gray-900">
         Rankings
       </h1>
-      <div className="h-10" />
+      <div className="mb-5 w-2/5 h-10 flex flex-row items-left justify-center">
+        <div className="min-w-max max-w-full">
+          <Input
+            label=""
+            placeholder="Search for a team..."
+            value={searchText}
+            onChange={(ev) => {
+              setSearchText(ev.target.value);
+            }}
+          />
+        </div>
+        <div className="w-10" />
+        <div className="min-w-max">
+          <Button
+            label="Search!"
+            variant="dark"
+            onClick={() => setSearchQuery(searchText)}
+          />
+        </div>
+      </div>
+
       <BattlecodeTable
         data={data?.results ?? []}
         loading={loading}

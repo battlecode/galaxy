@@ -25,7 +25,7 @@ function BattlecodeTable<T>({
   bottomElement,
 }: TableProps<T>) {
   return (
-    <div className="w-4/5 pl-50 ml-10">
+    <div className="w-4/5 pl-50">
       <table className="w-full text-sm text-left text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
