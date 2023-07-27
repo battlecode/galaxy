@@ -4,7 +4,7 @@ import { Api } from "../utils/api";
 import BattlecodeTable from "../components/BattlecodeTable";
 import { type PaginatedTeamPublicList } from "../utils/types/model/PaginatedTeamPublicList";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function trimString(str: string, maxLength: number) {
   if (str.length > maxLength) {
@@ -16,12 +16,8 @@ function trimString(str: string, maxLength: number) {
 const Rankings: React.FC = () => {
   const episodeId = useContext(EpisodeContext).episodeId;
 
-  const navigate = useNavigate();
-
   const [page, setPage] = useState<number>(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [requireActiveSubmission, setRequireActiveSubmission] =
-    useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   const [data, setData] = useState<PaginatedTeamPublicList | undefined>(
@@ -34,18 +30,14 @@ const Rankings: React.FC = () => {
     }
   }
 
-  console.log(data);
-
   useEffect(() => {
     setLoading(true);
     setData({ ...data, results: [] });
 
-    Api.searchTeams(episodeId, searchQuery, requireActiveSubmission, page).then(
-      (res) => {
-        setData(res);
-        setLoading(false);
-      }
-    );
+    Api.searchTeams(episodeId, searchQuery, false, page).then((res) => {
+      setData(res);
+      setLoading(false);
+    });
 
     return () => {
       setLoading(false);
@@ -71,9 +63,6 @@ const Rankings: React.FC = () => {
             }}
           />
         }
-        onRowClick={(r) => {
-          navigate(`/team/${r.id}`);
-        }}
         columns={[
           {
             header: "Rating",
@@ -81,14 +70,22 @@ const Rankings: React.FC = () => {
           },
           {
             header: "Team",
-            value: (team) => team.name,
+            value: (team) => (
+              <NavLink to={`/team/${team.id}`} className="hover:underline">
+                {trimString(team.name, 13)}
+              </NavLink>
+            ),
           },
           {
             header: "Members",
             value: (team) =>
               team.members.map((member, idx) => (
                 <>
-                  <NavLink key={idx} to={`/user/${member.id}`}>
+                  <NavLink
+                    key={idx}
+                    to={`/user/${member.id}`}
+                    className="hover:underline"
+                  >
                     {trimString(member.username, 13)}
                   </NavLink>
                   {idx !== team.members.length - 1 ? ", " : ""}

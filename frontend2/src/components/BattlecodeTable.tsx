@@ -45,7 +45,17 @@ function BattlecodeTable<T>({
                 onRowClick?.(row);
               }}
               className={
-                idx % 2 === 0 ? "bg-white border-b" : "bg-gray-50 border-b"
+                idx % 2 === 0
+                  ? `bg-white border-b ${
+                      onRowClick !== undefined
+                        ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+                        : ""
+                    }}`
+                  : `bg-gray-50 border-b ${
+                      onRowClick !== undefined
+                        ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+                        : ""
+                    }`
               }
             >
               {columns.map((col, idx) => (
@@ -61,13 +71,11 @@ function BattlecodeTable<T>({
           ))}
         </tbody>
       </table>
-      <div className="w-full text-center">
-        {loading && (
-          <div className="w-full h-100 text-center justify-center">
-            <Spinner />
-          </div>
-        )}
-      </div>
+      {loading && (
+        <div className="w-full h-64 flex flex-row items-center justify-center">
+          <Spinner />
+        </div>
+      )}
       <div className="mx-10 text-center">{bottomElement}</div>
     </div>
   );
@@ -76,7 +84,7 @@ function BattlecodeTable<T>({
 const Spinner: React.FC = () => (
   <svg
     aria-hidden="true"
-    className="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
+    className="w-16 h-16 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
     viewBox="0 0 100 101"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
