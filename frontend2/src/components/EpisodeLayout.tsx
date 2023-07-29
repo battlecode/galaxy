@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import Sidebar from "./sidebar";
 import { Outlet, useParams } from "react-router-dom";
 import { EpisodeContext } from "../contexts/EpisodeContext";
+import { useCurrentUser } from "../contexts/CurrentUserContext";
 
 // This component contains the NavBar and SideBar.
 // Child route components are rendered with <Outlet />
