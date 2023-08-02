@@ -39,10 +39,6 @@ const Rankings: React.FC = () => {
   }
 
   useEffect(() => {
-    if (searchQuery !== searchText) {
-      setSearchText(searchQuery);
-    }
-
     setLoading(true);
 
     Api.searchTeams(episodeId, searchQuery, false, page).then((res) => {
@@ -64,6 +60,7 @@ const Rankings: React.FC = () => {
         <div className="min-w-max max-w-full">
           <Input
             label=""
+            disabled={loading}
             placeholder="Search for a team..."
             value={searchText}
             onChange={(ev) => {
@@ -81,6 +78,7 @@ const Rankings: React.FC = () => {
         <div className="min-w-max">
           <Button
             label="Search!"
+            disabled={loading}
             variant="dark"
             onClick={() => {
               queryParams.set("search", searchText);
