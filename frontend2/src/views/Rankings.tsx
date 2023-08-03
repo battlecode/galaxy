@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { EpisodeContext } from "../contexts/EpisodeContext";
 import { Api } from "../utils/api";
 import BattlecodeTable from "../components/BattlecodeTable";
@@ -8,7 +8,7 @@ import { NavLink, useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 
-function trimString(str: string, maxLength: number) {
+function trimString(str: string, maxLength: number): string {
   if (str.length > maxLength) {
     return str.slice(0, maxLength - 1) + "...";
   }
@@ -31,20 +31,34 @@ const Rankings: React.FC = () => {
   const page = parseInt(queryParams.get("page") ?? "1");
   const searchQuery = queryParams.get("search") ?? "";
 
-  function handlePage(page: number) {
+  function handlePage(page: number): void {
     if (!loading) {
-      queryParams.set("page", page.toString());
-      setQueryParams(queryParams);
+      setQueryParams({ ...queryParams, page: page.toString() });
+    }
+  }
+
+  function handleSearch(): void {
+    if (!loading && searchText !== searchQuery) {
+      setQueryParams({ ...queryParams, search: searchText });
     }
   }
 
   useEffect(() => {
     setLoading(true);
 
-    Api.searchTeams(episodeId, searchQuery, false, page).then((res) => {
-      setData(res);
-      setLoading(false);
-    });
+    const search = async (): Promise<void> => {
+      console.log("here!");
+      await Api.searchTeams(episodeId, searchQuery, false, page)
+        .then((res) => {
+          setData(res);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    };
+
+    search();
 
     return () => {
       setLoading(false);
@@ -52,40 +66,33 @@ const Rankings: React.FC = () => {
   }, [searchQuery, page]);
 
   return (
-    <div className="ml-10 flex flex-col w-full">
-      <h1 className="mb-10 text-3xl font-bold leading-7 text-gray-900">
+    <div className="ml-10 mb-20 flex flex-col w-full">
+      <h1 className="mb-5 text-3xl font-bold leading-7 text-gray-900">
         Rankings
       </h1>
-      <div className="mb-5 w-2/5 h-10 flex flex-row items-left justify-center">
-        <div className="min-w-max max-w-full">
-          <Input
-            label=""
-            disabled={loading}
-            placeholder="Search for a team..."
-            value={searchText}
-            onChange={(ev) => {
-              setSearchText(ev.target.value);
-            }}
-            onKeyDown={(ev) => {
-              if (ev.key === "Enter") {
-                queryParams.set("search", searchText);
-                setQueryParams(queryParams);
-              }
-            }}
-          />
-        </div>
+      <div className="mb-5 w-3/5 h-10 flex flex-row items-center justify-left">
+        <Input
+          disabled={loading}
+          placeholder="Search for a team..."
+          value={searchText}
+          onChange={(ev) => {
+            setSearchText(ev.target.value);
+          }}
+          onKeyDown={(ev) => {
+            if (ev.key === "Enter") {
+              handleSearch();
+            }
+          }}
+        />
         <div className="w-10" />
-        <div className="min-w-max">
-          <Button
-            label="Search!"
-            disabled={loading}
-            variant="dark"
-            onClick={() => {
-              queryParams.set("search", searchText);
-              setQueryParams(queryParams);
-            }}
-          />
-        </div>
+        <Button
+          disabled={loading}
+          label="Search!"
+          variant="dark"
+          onClick={() => {
+            handleSearch();
+          }}
+        />
       </div>
 
       <BattlecodeTable
@@ -143,11 +150,19 @@ const Rankings: React.FC = () => {
           },
           {
             header: "Auto-Accept Ranked",
-            value: (team) => (team.profile?.autoAcceptRanked ? "Yes" : "No"),
+            value: (team) =>
+              team.profile?.autoAcceptRanked !== undefined &&
+              team.profile.autoAcceptRanked
+                ? "Yes"
+                : "No",
           },
           {
             header: "Auto-Accept Unranked",
-            value: (team) => (team.profile?.autoAcceptUnranked ? "Yes" : "No"),
+            value: (team) =>
+              team.profile?.autoAcceptUnranked !== undefined &&
+              team.profile?.autoAcceptUnranked
+                ? "Yes"
+                : "No",
           },
         ]}
       />

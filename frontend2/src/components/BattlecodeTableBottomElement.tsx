@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React from "react";
 
 interface TableBottomProps {
   totalCount: number;
@@ -13,12 +13,12 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
   currentPage,
   onPage,
 }) => {
-  const first = (currentPage - 1) * pageSize + 1
-  const last = Math.min(currentPage * pageSize, totalCount)
-  const pageCount = Math.ceil(totalCount / pageSize)
+  const first = (currentPage - 1) * pageSize + 1;
+  const last = Math.min(currentPage * pageSize, totalCount);
+  const pageCount = Math.ceil(totalCount / pageSize);
 
-  const backDisabled = currentPage <= 1
-  const forwardDisabled = currentPage >= pageCount
+  const backDisabled = currentPage <= 1;
+  const forwardDisabled = currentPage >= pageCount;
 
   return (
     <nav
@@ -38,7 +38,7 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
             <button
               type="button"
               onClick={(ev) => {
-                ev.stopPropagation()
+                ev.stopPropagation();
               }}
               className="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg cursor-not-allowed"
               disabled={true}
@@ -49,9 +49,9 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
             <button
               type="button"
               onClick={(ev) => {
-                ev.stopPropagation()
+                ev.stopPropagation();
                 if (!backDisabled) {
-                  onPage(currentPage - 1)
+                  onPage(currentPage - 1);
                 }
               }}
               className="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700"
@@ -66,8 +66,8 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
               <button
                 type="button"
                 onClick={(ev) => {
-                  ev.stopPropagation()
-                  onPage(idx + 1)
+                  ev.stopPropagation();
+                  onPage(idx + 1);
                 }}
                 className="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700"
               >
@@ -77,8 +77,8 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
               <button
                 type="button"
                 onClick={(ev) => {
-                  ev.stopPropagation()
-                  onPage(idx + 1)
+                  ev.stopPropagation();
+                  onPage(idx + 1);
                 }}
                 aria-current="page"
                 className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
@@ -92,9 +92,9 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
           <button
             type="button"
             onClick={(ev) => {
-              ev.stopPropagation()
+              ev.stopPropagation();
               if (!forwardDisabled) {
-                onPage(currentPage + 1)
+                onPage(currentPage + 1);
               }
             }}
             className={
@@ -109,7 +109,7 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
         </li>
       </ul>
     </nav>
-  )
-}
+  );
+};
 
-export default BattlecodeTableBottomElement
+export default BattlecodeTableBottomElement;

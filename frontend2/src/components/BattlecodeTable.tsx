@@ -23,14 +23,14 @@ function BattlecodeTable<T>({
   loading,
   onRowClick,
   bottomElement,
-}: TableProps<T>) {
+}: TableProps<T>): React.ReactElement {
   return (
-    <div className="w-4/5 pl-50">
+    <div className="w-5/6 pl-50">
       <table className="w-full text-sm text-left text-gray-500">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50">
           <tr>
             {columns.map((col, idx) => (
-              <th key={idx} scope="col" className="px-6 py-3">
+              <th key={idx} scope="col" className="px-8 py-3">
                 {col.header}
               </th>
             ))}
@@ -48,22 +48,22 @@ function BattlecodeTable<T>({
                 className={
                   idx % 2 === 0
                     ? `bg-white border-b ${
-                        onRowClick !== undefined
-                          ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
-                          : ""
-                      }}`
+                      onRowClick !== undefined
+                        ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+                        : ""
+                    }}`
                     : `bg-gray-50 border-b ${
-                        onRowClick !== undefined
-                          ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
-                          : ""
-                      }`
+                      onRowClick !== undefined
+                        ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+                        : ""
+                    }`
                 }
               >
                 {columns.map((col, idx) => (
                   <th
                     key={idx}
                     scope="row"
-                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+                    className="px-8 py-3 font-medium text-gray-900 whitespace-nowrap"
                   >
                     {col.value(row)}
                   </th>
