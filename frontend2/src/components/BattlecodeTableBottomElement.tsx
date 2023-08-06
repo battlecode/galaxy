@@ -20,6 +20,38 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
   const backDisabled = currentPage <= 1;
   const forwardDisabled = currentPage >= pageCount;
 
+  function getPageNumbers(): Array<string | number> {
+    const MAX_PAGES = 15;
+    if (pageCount > MAX_PAGES) {
+      if (currentPage <= MAX_PAGES - 2) {
+        const pages: Array<string | number> = ["", 0]
+          .concat(Array.from({ length: MAX_PAGES - 2 }, (_, idx) => idx + 1))
+          .concat(["...", pageCount]);
+        return pages.slice(2);
+      } else if (currentPage >= pageCount - MAX_PAGES + 3) {
+        return [1, "..."].concat(
+          Array.from(
+            { length: MAX_PAGES - 2 },
+            (_, idx) => pageCount - MAX_PAGES + idx + 3
+          )
+        );
+      } else {
+        return [1, "..."]
+          .concat(
+            Array.from(
+              { length: MAX_PAGES - 4 },
+              (_, idx) => idx + currentPage - 5
+            )
+          )
+          .concat(["...", pageCount]);
+      }
+    } else if (pageCount < 1) {
+      return ["1"];
+    } else {
+      return Array.from({ length: pageCount }, (_, idx) => idx + 1);
+    }
+  }
+
   return (
     <nav
       className="flex items-center justify-between pt-4"
@@ -34,81 +66,86 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
       </span>
       <ul className="inline-flex -space-x-px text-sm h-8">
         <li>
-          {backDisabled ? (
-            <button
-              type="button"
-              onClick={(ev) => {
-                ev.stopPropagation();
-              }}
-              className="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg cursor-not-allowed"
-              disabled={true}
-            >
-              Previous
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={(ev) => {
-                ev.stopPropagation();
-                if (!backDisabled) {
-                  onPage(currentPage - 1);
-                }
-              }}
-              className="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700"
-            >
-              Previous
-            </button>
-          )}
+          <DirectionPageButton
+            forward={false}
+            disabled={backDisabled}
+            currentPage={currentPage}
+            onPage={onPage}
+          />
         </li>
-        {Array.from({ length: pageCount }, (_, idx) => (
+        {getPageNumbers().map((page, idx) => (
           <li key={idx}>
-            {idx + 1 === currentPage ? (
-              <button
-                type="button"
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  onPage(idx + 1);
-                }}
-                className="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700"
-              >
-                {idx + 1}
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  onPage(idx + 1);
-                }}
-                aria-current="page"
-                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-              >
-                {idx + 1}
-              </button>
-            )}
+            <PageButton page={page} currentPage={currentPage} onPage={onPage} />
           </li>
         ))}
         <li>
-          <button
-            type="button"
-            onClick={(ev) => {
-              ev.stopPropagation();
-              if (!forwardDisabled) {
-                onPage(currentPage + 1);
-              }
-            }}
-            className={
-              backDisabled
-                ? "flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700"
-                : "flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg cursor-not-allowed"
-            }
+          <DirectionPageButton
+            forward={true}
             disabled={forwardDisabled}
-          >
-            Next
-          </button>
+            currentPage={currentPage}
+            onPage={onPage}
+          />
         </li>
       </ul>
     </nav>
+  );
+};
+
+const DirectionPageButton: React.FC<{
+  forward: boolean;
+  disabled: boolean;
+  currentPage: number;
+  onPage: (page: number) => void;
+}> = ({ forward, disabled, currentPage, onPage }) => {
+  const className = disabled
+    ? `flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-${
+      forward ? "r" : "l"
+    }-lg cursor-not-allowed`
+    : `flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-${
+      forward ? "r" : "l"
+    }-lg hover:bg-gray-100 hover:text-gray-700`;
+
+  return (
+    <button
+      type="button"
+      onClick={(ev) => {
+        if (!disabled) {
+          onPage(forward ? currentPage + 1 : currentPage - 1);
+        }
+        ev.stopPropagation();
+      }}
+      className={className}
+      disabled={disabled}
+    >
+      {forward ? "Next" : "Previous"}
+    </button>
+  );
+};
+
+const PageButton: React.FC<{
+  page: number | string;
+  onPage: (page: number) => void;
+  currentPage: number;
+}> = ({ page, onPage, currentPage }) => {
+  const className =
+    page === currentPage
+      ? "flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700"
+      : "flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700";
+
+  return (
+    <button
+      type="button"
+      onClick={(ev) => {
+        ev.stopPropagation();
+        if (typeof page === "number") {
+          onPage(page);
+        }
+      }}
+      aria-current="page"
+      className={className}
+    >
+      {page}
+    </button>
   );
 };
 

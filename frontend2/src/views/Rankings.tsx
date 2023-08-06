@@ -47,18 +47,21 @@ const Rankings: React.FC = () => {
     setLoading(true);
 
     const search = async (): Promise<void> => {
-      console.log("here!");
-      await Api.searchTeams(episodeId, searchQuery, false, page)
-        .then((res) => {
-          setData(res);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+      try {
+        const result = await Api.searchTeams(
+          episodeId,
+          searchQuery,
+          false,
+          page
+        );
+        setData(result);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+      }
     };
 
-    search();
+    void search();
 
     return () => {
       setLoading(false);
