@@ -20,10 +20,18 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
   const backDisabled = currentPage <= 1;
   const forwardDisabled = currentPage >= pageCount;
 
+  /**
+   *
+   * @returns an array of page numbers, each of which will be rendered as a button.
+   * The strings in the array, such as the ellipses will be rendered as disabled buttons.
+   */
   function getPageNumbers(): Array<string | number> {
+    // The maximum number of pages to show in the pagination bar.
     const MAX_PAGES = 15;
     if (pageCount > MAX_PAGES) {
+      // Determines where the ellipses should go based on the current page.
       if (currentPage <= MAX_PAGES - 2) {
+        // TS hack: gets the array not to throw a type error.
         const pages: Array<string | number> = ["", 0]
           .concat(Array.from({ length: MAX_PAGES - 2 }, (_, idx) => idx + 1))
           .concat(["...", pageCount]);
@@ -46,6 +54,7 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
           .concat(["...", pageCount]);
       }
     } else if (pageCount < 1) {
+      // If we have no data, return this non-clickable placeholder.
       return ["1"];
     } else {
       return Array.from({ length: pageCount }, (_, idx) => idx + 1);
@@ -99,11 +108,11 @@ const DirectionPageButton: React.FC<{
 }> = ({ forward, disabled, currentPage, onPage }) => {
   const className = disabled
     ? `flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-${
-      forward ? "r" : "l"
-    }-lg cursor-not-allowed`
+        forward ? "r" : "l"
+      }-lg cursor-not-allowed`
     : `flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-${
-      forward ? "r" : "l"
-    }-lg hover:bg-gray-100 hover:text-gray-700`;
+        forward ? "r" : "l"
+      }-lg hover:bg-gray-100 hover:text-gray-700`;
 
   return (
     <button
