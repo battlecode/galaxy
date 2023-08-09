@@ -29,7 +29,7 @@ module.exports = {
   plugins: ["react"],
   rules: {
     indent: ["error", 2],
-    semi: "error", // require semicolons ending statements
+    semi: ["error", "always"], // require semicolons ending statements
   },
   settings: {
     react: {
