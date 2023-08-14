@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { EpisodeContext } from "../contexts/EpisodeContext";
-import { Api } from "../utils/api";
+import * as Api from "../utils/api";
 import BattlecodeTable from "../components/BattlecodeTable";
 import { type PaginatedTeamPublicList } from "../utils/types/model/PaginatedTeamPublicList";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
