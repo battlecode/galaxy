@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { type UserPrivate } from "../utils/types";
-import { AuthStateEnum, type AuthState, CurrentUserContext } from "../contexts/CurrentUserContext";
-import { Api } from "../utils/api";
+import {
+  AuthStateEnum,
+  type AuthState,
+  CurrentUserContext,
+} from "../contexts/CurrentUserContext";
+import * as Api from "../utils/api";
 import { removeApiTokens, doApiTokensExist } from "../utils/cookies";
 
 export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
