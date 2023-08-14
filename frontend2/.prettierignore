@@ -7,6 +7,9 @@
 # production
 /build
 
+# auto-generated type
+src/utils/types
+
 /coverage
 
 package-lock.json
