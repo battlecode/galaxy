@@ -49,15 +49,15 @@ function BattlecodeTable<T>({
                 className={
                   idx % 2 === 0
                     ? `bg-white border-b ${
-                      onRowClick !== undefined
-                        ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
-                        : ""
-                    }}`
+                        onRowClick !== undefined
+                          ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+                          : ""
+                      }}`
                     : `bg-gray-50 border-b ${
-                      onRowClick !== undefined
-                        ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
-                        : ""
-                    }`
+                        onRowClick !== undefined
+                          ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
+                          : ""
+                      }`
                 }
               >
                 {columns.map((col, idx) => (

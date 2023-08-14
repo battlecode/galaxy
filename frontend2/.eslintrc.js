@@ -18,7 +18,7 @@ module.exports = {
     "*.json",
     ".eslintrc.js",
     "tailwind.config.js",
-    "**/types/**",
+    "src/utils/types",
   ],
   parserOptions: {
     project: "tsconfig.json",
@@ -28,7 +28,6 @@ module.exports = {
   },
   plugins: ["react"],
   rules: {
-    indent: ["error", 2],
     semi: ["error", "always"], // require semicolons ending statements
   },
   settings: {
