@@ -2,6 +2,7 @@ import { ApiApi } from "./types/api/ApiApi";
 import Cookies from "js-cookie";
 import * as $ from "jquery";
 import * as models from "./types/model/models";
+import type * as customModels from "./apiTypes";
 
 // hacky, fall back to localhost for now
 const baseUrl = process.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000";
@@ -297,9 +298,30 @@ export const getAllUserTournamentSubmissions = async (
  * @param user The user's info.
  */
 export const createUser = async (
-  user: models.UserCreate
+  user: customModels.CreateUserInput
 ): Promise<models.UserCreate> => {
-  return (await API.apiUserUCreate(user)).body;
+  const defaultUser = {
+    id: -1,
+    isStaff: false,
+    profile: {
+      avatarUrl: "",
+      hasAvatar: false,
+      hasResume: false,
+    },
+  };
+  // convert our input into models.UserCreate.
+  return (
+    await API.apiUserUCreate({
+      ...defaultUser,
+      ...user,
+      profile: {
+        ...defaultUser.profile,
+        ...user.profile,
+        gender: user.profile.gender as unknown as models.GenderEnum,
+        country: user.profile.country as unknown as models.CountryEnum,
+      },
+    })
+  ).body;
 };
 
 /**
