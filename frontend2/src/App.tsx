@@ -17,13 +17,17 @@ import {
 import { DEFAULT_EPISODE } from "./utils/constants";
 import NotFound from "./views/NotFound";
 import Rankings from "./views/Rankings";
+import { CurrentUserProvider } from "./components/CurrentUserProvider";
+import PrivateRoute from "./components/PrivateRoute";
 
 const App: React.FC = () => {
   const [episodeId, setEpisodeId] = useState(DEFAULT_EPISODE);
   return (
-    <EpisodeContext.Provider value={{ episodeId, setEpisodeId }}>
-      <RouterProvider router={router} />
-    </EpisodeContext.Provider>
+    <CurrentUserProvider>
+      <EpisodeContext.Provider value={{ episodeId, setEpisodeId }}>
+        <RouterProvider router={router} />
+      </EpisodeContext.Provider>
+    </CurrentUserProvider>
   );
 };
 
@@ -44,10 +48,19 @@ const router = createBrowserRouter([
       { path: "/:episodeId/quickstart", element: <QuickStart /> },
       { path: "/:episodeId/*", element: <NotFound /> },
       { path: "/:episodeId/rankings", element: <Rankings /> },
-      // Pages that should only be visible when logged in
-      // TODO: /:episodeId/team, /:episodeId/submissions, /:episodeId/scrimmaging
+    ],
+  },
+  // Pages that should only be visible when logged in
+  {
+    element: <PrivateRoute />,
+    children: [
+      {
+        element: <EpisodeLayout />,
+        children: [
+          // TODO: /:episodeId/team, /:episodeId/submissions, /:episodeId/scrimmaging
+        ],
+      },
       { path: "/account", element: <Account /> },
-      // etc
     ],
   },
   // Pages that should redirect
