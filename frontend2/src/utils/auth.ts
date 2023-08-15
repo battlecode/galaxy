@@ -2,6 +2,7 @@ import * as Api from "./api";
 import Cookies from "js-cookie";
 import type * as models from "./types/model/models";
 import { ApiApi } from "./types/api/ApiApi";
+import type * as customModels from "./apiTypes";
 
 /** This file contains all frontend authentication functions. Responsible for interacting with Cookies and expiring/setting JWT tokens. */
 
@@ -73,9 +74,12 @@ export const loginCheck = async (): Promise<boolean> => {
  * Register a new user.
  * @param user The user to register.
  */
-export const register = async (user: models.UserCreate): Promise<void> => {
-  await Api.createUser(user);
+export const register = async (
+  user: customModels.CreateUserInput
+): Promise<models.UserCreate> => {
+  const returnedUser = await Api.createUser(user);
   await login(user.username, user.password);
+  return returnedUser;
 };
 
 /**
