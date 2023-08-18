@@ -5,6 +5,8 @@ interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
   variant?: string;
   label?: string;
   iconName?: IconName;
+  fullWidth?: boolean;
+  className?: string;
 }
 
 const variants: Record<string, string> = {
@@ -13,21 +15,24 @@ const variants: Record<string, string> = {
 };
 
 const Button: React.FC<ButtonProps> = ({
-  variant,
+  variant = "",
   label,
   iconName,
+  fullWidth = false,
+  className = "",
   ...rest
 }) => {
-  variant = variant ?? "";
-  const variantStyle = variants[variant];
+  const variantStyle = `${variants[variant]}  ${
+    fullWidth ? "w-full" : ""
+  } ${className}`;
   return (
     <button
       // default button type
       type="button"
-      className={`flex flex-row gap-1.5 items-center justify-center rounded h-9 px-2.5 py-1.5 font-medium shadow-sm ${variantStyle}`}
+      className={`flex h-9 flex-row items-center justify-center gap-1.5 rounded px-2.5 py-1.5 font-medium shadow-sm ${variantStyle}`}
       {...rest}
     >
-      {iconName !== undefined && <Icon name={iconName} size="sm"/>}
+      {iconName !== undefined && <Icon name={iconName} size="sm" />}
       {label}
     </button>
   );
