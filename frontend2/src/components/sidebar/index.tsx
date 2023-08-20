@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   const linkBase = `/${episodeId}/`;
 
   return collapsed ? null : (
-    <div className="flex flex-col gap-8 py-4 h-full bg-gray-50 shadow-gray-200 shadow-sm">
+    <div className="flex flex-col gap-8 py-4 h-full bg-gray-50 shadow-gray-200 shadow-sm hidden sm:block">
       <SidebarSection title="">
         <SidebarItem
           icon={<HomeIcon className="h-6 w-6" />}
