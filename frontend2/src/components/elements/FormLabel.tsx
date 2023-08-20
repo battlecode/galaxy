@@ -1,19 +1,39 @@
 import React from "react";
+import Icon from "./Icon";
+import Tooltip from "./Tooltip";
 
 const FormLabel: React.FC<{
   label?: string;
   required?: boolean;
   className?: string;
-}> = ({ label, required = false, className }) => {
+  tooltip?: string;
+}> = ({ label, required = false, className, tooltip }) => {
   return (
-    <span
-      className={`text-sm font-medium leading-6 text-gray-700 ${
+    <div
+      className={`flex flex-row items-center gap-1 text-sm font-medium leading-6 text-gray-700 ${
         className ?? ""
       }`}
     >
+      <Tooltip tooltip="asdflkajdsf">
+        <Icon
+          className="ml-0.5 mt-0.5 inline text-gray-400"
+          size="xs"
+          name="information_circle"
+        />
+      </Tooltip>
+
       {label}
       {required && <span className="text-red-700"> *</span>}
-    </span>
+      {tooltip !== undefined && (
+        <Tooltip tooltip={tooltip}>
+          <Icon
+            className="ml-0.5 mt-0.5 inline text-gray-400"
+            size="xs"
+            name="information_circle"
+          />
+        </Tooltip>
+      )}
+    </div>
   );
 };
 

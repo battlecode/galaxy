@@ -58,7 +58,7 @@ const Register: React.FC = () => {
             setError("profile.country", { message: REQUIRED_ERROR_MSG });
           }
         }}
-        className="m-6 w-11/12 sm:w-[550px] flex flex-col gap-5 rounded-lg bg-gray-100 p-6 shadow-md"
+        className="m-6 flex w-11/12 flex-col gap-5 rounded-lg bg-gray-100 p-6 shadow-md sm:w-[550px]"
       >
         <Input
           required
@@ -103,6 +103,29 @@ const Register: React.FC = () => {
         </div>
         {/* begin profile fields */}
         <div className="grid grid-cols-2 gap-5">
+          <SelectMenu<Country>
+            required
+            onChange={(newCountry) => {
+              setCountry(newCountry);
+              setValue("profile.country", newCountry);
+              clearErrors("profile.country");
+            }}
+            errorMessage={errors.profile?.country?.message}
+            value={country}
+            label="Country"
+            placeholder="Select country"
+            options={Object.entries(COUNTRIES).map(([code, name]) => ({
+              value: code as Country,
+              label: name,
+            }))}
+          />
+          <Input
+            placeholder="MIT"
+            label="School"
+            {...register("profile.school")}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-5">
           <SelectMenu<GenderEnum>
             required
             onChange={(newGender) => {
@@ -125,28 +148,14 @@ const Register: React.FC = () => {
               { value: GenderEnum.RATHER_NOT_SAY, label: "Rather not say" },
             ]}
           />
-          <Input
-            placeholder="MIT"
-            label="School"
-            {...register("profile.school")}
-          />
+          {gender === GenderEnum.SELF_DESCRIBED && (
+            <Input
+              label="Self described gender identity"
+              {...register("profile.genderDetails")}
+            />
+          )}
         </div>
-        <SelectMenu<Country>
-          required
-          onChange={(newCountry) => {
-            setCountry(newCountry);
-            setValue("profile.country", newCountry);
-            clearErrors("profile.country");
-          }}
-          errorMessage={errors.profile?.country?.message}
-          value={country}
-          label="Country"
-          placeholder="Select country"
-          options={Object.entries(COUNTRIES).map(([code, name]) => ({
-            value: code as Country,
-            label: name,
-          }))}
-        />
+
         <Button
           className="mt-1"
           fullWidth

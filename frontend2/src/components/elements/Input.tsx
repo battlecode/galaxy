@@ -7,17 +7,18 @@ interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
   required?: boolean;
   className?: string;
   errorMessage?: string;
+  tooltip?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { label, required = false, className = "", errorMessage, ...rest },
+  { label, required = false, className = "", errorMessage, tooltip, ...rest },
   ref,
 ) {
   const invalid = errorMessage !== undefined;
   return (
     <div className={`relative ${invalid ? "mb-1" : ""} ${className}`}>
       <label>
-        <FormLabel label={label} required={required} />
+        <FormLabel label={label} required={required} tooltip={tooltip} />
         <div className="relative rounded-md shadow-sm">
           <input
             ref={ref}
