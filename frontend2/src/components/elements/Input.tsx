@@ -1,32 +1,37 @@
 import React, { forwardRef } from "react";
+import FormError from "./FormError";
+import FormLabel from "./FormLabel";
 
 interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
   label?: string;
   required?: boolean;
+  className?: string;
+  errorMessage?: string;
+  tooltip?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { label, required, ...rest },
-  ref
+  { label, required = false, className = "", errorMessage, tooltip, ...rest },
+  ref,
 ) {
-  required = required ?? false;
+  const invalid = errorMessage !== undefined;
   return (
-    <div className="w-full">
-      {label !== undefined && (
-        <label className="flex flex-col w-full gap-1 text-sm font-medium leading-6 text-gray-900">
-          <span>
-            {label}
-            {required && <span className="text-red-700"> *</span>}
-          </span>
-        </label>
-      )}
-      <div className="relative rounded-md shadow-sm">
-        <input
-          ref={ref}
-          className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-gray-700 sm:text-sm sm:leading-6"
-          {...rest}
-        />
-      </div>
+    <div className={`relative ${invalid ? "mb-1" : ""} ${className}`}>
+      <label>
+        <FormLabel label={label} required={required} tooltip={tooltip} />
+        <div className="relative rounded-md shadow-sm">
+          <input
+            ref={ref}
+            aria-invalid={errorMessage !== undefined ? "true" : "false"}
+            className={`block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 ring-1 ring-inset
+            ring-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-inset
+            focus:ring-cyan-600 sm:text-sm sm:leading-6
+            ${invalid ? "ring-red-500" : ""}`}
+            {...rest}
+          />
+        </div>
+        {invalid && <FormError message={errorMessage} />}
+      </label>
     </div>
   );
 });

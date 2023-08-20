@@ -26,9 +26,9 @@ function BattlecodeTable<T>({
   bottomElement,
 }: TableProps<T>): React.ReactElement {
   return (
-    <div className="w-5/6 pl-50">
-      <table className="w-full text-sm text-left text-gray-500">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+    <div className="pl-50 w-5/6">
+      <table className="w-full text-left text-sm text-gray-500">
+        <thead className="bg-gray-50 text-xs uppercase text-gray-700">
           <tr>
             {columns.map((col, idx) => (
               <th key={idx} scope="col" className="px-8 py-3">
@@ -48,12 +48,12 @@ function BattlecodeTable<T>({
                 }}
                 className={
                   idx % 2 === 0
-                    ? `bg-white border-b ${
+                    ? `border-b bg-white ${
                         onRowClick !== undefined
                           ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
                           : ""
                       }}`
-                    : `bg-gray-50 border-b ${
+                    : `border-b bg-gray-50 ${
                         onRowClick !== undefined
                           ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
                           : ""
@@ -64,7 +64,7 @@ function BattlecodeTable<T>({
                   <th
                     key={idx}
                     scope="row"
-                    className="px-8 py-3 font-medium text-gray-900 whitespace-nowrap"
+                    className="whitespace-nowrap px-8 py-3 font-medium text-gray-900"
                   >
                     {col.value(row)}
                   </th>
@@ -74,7 +74,7 @@ function BattlecodeTable<T>({
         </tbody>
       </table>
       {loading && (
-        <div className="w-full h-64 flex flex-row items-center justify-center">
+        <div className="flex h-64 w-full flex-row items-center justify-center">
           <Spinner />
         </div>
       )}

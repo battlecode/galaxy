@@ -30,7 +30,7 @@ export const logout = (): void => {
  */
 export const login = async (
   username: string,
-  password: string
+  password: string,
 ): Promise<void> => {
   const credentials = {
     username,
@@ -75,7 +75,7 @@ export const loginCheck = async (): Promise<boolean> => {
  * @param user The user to register.
  */
 export const register = async (
-  user: customModels.CreateUserInput
+  user: customModels.CreateUserInput,
 ): Promise<models.UserCreate> => {
   const returnedUser = await Api.createUser(user);
   await login(user.username, user.password);
@@ -89,7 +89,7 @@ export const register = async (
  */
 export const doResetPassword = async (
   password: string,
-  token: string
+  token: string,
 ): Promise<void> => {
   await API.apiUserPasswordResetConfirmCreate({ password, token });
 };
