@@ -27,6 +27,7 @@ const Register: React.FC = () => {
   } = useForm<CreateUserInput>();
   const [gender, setGender] = useState<Maybe<GenderEnum>>();
   const [country, setCountry] = useState<Maybe<Country>>();
+  const [formError, setFormError] = useState<Maybe<string>>();
 
   const onSubmit: SubmitHandler<CreateUserInput> = async (data) => {
     if (gender === undefined || country === undefined) {
@@ -35,9 +36,10 @@ const Register: React.FC = () => {
     try {
       const newUser = await Auth.register(data);
       login(newUser);
-      console.log("logged in successfully");
-    } catch (error) {
-      console.log("failure to register", error);
+      setFormError(undefined);
+    } catch {
+      // TODO: display a more helpful error message once the API changes are made
+      setFormError("Unable to register");
     }
   };
   return (
@@ -60,6 +62,10 @@ const Register: React.FC = () => {
         }}
         className="m-6 flex w-11/12 flex-col gap-5 rounded-lg bg-gray-100 p-6 shadow-md sm:w-[550px]"
       >
+        {
+          // TODO: replace this with our custom notification component
+          formError !== undefined && <p>{formError}</p>
+        }
         <Input
           required
           placeholder="battlecode_player_6.9610"
