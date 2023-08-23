@@ -40,16 +40,16 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
         return [1, "..."].concat(
           Array.from(
             { length: MAX_PAGES - 2 },
-            (_, idx) => pageCount - MAX_PAGES + idx + 3
-          )
+            (_, idx) => pageCount - MAX_PAGES + idx + 3,
+          ),
         );
       } else {
         return [1, "..."]
           .concat(
             Array.from(
               { length: MAX_PAGES - 4 },
-              (_, idx) => idx + currentPage - 5
-            )
+              (_, idx) => idx + currentPage - 5,
+            ),
           )
           .concat(["...", pageCount]);
       }
@@ -73,7 +73,7 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
         </span>{" "}
         of <span className="font-semibold text-gray-900">{totalCount}</span>
       </span>
-      <ul className="inline-flex -space-x-px text-sm h-8">
+      <ul className="inline-flex h-8 -space-x-px text-sm">
         <li>
           <DirectionPageButton
             forward={false}

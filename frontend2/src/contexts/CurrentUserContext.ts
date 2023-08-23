@@ -17,7 +17,7 @@ interface CurrentUserContextType {
 }
 
 export const CurrentUserContext = createContext<CurrentUserContextType | null>(
-  null
+  null,
 );
 
 export const useCurrentUser = (): CurrentUserContextType => {
@@ -25,7 +25,7 @@ export const useCurrentUser = (): CurrentUserContextType => {
 
   if (currentUserContext === null) {
     throw new Error(
-      "useCurrentUser has to be used within <CurrentUserContext.Provider>"
+      "useCurrentUser has to be used within <CurrentUserContext.Provider>",
     );
   }
 
