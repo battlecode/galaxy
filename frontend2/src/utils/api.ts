@@ -21,7 +21,7 @@ const API = new ApiApi(baseUrl);
  * @param credentials The user's credentials.
  */
 export const getApiTokens = async (
-  credentials: models.TokenObtainPair
+  credentials: models.TokenObtainPair,
 ): Promise<models.TokenObtainPair> => {
   return (await API.apiTokenCreate(credentials)).body;
 };
@@ -48,11 +48,11 @@ export const verifyCurrentToken = async (): Promise<boolean> => {
  * @param episodeId The current episode's ID.
  */
 export const getAllMaps = async (
-  episodeId: string
+  episodeId: string,
 ): Promise<models.ModelMap[]> => {
   return (
     ((await $.get(
-      `${baseUrl}/api/episode/${episodeId}/map/`
+      `${baseUrl}/api/episode/${episodeId}/map/`,
     )) as models.ModelMap[]) ?? []
   );
 };
@@ -65,7 +65,7 @@ export const getAllMaps = async (
  */
 export const createTeam = async (
   episodeId: string,
-  teamName: string
+  teamName: string,
 ): Promise<models.TeamCreate> => {
   // build default object... why? I couldn't tell you
   const teamCreate = {
@@ -89,7 +89,7 @@ export const createTeam = async (
 export const joinTeam = async (
   episodeId: string,
   teamName: string,
-  joinKey: string
+  joinKey: string,
 ): Promise<void> => {
   const teamInfo = {
     name: teamName,
@@ -113,7 +113,7 @@ export const leaveTeam = async (episodeId: string): Promise<void> => {
  */
 export const updateUserTeamCode = async (
   episodeId: string,
-  joinKey: string
+  joinKey: string,
 ): Promise<models.TeamPrivate> => {
   return (await API.apiTeamTMePartialUpdate(episodeId, { joinKey })).body;
 };
@@ -162,7 +162,7 @@ export const searchTeams = async (
   episodeId: string,
   searchQuery: string,
   requireActiveSubmission: boolean,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedTeamPublicList> => {
   const apiURL = `${baseUrl}/api/team/${episodeId}/t`;
   const encQuery = encodeURIComponent(searchQuery);
@@ -179,7 +179,7 @@ export const searchTeams = async (
  * @param episodeId The current episode's ID.
  */
 export const getEpisodeInfo = async (
-  episodeId: string
+  episodeId: string,
 ): Promise<models.Episode> => {
   return (await API.apiEpisodeERetrieve(episodeId)).body;
 };
@@ -212,7 +212,7 @@ export const uploadSubmission = async (
     file: File;
     packageName: string;
     description: string;
-  }
+  },
 ): Promise<void> => {
   const fileData = new FormData();
   fileData.append("source_code", submission.file);
@@ -235,12 +235,12 @@ export const uploadSubmission = async (
  */
 export const downloadSubmission = async (
   episodeId: string,
-  submissionId: number
+  submissionId: number,
 ): Promise<void> => {
   const url: string = (
     await API.apiCompeteSubmissionDownloadRetrieve(
       episodeId,
-      submissionId.toString()
+      submissionId.toString(),
     )
   ).body.url;
 
@@ -266,7 +266,7 @@ export const downloadSubmission = async (
  */
 export const getAllSubmissions = async (
   episodeId: string,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedSubmissionList> => {
   return (await API.apiCompeteSubmissionList(episodeId, page)).body;
 };
@@ -278,12 +278,12 @@ export const getAllSubmissions = async (
  */
 export const getAllUserTournamentSubmissions = async (
   episodeId: string,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedSubmissionList> => {
   const res: models.Submission[] = (await $.get(
     `${baseUrl}/api/compete/${episodeId}/submission/tournament/?page=${
       page ?? 1
-    }`
+    }`,
   )) as unknown as models.Submission[];
   return {
     count: res.length,
@@ -298,7 +298,7 @@ export const getAllUserTournamentSubmissions = async (
  * @param user The user's info.
  */
 export const createUser = async (
-  user: customModels.CreateUserInput
+  user: customModels.CreateUserInput,
 ): Promise<models.UserCreate> => {
   const defaultUser = {
     id: -1,
@@ -329,7 +329,7 @@ export const createUser = async (
  * @param userId The user's ID.
  */
 export const getUserProfileByUser = async (
-  userId: number
+  userId: number,
 ): Promise<models.UserPublic> => {
   return (await API.apiUserURetrieve(userId)).body;
 };
@@ -346,7 +346,7 @@ export const getUserUserProfile = async (): Promise<models.UserPrivate> => {
  * @param userId The user's ID.
  */
 export const getTeamsByUser = async (
-  userId: number
+  userId: number,
 ): Promise<models.TeamPublic> => {
   return (await API.apiUserUTeamsRetrieve(userId)).body;
 };
@@ -355,7 +355,7 @@ export const getTeamsByUser = async (
  * Update the currently logged in user's info.
  */
 export const updateUser = async (
-  user: models.PatchedUserPrivate
+  user: models.PatchedUserPrivate,
 ): Promise<void> => {
   await API.apiUserUMePartialUpdate(user);
 };
@@ -386,7 +386,7 @@ export const avatarUpload = async (avatarFile: File): Promise<void> => {
  */
 export const teamAvatarUpload = async (
   episodeId: string,
-  avatarFile: File
+  avatarFile: File,
 ): Promise<void> => {
   const data = new FormData();
   data.append("avatar", avatarFile);
@@ -445,7 +445,7 @@ export const downloadResume = async (): Promise<void> => {
  */
 export const uploadUserTeamReport = async (
   episodeId: string,
-  reportFile: File
+  reportFile: File,
 ): Promise<void> => {
   const data = new FormData();
   data.append("report", reportFile);
@@ -468,7 +468,7 @@ export const uploadUserTeamReport = async (
  */
 export const acceptScrimmage = async (
   episodeId: string,
-  scrimmageId: number
+  scrimmageId: number,
 ): Promise<void> => {
   const scrimId = scrimmageId.toString();
   await API.apiCompeteRequestAcceptCreate(episodeId, scrimId);
@@ -481,7 +481,7 @@ export const acceptScrimmage = async (
  */
 export const rejectScrimmage = async (
   episodeId: string,
-  scrimmageId: number
+  scrimmageId: number,
 ): Promise<void> => {
   const scrimId = scrimmageId.toString();
   await API.apiCompeteRequestRejectCreate(episodeId, scrimId);
@@ -493,7 +493,7 @@ export const rejectScrimmage = async (
  */
 export const getUserScrimmagesInbox = async (
   episodeId: string,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedScrimmageRequestList> => {
   return (await API.apiCompeteRequestInboxList(episodeId, page)).body;
 };
@@ -504,7 +504,7 @@ export const getUserScrimmagesInbox = async (
  */
 export const getUserScrimmagesOutbox = async (
   episodeId: string,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedScrimmageRequestList> => {
   return (await API.apiCompeteRequestOutboxList(episodeId, page)).body;
 };
@@ -521,7 +521,7 @@ export const requestScrimmage = async (
     requestedTo: number;
     playerOrder: models.PlayerOrderEnum;
     mapNames: string[];
-  }
+  },
 ): Promise<void> => {
   // Once again, the important values are params, we can just throw in the rest here to make the type happy
   const scrimRequest: models.ScrimmageRequest = {
@@ -547,7 +547,7 @@ export const requestScrimmage = async (
  */
 export const getUserScrimmages = async (
   episodeId: string,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedMatchList> => {
   return (await API.apiCompeteMatchScrimmageList(episodeId, page)).body;
 };
@@ -561,7 +561,7 @@ export const getUserScrimmages = async (
 export const getScrimmagesByTeam = async (
   episodeId: string,
   teamId: number,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedMatchList> => {
   return (await API.apiCompeteMatchScrimmageList(episodeId, teamId, page)).body;
 };
@@ -580,7 +580,7 @@ export const getMatchesByTeam = async (
   teamId: number,
   tournamentId?: string,
   roundId?: number,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedMatchList> => {
   return (
     await API.apiCompeteMatchTournamentList(
@@ -588,7 +588,7 @@ export const getMatchesByTeam = async (
       page,
       roundId,
       teamId,
-      tournamentId
+      tournamentId,
     )
   ).body;
 };
@@ -600,7 +600,7 @@ export const getMatchesByTeam = async (
  */
 export const getAllMatches = async (
   episodeId: string,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedMatchList> => {
   return (await API.apiCompeteMatchList(episodeId, page)).body;
 };
@@ -612,7 +612,7 @@ export const getAllMatches = async (
  */
 export const getAllScrimmages = async (
   episodeId: string,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedMatchList> => {
   return (await API.apiCompeteMatchScrimmageList(episodeId, page)).body;
 };
@@ -624,7 +624,7 @@ export const getAllScrimmages = async (
  */
 export const getUserMatches = async (
   episodeId: string,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedMatchList> => {
   return (await API.apiCompeteMatchList(episodeId, page)).body;
 };
@@ -635,7 +635,7 @@ export const getUserMatches = async (
  * @param episodeId The current episode's ID.
  */
 export const getNextTournament = async (
-  episodeId: string
+  episodeId: string,
 ): Promise<models.Tournament> => {
   return (await API.apiEpisodeTournamentNextRetrieve(episodeId)).body;
 };
@@ -647,7 +647,7 @@ export const getNextTournament = async (
  */
 export const getAllTournaments = async (
   episodeId: string,
-  page?: number
+  page?: number,
 ): Promise<models.PaginatedTournamentList> => {
   return (await API.apiEpisodeTournamentList(episodeId, page)).body;
 };
