@@ -1,13 +1,18 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import Icon, { type IconName } from "../elements/Icon";
 
 interface SidebarItemProps {
-  icon: React.ReactNode;
+  iconName: IconName;
   text: string;
   linkTo: string;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ icon, text, linkTo }) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({
+  iconName,
+  text,
+  linkTo,
+}) => {
   const baseStyle = "text-base flex items-center gap-3 ";
   const colorVariants = {
     gray: "text-gray-800 hover:text-gray-400",
@@ -20,7 +25,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, text, linkTo }) => {
       }
       to={linkTo}
     >
-      {icon}
+      <Icon name={iconName} size="md" />
       {text}
     </NavLink>
   );
