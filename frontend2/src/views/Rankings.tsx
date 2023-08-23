@@ -21,7 +21,7 @@ const Rankings: React.FC = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<PaginatedTeamPublicList | undefined>(
-    undefined
+    undefined,
   );
 
   const [queryParams, setQueryParams] = useSearchParams({
@@ -52,7 +52,7 @@ const Rankings: React.FC = () => {
           episodeId,
           searchQuery,
           false,
-          page
+          page,
         );
         setData(result);
         setLoading(false);
@@ -69,11 +69,11 @@ const Rankings: React.FC = () => {
   }, [searchQuery, page]);
 
   return (
-    <div className="ml-10 mb-20 flex flex-col w-full">
+    <div className="mb-20 ml-10 flex w-full flex-col">
       <h1 className="mb-5 text-3xl font-bold leading-7 text-gray-900">
         Rankings
       </h1>
-      <div className="mb-5 w-3/5 h-10 flex flex-row items-center justify-left">
+      <div className="justify-left mb-5 flex h-10 w-3/5 flex-row items-center">
         <Input
           disabled={loading}
           placeholder="Search for a team..."

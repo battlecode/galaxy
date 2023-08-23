@@ -9,7 +9,7 @@ const SidebarSection: React.FC<SidebarSectionProps> = ({ children, title }) => {
   return (
     <div className="pl-5 pr-8">
       {title !== undefined && (
-        <h2 className="uppercase text-gray-500 tracking-wider text-sm mb-3">
+        <h2 className="mb-3 text-sm uppercase tracking-wider text-gray-500">
           {title}
         </h2>
       )}
