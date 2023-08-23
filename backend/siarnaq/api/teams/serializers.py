@@ -186,3 +186,7 @@ class UserPassedSerializer(serializers.Serializer):
 
 class TeamReportSerializer(serializers.Serializer):
     report = serializers.FileField(write_only=True)
+
+
+class TeamLeaveSerializer(serializers.Serializer):
+    pass
