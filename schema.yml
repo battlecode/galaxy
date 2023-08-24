@@ -1657,7 +1657,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeamPublic'
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/TeamPublic'
           description: ''
   /api/user/u/avatar/:
     post:

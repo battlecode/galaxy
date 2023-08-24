@@ -5,8 +5,9 @@ import {
   type AuthState,
   CurrentUserContext,
 } from "../contexts/CurrentUserContext";
-import * as Api from "../utils/api";
 import { removeApiTokens } from "../utils/cookies";
+import { loginCheck } from "../utils/api/auth";
+import { getUserUserProfile } from "../utils/api/user";
 
 export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -32,13 +33,12 @@ export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     const checkLoggedIn = async (): Promise<void> => {
-      // check if cookies exist before attempting to load user
-      if (!(await Api.verifyCurrentToken())) {
+      if (!(await loginCheck())) {
         logout();
         return;
       }
       try {
-        const user = await Api.getUserUserProfile();
+        const user = await getUserUserProfile();
         login(user);
       } catch (error) {
         logout();

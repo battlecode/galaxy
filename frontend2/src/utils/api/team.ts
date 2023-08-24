@@ -4,10 +4,11 @@ import {
   type TeamCreate,
   type PaginatedTeamPublicList,
   type TeamTListRequest,
+  type TeamTAvatarCreateRequest,
 } from "../types";
-import { DEFAULT_API_CONFIGURATION } from "./constants";
+import { DEFAULT_API_CONFIGURATION } from "./helpers";
 
-/** This file contains all frontend user api functions. */
+/** This file contains all frontend team api functions. */
 const API = new TeamApi(DEFAULT_API_CONFIGURATION);
 
 /**
@@ -104,4 +105,39 @@ export const searchTeams = async (
     page: page ?? 1,
   };
   return await API.teamTList(request);
+};
+
+/**
+ * Upload a new avatar for the currently logged in user's team.
+ * @param episodeId The current episode's ID.
+ * @param avatarFile The avatar file.
+ */
+export const teamAvatarUpload = async (
+  episodeId: string,
+  avatarFile: File,
+): Promise<void> => {
+  const request: TeamTAvatarCreateRequest = {
+    episodeId,
+    teamAvatarRequest: {
+      avatar: avatarFile,
+    },
+  };
+  await API.teamTAvatarCreate(request);
+};
+
+/**
+ * Upload a new report for the currently logged in user's team.
+ * @param episodeId The current episode's ID.
+ * @param reportFile The report file.
+ */
+export const uploadUserTeamReport = async (
+  episodeId: string,
+  reportFile: File,
+): Promise<void> => {
+  await API.teamRequirementReportUpdate({
+    episodeId,
+    teamReportRequest: {
+      report: reportFile,
+    },
+  });
 };

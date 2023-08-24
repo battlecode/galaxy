@@ -520,7 +520,7 @@ export class UserApi extends runtime.BaseAPI {
     /**
      * Retrieve all teams associated with a user.
      */
-    async userUTeamsRetrieveRaw(requestParameters: UserUTeamsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TeamPublic>> {
+    async userUTeamsRetrieveRaw(requestParameters: UserUTeamsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: TeamPublic; }>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling userUTeamsRetrieve.');
         }
@@ -544,13 +544,13 @@ export class UserApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => TeamPublicFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => runtime.mapValues(jsonValue, TeamPublicFromJSON));
     }
 
     /**
      * Retrieve all teams associated with a user.
      */
-    async userUTeamsRetrieve(requestParameters: UserUTeamsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TeamPublic> {
+    async userUTeamsRetrieve(requestParameters: UserUTeamsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: TeamPublic; }> {
         const response = await this.userUTeamsRetrieveRaw(requestParameters, initOverrides);
         return await response.value();
     }
