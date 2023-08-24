@@ -83,7 +83,7 @@ class TeamProfilePrivateSerializer(TeamProfilePublicSerializer):
             "auto_accept_unranked",
             "eligible_for",
         ]
-        read_only_fields = ["rating", "has_avatar", "avatar_url"]
+        read_only_fields = ["rating", "has_avatar", "avatar_url", "has_report"]
 
     def create(self, validated_data):
         eligible_for = validated_data.pop("eligible_for", None)
@@ -114,19 +114,15 @@ class CurrentEpisodeDefault:
 
 class TeamPrivateSerializer(TeamPublicSerializer):
     profile = TeamProfilePrivateSerializer(required=False)
-    episode = serializers.PrimaryKeyRelatedField(
-        default=CurrentEpisodeDefault(), queryset=Episode.objects.all()
-    )
 
     class Meta:
         model = Team
         fields = ["id", "profile", "episode", "name", "members", "join_key", "status"]
-        read_only_fields = ["id", "name", "members", "join_key", "status"]
+        read_only_fields = ["id", "episode", "name", "members", "join_key", "status"]
 
     @transaction.atomic
     def create(self, validated_data):
         team = Team.objects.create(**validated_data)
-
         # Add self to team
         request = self.context.get("request")
         team.members.add(request.user)
@@ -142,6 +138,10 @@ class TeamPrivateSerializer(TeamPublicSerializer):
 
 
 class TeamCreateSerializer(TeamPrivateSerializer):
+    episode = serializers.PrimaryKeyRelatedField(
+        default=CurrentEpisodeDefault(), queryset=Episode.objects.all()
+    )
+
     class Meta:
         model = Team
         fields = ["id", "profile", "episode", "name", "members", "join_key", "status"]
