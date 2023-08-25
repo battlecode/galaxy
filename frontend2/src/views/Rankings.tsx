@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { EpisodeContext } from "../contexts/EpisodeContext";
-import * as Api from "../utils/api";
 import BattlecodeTable from "../components/BattlecodeTable";
-import { type PaginatedTeamPublicList } from "../utils/types/model/PaginatedTeamPublicList";
+import { type PaginatedTeamPublicList } from "../utils/types";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
 import { NavLink, useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
+import { searchTeams } from "../utils/api/team";
 
 function trimString(str: string, maxLength: number): string {
   if (str.length > maxLength) {
@@ -48,12 +48,7 @@ const Rankings: React.FC = () => {
 
     const search = async (): Promise<void> => {
       try {
-        const result = await Api.searchTeams(
-          episodeId,
-          searchQuery,
-          false,
-          page,
-        );
+        const result = await searchTeams(episodeId, searchQuery, false, page);
         setData(result);
         setLoading(false);
       } catch (err) {
@@ -147,23 +142,23 @@ const Rankings: React.FC = () => {
           {
             header: "Eligibility",
             value: (team) =>
-              (team.profile?.eligibleFor ?? [])
+              (team.profile?.eligible_for ?? [])
                 .map((e) => e.toString())
                 .join(", "),
           },
           {
             header: "Auto-Accept Ranked",
             value: (team) =>
-              team.profile?.autoAcceptRanked !== undefined &&
-              team.profile.autoAcceptRanked
+              team.profile?.auto_accept_ranked !== undefined &&
+              team.profile.auto_accept_ranked
                 ? "Yes"
                 : "No",
           },
           {
             header: "Auto-Accept Unranked",
             value: (team) =>
-              team.profile?.autoAcceptUnranked !== undefined &&
-              team.profile?.autoAcceptUnranked
+              team.profile?.auto_accept_unranked !== undefined &&
+              team.profile?.auto_accept_unranked
                 ? "Yes"
                 : "No",
           },

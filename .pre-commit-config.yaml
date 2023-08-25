@@ -4,9 +4,12 @@ repos:
     hooks:
       - id: check-merge-conflict
       - id: end-of-file-fixer
+        exclude: ^frontend2/src/utils/types
       - id: mixed-line-ending
         args: ["--fix=lf"]
+        exclude: ^frontend2/src/utils/types
       - id: trailing-whitespace
+        exclude: ^frontend2/src/utils/types
 
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.1
