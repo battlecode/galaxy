@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import * as Auth from "../utils/auth";
+import { createUser } from "../utils/api/user";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { useCurrentUser } from "../contexts/CurrentUserContext";
-import {
-  GenderEnum,
-  type Country,
-  type CreateUserInput,
-  COUNTRIES,
-} from "../utils/apiTypes";
+import { COUNTRIES } from "../utils/apiTypes";
 import SelectMenu from "../components/elements/SelectMenu";
 import { type Maybe } from "../utils/utilTypes";
+import {
+  GenderEnum,
+  type CountryEnum,
+  type UserCreateRequest,
+} from "../utils/types";
 
 const REQUIRED_ERROR_MSG = "This field is required.";
 
@@ -24,17 +24,17 @@ const Register: React.FC = () => {
     setError,
     clearErrors,
     formState: { errors },
-  } = useForm<CreateUserInput>();
+  } = useForm<UserCreateRequest>();
   const [gender, setGender] = useState<Maybe<GenderEnum>>();
-  const [country, setCountry] = useState<Maybe<Country>>();
+  const [country, setCountry] = useState<Maybe<CountryEnum>>();
   const [formError, setFormError] = useState<Maybe<string>>();
 
-  const onSubmit: SubmitHandler<CreateUserInput> = async (data) => {
+  const onSubmit: SubmitHandler<UserCreateRequest> = async (data) => {
     if (gender === undefined || country === undefined) {
       return;
     }
     try {
-      const newUser = await Auth.register(data);
+      const newUser = await createUser(data);
       login(newUser);
       setFormError(undefined);
     } catch {
@@ -95,21 +95,21 @@ const Register: React.FC = () => {
             required
             placeholder="Tim"
             label="First name"
-            errorMessage={errors.firstName?.message}
-            {...register("firstName", { required: REQUIRED_ERROR_MSG })}
+            errorMessage={errors.first_name?.message}
+            {...register("first_name", { required: REQUIRED_ERROR_MSG })}
           />
           <Input
             className="flex-grow basis-0"
             required
             placeholder="Beaver"
             label="Last name"
-            errorMessage={errors.lastName?.message}
-            {...register("lastName", { required: REQUIRED_ERROR_MSG })}
+            errorMessage={errors.last_name?.message}
+            {...register("last_name", { required: REQUIRED_ERROR_MSG })}
           />
         </div>
         {/* begin profile fields */}
         <div className="grid grid-cols-2 gap-5">
-          <SelectMenu<Country>
+          <SelectMenu<CountryEnum>
             required
             onChange={(newCountry) => {
               setCountry(newCountry);
@@ -121,7 +121,7 @@ const Register: React.FC = () => {
             label="Country"
             placeholder="Select country"
             options={Object.entries(COUNTRIES).map(([code, name]) => ({
-              value: code as Country,
+              value: code as CountryEnum,
               label: name,
             }))}
           />
@@ -144,20 +144,20 @@ const Register: React.FC = () => {
             label="Gender identity"
             placeholder="Select gender"
             options={[
-              { value: GenderEnum.FEMALE, label: "Female" },
-              { value: GenderEnum.MALE, label: "Male" },
-              { value: GenderEnum.NONBINARY, label: "Non-binary" },
+              { value: GenderEnum.F, label: "Female" },
+              { value: GenderEnum.M, label: "Male" },
+              { value: GenderEnum.N, label: "Non-binary" },
               {
-                value: GenderEnum.SELF_DESCRIBED,
+                value: GenderEnum.Star,
                 label: "Prefer to self describe",
               },
-              { value: GenderEnum.RATHER_NOT_SAY, label: "Rather not say" },
+              { value: GenderEnum.QuestionMark, label: "Rather not say" },
             ]}
           />
-          {gender === GenderEnum.SELF_DESCRIBED && (
+          {gender === GenderEnum.Star && (
             <Input
               label="Self described gender identity"
-              {...register("profile.genderDetails")}
+              {...register("profile.gender_details")}
             />
           )}
         </div>

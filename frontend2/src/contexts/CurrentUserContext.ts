@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { type UserPrivate } from "../utils/types/model/models";
+import { type UserPrivate } from "../utils/types";
 
 export enum AuthStateEnum {
   LOADING = "loading",

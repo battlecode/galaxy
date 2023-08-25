@@ -24,6 +24,7 @@ from siarnaq.api.compete.models import (
 )
 from siarnaq.api.compete.permissions import HasTeamSubmission
 from siarnaq.api.compete.serializers import (
+    EmptySerializer,
     HistoricalRatingSerializer,
     MatchReportSerializer,
     MatchSerializer,
@@ -149,8 +150,16 @@ class SubmissionViewSet(
             headers=headers,
         )
 
+    @extend_schema(
+        # https://drf-spectacular.readthedocs.io/en/latest/faq.html#i-m-using-action-detail-false-but-the-response-schema-is-not-a-list
+        responses=TournamentSubmissionSerializer(many=True)
+    )
     @action(
-        detail=False, methods=["get"], serializer_class=TournamentSubmissionSerializer
+        detail=False,
+        methods=["get"],
+        serializer_class=TournamentSubmissionSerializer,
+        # needed so that the generated schema is not paginated
+        pagination_class=None,
     )
     def tournament(self, request, *, episode_id):
         """Retrieve the submissions used in tournaments by the current team.."""
@@ -447,7 +456,7 @@ class MatchViewSet(
         detail=True,
         methods=["post"],
         permission_classes=(IsAdminUser,),
-        serializer_class=None,
+        serializer_class=EmptySerializer,
         throttle_classes=(),
     )
     def rating_update(self, request, pk=None, *, episode_id):
@@ -462,7 +471,7 @@ class MatchViewSet(
         detail=True,
         methods=["post"],
         permission_classes=(IsAdminUser,),
-        serializer_class=None,
+        serializer_class=EmptySerializer,
         throttle_classes=(),
     )
     def publish_public_bracket(self, request, pk=None, *, episode_id):

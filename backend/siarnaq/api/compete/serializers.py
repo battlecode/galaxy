@@ -469,3 +469,7 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
 class HistoricalRatingSerializer(serializers.Serializer):
     rating = RatingField()
     timestamp = serializers.DateTimeField()
+
+
+class EmptySerializer(serializers.Serializer):
+    pass

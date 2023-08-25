@@ -75,6 +75,14 @@ class UserViewSet(
                 serializer.save()
                 return Response(serializer.data)
 
+    @extend_schema(
+        responses={
+            status.HTTP_200_OK: {
+                "type": "object",
+                "additionalProperties": {"$ref": "#/components/schemas/TeamPublic"},
+            }
+        }
+    )
     @action(
         detail=True,
         permission_classes=(AllowAny,),

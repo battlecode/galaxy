@@ -22,6 +22,7 @@ from siarnaq.api.teams.serializers import (
     TeamAvatarSerializer,
     TeamCreateSerializer,
     TeamJoinSerializer,
+    TeamLeaveSerializer,
     TeamPrivateSerializer,
     TeamPublicSerializer,
     TeamReportSerializer,
@@ -114,7 +115,7 @@ class TeamViewSet(
     @action(
         detail=False,
         methods=["post"],
-        serializer_class=None,
+        serializer_class=TeamLeaveSerializer,
         permission_classes=(IsAuthenticated, IsEpisodeAvailable),
     )
     def leave(self, request, *, episode_id):
