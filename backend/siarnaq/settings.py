@@ -510,3 +510,18 @@ if len(sys.argv) > 1 and sys.argv[1] == "test":
         raise structlog.DropEvent
 
     structlog.configure(processors=[dropper])
+
+SPECTACULAR_SETTINGS = {
+    # Split components into request and response parts where appropriate
+    # This setting is highly recommended to achieve the most accurate API
+    # description, however it comes at the cost of having more components.
+    "COMPONENT_SPLIT_REQUEST": True,
+    # Controls which authentication methods are exposed in the schema. If not None,
+    # will hide authentication classes that are not contained in the whitelist.
+    # Use full import paths like
+    # ['rest_framework.authentication.TokenAuthentication', ...].
+    # Empty list ([]) will hide all authentication methods. The default None shows all.
+    "AUTHENTICATION_WHITELIST": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication"
+    ],
+}

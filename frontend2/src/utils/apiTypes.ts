@@ -1,14 +1,16 @@
+import { type CountryEnum, GenderEnum as GeneratedGenderEnum } from "./types";
+
 export enum GenderEnum {
-  FEMALE = "F",
-  MALE = "M",
-  NONBINARY = "N",
-  SELF_DESCRIBED = "*",
-  RATHER_NOT_SAY = "?",
+  FEMALE = GeneratedGenderEnum.F,
+  MALE = GeneratedGenderEnum.M,
+  NONBINARY = GeneratedGenderEnum.N,
+  SELF_DESCRIBED = GeneratedGenderEnum.Star,
+  RATHER_NOT_SAY = GeneratedGenderEnum.QuestionMark,
 }
 
 export type Gender = `${GenderEnum}`;
 
-export const COUNTRIES = {
+export const COUNTRIES: Record<CountryEnum, string> = {
   US: "United States of America",
   CA: "Canada",
   AU: "Australia",
@@ -259,27 +261,3 @@ export const COUNTRIES = {
   ZM: "Zambia",
   ZW: "Zimbabwe",
 } as const;
-
-export type Country = keyof typeof COUNTRIES;
-
-export interface CreateUserInput {
-  profile: {
-    gender: Gender;
-    genderDetails?: string;
-    school?: string;
-    country: Country;
-  };
-
-  /**
-   * Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
-   */
-  username: string;
-
-  password: string;
-
-  email: string;
-
-  firstName: string;
-
-  lastName: string;
-}
