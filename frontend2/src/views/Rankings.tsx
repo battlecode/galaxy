@@ -7,6 +7,7 @@ import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomEle
 import { NavLink, useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
+import PageTitle from "../components/elements/PageTitle";
 
 function trimString(str: string, maxLength: number): string {
   if (str.length > maxLength) {
@@ -70,9 +71,7 @@ const Rankings: React.FC = () => {
 
   return (
     <div className="mb-20 ml-10 flex w-full flex-col">
-      <h1 className="mb-5 text-3xl font-bold leading-7 text-gray-900">
-        Rankings
-      </h1>
+      <PageTitle variant="bold">Rankings</PageTitle>
       <div className="justify-left mb-5 flex h-10 w-3/5 flex-row items-center">
         <Input
           disabled={loading}
