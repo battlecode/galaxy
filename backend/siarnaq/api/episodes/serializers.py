@@ -1,5 +1,5 @@
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from rest_framework import serializers
 
 from siarnaq.api.episodes.models import (
@@ -48,6 +48,10 @@ class EpisodeSerializer(serializers.ModelSerializer):
         return obj.frozen()
 
 
+@extend_schema_serializer(
+    # workaround for https://github.com/OpenAPITools/openapi-generator/issues/9289
+    component_name="GameMap"
+)
 class MapSerializer(serializers.ModelSerializer):
     class Meta:
         model = Map
