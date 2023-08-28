@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { createUser } from "../utils/api/user";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import { useCurrentUser } from "../contexts/CurrentUserContext";
-import { COUNTRIES } from "../utils/apiTypes";
+import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import SelectMenu from "../components/elements/SelectMenu";
 import { type Maybe } from "../utils/utilTypes";
 import {
@@ -12,11 +11,15 @@ import {
   type CountryEnum,
   type UserCreateRequest,
 } from "../utils/types";
-
-const REQUIRED_ERROR_MSG = "This field is required.";
+import { COUNTRIES } from "../utils/apiTypes";
+import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
+import { useNavigate } from "react-router-dom";
+import { EpisodeContext } from "../contexts/EpisodeContext";
 
 const Register: React.FC = () => {
-  const { login } = useCurrentUser();
+  const { login, authState } = useCurrentUser();
+  const navigate = useNavigate();
+  const { episodeId } = useContext(EpisodeContext);
   const {
     register,
     handleSubmit,
@@ -28,6 +31,13 @@ const Register: React.FC = () => {
   const [gender, setGender] = useState<Maybe<GenderEnum>>();
   const [country, setCountry] = useState<Maybe<CountryEnum>>();
   const [formError, setFormError] = useState<Maybe<string>>();
+
+  useEffect(() => {
+    // redirect to home if already logged in
+    if (authState === AuthStateEnum.AUTHENTICATED) {
+      navigate(episodeId !== undefined ? `/${episodeId}/home` : "/");
+    }
+  }, [authState]);
 
   const onSubmit: SubmitHandler<UserCreateRequest> = async (data) => {
     if (gender === undefined || country === undefined) {
@@ -54,24 +64,26 @@ const Register: React.FC = () => {
           // validate gender and country
           await handleSubmit(onSubmit)(event);
           if (gender === undefined) {
-            setError("profile.gender", { message: REQUIRED_ERROR_MSG });
+            setError("profile.gender", { message: FIELD_REQUIRED_ERROR_MSG });
           }
           if (country === undefined) {
-            setError("profile.country", { message: REQUIRED_ERROR_MSG });
+            setError("profile.country", { message: FIELD_REQUIRED_ERROR_MSG });
           }
         }}
         className="m-6 flex w-11/12 flex-col gap-5 rounded-lg bg-gray-100 p-6 shadow-md sm:w-[550px]"
       >
         {
           // TODO: replace this with our custom notification component
-          formError !== undefined && <p>{formError}</p>
+          formError !== undefined && (
+            <p className="text-center text-sm text-red-600">{formError}</p>
+          )
         }
         <Input
           required
           placeholder="battlecode_player_6.9610"
           label="Username"
           errorMessage={errors.username?.message}
-          {...register("username", { required: REQUIRED_ERROR_MSG })}
+          {...register("username", { required: FIELD_REQUIRED_ERROR_MSG })}
         />
         <Input
           required
@@ -79,7 +91,7 @@ const Register: React.FC = () => {
           label="Password"
           type="password"
           errorMessage={errors.password?.message}
-          {...register("password", { required: REQUIRED_ERROR_MSG })}
+          {...register("password", { required: FIELD_REQUIRED_ERROR_MSG })}
         />
         <Input
           required
@@ -87,7 +99,7 @@ const Register: React.FC = () => {
           label="Email"
           type="email"
           errorMessage={errors.email?.message}
-          {...register("email", { required: REQUIRED_ERROR_MSG })}
+          {...register("email", { required: FIELD_REQUIRED_ERROR_MSG })}
         />
         <div className="grid grid-cols-2 gap-5">
           <Input
@@ -96,7 +108,7 @@ const Register: React.FC = () => {
             placeholder="Tim"
             label="First name"
             errorMessage={errors.first_name?.message}
-            {...register("first_name", { required: REQUIRED_ERROR_MSG })}
+            {...register("first_name", { required: FIELD_REQUIRED_ERROR_MSG })}
           />
           <Input
             className="flex-grow basis-0"
@@ -104,7 +116,7 @@ const Register: React.FC = () => {
             placeholder="Beaver"
             label="Last name"
             errorMessage={errors.last_name?.message}
-            {...register("last_name", { required: REQUIRED_ERROR_MSG })}
+            {...register("last_name", { required: FIELD_REQUIRED_ERROR_MSG })}
           />
         </div>
         {/* begin profile fields */}
