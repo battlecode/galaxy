@@ -8,6 +8,7 @@ import {
 import { removeApiTokens } from "../utils/cookies";
 import { loginCheck } from "../utils/api/auth";
 import { getUserUserProfile } from "../utils/api/user";
+import Cookies from "js-cookie";
 
 export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -26,6 +27,8 @@ export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
     });
   };
   const logout = (): void => {
+    Cookies.remove("access");
+    Cookies.remove("refresh");
     setUserData({
       authState: AuthStateEnum.NOT_AUTHENTICATED,
     });

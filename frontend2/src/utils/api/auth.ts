@@ -6,16 +6,6 @@ import { DEFAULT_API_CONFIGURATION } from "./helpers";
 const API = new TokenApi(DEFAULT_API_CONFIGURATION);
 
 /**
- * Clear the access and refresh tokens from the browser's cookies,
- * then redirects the user to the home page.
- */
-export const logout = (): void => {
-  Cookies.remove("access");
-  Cookies.remove("refresh");
-  window.location.replace("/");
-};
-
-/**
  * Set the access and refresh tokens in the browser's cookies.
  * @param username The username of the user.
  * @param password The password of the user.

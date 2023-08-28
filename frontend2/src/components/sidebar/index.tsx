@@ -2,66 +2,107 @@ import React, { useContext } from "react";
 import SidebarSection from "./SidebarSection";
 import SidebarItem from "./SidebarItem";
 import { EpisodeContext } from "../../contexts/EpisodeContext";
+import { type IconName } from "../elements/Icon";
 
 interface SidebarProps {
   collapsed?: boolean;
 }
 
+export const SIDEBAR_ITEM_DATA: Array<{
+  iconName: IconName;
+  text: string;
+  linkTo: string;
+}> = [
+  {
+    iconName: "home",
+    text: "Home",
+    linkTo: "home",
+  },
+  {
+    iconName: "map",
+    text: "Quick Start",
+    linkTo: "quickstart",
+  },
+  {
+    iconName: "clipboard_document",
+    text: "Resources",
+    linkTo: "resources",
+  },
+  {
+    iconName: "trophy",
+    text: "Tournaments",
+    linkTo: "tournaments",
+  },
+  {
+    iconName: "chart_bar",
+    text: "Rankings",
+    linkTo: "rankings",
+  },
+  {
+    iconName: "clock",
+    text: "Queue",
+    linkTo: "queue",
+  },
+  {
+    iconName: "user_group",
+    text: "My Team",
+    linkTo: "team",
+  },
+  {
+    iconName: "arrow_up_tray",
+    text: "Submissions",
+    linkTo: "submission",
+  },
+  {
+    iconName: "play_circle",
+    text: "Scrimmaging",
+    linkTo: "scrimmaging",
+  },
+];
+
+/**
+ *
+ * @param startIndex The first sidebar item to include. 0-indexed, inclusive.
+ * @param endIndex The last sidebar item to include (inclusive stop index)
+ * @param episodeId The episodeId to link to (e.g. "bc23")
+ * @returns
+ */
+export const generateSidebarItems = (
+  startIndex: number,
+  endIndex: number,
+  episodeId: string,
+): JSX.Element[] => {
+  const result: JSX.Element[] = [];
+  for (let i = startIndex; i <= endIndex; i++) {
+    const itemData = SIDEBAR_ITEM_DATA[i];
+    result.push(
+      <SidebarItem
+        key={i}
+        {...itemData}
+        linkTo={`/${episodeId}/${itemData.linkTo}`}
+      />,
+    );
+  }
+  return result;
+};
+
+// IMPORTANT: When changing this file, also remember to change the mobile menu that appears on small screens.
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   collapsed = collapsed ?? false;
   const { episodeId } = useContext(EpisodeContext);
-  const linkBase = `/${episodeId}/`;
 
   return collapsed ? null : (
-    <div className=" flex h-full flex-col gap-8 bg-gray-50 py-4 shadow-sm shadow-gray-200">
+    <nav className="hidden sm:flex h-full flex-col gap-8 bg-gray-50 py-4 shadow-sm shadow-gray-200">
       <SidebarSection title="">
-        <SidebarItem iconName="home" text="Home" linkTo={`${linkBase}home`} />
-        <SidebarItem
-          iconName="map"
-          text="Quick Start"
-          linkTo={`${linkBase}quickstart`}
-        />
-        <SidebarItem
-          iconName="clipboard_document"
-          text="Resources"
-          linkTo={`${linkBase}resources`}
-        />
+        {generateSidebarItems(0, 2, episodeId)}
       </SidebarSection>
       <SidebarSection title="compete">
-        <SidebarItem
-          iconName="trophy"
-          text="Tournaments"
-          linkTo={`${linkBase}tournaments`}
-        />
-        <SidebarItem
-          iconName="chart_bar"
-          text="Rankings"
-          linkTo={`${linkBase}rankings`}
-        />
-        <SidebarItem
-          iconName="clock"
-          text="Queue"
-          linkTo={`${linkBase}queue`}
-        />
+        {generateSidebarItems(3, 5, episodeId)}
       </SidebarSection>
       <SidebarSection title="team management">
-        <SidebarItem
-          iconName="user_group"
-          text="My Team"
-          linkTo={`${linkBase}team`}
-        />
-        <SidebarItem
-          iconName="arrow_up_tray"
-          text="Submissions"
-          linkTo={`${linkBase}submission`}
-        />
-        <SidebarItem
-          iconName="play_circle"
-          text="Scrimmaging"
-          linkTo={`${linkBase}scrimmaging`}
-        />
+        {generateSidebarItems(6, 8, episodeId)}
       </SidebarSection>
-    </div>
+    </nav>
   );
 };
 
