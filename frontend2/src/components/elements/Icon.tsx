@@ -83,7 +83,8 @@ const Icon: React.FC<IconProps> = ({
   size = "md",
   className = "",
 }: IconProps) => {
-  const IconComponent = size === "md" || size === "lg" ? icons24[name] : icons20[name];
+  const IconComponent =
+    size === "md" || size === "lg" ? icons24[name] : icons20[name];
   return <IconComponent className={`${sizeToClass[size]} ${className}`} />;
 };
 

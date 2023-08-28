@@ -90,8 +90,8 @@ const Login: React.FC = () => {
           </div>
         </div>
       </form>
-      <div className="flex-1 w-11/12">
-        <div className="text-light w-full mt-4 rounded-lg bg-white p-6  text-center text-sm shadow-md sm:w-[350px]">
+      <div className="w-11/12 flex-1">
+        <div className="text-light mt-4 w-full rounded-lg bg-white p-6  text-center text-sm shadow-md sm:w-[350px]">
           Need an account?{" "}
           <Link className="text-cyan-600" to="/register">
             Register for one!

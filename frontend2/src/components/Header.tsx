@@ -1,12 +1,10 @@
-import React, { Fragment, useContext, useState } from "react";
+import React, { Fragment, useContext } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { Link, NavLink } from "react-router-dom";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import Icon from "./elements/Icon";
-import SidebarItem from "./sidebar/SidebarItem";
 import { EpisodeContext } from "../contexts/EpisodeContext";
-import { SIDEBAR_ITEM_DATA, generateSidebarItems } from "./sidebar";
-import Button from "./elements/Button";
+import { SIDEBAR_ITEM_DATA } from "./sidebar";
 
 const Header: React.FC = () => {
   const { authState, logout, user } = useCurrentUser();
@@ -129,7 +127,7 @@ const Header: React.FC = () => {
             <div className="absolute inset-y-0 right-1 flex flex-row items-center justify-center gap-3">
               <Link
                 to="/login"
-                className="hidden rounded-full py-1.5 px-3 text-gray-200 ring-0 hover:bg-gray-100/10 sm:block"
+                className="hidden rounded-full px-3 py-1.5 text-gray-200 ring-0 hover:bg-gray-100/10 sm:block"
               >
                 Log in
               </Link>
