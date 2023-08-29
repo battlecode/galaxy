@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
-import Navbar from "./Navbar";
+import Header from "./Header";
 import Sidebar from "./sidebar";
 import { Outlet, useParams } from "react-router-dom";
 import { EpisodeContext } from "../contexts/EpisodeContext";
 
-// This component contains the NavBar and SideBar.
+// This component contains the Header and SideBar.
 // Child route components are rendered with <Outlet />
 const EpisodeLayout: React.FC = () => {
   const episodeContext = useContext(EpisodeContext);
@@ -14,7 +14,7 @@ const EpisodeLayout: React.FC = () => {
   }
   return (
     <div className="h-screen">
-      <Navbar />
+      <Header />
       <div className="flex h-full flex-row">
         <Sidebar />
         <Outlet />
