@@ -7,13 +7,13 @@ interface SidebarSectionProps {
 
 const SidebarSection: React.FC<SidebarSectionProps> = ({ children, title }) => {
   return (
-    <div className="pl-5 pr-8">
+    <div className="px-4">
       {title !== undefined && (
-        <h2 className="mb-3 text-sm uppercase tracking-wider text-gray-500">
+        <h2 className="mx-auto mb-2 font-light uppercase text-gray-500">
           {title}
         </h2>
       )}
-      <div className="flex flex-col gap-5">{children}</div>
+      <div className="flex flex-col gap-1">{children}</div>
     </div>
   );
 };
