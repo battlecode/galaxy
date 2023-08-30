@@ -1,6 +1,6 @@
+export const BC23_QUICKSTART = `# Quick Start
 
-export const BC23_QUICKSTART =
-`This is the Battlecode 2023 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
+This is the Battlecode 2023 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
 
 ## Create an account and team
 
@@ -22,19 +22,15 @@ If you're unsure how to install the JDK, you can find instructions for all opera
 
 Next, you should download the [Battlecode 2023 scaffold](https://github.com/battlecode/battlecode23-scaffold). To get up and running quickly, you can click "Clone or download" and then "Download ZIP," and move on to the next step.
 
-# Troubleshooting
+TODO: the rest of the page
+
 `;
 
-export const BC23_RESOURCES =
-`# Markdown syntax guide
-
-## Headers
+export const BC23_RESOURCES = `# Markdown syntax guide
 
 # This is a Heading h1
 ## This is a Heading h2
 ###### This is a Heading h6
-
-## Emphasis
 
 *This text will be italic*
 _This will also be italic_
@@ -44,16 +40,14 @@ __This will also be bold__
 
 _You **can** combine them_
 
-## Lists
-
-### Unordered
+### Unordered List
 
 * Item 1
 * Item 2
 * Item 2a
 * Item 2b
 
-### Ordered
+### Ordered List
 
 1. Item 1
 1. Item 2
@@ -61,36 +55,14 @@ _You **can** combine them_
   1. Item 3a
   1. Item 3b
 
-## Images
+![This is an alt text for an image.](/image/sample.png "This is a sample image.")
 
-![This is an alt text.](/image/sample.png "This is a sample image.")
-
-## Links
-
-You may be using [Markdown Live Preview](https://markdownlivepreview.com/).
-
-## Blockquotes
-
-> Markdown is a lightweight markup language with plain-text-formatting syntax, created in 2004 by John Gruber with Aaron Swartz.
->
->> Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.
-
-## Tables
-
-| Left columns  | Right columns |
-| ------------- |:-------------:|
-| left foo      | right foo     |
-| left bar      | right bar     |
-| left baz      | right baz     |
-
-## Blocks of code
+[This links to example.com](https://example.com).
 
 \`\`\`
 let message = 'Hello world';
 alert(message);
 \`\`\`
 
-## Inline code
-
-This web site is using \`markedjs/marked\`.
+this is \`an inline code block\`
 `;

@@ -92,7 +92,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   const { episodeId } = useContext(EpisodeContext);
 
   return collapsed ? null : (
-    <nav className="z-10 hidden fixed w-52 top-16 h-full flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">
+    <nav className="fixed top-16 z-10 hidden h-full w-52 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">
       <SidebarSection title="">
         {generateSidebarItems(0, 2, episodeId)}
       </SidebarSection>

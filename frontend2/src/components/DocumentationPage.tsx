@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 
 const isInternalLink = (to: string): boolean => {
   const url = new URL(to, window.location.origin);
-  console.log(url, window.location.hostname);
   return url.hostname === window.location.hostname;
 };
 

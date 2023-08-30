@@ -7,4 +7,3 @@ const QuickStart: React.FC = () => {
 };
 
 export default QuickStart;
-// todo this file

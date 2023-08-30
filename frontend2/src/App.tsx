@@ -68,7 +68,6 @@ const router = createBrowserRouter([
           return redirect(`/${params.episodeId as string}/home`);
         },
       },
-      { path: "/:episodeId/quickstart", element: <QuickStart /> },
       { path: "/:episodeId/*", element: <NotFound /> },
       { path: "/:episodeId/rankings", element: <Rankings /> },
     ],
