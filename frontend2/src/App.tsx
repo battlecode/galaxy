@@ -21,6 +21,7 @@ import Rankings from "./views/Rankings";
 import { CurrentUserProvider } from "./components/CurrentUserProvider";
 import PrivateRoute from "./components/PrivateRoute";
 import Resources from "./views/Resources";
+import Queue from "./views/Queue";
 
 const App: React.FC = () => {
   const [episodeId, setEpisodeId] = useState(DEFAULT_EPISODE);
@@ -49,6 +50,7 @@ const router = createBrowserRouter([
         element: <EpisodeLayout />,
         children: [
           // TODO: /:episodeId/team, /:episodeId/submissions, /:episodeId/scrimmaging
+          { path: "/:episodeId/queue", element: <Queue /> },
         ],
       },
     ],

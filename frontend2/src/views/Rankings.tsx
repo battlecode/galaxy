@@ -7,7 +7,7 @@ import { NavLink, useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { searchTeams } from "../utils/api/team";
-import PageTitle from "../components/elements/PageTitle";
+import { PageTitle } from "../components/elements/BattlecodeStyle";
 
 function trimString(str: string, maxLength: number): string {
   if (str.length > maxLength) {
@@ -66,7 +66,7 @@ const Rankings: React.FC = () => {
 
   return (
     <div className="mb-20 ml-10 flex w-full flex-col">
-      <PageTitle variant="bold">Rankings</PageTitle>
+      <PageTitle>Rankings</PageTitle>
       <div className="justify-left mb-5 flex h-10 w-3/5 flex-row items-center">
         <Input
           disabled={loading}
