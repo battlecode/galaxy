@@ -12,6 +12,7 @@ import {
   ChevronDownIcon as ChevronDownIcon24,
   CheckIcon as CheckIcon24,
   InformationCircleIcon as InformationCircleIcon24,
+  Bars3Icon as Bars3Icon24,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -27,6 +28,7 @@ import {
   ChevronDownIcon as ChevronDownIcon20,
   CheckIcon as CheckIcon20,
   InformationCircleIcon as InformationCircleIcon20,
+  Bars3Icon as Bars3Icon20,
 } from "@heroicons/react/20/solid";
 
 const icons24 = {
@@ -42,6 +44,7 @@ const icons24 = {
   chevron_down: ChevronDownIcon24,
   check: CheckIcon24,
   information_circle: InformationCircleIcon24,
+  bars_3: Bars3Icon24,
 };
 
 const icons20 = {
@@ -57,20 +60,22 @@ const icons20 = {
   chevron_down: ChevronDownIcon20,
   check: CheckIcon20,
   information_circle: InformationCircleIcon20,
+  bars_3: Bars3Icon20,
 };
 
 export type IconName = keyof typeof icons24 | keyof typeof icons20;
 
 export interface IconProps {
   name: IconName;
-  size?: "sm" | "md" | "xs";
+  size?: "sm" | "md" | "xs" | "lg";
   className?: string;
 }
 
 const sizeToClass = {
+  xs: "h-4 w-4",
   sm: "h-5 w-5",
   md: "h-6 w-6",
-  xs: "h-4 w-4",
+  lg: "h-7 w-7",
 };
 
 const Icon: React.FC<IconProps> = ({
@@ -78,7 +83,8 @@ const Icon: React.FC<IconProps> = ({
   size = "md",
   className = "",
 }: IconProps) => {
-  const IconComponent = size === "md" ? icons24[name] : icons20[name];
+  const IconComponent =
+    size === "md" || size === "lg" ? icons24[name] : icons20[name];
   return <IconComponent className={`${sizeToClass[size]} ${className}`} />;
 };
 

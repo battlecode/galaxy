@@ -13,15 +13,15 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   text,
   linkTo,
 }) => {
-  const baseStyle = "text-base flex items-center gap-3 ";
   const colorVariants = {
-    gray: "text-gray-800 hover:text-gray-400",
-    color: "text-teal",
+    gray: "text-gray-800 hover:text-gray-100 hover:bg-gray-500",
+    color: "text-cyan-600",
   };
   return (
     <NavLink
       className={({ isActive }) =>
-        baseStyle + (isActive ? colorVariants.color : colorVariants.gray)
+        "flex items-center gap-3 rounded-lg py-2 pl-1.5 pr-8 text-base " +
+        (isActive ? colorVariants.color : colorVariants.gray)
       }
       to={linkTo}
     >

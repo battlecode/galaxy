@@ -13,6 +13,7 @@ import {
   RouterProvider,
   createBrowserRouter,
   Navigate,
+  redirect,
 } from "react-router-dom";
 import { DEFAULT_EPISODE } from "./utils/constants";
 import NotFound from "./views/NotFound";
@@ -39,22 +40,11 @@ const router = createBrowserRouter([
   { path: "/register", element: <Register /> },
   { path: "/password_forgot", element: <PasswordForgot /> },
   { path: "/password_change", element: <PasswordChange /> },
-  // Pages that will contain the episode specific sidebar and navbar
-  {
-    element: <EpisodeLayout />,
-    children: [
-      // Pages that should always be visible
-      // TODO: /:episodeId/resources, /:episodeId/tournaments, /:episodeId/queue
-      { path: "/:episodeId/home", element: <Home /> },
-      { path: "/:episodeId/quickstart", element: <QuickStart /> },
-      { path: "/:episodeId/*", element: <NotFound /> },
-      { path: "/:episodeId/rankings", element: <Rankings /> },
-    ],
-  },
   // Pages that should only be visible when logged in
   {
     element: <PrivateRoute />,
     children: [
+      { path: "/account", element: <Account /> },
       {
         element: <EpisodeLayout />,
         children: [
@@ -62,7 +52,24 @@ const router = createBrowserRouter([
           { path: "/:episodeId/queue", element: <Queue /> },
         ],
       },
-      { path: "/account", element: <Account /> },
+    ],
+  },
+  // Pages that will contain the episode specific sidebar and navbar
+  {
+    element: <EpisodeLayout />,
+    children: [
+      // Pages that should always be visible
+      // TODO: /:episodeId/resources, /:episodeId/tournaments, /:episodeId/queue
+      { path: "/:episodeId/home", element: <Home /> },
+      {
+        path: "/:episodeId/",
+        loader: ({ params }) => {
+          return redirect(`/${params.episodeId as string}/home`);
+        },
+      },
+      { path: "/:episodeId/quickstart", element: <QuickStart /> },
+      { path: "/:episodeId/*", element: <NotFound /> },
+      { path: "/:episodeId/rankings", element: <Rankings /> },
     ],
   },
   // Pages that should redirect
