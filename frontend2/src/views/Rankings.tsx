@@ -64,7 +64,7 @@ const Rankings: React.FC = () => {
   }, [searchQuery, page]);
 
   return (
-    <div className="mb-20 ml-10 flex w-full flex-col">
+    <div className="flex h-full w-full flex-col overflow-auto p-6">
       <h1 className="mb-5 text-3xl font-bold leading-7 text-gray-900">
         Rankings
       </h1>
