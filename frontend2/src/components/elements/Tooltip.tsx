@@ -1,13 +1,13 @@
 import React from "react";
 
 // Example usage
-// <Tooltip content="This will be displayed inside the tooltip" location="left">
+// <Tooltip text="This will be displayed inside the tooltip" location="left">
 //   <p>Hovering this makes the tooltip appear</p>
 // </Tooltip>
 
 interface TooltipProps {
   children?: React.ReactNode;
-  content: string;
+  text: string;
   delay?: number;
   location?: "top" | "bottom" | "left" | "right";
 }
@@ -28,7 +28,7 @@ const TOOLTIP_TRIANGLE_CLASSES = {
 const Tooltip: React.FC<TooltipProps> = ({
   children,
   // the string to display inside the tooltip
-  content,
+  text,
   // delay between hover and tooltip appearance, in ms.
   delay = 400,
   // the location that the tooltip will appear (relative to the children)
@@ -42,7 +42,7 @@ const Tooltip: React.FC<TooltipProps> = ({
         text-center text-sm text-gray-50 opacity-0 transition-opacity delay-0 group-hover:opacity-100
         group-hover:delay-[${delay}ms] ${TOOLTIP_CLASSES[location]}`}
       >
-        {content}
+        {text}
         <div
           className={`absolute z-20 h-2.5 w-2.5 rotate-45 transform
           bg-gray-800 ${TOOLTIP_TRIANGLE_CLASSES[location]}`}
