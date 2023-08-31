@@ -2,6 +2,11 @@ import React, { Fragment } from "react";
 import { Disclosure, Transition } from "@headlessui/react";
 import Icon from "./Icon";
 
+// Example usage:
+// <Collapse title="This is the title">
+//   <p>Some content here</p>
+// </Collapse>
+
 interface CollapseProps {
   children?: React.ReactNode;
   title: string;
