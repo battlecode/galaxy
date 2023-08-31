@@ -1,21 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
-import {
-  StatusBccEnum,
-  type Match,
-  type PaginatedMatchList,
-} from "../utils/types";
+import { type PaginatedMatchList } from "../utils/types";
 import { useSearchParams } from "react-router-dom";
 import { getAllMatches, getScrimmagesByTeam } from "../utils/api/compete";
 import { EpisodeContext } from "../contexts/EpisodeContext";
 import BattlecodeTable from "../components/BattlecodeTable";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
 import Button from "../components/elements/Button";
-
-interface QueryParams {
-  page?: string;
-  teamId?: string;
-}
+import RatingDelta from "../components/compete/RatingDelta";
+import MatchScore from "../components/compete/MatchScore";
+import MatchStatus from "../components/compete/MatchStatus";
 
 const Queue: React.FC = () => {
   const episodeId = useContext(EpisodeContext).episodeId;
@@ -38,24 +32,13 @@ const Queue: React.FC = () => {
     }
   }
 
-  const MatchStatusDisplay: Record<StatusBccEnum, string> = {
-    [StatusBccEnum.New]: "Created",
-    [StatusBccEnum.Que]: "Queued",
-    [StatusBccEnum.Run]: "Running",
-    [StatusBccEnum.Try]: "Will be retried",
-    [StatusBccEnum.Ok]: "Success",
-    [StatusBccEnum.Err]: "Failed",
-    [StatusBccEnum.Can]: "Cancelled",
-  };
-
   async function refreshData(): Promise<void> {
     setLoading(true);
-    setData(undefined);
+    setData((prev) => ({ count: prev?.count }));
     try {
       const result: PaginatedMatchList =
         teamId === null
-          ? // TODO: check what exactly getAllMatches returns
-            await getAllMatches(episodeId, page)
+          ? await getAllMatches(episodeId, page)
           : await getScrimmagesByTeam(episodeId, teamId, page);
       setData(result);
     } catch (err) {
@@ -64,33 +47,27 @@ const Queue: React.FC = () => {
     setLoading(false);
   }
 
-  const ratingDeltaDisplay = (r: Match): number => {
-    // TODO: implement the rating delta display!
-    // Remember to account for ranked (has delta) vs. unranked (has no delta)
-    return 0;
-  };
-
-  const scoreDisplay = (r: Match): JSX.Element => {
-    return <></>;
-  };
-
   useEffect(() => {
     void refreshData();
   }, [page, teamId]);
 
   return (
-    <div className="mb-20 ml-10 flex w-full flex-col">
-      <div className="justify-right flex flex-row space-x-4 ">
+    <div className="mb-20 ml-4 mt-4 flex w-5/6 flex-col">
+      <div className="justify-right mb-2 flex flex-row space-x-4 ">
         <PageTitle>Recent Queue</PageTitle>
         <Button
           disabled={loading}
           label="Refresh!"
           variant="dark"
           onClick={() => {
-            void refreshData();
+            handlePage(1);
+            if (page === 1) {
+              void refreshData();
+            }
           }}
         />
       </div>
+      {/* TODO: Team Select! */}
       <BattlecodeTable
         data={data?.results ?? []}
         loading={loading}
@@ -107,18 +84,29 @@ const Queue: React.FC = () => {
         columns={[
           {
             header: "Team (Δ)",
-            // TODO: implement the rating delta display and make this a link!
-            value: (r) => r.participants[0]?.teamname,
+            value: (r) => {
+              const participant = r.participants[0];
+              if (participant !== undefined) {
+                return (
+                  <RatingDelta participant={participant} ranked={r.is_ranked} />
+                );
+              }
+            },
           },
-          // TODO: all the columns!!!
           {
             header: "Score",
-            value: (r) => scoreDisplay(r),
+            value: (r) => <MatchScore match={r} />,
           },
           {
             header: "Team (Δ)",
-            // TODO: implement the rating delta display and make this a link!
-            value: (r) => r.participants[1]?.teamname,
+            value: (r) => {
+              const participant = r.participants[1];
+              if (participant !== undefined) {
+                return (
+                  <RatingDelta participant={participant} ranked={r.is_ranked} />
+                );
+              }
+            },
           },
           {
             header: "Ranked?",
@@ -126,7 +114,7 @@ const Queue: React.FC = () => {
           },
           {
             header: "Status",
-            value: (r) => MatchStatusDisplay[r.status],
+            value: (r) => <MatchStatus match={r} />,
           },
           {
             header: "Created",

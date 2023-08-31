@@ -26,7 +26,7 @@ function BattlecodeTable<T>({
   bottomElement,
 }: TableProps<T>): React.ReactElement {
   return (
-    <div className="pl-50 w-5/6">
+    <div className="pl-50 w-full">
       <table className="w-full text-left text-sm text-gray-500">
         <thead className="bg-gray-50 text-xs uppercase text-gray-700">
           <tr>
