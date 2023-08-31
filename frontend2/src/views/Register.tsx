@@ -54,9 +54,9 @@ const Register: React.FC = () => {
   };
   return (
     <div className="flex h-screen flex-col items-center justify-center bg-gradient-to-tr from-cyan-200 to-cyan-700 p-2">
-      <h2 className="flex flex-1 items-end text-center font-display text-5xl tracking-wide text-white sm:text-6xl">
+      <div className="flex flex-1 items-end text-center font-display text-5xl tracking-wide text-white sm:text-6xl">
         BATTLECODE
-      </h2>
+      </div>
       {/* https://github.com/orgs/react-hook-form/discussions/8622 */}
       <form
         /* eslint-disable-next-line @typescript-eslint/no-misused-promises */
@@ -75,7 +75,7 @@ const Register: React.FC = () => {
         {
           // TODO: replace this with our custom notification component
           formError !== undefined && (
-            <p className="text-center text-sm text-red-600">{formError}</p>
+            <div className="text-center text-sm text-red-600">{formError}</div>
           )
         }
         <Input

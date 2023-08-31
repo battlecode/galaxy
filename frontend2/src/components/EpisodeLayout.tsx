@@ -13,10 +13,10 @@ const EpisodeLayout: React.FC = () => {
     episodeContext.setEpisodeId(episodeId);
   }
   return (
-    <div className="h-screen">
+    <div className="h-screen overflow-auto">
       <Header />
-      <div className="flex h-full flex-row">
-        <Sidebar />
+      <Sidebar />
+      <div className="fixed right-0 h-full pt-16 sm:left-52">
         <Outlet />
       </div>
     </div>
