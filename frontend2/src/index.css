@@ -1,4 +1,37 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Josefin+Sans:wght@100;300;400;500;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Josefin+Sans:wght@100;300;400;500;700&display=swap");
+
+@layer base {
+  h1 {
+    @apply pb-4 text-3xl font-medium text-gray-900;
+  }
+  h2 {
+    @apply pb-4 pt-6 text-2xl font-medium text-gray-900;
+  }
+  h3 {
+    @apply pb-4 text-xl font-medium text-gray-900;
+  }
+  h4 {
+    @apply pb-4 text-lg font-medium text-gray-700;
+  }
+  p {
+    @apply pb-4 text-gray-900;
+  }
+  code {
+    @apply rounded bg-gray-100 px-1 py-0.5 text-sm text-cyan-900;
+  }
+  pre code {
+    @apply p-0;
+  }
+  pre {
+    @apply rounded bg-gray-100 px-4 py-3;
+  }
+  ul {
+    @apply ml-6 list-outside list-disc pb-4;
+  }
+  ol {
+    @apply ml-6 list-outside list-decimal pb-4;
+  }
+}

@@ -53,13 +53,13 @@ const Login: React.FC = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="flex w-11/12 flex-col gap-5 rounded-lg bg-gray-100 p-6 shadow-md sm:w-[350px]"
       >
-        <h3 className="text-center text-xl font-light text-gray-700">
+        <div className="text-center text-xl font-light text-gray-700">
           Log in to Battlecode
-        </h3>
+        </div>
         {
           // TODO: replace this with our custom notification component
           loginError !== undefined && (
-            <p className="text-center text-sm text-red-600">{loginError}</p>
+            <div className="text-center text-sm text-red-600">{loginError}</div>
           )
         }
         <Input
@@ -91,7 +91,7 @@ const Login: React.FC = () => {
         </div>
       </form>
       <div className="w-11/12 flex-1">
-        <div className="text-light mt-4 w-full rounded-lg bg-white p-6  text-center text-sm shadow-md sm:w-[350px]">
+        <div className="text-light mx-auto mt-4 w-full rounded-lg bg-white p-6 text-center text-sm shadow-md sm:w-[350px]">
           Need an account?{" "}
           <Link className="text-cyan-600" to="/register">
             Register for one!
