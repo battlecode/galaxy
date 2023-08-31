@@ -65,9 +65,9 @@ const Rankings: React.FC = () => {
   }, [searchQuery, page]);
 
   return (
-    <div className="mb-20 ml-4 mt-4 flex w-5/6 flex-col">
+    <div className="flex h-full w-full flex-col overflow-auto p-6">
       <PageTitle>Rankings</PageTitle>
-      <div className="justify-left mb-5 flex h-10 w-4/5 flex-row items-center">
+      <div className="justify-left mb-5 flex h-10 w-3/5 flex-row items-center">
         <Input
           disabled={loading}
           placeholder="Search for a team..."
