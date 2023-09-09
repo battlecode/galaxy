@@ -22,7 +22,6 @@ import { CurrentUserProvider } from "./components/CurrentUserProvider";
 import PrivateRoute from "./components/PrivateRoute";
 import Queue from "./views/Queue";
 import Resources from "./views/Resources";
-import Queue from "./views/Queue";
 
 const App: React.FC = () => {
   const [episodeId, setEpisodeId] = useState(DEFAULT_EPISODE);
