@@ -65,9 +65,10 @@ const Rankings: React.FC = () => {
   }, [searchQuery, page]);
 
   return (
-    <div className="mb-20 ml-4 mt-4 flex w-5/6 flex-col">
-      <PageTitle>Rankings</PageTitle>
-      <div className="justify-left mb-5 flex h-10 w-4/5 flex-row items-center">
+    <div className="ml-4 mt-4 flex w-5/6 flex-col pb-8">
+      <div className="mb-3 flex w-4/5 flex-row items-center">
+        <PageTitle>Rankings</PageTitle>
+        <div className="w-4" />
         <Input
           disabled={loading}
           placeholder="Search for a team..."
@@ -81,7 +82,7 @@ const Rankings: React.FC = () => {
             }
           }}
         />
-        <div className="w-10" />
+        <div className="w-4" />
         <Button
           disabled={loading}
           label="Search!"

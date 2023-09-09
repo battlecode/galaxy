@@ -81,8 +81,8 @@ const Queue: React.FC = () => {
   }, [page, teamId]);
 
   return (
-    <div className="mb-20 ml-4 mt-4 flex w-5/6 flex-col">
-      <div className="justify-right mb-1 flex flex-row space-x-4 ">
+    <div className="ml-4 mt-4 flex w-5/6 flex-col pb-8">
+      <div className="justify-right mb-1 flex flex-row space-x-4">
         <PageTitle>Recent Queue</PageTitle>
         <Button
           disabled={loading}
