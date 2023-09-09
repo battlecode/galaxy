@@ -50,7 +50,6 @@ const router = createBrowserRouter([
         element: <EpisodeLayout />,
         children: [
           // TODO: /:episodeId/team, /:episodeId/submissions, /:episodeId/scrimmaging
-          { path: "/:episodeId/queue", element: <Queue /> },
         ],
       },
     ],

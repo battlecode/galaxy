@@ -1,16 +1,17 @@
 import { Combobox, Transition } from "@headlessui/react";
-import React, { Fragment, useMemo, useState } from "react";
+import React, { Fragment, useEffect, useState, useMemo } from "react";
 import FormLabel from "./FormLabel";
 import Icon from "./Icon";
 import FormError from "./FormError";
 import Spinner from "../Spinner";
+import { debounce } from "lodash";
 
 interface AsyncSelectMenuProps<T extends React.Key | null | undefined> {
   label?: string;
   required?: boolean;
-  options: Array<{ value: T; label: string }>;
-  loadOptions: (inputValue: string) => Promise<void> | undefined;
-  loading?: boolean;
+  loadOptions: (
+    inputValue: string,
+  ) => Promise<Array<{ value: T; label: string }>>;
   value: T | null;
   placeholder?: string;
   className?: string;
@@ -21,17 +22,54 @@ interface AsyncSelectMenuProps<T extends React.Key | null | undefined> {
 function AsyncSelectMenu<T extends React.Key | null | undefined>({
   label,
   required = false,
-  options,
   loadOptions,
-  loading = false,
   value,
   placeholder,
   className = "",
   errorMessage,
   onChange,
 }: AsyncSelectMenuProps<T>): JSX.Element {
+  const [options, setOptions] = useState<Array<{ value: T; label: string }>>(
+    [],
+  );
+  const [loading, setLoading] = useState<boolean>(false);
   const [searchText, setSearchText] = useState("");
   const invalid = errorMessage !== undefined;
+
+  const handleChange = (inputValue: string): void => {
+    setSearchText(inputValue);
+  };
+
+  const debouncedHandleChange = useMemo(() => debounce(handleChange, 300), []);
+
+  useEffect(() => {
+    return () => {
+      debouncedHandleChange.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const load = async (): Promise<void> => {
+      setLoading(true);
+      try {
+        const result = await loadOptions(searchText);
+        if (active) {
+          setOptions(result);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void load();
+
+    return () => {
+      active = false;
+    };
+  }, [searchText]);
 
   return (
     <div className={`relative ${invalid ? "mb-2" : ""} ${className}`}>
@@ -52,19 +90,14 @@ function AsyncSelectMenu<T extends React.Key | null | undefined>({
               <Combobox.Input
                 className="h-full w-4/5 bg-transparent ring-transparent"
                 onChange={(event) => {
-                  setSearchText(event.target.value);
-                  try {
-                    void loadOptions(searchText);
-                  } catch (err) {
-                    console.error(err);
-                  }
+                  debouncedHandleChange(event.target.value);
                 }}
-                defaultValue={placeholder}
-                value={searchText}
+                placeholder={placeholder}
               />
               {!loading && value !== null && (
                 <button
                   onClick={(ev) => {
+                    ev.stopPropagation();
                     onChange(null);
                     setSearchText("");
                   }}
@@ -101,11 +134,6 @@ function AsyncSelectMenu<T extends React.Key | null | undefined>({
                   } ui-active:bg-cyan-100`}
                   key={option.value}
                   value={option.value}
-                  onClick={(ev) => {
-                    ev.preventDefault();
-                    onChange(option.value);
-                    setSearchText(option.label);
-                  }}
                 >
                   <div className="overflow-x-auto pr-2">{option.label}</div>
                   <span className=" hidden items-center text-cyan-900 ui-selected:flex">

@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import type {
   PaginatedTeamPublicList,
   PaginatedMatchList,
-  TeamPublic,
 } from "../utils/types";
 import { useSearchParams } from "react-router-dom";
 import { getAllMatches, getScrimmagesByTeam } from "../utils/api/compete";
@@ -15,7 +14,6 @@ import RatingDelta from "../components/compete/RatingDelta";
 import MatchScore from "../components/compete/MatchScore";
 import MatchStatus from "../components/compete/MatchStatus";
 import { searchTeams } from "../utils/api/team";
-import { debounce } from "lodash";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
 import type { Maybe } from "../utils/utilTypes";
 
@@ -31,9 +29,6 @@ const Queue: React.FC = () => {
   const [teamId, setTeamId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<Maybe<PaginatedMatchList>>(undefined);
-  const [teamsData, setTeamsData] = useState<Maybe<TeamPublic[]>>(undefined);
-  const [teamsLoading, setTeamsLoading] = useState<boolean>(true);
-  const teamsEverLoaded = useRef<boolean>(false);
 
   function handlePage(page: number): void {
     if (!loading) {
@@ -41,6 +36,8 @@ const Queue: React.FC = () => {
     }
   }
 
+  // TODO: in future, also call getTournamentMatches (by team)
+  // and "mix" the results ordered by created_at
   async function refreshData(): Promise<void> {
     setLoading(true);
     setData((prev) => ({ count: prev?.count }));
@@ -52,12 +49,14 @@ const Queue: React.FC = () => {
       setData(result);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
-  const loadTeamOptions = async (inputValue: string): Promise<void> => {
-    setTeamsLoading(true);
+  const loadTeamOptions = async (
+    inputValue: string,
+  ): Promise<Array<{ value: number; label: string }>> => {
     try {
       const result: PaginatedTeamPublicList = await searchTeams(
         episodeId,
@@ -65,29 +64,21 @@ const Queue: React.FC = () => {
         true,
         1,
       );
-      setTeamsData(result.results);
+      return (
+        result.results?.map((t) => ({
+          value: t.id,
+          label: t.name,
+        })) ?? []
+      );
     } catch (err) {
       console.error(err);
+      return [];
     }
-    setTeamsLoading(false);
   };
-
-  const debouncedLoadTeamOptions = debounce(loadTeamOptions, 500);
 
   useEffect(() => {
     void refreshData();
   }, [page, teamId]);
-
-  useEffect(() => {
-    if (!teamsEverLoaded.current) {
-      teamsEverLoaded.current = true;
-      void debouncedLoadTeamOptions("");
-    }
-
-    return () => {
-      teamsEverLoaded.current = false;
-    };
-  }, []);
 
   return (
     <div className="mb-20 ml-4 mt-4 flex w-5/6 flex-col">
@@ -112,14 +103,7 @@ const Queue: React.FC = () => {
             handlePage(1);
           }}
           value={teamId}
-          options={
-            teamsData?.map((t) => ({
-              value: t.id,
-              label: t.name,
-            })) ?? []
-          }
-          loadOptions={debouncedLoadTeamOptions}
-          loading={teamsLoading}
+          loadOptions={loadTeamOptions}
           placeholder="Search for a team..."
         />
       </div>
