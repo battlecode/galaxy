@@ -23,6 +23,7 @@ import Queue from "./views/Queue";
 import Resources from "./views/Resources";
 import { CurrentTeamProvider } from "./contexts/CurrentTeamProvider";
 import { EpisodeProvider } from "./contexts/EpisodeProvider";
+import Scrimmaging from "./views/Scrimmaging";
 
 const App: React.FC = () => {
   return (
@@ -55,6 +56,7 @@ const router = createBrowserRouter([
             path: "/:episodeId/team",
           },
           // TODO: /:episodeId/team, /:episodeId/submissions, /:episodeId/scrimmaging
+          { path: "/:episodeId/scrimmaging", element: <Scrimmaging /> },
         ],
       },
     ],
