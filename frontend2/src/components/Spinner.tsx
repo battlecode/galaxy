@@ -2,15 +2,13 @@ import React from "react";
 
 interface SpinnerProps {
   size?: number;
-  color?: string;
+  className?: string;
 }
 
-const Spinner: React.FC<SpinnerProps> = ({ size, color }) => (
+const Spinner: React.FC<SpinnerProps> = ({ size = 16, className = "" }) => (
   <svg
     aria-hidden="true"
-    className={`w-${size ?? 16} h-${size ?? 16} mr-2 animate-spin fill-${
-      color !== undefined ? color : "blue"
-    }-600 text-gray-200`}
+    className={`w-${size} h-${size} mr-2 animate-spin fill-blue-600 text-gray-200 ${className}`}
     viewBox="0 0 100 101"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

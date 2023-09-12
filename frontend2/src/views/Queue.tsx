@@ -26,7 +26,10 @@ const Queue: React.FC = () => {
 
   const page = parseInt(queryParams.get("page") ?? "1");
 
-  const [teamId, setTeamId] = useState<number | null>(null);
+  const [selectedTeam, setSelectedTeam] = useState<{
+    value: number;
+    label: string;
+  } | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<Maybe<PaginatedMatchList>>(undefined);
 
@@ -43,9 +46,9 @@ const Queue: React.FC = () => {
     setData((prev) => ({ count: prev?.count }));
     try {
       const result: PaginatedMatchList =
-        teamId === null
+        selectedTeam === null
           ? await getAllMatches(episodeId, page)
-          : await getScrimmagesByTeam(episodeId, teamId, page);
+          : await getScrimmagesByTeam(episodeId, selectedTeam.value, page);
       setData(result);
     } catch (err) {
       console.error(err);
@@ -78,7 +81,7 @@ const Queue: React.FC = () => {
 
   useEffect(() => {
     void refreshData();
-  }, [page, teamId]);
+  }, [page, selectedTeam]);
 
   return (
     <div className="ml-4 mt-4 flex w-5/6 flex-col pb-8">
@@ -96,13 +99,13 @@ const Queue: React.FC = () => {
           }}
         />
       </div>
-      <div className="min-w-96 mb-4 grid w-2/3 grid-cols-2 gap-5">
+      <div className="mb-4 w-96 gap-5">
         <AsyncSelectMenu<number>
-          onChange={(selectedId) => {
-            setTeamId(selectedId);
+          onChange={(team) => {
+            setSelectedTeam(team);
             handlePage(1);
           }}
-          value={teamId}
+          selected={selectedTeam}
           loadOptions={loadTeamOptions}
           placeholder="Search for a team..."
         />

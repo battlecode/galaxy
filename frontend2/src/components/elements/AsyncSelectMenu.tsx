@@ -2,31 +2,28 @@ import { Combobox, Transition } from "@headlessui/react";
 import React, { Fragment, useEffect, useState, useMemo } from "react";
 import FormLabel from "./FormLabel";
 import Icon from "./Icon";
-import FormError from "./FormError";
 import Spinner from "../Spinner";
 import { debounce } from "lodash";
 
 interface AsyncSelectMenuProps<T extends React.Key | null | undefined> {
-  label?: string;
-  required?: boolean;
   loadOptions: (
     inputValue: string,
   ) => Promise<Array<{ value: T; label: string }>>;
-  value: T | null;
+  onChange: (selection: { value: T; label: string } | null) => void;
+  selected: { value: T; label: string } | null;
+  label?: string;
+  required?: boolean;
   placeholder?: string;
   className?: string;
-  errorMessage?: string;
-  onChange: (value: T | null) => void;
 }
 
 function AsyncSelectMenu<T extends React.Key | null | undefined>({
   label,
   required = false,
   loadOptions,
-  value,
+  selected,
   placeholder,
   className = "",
-  errorMessage,
   onChange,
 }: AsyncSelectMenuProps<T>): JSX.Element {
   const [options, setOptions] = useState<Array<{ value: T; label: string }>>(
@@ -34,18 +31,12 @@ function AsyncSelectMenu<T extends React.Key | null | undefined>({
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [searchText, setSearchText] = useState("");
-  const invalid = errorMessage !== undefined;
 
   const handleChange = (inputValue: string): void => {
     setSearchText(inputValue);
   };
 
   const debouncedHandleChange = useMemo(() => debounce(handleChange, 300), []);
-
-  const valueToLabel = useMemo(
-    () => new Map(options.map((option) => [option.value, option.label])),
-    [options],
-  );
 
   useEffect(() => {
     return () => {
@@ -77,40 +68,52 @@ function AsyncSelectMenu<T extends React.Key | null | undefined>({
   }, [searchText]);
 
   return (
-    <div className={`relative ${invalid ? "mb-2" : ""} ${className}`}>
-      <Combobox value={value} onChange={onChange}>
+    <div className={`relative ${className}`}>
+      <Combobox value={selected} onChange={onChange}>
         {label !== undefined && (
           <Combobox.Label>
             <FormLabel label={label} required={required} />
           </Combobox.Label>
         )}
-
-        <Combobox.Button
-          className={`relative h-10 w-full truncate rounded-md bg-white
-            pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300
-            focus:outline-none focus:ring-1 focus:ring-cyan-600 ui-open:ring-cyan-600
-            sm:text-sm sm:leading-6 ${invalid ? "ring-red-500" : ""}`}
+        <div
+          className={`
+          relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left
+          shadow-sm
+          sm:text-sm
+          `}
         >
-          {!loading && (
+          <Combobox.Input
+            className={`w-full border-none py-2 pl-3 ${
+              selected !== null ? "pr-14" : "pr-8"
+            } text-sm leading-5 text-gray-900 focus:ring-0`}
+            onChange={(event) => {
+              debouncedHandleChange(event.target.value);
+            }}
+            placeholder={placeholder}
+            displayValue={(selection: { value: T; label: string } | null) => {
+              return selection !== null ? selection.label : "";
+            }}
+          />
+          {selected !== null && (
+            <button
+              className="absolute inset-y-0 right-0 mr-8 flex transform items-center
+              text-red-700 transition duration-300 ui-open:rotate-180"
+              onClick={() => {
+                onChange(null);
+              }}
+            >
+              <Icon name="x_mark" size="xs" />
+            </button>
+          )}
+          <Combobox.Button>
             <div
               className="absolute inset-y-0 right-0 mr-2 flex transform items-center
               transition duration-300 ui-open:rotate-180"
             >
               <Icon name="chevron_down" size="sm" />
             </div>
-          )}
-          {loading && (
-            <div className="absolute inset-y-0 right-0 mr-2 flex transform items-center">
-              <Spinner size={4} />
-            </div>
-          )}
-        </Combobox.Button>
-        <Combobox.Input
-          onChange={(event) => {
-            debouncedHandleChange(event.target.value);
-          }}
-          placeholder={placeholder}
-        />
+          </Combobox.Button>
+        </div>
         <Transition
           as={Fragment}
           leave="transition ease-in duration-100"
@@ -118,41 +121,34 @@ function AsyncSelectMenu<T extends React.Key | null | undefined>({
           leaveTo="opacity-0"
         >
           <Combobox.Options
-            className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md
+            className="absolute z-10 ml-0 mt-1 max-h-48 w-full overflow-auto rounded-md
               bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
               sm:max-h-60 sm:text-sm"
           >
+            {loading && (
+              <div className="my-1 flex w-full justify-center">
+                <Spinner size={4} />
+              </div>
+            )}
             {options.map((option) => (
               <Combobox.Option
-                className={`flex cursor-default flex-row justify-between py-1.5 pl-4 pr-2 ${
-                  option.value === value ? "bg-cyan-100" : ""
-                } ui-active:bg-cyan-100`}
+                className={`flex cursor-default flex-row justify-between py-1.5 pl-4 pr-2
+                ui-selected:bg-cyan-100 ui-active:bg-cyan-100`}
                 key={option.value}
-                value={option.value}
+                value={option}
               >
                 <div className="overflow-x-auto pr-2">{option.label}</div>
                 <span className=" hidden items-center text-cyan-900 ui-selected:flex">
-                  {option.value === value && <Icon name="check" size="sm" />}
+                  <Icon name="check" size="sm" />
                 </span>
               </Combobox.Option>
             ))}
+            {!loading && options.length === 0 && (
+              <div className="px-3 py-1 text-gray-600">No results found.</div>
+            )}
           </Combobox.Options>
         </Transition>
       </Combobox>
-      {invalid && <FormError message={errorMessage} />}
-      {value !== null && (
-        <div className="flex max-w-max flex-row items-center space-x-2 rounded bg-cyan-800 px-2 py-1 text-white">
-          <span>{valueToLabel.get(value)}</span>
-          <button
-            onClick={() => {
-              onChange(null);
-            }}
-            className="cursor-pointer items-center rounded hover:bg-cyan-200"
-          >
-            <Icon name="x_mark" size="sm" />
-          </button>
-        </div>
-      )}
     </div>
   );
 }
