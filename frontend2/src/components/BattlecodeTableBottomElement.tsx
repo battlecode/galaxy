@@ -105,9 +105,9 @@ const DirectionPageButton: React.FC<{
   currentPage: number;
   onPage: (page: number) => void;
 }> = ({ forward, disabled, currentPage, onPage }) => {
-  const className = `flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-${
-    forward ? "r " : "l "
-  }-md${
+  const className = `flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 ${
+    forward ? "rounded-r-md " : "rounded-l-md "
+  }${
     disabled ? "cursor-not-allowed " : ""
   }hover:bg-gray-100 hover:text-gray-700`;
 
