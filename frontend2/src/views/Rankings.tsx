@@ -7,6 +7,7 @@ import { NavLink, useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { searchTeams } from "../utils/api/team";
+import { PageTitle } from "../components/elements/BattlecodeStyle";
 
 function trimString(str: string, maxLength: number): string {
   if (str.length > maxLength) {
@@ -64,11 +65,10 @@ const Rankings: React.FC = () => {
   }, [searchQuery, page]);
 
   return (
-    <div className="flex h-full w-full flex-col overflow-auto p-6">
-      <h1 className="mb-5 text-3xl font-bold leading-7 text-gray-900">
-        Rankings
-      </h1>
-      <div className="justify-left mb-5 flex h-10 w-3/5 flex-row items-center">
+    <div className="ml-4 mt-4 flex w-5/6 flex-col pb-8">
+      <div className="mb-3 flex w-4/5 flex-row items-center">
+        <PageTitle>Rankings</PageTitle>
+        <div className="w-4" />
         <Input
           disabled={loading}
           placeholder="Search for a team..."
@@ -82,7 +82,7 @@ const Rankings: React.FC = () => {
             }
           }}
         />
-        <div className="w-10" />
+        <div className="w-4" />
         <Button
           disabled={loading}
           label="Search!"
