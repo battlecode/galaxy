@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { type PaginatedMatchList } from "../utils/types";
 import { getTournamentMatches } from "../utils/api/compete";
 import { EpisodeContext } from "../contexts/EpisodeContext";
@@ -15,12 +15,15 @@ const Tournament: React.FC = () => {
   );
   // TODO: add team async select!
   const [teamId, setTeamId] = useState<number | null>(null);
-  const [page, setPage] = useState<number>(1);
-  // TODO: add round select! pull from tournament query api call???
-  const [round, setRound] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const onPage = (page: number): void => {
+  const [queryParams, setQueryParams] = useSearchParams({
+    page: "1",
+  });
+
+  const page = parseInt(queryParams.get("page") ?? "1");
+
+  const handlePage = (page: number): void => {
     // TODO: implement me!
     console.log("page!", page);
   };
@@ -28,16 +31,19 @@ const Tournament: React.FC = () => {
   useEffect(() => {
     const fetchMatches = async (): Promise<void> => {
       setLoading(true);
+      setMatches((prev) => ({ count: prev?.count ?? 0 }));
       try {
         const result = await getTournamentMatches(
           episodeId,
           teamId ?? undefined,
           tournamentId,
-          round,
+          // TODO: add round? what does it mean?
+          undefined,
           page,
         );
         setMatches(result);
       } catch (err) {
+        setMatches(undefined);
         console.error(err);
       } finally {
         setLoading(false);
@@ -45,25 +51,27 @@ const Tournament: React.FC = () => {
     };
 
     void fetchMatches();
-  }, [teamId, page, round]);
+  }, [teamId, page]);
 
   return (
     <div className="flex h-full w-full flex-col bg-white p-6">
       {/* TODO: change to tournament name from tourney query and add LOADING COMPONENT!!! */}
-      <h1 className="text-2xl font-bold">Tournament {tournamentId}</h1>
-      <BattlecodeTable
-        data={matches?.results ?? []}
-        loading={loading}
-        columns={[]}
-        bottomElement={
-          <BattlecodeTableBottomElement
-            totalCount={matches?.count ?? 0}
-            pageSize={10}
-            currentPage={page}
-            onPage={onPage}
-          />
-        }
-      />
+      <h1 className="mb-4 text-2xl font-bold">Tournament {tournamentId}</h1>
+      <div className="mb-2 w-5/6">
+        <BattlecodeTable
+          data={matches?.results ?? []}
+          loading={loading}
+          columns={[]}
+          bottomElement={
+            <BattlecodeTableBottomElement
+              totalCount={matches?.count ?? 0}
+              pageSize={10}
+              currentPage={page}
+              onPage={handlePage}
+            />
+          }
+        />
+      </div>
     </div>
   );
 };

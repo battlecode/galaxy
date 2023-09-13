@@ -8,46 +8,7 @@ import { getAllTournaments } from "../utils/api/episode";
 import BattlecodeTable from "../components/BattlecodeTable";
 // import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import Icon from "../components/elements/Icon";
-
-const isInternalLink = (to: string): boolean => {
-  const url = new URL(to, window.location.origin);
-  return url.hostname === window.location.hostname;
-};
-
-const MarkdownSection: React.FC<{ children: string; className?: string }> = ({
-  children,
-  className,
-}) => {
-  return (
-    <ReactMarkdown
-      className={className}
-      components={{
-        a: ({ href, ...props }) => {
-          const target = href ?? "";
-          if (isInternalLink(target)) {
-            return (
-              <Link
-                className="text-cyan-600 hover:underline"
-                to={target}
-                {...props}
-              />
-            );
-          } else {
-            return (
-              <a
-                className="text-cyan-600 hover:underline"
-                href={target}
-                {...props}
-              />
-            );
-          }
-        },
-      }}
-    >
-      {children}
-    </ReactMarkdown>
-  );
-};
+import Markdown from "../components/elements/Markdown";
 
 const Tournaments: React.FC = () => {
   const episodeId = useContext(EpisodeContext).episodeId;
@@ -82,9 +43,7 @@ const Tournaments: React.FC = () => {
 
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
-      <MarkdownSection>
-        {BC23_TOURNAMENTS[TourneyPage.SCHEDULE]}
-      </MarkdownSection>
+      <Markdown text={BC23_TOURNAMENTS[TourneyPage.SCHEDULE]} />
       <BattlecodeTable
         data={schedule ?? []}
         loading={loading}
@@ -127,13 +86,14 @@ const Tournaments: React.FC = () => {
           },
         ]}
       />
-      <MarkdownSection className="mt-10">
-        {BC23_TOURNAMENTS[TourneyPage.PRIZES]}
-      </MarkdownSection>
-      <MarkdownSection>{BC23_TOURNAMENTS[TourneyPage.FORMAT]}</MarkdownSection>
-      <MarkdownSection className="mt-4">
-        {BC23_TOURNAMENTS[TourneyPage.RULES]}
-      </MarkdownSection>
+
+      <Markdown
+        className="mt-10"
+        text={`${BC23_TOURNAMENTS[TourneyPage.PRIZES]} ${
+          BC23_TOURNAMENTS[TourneyPage.FORMAT]
+        } ${BC23_TOURNAMENTS[TourneyPage.RULES]}
+        `}
+      />
     </div>
   );
 };
