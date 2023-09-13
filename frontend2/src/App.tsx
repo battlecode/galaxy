@@ -25,6 +25,8 @@ import { CurrentTeamProvider } from "./contexts/CurrentTeamProvider";
 import { EpisodeProvider } from "./contexts/EpisodeProvider";
 import Scrimmaging from "./views/Scrimmaging";
 import MyTeam from "./views/MyTeam";
+import Tournaments from "./views/Tournaments";
+import Tournament from "./views/Tournament";
 
 const App: React.FC = () => {
   return (
@@ -68,7 +70,6 @@ const router = createBrowserRouter([
     element: <EpisodeLayout />,
     children: [
       // Pages that should always be visible
-      // TODO: /:episodeId/tournaments
       { path: "/:episodeId/resources", element: <Resources /> },
       { path: "/:episodeId/quickstart", element: <QuickStart /> },
       { path: "/:episodeId/home", element: <Home /> },
@@ -81,6 +82,8 @@ const router = createBrowserRouter([
       { path: "/:episodeId/*", element: <NotFound /> },
       { path: "/:episodeId/rankings", element: <Rankings /> },
       { path: "/:episodeId/queue", element: <Queue /> },
+      { path: "/:episodeId/tournaments", element: <Tournaments /> },
+      { path: "/:episodeId/tournament/:tournamentId", element: <Tournament /> },
     ],
   },
   // Pages that should redirect
