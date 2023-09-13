@@ -73,29 +73,28 @@ const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
         </span>{" "}
         of <span className="font-semibold text-gray-900">{totalCount}</span>
       </span>
-      <ul className="inline-flex h-8 -space-x-px text-sm">
-        <li>
-          <DirectionPageButton
-            forward={false}
-            disabled={backDisabled}
-            currentPage={currentPage}
-            onPage={onPage}
-          />
-        </li>
+      <div className="inline-flex h-8 -space-x-px text-sm">
+        <DirectionPageButton
+          forward={false}
+          disabled={backDisabled}
+          currentPage={currentPage}
+          onPage={onPage}
+        />
         {getPageNumbers().map((page, idx) => (
-          <li key={idx}>
-            <PageButton page={page} currentPage={currentPage} onPage={onPage} />
-          </li>
-        ))}
-        <li>
-          <DirectionPageButton
-            forward={true}
-            disabled={forwardDisabled}
+          <PageButton
+            key={idx}
+            page={page}
             currentPage={currentPage}
             onPage={onPage}
           />
-        </li>
-      </ul>
+        ))}
+        <DirectionPageButton
+          forward={true}
+          disabled={forwardDisabled}
+          currentPage={currentPage}
+          onPage={onPage}
+        />
+      </div>
     </nav>
   );
 };
@@ -106,13 +105,11 @@ const DirectionPageButton: React.FC<{
   currentPage: number;
   onPage: (page: number) => void;
 }> = ({ forward, disabled, currentPage, onPage }) => {
-  const className = disabled
-    ? `flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-${
-        forward ? "r" : "l"
-      }-lg cursor-not-allowed`
-    : `flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-${
-        forward ? "r" : "l"
-      }-lg hover:bg-gray-100 hover:text-gray-700`;
+  const className = `flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 ${
+    forward ? "rounded-r-md " : "rounded-l-md "
+  }${
+    disabled ? "cursor-not-allowed " : ""
+  }hover:bg-gray-100 hover:text-gray-700`;
 
   return (
     <button

@@ -26,9 +26,9 @@ function BattlecodeTable<T>({
   bottomElement,
 }: TableProps<T>): React.ReactElement {
   return (
-    <div className="pl-50 w-5/6">
+    <div className="pl-50 w-full">
       <table className="w-full text-left text-sm text-gray-500">
-        <thead className="bg-gray-50 text-xs uppercase text-gray-700">
+        <thead className="border-b bg-cyan-400 text-xs uppercase text-gray-700">
           <tr>
             {columns.map((col, idx) => (
               <th key={idx} scope="col" className="px-8 py-3">
@@ -48,16 +48,8 @@ function BattlecodeTable<T>({
                 }}
                 className={
                   idx % 2 === 0
-                    ? `border-b bg-white ${
-                        onRowClick !== undefined
-                          ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
-                          : ""
-                      }}`
-                    : `border-b bg-gray-50 ${
-                        onRowClick !== undefined
-                          ? "cursor-pointer hover:bg-gray-100 hover:text-gray-700"
-                          : ""
-                      }`
+                    ? "cursor-pointer border-b bg-white hover:bg-cyan-100 hover:text-gray-700"
+                    : "cursor-pointer border-b bg-gray-50 hover:bg-cyan-100 hover:text-gray-700"
                 }
               >
                 {columns.map((col, idx) => (
