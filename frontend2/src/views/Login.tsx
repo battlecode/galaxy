@@ -36,7 +36,6 @@ const Login: React.FC = () => {
       await apiLogin(data.username, data.password);
       login(await getUserUserProfile());
     } catch (error) {
-      console.log(error);
       setLoginError(
         "Error logging in. Did you enter your username and password correctly?",
       );
