@@ -20,6 +20,7 @@ import NotFound from "./views/NotFound";
 import Rankings from "./views/Rankings";
 import { CurrentUserProvider } from "./components/CurrentUserProvider";
 import PrivateRoute from "./components/PrivateRoute";
+import Queue from "./views/Queue";
 import Resources from "./views/Resources";
 
 const App: React.FC = () => {
@@ -58,7 +59,7 @@ const router = createBrowserRouter([
     element: <EpisodeLayout />,
     children: [
       // Pages that should always be visible
-      // TODO: /:episodeId/tournaments, /:episodeId/queue
+      // TODO: /:episodeId/tournaments
       { path: "/:episodeId/resources", element: <Resources /> },
       { path: "/:episodeId/quickstart", element: <QuickStart /> },
       { path: "/:episodeId/home", element: <Home /> },
@@ -70,9 +71,9 @@ const router = createBrowserRouter([
       },
       { path: "/:episodeId/*", element: <NotFound /> },
       { path: "/:episodeId/rankings", element: <Rankings /> },
+      { path: "/:episodeId/queue", element: <Queue /> },
     ],
   },
-
   // Pages that should redirect
   { path: "/*", element: <Navigate to={`/${DEFAULT_EPISODE}/home`} /> },
 ]);

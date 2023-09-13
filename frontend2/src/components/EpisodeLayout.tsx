@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./sidebar";
 import { Outlet, useParams } from "react-router-dom";
@@ -9,9 +9,11 @@ import { EpisodeContext } from "../contexts/EpisodeContext";
 const EpisodeLayout: React.FC = () => {
   const episodeContext = useContext(EpisodeContext);
   const { episodeId } = useParams();
-  if (episodeId !== undefined && episodeId !== episodeContext.episodeId) {
-    episodeContext.setEpisodeId(episodeId);
-  }
+  useEffect(() => {
+    if (episodeId !== undefined && episodeId !== episodeContext.episodeId) {
+      episodeContext.setEpisodeId(episodeId);
+    }
+  }, [episodeId]);
   return (
     <div className="h-screen overflow-auto">
       <Header />

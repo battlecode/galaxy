@@ -13,6 +13,7 @@ import {
   CheckIcon as CheckIcon24,
   InformationCircleIcon as InformationCircleIcon24,
   Bars3Icon as Bars3Icon24,
+  XMarkIcon as XMarkIcon24,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -29,6 +30,7 @@ import {
   CheckIcon as CheckIcon20,
   InformationCircleIcon as InformationCircleIcon20,
   Bars3Icon as Bars3Icon20,
+  XMarkIcon as XMarkIcon20,
 } from "@heroicons/react/20/solid";
 
 const icons24 = {
@@ -45,6 +47,7 @@ const icons24 = {
   check: CheckIcon24,
   information_circle: InformationCircleIcon24,
   bars_3: Bars3Icon24,
+  x_mark: XMarkIcon24,
 };
 
 const icons20 = {
@@ -61,6 +64,7 @@ const icons20 = {
   check: CheckIcon20,
   information_circle: InformationCircleIcon20,
   bars_3: Bars3Icon20,
+  x_mark: XMarkIcon20,
 };
 
 export type IconName = keyof typeof icons24 | keyof typeof icons20;
