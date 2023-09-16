@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useEpisodeId } from "../contexts/EpisodeContext";
+import React, { useEffect, useRef, useState } from "react";
 import type {
   PaginatedMatchList,
   PaginatedTeamPublicList,
+  TeamPublic,
 } from "../utils/types/models";
 import { NavLink, useSearchParams } from "react-router-dom";
 import { searchTeams } from "../utils/api/team";
@@ -14,7 +14,15 @@ import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import BattlecodeTable from "../components/BattlecodeTable";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
-import MyMatchResult from "../components/compete/MyMatchResult";
+import MatchScore from "../components/compete/MatchScore";
+import RatingDelta from "../components/compete/RatingDelta";
+import MatchStatus from "../components/compete/MatchStatus";
+import { getTeamsByUser } from "../utils/api/user";
+import {
+  CurrentUserContext,
+  useCurrentUser,
+} from "../contexts/CurrentUserContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 
 function trimString(str: string, maxLength: number): string {
   if (str.length > maxLength) {
@@ -25,8 +33,21 @@ function trimString(str: string, maxLength: number): string {
 
 const Scrimmaging: React.FC = () => {
   const episodeId = useEpisodeId().episodeId;
+  const currentUser = useCurrentUser().user;
 
-  const [searchText, setSearchText] = useState<string>("");
+  const [queryParams, setQueryParams] = useSearchParams({
+    teamsPage: "1",
+    scrimsPage: "1",
+    tourneyPage: "1",
+    search: "",
+  });
+
+  const teamsPage = parseInt(queryParams.get("teamsPage") ?? "1");
+  const scrimsPage = parseInt(queryParams.get("scrimsPage") ?? "1");
+  const tourneyPage = parseInt(queryParams.get("tourneyPage") ?? "1");
+  const searchQuery = queryParams.get("search") ?? "";
+
+  const [searchText, setSearchText] = useState<string>(searchQuery);
   const [teamsLoading, setTeamsLoading] = useState<boolean>(false);
   const [scrimsLoading, setScrimsLoading] = useState<boolean>(false);
   const [tourneyLoading, setTourneyLoading] = useState<boolean>(false);
@@ -39,17 +60,8 @@ const Scrimmaging: React.FC = () => {
   const [tourneyData, setTourneyData] = useState<
     PaginatedMatchList | undefined
   >(undefined);
-
-  const [queryParams, setQueryParams] = useSearchParams({
-    teamsPage: "1",
-    scrimsPage: "1",
-    tourneyPage: "1",
-    search: "",
-  });
-  const teamsPage = parseInt(queryParams.get("teamsPage") ?? "1");
-  const scrimsPage = parseInt(queryParams.get("scrimsPage") ?? "1");
-  const tourneyPage = parseInt(queryParams.get("tourneyPage") ?? "1");
-  const searchQuery = queryParams.get("search") ?? "";
+  const myTeamData = useRef<TeamPublic | undefined>(undefined);
+  const teamDataEverLoaded = useRef<boolean>(false);
 
   // function handlePage(page: number): void {
   //   if (!loading) {
@@ -81,8 +93,19 @@ const Scrimmaging: React.FC = () => {
     setScrimsLoading(true);
     setScrimsData((prev) => ({ count: prev?.count ?? 0 }));
     try {
-      const result = await getScrimmagesByTeam(episodeId, undefined, teamsPage);
-      setScrimsData(result);
+      const scrimsResult = await getScrimmagesByTeam(
+        episodeId,
+        undefined,
+        teamsPage,
+      );
+      if (currentUser !== undefined && !teamDataEverLoaded.current) {
+        // TODO: fix this!!!
+        // const myTeamResult = await getTeamsByUser(userId);
+        // const myTeam: TeamPublic | undefined = myTeamResult[episodeId];
+        // myTeamData.current = myTeam;
+        // teamDataEverLoaded.current = true;
+      }
+      setScrimsData(scrimsResult);
     } catch (err) {
       setScrimsData(undefined);
       console.log(err);
@@ -102,6 +125,7 @@ const Scrimmaging: React.FC = () => {
         undefined,
         tourneyPage,
       );
+      setTourneyData(result);
     } catch (err) {
       setTourneyData(undefined);
       console.log(err);
@@ -133,6 +157,10 @@ const Scrimmaging: React.FC = () => {
       <h1 className="mb-5 text-3xl font-bold leading-7 text-gray-900">
         Scrimmaging
       </h1>
+
+      <h1 className="text-2xl font-bold leading-7 text-gray-900">
+        Find a team to scrimmage!
+      </h1>
       <div className="justify-left mb-5 flex h-10 w-4/5 flex-row items-center">
         <Input
           disabled={teamsLoading}
@@ -157,11 +185,7 @@ const Scrimmaging: React.FC = () => {
           }}
         />
       </div>
-
-      <h1 className="mb-2 text-2xl font-bold leading-7 text-gray-900">
-        Find a team to scrimmage!
-      </h1>
-      <div className="mb-4 w-5/6">
+      <div className="mb-8">
         <BattlecodeTable
           data={teamsData?.results ?? []}
           loading={teamsLoading}
@@ -226,7 +250,12 @@ const Scrimmaging: React.FC = () => {
               pageSize={10}
               currentPage={teamsPage}
               onPage={(page) => {
-                setQueryParams({ ...queryParams, teamsPage: page.toString() });
+                if (!teamsLoading) {
+                  setQueryParams({
+                    ...queryParams,
+                    teamsPage: page.toString(),
+                  });
+                }
               }}
             />
           }
@@ -249,22 +278,63 @@ const Scrimmaging: React.FC = () => {
           }}
         />
       </div>
-      <div className="mb-4 w-5/6">
+      <div className="mb-8">
         <BattlecodeTable
           data={scrimsData?.results ?? []}
           loading={scrimsLoading}
           columns={[
             {
               header: "Score",
-              value: (match) => <MyMatchResult match={match} />,
-            },
-            {
-              header: "Δ",
-              value: (match) => "TODO",
+              value: (match) => {
+                const myTeam = match.participants.find(
+                  (p) => p.team === myTeamData.current?.id,
+                );
+                const opponent = match.participants?.find(
+                  (p) => p.team !== myTeam?.team,
+                );
+                if (myTeam === undefined || opponent === undefined) return;
+
+                const resultClass =
+                  myTeam.score === null || opponent.score === null
+                    ? "text-sm text-gray-700 bg-gray-200 rounded-full px-2.5 py-1 ml-2.5"
+                    : myTeam.score > opponent.score
+                    ? "text-sm text-gray-700 bg-green-200 rounded-full px-2 py-1 ml-2"
+                    : myTeam.score < opponent.score
+                    ? "text-sm text-gray-700 bg-red-200 rounded-full px-2.5 py-1 ml-2"
+                    : "text-sm text-gray-700 bg-gray-200 rounded-full px-2.5 py-1 ml-2";
+
+                return (
+                  <div className="flex flex-row items-center">
+                    <MatchScore match={match} />
+                    <div className={resultClass}>
+                      {myTeam.score === null || opponent.score === null
+                        ? "-"
+                        : myTeam.score > opponent.score
+                        ? "W"
+                        : myTeam.score < opponent.score
+                        ? "L"
+                        : "T"}
+                    </div>
+                  </div>
+                );
+              },
             },
             {
               header: "Opponent (Δ)",
-              value: (match) => "TODO",
+              value: (match) => {
+                const opponent = match.participants?.find(
+                  (p) =>
+                    myTeamData.current !== undefined &&
+                    p.team !== myTeamData.current.id,
+                );
+                if (opponent === undefined) return;
+                return (
+                  <RatingDelta
+                    participant={opponent}
+                    ranked={match.is_ranked}
+                  />
+                );
+              },
             },
             {
               header: "Ranked",
@@ -272,7 +342,7 @@ const Scrimmaging: React.FC = () => {
             },
             {
               header: "Status",
-              value: (match) => "TODO",
+              value: (match) => <MatchStatus match={match} />,
             },
             {
               header: "Replay",
@@ -280,6 +350,7 @@ const Scrimmaging: React.FC = () => {
             },
             {
               header: "Created At",
+              // TODO: use new DateTime component
               value: (match) => new Date(match.created).toLocaleDateString(),
             },
           ]}
@@ -289,7 +360,12 @@ const Scrimmaging: React.FC = () => {
               pageSize={10}
               currentPage={scrimsPage}
               onPage={(page) => {
-                setQueryParams({ ...queryParams, scrimsPage: page.toString() });
+                if (!scrimsLoading) {
+                  setQueryParams({
+                    ...queryParams,
+                    scrimsPage: page.toString(),
+                  });
+                }
               }}
             />
           }
@@ -313,21 +389,59 @@ const Scrimmaging: React.FC = () => {
         />
       </div>
 
-      <div className="mb-4 w-5/6">
+      <div className="mb-8">
         <BattlecodeTable
           data={tourneyData?.results ?? []}
           loading={tourneyLoading}
-          columns={[]}
+          columns={[
+            // score, opponent (delta), status, replay, created at
+            {
+              header: "Score",
+              value: (match) => <MatchScore match={match} />,
+            },
+            {
+              header: "Opponent",
+              value: (match) => {
+                const opponent = match.participants?.find(
+                  (p) =>
+                    myTeamData.current !== undefined &&
+                    p.team !== myTeamData.current.id,
+                );
+                if (opponent === undefined) return;
+                return (
+                  <RatingDelta
+                    participant={opponent}
+                    ranked={match.is_ranked}
+                  />
+                );
+              },
+            },
+            {
+              header: "Status",
+              value: (match) => <MatchStatus match={match} />,
+            },
+            {
+              header: "Replay",
+              value: (match) => "TODO",
+            },
+            {
+              header: "Created At",
+              // TODO: use new DateTime component
+              value: (match) => new Date(match.created).toLocaleDateString(),
+            },
+          ]}
           bottomElement={
             <BattlecodeTableBottomElement
               totalCount={tourneyData?.count ?? 0}
               pageSize={10}
               currentPage={tourneyPage}
               onPage={(page) => {
-                setQueryParams({
-                  ...queryParams,
-                  tourneyPage: page.toString(),
-                });
+                if (!tourneyLoading) {
+                  setQueryParams({
+                    ...queryParams,
+                    tourneyPage: page.toString(),
+                  });
+                }
               }}
             />
           }
