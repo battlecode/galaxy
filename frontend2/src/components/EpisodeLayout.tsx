@@ -18,7 +18,7 @@ const EpisodeLayout: React.FC = () => {
     <div className="h-screen overflow-auto">
       <Header />
       <Sidebar />
-      <div className="fixed right-0 h-full pt-16 sm:left-52">
+      <div className="fixed right-0 h-full mt-16 sm:left-52">
         <Outlet />
       </div>
     </div>

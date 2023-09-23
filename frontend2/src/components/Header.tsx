@@ -80,7 +80,6 @@ const Header: React.FC = () => {
                 alt="Battlecode Logo"
               />
             </div>
-            <div className="hidden sm:ml-6 sm:block"></div>
           </div>
           {/* profile menu (if the user is logged in) */}
           {authState === AuthStateEnum.AUTHENTICATED && (
