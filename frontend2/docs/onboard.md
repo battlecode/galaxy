@@ -1,28 +1,42 @@
 # Codebase Intro and Guide
 
+(with much help from Maggie Yao)
+
 **If you are trying to make code changes here, make sure to read all the (sub)sections called "Technical Detail".** _If you're not trying to make code changes but just need some working knowledge, then feel free to skip over those sections._ It's helpful but not necessary.
 
 The intent of this page is to discuss technical parts just enough, to get people started or reduce confusion. Feel free to change this and add more detail as it might be helpful (although it should probably go into other pages).
+
+_(Note to editors / maintainers of this page: If you need to explain a subject, no need to reinvent the wheel! Linking to a reputable tutorial should be just fine.)_
 
 ## Web Programming knowledge
 
 General principles and packages of web programming, that Battlecode uses.
 
+### What is a Frontend?
+
+A "frontend" is, in general, the part of an application which the users interacts with.
+
+In the Battlecode website, on a high level, the frontend takes in URLs from the user’s address bar, and returns rendered webpages to the user. The browser's process of loading and rendering these pages involves HTTP requests to the backend server. (The backend takes in these requests, and returns information.)
+
+These two servers run independently of one another, and do not inherently share any information. Instead, communication is achieved through those HTTP requests.
+
 ### NPM
 
 NPM, the Node Package Manager, is an online repository of JS packages, and a way to download and use them. It also exposes some helpful utilities.
 
+Amazing tutorials can be found at https://www.freecodecamp.org/news/what-is-npm-a-node-package-manager-tutorial-for-beginners/ and at https://nodesource.com/blog/an-absolute-beginners-guide-to-using-npm/. I would highly recommend using them!
+
 To run the frontend locally, you'll need to install the NPM CLI (command-line interface). See `local-setup.md` for more.
 
-and then react-scripts
+When installing a new Node package, always `npm install --save <package>`, and commit `package.json` and `package-lock.json`.
+
+Our local processes use `npm start` and/or `npm run start`. These commands automatically use `.env.development`, and not `.env.production`. See here for more information: https://create-react-app.dev/docs/adding-custom-environment-variables/#what-other-env-files-can-be-used.
 
 #### Technical Detail
 
 Here's a good tutorial to NPM, that should give you all you need. (It might actually give too much detail -- feel free to strip down as necessary.) [https://www.freecodecamp.org/news/what-is-npm-a-node-package-manager-tutorial-for-beginners/](https://www.freecodecamp.org/news/what-is-npm-a-node-package-manager-tutorial-for-beginners/)
 
-If this ever goes down or you don't like this tutorial, try this: [https://nodesource.com/blog/an-absolute-beginners-guide-to-using-npm/](https://nodesource.com/blog/an-absolute-beginners-guide-to-using-npm/)
-
-also, react-scripts TODO, tracked in #49
+Another useful source: [https://nodesource.com/blog/an-absolute-beginners-guide-to-using-npm/](https://nodesource.com/blog/an-absolute-beginners-guide-to-using-npm/)
 
 ### React
 
