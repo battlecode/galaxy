@@ -21,3 +21,5 @@ npm run start
 ```
 
 This automatically reloads the page on changes.
+
+For more info of what you can do to set up or run the frontend, see [create-react-app.md](create-react-app.md).
