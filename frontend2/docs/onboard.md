@@ -42,8 +42,9 @@ There's a couple other parts of React that we use heavily, that are not directly
 
 You may want to know how conditional rendering works -- depending on what you do, it might come up. Here's a good explanation: https://reactjs.org/docs/conditional-rendering.html
 
-Note that as you navigate our frontend, the URL in your web browser changes. A naive website implementation would have different html files for each page. But we only have one HTML file...what gives?
-This is thanks to Routes and Switches, from `react-router`. You might want to know how they work, since they might come up too. This will help you to figure out what component is being rendered, based on a URL. For explanation, you can _skim_ https://v5.reactrouter.com/web/api/Route and https://v5.reactrouter.com/web/api/Switch. If there are important details, make sure to check the docs.
+<!-- a page on react-router, Routes, and Switches, that isn't super useful and kinda google-able -->
+<!-- Note that as you navigate our frontend, the URL in your web browser changes. A naive website implementation would have different html files for each page. But we only have one HTML file...what gives?
+This is thanks to Routes and Switches, from `react-router`. You might want to know how they work, since they might come up too. This will help you to figure out what component is being rendered, based on a URL. For explanation, you can _skim_ https://v5.reactrouter.com/web/api/Route and https://v5.reactrouter.com/web/api/Switch. If there are important details, make sure to check the docs. -->
 
 ### JQuery
 
@@ -78,8 +79,12 @@ Any linked explanation or explnation we write ought to discuss
 
 ## Battlecode-specific frontend knowledge
 
-Here are (some) specifics about how Battlecode's frontend codebase is specifically set up and how it specifically works.
+Here are (some) specifics about Battlecode's frontend -- about how the codebase is set up, how it works, etc.
 
+This will be developed over time, as the new frontend is developed, too.
+
+<!-- The following are notes from the old frontend. Copy-paste as you please. -->
+<!--
 ### Injection from the root up
 
 So first, from the bottom, what creates our pages? Ultimately, our page is `public/index.html` with some js running.
@@ -96,12 +101,5 @@ But note also `src/index.js`, and especially its last few lines, is run on `publ
 
 See `src/index.js` for how we expose a single-page app, with routes and matching components, and especially to see how we only expose some routes.
 
-### Our API
-
-TODO. tracked in #49
-
-(hits backend, and sometimes hits other external sites too)
-
-#### Technical Detail
-
-TODO. tracked in #49
+Our API hits backend, and sometimes hits other external sites too
+ -->
