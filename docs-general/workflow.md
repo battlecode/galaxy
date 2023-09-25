@@ -62,6 +62,21 @@ For any task, **consider the benefits of doing it**. You can think of benefits f
 
 **On the other hand, consider the costs.** Remember that **your product takes effort, both to create and then to maintain.** Even if this task is easy to do in the short run, someone (perhaps not you) will have to be in charge of maintaining the finished product in the long run.
 
+### Coding
+
+Develop new features on branches. This is, in fact, almost mandatory -- the `main` branch is protected and pushes to `main` will be rejected.
+
+In places where it makes sense, it could be good to write automatic test cases, although a lot of the functionality might not be very testable.
+
+### Review
+
+When your code is ready, create a pull request (PR), and then request code review. All PRs require at least one person's approval to be merged to `main`.
+
+(If not ready but you would still like a PR, then you can create a draft PR. Press the corresponding button on GitHub.)
+
+Once you have a PR, then on every push, GitHub will take the latest commit and run all checks and test cases.
+It's not required to make sure every commit on GitHub passes, but anything merged to `main` is required (by GitHub) pass. GitHub will send you an automatic email if the checks fail.
+
 ## Doing Things: Working / Workstyle Preferences
 
 A rule of thumb: **If you're not making forward progress for a while, ask for help, or consider trying a different direction or just not achieving the thing**. While there is benefit in self-discovery, the benefits of productivity are generally worth it, especially with the limited time and unlimited backlog of student life. Also, not every features is required or mandated to do.
