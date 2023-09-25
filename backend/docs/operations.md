@@ -1,5 +1,13 @@
 # Operations
 
+## Get dev permissions
+
+TODO
+
+## Add a dev to any team
+
+TODO
+
 ## Resetting people's passwords
 
 Sometimes, password resets don't go through, since users never get the emails, due to issues with our email backend. No email backend will ever be failproof, so here are some other methods:
