@@ -5,6 +5,7 @@ import {
   type PaginatedTeamPublicList,
   type TeamTListRequest,
   type TeamTAvatarCreateRequest,
+  type TeamPrivate,
 } from "../types";
 import { DEFAULT_API_CONFIGURATION } from "./helpers";
 
@@ -52,6 +53,14 @@ export const joinTeam = async (
  */
 export const leaveTeam = async (episodeId: string): Promise<void> => {
   await API.teamTLeaveCreate({ episodeId });
+};
+
+/**
+ * Get the current user's team for an episode.
+ * @param episodeId The episode of the team to retrieve.
+ */
+export const retrieveTeam = async (episodeId: string): Promise<TeamPrivate> => {
+  return await API.teamTMeRetrieve({ episodeId });
 };
 
 // -- TEAM STATS --//

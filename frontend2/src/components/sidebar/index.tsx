@@ -1,7 +1,7 @@
-import React, { useContext } from "react";
+import React from "react";
 import SidebarSection from "./SidebarSection";
 import SidebarItem from "./SidebarItem";
-import { EpisodeContext } from "../../contexts/EpisodeContext";
+import { useEpisodeId } from "../../contexts/EpisodeContext";
 import { type IconName } from "../elements/Icon";
 
 interface SidebarProps {
@@ -89,7 +89,7 @@ export const generateSidebarItems = (
 // IMPORTANT: When changing this file, also remember to change the mobile menu that appears on small screens.
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   collapsed = collapsed ?? false;
-  const { episodeId } = useContext(EpisodeContext);
+  const { episodeId } = useEpisodeId();
 
   return collapsed ? null : (
     <nav className="fixed top-16 z-10 hidden h-full w-52 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">

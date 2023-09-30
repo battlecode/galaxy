@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
-import { EpisodeContext } from "../contexts/EpisodeContext";
+import React from "react";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 
 const Account: React.FC = () => {
-  const { episodeId } = useContext(EpisodeContext);
+  const { episodeId } = useEpisodeId();
   return <p>the episode is {episodeId} and this is the account page</p>;
 };
 

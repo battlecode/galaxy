@@ -1,14 +1,14 @@
-import React, { Fragment, useContext } from "react";
+import React, { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { Link, NavLink } from "react-router-dom";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import Icon from "./elements/Icon";
-import { EpisodeContext } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 import { SIDEBAR_ITEM_DATA } from "./sidebar";
 
 const Header: React.FC = () => {
   const { authState, logout, user } = useCurrentUser();
-  const { episodeId } = useContext(EpisodeContext);
+  const { episodeId } = useEpisodeId();
 
   return (
     <nav className="fixed top-0 h-16 w-full bg-gray-700">
@@ -80,7 +80,6 @@ const Header: React.FC = () => {
                 alt="Battlecode Logo"
               />
             </div>
-            <div className="hidden sm:ml-6 sm:block"></div>
           </div>
           {/* profile menu (if the user is logged in) */}
           {authState === AuthStateEnum.AUTHENTICATED && (

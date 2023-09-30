@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { login as apiLogin } from "../utils/api/auth";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
 import { Link, useNavigate } from "react-router-dom";
-import { EpisodeContext } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useCurrentUser, AuthStateEnum } from "../contexts/CurrentUserContext";
 import { type Maybe } from "../utils/utilTypes";
 import { getUserUserProfile } from "../utils/api/user";
@@ -17,7 +17,7 @@ interface LoginFormInput {
 
 const Login: React.FC = () => {
   const { register, handleSubmit } = useForm<LoginFormInput>();
-  const { episodeId } = useContext(EpisodeContext);
+  const { episodeId } = useEpisodeId();
   const { login, authState } = useCurrentUser();
   const [loginError, setLoginError] = useState<Maybe<string>>();
 
