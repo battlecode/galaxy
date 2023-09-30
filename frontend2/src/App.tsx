@@ -22,14 +22,18 @@ import { CurrentUserProvider } from "./components/CurrentUserProvider";
 import PrivateRoute from "./components/PrivateRoute";
 import Queue from "./views/Queue";
 import Resources from "./views/Resources";
+import MyTeam from "./views/MyTeam";
+import { CurrentTeamProvider } from "./contexts/CurrentTeamProvider";
 
 const App: React.FC = () => {
   const [episodeId, setEpisodeId] = useState(DEFAULT_EPISODE);
   return (
     <CurrentUserProvider>
+      <CurrentTeamProvider>
       <EpisodeContext.Provider value={{ episodeId, setEpisodeId }}>
         <RouterProvider router={router} />
       </EpisodeContext.Provider>
+      </CurrentTeamProvider>
     </CurrentUserProvider>
   );
 };
