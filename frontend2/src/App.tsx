@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import EpisodeLayout from "./components/EpisodeLayout";
 import Home from "./views/Home";
 import Logout from "./views/Logout";
@@ -8,7 +8,6 @@ import PasswordChange from "./views/PasswordChange";
 import Account from "./views/Account";
 import Login from "./views/Login";
 import QuickStart from "./views/QuickStart";
-import { EpisodeContext } from "./contexts/EpisodeContext";
 import {
   RouterProvider,
   createBrowserRouter,
@@ -24,16 +23,16 @@ import Queue from "./views/Queue";
 import Resources from "./views/Resources";
 import MyTeam from "./views/MyTeam";
 import { CurrentTeamProvider } from "./contexts/CurrentTeamProvider";
+import { EpisodeProvider } from "./contexts/EpisodeProvider";
 
 const App: React.FC = () => {
-  const [episodeId, setEpisodeId] = useState(DEFAULT_EPISODE);
   return (
     <CurrentUserProvider>
-      <CurrentTeamProvider>
-      <EpisodeContext.Provider value={{ episodeId, setEpisodeId }}>
-        <RouterProvider router={router} />
-      </EpisodeContext.Provider>
-      </CurrentTeamProvider>
+      <EpisodeProvider>
+        <CurrentTeamProvider>
+          <RouterProvider router={router} />
+        </CurrentTeamProvider>
+      </EpisodeProvider>
     </CurrentUserProvider>
   );
 };
@@ -53,6 +52,10 @@ const router = createBrowserRouter([
       {
         element: <EpisodeLayout />,
         children: [
+          {
+            path: "/:episodeId/team",
+            element: <MyTeam />,
+          },
           // TODO: /:episodeId/team, /:episodeId/submissions, /:episodeId/scrimmaging
         ],
       },

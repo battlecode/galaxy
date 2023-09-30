@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { type TeamPrivate } from "../utils/types";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import { CurrentTeamContext, TeamStateEnum } from "./CurrentTeamContext";
-import { EpisodeContext } from "./EpisodeContext";
+import { useEpisodeId } from "./EpisodeContext";
 import { retrieveTeam } from "../utils/api/team";
 
 export const CurrentTeamProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -15,7 +15,7 @@ export const CurrentTeamProvider: React.FC<{ children: React.ReactNode }> = ({
     teamState: TeamStateEnum.NO_TEAM,
   });
   const { authState } = useCurrentUser();
-  const { episodeId } = useContext(EpisodeContext);
+  const { episodeId } = useEpisodeId();
 
   useEffect(() => {
     const loadTeam = async (): Promise<void> => {

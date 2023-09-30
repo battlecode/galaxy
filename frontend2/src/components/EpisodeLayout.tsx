@@ -1,13 +1,13 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./sidebar";
 import { Outlet, useParams } from "react-router-dom";
-import { EpisodeContext } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 
 // This component contains the Header and SideBar.
 // Child route components are rendered with <Outlet />
 const EpisodeLayout: React.FC = () => {
-  const episodeContext = useContext(EpisodeContext);
+  const episodeContext = useEpisodeId();
   const { episodeId } = useParams();
   useEffect(() => {
     if (episodeId !== undefined && episodeId !== episodeContext.episodeId) {

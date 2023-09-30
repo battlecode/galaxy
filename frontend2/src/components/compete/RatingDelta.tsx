@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { type MatchParticipant } from "../../utils/types";
-import React, { useContext } from "react";
-import { EpisodeContext } from "../../contexts/EpisodeContext";
+import React from "react";
+import { useEpisodeId } from "../../contexts/EpisodeContext";
 
 interface RatingDeltaProps {
   participant: MatchParticipant;
@@ -9,7 +9,7 @@ interface RatingDeltaProps {
 }
 
 const RatingDelta: React.FC<RatingDeltaProps> = ({ participant, ranked }) => {
-  const episodeId = useContext(EpisodeContext).episodeId;
+  const { episodeId } = useEpisodeId();
 
   const newRating = ranked
     ? Math.round(participant.rating)

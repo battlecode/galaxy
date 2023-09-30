@@ -54,8 +54,7 @@ export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const providedValue = useMemo(
     () => ({
-      authState: userData.authState,
-      user: userData.user,
+      ...userData,
       login,
       logout,
     }),

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import type {
   PaginatedTeamPublicList,
@@ -6,7 +6,7 @@ import type {
 } from "../utils/types";
 import { useSearchParams } from "react-router-dom";
 import { getAllMatches, getScrimmagesByTeam } from "../utils/api/compete";
-import { EpisodeContext } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 import BattlecodeTable from "../components/BattlecodeTable";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
 import Button from "../components/elements/Button";
@@ -18,7 +18,7 @@ import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
 import type { Maybe } from "../utils/utilTypes";
 
 const Queue: React.FC = () => {
-  const episodeId = useContext(EpisodeContext).episodeId;
+  const { episodeId } = useEpisodeId();
 
   const [queryParams, setQueryParams] = useSearchParams({
     page: "1",

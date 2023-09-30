@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { EpisodeContext } from "../contexts/EpisodeContext";
+import React, { useEffect, useState } from "react";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 import BattlecodeTable from "../components/BattlecodeTable";
 import { type PaginatedTeamPublicList } from "../utils/types";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
@@ -17,7 +17,7 @@ function trimString(str: string, maxLength: number): string {
 }
 
 const Rankings: React.FC = () => {
-  const episodeId = useContext(EpisodeContext).episodeId;
+  const { episodeId } = useEpisodeId();
 
   const [searchText, setSearchText] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
