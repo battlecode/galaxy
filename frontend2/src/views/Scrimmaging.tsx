@@ -63,12 +63,6 @@ const Scrimmaging: React.FC = () => {
   const myTeamData = useRef<TeamPublic | undefined>(undefined);
   const teamDataEverLoaded = useRef<boolean>(false);
 
-  // function handlePage(page: number): void {
-  //   if (!loading) {
-  //     setQueryParams({ ...queryParams, page: page.toString() });
-  //   }
-  // }
-
   function handleSearch(): void {
     if (!teamsLoading && searchText !== searchQuery) {
       setQueryParams({ ...queryParams, search: searchText });
@@ -286,36 +280,11 @@ const Scrimmaging: React.FC = () => {
             {
               header: "Score",
               value: (match) => {
-                const myTeam = match.participants.find(
-                  (p) => p.team === myTeamData.current?.id,
-                );
-                const opponent = match.participants?.find(
-                  (p) => p.team !== myTeam?.team,
-                );
-                if (myTeam === undefined || opponent === undefined) return;
-
-                const resultClass =
-                  myTeam.score === null || opponent.score === null
-                    ? "text-sm text-gray-700 bg-gray-200 rounded-full px-2.5 py-1 ml-2.5"
-                    : myTeam.score > opponent.score
-                    ? "text-sm text-gray-700 bg-green-200 rounded-full px-2 py-1 ml-2"
-                    : myTeam.score < opponent.score
-                    ? "text-sm text-gray-700 bg-red-200 rounded-full px-2.5 py-1 ml-2"
-                    : "text-sm text-gray-700 bg-gray-200 rounded-full px-2.5 py-1 ml-2";
-
                 return (
-                  <div className="flex flex-row items-center">
-                    <MatchScore match={match} />
-                    <div className={resultClass}>
-                      {myTeam.score === null || opponent.score === null
-                        ? "-"
-                        : myTeam.score > opponent.score
-                        ? "W"
-                        : myTeam.score < opponent.score
-                        ? "L"
-                        : "T"}
-                    </div>
-                  </div>
+                  <MatchScore
+                    match={match}
+                    userTeamId={myTeamData.current?.id}
+                  />
                 );
               },
             },
@@ -394,10 +363,11 @@ const Scrimmaging: React.FC = () => {
           data={tourneyData?.results ?? []}
           loading={tourneyLoading}
           columns={[
-            // score, opponent (delta), status, replay, created at
             {
               header: "Score",
-              value: (match) => <MatchScore match={match} />,
+              value: (match) => (
+                <MatchScore match={match} userTeamId={myTeamData.current?.id} />
+              ),
             },
             {
               header: "Opponent",
