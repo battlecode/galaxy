@@ -30,13 +30,23 @@ Another practice that keep things simple is only deriving/manipulating each piec
 
 ### Organizing
 
-Todos are tracked first and foremost on GitHub's Issues list.
+Todos are tracked in two different places: on our internal Roadmap, and on GitHub's Issues list.
 
-Generally, we turn each todo into an issue. We try to assign each issue a priority, between `critical`, `medium`, and `low`.
+#### Roadmap
 
-(The exact meaning of each priority has changed, as the team features different members with different work styles, and as we find a system that works the best for all of us. A rule of thumb is that if `critical` issues are not fixed before the Battlecode season, then the competition will not fully run smoothly or as promised to competitors.)
+This is our more short-term solution, which is a Google Sheet that contains a list. These todos are usually short-term ones, for parts of the codebase that are not complete and actively in development. The roadmap also tracks who's doing the todo, how long it might take, links to relevant GitHub issues and PRs, etc.
 
-Each issue also can belong to one or more modules (e.gark. `backend`, `frontend`), and can have one or more types (e.g. `bug`, `refactor`). These, as well as priority, are assigned to issues via GitHub's labels. This allows for quick visualization and easy filtering.
+After building out those parts, we tend to either put those todos both on the roadmap and on the issues list, or just only on the issues list (and not the roadmap at all).
+
+You can find it here: https://docs.google.com/spreadsheets/d/172-JYNYRjMLcSE4diH5JcxV9_2i2Q9-YzzRpktx__WE/edit#gid=1866108322
+
+#### Issues
+
+We tend to use GitHub's issues during times of normal development. In particular, when a todo is more concrete and less obviously immediate, we turn it into an issue on GitHub. This list is used more as a backlog, and when development of all-new things slows, we tend to use this more.
+
+We try to assign each issue a priority, between `critical`, `medium`, and `low`. (The exact meaning of each priority has changed, as the team features different members with different work styles, and as we find a system that works the best for all of us. A rule of thumb is that if `critical` issues are not fixed before the Battlecode season, then the competition will not fully run smoothly or as promised to competitors.)
+
+Each issue also can belong to one or more modules (e.g. `backend`, `frontend`), and can have one or more types (e.g. `bug`, `refactor`). These, as well as priority, are assigned to issues via GitHub's labels. This allows for quick visualization and easy filtering.
 
 (The counterexample to this is when Dependabot makes its own PRs and issues, and gives them its own labels. In the future, we might customize these labels to better fit our needs. See https://github.com/battlecode/galaxy/issues/676 for tracking.)
 
@@ -49,14 +59,18 @@ We occasionally categorize issues via GitHub's Milestones. A milestone is a coll
 
 When any task makes itself known (by your testing, other reports, code flaws, or however else):
 
-- Create an issue. Make sure its title includes "[frontend]". Label it with "enhancement" or "critical"; see the "To-do organizing" section and use your judgement to classify this. Finally, if applicable, add it to a relevant milestone.
+- Record this task somewhere!
+
+  - If the todo is fitting for the roadmap, especially if it is to be actively worked on soon, then add it to the roadmap.
+  - If you use a GitHub Issue, then (if you can) give it the corresponding labels.
+  - (If you're having trouble deciding, then put it at least _somewhere_, or even in both. Ask the team for opinions too.)
 
 - Please do **not leave "TODO" in completed code. Instead, create an issue, and leave a comment referencing that issue**. It's easy to write TODOs in the code and then forget about them or never see them. A GitHub issue provides more visibility, and more safety and convenience in tracking.
   (This practice also then lets you succinctly use "TODO" in your code as "within this PR".)
 
 ### Selecting
 
-Now, say you're trying to do some work, and you look at the Issues list to pick a task to do. Before you begin a task, make a decision on whether you want to -- or should -- do this task.
+Now, say you're trying to do some work, and you look at the Roadmap or Issues list to pick a task to do. Before you begin a task, make a decision on whether you want to -- or should -- do this task.
 
 For any task, **consider the benefits of doing it**. You can think of benefits from the "negative" viewpoint too. For example, you could consider the negatives of _not_ doing it, such as the impact of security holes and breaking bugs, or the dev time inevitably lost. (Automation and refactors can be subtle, since they have little tangible impact to competitors, but they do have high benefits (and high opportunity costs!) for devs.)
 
