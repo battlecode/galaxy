@@ -1,13 +1,13 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./sidebar";
 import { Outlet, useParams } from "react-router-dom";
-import { EpisodeContext } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 
 // This component contains the Header and SideBar.
 // Child route components are rendered with <Outlet />
 const EpisodeLayout: React.FC = () => {
-  const episodeContext = useContext(EpisodeContext);
+  const episodeContext = useEpisodeId();
   const { episodeId } = useParams();
   useEffect(() => {
     if (episodeId !== undefined && episodeId !== episodeContext.episodeId) {
@@ -15,10 +15,10 @@ const EpisodeLayout: React.FC = () => {
     }
   }, [episodeId]);
   return (
-    <div className="h-screen overflow-auto">
+    <div className="h-screen">
       <Header />
       <Sidebar />
-      <div className="fixed right-0 h-full pt-16 sm:left-52">
+      <div className="h-full pt-16 sm:pl-52">
         <Outlet />
       </div>
     </div>
