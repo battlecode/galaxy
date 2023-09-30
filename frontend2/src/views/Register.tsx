@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createUser } from "../utils/api/user";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
@@ -14,12 +14,12 @@ import {
 import { COUNTRIES } from "../utils/apiTypes";
 import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
-import { EpisodeContext } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 
 const Register: React.FC = () => {
   const { login, authState } = useCurrentUser();
   const navigate = useNavigate();
-  const { episodeId } = useContext(EpisodeContext);
+  const { episodeId } = useEpisodeId();
   const {
     register,
     handleSubmit,
