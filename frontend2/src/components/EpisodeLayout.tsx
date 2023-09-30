@@ -15,10 +15,10 @@ const EpisodeLayout: React.FC = () => {
     }
   }, [episodeId]);
   return (
-    <div className="h-screen overflow-auto">
+    <div className="h-screen">
       <Header />
       <Sidebar />
-      <div className="fixed right-0 h-full mt-16 sm:left-52">
+      <div className="h-full pt-16 sm:pl-52">
         <Outlet />
       </div>
     </div>

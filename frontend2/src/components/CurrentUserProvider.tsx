@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { type UserPrivate } from "../utils/types";
 import {
   AuthStateEnum,
@@ -20,19 +20,20 @@ export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
     authState: AuthStateEnum.LOADING,
   });
 
-  const login = (user: UserPrivate): void => {
+  // useCallback to avoid redefining login/logout each rerender
+  const login = useCallback((user: UserPrivate): void => {
     setUserData({
       user,
       authState: AuthStateEnum.AUTHENTICATED,
     });
-  };
-  const logout = (): void => {
+  }, []);
+  const logout = useCallback((): void => {
     Cookies.remove("access");
     Cookies.remove("refresh");
     setUserData({
       authState: AuthStateEnum.NOT_AUTHENTICATED,
     });
-  };
+  }, []);
 
   useEffect(() => {
     const checkLoggedIn = async (): Promise<void> => {
@@ -51,15 +52,18 @@ export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
     void checkLoggedIn();
   }, []);
 
+  const providedValue = useMemo(
+    () => ({
+      authState: userData.authState,
+      user: userData.user,
+      login,
+      logout,
+    }),
+    [login, logout, userData],
+  );
+
   return (
-    <CurrentUserContext.Provider
-      value={{
-        authState: userData.authState,
-        user: userData.user,
-        login,
-        logout,
-      }}
-    >
+    <CurrentUserContext.Provider value={providedValue}>
       {children}
     </CurrentUserContext.Provider>
   );
