@@ -1,6 +1,14 @@
+<!-- TODO tracked in #49, expand this til nothing for this doc readily, easily comes to mind. In particular, _during onboarding session, take an audio recording_ and then use that to type this up after. -->
+
 # Codebase Intro and Guide
 
 (with much help from Maggie Yao)
+
+<!-- TODO in this PR... sketch this out more. Need to be concise somehow. Need to be organized, somehow!
+Consider linking Maggie's docs. Although really, everything relevant should be here.
+Most of all, this should be _ready for onboarding writeups._ -->
+
+<!-- TODO also looking at the organization... and wondering how to make more readable -->
 
 **If you are trying to make code changes here, make sure to read all the (sub)sections called "Technical Detail".** _If you're not trying to make code changes but just need some working knowledge, then feel free to skip over those sections._ It's helpful but not necessary.
 
@@ -8,7 +16,7 @@ The intent of this page is to discuss technical parts just enough, to get people
 
 _(Note to editors / maintainers of this page: If you need to explain a subject, no need to reinvent the wheel! Linking to a reputable tutorial should be just fine.)_
 
-## Web Programming knowledge
+## General web dev
 
 General principles and packages of web programming, that Battlecode uses.
 
@@ -32,8 +40,6 @@ When installing a new Node package, always `npm install --save <package>`, and c
 
 Our local processes use `npm start` and/or `npm run start`. These commands automatically use `.env.development`, and not `.env.production`. See here for more information: https://create-react-app.dev/docs/adding-custom-environment-variables/#what-other-env-files-can-be-used.
 
-#### Technical Detail
-
 Here's a good tutorial to NPM, that should give you all you need. (It might actually give too much detail -- feel free to strip down as necessary.) [https://www.freecodecamp.org/news/what-is-npm-a-node-package-manager-tutorial-for-beginners/](https://www.freecodecamp.org/news/what-is-npm-a-node-package-manager-tutorial-for-beginners/)
 
 Another useful source: [https://nodesource.com/blog/an-absolute-beginners-guide-to-using-npm/](https://nodesource.com/blog/an-absolute-beginners-guide-to-using-npm/)
@@ -41,8 +47,6 @@ Another useful source: [https://nodesource.com/blog/an-absolute-beginners-guide-
 ### React
 
 React is a popular JS framework. It's great! Turning html components into variables that are manipulatable in code is great.
-
-#### Technical Detail
 
 If you don't have any React knowledge at all, then you should familiarize yourself with the basics. There are plenty of tutorials to get you up to speed. I enjoy React's official tutorial, here: https://reactjs.org/tutorial/tutorial.html. **In particular, make sure you read up to (and including) the Overview section**.
 
@@ -62,8 +66,6 @@ This is thanks to Routes and Switches, from `react-router`. You might want to kn
 
 ### JQuery
 
-#### Technical Detail
-
 You actually probably don't need to know how JQuery works, other than how its API is exposed as a dollar sign object. TODO good links? tracked in #49
 
 ### APIs and the Web
@@ -73,15 +75,12 @@ You actually probably don't need to know how JQuery works, other than how its AP
 What is? TODO Link to a small explanation. tracked in #49
 Note that this is a thing for backend and frontend!
 
-#### Technical Detail
 
 TODO link to a small explanation. tracked in #49
 
 ### Async, Promises, and Callbacks
 
 TODO one-sentence description if at all. tracked in #49
-
-#### Technical Detail
 
 TODO link to a small explanation. tracked in #49
 
@@ -91,14 +90,17 @@ Any linked explanation or explnation we write ought to discuss
 - promises in vanilla JS first,
 - and then how JQuery's AJAX works
 
-## Battlecode-specific frontend knowledge
+## Battlecode-specific web dev
 
 Here are (some) specifics about Battlecode's frontend -- about how the codebase is set up, how it works, etc.
 
 This will be developed over time, as the new frontend is developed, too.
 
-<!-- The following are notes from the old frontend. Copy-paste as you please. -->
-<!--
+
+<!-- ## Legacy stuff
+
+The following are legacy notes from the old frontend. Copy-paste as you please.
+
 ### Injection from the root up
 
 So first, from the bottom, what creates our pages? Ultimately, our page is `public/index.html` with some js running.
