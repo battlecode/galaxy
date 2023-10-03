@@ -60,12 +60,6 @@ You may want to know how conditional rendering works -- depending on what you do
 
 TODO notes about react routes, and how our code takes in URLs and determines what to actually return. Link: https://reactrouter.com/en/main/route/route.
 
-### JQuery
-
-You actually probably don't need to know how JQuery works, other than how its API is exposed as a dollar sign object.
-
-<!-- TODO good links? tracked in #49 -->
-
 ### APIs and the Web
 
 ### HTTP Requests
