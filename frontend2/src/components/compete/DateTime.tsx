@@ -5,11 +5,7 @@ interface DateTimeStrings {
   localFullString: string;
 }
 
-interface DateTimeProps {
-  date: Date;
-}
-
-export const DateTime = ({ date }: DateTimeProps): DateTimeStrings => {
+export const dateTime = (date: Date): DateTimeStrings => {
   const estDateStr = date.toLocaleString("en-US", {
     timeZone: "EST",
     timeStyle: "short",

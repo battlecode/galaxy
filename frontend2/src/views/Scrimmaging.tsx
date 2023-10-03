@@ -1,14 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type {
+  PaginatedScrimmageRequestList,
   PaginatedMatchList,
   PaginatedTeamPublicList,
   TeamPublic,
+  ScrimmageRequest,
 } from "../utils/types/models";
 import { NavLink, useSearchParams } from "react-router-dom";
 import { searchTeams } from "../utils/api/team";
 import {
   getScrimmagesByTeam,
   getTournamentMatches,
+  getUserScrimmagesInbox,
+  getUserScrimmagesOutbox,
 } from "../utils/api/compete";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
@@ -17,12 +21,10 @@ import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomEle
 import MatchScore from "../components/compete/MatchScore";
 import RatingDelta from "../components/compete/RatingDelta";
 import MatchStatus from "../components/compete/MatchStatus";
-import { getTeamsByUser } from "../utils/api/user";
-import {
-  CurrentUserContext,
-  useCurrentUser,
-} from "../contexts/CurrentUserContext";
 import { useEpisodeId } from "../contexts/EpisodeContext";
+import { useCurrentTeam } from "../contexts/CurrentTeamContext";
+import { dateTime } from "../components/compete/DateTime";
+import Collapse from "../components/elements/Collapse";
 
 function trimString(str: string, maxLength: number): string {
   if (str.length > maxLength) {
@@ -33,24 +35,47 @@ function trimString(str: string, maxLength: number): string {
 
 const Scrimmaging: React.FC = () => {
   const episodeId = useEpisodeId().episodeId;
-  const currentUser = useCurrentUser().user;
+  const currentTeam = useCurrentTeam().team;
 
-  const [queryParams, setQueryParams] = useSearchParams({
-    teamsPage: "1",
-    scrimsPage: "1",
-    tourneyPage: "1",
-    search: "",
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const getParamEntries = (prev: URLSearchParams): Record<string, string> => {
+    return Object.fromEntries(prev.entries());
+  };
 
-  const teamsPage = parseInt(queryParams.get("teamsPage") ?? "1");
-  const scrimsPage = parseInt(queryParams.get("scrimsPage") ?? "1");
-  const tourneyPage = parseInt(queryParams.get("tourneyPage") ?? "1");
-  const searchQuery = queryParams.get("search") ?? "";
+  interface QueryParams {
+    inboxPage: number;
+    outboxPage: number;
+    teamsPage: number;
+    scrimsPage: number;
+    tourneyPage: number;
+    search: string;
+  }
 
-  const [searchText, setSearchText] = useState<string>(searchQuery);
+  const queryParams: QueryParams = useMemo(() => {
+    return {
+      inboxPage: parseInt(searchParams.get("inboxPage") ?? "1"),
+      outboxPage: parseInt(searchParams.get("outboxPage") ?? "1"),
+      teamsPage: parseInt(searchParams.get("teamsPage") ?? "1"),
+      scrimsPage: parseInt(searchParams.get("scrimsPage") ?? "1"),
+      tourneyPage: parseInt(searchParams.get("tourneyPage") ?? "1"),
+      search: searchParams.get("search") ?? "",
+    };
+  }, [searchParams]);
+
+  const [inboxLoading, setInboxLoading] = useState<boolean>(false);
+  const [outboxLoading, setOutboxLoading] = useState<boolean>(false);
+
+  const [searchText, setSearchText] = useState<string>(queryParams.search);
   const [teamsLoading, setTeamsLoading] = useState<boolean>(false);
   const [scrimsLoading, setScrimsLoading] = useState<boolean>(false);
   const [tourneyLoading, setTourneyLoading] = useState<boolean>(false);
+
+  const [inboxData, setInboxData] = useState<
+    PaginatedScrimmageRequestList | undefined
+  >(undefined);
+  const [outboxData, setOutboxData] = useState<
+    PaginatedScrimmageRequestList | undefined
+  >(undefined);
   const [teamsData, setTeamsData] = useState<
     PaginatedTeamPublicList | undefined
   >(undefined);
@@ -60,12 +85,48 @@ const Scrimmaging: React.FC = () => {
   const [tourneyData, setTourneyData] = useState<
     PaginatedMatchList | undefined
   >(undefined);
-  const myTeamData = useRef<TeamPublic | undefined>(undefined);
-  const teamDataEverLoaded = useRef<boolean>(false);
 
   function handleSearch(): void {
-    if (!teamsLoading && searchText !== searchQuery) {
-      setQueryParams({ ...queryParams, search: searchText });
+    if (!teamsLoading && searchText !== queryParams.search) {
+      setSearchParams((prev) => ({
+        ...getParamEntries(prev),
+        teamsPage: "1",
+        search: searchText,
+      }));
+    }
+  }
+
+  async function fetchInbox(): Promise<void> {
+    setInboxLoading(true);
+    setInboxData((prev) => ({ count: prev?.count ?? 0 }));
+    try {
+      const result = await getUserScrimmagesInbox(
+        episodeId,
+        queryParams.inboxPage,
+      );
+      setInboxData(result);
+    } catch (err) {
+      setInboxData(undefined);
+      console.error(err);
+    } finally {
+      setInboxLoading(false);
+    }
+  }
+
+  async function fetchOutbox(): Promise<void> {
+    setOutboxLoading(true);
+    setOutboxData((prev) => ({ count: prev?.count ?? 0 }));
+    try {
+      const result = await getUserScrimmagesOutbox(
+        episodeId,
+        queryParams.outboxPage,
+      );
+      setOutboxData(result);
+    } catch (err) {
+      setOutboxData(undefined);
+      console.error(err);
+    } finally {
+      setOutboxLoading(false);
     }
   }
 
@@ -73,11 +134,16 @@ const Scrimmaging: React.FC = () => {
     setTeamsLoading(true);
     setTeamsData((prev) => ({ count: prev?.count ?? 0 }));
     try {
-      const result = await searchTeams(episodeId, searchQuery, true, teamsPage);
+      const result = await searchTeams(
+        episodeId,
+        queryParams.search,
+        true,
+        queryParams.teamsPage,
+      );
       setTeamsData(result);
     } catch (err) {
       setTeamsData(undefined);
-      console.log(err);
+      console.error(err);
     } finally {
       setTeamsLoading(false);
     }
@@ -90,19 +156,12 @@ const Scrimmaging: React.FC = () => {
       const scrimsResult = await getScrimmagesByTeam(
         episodeId,
         undefined,
-        teamsPage,
+        queryParams.teamsPage,
       );
-      if (currentUser !== undefined && !teamDataEverLoaded.current) {
-        // TODO: fix this!!!
-        // const myTeamResult = await getTeamsByUser(userId);
-        // const myTeam: TeamPublic | undefined = myTeamResult[episodeId];
-        // myTeamData.current = myTeam;
-        // teamDataEverLoaded.current = true;
-      }
       setScrimsData(scrimsResult);
     } catch (err) {
       setScrimsData(undefined);
-      console.log(err);
+      console.error(err);
     } finally {
       setScrimsLoading(false);
     }
@@ -117,40 +176,94 @@ const Scrimmaging: React.FC = () => {
         undefined,
         undefined,
         undefined,
-        tourneyPage,
+        queryParams.tourneyPage,
       );
       setTourneyData(result);
     } catch (err) {
       setTourneyData(undefined);
-      console.log(err);
+      console.error(err);
     } finally {
       setTourneyLoading(false);
     }
   }
 
   useEffect(() => {
+    if (!inboxLoading) {
+      void fetchInbox();
+    }
+  }, [queryParams.inboxPage]);
+
+  useEffect(() => {
+    if (!outboxLoading) {
+      void fetchOutbox();
+    }
+    return () => {
+      setOutboxLoading(false);
+    };
+  }, [queryParams.outboxPage]);
+
+  useEffect(() => {
     if (!teamsLoading) {
       void fetchTeamsData();
     }
-  }, [searchQuery, teamsPage]);
+  }, [queryParams.search, queryParams.teamsPage]);
 
   useEffect(() => {
     if (!scrimsLoading) {
       void fetchScrimsData();
     }
-  }, [scrimsPage]);
+  }, [queryParams.scrimsPage]);
 
   useEffect(() => {
     if (!tourneyLoading) {
       void fetchTourneyData();
     }
-  }, [tourneyPage]);
+  }, [queryParams.tourneyPage]);
 
   return (
     <div className="flex h-full w-full flex-col overflow-auto p-6">
       <h1 className="mb-5 text-3xl font-bold leading-7 text-gray-900">
         Scrimmaging
       </h1>
+
+      <Collapse title="Inbox">
+        <BattlecodeTable
+          data={inboxData?.results ?? []}
+          loading={inboxLoading}
+          columns={[
+            {
+              header: "Team",
+              value: (req) => req.requested_by_name,
+            },
+            {
+              header: "",
+              value: (req) => "ACCEPT",
+            },
+            {
+              header: "",
+              value: (req) => "REJECT",
+            },
+          ]}
+        />
+      </Collapse>
+      <div className="mb-8" />
+      <Collapse title="Outbox">
+        <BattlecodeTable
+          data={outboxData?.results ?? []}
+          loading={outboxLoading}
+          columns={[
+            {
+              header: "Team",
+              value: (req) => req.requested_to_name,
+            },
+            {
+              header: "",
+              value: (req) => "CANCEL",
+            },
+          ]}
+        />
+      </Collapse>
+      <div className="mb-8" />
 
       <h1 className="text-2xl font-bold leading-7 text-gray-900">
         Find a team to scrimmage!
@@ -164,7 +277,7 @@ const Scrimmaging: React.FC = () => {
             setSearchText(ev.target.value);
           }}
           onKeyDown={(ev) => {
-            if (ev.key === "Enter") {
+            if (ev.key === "Enter" || ev.key === "NumpadEnter") {
               handleSearch();
             }
           }}
@@ -234,21 +347,20 @@ const Scrimmaging: React.FC = () => {
             },
             {
               header: "",
-              value: (team) => "Hallo :)",
-              // TODO: add "request scrimmage" button
+              value: (team) => "TODO",
             },
           ]}
           bottomElement={
             <BattlecodeTableBottomElement
               totalCount={teamsData?.count ?? 0}
               pageSize={10}
-              currentPage={teamsPage}
+              currentPage={queryParams.teamsPage}
               onPage={(page) => {
                 if (!teamsLoading) {
-                  setQueryParams({
-                    ...queryParams,
+                  setSearchParams((prev) => ({
+                    ...getParamEntries(prev),
                     teamsPage: page.toString(),
-                  });
+                  }));
                 }
               }}
             />
@@ -265,10 +377,14 @@ const Scrimmaging: React.FC = () => {
           label="Refresh!"
           variant="dark"
           onClick={() => {
-            setQueryParams({ ...queryParams, scrimsPage: "1" });
-            if (scrimsPage === 1 && !scrimsLoading) {
+            if (queryParams.scrimsPage === 1 && !scrimsLoading) {
               void fetchScrimsData();
+              return;
             }
+            setSearchParams((prev) => ({
+              ...getParamEntries(prev),
+              scrimsPage: "1",
+            }));
           }}
         />
       </div>
@@ -281,10 +397,7 @@ const Scrimmaging: React.FC = () => {
               header: "Score",
               value: (match) => {
                 return (
-                  <MatchScore
-                    match={match}
-                    userTeamId={myTeamData.current?.id}
-                  />
+                  <MatchScore match={match} userTeamId={currentTeam?.id} />
                 );
               },
             },
@@ -292,9 +405,7 @@ const Scrimmaging: React.FC = () => {
               header: "Opponent (Δ)",
               value: (match) => {
                 const opponent = match.participants?.find(
-                  (p) =>
-                    myTeamData.current !== undefined &&
-                    p.team !== myTeamData.current.id,
+                  (p) => currentTeam !== undefined && p.team !== currentTeam.id,
                 );
                 if (opponent === undefined) return;
                 return (
@@ -318,22 +429,21 @@ const Scrimmaging: React.FC = () => {
               value: (match) => "TODO",
             },
             {
-              header: "Created At",
-              // TODO: use new DateTime component
-              value: (match) => new Date(match.created).toLocaleDateString(),
+              header: "Created",
+              value: (match) => dateTime(match.created).localFullString,
             },
           ]}
           bottomElement={
             <BattlecodeTableBottomElement
               totalCount={scrimsData?.count ?? 0}
               pageSize={10}
-              currentPage={scrimsPage}
+              currentPage={queryParams.scrimsPage}
               onPage={(page) => {
                 if (!scrimsLoading) {
-                  setQueryParams({
-                    ...queryParams,
+                  setSearchParams((prev) => ({
+                    ...getParamEntries(prev),
                     scrimsPage: page.toString(),
-                  });
+                  }));
                 }
               }}
             />
@@ -350,10 +460,14 @@ const Scrimmaging: React.FC = () => {
           label="Refresh!"
           variant="dark"
           onClick={() => {
-            setQueryParams({ ...queryParams, tourneyPage: "1" });
-            if (tourneyPage === 1 && !tourneyLoading) {
+            if (queryParams.tourneyPage === 1 && !tourneyLoading) {
               void fetchTourneyData();
+              return;
             }
+            setSearchParams((prev) => ({
+              ...getParamEntries(prev),
+              tourneyPage: "1",
+            }));
           }}
         />
       </div>
@@ -366,16 +480,14 @@ const Scrimmaging: React.FC = () => {
             {
               header: "Score",
               value: (match) => (
-                <MatchScore match={match} userTeamId={myTeamData.current?.id} />
+                <MatchScore match={match} userTeamId={currentTeam?.id} />
               ),
             },
             {
               header: "Opponent",
               value: (match) => {
                 const opponent = match.participants?.find(
-                  (p) =>
-                    myTeamData.current !== undefined &&
-                    p.team !== myTeamData.current.id,
+                  (p) => currentTeam !== undefined && p.team !== currentTeam.id,
                 );
                 if (opponent === undefined) return;
                 return (
@@ -395,22 +507,21 @@ const Scrimmaging: React.FC = () => {
               value: (match) => "TODO",
             },
             {
-              header: "Created At",
-              // TODO: use new DateTime component
-              value: (match) => new Date(match.created).toLocaleDateString(),
+              header: "Created",
+              value: (match) => dateTime(match.created).localFullString,
             },
           ]}
           bottomElement={
             <BattlecodeTableBottomElement
               totalCount={tourneyData?.count ?? 0}
               pageSize={10}
-              currentPage={tourneyPage}
+              currentPage={queryParams.tourneyPage}
               onPage={(page) => {
                 if (!tourneyLoading) {
-                  setQueryParams({
-                    ...queryParams,
+                  setSearchParams((prev) => ({
+                    ...getParamEntries(prev),
                     tourneyPage: page.toString(),
-                  });
+                  }));
                 }
               }}
             />
@@ -419,6 +530,16 @@ const Scrimmaging: React.FC = () => {
       </div>
     </div>
   );
+};
+
+const RequestScrimmageButton: React.FC<{ team: TeamPublic }> = ({ team }) => {
+  return <>TODO</>;
+};
+
+const AcceptRejectScrimmageButton: React.FC<{
+  scrimRequest: ScrimmageRequest;
+}> = ({ scrimRequest }) => {
+  return <>TODO</>;
 };
 
 export default Scrimmaging;
