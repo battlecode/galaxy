@@ -1,5 +1,15 @@
 # Operations
 
+## Get dev permissions
+
+TODO, tracked in #681
+
+## Add a dev to any team
+
+TODO, tracked in #681
+
+This enables lots of cool technical support things. Most notably, **this is the (currently) "unofficial-official" way to view and download a team's submissions and replays**, which is helpful in debugging.
+
 ## Resetting people's passwords
 
 Sometimes, password resets don't go through, since users never get the emails, due to issues with our email backend. No email backend will ever be failproof, so here are some other methods:
