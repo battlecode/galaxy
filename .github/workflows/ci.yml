@@ -17,8 +17,8 @@ env:
   CACHE_NUMBER: 1
 
 jobs:
-  unit-test-frontend:
-    name: Frontend linting / unit tests
+  unit-test-frontend2:
+    name: Frontend2 linting / unit tests
     # Defines the type of runner the job runs on
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +27,7 @@ jobs:
       - name: Set up NodeJS environment
         uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '18.11.0'
       # Consider this as an add on to optimize the execution of actions
       - name: Cache node modules
         id: cache-npm
