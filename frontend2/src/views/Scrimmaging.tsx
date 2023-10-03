@@ -96,128 +96,170 @@ const Scrimmaging: React.FC = () => {
     }
   }
 
-  async function fetchInbox(): Promise<void> {
+  useEffect(() => {
+    let isActiveLookup = true;
+    if (inboxLoading) return;
     setInboxLoading(true);
     setInboxData((prev) => ({ count: prev?.count ?? 0 }));
-    try {
-      const result = await getUserScrimmagesInbox(
-        episodeId,
-        queryParams.inboxPage,
-      );
-      setInboxData(result);
-    } catch (err) {
-      setInboxData(undefined);
-      console.error(err);
-    } finally {
-      setInboxLoading(false);
-    }
-  }
 
-  async function fetchOutbox(): Promise<void> {
-    setOutboxLoading(true);
-    setOutboxData((prev) => ({ count: prev?.count ?? 0 }));
-    try {
-      const result = await getUserScrimmagesOutbox(
-        episodeId,
-        queryParams.outboxPage,
-      );
-      setOutboxData(result);
-    } catch (err) {
-      setOutboxData(undefined);
-      console.error(err);
-    } finally {
-      setOutboxLoading(false);
-    }
-  }
+    const fetchInbox = async (): Promise<void> => {
+      try {
+        const result = await getUserScrimmagesInbox(
+          episodeId,
+          queryParams.inboxPage,
+        );
+        if (isActiveLookup) {
+          setInboxData(result);
+        }
+      } catch (err) {
+        if (isActiveLookup) {
+          setInboxData(undefined);
+        }
+        console.error(err);
+      } finally {
+        setInboxLoading(false);
+      }
+    };
 
-  async function fetchTeamsData(): Promise<void> {
-    setTeamsLoading(true);
-    setTeamsData((prev) => ({ count: prev?.count ?? 0 }));
-    try {
-      const result = await searchTeams(
-        episodeId,
-        queryParams.search,
-        true,
-        queryParams.teamsPage,
-      );
-      setTeamsData(result);
-    } catch (err) {
-      setTeamsData(undefined);
-      console.error(err);
-    } finally {
-      setTeamsLoading(false);
-    }
-  }
+    void fetchInbox();
 
-  async function fetchScrimsData(): Promise<void> {
-    setScrimsLoading(true);
-    setScrimsData((prev) => ({ count: prev?.count ?? 0 }));
-    try {
-      const scrimsResult = await getScrimmagesByTeam(
-        episodeId,
-        undefined,
-        queryParams.teamsPage,
-      );
-      setScrimsData(scrimsResult);
-    } catch (err) {
-      setScrimsData(undefined);
-      console.error(err);
-    } finally {
-      setScrimsLoading(false);
-    }
-  }
-
-  async function fetchTourneyData(): Promise<void> {
-    setTourneyLoading(true);
-    setTourneyData((prev) => ({ count: prev?.count ?? 0 }));
-    try {
-      const result = await getTournamentMatches(
-        episodeId,
-        undefined,
-        undefined,
-        undefined,
-        queryParams.tourneyPage,
-      );
-      setTourneyData(result);
-    } catch (err) {
-      setTourneyData(undefined);
-      console.error(err);
-    } finally {
-      setTourneyLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    if (!inboxLoading) {
-      void fetchInbox();
-    }
+    return () => {
+      isActiveLookup = false;
+    };
   }, [queryParams.inboxPage]);
 
   useEffect(() => {
-    if (!outboxLoading) {
-      void fetchOutbox();
-    }
+    let isActiveLookup = true;
+    if (outboxLoading) return;
+    setOutboxLoading(true);
+    setOutboxData((prev) => ({ count: prev?.count ?? 0 }));
+
+    const fetchOutbox = async (): Promise<void> => {
+      try {
+        const result = await getUserScrimmagesOutbox(
+          episodeId,
+          queryParams.outboxPage,
+        );
+        if (isActiveLookup) {
+          setOutboxData(result);
+        }
+      } catch (err) {
+        if (isActiveLookup) {
+          setOutboxData(undefined);
+        }
+        console.error(err);
+      } finally {
+        setOutboxLoading(false);
+      }
+    };
+
+    void fetchOutbox();
+
     return () => {
-      setOutboxLoading(false);
+      isActiveLookup = false;
     };
   }, [queryParams.outboxPage]);
 
   useEffect(() => {
-    if (!teamsLoading) {
-      void fetchTeamsData();
-    }
+    let isActiveLookup = true;
+    if (teamsLoading) return;
+    setTeamsLoading(true);
+    setTeamsData((prev) => ({ count: prev?.count ?? 0 }));
+
+    const fetchTeams = async (): Promise<void> => {
+      try {
+        const result = await searchTeams(
+          episodeId,
+          queryParams.search,
+          true,
+          queryParams.teamsPage,
+        );
+        if (isActiveLookup) {
+          setTeamsData(result);
+        }
+      } catch (err) {
+        if (isActiveLookup) {
+          setTeamsData(undefined);
+        }
+        console.error(err);
+      } finally {
+        setTeamsLoading(false);
+      }
+    };
+
+    void fetchTeams();
+
+    return () => {
+      isActiveLookup = false;
+    };
   }, [queryParams.search, queryParams.teamsPage]);
 
   useEffect(() => {
-    if (!scrimsLoading) {
-      void fetchScrimsData();
-    }
+    let isActiveLookup = true;
+    if (scrimsLoading) return;
+    setScrimsLoading(true);
+    setScrimsData((prev) => ({ count: prev?.count ?? 0 }));
+
+    const fetchScrims = async (): Promise<void> => {
+      try {
+        const result = await getScrimmagesByTeam(
+          episodeId,
+          undefined,
+          queryParams.scrimsPage,
+        );
+        if (isActiveLookup) {
+          setScrimsData(result);
+        }
+      } catch (err) {
+        if (isActiveLookup) {
+          setScrimsData(undefined);
+        }
+        console.error(err);
+      } finally {
+        setScrimsLoading(false);
+      }
+    };
+
+    void fetchScrims();
+
+    return () => {
+      isActiveLookup = false;
+    };
   }, [queryParams.scrimsPage]);
 
   useEffect(() => {
-    if (!tourneyLoading) {
-      void fetchTourneyData();
-    }
+    let isActiveLookup = true;
+    if (tourneyLoading) return;
+    setTourneyLoading(true);
+    setTourneyData((prev) => ({ count: prev?.count ?? 0 }));
+
+    const fetchTourney = async (): Promise<void> => {
+      try {
+        const result = await getTournamentMatches(
+          episodeId,
+          undefined,
+          undefined,
+          undefined,
+          queryParams.tourneyPage,
+        );
+        if (isActiveLookup) {
+          setTourneyData(result);
+        }
+      } catch (err) {
+        if (isActiveLookup) {
+          setTourneyData(undefined);
+        }
+        console.error(err);
+      } finally {
+        setTourneyLoading(false);
+      }
+    };
+
+    void fetchTourney();
+
+    return () => {
+      isActiveLookup = false;
+    };
   }, [queryParams.tourneyPage]);
 
   return (
@@ -347,7 +389,7 @@ const Scrimmaging: React.FC = () => {
             },
             {
               header: "",
-              value: (team) => "TODO",
+              value: (team) => "REQUEST",
             },
           ]}
           bottomElement={
@@ -368,26 +410,9 @@ const Scrimmaging: React.FC = () => {
         />
       </div>
 
-      <div className="justify-right mb-1 flex flex-row space-x-4">
-        <h1 className="mb-2 text-2xl font-bold leading-7 text-gray-900">
-          Scrimmage History
-        </h1>
-        <Button
-          disabled={scrimsLoading}
-          label="Refresh!"
-          variant="dark"
-          onClick={() => {
-            if (queryParams.scrimsPage === 1 && !scrimsLoading) {
-              void fetchScrimsData();
-              return;
-            }
-            setSearchParams((prev) => ({
-              ...getParamEntries(prev),
-              scrimsPage: "1",
-            }));
-          }}
-        />
-      </div>
+      <h1 className="mb-2 text-2xl font-bold leading-7 text-gray-900">
+        Scrimmage History
+      </h1>
       <div className="mb-8">
         <BattlecodeTable
           data={scrimsData?.results ?? []}
@@ -426,7 +451,7 @@ const Scrimmaging: React.FC = () => {
             },
             {
               header: "Replay",
-              value: (match) => "TODO",
+              value: (match) => "REPLAY",
             },
             {
               header: "Created",
@@ -451,27 +476,9 @@ const Scrimmaging: React.FC = () => {
         />
       </div>
 
-      <div className="justify-right mb-1 flex flex-row space-x-4">
-        <h1 className="mb-2 text-2xl font-bold leading-7 text-gray-900">
-          Recent Tournament Matches
-        </h1>
-        <Button
-          disabled={tourneyLoading}
-          label="Refresh!"
-          variant="dark"
-          onClick={() => {
-            if (queryParams.tourneyPage === 1 && !tourneyLoading) {
-              void fetchTourneyData();
-              return;
-            }
-            setSearchParams((prev) => ({
-              ...getParamEntries(prev),
-              tourneyPage: "1",
-            }));
-          }}
-        />
-      </div>
-
+      <h1 className="mb-2 text-2xl font-bold leading-7 text-gray-900">
+        Recent Tournament Matches
+      </h1>
       <div className="mb-8">
         <BattlecodeTable
           data={tourneyData?.results ?? []}
@@ -504,7 +511,7 @@ const Scrimmaging: React.FC = () => {
             },
             {
               header: "Replay",
-              value: (match) => "TODO",
+              value: (match) => "REPLAY",
             },
             {
               header: "Created",
@@ -530,16 +537,6 @@ const Scrimmaging: React.FC = () => {
       </div>
     </div>
   );
-};
-
-const RequestScrimmageButton: React.FC<{ team: TeamPublic }> = ({ team }) => {
-  return <>TODO</>;
-};
-
-const AcceptRejectScrimmageButton: React.FC<{
-  scrimRequest: ScrimmageRequest;
-}> = ({ scrimRequest }) => {
-  return <>TODO</>;
 };
 
 export default Scrimmaging;
