@@ -60,10 +60,10 @@ You may want to know how conditional rendering works -- depending on what you do
 
 TODO notes about react routes, and how our code takes in URLs and determines what to actually return. Link: https://reactrouter.com/en/main/route/route.
 
-
 ### JQuery
 
 You actually probably don't need to know how JQuery works, other than how its API is exposed as a dollar sign object.
+
 <!-- TODO good links? tracked in #49 -->
 
 ### APIs and the Web
@@ -71,9 +71,10 @@ You actually probably don't need to know how JQuery works, other than how its AP
 ### HTTP Requests
 
 What is?
-<!-- TODO Link to a small explanation. tracked in #49 -->
-Note that this is a thing for backend and frontend!
 
+<!-- TODO Link to a small explanation. tracked in #49 -->
+
+Note that this is a thing for backend and frontend!
 
 <!-- TODO link to a small explanation. tracked in #49 -->
 
@@ -90,7 +91,6 @@ Any linked explanation or explanation we write ought to discuss
 Here are (some) specifics about Battlecode's frontend -- about how the codebase is set up, how it works, etc.
 
 This will be developed over time, as the new frontend is developed, too.
-
 
 <!-- ## Legacy stuff
 
