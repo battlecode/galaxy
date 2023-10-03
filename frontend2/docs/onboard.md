@@ -60,9 +60,8 @@ There's a couple other parts of React that we use heavily, that are not directly
 
 You may want to know how conditional rendering works -- depending on what you do, it might come up. Here's a good explanation: https://reactjs.org/docs/conditional-rendering.html
 
-<!-- a page on react-router, Routes, and Switches, that isn't super useful and kinda google-able -->
-<!-- Note that as you navigate our frontend, the URL in your web browser changes. A naive website implementation would have different html files for each page. But we only have one HTML file...what gives?
-This is thanks to Routes and Switches, from `react-router`. You might want to know how they work, since they might come up too. This will help you to figure out what component is being rendered, based on a URL. For explanation, you can _skim_ https://v5.reactrouter.com/web/api/Route and https://v5.reactrouter.com/web/api/Switch. If there are important details, make sure to check the docs. -->
+TODO notes about react routes, and how our code takes in URLs and determines what to actually return. Link: https://reactrouter.com/en/main/route/route.
+
 
 ### JQuery
 
