@@ -1,14 +1,12 @@
-<!-- TODO tracked in #49, expand this til nothing for this doc readily, easily comes to mind. In particular, _during onboarding session, take an audio recording_ and then use that to type this up after. -->
+<!-- TODO tracked in #49, expand this (especially writing about things that are already explained in other people's notes or in onboarding session) til nothing for this doc readily, easily comes to mind. In particular, _during onboarding session, take an audio recording_ and then use that to type this up after.
+Need to be concise somehow. Need to be organized, somehow! Overall need to be readable.
+Everything relevant from Maggie's docs should be here.
+
+No need to come up with novel stuff to write. No need to do additional thinking, creating, researching, etc that hasn't already been done before. -->
 
 # Codebase Intro and Guide
 
 (with much help from Maggie Yao)
-
-<!-- TODO in this PR... sketch this out more. Need to be concise somehow. Need to be organized, somehow!
-Consider linking Maggie's docs. Although really, everything relevant should be here.
-Most of all, this should be _ready for onboarding writeups._ -->
-
-<!-- TODO also looking at the organization... and wondering how to make more readable -->
 
 **If you are trying to make code changes here, make sure to read all the (sub)sections called "Technical Detail".** _If you're not trying to make code changes but just need some working knowledge, then feel free to skip over those sections._ It's helpful but not necessary.
 
@@ -65,29 +63,27 @@ TODO notes about react routes, and how our code takes in URLs and determines wha
 
 ### JQuery
 
-You actually probably don't need to know how JQuery works, other than how its API is exposed as a dollar sign object. TODO good links? tracked in #49
+You actually probably don't need to know how JQuery works, other than how its API is exposed as a dollar sign object.
+<!-- TODO good links? tracked in #49 -->
 
 ### APIs and the Web
 
 ### HTTP Requests
 
-What is? TODO Link to a small explanation. tracked in #49
+What is?
+<!-- TODO Link to a small explanation. tracked in #49 -->
 Note that this is a thing for backend and frontend!
 
 
-TODO link to a small explanation. tracked in #49
+<!-- TODO link to a small explanation. tracked in #49 -->
 
 ### Async, Promises, and Callbacks
 
-TODO one-sentence description if at all. tracked in #49
-
-TODO link to a small explanation. tracked in #49
-
-Any linked explanation or explnation we write ought to discuss
-
+<!-- TODO one-sentence description if at all. tracked in #49
+Any linked explanation or explanation we write ought to discuss
 - at a high level, what async programming is
 - promises in vanilla JS first,
-- and then how JQuery's AJAX works
+- and then how JQuery's AJAX works -->
 
 ## Battlecode-specific web dev
 
