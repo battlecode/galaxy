@@ -31,7 +31,7 @@ import type {
   UserPublic,
   UserResume,
   UserResumeRequest,
-} from '../models/index';
+} from '../models';
 import {
     EmailFromJSON,
     EmailToJSON,
@@ -65,7 +65,7 @@ import {
     UserResumeToJSON,
     UserResumeRequestFromJSON,
     UserResumeRequestToJSON,
-} from '../models/index';
+} from '../models';
 
 export interface UserPasswordResetConfirmCreateRequest {
     passwordTokenRequest: PasswordTokenRequest;

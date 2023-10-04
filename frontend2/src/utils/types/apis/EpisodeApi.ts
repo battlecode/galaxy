@@ -23,7 +23,7 @@ import type {
   PaginatedTournamentRoundList,
   Tournament,
   TournamentRound,
-} from '../models/index';
+} from '../models';
 import {
     AutoscrimRequestFromJSON,
     AutoscrimRequestToJSON,
@@ -41,7 +41,7 @@ import {
     TournamentToJSON,
     TournamentRoundFromJSON,
     TournamentRoundToJSON,
-} from '../models/index';
+} from '../models';
 
 export interface EpisodeEAutoscrimCreateRequest {
     id: string;

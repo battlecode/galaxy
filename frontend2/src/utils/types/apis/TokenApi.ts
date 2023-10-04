@@ -20,7 +20,7 @@ import type {
   TokenRefresh,
   TokenRefreshRequest,
   TokenVerifyRequest,
-} from '../models/index';
+} from '../models';
 import {
     TokenObtainPairFromJSON,
     TokenObtainPairToJSON,
@@ -32,7 +32,7 @@ import {
     TokenRefreshRequestToJSON,
     TokenVerifyRequestFromJSON,
     TokenVerifyRequestToJSON,
-} from '../models/index';
+} from '../models';
 
 export interface TokenCreateRequest {
     tokenObtainPairRequest: TokenObtainPairRequest;

@@ -172,20 +172,14 @@ export class BaseAPI {
             }))
         };
 
-        let body: any;
-        if (isFormData(overriddenInit.body)
-            || (overriddenInit.body instanceof URLSearchParams)
-            || isBlob(overriddenInit.body)) {
-          body = overriddenInit.body;
-        } else if (this.isJsonMime(headers['Content-Type'])) {
-          body = JSON.stringify(overriddenInit.body);
-        } else {
-          body = overriddenInit.body;
-        }
-
         const init: RequestInit = {
             ...overriddenInit,
-            body
+            body:
+                isFormData(overriddenInit.body) ||
+                overriddenInit.body instanceof URLSearchParams ||
+                isBlob(overriddenInit.body)
+                    ? overriddenInit.body
+                    : JSON.stringify(overriddenInit.body),
         };
 
         return { url, init };
