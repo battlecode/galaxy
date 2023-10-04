@@ -28,7 +28,7 @@ import type {
   TeamPublic,
   TeamReportRequest,
   UserPassed,
-} from '../models';
+} from '../models/index';
 import {
     ClassRequirementFromJSON,
     ClassRequirementToJSON,
@@ -56,7 +56,7 @@ import {
     TeamReportRequestToJSON,
     UserPassedFromJSON,
     UserPassedToJSON,
-} from '../models';
+} from '../models/index';
 
 export interface TeamRequirementCheckRetrieveRequest {
     episodeId: string;

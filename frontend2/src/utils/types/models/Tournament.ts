@@ -165,7 +165,7 @@ export function TournamentToJSON(value?: Tournament | null): any {
         'blurb': value.blurb,
         'episode': value.episode,
         'style': StyleEnumToJSON(value.style),
-        'display_date': (value.display_date.toISOString().substr(0,10)),
+        'display_date': (value.display_date.toISOString().substring(0,10)),
         'eligibility_includes': value.eligibility_includes,
         'eligibility_excludes': value.eligibility_excludes,
         'require_resume': value.require_resume,

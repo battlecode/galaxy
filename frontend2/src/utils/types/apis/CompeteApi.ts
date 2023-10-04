@@ -28,7 +28,7 @@ import type {
   SubmissionReportRequest,
   SubmissionRequest,
   TournamentSubmission,
-} from '../models';
+} from '../models/index';
 import {
     HistoricalRatingFromJSON,
     HistoricalRatingToJSON,
@@ -56,7 +56,7 @@ import {
     SubmissionRequestToJSON,
     TournamentSubmissionFromJSON,
     TournamentSubmissionToJSON,
-} from '../models';
+} from '../models/index';
 
 export interface CompeteMatchHistoricalRatingRetrieveRequest {
     episodeId: string;
