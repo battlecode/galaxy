@@ -36,7 +36,7 @@ export interface MatchParticipant {
      * @type {number}
      * @memberof MatchParticipant
      */
-    readonly submission: number;
+    readonly submission: number | null;
     /**
      * 
      * @type {number}

@@ -208,6 +208,12 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
             "old_rating",
         ]
         read_only_fields = fields
+        extra_kwargs = {
+            # MatchSerializer may redact score depending on tournament release status.
+            "score": {"allow_null": True},
+            # non-staff users cannot see submission from other teams
+            "submission": {"allow_null": True},
+        }
 
     @extend_schema_field(OpenApiTypes.DOUBLE)
     def get_old_rating(self, obj):
@@ -235,9 +241,10 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
 
 
 class MatchSerializer(serializers.ModelSerializer):
-    participants = MatchParticipantSerializer(many=True)
-    maps = serializers.SerializerMethodField()
-    replay_url = serializers.SerializerMethodField()
+    # These fields may be redacted depending on tournament release status.
+    participants = MatchParticipantSerializer(many=True, allow_null=True)
+    maps = serializers.SerializerMethodField(allow_null=True)
+    replay_url = serializers.SerializerMethodField(allow_null=True)
 
     class Meta:
         model = Match
