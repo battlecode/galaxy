@@ -10,7 +10,7 @@ Then, run
 npm install
 ```
 
-## Running
+## Run the frontend
 
 Make sure that the backend is running. (You can hook up to a deployed backend, or run it locally. Then make sure `.env.development` points to that backend.)
 
