@@ -39,5 +39,4 @@ We use a bash script to generate API types / functions from our backend code aut
 The following steps assume that you begin in the `galaxy` directory.
 
 1. `cd ./frontend2`
-2. `chmod +x generate_types.sh` (makes the script executable, only needs to be run one time)
-3. `./generate_types.sh` (calls the bash script)
+2. `./generate_types.sh` (runs the bash script)
