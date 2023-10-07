@@ -36,12 +36,6 @@ export interface TeamProfilePrivateRequest {
      * @type {boolean}
      * @memberof TeamProfilePrivateRequest
      */
-    has_report?: boolean;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof TeamProfilePrivateRequest
-     */
     auto_accept_ranked?: boolean;
     /**
      * 
@@ -78,7 +72,6 @@ export function TeamProfilePrivateRequestFromJSONTyped(json: any, ignoreDiscrimi
         
         'quote': !exists(json, 'quote') ? undefined : json['quote'],
         'biography': !exists(json, 'biography') ? undefined : json['biography'],
-        'has_report': !exists(json, 'has_report') ? undefined : json['has_report'],
         'auto_accept_ranked': !exists(json, 'auto_accept_ranked') ? undefined : json['auto_accept_ranked'],
         'auto_accept_unranked': !exists(json, 'auto_accept_unranked') ? undefined : json['auto_accept_unranked'],
         'eligible_for': !exists(json, 'eligible_for') ? undefined : json['eligible_for'],
@@ -96,7 +89,6 @@ export function TeamProfilePrivateRequestToJSON(value?: TeamProfilePrivateReques
         
         'quote': value.quote,
         'biography': value.biography,
-        'has_report': value.has_report,
         'auto_accept_ranked': value.auto_accept_ranked,
         'auto_accept_unranked': value.auto_accept_unranked,
         'eligible_for': value.eligible_for,

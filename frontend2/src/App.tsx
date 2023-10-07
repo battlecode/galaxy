@@ -21,7 +21,6 @@ import { CurrentUserProvider } from "./components/CurrentUserProvider";
 import PrivateRoute from "./components/PrivateRoute";
 import Queue from "./views/Queue";
 import Resources from "./views/Resources";
-import MyTeam from "./views/MyTeam";
 import { CurrentTeamProvider } from "./contexts/CurrentTeamProvider";
 import { EpisodeProvider } from "./contexts/EpisodeProvider";
 
@@ -54,7 +53,6 @@ const router = createBrowserRouter([
         children: [
           {
             path: "/:episodeId/team",
-            element: <MyTeam />,
           },
           // TODO: /:episodeId/team, /:episodeId/submissions, /:episodeId/scrimmaging
         ],

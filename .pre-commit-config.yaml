@@ -11,6 +11,14 @@ repos:
       - id: trailing-whitespace
         exclude: ^frontend2/src/utils/types
 
+  # This is only used for the old frontend. The prettier check for frontend2 exists in ci.yml
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.7.1
+    hooks:
+      - id: prettier
+        types_or: [css, html, javascript, json, jsx, markdown]
+        exclude: ^(frontend/public/assets|frontend2)
+
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.1
     hooks:
