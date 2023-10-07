@@ -55,7 +55,7 @@ export interface TeamPrivate {
      * @type {string}
      * @memberof TeamPrivate
      */
-    episode?: string;
+    readonly episode: string;
     /**
      * 
      * @type {string}
@@ -88,6 +88,7 @@ export interface TeamPrivate {
 export function instanceOfTeamPrivate(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "id" in value;
+    isInstance = isInstance && "episode" in value;
     isInstance = isInstance && "name" in value;
     isInstance = isInstance && "members" in value;
     isInstance = isInstance && "join_key" in value;
@@ -108,7 +109,7 @@ export function TeamPrivateFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'id': json['id'],
         'profile': !exists(json, 'profile') ? undefined : TeamProfilePrivateFromJSON(json['profile']),
-        'episode': !exists(json, 'episode') ? undefined : json['episode'],
+        'episode': json['episode'],
         'name': json['name'],
         'members': ((json['members'] as Array<any>).map(UserPublicFromJSON)),
         'join_key': json['join_key'],
@@ -126,7 +127,6 @@ export function TeamPrivateToJSON(value?: TeamPrivate | null): any {
     return {
         
         'profile': TeamProfilePrivateToJSON(value.profile),
-        'episode': value.episode,
     };
 }
 

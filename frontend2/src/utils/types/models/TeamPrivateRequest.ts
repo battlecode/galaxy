@@ -32,12 +32,6 @@ export interface TeamPrivateRequest {
      * @memberof TeamPrivateRequest
      */
     profile?: TeamProfilePrivateRequest;
-    /**
-     * 
-     * @type {string}
-     * @memberof TeamPrivateRequest
-     */
-    episode?: string;
 }
 
 /**
@@ -60,7 +54,6 @@ export function TeamPrivateRequestFromJSONTyped(json: any, ignoreDiscriminator: 
     return {
         
         'profile': !exists(json, 'profile') ? undefined : TeamProfilePrivateRequestFromJSON(json['profile']),
-        'episode': !exists(json, 'episode') ? undefined : json['episode'],
     };
 }
 
@@ -74,7 +67,6 @@ export function TeamPrivateRequestToJSON(value?: TeamPrivateRequest | null): any
     return {
         
         'profile': TeamProfilePrivateRequestToJSON(value.profile),
-        'episode': value.episode,
     };
 }
 
