@@ -2486,9 +2486,6 @@ components:
       properties:
         profile:
           $ref: '#/components/schemas/TeamProfilePrivateRequest'
-        episode:
-          type: string
-          minLength: 1
     PatchedUserPrivateRequest:
       type: object
       properties:
@@ -2826,6 +2823,7 @@ components:
           $ref: '#/components/schemas/TeamProfilePrivate'
         episode:
           type: string
+          readOnly: true
         name:
           type: string
           readOnly: true
@@ -2843,6 +2841,7 @@ components:
           - $ref: '#/components/schemas/Status526Enum'
           readOnly: true
       required:
+      - episode
       - id
       - join_key
       - members
@@ -2853,9 +2852,6 @@ components:
       properties:
         profile:
           $ref: '#/components/schemas/TeamProfilePrivateRequest'
-        episode:
-          type: string
-          minLength: 1
     TeamProfilePrivate:
       type: object
       properties:
@@ -2871,6 +2867,7 @@ components:
           readOnly: true
         has_report:
           type: boolean
+          readOnly: true
         avatar_url:
           type: string
           readOnly: true
@@ -2889,6 +2886,7 @@ components:
       required:
       - avatar_url
       - has_avatar
+      - has_report
       - rating
     TeamProfilePrivateRequest:
       type: object
@@ -2900,8 +2898,6 @@ components:
         biography:
           type: string
           maxLength: 1024
-        has_report:
-          type: boolean
         auto_accept_ranked:
           type: boolean
         auto_accept_unranked:

@@ -42,7 +42,7 @@ export interface TeamProfilePrivate {
      * @type {boolean}
      * @memberof TeamProfilePrivate
      */
-    has_report?: boolean;
+    readonly has_report: boolean;
     /**
      * 
      * @type {string}
@@ -81,6 +81,7 @@ export interface TeamProfilePrivate {
 export function instanceOfTeamProfilePrivate(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "has_avatar" in value;
+    isInstance = isInstance && "has_report" in value;
     isInstance = isInstance && "avatar_url" in value;
     isInstance = isInstance && "rating" in value;
 
@@ -100,7 +101,7 @@ export function TeamProfilePrivateFromJSONTyped(json: any, ignoreDiscriminator: 
         'quote': !exists(json, 'quote') ? undefined : json['quote'],
         'biography': !exists(json, 'biography') ? undefined : json['biography'],
         'has_avatar': json['has_avatar'],
-        'has_report': !exists(json, 'has_report') ? undefined : json['has_report'],
+        'has_report': json['has_report'],
         'avatar_url': json['avatar_url'],
         'rating': json['rating'],
         'auto_accept_ranked': !exists(json, 'auto_accept_ranked') ? undefined : json['auto_accept_ranked'],
@@ -120,7 +121,6 @@ export function TeamProfilePrivateToJSON(value?: TeamProfilePrivate | null): any
         
         'quote': value.quote,
         'biography': value.biography,
-        'has_report': value.has_report,
         'auto_accept_ranked': value.auto_accept_ranked,
         'auto_accept_unranked': value.auto_accept_unranked,
         'eligible_for': value.eligible_for,

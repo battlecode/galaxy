@@ -32,12 +32,6 @@ export interface PatchedTeamPrivateRequest {
      * @memberof PatchedTeamPrivateRequest
      */
     profile?: TeamProfilePrivateRequest;
-    /**
-     * 
-     * @type {string}
-     * @memberof PatchedTeamPrivateRequest
-     */
-    episode?: string;
 }
 
 /**
@@ -60,7 +54,6 @@ export function PatchedTeamPrivateRequestFromJSONTyped(json: any, ignoreDiscrimi
     return {
         
         'profile': !exists(json, 'profile') ? undefined : TeamProfilePrivateRequestFromJSON(json['profile']),
-        'episode': !exists(json, 'episode') ? undefined : json['episode'],
     };
 }
 
@@ -74,7 +67,6 @@ export function PatchedTeamPrivateRequestToJSON(value?: PatchedTeamPrivateReques
     return {
         
         'profile': TeamProfilePrivateRequestToJSON(value.profile),
-        'episode': value.episode,
     };
 }
 
