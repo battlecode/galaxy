@@ -54,9 +54,11 @@ From the tutorial, you'll want to at least familiarize yourself with:
 
 - what props are and what state is, and when components re-render
 
-There's a couple other parts of React that we use heavily, that are not directly in the turorial. _These aren't strictly needed to start, but do come back to them if they come up._
+There's a couple other parts of React that we use heavily, that are not directly in the tutorial.
 
 You may want to know how conditional rendering works -- depending on what you do, it might come up. Here's a good explanation: https://reactjs.org/docs/conditional-rendering.html
+
+We also use Routes, which is React's concept of translating URLs and paths into code.  
 
 TODO notes about react routes, and how our code takes in URLs and determines what to actually return. Link: https://reactrouter.com/en/main/route/route.
 
@@ -85,6 +87,28 @@ Any linked explanation or explanation we write ought to discuss
 Here are (some) specifics about Battlecode's frontend -- about how the codebase is set up, how it works, etc.
 
 This will be developed over time, as the new frontend is developed, too.
+
+Organized as codebase overview
+
+TODO i had to handle some text messages for a few mins, rewrite later xd
+
+- public
+
+-components
+
+- content
+-api
+
+-types
+Our types are automatically generated
+
+-contexts
+
+Contexts are a way to store and share information across React components. For example, we can store info about the user in a context, and can pass this to the Typescript of React files to work with it.
+
+TODO find a nice docs link cuz this is general
+
+Actually contexts should be not in this section but the one slightly above
 
 <!-- ## Legacy stuff
 
