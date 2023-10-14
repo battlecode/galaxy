@@ -1,3 +1,9 @@
+/*
+ * estDateStr: "Saturday, October 14, 2023 at 1:37 PM",
+ * localDateStr: "Saturday, October 14, 2023 at 2:37 PM",
+ * localTimezone: "EDT",
+ * localFullString: "Saturday, October 14, 2023 at 2:37 PM EDT"
+ */
 interface DateTimeStrings {
   estDateStr: string;
   localDateStr: string;

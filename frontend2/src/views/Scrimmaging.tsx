@@ -3,8 +3,6 @@ import type {
   PaginatedScrimmageRequestList,
   PaginatedMatchList,
   PaginatedTeamPublicList,
-  TeamPublic,
-  ScrimmageRequest,
 } from "../utils/types/models";
 import { NavLink, useSearchParams } from "react-router-dom";
 import { searchTeams } from "../utils/api/team";
@@ -23,7 +21,7 @@ import RatingDelta from "../components/compete/RatingDelta";
 import MatchStatus from "../components/compete/MatchStatus";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useCurrentTeam } from "../contexts/CurrentTeamContext";
-import { dateTime } from "../components/compete/DateTime";
+import { dateTime } from "../utils/dateTime";
 import Collapse from "../components/elements/Collapse";
 
 function trimString(str: string, maxLength: number): string {

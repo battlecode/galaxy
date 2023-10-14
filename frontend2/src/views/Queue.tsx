@@ -16,7 +16,7 @@ import MatchStatus from "../components/compete/MatchStatus";
 import { searchTeams } from "../utils/api/team";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
 import type { Maybe } from "../utils/utilTypes";
-import { dateTime } from "../components/compete/DateTime";
+import { dateTime } from "../utils/dateTime";
 
 const Queue: React.FC = () => {
   const { episodeId } = useEpisodeId();

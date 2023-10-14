@@ -6,9 +6,6 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      width: {
-        18: "4.5rem",
-      },
       container: {
         center: true,
       },
