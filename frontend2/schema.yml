@@ -2219,11 +2219,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MatchParticipant'
+          nullable: true
         maps:
           type: array
           items:
             type: string
           readOnly: true
+          nullable: true
         alternate_order:
           type: boolean
           readOnly: true
@@ -2237,6 +2239,7 @@ components:
         replay_url:
           type: string
           readOnly: true
+          nullable: true
       required:
       - alternate_order
       - created
@@ -2260,6 +2263,7 @@ components:
         submission:
           type: integer
           readOnly: true
+          nullable: true
         match:
           type: integer
           readOnly: true

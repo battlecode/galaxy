@@ -61,13 +61,13 @@ export interface Match {
      * @type {Array<MatchParticipant>}
      * @memberof Match
      */
-    participants: Array<MatchParticipant>;
+    participants: Array<MatchParticipant> | null;
     /**
      * 
      * @type {Array<string>}
      * @memberof Match
      */
-    readonly maps: Array<string>;
+    readonly maps: Array<string> | null;
     /**
      * 
      * @type {boolean}
@@ -91,7 +91,7 @@ export interface Match {
      * @type {string}
      * @memberof Match
      */
-    readonly replay_url: string;
+    readonly replay_url: string | null;
 }
 
 /**
@@ -127,7 +127,7 @@ export function MatchFromJSONTyped(json: any, ignoreDiscriminator: boolean): Mat
         'status': StatusBccEnumFromJSON(json['status']),
         'episode': json['episode'],
         'tournament_round': json['tournament_round'],
-        'participants': ((json['participants'] as Array<any>).map(MatchParticipantFromJSON)),
+        'participants': (json['participants'] === null ? null : (json['participants'] as Array<any>).map(MatchParticipantFromJSON)),
         'maps': json['maps'],
         'alternate_order': json['alternate_order'],
         'created': (new Date(json['created'])),
@@ -145,7 +145,7 @@ export function MatchToJSON(value?: Match | null): any {
     }
     return {
         
-        'participants': ((value.participants as Array<any>).map(MatchParticipantToJSON)),
+        'participants': (value.participants === null ? null : (value.participants as Array<any>).map(MatchParticipantToJSON)),
     };
 }
 
