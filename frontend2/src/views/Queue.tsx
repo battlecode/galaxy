@@ -11,7 +11,7 @@ import BattlecodeTable from "../components/BattlecodeTable";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
 import Button from "../components/elements/Button";
 import RatingDelta from "../components/compete/RatingDelta";
-import MatchScore from "../components/compete/MatchScore";
+import {getMatchScore} from "../utils/compete";
 import MatchStatus from "../components/compete/MatchStatus";
 import { searchTeams } from "../utils/api/team";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
@@ -127,12 +127,13 @@ const Queue: React.FC = () => {
           {
             header: "Team (Δ)",
             value: (r) => {
-              const participant = r.participants[0];
-              if (participant !== undefined) {
-                return (
-                  <RatingDelta participant={participant} ranked={r.is_ranked} />
-                );
+              if (r.participants === null || r.participants[0] === undefined) {
+                return;
               }
+              const participant = r.participants[0];
+              return (
+                <RatingDelta participant={participant} ranked={r.is_ranked} />
+              );
             },
           },
           {
@@ -142,12 +143,13 @@ const Queue: React.FC = () => {
           {
             header: "Team (Δ)",
             value: (r) => {
-              const participant = r.participants[1];
-              if (participant !== undefined) {
-                return (
-                  <RatingDelta participant={participant} ranked={r.is_ranked} />
-                );
+              if (r.participants === null || r.participants[1] === undefined) {
+                return;
               }
+              const participant = r.participants[1];
+              return (
+                <RatingDelta participant={participant} ranked={r.is_ranked} />
+              );
             },
           },
           {
