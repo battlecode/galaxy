@@ -1,14 +1,14 @@
-# General Onboarding
+# General onboarding
 
 (See frontend- and backend- specific folders for less specific materials.)
 
 ## Get some experience!
 
-First and foremost, the easiest way to get a handle on our codebase is to use everything. Go to the deployed website, make an account, join a team, upload a bot, and start playing.
+First and foremost, the easiest way to get a handle on our codebase is to use everything. Go to the deployed production website, make an account, join a team, upload a bot, and start playing.
 
-It similarly helps to 
+It similarly helps to run as much of the Battlecode stack as you can, especially the backend and frontend. Follow the steps in the top-level readme to set up conda, and then see each of the backend and frontend's readmes as well.
 
-## Goals of the Product
+## Goals of the product
 
 Allow a user to:
 
@@ -19,28 +19,42 @@ Allow a user to:
 
 The latter two are fairly straightforward; the first two are more complex, and involve our entire system.
 
-## Webinfra System Overview
+## Webinfra system overview
 
-This is a rough depiction of how webinfra code runs in practice / in deployment, 
+This is a rough depiction of how webinfra code runs in practice / in deployment. All of the systems in use are run through the Google Cloud Program (GCP).
 
 TODO drop the system diagram
 
-Competitor's local frontend
+## The big stuff
 
-Backend server
+First, a competitor uses their own computer to visit the _frontend_. Through the competitor's interactions, the frontend makes Internet requests to the _backend_, via the API. Finally, the backend stores and retrieves data in the _database_.
 
-When competitors want to submit their code or run a scrimmage, they send a request to our API, which puts info about this request onto a "queue". (Technically it's not first-in first-out, but, y'know, abstraction.) 
+For viewing general information or managing team/user data, the flow of data generally ends here. However, submissions and scrimmaging are more involved. 
+
+In these cases, the backend puts info about this request onto a _Pub/Sub_, which works very similarly to a queue.
+
+This request is then taken off the queue and processed by a _submission server_ or _scrimmage server_. 
+
 
 Cloud Storage
+TODO in this PR ^ fill in
 
-Titan is an integrated malware scanner. At the end of competition
+TODO in this PR review the rest of the system diagram and write about whatever i've missed
 
-Secret Manager is a Google product, that holds our internal secrets, such as our password to manage the database.
+### Other parts
 
-The Artifact Registry is a Google product that holds and organizes Docker containers. We use containers do standardize and deploy our backend servers and our compile/execute runners.
+While these parts need less active work and maintanence from devs, they are still important to know. 
 
-TODO include a cool link to Docker! 
+_Titan_ is an integrated malware scanner. At the end of competition, competitors upload files ostensiby containing their resumes to our site, which are compiled into a resume book given to sponsors. To prevent funny business, Titan intercepts and scans these files, and marks safe ones.
 
-(An extra layer of abstraction: the Load Balancer . It adds an extra dimension to the system. )
+The _Secret Manager_ is a Google product, that holds our internal secrets, such as our password to manage the database. This prevents us from having to put passwords and authentication tokens in our code (ask older devs for horror stories). Instead, deployed components access Secret Manager to get the passwords, and can inject these into the flow of code. 
 
-So finally what controls all this? What tells it to come alive? Google Cloud Build is 
+The _Artifact Registry_ is a Google product that holds and organizes Docker containers. We use containers do standardize and deploy our backend servers and our compile/execute runners.
+
+(Docker is an amazing service that enables standarized servers to run across different operating systems. You can learn more at [their page](https://www.docker.com).)
+
+Google's _Cloud Build_ turns our source code into real machines running that code, and allows us to manage and customize this process as well. 
+
+An extra layer of abstraction is created with the _Load Balancer_. This takes all HTTP requests to our domain, and points each request to the right place in our system. 
+
+Furthermore, many of these systems can have multiple instances running. For example, GCP can run multiple backend servers, in order to do more operations at the same rate, thus handling more network traffic and competitor usage. This scalability is enabled by the Load Balancer, which can distribute requests across these multiple isntances.
