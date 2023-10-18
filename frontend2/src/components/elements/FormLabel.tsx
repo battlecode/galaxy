@@ -7,7 +7,7 @@ const FormLabel: React.FC<{
 }> = ({ label, required = false, className }) => {
   return (
     <div
-      className={`flex flex-row items-center gap-1 text-sm font-medium leading-6 text-gray-700 ${
+      className={`flex flex-row items-center gap-1 text-sm leading-6 text-gray-700 ${
         className ?? ""
       }`}
     >

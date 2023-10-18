@@ -62,7 +62,7 @@ function SelectMenu<T extends React.Key | null | undefined>({
             leaveTo="opacity-0"
           >
             <Listbox.Options
-              className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md
+              className="absolute z-10 ml-0 mt-1 max-h-48 w-full overflow-auto rounded-md
               bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
               sm:max-h-60 sm:text-sm"
             >
