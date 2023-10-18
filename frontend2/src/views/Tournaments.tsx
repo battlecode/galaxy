@@ -1,20 +1,19 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
-import { EpisodeContext } from "../contexts/EpisodeContext";
-import ReactMarkdown from "react-markdown";
-import { NavLink, Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useEpisodeId } from "../contexts/EpisodeContext";
+import { NavLink } from "react-router-dom";
 import { BC23_TOURNAMENTS, TourneyPage } from "../content/bc23";
-import { type Tournament } from "../utils/types";
+import type { Tournament } from "../utils/types";
 import { getAllTournaments } from "../utils/api/episode";
 import BattlecodeTable from "../components/BattlecodeTable";
-// import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import Icon from "../components/elements/Icon";
 import Markdown from "../components/elements/Markdown";
+import type { Maybe } from "../utils/utilTypes";
 
 const Tournaments: React.FC = () => {
-  const episodeId = useContext(EpisodeContext).episodeId;
+  const { episodeId } = useEpisodeId();
   // const currentUser = useContext(CurrentUserContext)?.user;
 
-  const [schedule, setSchedule] = useState<Tournament[] | undefined>(undefined);
+  const [schedule, setSchedule] = useState<Maybe<Tournament[]>>();
   const [loading, setLoading] = useState<boolean>(true);
   const scheduleHasLoaded = useRef(false);
 
@@ -28,6 +27,7 @@ const Tournaments: React.FC = () => {
           setSchedule(result.results);
         } catch (err) {
           console.error(err);
+          setSchedule(undefined);
         } finally {
           setLoading(false);
         }

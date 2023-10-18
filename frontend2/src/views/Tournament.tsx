@@ -1,13 +1,21 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { type PaginatedMatchList } from "../utils/types";
 import { getTournamentMatches } from "../utils/api/compete";
-import { EpisodeContext } from "../contexts/EpisodeContext";
+import { EpisodeContext, useEpisodeId } from "../contexts/EpisodeContext";
 import BattlecodeTable from "../components/BattlecodeTable";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
 
+interface QueryParams {
+  page: number;
+}
+
+const getParamEntries = (prev: URLSearchParams): Record<string, string> => {
+  return Object.fromEntries(prev);
+};
+
 const Tournament: React.FC = () => {
-  const episodeId = useContext(EpisodeContext).episodeId;
+  const { episodeId } = useEpisodeId();
   const { tournamentId } = useParams();
 
   const [matches, setMatches] = useState<PaginatedMatchList | undefined>(
@@ -17,15 +25,22 @@ const Tournament: React.FC = () => {
   const [teamId, setTeamId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [queryParams, setQueryParams] = useSearchParams({
-    page: "1",
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const page = parseInt(queryParams.get("page") ?? "1");
+  const parsePageParam = (paramName: string): number =>
+    parseInt(searchParams.get(paramName) ?? "1");
+
+  const queryParams: QueryParams = useMemo(() => {
+    return {
+      page: parsePageParam("page"),
+    };
+  }, [searchParams]);
 
   const handlePage = (page: number): void => {
-    // TODO: implement me!
-    console.log("page!", page);
+    setSearchParams((prev) => ({
+      ...getParamEntries(prev),
+      page: page.toString(),
+    }));
   };
 
   useEffect(() => {
@@ -39,7 +54,7 @@ const Tournament: React.FC = () => {
           tournamentId,
           // TODO: add round? what does it mean?
           undefined,
-          page,
+          queryParams.page,
         );
         setMatches(result);
       } catch (err) {
@@ -51,7 +66,7 @@ const Tournament: React.FC = () => {
     };
 
     void fetchMatches();
-  }, [teamId, page]);
+  }, [teamId, queryParams.page]);
 
   return (
     <div className="flex h-full w-full flex-col bg-white p-6">
@@ -66,7 +81,7 @@ const Tournament: React.FC = () => {
             <BattlecodeTableBottomElement
               totalCount={matches?.count ?? 0}
               pageSize={10}
-              currentPage={page}
+              currentPage={queryParams.page}
               onPage={handlePage}
             />
           }
