@@ -23,6 +23,7 @@ import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useCurrentTeam } from "../contexts/CurrentTeamContext";
 import { dateTime } from "../utils/dateTime";
 import Collapse from "../components/elements/Collapse";
+import type { Maybe } from "../utils/utilTypes";
 
 function trimString(str: string, maxLength: number): string {
   if (str.length > maxLength) {
@@ -31,31 +32,35 @@ function trimString(str: string, maxLength: number): string {
   return str;
 }
 
+interface QueryParams {
+  inboxPage: number;
+  outboxPage: number;
+  teamsPage: number;
+  scrimsPage: number;
+  tourneyPage: number;
+  search: string;
+}
+
+const getParamEntries = (prev: URLSearchParams): Record<string, string> => {
+  return Object.fromEntries(prev);
+};
+
 const Scrimmaging: React.FC = () => {
-  const episodeId = useEpisodeId().episodeId;
-  const currentTeam = useCurrentTeam().team;
+  const { episodeId } = useEpisodeId();
+  const { team: currentTeam } = useCurrentTeam();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const getParamEntries = (prev: URLSearchParams): Record<string, string> => {
-    return Object.fromEntries(prev.entries());
-  };
 
-  interface QueryParams {
-    inboxPage: number;
-    outboxPage: number;
-    teamsPage: number;
-    scrimsPage: number;
-    tourneyPage: number;
-    search: string;
-  }
+  const parsePageParam = (paramName: string): number =>
+    parseInt(searchParams.get(paramName) ?? "1");
 
   const queryParams: QueryParams = useMemo(() => {
     return {
-      inboxPage: parseInt(searchParams.get("inboxPage") ?? "1"),
-      outboxPage: parseInt(searchParams.get("outboxPage") ?? "1"),
-      teamsPage: parseInt(searchParams.get("teamsPage") ?? "1"),
-      scrimsPage: parseInt(searchParams.get("scrimsPage") ?? "1"),
-      tourneyPage: parseInt(searchParams.get("tourneyPage") ?? "1"),
+      inboxPage: parsePageParam("inboxPage"),
+      outboxPage: parsePageParam("outboxPage"),
+      teamsPage: parsePageParam("teamsPage"),
+      scrimsPage: parsePageParam("scrimsPage"),
+      tourneyPage: parsePageParam("tourneyPage"),
       search: searchParams.get("search") ?? "",
     };
   }, [searchParams]);
@@ -68,21 +73,13 @@ const Scrimmaging: React.FC = () => {
   const [scrimsLoading, setScrimsLoading] = useState<boolean>(false);
   const [tourneyLoading, setTourneyLoading] = useState<boolean>(false);
 
-  const [inboxData, setInboxData] = useState<
-    PaginatedScrimmageRequestList | undefined
-  >(undefined);
-  const [outboxData, setOutboxData] = useState<
-    PaginatedScrimmageRequestList | undefined
-  >(undefined);
-  const [teamsData, setTeamsData] = useState<
-    PaginatedTeamPublicList | undefined
-  >(undefined);
-  const [scrimsData, setScrimsData] = useState<PaginatedMatchList | undefined>(
-    undefined,
-  );
-  const [tourneyData, setTourneyData] = useState<
-    PaginatedMatchList | undefined
-  >(undefined);
+  const [inboxData, setInboxData] =
+    useState<Maybe<PaginatedScrimmageRequestList>>();
+  const [outboxData, setOutboxData] =
+    useState<Maybe<PaginatedScrimmageRequestList>>();
+  const [teamsData, setTeamsData] = useState<Maybe<PaginatedTeamPublicList>>();
+  const [scrimsData, setScrimsData] = useState<Maybe<PaginatedMatchList>>();
+  const [tourneyData, setTourneyData] = useState<Maybe<PaginatedMatchList>>();
 
   function handleSearch(): void {
     if (!teamsLoading && searchText !== queryParams.search) {
@@ -124,7 +121,7 @@ const Scrimmaging: React.FC = () => {
     return () => {
       isActiveLookup = false;
     };
-  }, [queryParams.inboxPage]);
+  }, [episodeId, queryParams.inboxPage]);
 
   useEffect(() => {
     let isActiveLookup = true;
@@ -156,7 +153,7 @@ const Scrimmaging: React.FC = () => {
     return () => {
       isActiveLookup = false;
     };
-  }, [queryParams.outboxPage]);
+  }, [episodeId, queryParams.outboxPage]);
 
   useEffect(() => {
     let isActiveLookup = true;
@@ -190,7 +187,7 @@ const Scrimmaging: React.FC = () => {
     return () => {
       isActiveLookup = false;
     };
-  }, [queryParams.search, queryParams.teamsPage]);
+  }, [episodeId, queryParams.search, queryParams.teamsPage]);
 
   useEffect(() => {
     let isActiveLookup = true;
@@ -223,7 +220,7 @@ const Scrimmaging: React.FC = () => {
     return () => {
       isActiveLookup = false;
     };
-  }, [queryParams.scrimsPage]);
+  }, [episodeId, queryParams.scrimsPage]);
 
   useEffect(() => {
     let isActiveLookup = true;

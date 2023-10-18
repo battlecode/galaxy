@@ -10,6 +10,11 @@ interface MatchScoreProps {
   userTeamId?: number;
 }
 
+/**
+ * @param match The match to display the score for.
+ * @param userTeamId (Optional) The team ID of the user. If provided, the MatchScoreBadge will be from the user's perspective.
+ * Otherwise, it will be done in order of Match.participants, and two badges will be present.
+ */
 const MatchScore: React.FC<MatchScoreProps> = ({
   match,
   userTeamId,
@@ -61,7 +66,7 @@ const MatchScore: React.FC<MatchScoreProps> = ({
     );
 
   return (
-    <div className={"w-18 flex flex-row items-center justify-between"}>
+    <div className={"flex w-[4.5rem] flex-row items-center justify-between"}>
       {scoreDisplay}
       <MatchScoreBadge firstTeam={firstTeam} secondTeam={secondTeam} />
     </div>
