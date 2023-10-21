@@ -94,6 +94,7 @@ const Tournaments: React.FC = () => {
         } ${BC23_TOURNAMENTS[TourneyPage.RULES]}
         `}
       />
+      <hr className="my-8 h-px border-0 bg-gray-200" />
     </div>
   );
 };
