@@ -48,8 +48,12 @@ function BattlecodeTable<T>({
                 }}
                 className={
                   idx % 2 === 0
-                    ? "cursor-pointer border-b bg-white hover:bg-cyan-100 hover:text-gray-700"
-                    : "cursor-pointer border-b bg-gray-50 hover:bg-cyan-100 hover:text-gray-700"
+                    ? `${
+                        onRowClick !== undefined ? "cursor-pointer" : ""
+                      } border-b bg-white hover:bg-cyan-100 hover:text-gray-700`
+                    : `${
+                        onRowClick !== undefined ? "cursor-pointer" : ""
+                      } border-b bg-gray-50 hover:bg-cyan-100 hover:text-gray-700`
                 }
               >
                 {columns.map((col, idx) => (
