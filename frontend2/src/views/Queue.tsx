@@ -16,6 +16,7 @@ import MatchStatus from "../components/compete/MatchStatus";
 import { searchTeams } from "../utils/api/team";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
 import type { Maybe } from "../utils/utilTypes";
+import { dateTime } from "../utils/dateTime";
 
 const Queue: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -160,7 +161,7 @@ const Queue: React.FC = () => {
           },
           {
             header: "Created",
-            value: (r) => new Date(r.created).toLocaleString(),
+            value: (r) => dateTime(r.created).localFullString,
           },
         ]}
       />
