@@ -20,7 +20,7 @@ const DescriptiveCheckbox: React.FC<DescriptiveCheckboxProps> = ({
       checked={checked}
       onChange={onChange}
       className={`flex w-full
-      flex-row items-center justify-between rounded-lg px-6 py-4 shadow ring-2 ring-inset
+      flex-row items-center justify-between gap-3 rounded-lg px-6 py-4 shadow ring-2 ring-inset
        ring-cyan-600/20 transition-all ui-checked:bg-cyan-900/80 ui-checked:ring-0`}
     >
       <div className="flex flex-col gap-2 text-left">

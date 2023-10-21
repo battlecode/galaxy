@@ -1,17 +1,28 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import SectionCard from "../components/SectionCard";
 import Input from "../components/elements/Input";
 import TextArea from "../components/elements/TextArea";
-import { useCurrentTeam } from "../contexts/CurrentTeamContext";
+import { TeamStateEnum, useCurrentTeam } from "../contexts/CurrentTeamContext";
 import Button from "../components/elements/Button";
 import MemberList from "../components/team/MemberList";
 import DescriptiveCheckbox from "../components/elements/DescriptiveCheckbox";
+import JoinTeam from "../components/JoinTeam";
 
 const MyTeam: React.FC = () => {
   const { team, teamState } = useCurrentTeam();
   const [checked, setChecked] = useState<boolean>(false);
-  const [checked1, setChecked1] = useState<boolean>(false);
+  const membersList = useMemo(() => {
+    return (
+      <div className="flex flex-col gap-8">
+        {team !== undefined && <MemberList members={team?.members} />}
+        <Button className="self-start" label="Leave team" />
+      </div>
+    );
+  }, [team]);
+  if (teamState !== TeamStateEnum.IN_TEAM || team === undefined) {
+    return <JoinTeam />;
+  }
   return (
     <div className="p-10">
       <PageTitle>Team Settings</PageTitle>
@@ -22,17 +33,17 @@ const MyTeam: React.FC = () => {
               <div className="flex flex-col items-center gap-6 p-4">
                 <img
                   className="h-24 w-24 rounded-full bg-gray-400 md:h-48 md:w-48"
-                  src={team?.profile?.avatar_url}
+                  src={team.profile?.avatar_url}
                 />
                 <div className="text-center text-xl font-semibold">
-                  {team?.name}
+                  {team.name}
                 </div>
               </div>
               <div className="flex flex-1 flex-col gap-4">
                 <Input
                   disabled
                   label="Join key"
-                  value={team?.join_key ?? "Loading..."}
+                  value={team.join_key ?? "Loading..."}
                 />
                 <Input label="Team quote" />
                 <TextArea label="Team biography" />
@@ -43,6 +54,10 @@ const MyTeam: React.FC = () => {
                 <Button className="mt-2" label="Save" type="submit" />
               </div>
             </div>
+          </SectionCard>
+          {/* The members list that displays when on a smaller screen */}
+          <SectionCard className="shrink xl:hidden" title="Members">
+            {membersList}
           </SectionCard>
           <SectionCard title="Eligibility">
             <div className="flex flex-col gap-4 2xl:flex-row">
@@ -116,10 +131,10 @@ const MyTeam: React.FC = () => {
                   ranked scrimmage requests. Ranked scrimmages affect your ELO rating."
                 />
                 <DescriptiveCheckbox
-                  checked={checked1}
-                  onChange={(checked1) => {
-                    console.log("new value", checked1);
-                    setChecked1(checked1);
+                  checked={checked}
+                  onChange={(checked) => {
+                    console.log("new value", checked);
+                    setChecked(checked);
                   }}
                   title="Auto-accept unranked scrimmages"
                   description="When enabled, your team will automatically accept
@@ -129,8 +144,9 @@ const MyTeam: React.FC = () => {
             </div>
           </SectionCard>
         </div>
-        <SectionCard className="shrink xl:max-w-lg" title="Members">
-          {team !== undefined && <MemberList members={team?.members} />}
+        {/* The members list that displays to the right side when on a big screen. */}
+        <SectionCard className="hidden w-1/3 shrink xl:block" title="Members">
+          {membersList}
         </SectionCard>
       </div>
     </div>
