@@ -22,6 +22,7 @@ const Register: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const {
     register,
+    watch,
     handleSubmit,
     setValue,
     setError,
@@ -31,6 +32,7 @@ const Register: React.FC = () => {
   const [gender, setGender] = useState<Maybe<GenderEnum>>();
   const [country, setCountry] = useState<Maybe<CountryEnum>>();
   const [formError, setFormError] = useState<Maybe<string>>();
+  const watchSchool = watch("profile.school");
 
   useEffect(() => {
     // redirect to home if already logged in
@@ -143,6 +145,17 @@ const Register: React.FC = () => {
             {...register("profile.school")}
           />
         </div>
+
+        {["mit", "massachusetts institute of technology", "m.i.t."].includes(
+          watchSchool?.toLowerCase() ?? "",
+        ) && (
+          <Input
+            placeholder="timthebeaver"
+            label="Kerberos"
+            {...register("profile.kerberos")}
+          />
+        )}
+
         <div className="grid grid-cols-2 gap-5">
           <SelectMenu<GenderEnum>
             required
