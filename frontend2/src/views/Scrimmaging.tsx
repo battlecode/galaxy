@@ -19,7 +19,7 @@ import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomEle
 import MatchScore from "../components/compete/MatchScore";
 import RatingDelta from "../components/compete/RatingDelta";
 import MatchStatus from "../components/compete/MatchStatus";
-import { useEpisodeId } from "../contexts/EpisodeContext";
+import { useEpisode, useEpisodeId } from "../contexts/EpisodeContext";
 import { useCurrentTeam } from "../contexts/CurrentTeamContext";
 import { dateTime } from "../utils/dateTime";
 import Collapse from "../components/elements/Collapse";
@@ -47,6 +47,7 @@ const getParamEntries = (prev: URLSearchParams): Record<string, string> => {
 
 const Scrimmaging: React.FC = () => {
   const { episodeId } = useEpisodeId();
+  const episode = useEpisode();
   const { team: currentTeam } = useCurrentTeam();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -112,7 +113,9 @@ const Scrimmaging: React.FC = () => {
         }
         console.error(err);
       } finally {
-        setInboxLoading(false);
+        if (isActiveLookup) {
+          setInboxLoading(false);
+        }
       }
     };
 
@@ -144,7 +147,9 @@ const Scrimmaging: React.FC = () => {
         }
         console.error(err);
       } finally {
-        setOutboxLoading(false);
+        if (isActiveLookup) {
+          setOutboxLoading(false);
+        }
       }
     };
 
@@ -178,7 +183,9 @@ const Scrimmaging: React.FC = () => {
         }
         console.error(err);
       } finally {
-        setTeamsLoading(false);
+        if (isActiveLookup) {
+          setTeamsLoading(false);
+        }
       }
     };
 
@@ -211,7 +218,9 @@ const Scrimmaging: React.FC = () => {
         }
         console.error(err);
       } finally {
-        setScrimsLoading(false);
+        if (isActiveLookup) {
+          setScrimsLoading(false);
+        }
       }
     };
 
@@ -246,7 +255,9 @@ const Scrimmaging: React.FC = () => {
         }
         console.error(err);
       } finally {
-        setTourneyLoading(false);
+        if (isActiveLookup) {
+          setTourneyLoading(false);
+        }
       }
     };
 
@@ -446,7 +457,21 @@ const Scrimmaging: React.FC = () => {
             },
             {
               header: "Replay",
-              value: (match) => "REPLAY",
+              value: (match) =>
+                episode === undefined ? (
+                  <></>
+                ) : (
+                  <NavLink
+                    className="text-cyan-600 hover:underline"
+                    to={`https://releases.battlecode.org/client/${
+                      episode.artifact_name ?? ""
+                    }/${episode.release_version_public ?? ""}/visualizer.html?${
+                      match.replay_url
+                    }`}
+                  >
+                    Replay!
+                  </NavLink>
+                ),
             },
             {
               header: "Created",
@@ -506,7 +531,21 @@ const Scrimmaging: React.FC = () => {
             },
             {
               header: "Replay",
-              value: (match) => "REPLAY",
+              value: (match) =>
+                episode === undefined ? (
+                  <></>
+                ) : (
+                  <NavLink
+                    className="text-cyan-600 hover:underline"
+                    to={`https://releases.battlecode.org/client/${
+                      episode.artifact_name ?? ""
+                    }/${episode.release_version_public ?? ""}/visualizer.html?${
+                      match.replay_url
+                    }`}
+                  >
+                    Replay!
+                  </NavLink>
+                ),
             },
             {
               header: "Created",
