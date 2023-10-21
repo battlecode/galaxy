@@ -4,7 +4,6 @@ import SidebarItem from "./SidebarItem";
 import { useEpisodeId } from "../../contexts/EpisodeContext";
 import { type IconName } from "../elements/Icon";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
-import { isNull } from "lodash";
 import { useCurrentTeam } from "../../contexts/CurrentTeamContext";
 
 interface SidebarProps {
@@ -98,8 +97,8 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   let teamManage;
 
   // construct teamManage if needed
-  if (!isNull(user) && user !== undefined) {
-    if (!isNull(team) && team !== undefined) {
+  if (user !== undefined) {
+    if (team !== undefined) {
       teamManage = (
         <SidebarSection title="team management">
           {generateSidebarItems(6, 8, episodeId)}
