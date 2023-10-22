@@ -16,6 +16,6 @@ Sometimes, password resets don't go through, since users never get the emails, d
 
 - Have users switch to a different email address, with which that they can receive emails from our backend. You can make this switch in the admin panel. Then, have them request a new password through the normal means.
 
-## Administering Mailjet
+## Administering Backend Emails through Mailjet
 
-coming soon! tracked in #177
+If automated emails from the backend server stop sending, or if you have other issues with these emails, see [emails.md](the emails readme). Feel free to add any new notes there too!
