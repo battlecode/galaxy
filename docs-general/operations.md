@@ -18,4 +18,4 @@ Sometimes, password resets don't go through, since users never get the emails, d
 
 ## Administering Backend Emails through Mailjet
 
-If automated emails from the backend server stop sending, or if you have other issues with these emails, see [emails.md](the emails readme). Feel free to add any new notes there too!
+If automated emails from the backend server stop sending, or if you have other issues with these emails, see `emails.md` in this folder. Feel free to add any new notes there too!
