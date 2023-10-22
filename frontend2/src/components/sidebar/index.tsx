@@ -3,6 +3,8 @@ import SidebarSection from "./SidebarSection";
 import SidebarItem from "./SidebarItem";
 import { useEpisodeId } from "../../contexts/EpisodeContext";
 import { type IconName } from "../elements/Icon";
+import { useCurrentUser } from "../../contexts/CurrentUserContext";
+import { useCurrentTeam } from "../../contexts/CurrentTeamContext";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -90,7 +92,28 @@ export const generateSidebarItems = (
 const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   collapsed = collapsed ?? false;
   const { episodeId } = useEpisodeId();
+  const { user } = useCurrentUser();
+  const { team } = useCurrentTeam();
+  let teamManage;
 
+  // construct teamManage if needed
+  if (user !== undefined) {
+    if (team !== undefined) {
+      teamManage = (
+        <SidebarSection title="team management">
+          {generateSidebarItems(6, 8, episodeId)}
+        </SidebarSection>
+      );
+    } else {
+      teamManage = (
+        <SidebarSection title="team management">
+          {generateSidebarItems(6, 6, episodeId)}
+        </SidebarSection>
+      );
+    }
+  }
+
+  // generate sidebar
   return collapsed ? null : (
     <nav className="fixed top-16 z-10 hidden h-full w-52 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">
       <SidebarSection title="">
@@ -99,9 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       <SidebarSection title="compete">
         {generateSidebarItems(3, 5, episodeId)}
       </SidebarSection>
-      <SidebarSection title="team management">
-        {generateSidebarItems(6, 8, episodeId)}
-      </SidebarSection>
+      {teamManage}
     </nav>
   );
 };
