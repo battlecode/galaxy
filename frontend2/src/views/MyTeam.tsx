@@ -75,7 +75,6 @@ const MyTeam: React.FC = () => {
                 <DescriptiveCheckbox
                   checked={checked}
                   onChange={(checked) => {
-                    console.log("new value", checked);
                     setChecked(checked);
                   }}
                   title="Student"
@@ -84,7 +83,6 @@ const MyTeam: React.FC = () => {
                 <DescriptiveCheckbox
                   checked={checked}
                   onChange={(checked) => {
-                    console.log("new value", checked);
                     setChecked(checked);
                   }}
                   title="US Student"
@@ -93,7 +91,6 @@ const MyTeam: React.FC = () => {
                 <DescriptiveCheckbox
                   checked={checked}
                   onChange={(checked) => {
-                    console.log("new value", checked);
                     setChecked(checked);
                   }}
                   title="High school student"
@@ -102,7 +99,6 @@ const MyTeam: React.FC = () => {
                 <DescriptiveCheckbox
                   checked={checked}
                   onChange={(checked) => {
-                    console.log("new value", checked);
                     setChecked(checked);
                   }}
                   title="Newbie"
@@ -123,7 +119,6 @@ const MyTeam: React.FC = () => {
                 <DescriptiveCheckbox
                   checked={checked}
                   onChange={(checked) => {
-                    console.log("new value", checked);
                     setChecked(checked);
                   }}
                   title="Auto-accept ranked scrimmages"
@@ -133,7 +128,6 @@ const MyTeam: React.FC = () => {
                 <DescriptiveCheckbox
                   checked={checked}
                   onChange={(checked) => {
-                    console.log("new value", checked);
                     setChecked(checked);
                   }}
                   title="Auto-accept unranked scrimmages"

@@ -38,7 +38,6 @@ const UserRow: React.FC<UserRowProps> = ({ user, isCurrentUser = false }) => {
 // displays the current user first.
 const MemberList: React.FC<MemberListProps> = ({ members, className = "" }) => {
   const { user: currentUser } = useCurrentUser();
-  console.log(members[0]);
   return (
     <div className={`flex flex-col gap-6 ${className}`}>
       {/* display current user first */}
