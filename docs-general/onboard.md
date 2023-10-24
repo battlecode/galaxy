@@ -31,7 +31,7 @@ Here, we introduce the systems through tracking the flow of information.
 
 First, a competitor uses their own computer to load up `play.battlecode.org`, thus visiting the _frontend_. Through the competitor's interactions, the frontend makes Internet requests to the _backend_. The backend allows these requests via the _API_, an interface that the backend defines to communicate with the outside world. Finally, the backend stores and retrieves bulk amounts of data in the _database_.
 
-For viewing general information or managing team/user data, the flow of data generally ends here.  However, when a user wants to submit new source code for their bot, or request a scrimmage against another team... these are more involved.
+For viewing general information or managing team/user data, the flow of data generally ends here. However, when a user wants to submit new source code for their bot, or request a scrimmage against another team... these are more involved.
 
 Most importantly, in these cases, the backend puts info about this request onto a _Pub/Sub_, which works very similarly to a queue. (We use two of these, one for submitting code and the other for requesting scrimmages.)
 Furthermore, the backend also stores other information into the database for records. Also, for a submission, the backend saves the competitor's source code in _Google Cloud Storage_. (This is Google's simple file storage, which works similarly to Google Drive or other file-and-folder based stores.)
