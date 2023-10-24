@@ -23,6 +23,8 @@ Please follow these steps carefully to ensure your development environment is in
 
 If the Conda specifications are updated upstream, you can refresh your local environment to match it by running `conda env update -n galaxy -f environment-dev.yml`.
 
+Afterwards, to run systems locally, see each of their respective directory's readme files.
+
 ## Development workflow
 
 See [docs-general/workflow.md](docs-general/workflow.md) for workflow information. **Reading this page, especially the "Coding" and "Review" sections, before starting work is highly recommended.**
