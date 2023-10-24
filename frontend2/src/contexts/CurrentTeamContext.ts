@@ -2,6 +2,8 @@ import { createContext, useContext } from "react";
 import { type TeamPrivate } from "../utils/types";
 
 export enum TeamStateEnum {
+  // the current team state is still loading
+  LOADING = "loading",
   // the current user is not part of a team (or is not logged in)
   NO_TEAM = "no_team",
   // the current user is part of a team

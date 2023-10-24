@@ -8,11 +8,13 @@ import { retrieveTeam } from "../utils/api/team";
 export const CurrentTeamProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  // invariant: team must be undefined when teamState is LOADING or NO_TEAM
+  // team must be defined when teamState is IN_TEAM
   const [teamData, setTeamData] = useState<{
     team?: TeamPrivate;
     teamState: TeamStateEnum;
   }>({
-    teamState: TeamStateEnum.NO_TEAM,
+    teamState: TeamStateEnum.LOADING,
   });
   const { authState } = useCurrentUser();
   const { episodeId } = useEpisodeId();

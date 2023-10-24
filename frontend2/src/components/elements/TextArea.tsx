@@ -2,14 +2,14 @@ import React, { forwardRef } from "react";
 import FormError from "./FormError";
 import FormLabel from "./FormLabel";
 
-interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
+interface TextAreaProps extends React.ComponentPropsWithoutRef<"textarea"> {
   label?: string;
   required?: boolean;
   className?: string;
   errorMessage?: string;
 }
 
-const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+const Input = forwardRef<HTMLTextAreaElement, TextAreaProps>(function Input(
   { label, required = false, className = "", errorMessage, ...rest },
   ref,
 ) {
@@ -19,18 +19,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       <label>
         <FormLabel label={label} required={required} />
         <div className="relative rounded-md shadow-sm">
-          <input
+          <textarea
             ref={ref}
             aria-invalid={errorMessage !== undefined ? "true" : "false"}
-            className={`block w-full rounded-md border-0 px-2 py-1.5 ring-1 ring-inset
+            className={`block w-full rounded-md border-0 px-2 py-1.5 text-gray-900 ring-1 ring-inset
             ring-gray-300 placeholder:text-gray-400 focus:outline-none focus:ring-1 focus:ring-inset
             focus:ring-cyan-600 sm:text-sm sm:leading-6
-            ${invalid ? "ring-red-500" : ""}
-            ${
-              rest.disabled === true
-                ? "bg-gray-400/20 text-gray-600"
-                : "text-gray-900"
-            }`}
+            ${invalid ? "ring-red-500" : ""}`}
             {...rest}
           />
         </div>
