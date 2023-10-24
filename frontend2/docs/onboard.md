@@ -1,9 +1,3 @@
-<!-- TODO tracked in #49, expand this (especially writing about things that are already explained in other people's notes or in onboarding session) til nothing for this doc readily, easily comes to mind. In particular, _during onboarding session, take an audio recording_ and then use that to type this up after.
-Need to be concise somehow. Need to be organized, somehow! Overall need to be readable.
-Everything relevant from Maggie's docs should be here.
-
-No need to come up with novel stuff to write. No need to do additional thinking, creating, researching, etc that hasn't already been done before. -->
-
 # Codebase Intro and Guide
 
 (with much help from Maggie Yao)
@@ -58,29 +52,9 @@ There's a couple other parts of React that we use heavily, that are not directly
 
 You may want to know how conditional rendering works -- depending on what you do, it might come up. Here's a good explanation: https://reactjs.org/docs/conditional-rendering.html
 
-We also use Routes, which is React's concept of translating URLs and paths into code.  
+We also use Routes, which is React's concept of translating URLs and paths into code. You can find more info here: https://reactrouter.com/en/main/route/route.
 
-TODO notes about react routes, and how our code takes in URLs and determines what to actually return. Link: https://reactrouter.com/en/main/route/route.
-
-### APIs and the Web
-
-### HTTP Requests
-
-What is?
-
-<!-- TODO Link to a small explanation. tracked in #49 -->
-
-Note that this is a thing for backend and frontend!
-
-<!-- TODO link to a small explanation. tracked in #49 -->
-
-### Async, Promises, and Callbacks
-
-<!-- TODO one-sentence description if at all. tracked in #49
-Any linked explanation or explanation we write ought to discuss
-- at a high level, what async programming is
-- promises in vanilla JS first,
-- and then how JQuery's AJAX works -->
+Contexts are a way to store and share information across React components. For example, we can store info about the user in a context, and can pass this to the Typescript of React files to work with it. Learn more here: https://react.dev/learn/passing-data-deeply-with-context.
 
 ## Battlecode-specific web dev
 
@@ -88,27 +62,7 @@ Here are (some) specifics about Battlecode's frontend -- about how the codebase 
 
 This will be developed over time, as the new frontend is developed, too.
 
-Organized as codebase overview
-
-TODO i had to handle some text messages for a few mins, rewrite later xd
-
-- public
-
--components
-
-- content
--api
-
--types
-Our types are automatically generated
-
--contexts
-
-Contexts are a way to store and share information across React components. For example, we can store info about the user in a context, and can pass this to the Typescript of React files to work with it.
-
-TODO find a nice docs link cuz this is general
-
-Actually contexts should be not in this section but the one slightly above
+<!-- @ writers, put stuff here as you see fit! -->
 
 <!-- ## Legacy stuff
 
