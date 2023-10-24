@@ -11,7 +11,7 @@ const Header: React.FC = () => {
   const { episodeId } = useEpisodeId();
 
   return (
-    <nav className="fixed top-0 h-16 w-full bg-gray-700">
+    <nav className="fixed top-0 z-30 h-16 w-full bg-gray-700">
       <div className="w-full px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           {/* mobile menu */}
