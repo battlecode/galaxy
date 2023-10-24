@@ -31,9 +31,9 @@ Here, we introduce the systems through tracking the flow of information.
 
 First, a competitor uses their own computer to load up `play.battlecode.org`, thus visiting the _frontend_. Through the competitor's interactions, the frontend makes Internet requests to the _backend_. The backend allows these requests via the _API_, an interface that the backend defines to communicate with the outside world. Finally, the backend stores and retrieves bulk amounts of data in the _database_.
 
-For viewing general information or managing team/user data, the flow of data generally ends here. However, when a user wants to submit new source code for their bot, or submit a request to scrimmage against another team... these are more involved.
+For viewing general information or managing team/user data, the flow of data generally ends here.  However, when a user wants to submit new source code for their bot, or request a scrimmage against another team... these are more involved.
 
-Most importantly, these cases, the backend puts info about this request onto a _Pub/Sub_, which works very similarly to a queue. (We use two of these, one each for submitting and scrimmaging.)
+Most importantly, in these cases, the backend puts info about this request onto a _Pub/Sub_, which works very similarly to a queue. (We use two of these, one for submitting code and the other for requesting scrimmages.)
 Furthermore, the backend also stores other information into the database for records. Also, for a submission, the backend saves the competitor's source code in _Google Cloud Storage_. (This is Google's simple file storage, which works similarly to Google Drive or other file-and-folder based stores.)
 
 This request is then taken off the respective queue and processed by either a _compile runner_ (also called a compile server or submission server) or a _execute runner_ (also called an execute server or scrimmage server). A compile runner takes in the request, gets the competitor's source code from Cloud Storage, compiles this code through running Java commands, uploads the compiled code back to Cloud Storage, and tells the backend to update the database accordingly (to reflect the completion of compilation). An execute runner follows a similar process, though with matches rather than submissions.
