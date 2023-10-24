@@ -23,7 +23,7 @@ The latter two are fairly straightforward; the first two are more complex, and i
 
 This is a rough depiction of how webinfra code runs in practice / in deployment. All of the systems in use are run through the Google Cloud Program (GCP).
 
-TODO drop the system diagram
+![System Diagram](system-diagram.png)
 
 ## The big stuff
 
