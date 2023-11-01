@@ -104,9 +104,9 @@ class Resources extends Component {
                     {this.props.episode_name_long} will be holding lectures,
                     where a dev will be going over possible strategy, coding up
                     an example player, answering questions, etc. Lectures are
-                    streamed on Twitch .
+                    streamed on Twitch.
                     {/* every weekday the first two weeks of IAP. */}
-                    <i>More details coming soon!</i>
+                    <i> More details coming soon!</i>
                   </p>
                   <p>
                     All lectures are streamed live on{" "}
