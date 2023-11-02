@@ -87,72 +87,7 @@ class Tournaments extends Component {
                   <h4 className="title">Prizes</h4>
                 </div>
                 <div className="content">
-                  <p>
-                    Prize amounts are approximate and will be finalized soon!
-                  </p>
-                  <ul>
-                    <li>
-                      <b>Final Tournament prizes:</b> Prizes will range from
-                      $5000 for 1st place to $600 for 16th place.
-                    </li>
-                    <li>
-                      <b>Sprint prizes:</b> Winner of each tournament will
-                      receive $250.
-                    </li>
-                    <li>
-                      <b>Newbie, High School prizes:</b> Prizes will range from
-                      $700 to $200 for the top 4 teams.
-                    </li>
-                    <li>
-                      <a href="https://www.regression.gg/battlecode">
-                        <b>Best Devlog Series Prize:</b>
-                      </a>{" "}
-                      $800 prize given by our Gold Sponsor,{" "}
-                      <a href="https://www.regression.gg">Regression Games</a>.
-                      First place will receive $800, and all winners will
-                      receive a chance to interview for internships.
-                      <ul>
-                        <li>
-                          We want to see what you are building during the
-                          Battlecode season! Share your Battlecode development
-                          experience on your favorite social media platform over
-                          the course of the tournament. Post your learnings, fun
-                          moments, hardships, and progress! You must tag
-                          Battlecode and Regression Games in the post to be
-                          eligible for this prize (see{" "}
-                          <a href="https://regression.gg/battlecode">
-                            regression.gg/battlecode
-                          </a>{" "}
-                          for more info, ideas, and social media handles).
-                          {/* Historically, we have given out prizes for creative
-                          strategies, major bugs found, and other game-specific
-                          topics. Have fun with your strategies, write-ups, and
-                          overall participation in Battlecode! */}
-                        </li>
-                      </ul>
-                    </li>
-                    <li>
-                      <b>Best Strategy Report Prize: </b>
-                      $800 prize given by our Gold Sponsor,{" "}
-                      <a href="https://argus.gg/">Argus Labs</a>. First place
-                      will receive $800, and all winners will receive a chance
-                      to interview for internships and a swag box.
-                      <ul>
-                        <li>
-                          Submit a strategy report detailing the strategies you
-                          used to develop your bot! We'd love to see how you
-                          handled communication, resource allocation, battling,
-                          and more. Tell us what unique strategies your team
-                          came up with! A link for submitting reports will be
-                          provided later.
-                          {/* Historically, we have given out prizes for creative
-                          strategies, major bugs found, and other game-specific
-                          topics. Have fun with your strategies, write-ups, and
-                          overall participation in Battlecode! */}
-                        </li>
-                      </ul>
-                    </li>
-                  </ul>
+                  <p>Prize amounts are TBD for Battlecode 2024.</p>
                   <p>
                     If you are an international participant, please note that{" "}
                     <a href="https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/sanctioned-destinations">
