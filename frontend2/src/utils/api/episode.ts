@@ -4,6 +4,7 @@ import {
   type GameMap,
   type Tournament,
   type PaginatedTournamentList,
+  EligibilityCriterion,
 } from "../types";
 import { DEFAULT_API_CONFIGURATION } from "./helpers";
 
@@ -46,4 +47,19 @@ export const getAllTournaments = async (
   page?: number,
 ): Promise<PaginatedTournamentList> => {
   return await API.episodeTournamentList({ episodeId, page });
+};
+
+/**
+ * Get the information of a specific tournament during the given episode.
+ * @param episodeId The current episode's ID.
+ * @param tournamentId The tournament's ID.
+ */
+export const getTournamentInfo = async (
+  episodeId: string,
+  tournamentId: string,
+): Promise<Tournament> => {
+  return await API.episodeTournamentRetrieve({
+    episodeId,
+    id: tournamentId,
+  });
 };

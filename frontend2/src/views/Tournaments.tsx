@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import { NavLink, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { BC23_TOURNAMENTS, TourneyPage } from "../content/bc23";
-import type { PaginatedTournamentList, Tournament } from "../utils/types";
+import type { PaginatedTournamentList } from "../utils/types";
 import { getAllTournaments } from "../utils/api/episode";
 import BattlecodeTable from "../components/BattlecodeTable";
 import Icon from "../components/elements/Icon";
 import Markdown from "../components/elements/Markdown";
 import { dateTime } from "../utils/dateTime";
 import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
+import SectionCard from "../components/SectionCard";
 
 interface QueryParams {
   page: number;
@@ -20,6 +21,7 @@ const getParamEntries = (prev: URLSearchParams): Record<string, string> => {
 
 const Tournaments: React.FC = () => {
   const { episodeId } = useEpisodeId();
+  const navigate = useNavigate();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -43,7 +45,7 @@ const Tournaments: React.FC = () => {
 
     const fetchSchedule = async (): Promise<void> => {
       try {
-        const result = await getAllTournaments(episodeId, queryParams.page); // TODO: page!
+        const result = await getAllTournaments(episodeId, queryParams.page);
         if (isActiveLookup) {
           setSchedule(result);
         }
@@ -68,69 +70,67 @@ const Tournaments: React.FC = () => {
 
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
-      <Markdown text={BC23_TOURNAMENTS[TourneyPage.SCHEDULE]} />
-      <BattlecodeTable
-        data={schedule?.results ?? []}
-        loading={loading}
-        columns={[
-          {
-            header: "Tournament",
-            value: (r) => r.name_long,
-          },
-          {
-            header: "Date",
-            value: (r) => dateTime(r.display_date).localFullString,
-          },
-          {
-            header: "Eligibility",
-            value: (r) =>
-              r.is_eligible ? (
-                <Icon name={"check"} className="text-green-700" size="md" />
-              ) : (
-                <Icon name={"x_mark"} className="text-red-700" size="md" />
-              ),
-          },
-          {
-            header: "Results",
-            value: (r) => (
-              <NavLink
-                to={`/${episodeId}/tournament/${r.name_short}`}
-                className="text-cyan-600 hover:underline"
-              >
-                View
-              </NavLink>
-            ),
-          },
-          {
-            header: "About",
-            value: (r) => <span>{r.blurb}</span>,
-          },
-        ]}
-        bottomElement={
-          <BattlecodeTableBottomElement
-            totalCount={schedule?.count ?? 0}
-            pageSize={10}
-            currentPage={queryParams.page}
-            onPage={(page) => {
-              if (!loading) {
-                setSearchParams((prev) => ({
-                  ...getParamEntries(prev),
-                  page: page.toString(),
-                }));
-              }
+      <div className="flex flex-1 flex-col gap-8">
+        <SectionCard>
+          <Markdown text={BC23_TOURNAMENTS[TourneyPage.SCHEDULE]} />
+          <BattlecodeTable
+            data={schedule?.results ?? []}
+            loading={loading}
+            onRowClick={(tour) => {
+              navigate(`/${episodeId}/tournament/${tour.name_short}`);
             }}
+            columns={[
+              {
+                header: "Tournament",
+                value: (r) => (
+                  <span className="hover:underline">{r.name_long}</span>
+                ),
+              },
+              {
+                header: "Date",
+                value: (r) => dateTime(r.display_date).shortDateStr,
+              },
+              {
+                header: "Eligible?",
+                value: (r) =>
+                  r.is_eligible ? (
+                    <Icon name={"check"} className="text-green-700" size="md" />
+                  ) : (
+                    <Icon name={"x_mark"} className="text-red-700" size="md" />
+                  ),
+              },
+              {
+                header: "About",
+                value: (r) => <div className="max-w-80">{r.blurb}</div>,
+              },
+            ]}
+            bottomElement={
+              <BattlecodeTableBottomElement
+                totalCount={schedule?.count ?? 0}
+                pageSize={10}
+                currentPage={queryParams.page}
+                onPage={(page) => {
+                  if (!loading) {
+                    setSearchParams((prev) => ({
+                      ...getParamEntries(prev),
+                      page: page.toString(),
+                    }));
+                  }
+                }}
+              />
+            }
           />
-        }
-      />
-
-      <Markdown
-        className="mt-10"
-        text={`${BC23_TOURNAMENTS[TourneyPage.PRIZES]} ${
-          BC23_TOURNAMENTS[TourneyPage.FORMAT]
-        } ${BC23_TOURNAMENTS[TourneyPage.RULES]}
-        `}
-      />
-      <hr className="my-8 h-1 border-0 bg-gray-200" />
+        </SectionCard>
+        <SectionCard>
+          <Markdown text={`${BC23_TOURNAMENTS[TourneyPage.PRIZES]}`} />
+        </SectionCard>
+        <SectionCard>
+          <Markdown text={`${BC23_TOURNAMENTS[TourneyPage.FORMAT]}`} />
+        </SectionCard>
+        <SectionCard>
+          <Markdown text={`${BC23_TOURNAMENTS[TourneyPage.RULES]}`} />
+        </SectionCard>
+      </div>
     </div>
   );
 };

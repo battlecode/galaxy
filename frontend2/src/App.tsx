@@ -26,7 +26,7 @@ import { EpisodeProvider } from "./contexts/EpisodeProvider";
 import Scrimmaging from "./views/Scrimmaging";
 import MyTeam from "./views/MyTeam";
 import Tournaments from "./views/Tournaments";
-import Tournament from "./views/Tournament";
+import TournamentPage from "./views/Tournament";
 
 const App: React.FC = () => {
   return (
@@ -83,7 +83,10 @@ const router = createBrowserRouter([
       { path: "/:episodeId/rankings", element: <Rankings /> },
       { path: "/:episodeId/queue", element: <Queue /> },
       { path: "/:episodeId/tournaments", element: <Tournaments /> },
-      { path: "/:episodeId/tournament/:tournamentId", element: <Tournament /> },
+      {
+        path: "/:episodeId/tournament/:tournamentId",
+        element: <TournamentPage />,
+      },
     ],
   },
   // Pages that should redirect
