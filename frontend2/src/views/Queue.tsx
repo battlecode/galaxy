@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
-import type {
-  PaginatedTeamPublicList,
-  PaginatedMatchList,
-} from "../utils/types";
+import type { PaginatedMatchList } from "../utils/types";
 import { useSearchParams } from "react-router-dom";
 import { getAllMatches, getScrimmagesByTeam } from "../utils/api/compete";
 import { useEpisodeId } from "../contexts/EpisodeContext";
@@ -13,7 +10,6 @@ import Button from "../components/elements/Button";
 import RatingDelta from "../components/compete/RatingDelta";
 import MatchScore from "../components/compete/MatchScore";
 import MatchStatus from "../components/compete/MatchStatus";
-import { searchTeams } from "../utils/api/team";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
 import type { Maybe } from "../utils/utilTypes";
 import { dateTime } from "../utils/dateTime";

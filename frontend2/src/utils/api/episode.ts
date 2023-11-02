@@ -4,7 +4,6 @@ import {
   type GameMap,
   type Tournament,
   type PaginatedTournamentList,
-  EligibilityCriterion,
 } from "../types";
 import { DEFAULT_API_CONFIGURATION } from "./helpers";
 
