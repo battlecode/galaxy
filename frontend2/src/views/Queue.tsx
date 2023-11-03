@@ -63,7 +63,7 @@ const Queue: React.FC = () => {
   const loadSelectOptions = async (
     inputValue: string,
   ): Promise<Array<{ value: number; label: string }>> => {
-    return loadTeamOptions(episodeId, inputValue, true, 1);
+    return await loadTeamOptions(episodeId, inputValue, true, 1);
   };
 
   useEffect(() => {
