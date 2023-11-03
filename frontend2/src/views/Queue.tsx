@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
-import type {
-  PaginatedTeamPublicList,
-  PaginatedMatchList,
-} from "../utils/types";
+import type { PaginatedMatchList } from "../utils/types";
 import { useSearchParams } from "react-router-dom";
 import { getAllMatches, getScrimmagesByTeam } from "../utils/api/compete";
 import { useEpisodeId } from "../contexts/EpisodeContext";
@@ -13,10 +10,10 @@ import Button from "../components/elements/Button";
 import RatingDelta from "../components/compete/RatingDelta";
 import MatchScore from "../components/compete/MatchScore";
 import MatchStatus from "../components/compete/MatchStatus";
-import { searchTeams } from "../utils/api/team";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
 import type { Maybe } from "../utils/utilTypes";
 import { dateTime } from "../utils/dateTime";
+import { loadTeamOptions } from "../utils/loadTeams";
 
 const Queue: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -58,26 +55,15 @@ const Queue: React.FC = () => {
     }
   }
 
-  const loadTeamOptions = async (
+  /**
+   * A wrapper function that returns the value/label pairs for the AsyncSelectMenu.
+   * @param inputValue The search string from the menu
+   * @returns An array of value/label pairs for the menu
+   */
+  const loadSelectOptions = async (
     inputValue: string,
   ): Promise<Array<{ value: number; label: string }>> => {
-    try {
-      const result: PaginatedTeamPublicList = await searchTeams(
-        episodeId,
-        inputValue,
-        true,
-        1,
-      );
-      return (
-        result.results?.map((t) => ({
-          value: t.id,
-          label: t.name,
-        })) ?? []
-      );
-    } catch (err) {
-      console.error(err);
-      return [];
-    }
+    return await loadTeamOptions(episodeId, inputValue, true, 1);
   };
 
   useEffect(() => {
@@ -107,7 +93,7 @@ const Queue: React.FC = () => {
             handlePage(1);
           }}
           selected={selectedTeam}
-          loadOptions={loadTeamOptions}
+          loadOptions={loadSelectOptions}
           placeholder="Search for a team..."
         />
       </div>
