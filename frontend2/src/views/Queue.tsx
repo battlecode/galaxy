@@ -55,10 +55,15 @@ const Queue: React.FC = () => {
     }
   }
 
+  /**
+   * A wrapper function that returns the value/label pairs for the AsyncSelectMenu.
+   * @param inputValue The search string from the menu
+   * @returns An array of value/label pairs for the menu
+   */
   const loadSelectOptions = async (
     inputValue: string,
   ): Promise<Array<{ value: number; label: string }>> => {
-    return await loadTeamOptions(episodeId, inputValue, true, 1);
+    return loadTeamOptions(episodeId, inputValue, true, 1);
   };
 
   useEffect(() => {

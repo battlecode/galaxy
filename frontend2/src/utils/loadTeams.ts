@@ -2,12 +2,12 @@ import { searchTeams } from "./api/team";
 import type { PaginatedTeamPublicList } from "./types";
 
 /**
- * Search for teams by name.
+ * Search for teams by name. Often used for the AsyncSelectMenu component.
  * @param episodeId
  * @param inputValue Team name search string.
  * @param requireActiveSubmission (Optional) Whether to only return teams with active submissions (default: true).
  * @param page (Optional) Page number (default: 1).
- * @returns Array of teams.
+ * @returns An array of value/label pairs, which is expected by the AsyncSelectMenu component.
  */
 export const loadTeamOptions = async (
   episodeId: string,
