@@ -8,8 +8,6 @@ import {
 } from "../utils/types";
 import { getTournamentMatches } from "../utils/api/compete";
 import { useEpisode, useEpisodeId } from "../contexts/EpisodeContext";
-import BattlecodeTable from "../components/BattlecodeTable";
-import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
 import { getTournamentInfo } from "../utils/api/episode";
 import MatchScore from "../components/compete/MatchScore";
 import MatchStatus from "../components/compete/MatchStatus";
@@ -22,6 +20,8 @@ import SectionCard from "../components/SectionCard";
 import Tooltip from "../components/elements/Tooltip";
 import Collapse from "../components/elements/Collapse";
 import Icon from "../components/elements/Icon";
+import Table from "../components/Table";
+import TableBottom from "../components/TableBottom";
 
 interface QueryParams {
   page: number;
@@ -243,12 +243,29 @@ const TournamentPage: React.FC = () => {
               placeholder="Search for a team..."
             />
           </div>
-          <BattlecodeTable
+          <Table
             data={matches?.results ?? []}
             loading={matchesLoading}
+            keyFromValue={(match) => match.id.toString()}
+            bottomElement={
+              <TableBottom
+                totalCount={matches?.count ?? 0}
+                pageSize={10}
+                currentPage={queryParams.page}
+                onPage={(page) => {
+                  if (!matchesLoading) {
+                    setSearchParams((prev) => ({
+                      ...getParamEntries(prev),
+                      page: page.toString(),
+                    }));
+                  }
+                }}
+              />
+            }
             columns={[
               {
                 header: "Team (Δ)",
+                key: "team1",
                 value: (r) => {
                   const participant = r.participants[0];
                   if (participant !== undefined) {
@@ -263,10 +280,12 @@ const TournamentPage: React.FC = () => {
               },
               {
                 header: "Score",
+                key: "score",
                 value: (r) => <MatchScore match={r} />,
               },
               {
                 header: "Team (Δ)",
+                key: "team2",
                 value: (r) => {
                   const participant = r.participants[1];
                   if (participant !== undefined) {
@@ -281,14 +300,17 @@ const TournamentPage: React.FC = () => {
               },
               {
                 header: "Ranked?",
+                key: "ranked",
                 value: (r) => (r.is_ranked ? "Ranked" : "Unranked"),
               },
               {
                 header: "Status",
+                key: "status",
                 value: (r) => <MatchStatus match={r} />,
               },
               {
                 header: "Replay",
+                key: "replay",
                 value: (match) =>
                   episode === undefined || match.status !== StatusBccEnum.Ok ? (
                     <></>
@@ -307,24 +329,10 @@ const TournamentPage: React.FC = () => {
               },
               {
                 header: "Created",
+                key: "created",
                 value: (r) => dateTime(r.created).localFullString,
               },
             ]}
-            bottomElement={
-              <BattlecodeTableBottomElement
-                totalCount={matches?.count ?? 0}
-                pageSize={10}
-                currentPage={queryParams.page}
-                onPage={(page) => {
-                  if (!matchesLoading) {
-                    setSearchParams((prev) => ({
-                      ...getParamEntries(prev),
-                      page: page.toString(),
-                    }));
-                  }
-                }}
-              />
-            }
           />
         </SectionCard>
       </div>

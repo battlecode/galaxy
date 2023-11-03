@@ -97,11 +97,12 @@ const Queue: React.FC = () => {
           placeholder="Search for a team..."
         />
       </div>
-      <BattlecodeTable
+      <Table
         data={data?.results ?? []}
         loading={loading}
+        keyFromValue={(match) => match.id.toString()}
         bottomElement={
-          <BattlecodeTableBottomElement
+          <TableBottom
             totalCount={data?.count ?? 0}
             pageSize={10}
             currentPage={page}
@@ -113,6 +114,7 @@ const Queue: React.FC = () => {
         columns={[
           {
             header: "Team (Δ)",
+            key: "team1",
             value: (r) => {
               const participant = r.participants[0];
               if (participant !== undefined) {
@@ -124,10 +126,12 @@ const Queue: React.FC = () => {
           },
           {
             header: "Score",
+            key: "score",
             value: (r) => <MatchScore match={r} />,
           },
           {
             header: "Team (Δ)",
+            key: "team2",
             value: (r) => {
               const participant = r.participants[1];
               if (participant !== undefined) {
@@ -139,14 +143,17 @@ const Queue: React.FC = () => {
           },
           {
             header: "Ranked?",
+            key: "ranked",
             value: (r) => (r.is_ranked ? "Ranked" : "Unranked"),
           },
           {
             header: "Status",
+            key: "status",
             value: (r) => <MatchStatus match={r} />,
           },
           {
             header: "Created",
+            key: "created",
             value: (r) => dateTime(r.created).localFullString,
           },
         ]}

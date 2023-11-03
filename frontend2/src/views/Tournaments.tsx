@@ -4,12 +4,12 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { BC23_TOURNAMENTS, TourneyPage } from "../content/bc23";
 import type { PaginatedTournamentList } from "../utils/types";
 import { getAllTournaments } from "../utils/api/episode";
-import BattlecodeTable from "../components/BattlecodeTable";
 import Icon from "../components/elements/Icon";
 import Markdown from "../components/elements/Markdown";
 import { dateTime } from "../utils/dateTime";
-import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
 import SectionCard from "../components/SectionCard";
+import Table from "../components/Table";
+import TableBottom from "../components/TableBottom";
 
 interface QueryParams {
   page: number;
@@ -73,39 +73,15 @@ const Tournaments: React.FC = () => {
       <div className="flex flex-1 flex-col gap-8">
         <SectionCard>
           <Markdown text={BC23_TOURNAMENTS[TourneyPage.SCHEDULE]} />
-          <BattlecodeTable
+          <Table
             data={schedule?.results ?? []}
             loading={loading}
+            keyFromValue={(tour) => tour.name_short}
             onRowClick={(tour) => {
               navigate(`/${episodeId}/tournament/${tour.name_short}`);
             }}
-            columns={[
-              {
-                header: "Tournament",
-                value: (r) => (
-                  <span className="hover:underline">{r.name_long}</span>
-                ),
-              },
-              {
-                header: "Date",
-                value: (r) => dateTime(r.display_date).shortDateStr,
-              },
-              {
-                header: "Eligible?",
-                value: (r) =>
-                  r.is_eligible ? (
-                    <Icon name={"check"} className="text-green-700" size="md" />
-                  ) : (
-                    <Icon name={"x_mark"} className="text-red-700" size="md" />
-                  ),
-              },
-              {
-                header: "About",
-                value: (r) => <div className="max-w-80">{r.blurb}</div>,
-              },
-            ]}
             bottomElement={
-              <BattlecodeTableBottomElement
+              <TableBottom
                 totalCount={schedule?.count ?? 0}
                 pageSize={10}
                 currentPage={queryParams.page}
@@ -119,6 +95,35 @@ const Tournaments: React.FC = () => {
                 }}
               />
             }
+            columns={[
+              {
+                header: "Tournament",
+                key: "name_long",
+                value: (tour) => (
+                  <span className="hover:underline">{tour.name_long}</span>
+                ),
+              },
+              {
+                header: "Date",
+                key: "display_date",
+                value: (tour) => dateTime(tour.display_date).shortDateStr,
+              },
+              {
+                header: "Eligible?",
+                key: "is_eligible",
+                value: (tour) =>
+                  tour.is_eligible ? (
+                    <Icon name={"check"} className="text-green-700" size="md" />
+                  ) : (
+                    <Icon name={"x_mark"} className="text-red-700" size="md" />
+                  ),
+              },
+              {
+                header: "About",
+                key: "blurb",
+                value: (tour) => <div className="max-w-80">{tour.blurb}</div>,
+              },
+            ]}
           />
         </SectionCard>
         <SectionCard>

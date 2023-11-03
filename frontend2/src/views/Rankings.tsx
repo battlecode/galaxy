@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import BattlecodeTable from "../components/Table";
+import Table from "../components/Table";
 import { type PaginatedTeamPublicList } from "../utils/types";
-import BattlecodeTableBottomElement from "../components/TableBottom";
 import { NavLink, useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { searchTeams } from "../utils/api/team";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
+import TableBottom from "../components/TableBottom";
 
 function trimString(str: string, maxLength: number): string {
   if (str.length > maxLength) {
@@ -93,11 +93,12 @@ const Rankings: React.FC = () => {
         />
       </div>
 
-      <BattlecodeTable
+      <Table
         data={data?.results ?? []}
         loading={loading}
+        keyFromValue={(team) => team.id.toString()}
         bottomElement={
-          <BattlecodeTableBottomElement
+          <TableBottom
             totalCount={data?.count ?? 0}
             pageSize={10}
             currentPage={page}
@@ -109,10 +110,12 @@ const Rankings: React.FC = () => {
         columns={[
           {
             header: "Rating",
+            key: "rating",
             value: (team) => Math.round(team.profile?.rating ?? 0),
           },
           {
             header: "Team",
+            key: "team",
             value: (team) => (
               <NavLink to={`/team/${team.id}`} className="hover:underline">
                 {trimString(team.name, 13)}
@@ -121,6 +124,7 @@ const Rankings: React.FC = () => {
           },
           {
             header: "Members",
+            key: "members",
             value: (team) =>
               team.members.map((member, idx) => (
                 <>
@@ -137,10 +141,12 @@ const Rankings: React.FC = () => {
           },
           {
             header: "Quote",
+            key: "quote",
             value: (team) => team.profile?.quote ?? "",
           },
           {
             header: "Eligibility",
+            key: "eligibility",
             value: (team) =>
               (team.profile?.eligible_for ?? [])
                 .map((e) => e.toString())
@@ -148,6 +154,7 @@ const Rankings: React.FC = () => {
           },
           {
             header: "Auto-Accept Ranked",
+            key: "auto_accept_ranked",
             value: (team) =>
               team.profile?.auto_accept_ranked !== undefined &&
               team.profile.auto_accept_ranked
@@ -156,6 +163,7 @@ const Rankings: React.FC = () => {
           },
           {
             header: "Auto-Accept Unranked",
+            key: "auto_accept_unranked",
             value: (team) =>
               team.profile?.auto_accept_unranked !== undefined &&
               team.profile?.auto_accept_unranked
