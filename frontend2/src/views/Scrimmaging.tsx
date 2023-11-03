@@ -14,8 +14,8 @@ import {
 } from "../utils/api/compete";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
-import BattlecodeTable from "../components/BattlecodeTable";
-import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
+import BattlecodeTable from "../components/Table";
+import BattlecodeTableBottomElement from "../components/TableBottom";
 import MatchScore from "../components/compete/MatchScore";
 import RatingDelta from "../components/compete/RatingDelta";
 import MatchStatus from "../components/compete/MatchStatus";

@@ -1,8 +1,9 @@
 import React from "react";
 import Spinner from "./Spinner";
 
-interface Column<T> {
+export interface Column<T> {
   header: React.ReactNode;
+  key: string;
   value: (data: T) => React.ReactNode;
 }
 
@@ -10,6 +11,7 @@ interface TableProps<T> {
   data: T[];
   columns: Array<Column<T>>;
   loading: boolean;
+  keyFromValue: (data: T) => string;
   onRowClick?: (data: T) => void;
   bottomElement?: JSX.Element;
 }
@@ -18,10 +20,11 @@ interface TableProps<T> {
  * Generic function prop types don't work with React.FC.
  * For more, see https://stackoverflow.com/questions/68757395/how-to-make-a-functional-react-component-with-generic-type
  */
-function BattlecodeTable<T>({
+function Table<T>({
   data,
   columns,
   loading,
+  keyFromValue,
   onRowClick,
   bottomElement,
 }: TableProps<T>): React.ReactElement {
@@ -30,8 +33,8 @@ function BattlecodeTable<T>({
       <table className="w-full text-left text-sm text-gray-500">
         <thead className="border-b bg-cyan-400 text-xs uppercase text-gray-700">
           <tr>
-            {columns.map((col, idx) => (
-              <th key={idx} scope="col" className="px-8 py-3">
+            {columns.map((col) => (
+              <th key={col.key} scope="col" className="px-8 py-3">
                 {col.header}
               </th>
             ))}
@@ -41,7 +44,7 @@ function BattlecodeTable<T>({
           {!loading &&
             data.map((row, idx) => (
               <tr
-                key={idx}
+                key={keyFromValue(row)}
                 onClick={(ev) => {
                   ev.stopPropagation();
                   onRowClick?.(row);
@@ -50,17 +53,17 @@ function BattlecodeTable<T>({
                   idx % 2 === 0
                     ? `${
                         onRowClick !== undefined ? "cursor-pointer" : ""
-                      } border-b bg-white hover:bg-cyan-100 hover:text-gray-700`
+                      } border-b bg-white hover:bg-cyan-600 hover:text-gray-700`
                     : `${
                         onRowClick !== undefined ? "cursor-pointer" : ""
-                      } border-b bg-gray-50 hover:bg-cyan-100 hover:text-gray-700`
+                      } border-b bg-gray-50 hover:bg-cyan-600 hover:text-gray-700`
                 }
               >
-                {columns.map((col, idx) => (
+                {columns.map((col) => (
                   <th
-                    key={idx}
+                    key={keyFromValue(row)}
                     scope="row"
-                    className="break-normal px-8 py-3 font-medium text-gray-900"
+                    className="whitespace-nowrap px-8 py-3 font-medium text-gray-900"
                   >
                     {col.value(row)}
                   </th>
@@ -79,4 +82,4 @@ function BattlecodeTable<T>({
   );
 }
 
-export default BattlecodeTable;
+export default Table;

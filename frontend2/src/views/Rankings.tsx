@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import BattlecodeTable from "../components/BattlecodeTable";
+import BattlecodeTable from "../components/Table";
 import { type PaginatedTeamPublicList } from "../utils/types";
-import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
+import BattlecodeTableBottomElement from "../components/TableBottom";
 import { NavLink, useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
