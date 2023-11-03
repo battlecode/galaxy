@@ -10,13 +10,19 @@ import DescriptiveCheckbox from "../components/elements/DescriptiveCheckbox";
 import JoinTeam from "../components/JoinTeam";
 
 const MyTeam: React.FC = () => {
-  const { team, teamState } = useCurrentTeam();
+  const { team, teamState, leaveMyTeam } = useCurrentTeam();
   const [checked, setChecked] = useState<boolean>(false);
   const membersList = useMemo(() => {
     return (
       <div className="flex flex-col gap-8">
         {team !== undefined && <MemberList members={team?.members} />}
-        <Button className="self-start" label="Leave team" />
+        <Button
+          className="self-start"
+          onClick={() => {
+            void leaveMyTeam();
+          }}
+          label="Leave team"
+        />
       </div>
     );
   }, [team]);

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { type TeamPrivate } from "../utils/types";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import { CurrentTeamContext, TeamStateEnum } from "./CurrentTeamContext";
 import { useEpisodeId } from "./EpisodeContext";
-import { retrieveTeam } from "../utils/api/team";
+import { retrieveTeam, leaveTeam } from "../utils/api/team";
 
 export const CurrentTeamProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -18,6 +18,11 @@ export const CurrentTeamProvider: React.FC<{ children: React.ReactNode }> = ({
   });
   const { authState } = useCurrentUser();
   const { episodeId } = useEpisodeId();
+
+  const leaveMyTeam = useCallback(async (): Promise<void> => {
+    await leaveTeam(episodeId);
+    setTeamData({ teamState: TeamStateEnum.NO_TEAM });
+  }, []);
 
   useEffect(() => {
     const loadTeam = async (): Promise<void> => {
@@ -39,7 +44,7 @@ export const CurrentTeamProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [authState, episodeId]);
 
   return (
-    <CurrentTeamContext.Provider value={teamData}>
+    <CurrentTeamContext.Provider value={{ ...teamData, leaveMyTeam }}>
       {children}
     </CurrentTeamContext.Provider>
   );
