@@ -60,7 +60,7 @@ function BattlecodeTable<T>({
                   <th
                     key={idx}
                     scope="row"
-                    className="whitespace-nowrap px-8 py-3 font-medium text-gray-900"
+                    className="break-normal px-8 py-3 font-medium text-gray-900"
                   >
                     {col.value(row)}
                   </th>

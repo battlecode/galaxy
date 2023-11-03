@@ -3,12 +3,14 @@
  * localDateStr: "Saturday, October 14, 2023 at 2:37 PM",
  * localTimezone: "EDT",
  * localFullString: "Saturday, October 14, 2023 at 2:37 PM EDT"
+ * shortDateStr: "10/14/2023"
  */
 interface DateTimeStrings {
   estDateStr: string;
   localDateStr: string;
   localTimezone: string;
   localFullString: string;
+  shortDateStr: string;
 }
 
 export const dateTime = (date: Date): DateTimeStrings => {
@@ -25,10 +27,13 @@ export const dateTime = (date: Date): DateTimeStrings => {
     .toLocaleTimeString("en-us", { timeZoneName: "short" })
     .split(" ")[2];
 
+  const shortDateStr = date.toLocaleDateString("en-US");
+
   return {
     estDateStr,
     localDateStr,
     localTimezone,
     localFullString: `${localDateStr} ${localTimezone}`,
+    shortDateStr,
   };
 };
