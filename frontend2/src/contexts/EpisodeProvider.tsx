@@ -17,7 +17,6 @@ export const EpisodeProvider: React.FC<{ children: React.ReactNode }> = ({
     let isActiveLookup = true;
     const loadEpisodeInfo = async (): Promise<void> => {
       try {
-        console.log("episode id in loadEpisodeInfo:", episodeId);
         const episode = await getEpisodeInfo(episodeId);
         if (isActiveLookup) {
           setEpisode(episode);

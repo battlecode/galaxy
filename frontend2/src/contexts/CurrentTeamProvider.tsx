@@ -22,7 +22,7 @@ export const CurrentTeamProvider: React.FC<{ children: React.ReactNode }> = ({
   const leaveMyTeam = useCallback(async (): Promise<void> => {
     await leaveTeam(episodeId);
     setTeamData({ teamState: TeamStateEnum.NO_TEAM });
-  }, []);
+  }, [episodeId]);
 
   useEffect(() => {
     const loadTeam = async (): Promise<void> => {

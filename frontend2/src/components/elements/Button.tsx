@@ -47,7 +47,9 @@ const Button: React.FC<ButtonProps> = ({
       {loading ? (
         <Spinner
           className="mx-2"
-          variant={variant.includes("danger") ? "danger" : ""}
+          variant={
+            variant === "danger" || variant === "danger-outline" ? "danger" : ""
+          }
           size="sm"
         />
       ) : (
