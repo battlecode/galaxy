@@ -11,7 +11,7 @@ interface TableProps<T> {
   data: T[];
   columns: Array<Column<T>>;
   loading: boolean;
-  keyFromValue: (data: T) => string;
+  keyFromValue: (data: T) => React.Key;
   onRowClick?: (data: T) => void;
   bottomElement?: JSX.Element;
 }
@@ -34,7 +34,7 @@ function Table<T>({
         <thead className="border-b bg-cyan-400 text-xs uppercase text-gray-700">
           <tr>
             {columns.map((col) => (
-              <th key={col.key} scope="col" className="px-8 py-3">
+              <th key={"header" + col.key} scope="col" className="px-8 py-3">
                 {col.header}
               </th>
             ))}
@@ -44,7 +44,7 @@ function Table<T>({
           {!loading &&
             data.map((row, idx) => (
               <tr
-                key={keyFromValue(row)}
+                key={"row" + keyFromValue(row).toString()}
                 onClick={(ev) => {
                   ev.stopPropagation();
                   onRowClick?.(row);
@@ -53,17 +53,17 @@ function Table<T>({
                   idx % 2 === 0
                     ? `${
                         onRowClick !== undefined ? "cursor-pointer" : ""
-                      } border-b bg-white hover:bg-cyan-600 hover:text-gray-700`
+                      } border-b bg-white hover:bg-cyan-200 hover:text-gray-700`
                     : `${
                         onRowClick !== undefined ? "cursor-pointer" : ""
-                      } border-b bg-gray-50 hover:bg-cyan-600 hover:text-gray-700`
+                      } border-b bg-gray-50 hover:bg-cyan-200 hover:text-gray-700`
                 }
               >
                 {columns.map((col) => (
                   <th
-                    key={keyFromValue(row)}
+                    key={"cell" + col.key + keyFromValue(row).toString()}
                     scope="row"
-                    className="whitespace-nowrap px-8 py-3 font-medium text-gray-900"
+                    className="text-ellipsis whitespace-normal px-8 py-3 font-medium text-gray-900"
                   >
                     {col.value(row)}
                   </th>

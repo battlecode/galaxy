@@ -1,176 +1,141 @@
-import React, { useEffect, useState } from "react";
-import { useEpisodeId } from "../contexts/EpisodeContext";
-import Table from "../components/Table";
-import { type PaginatedTeamPublicList } from "../utils/types";
-import { NavLink, useSearchParams } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { useEpisode, useEpisodeId } from "../contexts/EpisodeContext";
+import type {
+  EligibilityCriterion,
+  PaginatedTeamPublicList,
+} from "../utils/types";
+import { useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { searchTeams } from "../utils/api/team";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
-import TableBottom from "../components/TableBottom";
+import RankingsTable from "../components/tables/RankingsTable";
+import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 
-function trimString(str: string, maxLength: number): string {
-  if (str.length > maxLength) {
-    return str.slice(0, maxLength - 1) + "...";
-  }
-  return str;
+interface QueryParams {
+  page: number;
+  search: string;
 }
 
 const Rankings: React.FC = () => {
   const { episodeId } = useEpisodeId();
+  const episode = useEpisode();
 
   const [searchText, setSearchText] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<PaginatedTeamPublicList | undefined>(
     undefined,
   );
 
-  const [queryParams, setQueryParams] = useSearchParams({
-    page: "1",
-    search: "",
-  });
-  const page = parseInt(queryParams.get("page") ?? "1");
-  const searchQuery = queryParams.get("search") ?? "";
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const queryParams: QueryParams = useMemo(() => {
+    return {
+      page: parsePageParam("page", searchParams),
+      search: searchParams.get("search") ?? "",
+    };
+  }, [searchParams]);
+
+  /**
+   * This enables us to look up eligibility criteria by index in the table component.
+   */
+  const eligibilityMap: Map<number, EligibilityCriterion> = useMemo(() => {
+    if (episode === undefined) {
+      return new Map<number, EligibilityCriterion>();
+    }
+    return new Map(
+      episode.eligibility_criteria.map((crit, idx) => [idx, crit]),
+    );
+  }, [episode]);
 
   function handlePage(page: number): void {
     if (!loading) {
-      setQueryParams({ ...queryParams, page: page.toString() });
+      setSearchParams({ ...queryParams, page: page.toString() });
     }
   }
 
   function handleSearch(): void {
-    if (!loading && searchText !== searchQuery) {
-      setQueryParams({ ...queryParams, search: searchText });
+    if (!loading && searchText !== queryParams.search) {
+      setSearchParams((prev) => ({
+        ...getParamEntries(prev),
+        search: searchText,
+        page: "1",
+      }));
     }
   }
 
   useEffect(() => {
+    let isActiveLookup = true;
+    if (loading) return;
     setLoading(true);
+    setData((prev) => ({ count: prev?.count ?? 0 }));
 
     const search = async (): Promise<void> => {
       try {
-        const result = await searchTeams(episodeId, searchQuery, false, page);
-        setData(result);
-        setLoading(false);
+        const result = await searchTeams(
+          episodeId,
+          queryParams.search,
+          false,
+          queryParams.page,
+        );
+        if (isActiveLookup) {
+          setData(result);
+        }
       } catch (err) {
+        if (isActiveLookup) {
+          setData(undefined);
+        }
         console.error(err);
+      } finally {
+        if (isActiveLookup) {
+          setLoading(false);
+        }
       }
     };
 
     void search();
 
     return () => {
-      setLoading(false);
+      isActiveLookup = false;
     };
-  }, [searchQuery, page]);
+  }, [queryParams.search, queryParams.page, episodeId]);
 
   return (
-    <div className="ml-4 mt-4 flex w-5/6 flex-col pb-8">
-      <div className="mb-3 flex w-4/5 flex-row items-center">
+    <div className="flex h-full w-full flex-col overflow-auto p-6">
+      <div className="items-left flex w-4/5 flex-col">
         <PageTitle>Rankings</PageTitle>
-        <div className="w-4" />
-        <Input
-          disabled={loading}
-          placeholder="Search for a team..."
-          value={searchText}
-          onChange={(ev) => {
-            setSearchText(ev.target.value);
-          }}
-          onKeyDown={(ev) => {
-            if (ev.key === "Enter") {
-              handleSearch();
-            }
-          }}
-        />
-        <div className="w-4" />
-        <Button
-          disabled={loading}
-          label="Search!"
-          variant="dark"
-          onClick={() => {
-            handleSearch();
-          }}
-        />
-      </div>
-
-      <Table
-        data={data?.results ?? []}
-        loading={loading}
-        keyFromValue={(team) => team.id.toString()}
-        bottomElement={
-          <TableBottom
-            totalCount={data?.count ?? 0}
-            pageSize={10}
-            currentPage={page}
-            onPage={(page) => {
-              handlePage(page);
+        <div className="mb-4 flex w-3/5 flex-row">
+          <Input
+            disabled={loading}
+            placeholder="Search for a team..."
+            value={searchText}
+            onChange={(ev) => {
+              setSearchText(ev.target.value);
+            }}
+            onKeyDown={(ev) => {
+              if (ev.key === "Enter" || ev.key === "NumpadEnter") {
+                handleSearch();
+              }
             }}
           />
-        }
-        columns={[
-          {
-            header: "Rating",
-            key: "rating",
-            value: (team) => Math.round(team.profile?.rating ?? 0),
-          },
-          {
-            header: "Team",
-            key: "team",
-            value: (team) => (
-              <NavLink to={`/team/${team.id}`} className="hover:underline">
-                {trimString(team.name, 13)}
-              </NavLink>
-            ),
-          },
-          {
-            header: "Members",
-            key: "members",
-            value: (team) =>
-              team.members.map((member, idx) => (
-                <>
-                  <NavLink
-                    key={idx}
-                    to={`/user/${member.id}`}
-                    className="hover:underline"
-                  >
-                    {trimString(member.username, 13)}
-                  </NavLink>
-                  {idx !== team.members.length - 1 ? ", " : ""}
-                </>
-              )),
-          },
-          {
-            header: "Quote",
-            key: "quote",
-            value: (team) => team.profile?.quote ?? "",
-          },
-          {
-            header: "Eligibility",
-            key: "eligibility",
-            value: (team) =>
-              (team.profile?.eligible_for ?? [])
-                .map((e) => e.toString())
-                .join(", "),
-          },
-          {
-            header: "Auto-Accept Ranked",
-            key: "auto_accept_ranked",
-            value: (team) =>
-              team.profile?.auto_accept_ranked !== undefined &&
-              team.profile.auto_accept_ranked
-                ? "Yes"
-                : "No",
-          },
-          {
-            header: "Auto-Accept Unranked",
-            key: "auto_accept_unranked",
-            value: (team) =>
-              team.profile?.auto_accept_unranked !== undefined &&
-              team.profile?.auto_accept_unranked
-                ? "Yes"
-                : "No",
-          },
-        ]}
+          <div className="w-4" />
+          <Button
+            disabled={loading}
+            label="Search!"
+            variant="dark"
+            onClick={() => {
+              handleSearch();
+            }}
+          />
+        </div>
+      </div>
+
+      <RankingsTable
+        data={data}
+        loading={loading}
+        page={queryParams.page}
+        eligibilityMap={eligibilityMap}
+        handlePage={handlePage}
       />
     </div>
   );

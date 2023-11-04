@@ -1,36 +1,26 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { BC23_TOURNAMENTS, TourneyPage } from "../content/bc23";
 import type { PaginatedTournamentList } from "../utils/types";
 import { getAllTournaments } from "../utils/api/episode";
-import Icon from "../components/elements/Icon";
 import Markdown from "../components/elements/Markdown";
-import { dateTime } from "../utils/dateTime";
 import SectionCard from "../components/SectionCard";
-import Table from "../components/Table";
-import TableBottom from "../components/TableBottom";
+import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
+import TournamentsTable from "../components/tables/TournamentsTable";
 
 interface QueryParams {
   page: number;
 }
 
-const getParamEntries = (prev: URLSearchParams): Record<string, string> => {
-  return Object.fromEntries(prev);
-};
-
 const Tournaments: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const navigate = useNavigate();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const parsePageParam = (paramName: string): number =>
-    parseInt(searchParams.get(paramName) ?? "1");
-
   const queryParams: QueryParams = useMemo(() => {
     return {
-      page: parsePageParam("page"),
+      page: parsePageParam("page", searchParams),
     };
   }, [searchParams]);
 
@@ -73,57 +63,16 @@ const Tournaments: React.FC = () => {
       <div className="flex flex-1 flex-col gap-8">
         <SectionCard>
           <Markdown text={BC23_TOURNAMENTS[TourneyPage.SCHEDULE]} />
-          <Table
-            data={schedule?.results ?? []}
+          <TournamentsTable
+            data={schedule}
             loading={loading}
-            keyFromValue={(tour) => tour.name_short}
-            onRowClick={(tour) => {
-              navigate(`/${episodeId}/tournament/${tour.name_short}`);
+            page={queryParams.page}
+            handlePage={(page: number) => {
+              setSearchParams((prev) => ({
+                ...getParamEntries(prev),
+                page: page.toString(),
+              }));
             }}
-            bottomElement={
-              <TableBottom
-                totalCount={schedule?.count ?? 0}
-                pageSize={10}
-                currentPage={queryParams.page}
-                onPage={(page) => {
-                  if (!loading) {
-                    setSearchParams((prev) => ({
-                      ...getParamEntries(prev),
-                      page: page.toString(),
-                    }));
-                  }
-                }}
-              />
-            }
-            columns={[
-              {
-                header: "Tournament",
-                key: "name_long",
-                value: (tour) => (
-                  <span className="hover:underline">{tour.name_long}</span>
-                ),
-              },
-              {
-                header: "Date",
-                key: "display_date",
-                value: (tour) => dateTime(tour.display_date).shortDateStr,
-              },
-              {
-                header: "Eligible?",
-                key: "is_eligible",
-                value: (tour) =>
-                  tour.is_eligible ? (
-                    <Icon name={"check"} className="text-green-700" size="md" />
-                  ) : (
-                    <Icon name={"x_mark"} className="text-red-700" size="md" />
-                  ),
-              },
-              {
-                header: "About",
-                key: "blurb",
-                value: (tour) => <div className="max-w-80">{tour.blurb}</div>,
-              },
-            ]}
           />
         </SectionCard>
         <SectionCard>

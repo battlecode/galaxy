@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { NavLink, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import {
-  StatusBccEnum,
   type PaginatedMatchList,
   type Tournament,
   type EligibilityCriterion,
@@ -9,9 +8,6 @@ import {
 import { getTournamentMatches } from "../utils/api/compete";
 import { useEpisode, useEpisodeId } from "../contexts/EpisodeContext";
 import { getTournamentInfo } from "../utils/api/episode";
-import MatchScore from "../components/compete/MatchScore";
-import MatchStatus from "../components/compete/MatchStatus";
-import RatingDelta from "../components/compete/RatingDelta";
 import { dateTime } from "../utils/dateTime";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
 import { loadTeamOptions } from "../utils/loadTeams";
@@ -20,16 +16,13 @@ import SectionCard from "../components/SectionCard";
 import Tooltip from "../components/elements/Tooltip";
 import Collapse from "../components/elements/Collapse";
 import Icon from "../components/elements/Icon";
-import Table from "../components/Table";
-import TableBottom from "../components/TableBottom";
+import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
+import EligibilityIcon from "../components/EligibilityIcon";
+import TournamentResultsTable from "../components/tables/TournamentResultsTable";
 
 interface QueryParams {
   page: number;
 }
-
-const getParamEntries = (prev: URLSearchParams): Record<string, string> => {
-  return Object.fromEntries(prev);
-};
 
 const TournamentPage: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -38,12 +31,9 @@ const TournamentPage: React.FC = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const parsePageParam = (paramName: string): number =>
-    parseInt(searchParams.get(paramName) ?? "1");
-
   const queryParams: QueryParams = useMemo(() => {
     return {
-      page: parsePageParam("page"),
+      page: parsePageParam("page", searchParams),
     };
   }, [searchParams]);
 
@@ -206,9 +196,10 @@ const TournamentPage: React.FC = () => {
               {eligibility.includes.length > 0 ? (
                 <>
                   {eligibility.includes.map((inc) => (
-                    <Tooltip key={"icon " + inc.id.toString()} text={inc.title}>
-                      {inc.icon}
-                    </Tooltip>
+                    <EligibilityIcon
+                      key={"icon " + inc.id.toString()}
+                      criterion={inc}
+                    />
                   ))}
                 </>
               ) : (
@@ -229,7 +220,7 @@ const TournamentPage: React.FC = () => {
           </Collapse>
         </SectionCard>
         <SectionCard title="Results">
-          <div className="mb-4 w-96 gap-5">
+          <div className="mb-4 max-w-md gap-5">
             <AsyncSelectMenu<number>
               onChange={(team) => {
                 setSelectedTeam(team);
@@ -243,96 +234,17 @@ const TournamentPage: React.FC = () => {
               placeholder="Search for a team..."
             />
           </div>
-          <Table
-            data={matches?.results ?? []}
+          <TournamentResultsTable
+            data={matches}
             loading={matchesLoading}
-            keyFromValue={(match) => match.id.toString()}
-            bottomElement={
-              <TableBottom
-                totalCount={matches?.count ?? 0}
-                pageSize={10}
-                currentPage={queryParams.page}
-                onPage={(page) => {
-                  if (!matchesLoading) {
-                    setSearchParams((prev) => ({
-                      ...getParamEntries(prev),
-                      page: page.toString(),
-                    }));
-                  }
-                }}
-              />
-            }
-            columns={[
-              {
-                header: "Team (Δ)",
-                key: "team1",
-                value: (r) => {
-                  const participant = r.participants[0];
-                  if (participant !== undefined) {
-                    return (
-                      <RatingDelta
-                        participant={participant}
-                        ranked={r.is_ranked}
-                      />
-                    );
-                  }
-                },
-              },
-              {
-                header: "Score",
-                key: "score",
-                value: (r) => <MatchScore match={r} />,
-              },
-              {
-                header: "Team (Δ)",
-                key: "team2",
-                value: (r) => {
-                  const participant = r.participants[1];
-                  if (participant !== undefined) {
-                    return (
-                      <RatingDelta
-                        participant={participant}
-                        ranked={r.is_ranked}
-                      />
-                    );
-                  }
-                },
-              },
-              {
-                header: "Ranked?",
-                key: "ranked",
-                value: (r) => (r.is_ranked ? "Ranked" : "Unranked"),
-              },
-              {
-                header: "Status",
-                key: "status",
-                value: (r) => <MatchStatus match={r} />,
-              },
-              {
-                header: "Replay",
-                key: "replay",
-                value: (match) =>
-                  episode === undefined || match.status !== StatusBccEnum.Ok ? (
-                    <></>
-                  ) : (
-                    <NavLink
-                      className="text-cyan-600 hover:underline"
-                      to={`https://releases.battlecode.org/client/${
-                        episode.artifact_name ?? ""
-                      }/${
-                        episode.release_version_public ?? ""
-                      }/visualizer.html?${match.replay_url}`}
-                    >
-                      Replay!
-                    </NavLink>
-                  ),
-              },
-              {
-                header: "Created",
-                key: "created",
-                value: (r) => dateTime(r.created).localFullString,
-              },
-            ]}
+            page={queryParams.page}
+            episode={episode}
+            handlePage={(page) => {
+              setSearchParams((prev) => ({
+                ...getParamEntries(prev),
+                page: page.toString(),
+              }));
+            }}
           />
         </SectionCard>
       </div>

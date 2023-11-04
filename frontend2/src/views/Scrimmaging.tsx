@@ -4,7 +4,7 @@ import type {
   PaginatedMatchList,
   PaginatedTeamPublicList,
 } from "../utils/types/models";
-import { NavLink, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { searchTeams } from "../utils/api/team";
 import {
   getScrimmagesByTeam,
@@ -14,23 +14,15 @@ import {
 } from "../utils/api/compete";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
-import MatchScore from "../components/compete/MatchScore";
-import RatingDelta from "../components/compete/RatingDelta";
-import MatchStatus from "../components/compete/MatchStatus";
-import { useEpisode, useEpisodeId } from "../contexts/EpisodeContext";
-import { useCurrentTeam } from "../contexts/CurrentTeamContext";
-import { dateTime } from "../utils/dateTime";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 import Collapse from "../components/elements/Collapse";
 import type { Maybe } from "../utils/utilTypes";
-import Table from "../components/Table";
-import TableBottom from "../components/TableBottom";
-
-function trimString(str: string, maxLength: number): string {
-  if (str.length > maxLength) {
-    return str.slice(0, maxLength - 1) + "...";
-  }
-  return str;
-}
+import InboxTable from "../components/tables/scrimmaging/InboxTable";
+import OutboxTable from "../components/tables/scrimmaging/OutboxTable";
+import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
+import TeamsTable from "../components/tables/scrimmaging/TeamsTable";
+import TournamentMatchesTable from "../components/tables/scrimmaging/TournamentMatchesTable";
+import ScrimHistoryTable from "../components/tables/scrimmaging/ScrimHistoryTable";
 
 interface QueryParams {
   inboxPage: number;
@@ -41,27 +33,18 @@ interface QueryParams {
   search: string;
 }
 
-const getParamEntries = (prev: URLSearchParams): Record<string, string> => {
-  return Object.fromEntries(prev);
-};
-
 const Scrimmaging: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const episode = useEpisode();
-  const { team: currentTeam } = useCurrentTeam();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const parsePageParam = (paramName: string): number =>
-    parseInt(searchParams.get(paramName) ?? "1");
-
   const queryParams: QueryParams = useMemo(() => {
     return {
-      inboxPage: parsePageParam("inboxPage"),
-      outboxPage: parsePageParam("outboxPage"),
-      teamsPage: parsePageParam("teamsPage"),
-      scrimsPage: parsePageParam("scrimsPage"),
-      tourneyPage: parsePageParam("tourneyPage"),
+      inboxPage: parsePageParam("inboxPage", searchParams),
+      outboxPage: parsePageParam("outboxPage", searchParams),
+      teamsPage: parsePageParam("teamsPage", searchParams),
+      scrimsPage: parsePageParam("scrimsPage", searchParams),
+      tourneyPage: parsePageParam("tourneyPage", searchParams),
       search: searchParams.get("search") ?? "",
     };
   }, [searchParams]);
@@ -90,6 +73,20 @@ const Scrimmaging: React.FC = () => {
         search: searchText,
       }));
     }
+  }
+
+  /**
+   * Helper function to update the page number of the desired table.
+   * This is done by updating the URL (search) params.
+   */
+  function handlePage(
+    page: number,
+    key: keyof Omit<QueryParams, "search">,
+  ): void {
+    setSearchParams((prev) => ({
+      ...getParamEntries(prev),
+      [key]: page.toString(),
+    }));
   }
 
   useEffect(() => {
@@ -275,48 +272,11 @@ const Scrimmaging: React.FC = () => {
       </h1>
 
       <Collapse title="Inbox">
-        <Table
-          data={inboxData?.results ?? []}
-          loading={inboxLoading}
-          keyFromValue={(req) => req.id.toString()}
-          columns={[
-            {
-              header: "Team",
-              key: "requestor",
-              value: (req) => req.requested_by_name,
-            },
-            {
-              header: "",
-              key: "accept",
-              value: (req) => "ACCEPT",
-            },
-            {
-              header: "",
-              key: "reject",
-              value: (req) => "REJECT",
-            },
-          ]}
-        />
+        <InboxTable data={inboxData} loading={inboxLoading} />
       </Collapse>
       <div className="mb-8" />
       <Collapse title="Outbox">
-        <Table
-          data={outboxData?.results ?? []}
-          loading={outboxLoading}
-          keyFromValue={(req) => req.id.toString()}
-          columns={[
-            {
-              header: "Team",
-              key: "requestee",
-              value: (req) => req.requested_to_name,
-            },
-            {
-              header: "",
-              key: "cancel",
-              value: (req) => "CANCEL",
-            },
-          ]}
-        />
+        <OutboxTable data={outboxData} loading={outboxLoading} />
       </Collapse>
       <div className="mb-8" />
 
@@ -348,86 +308,13 @@ const Scrimmaging: React.FC = () => {
         />
       </div>
       <div className="mb-8">
-        <Table
-          data={teamsData?.results ?? []}
+        <TeamsTable
+          data={teamsData}
           loading={teamsLoading}
-          keyFromValue={(team) => team.id.toString()}
-          bottomElement={
-            <TableBottom
-              totalCount={teamsData?.count ?? 0}
-              pageSize={10}
-              currentPage={queryParams.teamsPage}
-              onPage={(page) => {
-                if (!teamsLoading) {
-                  setSearchParams((prev) => ({
-                    ...getParamEntries(prev),
-                    teamsPage: page.toString(),
-                  }));
-                }
-              }}
-            />
-          }
-          columns={[
-            {
-              header: "Rating",
-              key: "rating",
-              value: (team) => Math.round(team.profile?.rating ?? 0),
-            },
-            {
-              header: "Team",
-              key: "team",
-              value: (team) => (
-                <NavLink to={`/team/${team.id}`} className="hover:underline">
-                  {trimString(team.name, 13)}
-                </NavLink>
-              ),
-            },
-            {
-              header: "Members",
-              key: "members",
-              value: (team) =>
-                team.members.map((member, idx) => (
-                  <>
-                    <NavLink
-                      key={idx}
-                      to={`/user/${member.id}`}
-                      className="hover:underline"
-                    >
-                      {trimString(member.username, 13)}
-                    </NavLink>
-                    {idx !== team.members.length - 1 ? ", " : ""}
-                  </>
-                )),
-            },
-            {
-              header: "Quote",
-              key: "quote",
-              value: (team) => team.profile?.quote ?? "",
-            },
-            {
-              header: "Auto-Accept Ranked",
-              key: "auto_accept_ranked",
-              value: (team) =>
-                team.profile?.auto_accept_ranked !== undefined &&
-                team.profile.auto_accept_ranked
-                  ? "Yes"
-                  : "No",
-            },
-            {
-              header: "Auto-Accept Unranked",
-              key: "auto_accept_unranked",
-              value: (team) =>
-                team.profile?.auto_accept_unranked !== undefined &&
-                team.profile?.auto_accept_unranked
-                  ? "Yes"
-                  : "No",
-            },
-            {
-              header: "",
-              key: "request",
-              value: (team) => "REQUEST",
-            },
-          ]}
+          page={queryParams.teamsPage}
+          handlePage={(page) => {
+            handlePage(page, "teamsPage");
+          }}
         />
       </div>
 
@@ -435,86 +322,13 @@ const Scrimmaging: React.FC = () => {
         Scrimmage History
       </h1>
       <div className="mb-8">
-        <Table
-          data={scrimsData?.results ?? []}
+        <ScrimHistoryTable
+          data={scrimsData}
           loading={scrimsLoading}
-          keyFromValue={(match) => match.id.toString()}
-          bottomElement={
-            <TableBottom
-              totalCount={scrimsData?.count ?? 0}
-              pageSize={10}
-              currentPage={queryParams.scrimsPage}
-              onPage={(page) => {
-                if (!scrimsLoading) {
-                  setSearchParams((prev) => ({
-                    ...getParamEntries(prev),
-                    scrimsPage: page.toString(),
-                  }));
-                }
-              }}
-            />
-          }
-          columns={[
-            {
-              header: "Score",
-              key: "score",
-              value: (match) => {
-                return (
-                  <MatchScore match={match} userTeamId={currentTeam?.id} />
-                );
-              },
-            },
-            {
-              header: "Opponent (Δ)",
-              key: "opponent",
-              value: (match) => {
-                const opponent = match.participants?.find(
-                  (p) => currentTeam !== undefined && p.team !== currentTeam.id,
-                );
-                if (opponent === undefined) return;
-                return (
-                  <RatingDelta
-                    participant={opponent}
-                    ranked={match.is_ranked}
-                  />
-                );
-              },
-            },
-            {
-              header: "Ranked",
-              key: "ranked",
-              value: (match) => (match.is_ranked ? "Ranked" : "Unranked"),
-            },
-            {
-              header: "Status",
-              key: "status",
-              value: (match) => <MatchStatus match={match} />,
-            },
-            {
-              header: "Replay",
-              key: "replay",
-              value: (match) =>
-                episode === undefined ? (
-                  <></>
-                ) : (
-                  <NavLink
-                    className="text-cyan-600 hover:underline"
-                    to={`https://releases.battlecode.org/client/${
-                      episode.artifact_name ?? ""
-                    }/${episode.release_version_public ?? ""}/visualizer.html?${
-                      match.replay_url
-                    }`}
-                  >
-                    Replay!
-                  </NavLink>
-                ),
-            },
-            {
-              header: "Created",
-              key: "created",
-              value: (match) => dateTime(match.created).localFullString,
-            },
-          ]}
+          page={queryParams.scrimsPage}
+          handlePage={(page) => {
+            handlePage(page, "scrimsPage");
+          }}
         />
       </div>
 
@@ -522,79 +336,13 @@ const Scrimmaging: React.FC = () => {
         Recent Tournament Matches
       </h1>
       <div className="mb-8">
-        <Table
-          data={tourneyData?.results ?? []}
+        <TournamentMatchesTable
+          data={tourneyData}
           loading={tourneyLoading}
-          keyFromValue={(match) => match.id.toString()}
-          bottomElement={
-            <TableBottom
-              totalCount={tourneyData?.count ?? 0}
-              pageSize={10}
-              currentPage={queryParams.tourneyPage}
-              onPage={(page) => {
-                if (!tourneyLoading) {
-                  setSearchParams((prev) => ({
-                    ...getParamEntries(prev),
-                    tourneyPage: page.toString(),
-                  }));
-                }
-              }}
-            />
-          }
-          columns={[
-            {
-              header: "Score",
-              key: "score",
-              value: (match) => (
-                <MatchScore match={match} userTeamId={currentTeam?.id} />
-              ),
-            },
-            {
-              header: "Opponent",
-              key: "opponent",
-              value: (match) => {
-                const opponent = match.participants?.find(
-                  (p) => currentTeam !== undefined && p.team !== currentTeam.id,
-                );
-                if (opponent === undefined) return;
-                return (
-                  <RatingDelta
-                    participant={opponent}
-                    ranked={match.is_ranked}
-                  />
-                );
-              },
-            },
-            {
-              header: "Status",
-              key: "status",
-              value: (match) => <MatchStatus match={match} />,
-            },
-            {
-              header: "Replay",
-              key: "replay",
-              value: (match) =>
-                episode === undefined ? (
-                  <></>
-                ) : (
-                  <NavLink
-                    className="text-cyan-600 hover:underline"
-                    to={`https://releases.battlecode.org/client/${
-                      episode.artifact_name ?? ""
-                    }/${episode.release_version_public ?? ""}/visualizer.html?${
-                      match.replay_url
-                    }`}
-                  >
-                    Replay!
-                  </NavLink>
-                ),
-            },
-            {
-              header: "Created",
-              key: "created",
-              value: (match) => dateTime(match.created).localFullString,
-            },
-          ]}
+          page={queryParams.tourneyPage}
+          handlePage={(page: number) => {
+            handlePage(page, "tourneyPage");
+          }}
         />
       </div>
     </div>
