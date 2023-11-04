@@ -1,14 +1,30 @@
 import React from "react";
 
 interface SpinnerProps {
-  size?: number;
+  size?: "sm" | "md" | "xs" | "lg";
+  variant?: "danger" | "";
   className?: string;
 }
 
-const Spinner: React.FC<SpinnerProps> = ({ size = 16, className = "" }) => (
+const sizeToClass = {
+  xs: "h-4 w-4",
+  sm: "h-6 w-6",
+  md: "h-10 w-10",
+  lg: "h-16 w-16",
+};
+
+const Spinner: React.FC<SpinnerProps> = ({
+  size = "md",
+  variant = "",
+  className = "",
+}) => (
   <svg
     aria-hidden="true"
-    className={`w-${size} h-${size} mr-2 animate-spin fill-blue-600 text-gray-200 ${className}`}
+    className={`${sizeToClass[size]} animate-spin ${
+      variant === "danger"
+        ? "fill-red-600 text-red-200"
+        : "fill-cyan-600 text-gray-200"
+    } border-0 ${className}`}
     viewBox="0 0 100 101"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

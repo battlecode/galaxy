@@ -14,6 +14,7 @@ const MyTeam: React.FC = () => {
   const { team, teamState, leaveMyTeam } = useCurrentTeam();
   const [checked, setChecked] = useState<boolean>(false);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
+  const [isLeaveTeamPending, setIsLeaveTeamPending] = useState<boolean>(false);
   const membersList = useMemo(() => {
     return (
       <div className="flex flex-col gap-8">
@@ -167,9 +168,15 @@ const MyTeam: React.FC = () => {
             <Button
               variant="danger-outline"
               onClick={() => {
-                void leaveMyTeam();
-                setIsLeaveModalOpen(false);
+                const leave = async (): Promise<void> => {
+                  setIsLeaveTeamPending(true);
+                  await leaveMyTeam();
+                  setIsLeaveTeamPending(false);
+                  setIsLeaveModalOpen(false);
+                };
+                void leave();
               }}
+              loading={isLeaveTeamPending}
               label="Leave team"
             />
             <Button
