@@ -5,7 +5,7 @@ const Loading: React.FC = () => {
   return (
     <>
       Loading...
-      <Spinner />
+      <Spinner size="lg" />
     </>
   );
 };

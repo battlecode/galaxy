@@ -13,6 +13,7 @@ export enum TeamStateEnum {
 interface CurrentTeamContextType {
   teamState: TeamStateEnum;
   team?: TeamPrivate;
+  leaveMyTeam: () => Promise<void>;
 }
 
 export const CurrentTeamContext = createContext<CurrentTeamContextType | null>(

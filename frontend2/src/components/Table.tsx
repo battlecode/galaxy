@@ -74,7 +74,7 @@ function Table<T>({
       </table>
       {loading && (
         <div className="flex h-64 w-full flex-row items-center justify-center">
-          <Spinner />
+          <Spinner size="lg" />
         </div>
       )}
       <div className="mx-10 text-center">{bottomElement}</div>
