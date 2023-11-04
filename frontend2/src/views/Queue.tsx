@@ -1,59 +1,70 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import type { PaginatedMatchList } from "../utils/types";
 import { useSearchParams } from "react-router-dom";
 import { getAllMatches, getScrimmagesByTeam } from "../utils/api/compete";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import BattlecodeTable from "../components/BattlecodeTable";
-import BattlecodeTableBottomElement from "../components/BattlecodeTableBottomElement";
 import Button from "../components/elements/Button";
-import RatingDelta from "../components/compete/RatingDelta";
-import MatchScore from "../components/compete/MatchScore";
-import MatchStatus from "../components/compete/MatchStatus";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
 import type { Maybe } from "../utils/utilTypes";
-import { dateTime } from "../utils/dateTime";
 import { loadTeamOptions } from "../utils/loadTeams";
+import QueueTable from "../components/tables/QueueTable";
+import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
+
+interface QueryParams {
+  page: number;
+}
 
 const Queue: React.FC = () => {
   const { episodeId } = useEpisodeId();
 
-  const [queryParams, setQueryParams] = useSearchParams({
-    page: "1",
-  });
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const page = parseInt(queryParams.get("page") ?? "1");
+  const queryParams: QueryParams = useMemo(() => {
+    return {
+      page: parsePageParam("page", searchParams),
+    };
+  }, [searchParams]);
 
   const [selectedTeam, setSelectedTeam] = useState<{
     value: number;
     label: string;
   } | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<Maybe<PaginatedMatchList>>(undefined);
-
-  function handlePage(page: number): void {
-    if (!loading) {
-      setQueryParams({ ...queryParams, page: page.toString() });
-    }
-  }
 
   // TODO: in future, also call getTournamentMatches (by team)
   // and "mix" the results ordered by created_at
   async function refreshData(): Promise<void> {
+    if (loading) return;
     setLoading(true);
-    setData((prev) => ({ count: prev?.count }));
+    setData((prev) => ({ count: prev?.count ?? 0 }));
     try {
       const result: PaginatedMatchList =
         selectedTeam === null
-          ? await getAllMatches(episodeId, page)
-          : await getScrimmagesByTeam(episodeId, selectedTeam.value, page);
+          ? await getAllMatches(episodeId, queryParams.page)
+          : await getScrimmagesByTeam(
+              episodeId,
+              selectedTeam.value,
+              queryParams.page,
+            );
       setData(result);
     } catch (err) {
+      setData(undefined);
       console.error(err);
     } finally {
       setLoading(false);
     }
   }
+
+  const handlePage = (page: number): void => {
+    if (!loading) {
+      setSearchParams((prev) => ({
+        ...getParamEntries(prev),
+        page: page.toString(),
+      }));
+    }
+  };
 
   /**
    * A wrapper function that returns the value/label pairs for the AsyncSelectMenu.
@@ -68,10 +79,10 @@ const Queue: React.FC = () => {
 
   useEffect(() => {
     void refreshData();
-  }, [page, selectedTeam]);
+  }, [queryParams.page, selectedTeam]);
 
   return (
-    <div className="ml-4 mt-4 flex w-5/6 flex-col pb-8">
+    <div className="flex h-full w-full flex-col overflow-auto p-6">
       <div className="justify-right mb-1 flex flex-row space-x-4">
         <PageTitle>Recent Queue</PageTitle>
         <Button
@@ -80,7 +91,7 @@ const Queue: React.FC = () => {
           variant="dark"
           onClick={() => {
             handlePage(1);
-            if (page === 1) {
+            if (queryParams.page === 1) {
               void refreshData();
             }
           }}
@@ -97,59 +108,11 @@ const Queue: React.FC = () => {
           placeholder="Search for a team..."
         />
       </div>
-      <BattlecodeTable
-        data={data?.results ?? []}
+      <QueueTable
+        data={data}
         loading={loading}
-        bottomElement={
-          <BattlecodeTableBottomElement
-            totalCount={data?.count ?? 0}
-            pageSize={10}
-            currentPage={page}
-            onPage={(page) => {
-              handlePage(page);
-            }}
-          />
-        }
-        columns={[
-          {
-            header: "Team (Δ)",
-            value: (r) => {
-              const participant = r.participants[0];
-              if (participant !== undefined) {
-                return (
-                  <RatingDelta participant={participant} ranked={r.is_ranked} />
-                );
-              }
-            },
-          },
-          {
-            header: "Score",
-            value: (r) => <MatchScore match={r} />,
-          },
-          {
-            header: "Team (Δ)",
-            value: (r) => {
-              const participant = r.participants[1];
-              if (participant !== undefined) {
-                return (
-                  <RatingDelta participant={participant} ranked={r.is_ranked} />
-                );
-              }
-            },
-          },
-          {
-            header: "Ranked?",
-            value: (r) => (r.is_ranked ? "Ranked" : "Unranked"),
-          },
-          {
-            header: "Status",
-            value: (r) => <MatchStatus match={r} />,
-          },
-          {
-            header: "Created",
-            value: (r) => dateTime(r.created).localFullString,
-          },
-        ]}
+        page={queryParams.page}
+        handlePage={handlePage}
       />
     </div>
   );
