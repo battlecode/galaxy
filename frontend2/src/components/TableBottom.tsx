@@ -7,7 +7,7 @@ interface TableBottomProps {
   onPage: (page: number) => void;
 }
 
-const BattlecodeTableBottomElement: React.FC<TableBottomProps> = ({
+const TableBottom: React.FC<TableBottomProps> = ({
   totalCount,
   pageSize,
   currentPage,
@@ -155,4 +155,4 @@ const PageButton: React.FC<{
   );
 };
 
-export default BattlecodeTableBottomElement;
+export default TableBottom;
