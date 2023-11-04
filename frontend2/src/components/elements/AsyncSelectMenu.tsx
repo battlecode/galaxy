@@ -127,7 +127,7 @@ function AsyncSelectMenu<T extends React.Key | null | undefined>({
           >
             {loading && (
               <div className="my-1 flex w-full justify-center">
-                <Spinner size={4} />
+                <Spinner size="xs" />
               </div>
             )}
             {options.map((option) => (

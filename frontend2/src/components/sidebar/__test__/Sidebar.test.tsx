@@ -39,7 +39,13 @@ test("UI: should collapse sidebar", () => {
         value={{ episodeId: "something", setEpisodeId: (_) => undefined }}
       >
         <CurrentTeamContext.Provider
-          value={{ teamState: TeamStateEnum.IN_TEAM, team: faketeam }}
+          value={{
+            teamState: TeamStateEnum.IN_TEAM,
+            team: faketeam,
+            leaveMyTeam: async (): Promise<void> => {
+              await Promise.resolve();
+            },
+          }}
         >
           <CurrentUserContext.Provider
             value={{
@@ -69,7 +75,13 @@ test("UI: should link to episode in surrounding context", () => {
         value={{ episodeId: "something", setEpisodeId: (_) => undefined }}
       >
         <CurrentTeamContext.Provider
-          value={{ teamState: TeamStateEnum.IN_TEAM, team: faketeam }}
+          value={{
+            teamState: TeamStateEnum.IN_TEAM,
+            team: faketeam,
+            leaveMyTeam: async (): Promise<void> => {
+              await Promise.resolve();
+            },
+          }}
         >
           <CurrentUserContext.Provider
             value={{

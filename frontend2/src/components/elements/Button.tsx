@@ -1,15 +1,22 @@
 import React from "react";
 import Icon, { type IconName } from "./Icon";
+import Spinner from "../Spinner";
 
-const VARIANTS: Record<string, string> = {
+const VARIANTS = {
   "": "bg-gray-50 text-gray-800 hover:bg-gray-100 hover:ring-gray-900 hover:text-black ring-gray-500 ring-1 ring-inset",
   dark: "bg-cyan-700 text-white hover:bg-cyan-800",
+  danger: "bg-red-700 text-white hover:bg-red-800",
+  "danger-outline":
+    "bg-red-50 text-red-800 hover:bg-red-100 hover:ring-red-700 ring-red-500 ring-1 ring-inset",
   "light-outline":
     "ring-2 ring-inset ring-gray-200 text-gray-200 hover:bg-gray-100/20",
 } as const;
 
+type VariantType = keyof typeof VARIANTS;
+
 interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
-  variant?: string;
+  variant?: VariantType;
+  loading?: boolean;
   label?: string;
   iconName?: IconName;
   fullWidth?: boolean;
@@ -18,6 +25,7 @@ interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
 
 const Button: React.FC<ButtonProps> = ({
   variant = "",
+  loading = false,
   label,
   iconName,
   fullWidth = false,
@@ -36,7 +44,17 @@ const Button: React.FC<ButtonProps> = ({
       {...rest}
     >
       {iconName !== undefined && <Icon name={iconName} size="sm" />}
-      {label}
+      {loading ? (
+        <Spinner
+          className="mx-2"
+          variant={
+            variant === "danger" || variant === "danger-outline" ? "danger" : ""
+          }
+          size="sm"
+        />
+      ) : (
+        label
+      )}
     </button>
   );
 };
