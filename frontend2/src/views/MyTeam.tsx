@@ -8,15 +8,24 @@ import Button from "../components/elements/Button";
 import MemberList from "../components/team/MemberList";
 import DescriptiveCheckbox from "../components/elements/DescriptiveCheckbox";
 import JoinTeam from "../components/JoinTeam";
+import Modal from "../components/Modal";
 
 const MyTeam: React.FC = () => {
-  const { team, teamState } = useCurrentTeam();
+  const { team, teamState, leaveMyTeam } = useCurrentTeam();
   const [checked, setChecked] = useState<boolean>(false);
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
+  const [isLeaveTeamPending, setIsLeaveTeamPending] = useState<boolean>(false);
   const membersList = useMemo(() => {
     return (
       <div className="flex flex-col gap-8">
         {team !== undefined && <MemberList members={team?.members} />}
-        <Button className="self-start" label="Leave team" />
+        <Button
+          className="self-start"
+          onClick={() => {
+            setIsLeaveModalOpen(true);
+          }}
+          label="Leave team"
+        />
       </div>
     );
   }, [team]);
@@ -143,6 +152,42 @@ const MyTeam: React.FC = () => {
           {membersList}
         </SectionCard>
       </div>
+      <Modal
+        isOpen={isLeaveModalOpen}
+        closeModal={() => {
+          setIsLeaveModalOpen(false);
+        }}
+        title="Leave team"
+      >
+        <div className="mt-4 flex flex-col gap-2">
+          <p>
+            Are you sure you want to leave{" "}
+            <span className="font-semibold">{team.name}</span>?
+          </p>
+          <div className="flex flex-row gap-4">
+            <Button
+              variant="danger-outline"
+              onClick={() => {
+                const leave = async (): Promise<void> => {
+                  setIsLeaveTeamPending(true);
+                  await leaveMyTeam();
+                  setIsLeaveTeamPending(false);
+                  setIsLeaveModalOpen(false);
+                };
+                void leave();
+              }}
+              loading={isLeaveTeamPending}
+              label="Leave team"
+            />
+            <Button
+              onClick={() => {
+                setIsLeaveModalOpen(false);
+              }}
+              label="Cancel"
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
