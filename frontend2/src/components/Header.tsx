@@ -5,8 +5,8 @@ import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import Icon from "./elements/Icon";
 import { useEpisodeId, useEpisodeList } from "../contexts/EpisodeContext";
 import { SIDEBAR_ITEM_DATA } from "./sidebar";
-import SelectMenu from "./elements/SelectMenu";
 import { isPresent } from "../utils/utilTypes";
+import EpisodeSwitcher from "./EpisodeSwitcher";
 
 const Header: React.FC = () => {
   const { authState, logout, user } = useCurrentUser();
@@ -86,23 +86,19 @@ const Header: React.FC = () => {
               />
             </div>
             {isPresent(episodeList) && (
-              <div className="max-w-96">
-                <SelectMenu<string>
-                  options={
-                    episodeList.map((ep) => ({
-                      value: ep.name_short,
-                      label: ep.name_long,
-                    })) ?? []
-                  }
-                  value={episodeId}
-                  onChange={(newEpisodeId) => {
-                    setEpisodeId(newEpisodeId);
-                    navigate(
-                      location.pathname.replace(episodeId, newEpisodeId),
-                    );
-                  }}
-                />
-              </div>
+              <EpisodeSwitcher<string>
+                options={
+                  episodeList.map((ep) => ({
+                    value: ep.name_short,
+                    label: ep.name_long,
+                  })) ?? []
+                }
+                value={episodeId}
+                onChange={(newEpisodeId) => {
+                  setEpisodeId(newEpisodeId);
+                  navigate(location.pathname.replace(episodeId, newEpisodeId));
+                }}
+              />
             )}
           </div>
           {/* profile menu (if the user is logged in) */}
