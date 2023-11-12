@@ -1,16 +1,19 @@
-import React, { Fragment, useMemo } from "react";
+import React, { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import Icon from "./elements/Icon";
 import { useEpisodeId, useEpisodeList } from "../contexts/EpisodeContext";
 import { SIDEBAR_ITEM_DATA } from "./sidebar";
 import SelectMenu from "./elements/SelectMenu";
+import { isPresent } from "../utils/utilTypes";
 
 const Header: React.FC = () => {
   const { authState, logout, user } = useCurrentUser();
   const { episodeId, setEpisodeId } = useEpisodeId();
   const episodeList = useEpisodeList();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   return (
     <nav className="fixed top-0 z-30 h-16 w-full bg-gray-700">
@@ -82,21 +85,25 @@ const Header: React.FC = () => {
                 alt="Battlecode Logo"
               />
             </div>
-            <div className="max-w-96">
-              <SelectMenu<string>
-                options={
-                  episodeList?.map((ep) => ({
-                    value: ep.name_short,
-                    label: ep.name_long,
-                  })) ?? []
-                }
-                value={episodeId}
-                placeholder="Loading..."
-                onChange={(newEpisodeId) => {
-                  setEpisodeId(newEpisodeId);
-                }}
-              />
-            </div>
+            {isPresent(episodeList) && (
+              <div className="max-w-96">
+                <SelectMenu<string>
+                  options={
+                    episodeList.map((ep) => ({
+                      value: ep.name_short,
+                      label: ep.name_long,
+                    })) ?? []
+                  }
+                  value={episodeId}
+                  onChange={(newEpisodeId) => {
+                    setEpisodeId(newEpisodeId);
+                    navigate(
+                      location.pathname.replace(episodeId, newEpisodeId),
+                    );
+                  }}
+                />
+              </div>
+            )}
           </div>
           {/* profile menu (if the user is logged in) */}
           {authState === AuthStateEnum.AUTHENTICATED && (
