@@ -1,14 +1,16 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useMemo } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { Link, NavLink } from "react-router-dom";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import Icon from "./elements/Icon";
-import { useEpisodeId } from "../contexts/EpisodeContext";
+import { useEpisodeId, useEpisodeList } from "../contexts/EpisodeContext";
 import { SIDEBAR_ITEM_DATA } from "./sidebar";
+import SelectMenu from "./elements/SelectMenu";
 
 const Header: React.FC = () => {
   const { authState, logout, user } = useCurrentUser();
-  const { episodeId } = useEpisodeId();
+  const { episodeId, setEpisodeId } = useEpisodeId();
+  const episodeList = useEpisodeList();
 
   return (
     <nav className="fixed top-0 z-30 h-16 w-full bg-gray-700">
@@ -66,8 +68,8 @@ const Header: React.FC = () => {
               </Menu.Items>
             </Transition>
           </Menu>
-          {/* battlecode logo */}
-          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+          {/* battlecode logo, episode select */}
+          <div className="flex flex-1 items-center justify-center space-x-4 sm:items-stretch sm:justify-start">
             <div className="flex flex-shrink-0 items-center">
               <img
                 className="hidden h-8 sm:block"
@@ -78,6 +80,21 @@ const Header: React.FC = () => {
                 className="h-10 sm:hidden"
                 src="/battlecode-logo-vert-white.png"
                 alt="Battlecode Logo"
+              />
+            </div>
+            <div className="max-w-96">
+              <SelectMenu<string>
+                options={
+                  episodeList?.map((ep) => ({
+                    value: ep.name_short,
+                    label: ep.name_long,
+                  })) ?? []
+                }
+                value={episodeId}
+                placeholder="Loading..."
+                onChange={(newEpisodeId) => {
+                  setEpisodeId(newEpisodeId);
+                }}
               />
             </div>
           </div>
