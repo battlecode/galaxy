@@ -1,19 +1,15 @@
 import React, { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import Icon from "./elements/Icon";
-import { useEpisodeId, useEpisodeList } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 import { SIDEBAR_ITEM_DATA } from "./sidebar";
-import { isPresent } from "../utils/utilTypes";
 import EpisodeSwitcher from "./EpisodeSwitcher";
 
 const Header: React.FC = () => {
   const { authState, logout, user } = useCurrentUser();
-  const { episodeId, setEpisodeId } = useEpisodeId();
-  const episodeList = useEpisodeList();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { episodeId } = useEpisodeId();
 
   return (
     <nav className="fixed top-0 z-30 h-16 w-full bg-gray-700">
@@ -72,7 +68,7 @@ const Header: React.FC = () => {
             </Transition>
           </Menu>
           {/* battlecode logo, episode select */}
-          <div className="flex flex-1 items-center justify-center space-x-4 sm:items-stretch sm:justify-start">
+          <div className="flex flex-1 items-center justify-center space-x-6 sm:items-stretch sm:justify-start">
             <div className="flex flex-shrink-0 items-center">
               <img
                 className="hidden h-8 sm:block"
@@ -85,21 +81,7 @@ const Header: React.FC = () => {
                 alt="Battlecode Logo"
               />
             </div>
-            {isPresent(episodeList) && (
-              <EpisodeSwitcher<string>
-                options={
-                  episodeList.map((ep) => ({
-                    value: ep.name_short,
-                    label: ep.name_long,
-                  })) ?? []
-                }
-                value={episodeId}
-                onChange={(newEpisodeId) => {
-                  setEpisodeId(newEpisodeId);
-                  navigate(location.pathname.replace(episodeId, newEpisodeId));
-                }}
-              />
-            )}
+            <EpisodeSwitcher />
           </div>
           {/* profile menu (if the user is logged in) */}
           {authState === AuthStateEnum.AUTHENTICATED && (

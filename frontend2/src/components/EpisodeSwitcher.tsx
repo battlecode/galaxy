@@ -1,33 +1,38 @@
 import React, { Fragment, useMemo } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import Icon from "./elements/Icon";
+import { useEpisodeId, useEpisodeList } from "../contexts/EpisodeContext";
+import { isPresent } from "../utils/utilTypes";
+import { useNavigate } from "react-router-dom";
 
-interface EpisodeSwitcherProps<T extends React.Key | null | undefined> {
-  options: Array<{ value: T; label: string }>;
-  value: T;
-  onChange?: (value: T) => void;
-}
-
-function EpisodeSwitcher<T extends React.Key | null | undefined>({
-  options,
-  value,
-  onChange,
-}: EpisodeSwitcherProps<T>): JSX.Element {
-  const valueToLabel = useMemo(
-    () => new Map(options.map((option) => [option.value, option.label])),
-    [options],
+const EpisodeSwitcher: React.FC = () => {
+  const episodeList = useEpisodeList();
+  const { episodeId, setEpisodeId } = useEpisodeId();
+  const navigate = useNavigate();
+  if (!isPresent(episodeList)) {
+    return null;
+  }
+  const idToName = useMemo(
+    () => new Map(episodeList.map((ep) => [ep.name_short, ep.name_long])),
+    [episodeList],
   );
   return (
     <div className={`relative`}>
-      <Listbox value={value} onChange={onChange}>
+      <Listbox
+        value={episodeId}
+        onChange={(newEpisodeId) => {
+          setEpisodeId(newEpisodeId);
+          navigate(location.pathname.replace(episodeId, newEpisodeId));
+        }}
+      >
         <div className="relative">
           <Listbox.Button
             className={`relative h-9 w-full truncate rounded-full bg-gray-900/80 py-1.5
-            pl-3.5 pr-8 text-left text-gray-200 shadow-sm focus:outline-none
+            pl-3.5 pr-8 text-left text-gray-100 shadow-sm focus:outline-none
             sm:text-sm sm:leading-6`}
           >
             <span className="text-sm font-semibold">
-              {valueToLabel.get(value)}
+              {idToName.get(episodeId)}
             </span>
             <div
               className="absolute inset-y-0 right-0 mr-2 flex transform items-center
@@ -47,13 +52,13 @@ function EpisodeSwitcher<T extends React.Key | null | undefined>({
               bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
               sm:max-h-60 sm:text-sm"
             >
-              {options.map((option) => (
+              {episodeList.map((ep) => (
                 <Listbox.Option
                   className="flex cursor-default flex-row justify-between py-1.5 pl-4 pr-2 ui-active:bg-cyan-100"
-                  key={option.value}
-                  value={option.value}
+                  key={ep.name_short}
+                  value={ep.name_short}
                 >
-                  <div className="overflow-x-auto pr-2">{option.label}</div>
+                  <div className="overflow-x-auto pr-2">{ep.name_long}</div>
                   <span className=" hidden items-center text-cyan-900 ui-selected:flex">
                     <Icon name="check" size="sm" />
                   </span>
@@ -65,6 +70,6 @@ function EpisodeSwitcher<T extends React.Key | null | undefined>({
       </Listbox>
     </div>
   );
-}
+};
 
 export default EpisodeSwitcher;
