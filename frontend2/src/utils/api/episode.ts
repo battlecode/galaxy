@@ -4,6 +4,7 @@ import {
   type GameMap,
   type Tournament,
   type PaginatedTournamentList,
+  type PaginatedEpisodeList,
 } from "../types";
 import { DEFAULT_API_CONFIGURATION } from "./helpers";
 
@@ -16,6 +17,13 @@ const API = new EpisodeApi(DEFAULT_API_CONFIGURATION);
  */
 export const getEpisodeInfo = async (episodeId: string): Promise<Episode> => {
   return await API.episodeERetrieve({ id: episodeId });
+};
+
+/**
+ * Get a list of all Battlecode episodes.
+ */
+export const getAllEpisodes = async (): Promise<PaginatedEpisodeList> => {
+  return await API.episodeEList();
 };
 
 /**

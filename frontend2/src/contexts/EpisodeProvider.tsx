@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { type Episode } from "../utils/types";
-import { EpisodeContext, EpisodeIdContext } from "./EpisodeContext";
+import {
+  EpisodeContext,
+  EpisodeIdContext,
+  EpisodeListContext,
+} from "./EpisodeContext";
 import { DEFAULT_EPISODE } from "../utils/constants";
-import { getEpisodeInfo } from "../utils/api/episode";
+import { getAllEpisodes, getEpisodeInfo } from "../utils/api/episode";
+import type { Maybe } from "../utils/utilTypes";
 
 export const EpisodeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -11,6 +16,8 @@ export const EpisodeProvider: React.FC<{ children: React.ReactNode }> = ({
   const [episodeId, setEpisodeId] = useState<string>(DEFAULT_EPISODE);
   // on episodeId changes (or initial load), we will fetch information for the episode
   const [episode, setEpisode] = useState<Episode>();
+  // on initial load, we will fetch the list of all episodes.
+  const [episodeList, setEpisodeList] = useState<Maybe<Episode[]>>(undefined);
 
   useEffect(() => {
     // used to avoid data races when loading episodes.
@@ -37,6 +44,30 @@ export const EpisodeProvider: React.FC<{ children: React.ReactNode }> = ({
     };
   }, [episodeId]);
 
+  useEffect(() => {
+    let isActiveLookup = true;
+
+    const fetchEpisodes = async (): Promise<void> => {
+      try {
+        const result = await getAllEpisodes();
+        if (isActiveLookup) {
+          setEpisodeList(result.results);
+        }
+      } catch (err) {
+        if (isActiveLookup) {
+          setEpisodeList(undefined);
+        }
+        console.error(err);
+      }
+    };
+
+    setEpisodeList(undefined);
+    void fetchEpisodes();
+    return () => {
+      isActiveLookup = false;
+    };
+  }, []);
+
   // avoid recreating context value if episode id hasn't changed
   const episodeIdContextValue = useMemo(
     () => ({
@@ -49,7 +80,9 @@ export const EpisodeProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <EpisodeIdContext.Provider value={episodeIdContextValue}>
       <EpisodeContext.Provider value={episode}>
-        {children}
+        <EpisodeListContext.Provider value={episodeList}>
+          {children}
+        </EpisodeListContext.Provider>
       </EpisodeContext.Provider>
     </EpisodeIdContext.Provider>
   );
