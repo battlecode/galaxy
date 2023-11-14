@@ -5,6 +5,7 @@ import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import Icon from "./elements/Icon";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { SIDEBAR_ITEM_DATA } from "./sidebar";
+import EpisodeSwitcher from "./EpisodeSwitcher";
 
 const Header: React.FC = () => {
   const { authState, logout, user } = useCurrentUser();
@@ -66,8 +67,8 @@ const Header: React.FC = () => {
               </Menu.Items>
             </Transition>
           </Menu>
-          {/* battlecode logo */}
-          <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+          {/* battlecode logo, episode select */}
+          <div className="flex flex-1 items-center justify-center space-x-6 sm:items-stretch sm:justify-start">
             <div className="flex flex-shrink-0 items-center">
               <img
                 className="hidden h-8 sm:block"
@@ -80,6 +81,7 @@ const Header: React.FC = () => {
                 alt="Battlecode Logo"
               />
             </div>
+            <EpisodeSwitcher />
           </div>
           {/* profile menu (if the user is logged in) */}
           {authState === AuthStateEnum.AUTHENTICATED && (
