@@ -14,6 +14,7 @@ interface CurrentTeamContextType {
   teamState: TeamStateEnum;
   team?: TeamPrivate;
   leaveMyTeam: () => Promise<void>;
+  refreshTeam: (updatedTeam: TeamPrivate) => void;
 }
 
 export const CurrentTeamContext = createContext<CurrentTeamContextType | null>(
