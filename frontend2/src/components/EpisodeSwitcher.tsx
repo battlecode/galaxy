@@ -9,13 +9,14 @@ const EpisodeSwitcher: React.FC = () => {
   const episodeList = useEpisodeList();
   const { episodeId, setEpisodeId } = useEpisodeId();
   const navigate = useNavigate();
+  const idToName = useMemo(
+    () =>
+      new Map((episodeList ?? []).map((ep) => [ep.name_short, ep.name_long])),
+    [episodeList],
+  );
   if (!isPresent(episodeList)) {
     return null;
   }
-  const idToName = useMemo(
-    () => new Map(episodeList.map((ep) => [ep.name_short, ep.name_long])),
-    [episodeList],
-  );
   return (
     <div className={`relative`}>
       <Listbox
