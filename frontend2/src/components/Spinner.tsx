@@ -1,7 +1,7 @@
 import React from "react";
 
 interface SpinnerProps {
-  size?: "sm" | "md" | "xs" | "lg";
+  size?: "sm" | "md" | "xs" | "lg" | "xl";
   variant?: "danger" | "";
   className?: string;
 }
@@ -9,12 +9,13 @@ interface SpinnerProps {
 const sizeToClass = {
   xs: "h-4 w-4",
   sm: "h-6 w-6",
-  md: "h-10 w-10",
-  lg: "h-16 w-16",
+  md: "h-8 w-8",
+  lg: "h-10 w-10",
+  xl: "h-16 w-16",
 };
 
 const Spinner: React.FC<SpinnerProps> = ({
-  size = "md",
+  size = "lg",
   variant = "",
   className = "",
 }) => (

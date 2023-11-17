@@ -1,24 +1,32 @@
 import React from "react";
 import Icon from "./Icon";
 import { Switch } from "@headlessui/react";
+import Spinner from "../Spinner";
+
+export const enum CheckboxState {
+  CHECKED,
+  UNCHECKED,
+  LOADING,
+}
 
 interface DescriptiveCheckboxProps {
-  checked: boolean;
+  status: CheckboxState;
   onChange: (checked: boolean) => void;
   title: string;
   description: string;
 }
 
 const DescriptiveCheckbox: React.FC<DescriptiveCheckboxProps> = ({
-  checked,
+  status,
   onChange,
   title,
   description,
 }) => {
   return (
     <Switch
-      checked={checked}
+      checked={status === CheckboxState.CHECKED}
       onChange={onChange}
+      disabled={status === CheckboxState.LOADING}
       className={`flex w-full
       flex-row items-center justify-between gap-3 rounded-lg px-6 py-4 shadow ring-2 ring-inset
        ring-cyan-600/20 transition-all ui-checked:bg-cyan-900/80 ui-checked:ring-0`}
@@ -29,16 +37,23 @@ const DescriptiveCheckbox: React.FC<DescriptiveCheckboxProps> = ({
           {description}
         </div>
       </div>
-      <div
-        className="rounded-full p-1.5 ring-2 ring-inset ring-cyan-600/20 transition-all
-       ui-checked:bg-cyan-500/50 ui-checked:ring-0"
-      >
-        <Icon
-          name="check"
-          size="sm"
-          className={`text-cyan-100 opacity-0 ui-checked:opacity-100`}
-        />
-      </div>
+
+      {status === CheckboxState.LOADING ? (
+        <div>
+          <Spinner size="md" />
+        </div>
+      ) : (
+        <div
+          className="rounded-full p-1.5 ring-2 ring-inset ring-cyan-600/20 transition-all
+      ui-checked:bg-cyan-500/50 ui-checked:ring-0"
+        >
+          <Icon
+            name="check"
+            size="sm"
+            className={`text-cyan-100 opacity-0 ui-checked:opacity-100`}
+          />
+        </div>
+      )}
     </Switch>
   );
 };

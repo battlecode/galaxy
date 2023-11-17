@@ -14,7 +14,7 @@ const PrivateRoute: React.FC = () => {
   } else {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Spinner size="lg" />
+        <Spinner size="xl" />
       </div>
     );
   }
