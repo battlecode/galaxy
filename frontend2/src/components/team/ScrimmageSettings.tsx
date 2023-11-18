@@ -9,6 +9,7 @@ import { useEpisode, useEpisodeId } from "../../contexts/EpisodeContext";
 import { isPresent } from "../../utils/utilTypes";
 import { updateTeamPartial } from "../../utils/api/team";
 import { determineCheckboxState } from "./EligibilitySettings";
+import { type TeamPrivate } from "../../utils/types";
 
 // This component should only be used when there is a logged in user with a team.
 const ScrimmageSettings: React.FC = () => {
@@ -44,20 +45,28 @@ const ScrimmageSettings: React.FC = () => {
 
     let isActive = true;
     const update = async (): Promise<void> => {
-      const updatedTeam = await updateTeamPartial(episodeId, {
-        auto_accept_ranked: ranked,
-        auto_accept_unranked: unranked,
-      });
+      let updatedTeam: TeamPrivate;
+      try {
+        updatedTeam = await updateTeamPartial(episodeId, {
+          auto_accept_ranked: ranked,
+          auto_accept_unranked: unranked,
+        });
+      } catch (error) {
+        // TODO: Add a notif here indicating that the update failed
+        console.error(error);
+        return;
+      }
       const newProfile = team?.profile;
       if (isActive && isPresent(newProfile) && isPresent(team)) {
         // only update the ranked / unranked of the team profile to avoid
         // race conditions with other team profile updaters on this page
-        newProfile.auto_accept_ranked = updatedTeam.profile?.auto_accept_ranked;
-        newProfile.auto_accept_unranked =
-          updatedTeam.profile?.auto_accept_unranked;
         refreshTeam({
           ...team,
-          profile: newProfile,
+          profile: {
+            ...newProfile,
+            auto_accept_unranked: updatedTeam.profile?.auto_accept_unranked,
+            auto_accept_ranked: updatedTeam.profile?.auto_accept_ranked,
+          },
         });
       }
     };

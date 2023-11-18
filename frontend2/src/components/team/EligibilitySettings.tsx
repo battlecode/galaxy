@@ -10,6 +10,7 @@ import DescriptiveCheckbox, {
 import { useEpisode, useEpisodeId } from "../../contexts/EpisodeContext";
 import { isPresent } from "../../utils/utilTypes";
 import { updateTeamPartial } from "../../utils/api/team";
+import { isEqual } from "lodash";
 
 export function determineCheckboxState(
   inDesired: boolean,
@@ -40,9 +41,8 @@ const EligibilitySettings: React.FC = () => {
   useEffect(() => {
     // if actual team eligibility hasn't loaded yet or the desired/actual are identical
     if (
-      (!isPresent(desiredEligibility) ||
-        desiredEligibility === team?.profile?.eligible_for) ??
-      []
+      !isPresent(desiredEligibility) ||
+      isEqual(desiredEligibility, team?.profile?.eligible_for)
     ) {
       return;
     }
@@ -56,10 +56,12 @@ const EligibilitySettings: React.FC = () => {
       if (isActive && isPresent(newProfile) && isPresent(team)) {
         // only update the eligibility of the team profile to avoid race conditions
         // with other team profile updaters on this page
-        newProfile.eligible_for = updatedTeam.profile?.eligible_for;
         refreshTeam({
           ...team,
-          profile: newProfile,
+          profile: {
+            ...newProfile,
+            eligible_for: updatedTeam.profile?.eligible_for,
+          },
         });
       }
     };
@@ -74,7 +76,7 @@ const EligibilitySettings: React.FC = () => {
     !isPresent(team) ||
     !isPresent(episode)
   ) {
-    return null;
+    return "Error: You're not in a team!";
   }
   return (
     <SectionCard title="Eligibility">
