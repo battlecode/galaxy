@@ -53,7 +53,7 @@ export const SIDEBAR_ITEM_DATA: Array<{
   {
     iconName: "arrow_up_tray",
     text: "Submissions",
-    linkTo: "submission",
+    linkTo: "submissions",
   },
   {
     iconName: "play_circle",
