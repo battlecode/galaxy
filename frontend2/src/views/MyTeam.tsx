@@ -10,11 +10,30 @@ import JoinTeam from "../components/JoinTeam";
 import Modal from "../components/Modal";
 import EligibilitySettings from "../components/team/EligibilitySettings";
 import ScrimmageSettings from "../components/team/ScrimmageSettings";
+import { type SubmitHandler, useForm } from "react-hook-form";
+import { updateTeamPartial } from "../utils/api/team";
+import { useEpisodeId } from "../contexts/EpisodeContext";
+
+interface QuoteBioForm {
+  quote: string;
+  biography: string;
+}
 
 const MyTeam: React.FC = () => {
   const { team, teamState, leaveMyTeam } = useCurrentTeam();
+  const { episodeId } = useEpisodeId();
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
   const [isLeaveTeamPending, setIsLeaveTeamPending] = useState<boolean>(false);
+  const { register, handleSubmit } = useForm<QuoteBioForm>();
+
+  const onQuoteBioSubmit: SubmitHandler<QuoteBioForm> = async (data) => {
+    try {
+      await updateTeamPartial(episodeId, data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const membersList = useMemo(() => {
     return (
       <div className="flex flex-col gap-8">
@@ -48,20 +67,24 @@ const MyTeam: React.FC = () => {
                   {team.name}
                 </div>
               </div>
-              <div className="flex flex-1 flex-col gap-4">
+              <form
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                onSubmit={handleSubmit(onQuoteBioSubmit)}
+                className="flex flex-1 flex-col gap-4"
+              >
                 <Input
                   disabled
                   label="Join key"
                   value={team.join_key ?? "Loading..."}
                 />
-                <Input label="Team quote" />
-                <TextArea label="Team biography" />
+                <Input label="Team quote" {...register("quote")} />
+                <TextArea label="Team biography" {...register("biography")} />
                 {/* TODO: This button will be disabled when no changes have been made,
                 and will turn dark cyan after changes have been made. When changes
                 are saved, it will be disabled again. We may want to show a popup indicating
                 success */}
                 <Button className="mt-2" label="Save" type="submit" />
-              </div>
+              </form>
             </div>
           </SectionCard>
           {/* The members list that displays when on a smaller screen */}
