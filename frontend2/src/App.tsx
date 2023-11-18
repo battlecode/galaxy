@@ -27,6 +27,7 @@ import Scrimmaging from "./views/Scrimmaging";
 import MyTeam from "./views/MyTeam";
 import Tournaments from "./views/Tournaments";
 import TournamentPage from "./views/Tournament";
+import Submissions from "./views/Submissions";
 
 const App: React.FC = () => {
   return (
@@ -55,7 +56,10 @@ const router = createBrowserRouter([
       {
         element: <EpisodeLayout />,
         children: [
-          // TODO: /:episodeId/submissions
+          {
+            path: "/:episodeId/submissions",
+            element: <Submissions />,
+          },
           {
             path: "/:episodeId/team",
             element: <MyTeam />,
