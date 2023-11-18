@@ -6,13 +6,13 @@ import TextArea from "../components/elements/TextArea";
 import { TeamStateEnum, useCurrentTeam } from "../contexts/CurrentTeamContext";
 import Button from "../components/elements/Button";
 import MemberList from "../components/team/MemberList";
-import DescriptiveCheckbox from "../components/elements/DescriptiveCheckbox";
 import JoinTeam from "../components/JoinTeam";
 import Modal from "../components/Modal";
+import EligibilitySettings from "../components/team/EligibilitySettings";
+import ScrimmageSettings from "../components/team/ScrimmageSettings";
 
 const MyTeam: React.FC = () => {
   const { team, teamState, leaveMyTeam } = useCurrentTeam();
-  const [checked, setChecked] = useState<boolean>(false);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
   const [isLeaveTeamPending, setIsLeaveTeamPending] = useState<boolean>(false);
   const membersList = useMemo(() => {
@@ -68,90 +68,15 @@ const MyTeam: React.FC = () => {
           <SectionCard className="shrink xl:hidden" title="Members">
             {membersList}
           </SectionCard>
-          <SectionCard title="Eligibility">
-            <div className="flex flex-col gap-4 2xl:flex-row">
-              <div className="2xl:w-60">
-                <p className="text-gray-700">
-                  Check the box(es) that apply to <i>all</i> members of your
-                  team.
-                </p>
-                <p className="text-gray-700">
-                  This determines which tournaments and prizes your team is
-                  eligible for.
-                </p>
-              </div>
-              <div className="flex flex-1 flex-col gap-2">
-                <DescriptiveCheckbox
-                  checked={checked}
-                  onChange={(checked) => {
-                    setChecked(checked);
-                  }}
-                  title="Student"
-                  description="Here's a description of what a student is"
-                />
-                <DescriptiveCheckbox
-                  checked={checked}
-                  onChange={(checked) => {
-                    setChecked(checked);
-                  }}
-                  title="US Student"
-                  description="Here's a description of what a US student is"
-                />
-                <DescriptiveCheckbox
-                  checked={checked}
-                  onChange={(checked) => {
-                    setChecked(checked);
-                  }}
-                  title="High school student"
-                  description="These descriptions and titles should be loaded dynamically."
-                />
-                <DescriptiveCheckbox
-                  checked={checked}
-                  onChange={(checked) => {
-                    setChecked(checked);
-                  }}
-                  title="Newbie"
-                  description="These descriptions and titles should be loaded dynamically. I think this is MIT newbie? we might want to rename this criteria"
-                />
-              </div>
-            </div>
-          </SectionCard>
-          <SectionCard title="Scrimmaging">
-            <div className="flex flex-col gap-3 2xl:flex-row">
-              <div className="text-green-600 2xl:w-60">
-                <p className="text-gray-700">
-                  Choose how you want to handle incoming scrimmage requests from
-                  other players.
-                </p>
-              </div>
-              <div className="flex flex-1 flex-col gap-2">
-                <DescriptiveCheckbox
-                  checked={checked}
-                  onChange={(checked) => {
-                    setChecked(checked);
-                  }}
-                  title="Auto-accept ranked scrimmages"
-                  description="When enabled, your team will automatically accept
-                  ranked scrimmage requests. Ranked scrimmages affect your ELO rating."
-                />
-                <DescriptiveCheckbox
-                  checked={checked}
-                  onChange={(checked) => {
-                    setChecked(checked);
-                  }}
-                  title="Auto-accept unranked scrimmages"
-                  description="When enabled, your team will automatically accept
-                  unranked scrimmage requests. Unranked scrimmages do not affect your ELO rating."
-                />
-              </div>
-            </div>
-          </SectionCard>
+          <EligibilitySettings />
+          <ScrimmageSettings />
         </div>
         {/* The members list that displays to the right side when on a big screen. */}
         <SectionCard className="hidden w-1/3 shrink xl:block" title="Members">
           {membersList}
         </SectionCard>
       </div>
+      {/* The confirmation modal that pops up when a user clicks "Leave Team" */}
       <Modal
         isOpen={isLeaveModalOpen}
         closeModal={() => {
