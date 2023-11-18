@@ -15,52 +15,52 @@ export const SIDEBAR_ITEM_DATA: Array<{
   text: string;
   linkTo: string;
 }> = [
-    {
-      iconName: "home",
-      text: "Home",
-      linkTo: "home",
-    },
-    {
-      iconName: "map",
-      text: "Quick Start",
-      linkTo: "quickstart",
-    },
-    {
-      iconName: "clipboard_document",
-      text: "Resources",
-      linkTo: "resources",
-    },
-    {
-      iconName: "trophy",
-      text: "Tournaments",
-      linkTo: "tournaments",
-    },
-    {
-      iconName: "chart_bar",
-      text: "Rankings",
-      linkTo: "rankings",
-    },
-    {
-      iconName: "clock",
-      text: "Queue",
-      linkTo: "queue",
-    },
-    {
-      iconName: "user_group",
-      text: "My Team",
-      linkTo: "team",
-    },
-    {
-      iconName: "arrow_up_tray",
-      text: "Submissions",
-      linkTo: "submissions",
-    },
-    {
-      iconName: "play_circle",
-      text: "Scrimmaging",
-      linkTo: "scrimmaging",
-    },
-  ];
+  {
+    iconName: "home",
+    text: "Home",
+    linkTo: "home",
+  },
+  {
+    iconName: "map",
+    text: "Quick Start",
+    linkTo: "quickstart",
+  },
+  {
+    iconName: "clipboard_document",
+    text: "Resources",
+    linkTo: "resources",
+  },
+  {
+    iconName: "trophy",
+    text: "Tournaments",
+    linkTo: "tournaments",
+  },
+  {
+    iconName: "chart_bar",
+    text: "Rankings",
+    linkTo: "rankings",
+  },
+  {
+    iconName: "clock",
+    text: "Queue",
+    linkTo: "queue",
+  },
+  {
+    iconName: "user_group",
+    text: "My Team",
+    linkTo: "team",
+  },
+  {
+    iconName: "arrow_up_tray",
+    text: "Submissions",
+    linkTo: "submissions",
+  },
+  {
+    iconName: "play_circle",
+    text: "Scrimmaging",
+    linkTo: "scrimmaging",
+  },
+];
 
 /**
  *

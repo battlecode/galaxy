@@ -2,28 +2,16 @@ import React, { useEffect, useState } from "react";
 import type { Maybe } from "../utils/utilTypes";
 import {
   type PaginatedSubmissionList,
-  StatusBccEnum,
   type TournamentSubmission,
 } from "../utils/types";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import { NavLink, createSearchParams } from "react-router-dom";
 import {
   getAllSubmissions,
   getAllUserTournamentSubmissions,
 } from "../utils/api/compete";
 import SectionCard from "../components/SectionCard";
-import BattlecodeTable from "../components/BattlecodeTable";
-import { dateTime } from "../utils/dateTime";
-
-const SubmissionStatusDisplays: Record<StatusBccEnum, string> = {
-  [StatusBccEnum.New]: "Created",
-  [StatusBccEnum.Que]: "Queued",
-  [StatusBccEnum.Run]: "Running",
-  [StatusBccEnum.Try]: "Will be retried",
-  [StatusBccEnum.Ok]: "Success",
-  [StatusBccEnum.Err]: "Failed",
-  [StatusBccEnum.Can]: "Cancelled",
-};
+import SubHistoryTable from "../components/tables/submissions/SubHistoryTable";
+import TourneySubTable from "../components/tables/submissions/TourneySubTable";
 
 const Submissions: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -104,92 +92,11 @@ const Submissions: React.FC = () => {
       </h1>
 
       <SectionCard title="Submission History" className="mb-8">
-        <BattlecodeTable
-          data={subData?.results ?? []}
-          loading={subsLoading}
-          columns={[
-            {
-              header: "Submitted At",
-              value: (sub) => dateTime(sub.created).localFullString,
-            },
-            {
-              header: "Status",
-              value: (sub) =>
-                sub.status === "OK!"
-                  ? sub.accepted
-                    ? "Accepted"
-                    : "Rejected"
-                  : SubmissionStatusDisplays[sub.status],
-            },
-            {
-              header: "Description",
-              value: (sub) => sub.description ?? "",
-            },
-            {
-              header: "Package Name",
-              value: (sub) => sub._package,
-            },
-            {
-              header: "Submitter",
-              value: (sub) => (
-                <NavLink to={`/user/${sub.user}`} className="hover:underline">
-                  {sub.username}
-                </NavLink>
-              ),
-            },
-            {
-              header: "",
-              value: (sub) => (
-                <NavLink
-                  className="text-cyan-600 hover:underline"
-                  to={URL.createObjectURL(
-                    new Blob([sub.logs], { type: "text/plain" }),
-                  )}
-                  target="_blank"
-                >
-                  View log
-                </NavLink>
-              ),
-            },
-            {
-              header: "",
-              value: (sub) => "Download",
-            },
-          ]}
-        />
+        <SubHistoryTable data={subData} loading={subsLoading} />
       </SectionCard>
 
       <SectionCard title="Tournament Submission History">
-        <BattlecodeTable
-          data={tourneySubData ?? []}
-          loading={tourneySubsLoading}
-          columns={[
-            {
-              header: "Tournament",
-              value: (sub) => sub.tournament,
-            },
-            {
-              header: "Submitted At",
-              value: (sub) => dateTime(sub.created).localFullString,
-            },
-            {
-              header: "Description",
-              value: (sub) => sub.description,
-            },
-            {
-              header: "Package Name",
-              value: (sub) => sub._package,
-            },
-            {
-              header: "Submitter",
-              value: (sub) => (
-                <NavLink to={`/user/${sub.user}`} className="hover:underline">
-                  {sub.username}
-                </NavLink>
-              ),
-            },
-          ]}
-        />
+        <TourneySubTable data={tourneySubData} loading={tourneySubsLoading} />
       </SectionCard>
     </div>
   );
