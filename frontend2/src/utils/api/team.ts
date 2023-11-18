@@ -66,6 +66,7 @@ export const retrieveTeam = async (episodeId: string): Promise<TeamPrivate> => {
 
 /**
  * Push a partial update to the current user's team for a specific episode.
+ * The current user must be on a team in the provided episode.
  * @param episodeId The episode of the team
  * @param teamProfilePrivateRequest The partial team update
  * @returns The updated TeamPrivate object

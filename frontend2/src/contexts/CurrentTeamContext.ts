@@ -13,7 +13,19 @@ export enum TeamStateEnum {
 interface CurrentTeamContextType {
   teamState: TeamStateEnum;
   team?: TeamPrivate;
+  /**
+   * Leaves the current user's team for the current episode
+   * The current user should be on team in the current episode before calling
+   * this function.
+   */
   leaveMyTeam: () => Promise<void>;
+  /**
+   * Replaces the TeamPrivate value in the context with a new value. Used to
+   * refresh the value upon receiving updated values from API calls.
+   * The current user must be on a team in the current episode
+   * before calling this function.
+   * @param updatedTeam The new team value to store in the context.
+   */
   refreshTeam: (updatedTeam: TeamPrivate) => void;
 }
 
