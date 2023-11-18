@@ -45,6 +45,8 @@ test("UI: should collapse sidebar", () => {
             leaveMyTeam: async (): Promise<void> => {
               await Promise.resolve();
             },
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            refreshTeam: (team): void => {},
           }}
         >
           <CurrentUserContext.Provider
@@ -81,6 +83,8 @@ test("UI: should link to episode in surrounding context", () => {
             leaveMyTeam: async (): Promise<void> => {
               await Promise.resolve();
             },
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            refreshTeam: (team): void => {},
           }}
         >
           <CurrentUserContext.Provider

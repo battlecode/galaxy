@@ -6,6 +6,7 @@ import {
   type TeamTListRequest,
   type TeamTAvatarCreateRequest,
   type TeamPrivate,
+  type TeamProfilePrivateRequest,
 } from "../types";
 import { DEFAULT_API_CONFIGURATION } from "./helpers";
 
@@ -61,6 +62,23 @@ export const leaveTeam = async (episodeId: string): Promise<void> => {
  */
 export const retrieveTeam = async (episodeId: string): Promise<TeamPrivate> => {
   return await API.teamTMeRetrieve({ episodeId });
+};
+
+/**
+ * Push a partial update to the current user's team for a specific episode.
+ * The current user must be on a team in the provided episode.
+ * @param episodeId The episode of the team
+ * @param teamProfilePrivateRequest The partial team update
+ * @returns The updated TeamPrivate object
+ */
+export const updateTeamPartial = async (
+  episodeId: string,
+  teamProfilePrivateRequest: TeamProfilePrivateRequest,
+): Promise<TeamPrivate> => {
+  return await API.teamTMePartialUpdate({
+    episodeId,
+    patchedTeamPrivateRequest: { profile: teamProfilePrivateRequest },
+  });
 };
 
 // -- TEAM STATS --//
