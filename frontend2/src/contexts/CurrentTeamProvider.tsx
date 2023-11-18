@@ -24,6 +24,13 @@ export const CurrentTeamProvider: React.FC<{ children: React.ReactNode }> = ({
     setTeamData({ teamState: TeamStateEnum.NO_TEAM });
   }, [episodeId]);
 
+  const refreshTeam = useCallback((updatedTeam: TeamPrivate): void => {
+    setTeamData({
+      team: updatedTeam,
+      teamState: TeamStateEnum.IN_TEAM,
+    });
+  }, []);
+
   useEffect(() => {
     const loadTeam = async (): Promise<void> => {
       try {
@@ -44,7 +51,9 @@ export const CurrentTeamProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [authState, episodeId]);
 
   return (
-    <CurrentTeamContext.Provider value={{ ...teamData, leaveMyTeam }}>
+    <CurrentTeamContext.Provider
+      value={{ ...teamData, leaveMyTeam, refreshTeam }}
+    >
       {children}
     </CurrentTeamContext.Provider>
   );
