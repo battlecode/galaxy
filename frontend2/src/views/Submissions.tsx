@@ -204,10 +204,7 @@ const Submissions: React.FC = () => {
             </span>
             <form
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onSubmit={(event) => {
-                event.preventDefault();
-                handleSubmit(onSubmit);
-              }}
+              onSubmit={handleSubmit(onSubmit)}
               className="mt-4 flex flex-col"
             >
               <FileUpload
@@ -215,6 +212,7 @@ const Submissions: React.FC = () => {
                 fileInputHelp="Java .zip File (5MB max)"
                 errorMessage={subError}
                 required
+                accept=".zip"
                 {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
               />
               {/* <div className="flex w-full flex-row items-center gap-10"> */}

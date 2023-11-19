@@ -1,4 +1,11 @@
-import React, { forwardRef, useMemo, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useMemo,
+  useImperativeHandle,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
 import FormLabel from "./elements/FormLabel";
 import FormError from "./elements/FormError";
 import type { Maybe } from "../utils/utilTypes";
@@ -21,19 +28,17 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       fileInputHelp,
       ...rest
     },
-    ref,
+    forwardedRef,
   ) {
     const invalid = errorMessage !== undefined;
     const disabledClassName = `${invalid ? "ring-red-500" : ""}
     ${rest.disabled === true ? "bg-gray-400/20 text-gray-600" : ""}`;
 
-    const fileUploadRef = useRef<HTMLInputElement>(null);
+    const ref = useRef<HTMLInputElement>(null);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    useImperativeHandle(forwardedRef, () => ref.current!, []);
 
     const [fileName, setFileName] = useState<Maybe<string>>();
-
-    useMemo(() => {
-      setFileName((fileUploadRef.current?.files ?? [])[0]?.name);
-    }, [fileUploadRef.current?.files]);
 
     return (
       <div className={`relative ${invalid ? "mb-1" : ""} ${className}`}>
@@ -42,6 +47,11 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
           <input
             aria-invalid={errorMessage !== undefined ? "true" : "false"}
             type="file"
+            onInput={() => {
+              let name = ref.current?.files?.item(0)?.name;
+              if (name === null) name = undefined;
+              setFileName(name);
+            }}
             className="hidden"
             ref={ref}
             {...rest}
