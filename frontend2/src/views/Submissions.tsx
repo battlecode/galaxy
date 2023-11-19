@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import type { Maybe } from "../utils/utilTypes";
-import {
-  type PaginatedSubmissionList,
-  type TournamentSubmission,
+import type {
+  Tournament,
+  PaginatedSubmissionList,
+  TournamentSubmission,
 } from "../utils/types";
-import { useEpisodeId } from "../contexts/EpisodeContext";
+import { useEpisode, useEpisodeId } from "../contexts/EpisodeContext";
 import {
   getAllSubmissions,
   getAllUserTournamentSubmissions,
@@ -19,17 +20,23 @@ import FileUpload from "../components/FileUpload";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import type { SubmissionUploadRequest } from "../utils/apiTypes";
 import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
+import { getNextTournament } from "../utils/api/episode";
+import Spinner from "../components/Spinner";
+import TournamentCountdown from "../components/compete/TournamentCountdown";
 
 const Submissions: React.FC = () => {
   const { episodeId } = useEpisodeId();
+  const episode = useEpisode();
   const { register, handleSubmit } = useForm<SubmissionUploadRequest>();
 
   const [subsLoading, setSubsLoading] = useState<boolean>(false);
   const [tourneySubsLoading, setTourneySubsLoading] = useState<boolean>(false);
+  const [nextTourneyLoading, setNextTourneyLoading] = useState<boolean>(false);
 
   const [subData, setSubData] = useState<Maybe<PaginatedSubmissionList>>();
   const [tourneySubData, setTourneySubData] =
     useState<Maybe<TournamentSubmission[]>>();
+  const [nextTourneyData, setNextTourneyData] = useState<Maybe<Tournament>>();
 
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [subError, setSubError] = useState<Maybe<string>>();
@@ -108,6 +115,37 @@ const Submissions: React.FC = () => {
     };
   }, [episodeId]);
 
+  useEffect(() => {
+    let isActiveLookup = true;
+    if (nextTourneyLoading) return;
+    setNextTourneyLoading(true);
+    setNextTourneyData(undefined);
+
+    const fetchNextTourney = async (): Promise<void> => {
+      try {
+        const result = await getNextTournament(episodeId);
+        if (isActiveLookup) {
+          setNextTourneyData(result);
+        }
+      } catch (err) {
+        if (isActiveLookup) {
+          setNextTourneyData(undefined);
+        }
+        console.error(err);
+      } finally {
+        if (isActiveLookup) {
+          setNextTourneyLoading(false);
+        }
+      }
+    };
+
+    void fetchNextTourney();
+
+    return () => {
+      isActiveLookup = false;
+    };
+  }, [episodeId]);
+
   return (
     <div className="flex h-full w-full flex-col overflow-auto p-6">
       <h1 className="mb-5 text-3xl font-bold leading-7 text-gray-900">
@@ -115,73 +153,99 @@ const Submissions: React.FC = () => {
       </h1>
 
       <SectionCard title="Next Submission Deadline" className="mb-8">
-        Hello world!
+        {nextTourneyLoading ? (
+          <div className="flex flex-row items-center gap-4">
+            <Spinner size="md" />
+            <span>Loading...</span>
+          </div>
+        ) : (
+          <TournamentCountdown tournament={nextTourneyData} />
+        )}
       </SectionCard>
 
       <SectionCard title="Submit Code" className="mb-8">
-        <p>Submit your code using the button below.</p>
-        <p>
-          Create a{" "}
-          <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
-            zip
-          </span>{" "}
-          file of your robot player, and submit it below. The submission format
-          should be a zip file containing a single folder (which is your package
-          name), which should contain{" "}
-          <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
-            RobotPlayer.java
-          </span>{" "}
-          and any other code you have written, for example:
-        </p>
-        <span className="w-full">
-          <p className="rounded-md border border-gray-400 bg-gray-100 px-4 py-3 font-mono">
-            {
-              "submission.zip --> examplefuncsplayer --> RobotPlayer.java, FooBar.java"
-            }
-          </p>
-        </span>
-        <form
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleSubmit(onSubmit);
-          }}
-          className="mt-4 flex flex-col"
-        >
-          <FileUpload
-            label="Choose Submission File"
-            fileInputHelp="Java .zip File (5MB max)"
-            errorMessage={subError}
-            required
-            {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
-          />
-          {/* <div className="flex w-full flex-row items-center gap-10"> */}
-          <Input
-            className="w-1/3"
-            label="Package Name (i.e. where is RobotPlayer?)"
-            required
-            {...register("packageName", {
-              required: FIELD_REQUIRED_ERROR_MSG,
-            })}
-          />
-          <Input
-            className="w-2/3"
-            label="Description (for your reference)"
-            required
-            {...register("description", {
-              required: FIELD_REQUIRED_ERROR_MSG,
-            })}
-          />
-          {/* </div> */}
-          <Button
-            className="mt-4 max-w-sm"
-            variant="dark"
-            label="Submit"
-            type="submit"
-            loading={submitting}
-            disabled={submitting}
-          />
-        </form>
+        {episode === undefined ? (
+          <>
+            <div className="flex flex-row items-center gap-4">
+              <Spinner size="md" />
+              <span>Loading...</span>
+            </div>
+          </>
+        ) : episode.frozen ? (
+          <>
+            <p>
+              Submissions are currently frozen! This is most likely due to a
+              submission freeze for a tournament. If you think the freeze has
+              passed, try refreshing the page.
+            </p>
+          </>
+        ) : (
+          <>
+            <p>Submit your code using the button below.</p>
+            <p>
+              Create a{" "}
+              <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
+                zip
+              </span>{" "}
+              file of your robot player, and submit it below. The submission
+              format should be a zip file containing a single folder (which is
+              your package name), which should contain{" "}
+              <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
+                RobotPlayer.java
+              </span>{" "}
+              and any other code you have written, for example:
+            </p>
+            <span className="w-full">
+              <p className="rounded-md border border-gray-400 bg-gray-100 px-4 py-3 font-mono">
+                {
+                  "submission.zip --> examplefuncsplayer --> RobotPlayer.java, FooBar.java"
+                }
+              </p>
+            </span>
+            <form
+              // eslint-disable-next-line @typescript-eslint/no-misused-promises
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleSubmit(onSubmit);
+              }}
+              className="mt-4 flex flex-col"
+            >
+              <FileUpload
+                label="Choose Submission File"
+                fileInputHelp="Java .zip File (5MB max)"
+                errorMessage={subError}
+                required
+                {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
+              />
+              {/* <div className="flex w-full flex-row items-center gap-10"> */}
+              <Input
+                className="w-1/3"
+                label="Package Name (i.e. where is RobotPlayer?)"
+                required
+                {...register("packageName", {
+                  required: FIELD_REQUIRED_ERROR_MSG,
+                })}
+              />
+              <Input
+                className="w-2/3"
+                label="Description (for your reference)"
+                required
+                {...register("description", {
+                  required: FIELD_REQUIRED_ERROR_MSG,
+                })}
+              />
+              {/* </div> */}
+              <Button
+                className="mt-4 max-w-sm"
+                variant="dark"
+                label="Submit"
+                type="submit"
+                loading={submitting}
+                disabled={submitting}
+              />
+            </form>
+          </>
+        )}
       </SectionCard>
 
       <SectionCard title="Submission History" className="mb-8">
