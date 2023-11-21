@@ -47,7 +47,6 @@ models/StyleEnum.ts
 models/Submission.ts
 models/SubmissionDownload.ts
 models/SubmissionReportRequest.ts
-models/SubmissionRequest.ts
 models/TeamAvatarRequest.ts
 models/TeamCreate.ts
 models/TeamCreateRequest.ts
