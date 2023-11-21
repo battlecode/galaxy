@@ -57,7 +57,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             {...rest}
           />
           <div
-            className={`flex w-[150px] cursor-pointer items-center justify-center rounded-l-lg border-y border-l border-gray-200 bg-cyan-400 p-2 text-sm text-gray-700 hover:bg-cyan-300 focus:outline-none ${disabledClassName}`}
+            className={`flex w-[150px] cursor-pointer items-center justify-center rounded-l-lg border-y border-l border-gray-200 bg-cyan-400 p-2 text-sm text-cyan-900 hover:bg-cyan-300 focus:outline-none ${disabledClassName}`}
           >
             Choose File
           </div>
@@ -67,10 +67,10 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             {fileName ?? "No file uploaded."}
           </div>
         </label>
+        {invalid && <FormError className="mb-4" message={errorMessage} />}
         {fileInputHelp !== undefined && (
           <p className="mb-0 mt-1 text-sm text-gray-500">{fileInputHelp}</p>
         )}
-        {invalid && <FormError message={errorMessage} />}
       </div>
     );
   },

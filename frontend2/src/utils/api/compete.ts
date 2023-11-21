@@ -26,11 +26,9 @@ export const uploadSubmission = async (
 ): Promise<void> => {
   await API.competeSubmissionCreate({
     episodeId,
-    submissionRequest: {
-      source_code: submission.file,
-      _package: submission.packageName,
-      description: submission.description,
-    },
+    sourceCode: submission.file,
+    _package: submission.packageName,
+    description: submission.description,
   });
 };
 

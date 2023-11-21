@@ -24,10 +24,16 @@ import { getNextTournament } from "../utils/api/episode";
 import Spinner from "../components/Spinner";
 import TournamentCountdown from "../components/compete/TournamentCountdown";
 
+interface SubmissionFormInput {
+  file: FileList;
+  packageName: string;
+  description: string;
+}
+
 const Submissions: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const episode = useEpisode();
-  const { register, handleSubmit } = useForm<SubmissionUploadRequest>();
+  const { register, handleSubmit } = useForm<SubmissionFormInput>();
 
   const [subsLoading, setSubsLoading] = useState<boolean>(false);
   const [tourneySubsLoading, setTourneySubsLoading] = useState<boolean>(false);
@@ -41,13 +47,16 @@ const Submissions: React.FC = () => {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [subError, setSubError] = useState<Maybe<string>>();
 
-  const onSubmit: SubmitHandler<SubmissionUploadRequest> = async (data) => {
+  const onSubmit: SubmitHandler<SubmissionFormInput> = async (data) => {
     if (submitting) return;
     setSubmitting(true);
     try {
-      await uploadSubmission(episodeId, data);
+      await uploadSubmission(episodeId, {
+        ...data,
+        file: data.file[0],
+      });
     } catch (err) {
-      setSubError(`Error uploading submission: ${err as string}`);
+      setSubError(`${err as string}`);
     } finally {
       setSubmitting(false);
     }
