@@ -16,13 +16,12 @@ import SubHistoryTable from "../components/tables/submissions/SubHistoryTable";
 import TourneySubTable from "../components/tables/submissions/TourneySubTable";
 import Button from "../components/elements/Button";
 import Input from "../components/elements/Input";
-import FileUpload from "../components/FileUpload";
 import { type SubmitHandler, useForm } from "react-hook-form";
-import type { SubmissionUploadRequest } from "../utils/apiTypes";
 import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
 import { getNextTournament } from "../utils/api/episode";
 import Spinner from "../components/Spinner";
 import TournamentCountdown from "../components/compete/TournamentCountdown";
+import FormLabel from "../components/elements/FormLabel";
 
 interface SubmissionFormInput {
   file: FileList;
@@ -33,7 +32,12 @@ interface SubmissionFormInput {
 const Submissions: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const episode = useEpisode();
-  const { register, handleSubmit } = useForm<SubmissionFormInput>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<SubmissionFormInput>();
 
   const [subsLoading, setSubsLoading] = useState<boolean>(false);
   const [tourneySubsLoading, setTourneySubsLoading] = useState<boolean>(false);
@@ -45,7 +49,6 @@ const Submissions: React.FC = () => {
   const [nextTourneyData, setNextTourneyData] = useState<Maybe<Tournament>>();
 
   const [submitting, setSubmitting] = useState<boolean>(false);
-  const [subError, setSubError] = useState<Maybe<string>>();
 
   const onSubmit: SubmitHandler<SubmissionFormInput> = async (data) => {
     if (submitting) return;
@@ -55,8 +58,9 @@ const Submissions: React.FC = () => {
         ...data,
         file: data.file[0],
       });
+      reset();
     } catch (err) {
-      setSubError(`${err as string}`);
+      console.error(err);
     } finally {
       setSubmitting(false);
     }
@@ -140,7 +144,6 @@ const Submissions: React.FC = () => {
         if (isActiveLookup) {
           setNextTourneyData(undefined);
         }
-        console.error(err);
       } finally {
         if (isActiveLookup) {
           setNextTourneyLoading(false);
@@ -214,36 +217,40 @@ const Submissions: React.FC = () => {
             <form
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onSubmit={handleSubmit(onSubmit)}
-              className="mt-4 flex flex-col"
+              className="mt-4 flex flex-col gap-4"
             >
-              <FileUpload
-                label="Choose Submission File"
-                fileInputHelp="Java .zip File (5MB max)"
-                errorMessage={subError}
-                required
-                accept=".zip"
-                {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
-              />
-              {/* <div className="flex w-full flex-row items-center gap-10"> */}
-              <Input
-                className="w-1/3"
-                label="Package Name (i.e. where is RobotPlayer?)"
-                required
-                {...register("packageName", {
-                  required: FIELD_REQUIRED_ERROR_MSG,
-                })}
-              />
-              <Input
-                className="w-2/3"
-                label="Description (for your reference)"
-                required
-                {...register("description", {
-                  required: FIELD_REQUIRED_ERROR_MSG,
-                })}
-              />
-              {/* </div> */}
+              <div>
+                {/* TODO: TOAST when upload fails! */}
+                <FormLabel required label="Choose Submission File" />
+                <input
+                  type="file"
+                  accept=".zip"
+                  required
+                  {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
+                />
+              </div>
+              <div className="flex w-full flex-row items-end gap-10">
+                <Input
+                  className="w-1/3"
+                  label="Package Name (i.e. where is RobotPlayer?)"
+                  required
+                  errorMessage={errors.packageName?.message}
+                  {...register("packageName", {
+                    required: FIELD_REQUIRED_ERROR_MSG,
+                  })}
+                />
+                <Input
+                  className="w-2/3"
+                  label="Description (for your reference)"
+                  required
+                  errorMessage={errors.description?.message}
+                  {...register("description", {
+                    required: FIELD_REQUIRED_ERROR_MSG,
+                  })}
+                />
+              </div>
               <Button
-                className="mt-4 max-w-sm"
+                className="max-w-sm"
                 variant="dark"
                 label="Submit"
                 type="submit"
