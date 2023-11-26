@@ -34,7 +34,7 @@ class SideBar extends Component {
         <div className="sidebar-wrapper">
           <div className="logo text">
             <a href={`/${this.props.episode}/home`}>
-              <img src="/bc/img/logo.png" />
+              <img src="/bc/img/bc24.png" />
             </a>
             <p>
               {this.props.episode_info &&

@@ -604,47 +604,47 @@ body > .navbar-collapse[data-color="chess"]:after,
 .sidebar[data-color="dust"],
 body > .navbar-collapse[data-color="dust"]:after,
 .dustBackground {
-  background: #2f3061;
-  background: -moz-linear-gradient(top, #2f3061 10%, #96acb7 60%, #fedc97 100%);
+  background: #164e63;
+  background: -moz-linear-gradient(top, #164e63 10%, #0891b2 60%, #67e8f9 100%);
   background: -webkit-gradient(
     linear,
     left top,
     left bottom,
-    color-stop(10%, #2f3061),
-    color-stop(100%, #96acb7),
-    color-stop(100%, #fedc97)
+    color-stop(10%, #164e63),
+    color-stop(100%, #0891b2),
+    color-stop(100%, #67e8f9)
   );
   background: -webkit-linear-gradient(
     top,
-    #2f3061 10%,
-    #96acb7 60%,
-    #fedc97 100%
+    #164e63 10%,
+    #0891b2 60%,
+    #67e8f9 100%
   );
-  background: -o-linear-gradient(top, #2f3061 10%, #96acb7 60%, #fedc97 100%);
-  background: -ms-linear-gradient(top, #2f3061 10%, #96acb7 60%, #fedc97 100%);
+  background: -o-linear-gradient(top, #164e63 10%, #0891b2 60%, #67e8f9 100%);
+  background: -ms-linear-gradient(top, #164e63 10%, #0891b2 60%, #67e8f9 100%);
   background: linear-gradient(
     to bottom,
-    #2f3061 10%,
-    #96acb7 60%,
-    #fedc97 100%
+    #164e63 10%,
+    #0891b2 60%,
+    #67e8f9 100%
   );
   background-size: 150% 150%;
 }
 .sidebar[data-color="anomoly"],
 body > .navbar-collapse[data-color="anomoly"]:after {
-  background: #425e16;
-  background: -moz-linear-gradient(top, #425e16 0%, #cfe1b9 100%);
+  background: #164e63;
+  background: -moz-linear-gradient(top, #164e63 0%, #0e7490 100%);
   background: -webkit-gradient(
     linear,
     left top,
     left bottom,
-    color-stop(0%, #425e16),
-    color-stop(100%, #cfe1b9)
+    color-stop(0%, #164e63),
+    color-stop(100%, #0e7490)
   );
-  background: -webkit-linear-gradient(top, #425e16 0%, #cfe1b9 100%);
-  background: -o-linear-gradient(top, #425e16 0%, #cfe1b9 100%);
-  background: -ms-linear-gradient(top, #425e16 0%, #cfe1b9 100%);
-  background: linear-gradient(to bottom, #425e16 0%, #cfe1b9 100%);
+  background: -webkit-linear-gradient(top, #164e63 0%, #0e7490 100%);
+  background: -o-linear-gradient(top, #164e63 0%, #0e7490 100%);
+  background: -ms-linear-gradient(top, #164e63 0%, #0e7490 100%);
+  background: linear-gradient(to bottom, #164e63 0%, #0e7490 100%);
   background-size: 150% 150%;
 }
 
