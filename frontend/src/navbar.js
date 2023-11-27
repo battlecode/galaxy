@@ -67,8 +67,10 @@ class NavBarAccount extends Component {
           {/* <li>
             <NavLink to={`/multi-episode`}>Change Episode</NavLink>
           </li> */}
-          <li>
-            <NavLink to={`/register`}>Register</NavLink>
+          <li style={{ background: "#0e7490" }}>
+            <NavLink style={{ color: "white" }} to={`/register`}>
+              Register
+            </NavLink>
           </li>
           <li>
             <NavLink to={`/login`}>Log in</NavLink>

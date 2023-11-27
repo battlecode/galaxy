@@ -12,22 +12,22 @@ body {
 }
 
 a {
-  color: #6e6eb6;
+  color: #0891b2;
 }
 
 a:hover {
-  color: #272750;
+  color: #155e75;
 }
 
 .btn {
-  background-color: #52527a !important;
-  border-color: #52527a !important;
+  background-color: #155e75 !important;
+  border-color: #155e75 !important;
   color: rgb(230, 230, 230);
 }
 
 .btn:hover {
-  background-color: #2f3061 !important;
-  border-color: #2f3061 !important;
+  background-color: #083344 !important;
+  border-color: #083344 !important;
 }
 
 /* a centered row of things used in team page for checkboxes */

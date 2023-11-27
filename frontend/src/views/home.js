@@ -129,6 +129,10 @@ class InstrCard extends UpdateCard {
         </div>
         <div className="content">
           <p>
+            <a href={`/register`}>Register</a> for an account, then{" "}
+            <a href={`/${this.props.episode}/team`}>join or create a team</a>!
+          </p>
+          <p>
             Please join our <a href="https://discord.gg/N86mxkH">Discord</a>,
             and follow our{" "}
             <a href="https://www.facebook.com/mitbattlecode">Facebook</a> and{" "}
@@ -167,6 +171,10 @@ class LinksCard extends Component {
               <b>for all official announcements and our community</b>
             </li>
             <li>
+              <a href="https://twitch.tv/mitbattlecode">Twitch</a> -{" "}
+              <b>for lecture and tournament streams</b>
+            </li>
+            <li>
               <a href="https://www.facebook.com/mitbattlecode">Facebook</a> and{" "}
               <a href="https://www.instagram.com/mitbattlecode/">Instagram</a> -{" "}
               <b>for event announcements and photos</b>
@@ -175,16 +183,16 @@ class LinksCard extends Component {
               <a href="https://github.com/battlecode">GitHub</a>
             </li>
             <li>
-              <a href="https://twitch.tv/mitbattlecode">Twitch</a>
-            </li>
-            <li>
               <a href="https://battlecode.org">Battlecode.org</a>
               <ul>
                 <li>
-                  <a href="https://battlecode.org/schedule.html">Schedule</a>
+                  <a href="https://battlecode.org/schedule.html">Schedule</a> -{" "}
+                  <b>for lectures and tournaments</b>
                 </li>
                 <li>
-                  <a href="https://battlecode.org/about.html">Eligibility</a>
+                  <a href="https://battlecode.org/about.html">
+                    Eligibility Rules
+                  </a>
                 </li>
               </ul>
             </li>
