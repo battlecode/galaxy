@@ -6,8 +6,11 @@ import TextArea from "../components/elements/TextArea";
 import { TeamStateEnum, useCurrentTeam } from "../contexts/CurrentTeamContext";
 import Button from "../components/elements/Button";
 import MemberList from "../components/team/MemberList";
-import DescriptiveCheckbox from "../components/elements/DescriptiveCheckbox";
 import JoinTeam from "./JoinTeam";
+import Modal from "../components/Modal";
+import EligibilitySettings from "../components/team/EligibilitySettings";
+import ScrimmageSettings from "../components/team/ScrimmageSettings";
+
 
 const MyTeam: React.FC = () => {
   const { team, teamState, leaveMyTeam } = useCurrentTeam();

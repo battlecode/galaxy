@@ -68,6 +68,7 @@ class TeamViewSet(
     def get_serializer_class(self):
         match self.action:
             case "create":
+                print("found")
                 return TeamCreateSerializer
             case "retrieve" | "list":
                 return TeamPublicSerializer

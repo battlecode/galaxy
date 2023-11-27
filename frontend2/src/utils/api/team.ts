@@ -24,7 +24,6 @@ export const createTeam = async (
   return await API.teamTCreate({
     episodeId,
     teamCreateRequest: {
-      episode: episodeId,
       name: teamName,
     },
   });

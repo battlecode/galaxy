@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import SectionCard from "../components/SectionCard";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
@@ -6,50 +6,52 @@ import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useCurrentTeam } from "../contexts/CurrentTeamContext";
-import { createTeam, joinTeam } from "../utils/api/team";
+import { createTeam, joinTeam, retrieveTeam } from "../utils/api/team";
 import { type Maybe } from "../utils/utilTypes";
+import { type TeamPrivate } from "../utils/types";
+// import types;
 
 interface CreateTeamInput {
-  episodeId: string;
   teamName: string;
 }
 interface JoinTeamInput {
-  episodeId: string;
   teamName: string;
   joinKey: string;
 }
 
 
 const JoinTeam: React.FC = () => {
+  const {episodeId} = useEpisodeId();
   // const { register, handleSubmit } = useForm<CreateTeamInput>();
   const { register:registerJoin, handleSubmit:handleJoinSubmit } = useForm<JoinTeamInput>();
   const { register, handleSubmit } = useForm<CreateTeamInput>();
-  // const { login, authState } = useCurrentTeam();
-  const [loginError, setJoinError] = useState<Maybe<string>>();
+  const { refreshTeam } = useCurrentTeam();
+  const [createError, setCreateError] = useState<Maybe<string>>();
+  const [joinError, setJoinError] = useState<Maybe<string>>();
 
-  const onTeamCreate: SubmitHandler<CreateTeamInput> = async (data) => {
+  const onTeamCreate: SubmitHandler<CreateTeamInput> = useCallback(async (data) => {
     try {
-      setJoinError(undefined);
-      console.log("teaming");
-      await createTeam(data.episodeId, data.teamName);
-      // login(await getUserUserProfile());
+      setCreateError(undefined);
+      refreshTeam(await createTeam(episodeId, data.teamName) as TeamPrivate);
     } catch (error) {
-      // setLoginError(
-      //   "Error logging in. Did you enter your username and password correctly?",
-      // );
+      setCreateError(
+
+        "Error creating team, try a different name",
+      );
     }
-  };
-  const onTeamJoin: SubmitHandler<JoinTeamInput> = async (data) => {
+  }, [episodeId]);
+  const onTeamJoin: SubmitHandler<JoinTeamInput> = useCallback(async (data) => {
     try {
       setJoinError(undefined);
-      await joinTeam(data.episodeId, data.teamName, data.joinKey);
-      // login();
+      await joinTeam(episodeId, data.teamName, data.joinKey);
+      const team = await retrieveTeam(episodeId);
+      refreshTeam(team);
     } catch (error) {
       setJoinError(
         "Error joining team. Did you enter the name and key correctly?",
       );
     }
-  };
+  }, [episodeId]);
 
   return (
     <div className="p-10">
@@ -59,6 +61,11 @@ const JoinTeam: React.FC = () => {
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={handleSubmit(onTeamCreate)}
       >
+        {
+          createError !== undefined && (
+            <div className="text-center text-sm text-red-600">{createError}</div>
+          )
+        }
       <SectionCard title="Create Team" className="max-w-5xl">
         <div className="flex flex-col gap-2">
         <Input
@@ -79,6 +86,11 @@ const JoinTeam: React.FC = () => {
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSubmit={handleJoinSubmit(onTeamJoin)}
       >
+        {
+          joinError !== undefined && (
+            <div className="text-center text-sm text-red-600">{joinError}</div>
+          )
+        }
       <SectionCard title="Join Team" className="max-w-5xl">
       <div className="flex flex-col gap-2">
           <Input
