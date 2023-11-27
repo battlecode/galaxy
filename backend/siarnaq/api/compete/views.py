@@ -263,14 +263,25 @@ class MatchViewSet(
         """List matches played in a tournament."""
         queryset = self.get_queryset()
 
-        # Filter tournament as requested
-        tournaments = Tournament.objects.visible_to_user(is_staff=request.user.is_staff)
-        tournament_id = self.request.query_params.get("tournament_id")
-        if tournament_id is not None:
-            tournaments = tournaments.filter(pk=tournament_id)
-        queryset = self.get_queryset().filter(
-            tournament_round__tournament__in=Subquery(tournaments.values("pk"))
-        )
+        # First attempt to get tournament by private challonge id
+        external_id_private = self.request.query_params.get("external_id_private")
+        tournaments = None
+        if external_id_private is not None:
+            tournaments = Tournament.objects.visible_to_user(is_staff=True)
+            tournaments = tournaments.filter(external_id_private=external_id_private)
+            if tournaments.count() != 1:
+                return Response(None, status=status.HTTP_404_NOT_FOUND)
+        else:
+            # Filter tournament as requested
+            tournaments = Tournament.objects.visible_to_user(
+                is_staff=request.user.is_staff
+            )
+            tournament_id = self.request.query_params.get("tournament_id")
+            if tournament_id is not None:
+                tournaments = tournaments.filter(pk=tournament_id)
+            queryset = self.get_queryset().filter(
+                tournament_round__tournament__in=Subquery(tournaments.values("pk"))
+            )
 
         # Filter rounds as requested
         round_id = parse_int(self.request.query_params.get("round_id"))
