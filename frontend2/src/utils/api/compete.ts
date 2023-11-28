@@ -1,3 +1,4 @@
+import type { SubmissionUploadRequest } from "../apiTypes";
 import {
   CompeteApi,
   type TournamentSubmission,
@@ -21,19 +22,13 @@ const API = new CompeteApi(DEFAULT_API_CONFIGURATION);
  */
 export const uploadSubmission = async (
   episodeId: string,
-  submission: {
-    file: File;
-    packageName: string;
-    description: string;
-  },
+  submission: SubmissionUploadRequest,
 ): Promise<void> => {
   await API.competeSubmissionCreate({
     episodeId,
-    submissionRequest: {
-      source_code: submission.file,
-      _package: submission.packageName,
-      description: submission.description,
-    },
+    sourceCode: submission.file,
+    _package: submission.packageName,
+    description: submission.description,
   });
 };
 

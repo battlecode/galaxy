@@ -109,6 +109,18 @@ class SubmissionViewSet(
             .order_by("-pk")
         )
 
+    @extend_schema(
+        request={
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "package": {"type": "string"},
+                    "description": {"type": "string"},
+                    "source_code": {"type": "string", "format": "binary"},
+                },
+            }
+        },
+    )
     def create(self, request, *, episode_id):
         """
         Create a new submission. This operation creates a submission record in the
