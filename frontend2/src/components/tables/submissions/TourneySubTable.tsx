@@ -15,7 +15,9 @@ const TourneySubTable: React.FC<TourneySubTableProps> = ({ data, loading }) => {
     <Table
       data={data ?? []}
       loading={loading}
-      keyFromValue={(match) => match.id.toString()}
+      keyFromValue={(match) =>
+        match.tournament.toString() + "match" + match.id.toString()
+      }
       columns={[
         {
           header: "Tournament",
