@@ -261,3 +261,9 @@ export const COUNTRIES: Record<CountryEnum, string> = {
   ZM: "Zambia",
   ZW: "Zimbabwe",
 } as const;
+
+export interface SubmissionUploadRequest {
+  file: File;
+  packageName: string;
+  description: string;
+}

@@ -450,16 +450,17 @@ paths:
       - compete
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SubmissionRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/SubmissionRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/SubmissionRequest'
-        required: true
+              type: object
+              properties:
+                package:
+                  type: string
+                description:
+                  type: string
+                source_code:
+                  type: string
+                  format: binary
       security:
       - jwtAuth: []
       responses:
@@ -2729,21 +2730,6 @@ components:
           type: boolean
       required:
       - invocation
-    SubmissionRequest:
-      type: object
-      properties:
-        package:
-          type: string
-          maxLength: 32
-        description:
-          type: string
-          maxLength: 128
-        source_code:
-          type: string
-          format: binary
-          writeOnly: true
-      required:
-      - source_code
     TeamAvatarRequest:
       type: object
       properties:
