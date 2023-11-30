@@ -1815,6 +1815,8 @@ components:
             type: integer
         min_score:
           type: integer
+          maximum: 32767
+          minimum: 0
       required:
       - episode
       - maps
@@ -3080,6 +3082,8 @@ components:
           type: string
         external_id:
           type: integer
+          maximum: 32767
+          minimum: -32768
           nullable: true
         name:
           type: string
@@ -3089,7 +3093,10 @@ components:
           items:
             type: integer
         release_status:
-          $ref: '#/components/schemas/ReleaseStatusEnum'
+          allOf:
+          - $ref: '#/components/schemas/ReleaseStatusEnum'
+          minimum: -2147483648
+          maximum: 2147483647
       required:
       - id
       - name

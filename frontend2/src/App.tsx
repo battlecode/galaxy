@@ -1,4 +1,5 @@
 import React from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import EpisodeLayout from "./components/EpisodeLayout";
 import Home from "./views/Home";
 import Logout from "./views/Logout";
@@ -29,15 +30,19 @@ import Tournaments from "./views/Tournaments";
 import TournamentPage from "./views/Tournament";
 import Submissions from "./views/Submissions";
 
+const queryClient = new QueryClient();
+
 const App: React.FC = () => {
   return (
-    <CurrentUserProvider>
-      <EpisodeProvider>
-        <CurrentTeamProvider>
-          <RouterProvider router={router} />
-        </CurrentTeamProvider>
-      </EpisodeProvider>
-    </CurrentUserProvider>
+    <QueryClientProvider client={queryClient}>
+      <CurrentUserProvider>
+        <EpisodeProvider>
+          <CurrentTeamProvider>
+            <RouterProvider router={router} />
+          </CurrentTeamProvider>
+        </EpisodeProvider>
+      </CurrentUserProvider>
+    </QueryClientProvider>
   );
 };
 
