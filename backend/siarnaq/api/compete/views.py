@@ -244,6 +244,11 @@ class MatchViewSet(
                 description="A tournament to filter for.",
             ),
             OpenApiParameter(
+                name="external_id_private",
+                type=str,
+                description="A private id to filter for.",
+            ),
+            OpenApiParameter(
                 name="round_id",
                 type=int,
                 description="A tournament round to filter for.",
