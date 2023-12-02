@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import SectionCard from "../components/SectionCard";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
