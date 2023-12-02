@@ -10,7 +10,8 @@ This is a outline (non-exhaustive) of necessary tasks when creating and releasin
 - Add tournaments to backend
   - If exact tournaments and schedule is not known, estimates are fine. (Or you can skip this step for now.)
 - Create the team of Teh Devs
-- Have new devs create accounts, and make all of these "admin" accounts (Any dev can do this from the admin panel with their IDs)
+- Have new devs create accounts.
+- For _only to the people who need this_, make their accounts "admin" accounts. (Any other admin can do this from the admin panel with their IDs.) Please be cautious, safe, and secure!!
 - Add episode in frontend
 - Update the default episode in frontend
 - Update the competition info in the frontend. (Again, you can do this later, just don't forget.) In particular, update:
