@@ -19,6 +19,7 @@ This is a outline (non-exhaustive) of necessary tasks when creating and releasin
   - Tournament info
 - Release a new version of the backend. (Note: at this point, the versions may be temporarily incompatible with each other)
 - Release a new version of the frontend.
+- (Also, release a new version of the engine and client when ready. Instructions for this should be in the respective readme. You can ask their teams to do it.)
 
 ## Get dev permissions
 
