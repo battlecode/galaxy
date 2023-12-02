@@ -1,5 +1,25 @@
 # Operations
 
+## Enabling a new episode
+
+This is a outline (non-exhaustive) of necessary tasks when creating and releasing a new episode, such as releasing every new annual game.
+
+- Determine various info about the episode, especially prize and tournament info. (This should be done by the presidents, etc. You can also do this later.)
+- Add episode to backend
+  - This should be easy via the admin panel. You'll have to add various information there
+- Add tournaments to backend
+  - If exact tournaments and schedule is not known, estimates are fine. (Or you can skip this step for now.)
+- Create the team of Teh Devs
+- Have new devs create accounts, and make all of these "admin" accounts (Any dev can do this from the admin panel with their IDs)
+- Add episode in frontend
+- Update the default episode in frontend
+- Update the competition info in the frontend. (Again, you can do this later, just don't forget.) In particular, update:
+  - Prizes
+  - Sponsors
+  - Tournament info
+- Release a new version of the backend. (Note: at this point, the versions may be temporarily incompatible with each other)
+- Release a new version of the frontend.
+
 ## Get dev permissions
 
 TODO, tracked in #681
