@@ -19,7 +19,7 @@ const Account: React.FC = () => {
     <div className="p-6">
       <PageTitle>User Settings</PageTitle>
       <div className="flex flex-col gap-8 xl:flex-row">
-        <SectionCard title="Profile" className="flex-1 max-w-5xl">
+        <SectionCard title="Profile" className="max-w-5xl flex-1">
           <div className="flex flex-col lg:flex-row lg:gap-8">
             <div className="flex flex-col items-center gap-6 p-4">
               <img
@@ -67,7 +67,6 @@ const Account: React.FC = () => {
 
               <TextArea label="User biography" />
               <Button className="mb-10 mt-2" label="Save" type="submit" />
-
             </div>
           </div>
         </SectionCard>
