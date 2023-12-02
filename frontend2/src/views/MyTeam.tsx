@@ -11,7 +11,6 @@ import Modal from "../components/Modal";
 import EligibilitySettings from "../components/team/EligibilitySettings";
 import ScrimmageSettings from "../components/team/ScrimmageSettings";
 
-
 const MyTeam: React.FC = () => {
   const { team, teamState, leaveMyTeam } = useCurrentTeam();
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
@@ -34,7 +33,7 @@ const MyTeam: React.FC = () => {
     return <JoinTeam />;
   }
   return (
-   <div className="p-10">
+    <div className="p-10">
       <PageTitle>Team Settings</PageTitle>
       <div className="flex flex-col gap-8 xl:flex-row">
         <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
