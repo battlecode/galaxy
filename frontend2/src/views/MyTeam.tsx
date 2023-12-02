@@ -33,7 +33,7 @@ const MyTeam: React.FC = () => {
     return <JoinTeam />;
   }
   return (
-    <div className="p-10">
+    <div className="p-6">
       <PageTitle>Team Settings</PageTitle>
       <div className="flex flex-col gap-8 xl:flex-row">
         <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
@@ -56,10 +56,6 @@ const MyTeam: React.FC = () => {
                 />
                 <Input label="Team quote" />
                 <TextArea label="Team biography" />
-                {/* TODO: This button will be disabled when no changes have been made,
-                and will turn dark cyan after changes have been made. When changes
-                are saved, it will be disabled again. We may want to show a popup indicating
-                success */}
                 <Button className="mt-2" label="Save" type="submit" />
               </div>
             </div>
