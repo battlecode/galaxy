@@ -56,6 +56,10 @@ const MyTeam: React.FC = () => {
                 />
                 <Input label="Team quote" />
                 <TextArea label="Team biography" />
+                {/* TODO: This button will be disabled when no changes have been made,
+                and will turn dark cyan after changes have been made. When changes
+                are saved, it will be disabled again. We may want to show a popup indicating
+                success */}
                 <Button className="mt-2" label="Save" type="submit" />
               </div>
             </div>

@@ -18,8 +18,8 @@ const Account: React.FC = () => {
   return (
     <div className="p-6">
       <PageTitle>User Settings</PageTitle>
-      <div className="flex flex-col">
-        <SectionCard title="Profile">
+      <div className="flex flex-col gap-8 xl:flex-row">
+        <SectionCard title="Profile" className="flex-1 max-w-5xl">
           <div className="flex flex-col lg:flex-row lg:gap-8">
             <div className="flex flex-col items-center gap-6 p-4">
               <img
@@ -68,23 +68,26 @@ const Account: React.FC = () => {
               <TextArea label="User biography" />
               <Button className="mb-10 mt-2" label="Save" type="submit" />
 
-              <div className="flex flex-col gap-8 lg:flex-row ">
-                <div>
-                  <FormLabel label="Profile picture" />
-                  <input type="file" accept="image/*" className="w-full" />
-                  <Button
-                    className="mt-2"
-                    label="Save profile picture"
-                    type="submit"
-                  />
-                </div>
+            </div>
+          </div>
+        </SectionCard>
 
-                <div>
-                  <FormLabel label="Resume" />
-                  <input type="file" accept=".pdf" className="w-full" />
-                  <Button className="mt-2" label="Save resume" type="submit" />
-                </div>
-              </div>
+        <SectionCard title="File Upload">
+          <div className="flex flex-row gap-10 xl:flex-col ">
+            <div>
+              <FormLabel label="Profile picture" />
+              <input type="file" accept="image/*" className="w-full" />
+              <Button
+                className="mt-2"
+                label="Save profile picture"
+                type="submit"
+              />
+            </div>
+
+            <div>
+              <FormLabel label="Resume" />
+              <input type="file" accept=".pdf" className="w-full" />
+              <Button className="mt-2" label="Save resume" type="submit" />
             </div>
           </div>
         </SectionCard>
