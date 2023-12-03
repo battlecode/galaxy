@@ -7,10 +7,11 @@ import SectionCard from "../SectionCard";
 import DescriptiveCheckbox, {
   CheckboxState,
 } from "../elements/DescriptiveCheckbox";
-import { useEpisode, useEpisodeId } from "../../contexts/EpisodeContext";
+import { useEpisodeId } from "../../contexts/EpisodeContext";
 import { isPresent } from "../../utils/utilTypes";
 import { updateTeamPartial } from "../../utils/api/team";
 import { isEqual } from "lodash";
+import { useEpisodeInfo } from "../../api/episode/useEpisode";
 
 export function determineCheckboxState(
   inDesired: boolean,
@@ -28,8 +29,8 @@ export function determineCheckboxState(
 // This component should only be used when there is a logged in user with a team.
 const EligibilitySettings: React.FC = () => {
   const { team, teamState, refreshTeam } = useCurrentTeam();
-  const episode = useEpisode();
   const { episodeId } = useEpisodeId();
+  const { data: episode } = useEpisodeInfo({ id: episodeId });
   // the desired state according to what the user has clicked on the page
   const [desiredEligibility, setDesiredEligibility] = useState<
     number[] | undefined
@@ -76,7 +77,7 @@ const EligibilitySettings: React.FC = () => {
     !isPresent(team) ||
     !isPresent(episode)
   ) {
-    return <div>Error: You`&apos;`re not in a team!</div>;
+    return <div>{"Error: You're not in a team!"}</div>;
   }
   return (
     <SectionCard title="Eligibility">

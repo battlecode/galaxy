@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useEpisode, useEpisodeId } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 import type {
   EligibilityCriterion,
   PaginatedTeamPublicList,
@@ -11,6 +11,7 @@ import { searchTeams } from "../utils/api/team";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import RankingsTable from "../components/tables/RankingsTable";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
+import { useEpisodeInfo } from "../api/episode/useEpisode";
 
 interface QueryParams {
   page: number;
@@ -19,7 +20,7 @@ interface QueryParams {
 
 const Rankings: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const episode = useEpisode();
+  const { data: episode } = useEpisodeInfo({ id: episodeId });
 
   const [searchText, setSearchText] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);

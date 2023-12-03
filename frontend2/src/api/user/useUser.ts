@@ -3,8 +3,8 @@ import {
   getUserProfileByUser,
   getUserUserProfile,
   updateUser,
-} from "../level-2/user";
-import { type PatchedUserPrivateRequest } from "../level-1";
+} from "./userApi";
+import { type PatchedUserPrivateRequest } from "../_autogen";
 
 // ---------- KEY FACTORIES ----------//
 export const userQueryKeys = {
@@ -40,7 +40,7 @@ export const useUserById = (userId: number) => {
   return useQuery({
     queryKey: userQueryKeys.public(userId),
     // TODO: confirm that this is correct!
-    queryFn: async () => await getUserProfileByUser(userId),
+    queryFn: () => getUserProfileByUser(userId),
   });
 };
 

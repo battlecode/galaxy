@@ -5,17 +5,18 @@ import {
 } from "../../contexts/CurrentTeamContext";
 import SectionCard from "../SectionCard";
 import DescriptiveCheckbox from "../elements/DescriptiveCheckbox";
-import { useEpisode, useEpisodeId } from "../../contexts/EpisodeContext";
+import { useEpisodeId } from "../../contexts/EpisodeContext";
 import { isPresent } from "../../utils/utilTypes";
 import { updateTeamPartial } from "../../utils/api/team";
 import { determineCheckboxState } from "./EligibilitySettings";
 import { type TeamPrivate } from "../../utils/types";
+import { useEpisodeInfo } from "../../api/episode/useEpisode";
 
 // This component should only be used when there is a logged in user with a team.
 const ScrimmageSettings: React.FC = () => {
   const { team, teamState, refreshTeam } = useCurrentTeam();
-  const episode = useEpisode();
   const { episodeId } = useEpisodeId();
+  const { data: episode } = useEpisodeInfo({ id: episodeId });
   // true when the team has accept on, undefined when team's data hasn't loaded
   const [ranked, setRanked] = useState<boolean | undefined>(undefined);
   const [unranked, setUnranked] = useState<boolean | undefined>(undefined);

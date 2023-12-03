@@ -1,6 +1,6 @@
-import { TokenApi } from "../level-1";
+import { TokenApi } from "../_autogen";
 import Cookies from "js-cookie";
-import { DEFAULT_API_CONFIGURATION } from "./helpers";
+import { DEFAULT_API_CONFIGURATION } from "../helpers";
 
 /** This file contains all frontend authentication functions. Responsible for interacting with Cookies and expiring/setting JWT tokens. */
 const API = new TokenApi(DEFAULT_API_CONFIGURATION);

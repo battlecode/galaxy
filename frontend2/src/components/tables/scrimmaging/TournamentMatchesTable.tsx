@@ -9,7 +9,8 @@ import MatchStatus from "../../compete/MatchStatus";
 import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";
 import { useCurrentTeam } from "../../../contexts/CurrentTeamContext";
-import { useEpisode } from "../../../contexts/EpisodeContext";
+import { useEpisodeId } from "../../../contexts/EpisodeContext";
+import { useEpisodeInfo } from "../../../api/episode/useEpisode";
 
 interface TournamentMatchesTableProps {
   data: Maybe<PaginatedMatchList>;
@@ -24,7 +25,8 @@ const TournamentMatchesTable: React.FC<TournamentMatchesTableProps> = ({
   loading,
   handlePage,
 }) => {
-  const episode = useEpisode();
+  const { episodeId } = useEpisodeId();
+  const { data: episode } = useEpisodeInfo({ id: episodeId });
   const { team: currentTeam } = useCurrentTeam();
 
   return (

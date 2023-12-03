@@ -7,9 +7,9 @@ import {
   type TeamPublic,
   type PatchedUserPrivateRequest,
   type UserAvatarRequest,
-} from "../level-1";
-import { DEFAULT_API_CONFIGURATION, downloadFile } from "./helpers";
-import { login } from "./auth";
+} from "../_autogen";
+import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
+import { login } from "../auth/authApi";
 
 /** This file contains all frontend user api functions. */
 const API = new UserApi(DEFAULT_API_CONFIGURATION);

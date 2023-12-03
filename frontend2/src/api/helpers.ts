@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { Configuration } from "../level-1";
+import { Configuration } from "./_autogen";
 
 // fall back to localhost for now
 export const BASE_URL =

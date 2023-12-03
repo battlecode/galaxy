@@ -6,8 +6,8 @@ import {
   type ScrimmageRequestRequest,
   type PlayerOrderEnum,
   type PaginatedMatchList,
-} from "../level-1";
-import { DEFAULT_API_CONFIGURATION, downloadFile } from "./helpers";
+} from "../_autogen";
+import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
 
 /** This file contains all frontend compete functions.
  * Note that "scrimmage" refers to a match that does not belong to a tournament.

@@ -6,7 +6,7 @@ import {
   type EligibilityCriterion,
 } from "../utils/types";
 import { getTournamentMatches } from "../utils/api/compete";
-import { useEpisode, useEpisodeId } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 import { getTournamentInfo } from "../utils/api/episode";
 import { dateTime } from "../utils/dateTime";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
@@ -19,6 +19,7 @@ import Icon from "../components/elements/Icon";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import EligibilityIcon from "../components/EligibilityIcon";
 import TournamentResultsTable from "../components/tables/TournamentResultsTable";
+import { useEpisodeInfo } from "../api/episode/useEpisode";
 
 interface QueryParams {
   page: number;
@@ -26,7 +27,7 @@ interface QueryParams {
 
 const TournamentPage: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const episode = useEpisode();
+  const { data: episode } = useEpisodeInfo({ id: episodeId });
   const { tournamentId } = useParams();
 
   const [searchParams, setSearchParams] = useSearchParams();

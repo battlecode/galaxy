@@ -7,8 +7,8 @@ import {
   type TeamTAvatarCreateRequest,
   type TeamPrivate,
   type TeamProfilePrivateRequest,
-} from "../level-1";
-import { DEFAULT_API_CONFIGURATION } from "./helpers";
+} from "../_autogen";
+import { DEFAULT_API_CONFIGURATION } from "../helpers";
 
 /** This file contains all frontend team api functions. */
 const API = new TeamApi(DEFAULT_API_CONFIGURATION);

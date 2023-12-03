@@ -7,18 +7,18 @@ interface EpisodeIdContextType {
   setEpisodeId: (episodeId: string) => void;
 }
 
-export const EpisodeContext = createContext<Maybe<Episode>>(undefined);
+// export const EpisodeContext = createContext<Maybe<Episode>>(undefined);
 export const EpisodeIdContext = createContext<EpisodeIdContextType | null>(
   null,
 );
-export const EpisodeListContext = createContext<Maybe<Episode[]>>(undefined);
+// export const EpisodeListContext = createContext<Maybe<Episode[]>>(undefined);
 
 // Use this function to retrieve full episode information. If the api call to
 // retrieve full episode information has not completed, then
 // episodeContext.episode will be undefined.
-export const useEpisode = (): Maybe<Episode> => {
-  return useContext(EpisodeContext);
-};
+// export const useEpisode = (): Maybe<Episode> => {
+//   return useContext(EpisodeContext);
+// };
 
 // Use this function to retrieve and update the episodeId.
 export const useEpisodeId = (): EpisodeIdContextType => {
@@ -30,6 +30,6 @@ export const useEpisodeId = (): EpisodeIdContextType => {
 };
 
 /** Use this function to retrieve all episodes. */
-export const useEpisodeList = (): Maybe<Episode[]> => {
-  return useContext(EpisodeListContext);
-};
+// export const useEpisodeList = (): Maybe<Episode[]> => {
+//   return useContext(EpisodeListContext);
+// };
