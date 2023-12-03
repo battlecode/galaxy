@@ -1,3 +1,4 @@
+/* tslint:disable */
 /* eslint-disable */
 export * from './CompeteApi';
 export * from './EpisodeApi';

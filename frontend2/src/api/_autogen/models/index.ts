@@ -1,3 +1,4 @@
+/* tslint:disable */
 /* eslint-disable */
 export * from './AutoscrimRequest';
 export * from './ClassRequirement';
@@ -39,7 +40,6 @@ export * from './StyleEnum';
 export * from './Submission';
 export * from './SubmissionDownload';
 export * from './SubmissionReportRequest';
-export * from './SubmissionRequest';
 export * from './TeamAvatarRequest';
 export * from './TeamCreate';
 export * from './TeamCreateRequest';

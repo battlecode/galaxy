@@ -1,3 +1,4 @@
+/* tslint:disable */
 /* eslint-disable */
 /**
  *
@@ -25,7 +26,6 @@ import type {
   Submission,
   SubmissionDownload,
   SubmissionReportRequest,
-  SubmissionRequest,
   TournamentSubmission,
 } from '../models';
 import {
@@ -51,8 +51,6 @@ import {
     SubmissionDownloadToJSON,
     SubmissionReportRequestFromJSON,
     SubmissionReportRequestToJSON,
-    SubmissionRequestFromJSON,
-    SubmissionRequestToJSON,
     TournamentSubmissionFromJSON,
     TournamentSubmissionToJSON,
 } from '../models';
@@ -134,7 +132,9 @@ export interface CompeteRequestRejectCreateRequest {
 
 export interface CompeteSubmissionCreateRequest {
     episodeId: string;
-    submissionRequest: SubmissionRequest;
+    _package?: string;
+    description?: string;
+    sourceCode?: Blob;
 }
 
 export interface CompeteSubmissionDownloadRetrieveRequest {
@@ -783,15 +783,9 @@ export class CompeteApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling competeSubmissionCreate.');
         }
 
-        if (requestParameters.submissionRequest === null || requestParameters.submissionRequest === undefined) {
-            throw new runtime.RequiredError('submissionRequest','Required parameter requestParameters.submissionRequest was null or undefined when calling competeSubmissionCreate.');
-        }
-
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -801,12 +795,40 @@ export class CompeteApi extends runtime.BaseAPI {
                 headerParameters["Authorization"] = `Bearer ${tokenString}`;
             }
         }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters._package !== undefined) {
+            formParams.append('package', requestParameters._package as any);
+        }
+
+        if (requestParameters.description !== undefined) {
+            formParams.append('description', requestParameters.description as any);
+        }
+
+        if (requestParameters.sourceCode !== undefined) {
+            formParams.append('source_code', requestParameters.sourceCode as any);
+        }
+
         const response = await this.request({
             path: `/api/compete/{episode_id}/submission/`.replace(`{${"episode_id"}}`, encodeURIComponent(String(requestParameters.episodeId))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: SubmissionRequestToJSON(requestParameters.submissionRequest),
+            body: formParams,
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => SubmissionFromJSON(jsonValue));
