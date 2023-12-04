@@ -33,7 +33,7 @@ const MyTeam: React.FC = () => {
     return <JoinTeam />;
   }
   return (
-    <div className="p-10">
+    <div className="p-6">
       <PageTitle>Team Settings</PageTitle>
       <div className="flex flex-col gap-8 xl:flex-row">
         <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">

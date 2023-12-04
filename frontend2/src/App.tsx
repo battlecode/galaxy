@@ -52,7 +52,6 @@ const router = createBrowserRouter([
   {
     element: <PrivateRoute />,
     children: [
-      { path: "/account", element: <Account /> },
       {
         element: <EpisodeLayout />,
         children: [
@@ -65,6 +64,7 @@ const router = createBrowserRouter([
             element: <MyTeam />,
           },
           { path: "/:episodeId/scrimmaging", element: <Scrimmaging /> },
+          { path: "/account", element: <Account /> },
         ],
       },
     ],
