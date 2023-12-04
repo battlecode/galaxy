@@ -10,11 +10,22 @@ import JoinTeam from "./JoinTeam";
 import Modal from "../components/Modal";
 import EligibilitySettings from "../components/team/EligibilitySettings";
 import ScrimmageSettings from "../components/team/ScrimmageSettings";
+import { useEpisodeId } from "../contexts/EpisodeContext";
+import { useLeaveTeam, useUserTeam } from "../api/team/useTeam";
+import { isPresent } from "../utils/utilTypes";
+import Loading from "../components/Loading";
 
 const MyTeam: React.FC = () => {
-  const { team, teamState, leaveMyTeam } = useCurrentTeam();
+  // const { team, teamState, leaveMyTeam } = useCurrentTeam();
+  const { episodeId } = useEpisodeId();
+  const { data: team, isLoading: teamLoading } = useUserTeam({ episodeId });
+
+  const leaveTeam = useLeaveTeam({
+    episodeId,
+  });
+
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
-  const [isLeaveTeamPending, setIsLeaveTeamPending] = useState<boolean>(false);
+  // const [isLeaveTeamPending, setIsLeaveTeamPending] = useState<boolean>(false);
   const membersList = useMemo(() => {
     return (
       <div className="flex flex-col gap-8">
@@ -29,9 +40,16 @@ const MyTeam: React.FC = () => {
       </div>
     );
   }, [team]);
-  if (teamState !== TeamStateEnum.IN_TEAM || team === undefined) {
+
+  // TODO: find a more elegant way to handle loading!
+  if (teamLoading) {
+    return <Loading />;
+  } else if (!isPresent(team)) {
     return <JoinTeam />;
   }
+  // if (teamState !== TeamStateEnum.IN_TEAM || team === undefined) {
+  //   return <JoinTeam />;
+  // }
   return (
     <div className="p-6">
       <PageTitle>Team Settings</PageTitle>
@@ -92,16 +110,20 @@ const MyTeam: React.FC = () => {
           <div className="flex flex-row gap-4">
             <Button
               variant="danger-outline"
-              onClick={() => {
-                const leave = async (): Promise<void> => {
-                  setIsLeaveTeamPending(true);
-                  await leaveMyTeam();
-                  setIsLeaveTeamPending(false);
-                  setIsLeaveModalOpen(false);
-                };
-                void leave();
+              onClick={async () => {
+                // const leave = async (): Promise<void> => {
+                //   setIsLeaveTeamPending(true);
+                //   await leaveMyTeam();
+                //   setIsLeaveTeamPending(false);
+                //   setIsLeaveModalOpen(false);
+                // };
+                // void leave();
+
+                // TODO: verify that this hook works as expected!
+                await leaveTeam.mutateAsync();
+                setIsLeaveModalOpen(false);
               }}
-              loading={isLeaveTeamPending}
+              loading={leaveTeam.isPending}
               label="Leave team"
             />
             <Button

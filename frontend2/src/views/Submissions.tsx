@@ -5,7 +5,7 @@ import type {
   PaginatedSubmissionList,
   TournamentSubmission,
 } from "../utils/types";
-import { useEpisode, useEpisodeId } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 import {
   getAllSubmissions,
   getAllUserTournamentSubmissions,
@@ -22,6 +22,7 @@ import { getNextTournament } from "../utils/api/episode";
 import Spinner from "../components/Spinner";
 import TournamentCountdown from "../components/compete/TournamentCountdown";
 import FormLabel from "../components/elements/FormLabel";
+import { useEpisodeInfo } from "../api/episode/useEpisode";
 
 interface SubmissionFormInput {
   file: FileList;
@@ -31,7 +32,7 @@ interface SubmissionFormInput {
 
 const Submissions: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const episode = useEpisode();
+  const { data: episode } = useEpisodeInfo({ id: episodeId });
   const {
     register,
     handleSubmit,

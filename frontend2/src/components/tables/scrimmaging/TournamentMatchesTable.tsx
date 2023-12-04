@@ -11,6 +11,7 @@ import { dateTime } from "../../../utils/dateTime";
 import { useCurrentTeam } from "../../../contexts/CurrentTeamContext";
 import { useEpisodeId } from "../../../contexts/EpisodeContext";
 import { useEpisodeInfo } from "../../../api/episode/useEpisode";
+import { useUserTeam } from "../../../api/team/useTeam";
 
 interface TournamentMatchesTableProps {
   data: Maybe<PaginatedMatchList>;
@@ -27,7 +28,7 @@ const TournamentMatchesTable: React.FC<TournamentMatchesTableProps> = ({
 }) => {
   const { episodeId } = useEpisodeId();
   const { data: episode } = useEpisodeInfo({ id: episodeId });
-  const { team: currentTeam } = useCurrentTeam();
+  const { data: currentTeam } = useUserTeam({ episodeId });
 
   return (
     <Table

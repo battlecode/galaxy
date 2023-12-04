@@ -11,6 +11,7 @@ import MatchStatus from "../../compete/MatchStatus";
 import RatingDelta from "../../compete/RatingDelta";
 import { useEpisodeInfo } from "../../../api/episode/useEpisode";
 import { useEpisodeId } from "../../../contexts/EpisodeContext";
+import { useUserTeam } from "../../../api/team/useTeam";
 
 interface ScrimHistoryTableProps {
   data: Maybe<PaginatedMatchList>;
@@ -27,7 +28,7 @@ const ScrimHistoryTable: React.FC<ScrimHistoryTableProps> = ({
 }) => {
   const { episodeId } = useEpisodeId();
   const { data: episode } = useEpisodeInfo({ id: episodeId });
-  const { team: currentTeam } = useCurrentTeam();
+  const { data: currentTeam } = useUserTeam({ episodeId });
 
   return (
     <Table

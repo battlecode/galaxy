@@ -12,6 +12,8 @@ import { isPresent } from "../../utils/utilTypes";
 import { updateTeamPartial } from "../../utils/api/team";
 import { isEqual } from "lodash";
 import { useEpisodeInfo } from "../../api/episode/useEpisode";
+import { useUpdateTeam, useUserTeam } from "../../api/team/useTeam";
+import Loading from "../Loading";
 
 export function determineCheckboxState(
   inDesired: boolean,
@@ -28,55 +30,65 @@ export function determineCheckboxState(
 
 // This component should only be used when there is a logged in user with a team.
 const EligibilitySettings: React.FC = () => {
-  const { team, teamState, refreshTeam } = useCurrentTeam();
+  // const { team, teamState, refreshTeam } = useCurrentTeam();
   const { episodeId } = useEpisodeId();
+  const { data: team, isLoading } = useUserTeam({ episodeId });
+  // TODO: use this isPending state to block the UI while the update is in progress
+  const { mutate: updateTeam, isPending } = useUpdateTeam({
+    episodeId,
+    patchedTeamPrivateRequest: { profile: team?.profile },
+  });
   const { data: episode } = useEpisodeInfo({ id: episodeId });
   // the desired state according to what the user has clicked on the page
   const [desiredEligibility, setDesiredEligibility] = useState<
     number[] | undefined
   >();
+
+  // TODO: We should add the "isPending" state from the updateTeam hook to block the UI while the update is in progress
+  // i.e., this state should be removed entirely!
+  // for now, will leave as is!
   useEffect(() => {
     setDesiredEligibility(team?.profile?.eligible_for);
   }, [team?.profile?.eligible_for]);
 
-  useEffect(() => {
-    // if actual team eligibility hasn't loaded yet or the desired/actual are identical
-    if (
-      !isPresent(desiredEligibility) ||
-      isEqual(desiredEligibility, team?.profile?.eligible_for)
-    ) {
-      return;
-    }
+  // useEffect(() => {
+  //   // if actual team eligibility hasn't loaded yet or the desired/actual are identical
+  //   if (
+  //     !isPresent(desiredEligibility) ||
+  //     isEqual(desiredEligibility, team?.profile?.eligible_for)
+  //   ) {
+  //     return;
+  //   }
 
-    let isActive = true;
-    const update = async (): Promise<void> => {
-      const updatedTeam = await updateTeamPartial(episodeId, {
-        eligible_for: desiredEligibility,
-      });
-      const newProfile = team?.profile;
-      if (isActive && isPresent(newProfile) && isPresent(team)) {
-        // only update the eligibility of the team profile to avoid race conditions
-        // with other team profile updaters on this page
-        refreshTeam({
-          ...team,
-          profile: {
-            ...newProfile,
-            eligible_for: updatedTeam.profile?.eligible_for,
-          },
-        });
-      }
-    };
-    void update();
-    return () => {
-      isActive = false;
-    };
-  }, [desiredEligibility, episodeId]);
+  //   let isActive = true;
+  //   const update = async (): Promise<void> => {
+  //     const updatedTeam = await updateTeamPartial(episodeId, {
+  //       eligible_for: desiredEligibility,
+  //     });
+  //     const newProfile = team?.profile;
+  //     if (isActive && isPresent(newProfile) && isPresent(team)) {
+  //       // only update the eligibility of the team profile to avoid race conditions
+  //       // with other team profile updaters on this page
+  //       refreshTeam({
+  //         ...team,
+  //         profile: {
+  //           ...newProfile,
+  //           eligible_for: updatedTeam.profile?.eligible_for,
+  //         },
+  //       });
+  //     }
+  //   };
+  //   void update();
+  //   return () => {
+  //     isActive = false;
+  //   };
+  // }, [desiredEligibility, episodeId]);
 
-  if (
-    teamState !== TeamStateEnum.IN_TEAM ||
-    !isPresent(team) ||
-    !isPresent(episode)
-  ) {
+  // TODO: I think there is a better way to handle loading than rendering a Loading component
+  // Since we will eventually prefetch the team data, maybe we can jsut forego this loading entirely!
+  if (isLoading) {
+    return <Loading />;
+  } else if (!isPresent(team) || !isPresent(episode)) {
     return <div>{"Error: You're not in a team!"}</div>;
   }
   return (
@@ -101,18 +113,44 @@ const EligibilitySettings: React.FC = () => {
                     desiredEligibility.includes(criterion.id),
                     (team.profile?.eligible_for ?? []).includes(criterion.id),
                   )}
-                  onChange={(checked) => {
+                  onChange={async (checked) => {
                     if (checked && !desiredEligibility.includes(criterion.id)) {
-                      setDesiredEligibility([
-                        ...desiredEligibility,
-                        criterion.id,
-                      ]);
+                      // Add criterion to team
+                      // We do NOT want to await this, because we want to send the state of this mutation to isPending!
+                      updateTeam({
+                        episodeId,
+                        patchedTeamPrivateRequest: {
+                          profile: {
+                            ...team.profile,
+                            eligible_for: [
+                              ...(team.profile?.eligible_for ?? []),
+                              criterion.id,
+                            ],
+                          },
+                        },
+                      });
+                      // setDesiredEligibility([
+                      //   ...desiredEligibility,
+                      //   criterion.id,
+                      // ]);
                     } else if (!checked) {
-                      setDesiredEligibility(
-                        desiredEligibility.filter(
-                          (item) => item !== criterion.id,
-                        ),
-                      );
+                      // Remove criterion from team
+                      updateTeam({
+                        episodeId,
+                        patchedTeamPrivateRequest: {
+                          profile: {
+                            ...team.profile,
+                            eligible_for: team.profile?.eligible_for?.filter(
+                              (item) => item !== criterion.id,
+                            ),
+                          },
+                        },
+                      });
+                      // setDesiredEligibility(
+                      //   desiredEligibility.filter(
+                      //     (item) => item !== criterion.id,
+                      //   ),
+                      // );
                     }
                   }}
                   title={`${criterion.title} ${criterion.icon}`}

@@ -1,12 +1,17 @@
 import {
   TeamApi,
-  type TeamJoinRequest,
   type TeamCreate,
   type PaginatedTeamPublicList,
   type TeamTListRequest,
   type TeamTAvatarCreateRequest,
   type TeamPrivate,
-  type TeamProfilePrivateRequest,
+  type TeamTJoinCreateRequest,
+  type TeamTLeaveCreateRequest,
+  type TeamTMeRetrieveRequest,
+  type TeamTMePartialUpdateRequest,
+  type TeamRequirementReportUpdateRequest,
+  TeamTRetrieveRequest,
+  TeamPublic,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION } from "../helpers";
 
@@ -15,71 +20,82 @@ const API = new TeamApi(DEFAULT_API_CONFIGURATION);
 
 /**
  * Creates a new team.
- * @param teamName The name of the team.
+ * @param episodeId The episode of the team to be created.
+ * @param name The name of the team.
  */
-export const createTeam = async (
-  episodeId: string,
-  teamName: string,
-): Promise<TeamCreate> => {
-  return await API.teamTCreate({
+export const createTeam = async ({
+  episodeId,
+  name,
+}: {
+  episodeId: string;
+  name: string;
+}): Promise<TeamCreate> =>
+  await API.teamTCreate({
     episodeId,
     teamCreateRequest: {
       episode: episodeId,
-      name: teamName,
+      name,
     },
   });
-};
 
 /**
  * Join the team with the given join key & name.
- * @param episodeId The current episode's ID.
- * @param teamName The team's name.
- * @param joinKey The team's join key.
+ * @param episodeId The episode of the team to join.
+ * @param teamJoinRequest The team's join key & name.
  */
-export const joinTeam = async (
-  episodeId: string,
-  teamName: string,
-  joinKey: string,
-): Promise<void> => {
-  const teamJoinRequest: TeamJoinRequest = {
-    name: teamName,
-    join_key: joinKey,
-  };
+export const joinTeam = async ({
+  episodeId,
+  teamJoinRequest,
+}: TeamTJoinCreateRequest): Promise<void> =>
   await API.teamTJoinCreate({ episodeId, teamJoinRequest });
-};
 
 /**
- * Leave the user's current team.
- * @param episodeId The current episode's ID.
+ * Leave the user's current team in a given episode.
+ * @param episodeId The given episode's ID.
  */
-export const leaveTeam = async (episodeId: string): Promise<void> => {
+export const leaveTeam = async ({
+  episodeId,
+}: TeamTLeaveCreateRequest): Promise<void> =>
   await API.teamTLeaveCreate({ episodeId });
-};
 
 /**
  * Get the current user's team for an episode.
  * @param episodeId The episode of the team to retrieve.
  */
-export const retrieveTeam = async (episodeId: string): Promise<TeamPrivate> => {
-  return await API.teamTMeRetrieve({ episodeId });
-};
+export const getUserTeamInfo = async ({
+  episodeId,
+}: TeamTMeRetrieveRequest): Promise<TeamPrivate> =>
+  await API.teamTMeRetrieve({ episodeId });
+
+/**
+ * Get a team's info by its ID.
+ * @param episodeId The episode of the team to retrieve.
+ * @param id The team's ID.
+ */
+export const getTeamInfo = async ({
+  episodeId,
+  id,
+}: TeamTRetrieveRequest): Promise<TeamPublic> =>
+  await API.teamTRetrieve({
+    episodeId,
+    id,
+  });
 
 /**
  * Push a partial update to the current user's team for a specific episode.
  * The current user must be on a team in the provided episode.
  * @param episodeId The episode of the team
- * @param teamProfilePrivateRequest The partial team update
+ * @param patchedTeamPrivateRequest The partial team update
  * @returns The updated TeamPrivate object
  */
-export const updateTeamPartial = async (
-  episodeId: string,
-  teamProfilePrivateRequest: TeamProfilePrivateRequest,
-): Promise<TeamPrivate> => {
-  return await API.teamTMePartialUpdate({
+export const updateTeamPartial = async ({
+  episodeId,
+  patchedTeamPrivateRequest,
+}: TeamTMePartialUpdateRequest): Promise<TeamPrivate> =>
+  await API.teamTMePartialUpdate({
     episodeId,
-    patchedTeamPrivateRequest: { profile: teamProfilePrivateRequest },
+    patchedTeamPrivateRequest,
   });
-};
 
 // -- TEAM STATS --//
 
@@ -115,56 +131,42 @@ export const updateTeamPartial = async (
 /**
  * Search team, ordering the result by ranking.
  * @param episodeId The current episode's ID.
- * @param searchQuery The search query.
- * @param requireActiveSubmission Whether to require an active submission.
+ * @param search The search query.
  * @param page The page number.
  */
-export const searchTeams = async (
-  episodeId: string,
-  searchQuery: string,
-  requireActiveSubmission: boolean,
-  page?: number,
-): Promise<PaginatedTeamPublicList> => {
-  const request: TeamTListRequest = {
+export const searchTeams = async ({
+  episodeId,
+  search,
+  page,
+}: TeamTListRequest): Promise<PaginatedTeamPublicList> =>
+  await API.teamTList({
     episodeId,
     ordering: "-rating,name",
-    search: searchQuery,
-    page: page ?? 1,
-  };
-  return await API.teamTList(request);
-};
+    search,
+    page,
+  });
 
 /**
  * Upload a new avatar for the currently logged in user's team.
  * @param episodeId The current episode's ID.
- * @param avatarFile The avatar file.
+ * @param avatar The avatar file.
  */
-export const teamAvatarUpload = async (
-  episodeId: string,
-  avatarFile: File,
-): Promise<void> => {
-  const request: TeamTAvatarCreateRequest = {
-    episodeId,
-    teamAvatarRequest: {
-      avatar: avatarFile,
-    },
-  };
-  await API.teamTAvatarCreate(request);
-};
+export const teamAvatarUpload = async ({
+  episodeId,
+  teamAvatarRequest,
+}: TeamTAvatarCreateRequest): Promise<void> =>
+  await API.teamTAvatarCreate({ episodeId, teamAvatarRequest });
 
 /**
  * Upload a new report for the currently logged in user's team.
  * @param episodeId The current episode's ID.
  * @param reportFile The report file.
  */
-export const uploadUserTeamReport = async (
-  episodeId: string,
-  reportFile: File,
-): Promise<void> => {
+export const uploadUserTeamReport = async ({
+  episodeId,
+  teamReportRequest,
+}: TeamRequirementReportUpdateRequest): Promise<void> =>
   await API.teamRequirementReportUpdate({
     episodeId,
-    teamReportRequest: {
-      report: reportFile,
-    },
+    teamReportRequest,
   });
-};
