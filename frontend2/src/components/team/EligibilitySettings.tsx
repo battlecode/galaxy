@@ -76,7 +76,7 @@ const EligibilitySettings: React.FC = () => {
     !isPresent(team) ||
     !isPresent(episode)
   ) {
-    return "Error: You're not in a team!";
+    return <div>Error: You`&apos;`re not in a team!</div>;
   }
   return (
     <SectionCard title="Eligibility">
