@@ -41,6 +41,7 @@ const Login: React.FC = () => {
       );
     }
   };
+
   return (
     <div className="flex h-screen flex-col items-center justify-center bg-gradient-to-tr from-cyan-200 to-cyan-700 p-2">
       <div className="mb-6 flex flex-1 items-end text-center font-display text-5xl tracking-wide text-white sm:text-6xl">
