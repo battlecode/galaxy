@@ -10,8 +10,8 @@ import {
   type TeamTMeRetrieveRequest,
   type TeamTMePartialUpdateRequest,
   type TeamRequirementReportUpdateRequest,
-  TeamTRetrieveRequest,
-  TeamPublic,
+  type TeamTRetrieveRequest,
+  type TeamPublic,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION } from "../helpers";
 
@@ -46,8 +46,9 @@ export const createTeam = async ({
 export const joinTeam = async ({
   episodeId,
   teamJoinRequest,
-}: TeamTJoinCreateRequest): Promise<void> =>
+}: TeamTJoinCreateRequest): Promise<void> => {
   await API.teamTJoinCreate({ episodeId, teamJoinRequest });
+};
 
 /**
  * Leave the user's current team in a given episode.
@@ -55,8 +56,9 @@ export const joinTeam = async ({
  */
 export const leaveTeam = async ({
   episodeId,
-}: TeamTLeaveCreateRequest): Promise<void> =>
+}: TeamTLeaveCreateRequest): Promise<void> => {
   await API.teamTLeaveCreate({ episodeId });
+};
 
 /**
  * Get the current user's team for an episode.
@@ -154,8 +156,9 @@ export const searchTeams = async ({
 export const teamAvatarUpload = async ({
   episodeId,
   teamAvatarRequest,
-}: TeamTAvatarCreateRequest): Promise<void> =>
+}: TeamTAvatarCreateRequest): Promise<void> => {
   await API.teamTAvatarCreate({ episodeId, teamAvatarRequest });
+};
 
 /**
  * Upload a new report for the currently logged in user's team.
@@ -165,8 +168,9 @@ export const teamAvatarUpload = async ({
 export const uploadUserTeamReport = async ({
   episodeId,
   teamReportRequest,
-}: TeamRequirementReportUpdateRequest): Promise<void> =>
+}: TeamRequirementReportUpdateRequest): Promise<void> => {
   await API.teamRequirementReportUpdate({
     episodeId,
     teamReportRequest,
   });
+};

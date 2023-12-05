@@ -31,6 +31,7 @@ import {
   updateTeamPartial,
   uploadUserTeamReport,
 } from "./teamApi";
+import { toast } from "react-hot-toast";
 
 // ---------- QUERY HOOKS ---------- //
 /**
@@ -53,7 +54,7 @@ export const useTeam = ({
   id,
 }: TeamTRetrieveRequest): UseQueryResult<TeamPublic, Error> =>
   useQuery({
-    queryKey: teamQueryKeys.info({ episodeId, id }),
+    queryKey: teamQueryKeys.otherInfo({ episodeId, id }),
     queryFn: async () => await getTeamInfo({ episodeId, id }),
     staleTime: 5 * 1000 * 60, // 5 minutes
   });
@@ -87,7 +88,12 @@ export const useCreateTeam = ({
 
   return useMutation({
     mutationKey: teamMutationKeys.create({ episodeId, name }),
-    mutationFn: async () => await createTeam({ episodeId, name }),
+    mutationFn: async () =>
+      await toast.promise(createTeam({ episodeId, name }), {
+        loading: "Creating team...",
+        success: (team) => `Created team ${team.name}!`,
+        error: "Error creating team.",
+      }),
     onSuccess: (data) => {
       queryClient.setQueryData(teamQueryKeys.myTeam({ episodeId }), data);
     },
@@ -105,9 +111,17 @@ export const useJoinTeam = ({
 
   return useMutation({
     mutationKey: teamMutationKeys.join({ episodeId, teamJoinRequest }),
-    mutationFn: async () => await joinTeam({ episodeId, teamJoinRequest }),
-    onSuccess: (data) => {
-      queryClient.setQueryData(teamQueryKeys.myTeam({ episodeId }), data);
+    mutationFn: async () => {
+      await toast.promise(joinTeam({ episodeId, teamJoinRequest }), {
+        loading: "Joining team...",
+        success: "Joined team!",
+        error: "Error joining team.",
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
+        queryKey: teamQueryKeys.myTeam({ episodeId }),
+      });
     },
   });
 };
@@ -122,10 +136,15 @@ export const useLeaveTeam = ({
 
   return useMutation({
     mutationKey: teamMutationKeys.leave({ episodeId }),
-    mutationFn: async () => await leaveTeam({ episodeId }),
-    onSuccess: () => {
-      // use refetch instead of invalidate so we immediately load "no team"
-      queryClient.refetchQueries({
+    mutationFn: async () => {
+      await toast.promise(leaveTeam({ episodeId }), {
+        loading: "Leaving team...",
+        success: "Left team!",
+        error: "Error leaving team.",
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: teamQueryKeys.myTeam({ episodeId }),
       });
     },
@@ -155,7 +174,14 @@ export const useUpdateTeam = ({
       episodeId,
       patchedTeamPrivateRequest,
     }: TeamTMePartialUpdateRequest) =>
-      await updateTeamPartial({ episodeId, patchedTeamPrivateRequest }),
+      await toast.promise(
+        updateTeamPartial({ episodeId, patchedTeamPrivateRequest }),
+        {
+          loading: "Updating team...",
+          success: "Updated team!",
+          error: "Error updating team.",
+        },
+      ),
     onSuccess: (data) => {
       queryClient.setQueryData(teamQueryKeys.myTeam({ episodeId }), data);
     },
@@ -173,10 +199,15 @@ export const useUpdateTeamAvatar = ({
 
   return useMutation({
     mutationKey: teamMutationKeys.avatar({ episodeId, teamAvatarRequest }),
-    mutationFn: async () =>
-      await teamAvatarUpload({ episodeId, teamAvatarRequest }),
-    onSuccess: () => {
-      queryClient.refetchQueries({
+    mutationFn: async () => {
+      await toast.promise(teamAvatarUpload({ episodeId, teamAvatarRequest }), {
+        loading: "Uploading team avatar...",
+        success: "Uploaded team avatar!",
+        error: "Error uploading team avatar.",
+      });
+    },
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
         queryKey: teamQueryKeys.myTeam({ episodeId }),
       });
     },
@@ -199,10 +230,18 @@ export const useUpdateTeamReport = ({
 
   return useMutation({
     mutationKey: teamMutationKeys.report({ episodeId, teamReportRequest }),
-    mutationFn: async () =>
-      await uploadUserTeamReport({ episodeId, teamReportRequest }),
-    onSuccess: () => {
-      queryClient.refetchQueries({
+    mutationFn: async () => {
+      await toast.promise(
+        uploadUserTeamReport({ episodeId, teamReportRequest }),
+        {
+          loading: "Uploading team report...",
+          success: "Uploaded team report!",
+          error: "Error uploading team report.",
+        },
+      );
+    },
+    onSuccess: async () => {
+      await queryClient.refetchQueries({
         queryKey: teamQueryKeys.myTeam({ episodeId }),
       });
     },

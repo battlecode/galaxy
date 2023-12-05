@@ -1,5 +1,10 @@
 import React from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import EpisodeLayout from "./components/EpisodeLayout";
 import Home from "./views/Home";
 import Logout from "./views/Logout";
@@ -30,12 +35,18 @@ import Tournaments from "./views/Tournaments";
 import TournamentPage from "./views/Tournament";
 import Submissions from "./views/Submissions";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { toast, Toaster } from "react-hot-toast";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => toast.error(`Something went wrong: ${error.message}`),
+  }),
+});
 
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
+      <Toaster position="bottom-right" reverseOrder={false} />
       <CurrentUserProvider>
         <EpisodeProvider>
           <CurrentTeamProvider>

@@ -2,105 +2,107 @@ import {
   UserApi,
   type UserPublic,
   type UserCreate,
-  type UserCreateRequest,
   type UserPrivate,
   type TeamPublic,
-  type PatchedUserPrivateRequest,
-  type UserAvatarRequest,
+  type UserUCreateRequest,
+  type UserPasswordResetConfirmCreateRequest,
+  type UserPasswordResetCreateRequest,
+  type UserURetrieveRequest,
+  type UserUTeamsRetrieveRequest,
+  type UserUMePartialUpdateRequest,
+  type UserUAvatarCreateRequest,
+  type UserUResumeUpdateRequest,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
-import { login } from "../auth/authApi";
 
 /** This file contains all frontend user api functions. */
 const API = new UserApi(DEFAULT_API_CONFIGURATION);
 
 /**
  * Register a new user, and logs the new user in (via access / refresh tokens)
- * @param user The user to register.
+ * @param userCreateRequest The user to register.
  * @returns The new user that was created.
  */
-export const createUser = async (
-  user: UserCreateRequest,
-): Promise<UserCreate> => {
-  const returnedUser = await API.userUCreate({ userCreateRequest: user });
-  await login(user.username, user.password);
-  return returnedUser;
-};
+export const createUser = async ({
+  userCreateRequest,
+}: UserUCreateRequest): Promise<UserCreate> =>
+  await API.userUCreate({ userCreateRequest });
 
 /**
  * Confirm resetting a user's password.
- * @param password The new password.
- * @param token The password reset token.
+ * @param passwordTokenRequest The new password and password reset token.
  */
-export const doResetPassword = async (
-  password: string,
-  token: string,
-): Promise<void> => {
+export const doResetPassword = async ({
+  passwordTokenRequest,
+}: UserPasswordResetConfirmCreateRequest): Promise<void> => {
   await API.userPasswordResetConfirmCreate({
-    passwordTokenRequest: { password, token },
+    passwordTokenRequest,
   });
 };
 
 /**
  * Request a password reset token to be sent to the provided email.
+ * @param emailRequest The email to send the password reset token to.
  */
-export const forgotPassword = async (email: string): Promise<void> => {
-  await API.userPasswordResetCreate({ emailRequest: { email } });
+export const forgotPassword = async ({
+  emailRequest,
+}: UserPasswordResetCreateRequest): Promise<void> => {
+  await API.userPasswordResetCreate({ emailRequest });
 };
 
 /**
- * Get a user's profile.
- * @param userId The user's ID.
+ * Get a user's info.
+ * @param id The user's ID.
  */
-export const getUserProfileByUser = async (
-  userId: number,
-): Promise<UserPublic> => {
-  return await API.userURetrieve({ id: userId });
-};
+export const getUserInfoById = async ({
+  id,
+}: UserURetrieveRequest): Promise<UserPublic> =>
+  await API.userURetrieve({ id });
 
 /**
- * Get the currently logged in user's profile.
+ * Get the currently logged in user's info.
  */
-export const getUserUserProfile = async (): Promise<UserPrivate> => {
-  return await API.userUMeRetrieve();
-};
+export const getCurrentUserInfo = async (): Promise<UserPrivate> =>
+  await API.userUMeRetrieve();
 
 /**
  * Get all teams associated with a user.
- * @param userId The user's ID.
+ * @param id The user's ID.
  */
-export const getTeamsByUser = async (
-  userId: number,
-): Promise<Record<string, TeamPublic>> => {
-  return await API.userUTeamsRetrieve({ id: userId });
-};
+export const getTeamsByUser = async ({
+  id,
+}: UserUTeamsRetrieveRequest): Promise<Record<string, TeamPublic>> =>
+  await API.userUTeamsRetrieve({ id });
 
 /**
  * Update the currently logged in user's info.
+ * @param patchedUserPrivateRequest The PARTIAL user update.
  */
-export const updateUser = async (
-  user: PatchedUserPrivateRequest,
-): Promise<UserPrivate> => {
-  return await API.userUMePartialUpdate({ patchedUserPrivateRequest: user });
-};
+export const updateCurrentUser = async ({
+  patchedUserPrivateRequest,
+}: UserUMePartialUpdateRequest): Promise<UserPrivate> =>
+  await API.userUMePartialUpdate({ patchedUserPrivateRequest });
 
 /**
  * Upload a new avatar for the currently logged in user.
- * @param avatarFile The avatar file.
+ * @param userAvatarRequest The avatar file.
  */
-export const avatarUpload = async (avatarFile: File): Promise<void> => {
-  const userAvatarRequest: UserAvatarRequest = {
-    avatar: avatarFile,
-  };
+export const avatarUpload = async ({
+  userAvatarRequest,
+}: UserUAvatarCreateRequest): Promise<void> => {
   await API.userUAvatarCreate({ userAvatarRequest });
 };
 
 /**
  * Upload a resume for the currently logged in user.
- * @param resumeFile The resume file.
+ * @param userResumeRequest The resume file.
  */
-export const resumeUpload = async (resumeFile: File): Promise<void> => {
-  await API.userUResumeUpdate({ userResumeRequest: { resume: resumeFile } });
+export const resumeUpload = async ({
+  userResumeRequest,
+}: UserUResumeUpdateRequest): Promise<void> => {
+  // TODO: add a query to get the currently logged-in user's resume
+  // The hook for this should have an INFINITE staleTime!
+  await API.userUResumeUpdate({ userResumeRequest });
 };
 
 /**
