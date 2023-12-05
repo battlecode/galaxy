@@ -3,7 +3,7 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
-  UseMutationResult,
+  type UseMutationResult,
 } from "@tanstack/react-query";
 import type {
   UserPrivate,
@@ -137,12 +137,13 @@ export const useResetPassword = ({
 > =>
   useMutation({
     mutationKey: userMutationKeys.resetPassword({ passwordTokenRequest }),
-    mutationFn: async () =>
+    mutationFn: async () => {
       await toast.promise(doResetPassword({ passwordTokenRequest }), {
         loading: "Resetting password...",
         success: "Reset password!",
         error: "Error resetting password.",
-      }),
+      });
+    },
   });
 
 /**
@@ -153,12 +154,13 @@ export const useAvatarUpload = ({
 }: UserUAvatarCreateRequest): UseMutationResult<void, Error, void, unknown> =>
   useMutation({
     mutationKey: userMutationKeys.avatarUpload({ userAvatarRequest }),
-    mutationFn: async () =>
+    mutationFn: async () => {
       await toast.promise(avatarUpload({ userAvatarRequest }), {
         loading: "Uploading new avatar...",
         success: "Uploaded new avatar!",
         error: "Error uploading new avatar.",
-      }),
+      });
+    },
     onSuccess: async () => {
       const queryClient = useQueryClient();
       // Refetch the current user's info.
@@ -174,12 +176,13 @@ export const useResumeUpload = ({
 }: UserUResumeUpdateRequest) =>
   useMutation({
     mutationKey: userMutationKeys.resumeUpload({ userResumeRequest }),
-    mutationFn: async () =>
+    mutationFn: async () => {
       await toast.promise(resumeUpload({ userResumeRequest }), {
         loading: "Uploading new resume...",
         success: "Uploaded new resume!",
         error: "Error uploading new resume.",
-      }),
+      });
+    },
     onSuccess: async () => {
       const queryClient = useQueryClient();
       // Refetch the current user's info.

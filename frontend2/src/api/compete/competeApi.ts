@@ -6,6 +6,7 @@ import {
   type ScrimmageRequestRequest,
   type PlayerOrderEnum,
   type PaginatedMatchList,
+  CompeteSubmissionCreateRequest,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
 
@@ -19,21 +20,17 @@ const API = new CompeteApi(DEFAULT_API_CONFIGURATION);
  * @param episodeId The current episode's ID.
  * @param submission The submission's info.
  */
-export const uploadSubmission = async (
-  episodeId: string,
-  submission: {
-    file: File;
-    packageName: string;
-    description: string;
-  },
-): Promise<void> => {
+export const uploadSubmission = async ({
+  episodeId,
+  _package,
+  description,
+  sourceCode,
+}: CompeteSubmissionCreateRequest): Promise<void> => {
   await API.competeSubmissionCreate({
     episodeId,
-    submissionRequest: {
-      source_code: submission.file,
-      _package: submission.packageName,
-      description: submission.description,
-    },
+    sourceCode,
+    _package,
+    description,
   });
 };
 
