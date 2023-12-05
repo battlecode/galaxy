@@ -274,8 +274,6 @@ class MatchViewSet(
         if external_id_private is not None:
             tournaments = Tournament.objects.visible_to_user(is_staff=True)
             tournaments = tournaments.filter(external_id_private=external_id_private)
-            if tournaments.count() != 1:
-                return Response(None, status=status.HTTP_404_NOT_FOUND)
         else:
             # Filter tournament as requested
             tournaments = Tournament.objects.visible_to_user(
@@ -287,7 +285,8 @@ class MatchViewSet(
             queryset = self.get_queryset().filter(
                 tournament_round__tournament__in=Subquery(tournaments.values("pk"))
             )
-
+        if tournaments.count() != 1:
+            return Response(None, status=status.HTTP_404_NOT_FOUND)
         # Filter rounds as requested
         round_id = parse_int(self.request.query_params.get("round_id"))
         if round_id is not None:
@@ -354,7 +353,7 @@ class MatchViewSet(
             status.HTTP_204_NO_CONTENT: OpenApiResponse(
                 description="No ranked matches found."
             ),
-            status.HTTP_200_OK: HistoricalRatingSerializer(),
+            status.HTTP_200_OK: HistoricalRatingSerializer(many=True),
         },
     )
     @action(
