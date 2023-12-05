@@ -282,11 +282,11 @@ class MatchViewSet(
             tournament_id = self.request.query_params.get("tournament_id")
             if tournament_id is not None:
                 tournaments = tournaments.filter(pk=tournament_id)
-            queryset = self.get_queryset().filter(
-                tournament_round__tournament__in=Subquery(tournaments.values("pk"))
-            )
         if tournaments.count() != 1:
             return Response(None, status=status.HTTP_404_NOT_FOUND)
+        queryset = self.get_queryset().filter(
+            tournament_round__tournament__in=Subquery(tournaments.values("pk"))
+        )
         # Filter rounds as requested
         round_id = parse_int(self.request.query_params.get("round_id"))
         if round_id is not None:
