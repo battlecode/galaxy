@@ -6,7 +6,7 @@ import TextArea from "../components/elements/TextArea";
 import { TeamStateEnum, useCurrentTeam } from "../contexts/CurrentTeamContext";
 import Button from "../components/elements/Button";
 import MemberList from "../components/team/MemberList";
-import JoinTeam from "../components/JoinTeam";
+import JoinTeam from "./JoinTeam";
 import Modal from "../components/Modal";
 import EligibilitySettings from "../components/team/EligibilitySettings";
 import ScrimmageSettings from "../components/team/ScrimmageSettings";
