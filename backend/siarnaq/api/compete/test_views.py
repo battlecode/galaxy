@@ -1,5 +1,6 @@
 import io
 import random
+import sys
 from datetime import timedelta
 from unittest.mock import mock_open, patch
 
@@ -321,15 +322,17 @@ class MatchSerializerTestCase(TestCase):
         self.r_hidden = TournamentRound.objects.create(
             tournament=tournament, release_status=ReleaseStatus.HIDDEN, display_order=0
         )
+        self.r_hidden.maps.set([self.map])
         self.r_participants = TournamentRound.objects.create(
             tournament=tournament,
             release_status=ReleaseStatus.PARTICIPANTS,
             display_order=1,
         )
+        self.r_participants.maps.set([self.map])
         self.r_results = TournamentRound.objects.create(
             tournament=tournament, release_status=ReleaseStatus.RESULTS, display_order=2
         )
-
+        self.r_results.maps.set([self.map])
         self.users, self.teams, self.submissions = [], [], []
         for i in range(4):
             u = User.objects.create_user(
@@ -390,13 +393,21 @@ class MatchSerializerTestCase(TestCase):
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
+        print(data, file=sys.stderr)
         self.assertEqual(
             data,
             {
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "tournament_round": self.r_hidden.pk,
+                "tournament_round": {
+                    "id": self.r_hidden.pk,
+                    "tournament": self.r_hidden.tournament.pk,
+                    "external_id": self.r_hidden.external_id,
+                    "name": self.r_hidden.name,
+                    "maps": None,
+                    "release_status": self.r_hidden.release_status,
+                },
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -538,7 +549,14 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "tournament_round": self.r_results.pk,
+                "tournament_round": {
+                    "id": self.r_results.pk,
+                    "tournament": self.r_results.tournament.pk,
+                    "external_id": self.r_results.external_id,
+                    "name": self.r_results.name,
+                    "maps": [self.map.pk],
+                    "release_status": self.r_results.release_status,
+                },
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -609,7 +627,14 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "tournament_round": self.r_participants.pk,
+                "tournament_round": {
+                    "id": self.r_participants.pk,
+                    "tournament": self.r_participants.tournament.pk,
+                    "external_id": self.r_participants.external_id,
+                    "name": self.r_participants.name,
+                    "maps": None,
+                    "release_status": self.r_participants.release_status,
+                },
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -680,7 +705,14 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "tournament_round": self.r_hidden.pk,
+                "tournament_round": {
+                    "id": self.r_hidden.pk,
+                    "tournament": self.r_hidden.tournament.pk,
+                    "external_id": self.r_hidden.external_id,
+                    "name": self.r_hidden.name,
+                    "maps": None,
+                    "release_status": self.r_hidden.release_status,
+                },
                 "participants": None,
                 "maps": None,
                 "alternate_order": match.alternate_order,
