@@ -303,6 +303,7 @@ class MatchViewSet(
         queryset = self.get_queryset().filter(
             tournament_round__tournament__in=Subquery(tournaments.values("pk"))
         )
+
         # Filter rounds as requested
         round_id = parse_int(self.request.query_params.get("round_id"))
         if round_id is not None:
@@ -369,7 +370,7 @@ class MatchViewSet(
             status.HTTP_204_NO_CONTENT: OpenApiResponse(
                 description="No ranked matches found."
             ),
-            status.HTTP_200_OK: HistoricalRatingSerializer(many=True),
+            status.HTTP_200_OK: HistoricalRatingSerializer(),
         },
     )
     @action(
