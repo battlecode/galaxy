@@ -1096,6 +1096,9 @@ class MatchViewSetTestCase(APITestCase):
         self.m_private_results = self.helper_create_tournament_match(
             self.r_private_results
         )
+        # extra tournament match for regression test (using external ID
+        # shouldn't return all matches)
+        self.helper_create_tournament_match(self.r_public_results)
 
     # Partitions for: tournament.
     # match tournament: public, private
