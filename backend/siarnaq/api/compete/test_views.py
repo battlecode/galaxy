@@ -321,15 +321,17 @@ class MatchSerializerTestCase(TestCase):
         self.r_hidden = TournamentRound.objects.create(
             tournament=tournament, release_status=ReleaseStatus.HIDDEN, display_order=0
         )
+        self.r_hidden.maps.set([self.map])
         self.r_participants = TournamentRound.objects.create(
             tournament=tournament,
             release_status=ReleaseStatus.PARTICIPANTS,
             display_order=1,
         )
+        self.r_participants.maps.set([self.map])
         self.r_results = TournamentRound.objects.create(
             tournament=tournament, release_status=ReleaseStatus.RESULTS, display_order=2
         )
-
+        self.r_results.maps.set([self.map])
         self.users, self.teams, self.submissions = [], [], []
         for i in range(4):
             u = User.objects.create_user(
@@ -396,7 +398,14 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "tournament_round": self.r_hidden.pk,
+                "tournament_round": {
+                    "id": self.r_hidden.pk,
+                    "tournament": self.r_hidden.tournament.pk,
+                    "external_id": self.r_hidden.external_id,
+                    "name": self.r_hidden.name,
+                    "maps": None,
+                    "release_status": self.r_hidden.release_status,
+                },
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -538,7 +547,14 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "tournament_round": self.r_results.pk,
+                "tournament_round": {
+                    "id": self.r_results.pk,
+                    "tournament": self.r_results.tournament.pk,
+                    "external_id": self.r_results.external_id,
+                    "name": self.r_results.name,
+                    "maps": [self.map.pk],
+                    "release_status": self.r_results.release_status,
+                },
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -609,7 +625,14 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "tournament_round": self.r_participants.pk,
+                "tournament_round": {
+                    "id": self.r_participants.pk,
+                    "tournament": self.r_participants.tournament.pk,
+                    "external_id": self.r_participants.external_id,
+                    "name": self.r_participants.name,
+                    "maps": None,
+                    "release_status": self.r_participants.release_status,
+                },
                 "participants": [
                     {
                         "team": red.team.pk,
@@ -680,7 +703,14 @@ class MatchSerializerTestCase(TestCase):
                 "id": match.pk,
                 "status": str(match.status),
                 "episode": match.episode.pk,
-                "tournament_round": self.r_hidden.pk,
+                "tournament_round": {
+                    "id": self.r_hidden.pk,
+                    "tournament": self.r_hidden.tournament.pk,
+                    "external_id": self.r_hidden.external_id,
+                    "name": self.r_hidden.name,
+                    "maps": None,
+                    "release_status": self.r_hidden.release_status,
+                },
                 "participants": None,
                 "maps": None,
                 "alternate_order": match.alternate_order,
@@ -959,6 +989,32 @@ class MatchSerializerTestCase(TestCase):
 class MatchViewSetTestCase(APITestCase):
     """Test suite for the Matches API."""
 
+    def helper_create_tournament_match(self, tournament_round):
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=tournament_round,
+            alternate_order=True,
+            is_ranked=False,
+        )
+        red = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[0],
+            submission=self.submissions[0],
+            match=match,
+            player_index=0,
+            score=0,
+            rating=Rating.objects.create(),
+        )
+        blue = MatchParticipant.objects.create(  # noqa: F841
+            team=self.teams[1],
+            submission=self.submissions[1],
+            match=match,
+            player_index=1,
+            score=1,
+            rating=Rating.objects.create(),
+        )
+        match.maps.add(self.map)
+        return match
+
     def setUp(self):
         self.e1 = Episode.objects.create(
             name_short="e1",
@@ -968,7 +1024,7 @@ class MatchViewSetTestCase(APITestCase):
             language=Language.JAVA_8,
         )
         self.map = Map.objects.create(episode=self.e1, name="map")
-        tournament = Tournament.objects.create(
+        public_tournament = Tournament.objects.create(
             name_short="t",
             episode=self.e1,
             style=TournamentStyle.DOUBLE_ELIMINATION,
@@ -978,13 +1034,42 @@ class MatchViewSetTestCase(APITestCase):
             submission_freeze=timezone.now(),
             submission_unfreeze=timezone.now(),
         )
-        self.r_results = TournamentRound.objects.create(
-            tournament=tournament, release_status=ReleaseStatus.RESULTS, display_order=0
+        self.r_public_results = TournamentRound.objects.create(
+            tournament=public_tournament,
+            release_status=ReleaseStatus.RESULTS,
+            display_order=0,
         )
-        self.r_hidden = TournamentRound.objects.create(
-            tournament=tournament, release_status=ReleaseStatus.HIDDEN, display_order=1
+        self.r_public_hidden = TournamentRound.objects.create(
+            tournament=public_tournament,
+            release_status=ReleaseStatus.HIDDEN,
+            display_order=1,
         )
-
+        self.t_private = Tournament.objects.create(
+            name_short="t_private",
+            episode=self.e1,
+            style=TournamentStyle.DOUBLE_ELIMINATION,
+            require_resume=False,
+            is_public=False,
+            display_date=timezone.now(),
+            submission_freeze=timezone.now(),
+            submission_unfreeze=timezone.now(),
+            external_id_private="challongeid",
+        )
+        self.r_private_results = TournamentRound.objects.create(
+            tournament=self.t_private,
+            release_status=ReleaseStatus.RESULTS,
+            display_order=0,
+        )
+        self.r_private_hidden = TournamentRound.objects.create(
+            tournament=self.t_private,
+            release_status=ReleaseStatus.HIDDEN,
+            display_order=1,
+        )
+        self.r_private_participants = TournamentRound.objects.create(
+            tournament=self.t_private,
+            release_status=ReleaseStatus.PARTICIPANTS,
+            display_order=2,
+        )
         self.users, self.teams, self.submissions = [], [], []
         for i in range(2):
             u = User.objects.create_user(
@@ -1000,6 +1085,63 @@ class MatchViewSetTestCase(APITestCase):
             self.users.append(u)
             self.teams.append(t)
 
+        self.m_private_hidden = self.helper_create_tournament_match(
+            self.r_private_hidden
+        )
+        self.m_private_participants = self.helper_create_tournament_match(
+            self.r_private_participants
+        )
+        self.m_private_results = self.helper_create_tournament_match(
+            self.r_private_results
+        )
+        # extra tournament match for regression test (using external ID
+        # shouldn't return all matches)
+        self.helper_create_tournament_match(self.r_public_results)
+
+    # Partitions for: tournament.
+    # match tournament: public, private
+    # lookup by: external id (correct, wrong), tournament id (correct, wrong)
+    # match tournament round release: hidden, participants, results
+
+    def test_not_public_external_id(self):
+        """tournament is private, correct external id"""
+        self.client.force_authenticate(self.users[0])
+        response = self.client.get(
+            reverse("match-tournament", kwargs={"episode_id": "e1"}),
+            {"external_id_private": "challongeid"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()["results"]), 3)
+        self.assertEqual(len(response.json()["results"][0]["participants"]), 2)
+
+    def test_not_public_bad_external_id(self):
+        """tournament is private, wrong external id"""
+        self.client.force_authenticate(self.users[0])
+        response = self.client.get(
+            reverse("match-tournament", kwargs={"episode_id": "e1"}),
+            {"external_id_private": "wrong"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_not_public_id(self):
+        """tournament is private, correct tourney id"""
+        self.client.force_authenticate(self.users[0])
+        response = self.client.get(
+            reverse("match-tournament", kwargs={"episode_id": "e1"}),
+            {"tournament_id": self.t_private.pk},
+        )
+        # not logged in so it should 404
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_public_bad_id(self):
+        """tournament is public, wrong tourney id"""
+        self.client.force_authenticate(self.users[0])
+        response = self.client.get(
+            reverse("match-tournament", kwargs={"episode_id": "e1"}),
+            {"tournament_id": "asdf"},
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     # Partitions for: my.
     # match tournament round released: results, no results, none
 
@@ -1007,7 +1149,7 @@ class MatchViewSetTestCase(APITestCase):
         self.client.force_authenticate(self.users[0])
         match = Match.objects.create(
             episode=self.e1,
-            tournament_round=self.r_results,
+            tournament_round=self.r_public_results,
             alternate_order=True,
             is_ranked=False,
         )
@@ -1040,7 +1182,7 @@ class MatchViewSetTestCase(APITestCase):
         self.client.force_authenticate(self.users[0])
         match = Match.objects.create(
             episode=self.e1,
-            tournament_round=self.r_hidden,
+            tournament_round=self.r_public_hidden,
             alternate_order=True,
             is_ranked=False,
         )

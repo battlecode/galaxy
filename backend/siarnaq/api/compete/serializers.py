@@ -19,6 +19,7 @@ from siarnaq.api.compete.models import (
     Submission,
 )
 from siarnaq.api.episodes.models import Map, ReleaseStatus
+from siarnaq.api.episodes.serializers import TournamentRoundSerializer
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.serializers import RatingField
 
@@ -238,6 +239,7 @@ class MatchSerializer(serializers.ModelSerializer):
     participants = MatchParticipantSerializer(many=True)
     maps = serializers.SerializerMethodField()
     replay_url = serializers.SerializerMethodField()
+    tournament_round = TournamentRoundSerializer(required=False, allow_null=True)
 
     class Meta:
         model = Match

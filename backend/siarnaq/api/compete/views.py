@@ -236,12 +236,33 @@ class MatchViewSet(
         )
         return queryset
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if self.action != "tournament":
+            return context
+        # check if the external id is valid
+        external_id_private = self.request.query_params.get("external_id_private")
+        tournaments = None
+        if external_id_private is None:
+            return context
+        tournaments = Tournament.objects.visible_to_user(is_staff=True)
+        tournaments = tournaments.filter(external_id_private=external_id_private)
+        if tournaments.count() == 1:
+            # if the external id is valid, allow lookup of all tournament info
+            context.update({"user_is_staff": True})
+        return context
+
     @extend_schema(
         parameters=[
             OpenApiParameter(
                 name="tournament_id",
                 type=str,
                 description="A tournament to filter for.",
+            ),
+            OpenApiParameter(
+                name="external_id_private",
+                type=str,
+                description="A private id to filter for.",
             ),
             OpenApiParameter(
                 name="round_id",
@@ -263,11 +284,22 @@ class MatchViewSet(
         """List matches played in a tournament."""
         queryset = self.get_queryset()
 
-        # Filter tournament as requested
-        tournaments = Tournament.objects.visible_to_user(is_staff=request.user.is_staff)
-        tournament_id = self.request.query_params.get("tournament_id")
-        if tournament_id is not None:
-            tournaments = tournaments.filter(pk=tournament_id)
+        external_id_private = self.request.query_params.get("external_id_private")
+        tournaments = None
+        if external_id_private is not None:
+            # If an external id is provided, filter tournaments by it
+            tournaments = Tournament.objects.visible_to_user(is_staff=True)
+            tournaments = tournaments.filter(external_id_private=external_id_private)
+        else:
+            # Otherwise filter by provided tournament id
+            tournaments = Tournament.objects.visible_to_user(
+                is_staff=request.user.is_staff
+            )
+            tournament_id = self.request.query_params.get("tournament_id")
+            if tournament_id is not None:
+                tournaments = tournaments.filter(pk=tournament_id)
+        if tournaments.count() != 1:
+            return Response(None, status=status.HTTP_404_NOT_FOUND)
         queryset = self.get_queryset().filter(
             tournament_round__tournament__in=Subquery(tournaments.values("pk"))
         )
