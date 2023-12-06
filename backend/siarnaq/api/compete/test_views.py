@@ -1112,6 +1112,7 @@ class MatchViewSetTestCase(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()["results"]), 3)
+        self.assertEqual(len(response.json()["results"][0]["participants"]), 2)
 
     def test_not_public_bad_external_id(self):
         """tournament is private, wrong external id"""

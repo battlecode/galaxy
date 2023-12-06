@@ -236,6 +236,22 @@ class MatchViewSet(
         )
         return queryset
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if self.action != "tournament":
+            return context
+        # check if the external id is valid
+        external_id_private = self.request.query_params.get("external_id_private")
+        tournaments = None
+        if external_id_private is None:
+            return context
+        tournaments = Tournament.objects.visible_to_user(is_staff=True)
+        tournaments = tournaments.filter(external_id_private=external_id_private)
+        if tournaments.count() == 1:
+            # if the external id is valid, allow lookup of all tournament info
+            context.update({"user_is_staff": True})
+        return context
+
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -268,14 +284,14 @@ class MatchViewSet(
         """List matches played in a tournament."""
         queryset = self.get_queryset()
 
-        # First attempt to get tournament by private challonge id
         external_id_private = self.request.query_params.get("external_id_private")
         tournaments = None
         if external_id_private is not None:
+            # If an external id is provided, filter tournaments by it
             tournaments = Tournament.objects.visible_to_user(is_staff=True)
             tournaments = tournaments.filter(external_id_private=external_id_private)
         else:
-            # Filter tournament as requested
+            # Otherwise filter by provided tournament id
             tournaments = Tournament.objects.visible_to_user(
                 is_staff=request.user.is_staff
             )
