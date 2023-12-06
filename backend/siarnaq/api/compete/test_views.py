@@ -1,6 +1,5 @@
 import io
 import random
-import sys
 from datetime import timedelta
 from unittest.mock import mock_open, patch
 
@@ -393,7 +392,6 @@ class MatchSerializerTestCase(TestCase):
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
-        print(data, file=sys.stderr)
         self.assertEqual(
             data,
             {
