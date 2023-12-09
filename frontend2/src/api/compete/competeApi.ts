@@ -3,10 +3,21 @@ import {
   type TournamentSubmission,
   type PaginatedSubmissionList,
   type PaginatedScrimmageRequestList,
-  type ScrimmageRequestRequest,
-  type PlayerOrderEnum,
   type PaginatedMatchList,
-  CompeteSubmissionCreateRequest,
+  type CompeteSubmissionCreateRequest,
+  type CompeteSubmissionDownloadRetrieveRequest,
+  type CompeteSubmissionListRequest,
+  type Submission,
+  type CompeteRequestAcceptCreateRequest,
+  type CompeteRequestRejectCreateRequest,
+  type CompeteRequestInboxListRequest,
+  type CompeteRequestOutboxListRequest,
+  type CompeteRequestCreateRequest,
+  type ScrimmageRequest,
+  type CompeteMatchScrimmageListRequest,
+  type CompeteMatchTournamentListRequest,
+  type CompeteMatchListRequest,
+  CompeteSubmissionTournamentListRequest,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
 
@@ -18,152 +29,137 @@ const API = new CompeteApi(DEFAULT_API_CONFIGURATION);
 /**
  * Uploads a new submission to the Google Cloud Storage bucket.
  * @param episodeId The current episode's ID.
- * @param submission The submission's info.
+ * @param _package The name of the submission's package.
+ * @param description The submission's description.
+ * @param sourceCode The submission's source code.
  */
 export const uploadSubmission = async ({
   episodeId,
   _package,
   description,
   sourceCode,
-}: CompeteSubmissionCreateRequest): Promise<void> => {
+}: CompeteSubmissionCreateRequest): Promise<Submission> =>
   await API.competeSubmissionCreate({
     episodeId,
     sourceCode,
     _package,
     description,
   });
-};
 
 /**
  * Download a submission from the Google Cloud Storage bucket.
  * @param episodeId The current episode's ID.
- * @param submissionId The submission's ID.
+ * @param id The submission's ID.
  */
-export const downloadSubmission = async (
-  episodeId: string,
-  submissionId: number,
-): Promise<void> => {
+export const downloadSubmission = async ({
+  episodeId,
+  id,
+}: CompeteSubmissionDownloadRetrieveRequest): Promise<void> => {
+  // TODO: use useMutationState to download submission from cache once its ready?
   // the url where the submission is located
   const url: string = (
     await API.competeSubmissionDownloadRetrieve({
       episodeId,
-      id: submissionId.toString(),
+      id,
     })
   ).url;
 
-  await downloadFile(url, `battlecode_source_${submissionId}.zip`);
+  await downloadFile(url, `battlecode_source_${id}.zip`);
 };
 
 /**
- * Get all submissions.
+ * Get a paginated list of all of the current user's team's submissions.
  * @param episodeId The current episode's ID.
  * @param page The page number.
  */
-export const getAllSubmissions = async (
-  episodeId: string,
-  page?: number,
-): Promise<PaginatedSubmissionList> => {
-  return await API.competeSubmissionList({ episodeId, page });
-};
+export const getSubmissionsList = async ({
+  episodeId,
+  page,
+}: CompeteSubmissionListRequest): Promise<PaginatedSubmissionList> =>
+  await API.competeSubmissionList({ episodeId, page });
 
 /**
  * Get all tournament submissions for the currently logged in user's team.
  * @param episodeId The current episode's ID.
  */
-export const getAllUserTournamentSubmissions = async (
-  episodeId: string,
-): Promise<TournamentSubmission[]> => {
-  return await API.competeSubmissionTournamentList({ episodeId });
-};
+export const getAllUserTournamentSubmissions = async ({
+  episodeId,
+}: CompeteSubmissionTournamentListRequest): Promise<TournamentSubmission[]> =>
+  await API.competeSubmissionTournamentList({ episodeId });
 
 /**
  * Accept a scrimmage invitation.
  * @param episodeId The current episode's ID.
- * @param scrimmageId The scrimmage's ID to accept.
+ * @param id The scrimmage's ID to accept.
  */
-export const acceptScrimmage = async (
-  episodeId: string,
-  scrimmageId: number,
-): Promise<void> => {
-  const scrimId = scrimmageId.toString();
-  await API.competeRequestAcceptCreate({ episodeId, id: scrimId });
+export const acceptScrimmage = async ({
+  episodeId,
+  id,
+}: CompeteRequestAcceptCreateRequest): Promise<void> => {
+  await API.competeRequestAcceptCreate({ episodeId, id });
 };
 
 /**
  * Reject a scrimmage invitation.
  * @param episodeId The current episode's ID.
- * @param scrimmageId The scrimmage's ID to reject.
+ * @param id The scrimmage's ID to reject.
  */
-export const rejectScrimmage = async (
-  episodeId: string,
-  scrimmageId: number,
-): Promise<void> => {
-  const scrimId = scrimmageId.toString();
-  await API.competeRequestRejectCreate({ episodeId, id: scrimId });
+export const rejectScrimmage = async ({
+  episodeId,
+  id,
+}: CompeteRequestRejectCreateRequest): Promise<void> => {
+  await API.competeRequestRejectCreate({ episodeId, id });
 };
 
 /**
- * Get all of the currently logged in user's incoming scrimmage requests.
+ * Get a paginated list of the currently logged in user's incoming scrimmage requests.
  * @param episodeId The current episode's ID.
+ * @param page The page number.
  */
-export const getUserScrimmagesInbox = async (
-  episodeId: string,
-  page?: number,
-): Promise<PaginatedScrimmageRequestList> => {
-  return await API.competeRequestInboxList({ episodeId, page });
-};
+export const getUserScrimmagesInboxList = async ({
+  episodeId,
+  page,
+}: CompeteRequestInboxListRequest): Promise<PaginatedScrimmageRequestList> =>
+  await API.competeRequestInboxList({ episodeId, page });
 
 /**
- * Get all of the currently logged in user's outgoing scrimmage requests.
+ * Get a paginated list of the currently logged in user's outgoing scrimmage requests.
  * @param episodeId The current episode's ID.
+ * @param page The page number.
  */
-export const getUserScrimmagesOutbox = async (
-  episodeId: string,
-  page?: number,
-): Promise<PaginatedScrimmageRequestList> => {
-  return await API.competeRequestOutboxList({ episodeId, page });
-};
+export const getUserScrimmagesOutboxList = async ({
+  episodeId,
+  page,
+}: CompeteRequestOutboxListRequest): Promise<PaginatedScrimmageRequestList> =>
+  await API.competeRequestOutboxList({ episodeId, page });
 
 /**
  * Request a scrimmage with a team.
  * @param episodeId The current episode's ID.
- * @param request The scrimmage request body.
+ * @param scrimmageRequestRequest The scrimmage request body.
  */
-export const requestScrimmage = async (
-  episodeId: string,
-  request: {
-    isRanked: boolean;
-    requestedTo: number;
-    playerOrder: PlayerOrderEnum;
-    mapNames: string[];
-  },
-): Promise<void> => {
-  const scrimmageRequest: ScrimmageRequestRequest = {
-    is_ranked: request.isRanked,
-    requested_to: request.requestedTo,
-    player_order: request.playerOrder,
-    map_names: request.mapNames,
-  };
+export const requestScrimmage = async ({
+  episodeId,
+  scrimmageRequestRequest,
+}: CompeteRequestCreateRequest): Promise<ScrimmageRequest> =>
   await API.competeRequestCreate({
     episodeId,
-    scrimmageRequestRequest: scrimmageRequest,
+    scrimmageRequestRequest,
   });
-};
 
 /**
- * Get all of the scrimmages (non-tournament matches) that a given team has played.
+ * Get a paginated list of the scrimmages (non-tournament matches) that a given team has played.
  * If teamId is not specified, defaults to the logged in user's team.
  * @param episodeId The current episode's ID.
  * @param teamId The team's ID. Defaults to the logged in user's team.
  * @param page The page of scrimmages to get.
  */
-export const getScrimmagesByTeam = async (
-  episodeId: string,
-  teamId?: number,
-  page?: number,
-): Promise<PaginatedMatchList> => {
-  return await API.competeMatchScrimmageList({ episodeId, teamId, page });
-};
+export const getScrimmagesListByTeam = async ({
+  episodeId,
+  teamId,
+  page,
+}: CompeteMatchScrimmageListRequest): Promise<PaginatedMatchList> =>
+  await API.competeMatchScrimmageList({ episodeId, teamId, page });
 
 /**
  * Get all of the tournament matches of an episode,
@@ -174,21 +170,20 @@ export const getScrimmagesByTeam = async (
  * @param roundId The tournament round's ID.
  * @param page The page of matches to get.
  */
-export const getTournamentMatches = async (
-  episodeId: string,
-  teamId?: number,
-  tournamentId?: string,
-  roundId?: number,
-  page?: number,
-): Promise<PaginatedMatchList> => {
-  return await API.competeMatchTournamentList({
+export const getTournamentMatchesList = async ({
+  episodeId,
+  teamId,
+  tournamentId,
+  roundId,
+  page,
+}: CompeteMatchTournamentListRequest): Promise<PaginatedMatchList> =>
+  await API.competeMatchTournamentList({
     episodeId,
     page,
     roundId,
     teamId,
     tournamentId,
   });
-};
 
 /**
  * Get all of the matches played in the given episode. Includes both tournament
@@ -196,9 +191,8 @@ export const getTournamentMatches = async (
  * @param episodeId The current episode's ID.
  * @param page The page of matches to get.
  */
-export const getAllMatches = async (
-  episodeId: string,
-  page?: number,
-): Promise<PaginatedMatchList> => {
-  return await API.competeMatchList({ episodeId, page });
-};
+export const getMatchesList = async ({
+  episodeId,
+  page,
+}: CompeteMatchListRequest): Promise<PaginatedMatchList> =>
+  await API.competeMatchList({ episodeId, page });

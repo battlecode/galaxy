@@ -1,6 +1,4 @@
 import type {
-  PatchedUserPrivateRequest,
-  UserCreateRequest,
   UserPasswordResetConfirmCreateRequest,
   UserUAvatarCreateRequest,
   UserUCreateRequest,
