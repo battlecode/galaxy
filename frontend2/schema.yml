@@ -143,7 +143,7 @@ paths:
           description: This match was already finalized
   /api/compete/{episode_id}/match/historical_rating/:
     get:
-      operationId: compete_match_historical_rating_retrieve
+      operationId: compete_match_historical_rating_list
       description: List the historical rating of a team.
       parameters:
       - in: path
@@ -152,6 +152,12 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
       - in: query
         name: team_id
         schema:
@@ -168,7 +174,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HistoricalRating'
+                $ref: '#/components/schemas/PaginatedHistoricalRatingList'
           description: ''
   /api/compete/{episode_id}/match/scrimmage/:
     get:
@@ -2350,6 +2356,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Episode'
+    PaginatedHistoricalRatingList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/HistoricalRating'
     PaginatedMatchList:
       type: object
       properties:

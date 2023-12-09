@@ -397,7 +397,7 @@ class MatchViewSet(
             status.HTTP_204_NO_CONTENT: OpenApiResponse(
                 description="No ranked matches found."
             ),
-            status.HTTP_200_OK: HistoricalRatingSerializer(),
+            status.HTTP_200_OK: HistoricalRatingSerializer(many=True),
         },
     )
     @action(

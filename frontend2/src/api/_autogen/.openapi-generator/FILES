@@ -23,6 +23,7 @@ models/MatchParticipant.ts
 models/MatchReportRequest.ts
 models/PaginatedClassRequirementList.ts
 models/PaginatedEpisodeList.ts
+models/PaginatedHistoricalRatingList.ts
 models/PaginatedMatchList.ts
 models/PaginatedScrimmageRequestList.ts
 models/PaginatedSubmissionList.ts

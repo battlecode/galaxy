@@ -15,9 +15,9 @@
 
 import * as runtime from '../runtime';
 import type {
-  HistoricalRating,
   Match,
   MatchReportRequest,
+  PaginatedHistoricalRatingList,
   PaginatedMatchList,
   PaginatedScrimmageRequestList,
   PaginatedSubmissionList,
@@ -29,12 +29,12 @@ import type {
   TournamentSubmission,
 } from '../models';
 import {
-    HistoricalRatingFromJSON,
-    HistoricalRatingToJSON,
     MatchFromJSON,
     MatchToJSON,
     MatchReportRequestFromJSON,
     MatchReportRequestToJSON,
+    PaginatedHistoricalRatingListFromJSON,
+    PaginatedHistoricalRatingListToJSON,
     PaginatedMatchListFromJSON,
     PaginatedMatchListToJSON,
     PaginatedScrimmageRequestListFromJSON,
@@ -55,8 +55,9 @@ import {
     TournamentSubmissionToJSON,
 } from '../models';
 
-export interface CompeteMatchHistoricalRatingRetrieveRequest {
+export interface CompeteMatchHistoricalRatingListRequest {
     episodeId: string;
+    page?: number;
     teamId?: number;
 }
 
@@ -171,12 +172,16 @@ export class CompeteApi extends runtime.BaseAPI {
     /**
      * List the historical rating of a team.
      */
-    async competeMatchHistoricalRatingRetrieveRaw(requestParameters: CompeteMatchHistoricalRatingRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HistoricalRating>> {
+    async competeMatchHistoricalRatingListRaw(requestParameters: CompeteMatchHistoricalRatingListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedHistoricalRatingList>> {
         if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
-            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling competeMatchHistoricalRatingRetrieve.');
+            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling competeMatchHistoricalRatingList.');
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters.page !== undefined) {
+            queryParameters['page'] = requestParameters.page;
+        }
 
         if (requestParameters.teamId !== undefined) {
             queryParameters['team_id'] = requestParameters.teamId;
@@ -199,14 +204,14 @@ export class CompeteApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => HistoricalRatingFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => PaginatedHistoricalRatingListFromJSON(jsonValue));
     }
 
     /**
      * List the historical rating of a team.
      */
-    async competeMatchHistoricalRatingRetrieve(requestParameters: CompeteMatchHistoricalRatingRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HistoricalRating> {
-        const response = await this.competeMatchHistoricalRatingRetrieveRaw(requestParameters, initOverrides);
+    async competeMatchHistoricalRatingList(requestParameters: CompeteMatchHistoricalRatingListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedHistoricalRatingList> {
+        const response = await this.competeMatchHistoricalRatingListRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

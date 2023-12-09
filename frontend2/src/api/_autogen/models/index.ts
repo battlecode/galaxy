@@ -16,6 +16,7 @@ export * from './MatchParticipant';
 export * from './MatchReportRequest';
 export * from './PaginatedClassRequirementList';
 export * from './PaginatedEpisodeList';
+export * from './PaginatedHistoricalRatingList';
 export * from './PaginatedMatchList';
 export * from './PaginatedScrimmageRequestList';
 export * from './PaginatedSubmissionList';
