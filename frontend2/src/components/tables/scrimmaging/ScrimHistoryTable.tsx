@@ -1,6 +1,5 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { useCurrentTeam } from "../../../contexts/CurrentTeamContext";
 import { dateTime } from "../../../utils/dateTime";
 import type { PaginatedMatchList } from "../../../utils/types";
 import type { Maybe } from "../../../utils/utilTypes";

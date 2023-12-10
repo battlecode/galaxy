@@ -7,7 +7,6 @@ import {
 } from "@tanstack/react-query";
 import type {
   UserPrivate,
-  PatchedUserPrivateRequest,
   UserPublic,
   UserURetrieveRequest,
   UserUTeamsRetrieveRequest,
@@ -41,7 +40,6 @@ export const useCurrentUserInfo = (): UseQueryResult<UserPrivate, Error> =>
   useQuery({
     queryKey: userQueryKeys.meBase,
     queryFn: async () => await getCurrentUserInfo(),
-    staleTime: 5 * 1000 * 60, // 5 minutes
   });
 
 /**
@@ -53,9 +51,6 @@ export const useUserInfoById = ({
   useQuery({
     queryKey: userQueryKeys.otherInfo({ id }),
     queryFn: async () => await getUserInfoById({ id }),
-    // 30 secs, so that quickly tabbing through pages won't refetch, but
-    // also short enough for the user to see updated info soon after
-    staleTime: 1000 * 30,
   });
 
 /**
@@ -70,9 +65,6 @@ export const useTeamsByUser = ({
   useQuery({
     queryKey: userQueryKeys.otherTeams({ id }),
     queryFn: async () => await getTeamsByUser({ id }),
-    // 30 secs, so that quickly tabbing through pages won't refetch, but
-    // also short enough for the user to see updated info soon after
-    staleTime: 1000 * 30,
   });
 
 // ---------- MUTATION HOOKS ----------//
@@ -173,7 +165,7 @@ export const useAvatarUpload = ({
  */
 export const useResumeUpload = ({
   userResumeRequest,
-}: UserUResumeUpdateRequest) =>
+}: UserUResumeUpdateRequest): UseMutationResult<void, Error, void, unknown> =>
   useMutation({
     mutationKey: userMutationKeys.resumeUpload({ userResumeRequest }),
     mutationFn: async () => {

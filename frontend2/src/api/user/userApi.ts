@@ -100,8 +100,6 @@ export const avatarUpload = async ({
 export const resumeUpload = async ({
   userResumeRequest,
 }: UserUResumeUpdateRequest): Promise<void> => {
-  // TODO: add a query to get the currently logged-in user's resume
-  // The hook for this should have an INFINITE staleTime!
   await API.userUResumeUpdate({ userResumeRequest });
 };
 

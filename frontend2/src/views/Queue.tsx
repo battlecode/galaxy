@@ -1,15 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
-import type { PaginatedMatchList } from "../utils/types";
 import { useSearchParams } from "react-router-dom";
-import { getAllMatches, getScrimmagesByTeam } from "../utils/api/compete";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import Button from "../components/elements/Button";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
-import type { Maybe } from "../utils/utilTypes";
 import { loadTeamOptions } from "../utils/loadTeams";
 import QueueTable from "../components/tables/QueueTable";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
+import { useQueryClient } from "@tanstack/react-query";
+import { useMatchList, useTeamScrimmageList } from "../api/compete/useCompete";
+import { toast } from "react-hot-toast";
 
 interface QueryParams {
   page: number;
@@ -17,9 +17,9 @@ interface QueryParams {
 
 const Queue: React.FC = () => {
   const { episodeId } = useEpisodeId();
+  const queryClient = useQueryClient();
 
   const [searchParams, setSearchParams] = useSearchParams();
-
   const queryParams: QueryParams = useMemo(() => {
     return {
       page: parsePageParam("page", searchParams),
@@ -30,69 +30,45 @@ const Queue: React.FC = () => {
     value: number;
     label: string;
   } | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [data, setData] = useState<Maybe<PaginatedMatchList>>(undefined);
 
-  // TODO: in future, also call getTournamentMatches (by team)
-  // and "mix" the results ordered by created_at
-  async function refreshData(): Promise<void> {
-    if (loading) return;
-    setLoading(true);
-    setData((prev) => ({ count: prev?.count ?? 0 }));
-    try {
-      const result: PaginatedMatchList =
-        selectedTeam === null
-          ? await getAllMatches(episodeId, queryParams.page)
-          : await getScrimmagesByTeam(
-              episodeId,
-              selectedTeam.value,
-              queryParams.page,
-            );
-      setData(result);
-    } catch (err) {
-      setData(undefined);
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }
+  // This is a hack since we don't support filter the all matches endpoint by team
+  const allMatchesData = useMatchList(
+    {
+      episodeId,
+      page: queryParams.page,
+    },
+    queryClient,
+  );
+  const teamMatchesData = useTeamScrimmageList(
+    { episodeId, teamId: selectedTeam?.value, page: queryParams.page },
+    queryClient,
+  );
+
+  // Not going to memoize this... will use this to determine which data/loading to use
+  const activeData = selectedTeam === null ? allMatchesData : teamMatchesData;
 
   const handlePage = (page: number): void => {
-    if (!loading) {
-      setSearchParams((prev) => ({
-        ...getParamEntries(prev),
-        page: page.toString(),
-      }));
-    }
+    setSearchParams((prev) => ({
+      ...getParamEntries(prev),
+      page: page.toString(),
+    }));
   };
-
-  /**
-   * A wrapper function that returns the value/label pairs for the AsyncSelectMenu.
-   * @param inputValue The search string from the menu
-   * @returns An array of value/label pairs for the menu
-   */
-  const loadSelectOptions = async (
-    inputValue: string,
-  ): Promise<Array<{ value: number; label: string }>> => {
-    return await loadTeamOptions(episodeId, inputValue, true, 1);
-  };
-
-  useEffect(() => {
-    void refreshData();
-  }, [queryParams.page, selectedTeam]);
 
   return (
     <div className="flex h-full w-full flex-col overflow-auto p-6">
       <div className="justify-right mb-1 flex flex-row space-x-4">
         <PageTitle>Recent Queue</PageTitle>
         <Button
-          disabled={loading}
+          disabled={activeData.isLoading}
           label="Refresh!"
           variant="dark"
           onClick={() => {
             handlePage(1);
             if (queryParams.page === 1) {
-              void refreshData();
+              // This is an IIFE. See https://stackoverflow.com/questions/63488141/promise-returned-in-function-argument-where-a-void-return-was-expected
+              (async () => await activeData.refetch())().catch((e) =>
+                toast.error((e as Error).message),
+              );
             }
           }}
         />
@@ -104,13 +80,15 @@ const Queue: React.FC = () => {
             handlePage(1);
           }}
           selected={selectedTeam}
-          loadOptions={loadSelectOptions}
+          loadOptions={async (search) =>
+            await loadTeamOptions(episodeId, search, true, 1)
+          }
           placeholder="Search for a team..."
         />
       </div>
       <QueueTable
-        data={data}
-        loading={loading}
+        data={activeData.data}
+        loading={activeData.isLoading}
         page={queryParams.page}
         handlePage={handlePage}
       />

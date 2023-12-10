@@ -1,6 +1,5 @@
 import Cookies from "js-cookie";
 import { Configuration } from "./_autogen";
-import { QueryClient } from "@tanstack/react-query";
 
 // fall back to localhost for now
 export const BASE_URL =

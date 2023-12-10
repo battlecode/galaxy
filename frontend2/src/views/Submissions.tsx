@@ -1,16 +1,5 @@
-import React, { useEffect, useState } from "react";
-import type { Maybe } from "../utils/utilTypes";
-import type {
-  Tournament,
-  PaginatedSubmissionList,
-  TournamentSubmission,
-} from "../utils/types";
+import React, { useMemo } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import {
-  getAllSubmissions,
-  getAllUserTournamentSubmissions,
-  uploadSubmission,
-} from "../utils/api/compete";
 import SectionCard from "../components/SectionCard";
 import SubHistoryTable from "../components/tables/submissions/SubHistoryTable";
 import TourneySubTable from "../components/tables/submissions/TourneySubTable";
@@ -18,11 +7,18 @@ import Button from "../components/elements/Button";
 import Input from "../components/elements/Input";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
-import { getNextTournament } from "../utils/api/episode";
 import Spinner from "../components/Spinner";
 import TournamentCountdown from "../components/compete/TournamentCountdown";
 import FormLabel from "../components/elements/FormLabel";
-import { useEpisodeInfo } from "../api/episode/useEpisode";
+import { useEpisodeInfo, useNextTournament } from "../api/episode/useEpisode";
+import {
+  useSubmissionsList,
+  useTournamentSubmissions,
+  useUploadSubmission,
+} from "../api/compete/useCompete";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
+import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 
 interface SubmissionFormInput {
   file: FileList;
@@ -30,9 +26,46 @@ interface SubmissionFormInput {
   description: string;
 }
 
+interface QueryParams {
+  scrimsPage: number;
+}
+
 const Submissions: React.FC = () => {
   const { episodeId } = useEpisodeId();
+  const queryClient = useQueryClient();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryParams: QueryParams = useMemo(() => {
+    return {
+      scrimsPage: parsePageParam("scrimsPage", searchParams),
+    };
+  }, [searchParams]);
+
   const { data: episode } = useEpisodeInfo({ id: episodeId });
+
+  const { data: subsData, isLoading: subsLoading } = useSubmissionsList(
+    {
+      episodeId,
+      page: queryParams.scrimsPage,
+    },
+    queryClient,
+  );
+  const { data: tourneySubData, isLoading: tourneySubsLoading } =
+    useTournamentSubmissions({
+      episodeId,
+    });
+  const { data: nextTourneyData, isLoading: nextTourneyLoading } =
+    useNextTournament({
+      episodeId,
+    });
+
+  const { mutate: uploadSub, isPending: uploadingSub } = useUploadSubmission(
+    {
+      episodeId,
+    },
+    queryClient,
+  );
+
   const {
     register,
     handleSubmit,
@@ -40,124 +73,30 @@ const Submissions: React.FC = () => {
     formState: { errors },
   } = useForm<SubmissionFormInput>();
 
-  const [subsLoading, setSubsLoading] = useState<boolean>(false);
-  const [tourneySubsLoading, setTourneySubsLoading] = useState<boolean>(false);
-  const [nextTourneyLoading, setNextTourneyLoading] = useState<boolean>(false);
-
-  const [subData, setSubData] = useState<Maybe<PaginatedSubmissionList>>();
-  const [tourneySubData, setTourneySubData] =
-    useState<Maybe<TournamentSubmission[]>>();
-  const [nextTourneyData, setNextTourneyData] = useState<Maybe<Tournament>>();
-
-  const [submitting, setSubmitting] = useState<boolean>(false);
-
-  const onSubmit: SubmitHandler<SubmissionFormInput> = async (data) => {
-    if (submitting) return;
-    setSubmitting(true);
-    try {
-      await uploadSubmission(episodeId, {
-        ...data,
-        file: data.file[0],
-      });
-      reset();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setSubmitting(false);
-    }
+  const onSubmit: SubmitHandler<SubmissionFormInput> = (data) => {
+    if (uploadingSub) return;
+    uploadSub({
+      episodeId,
+      _package: data.packageName,
+      description: data.description,
+      sourceCode: data.file[0],
+    });
+    reset();
   };
 
-  useEffect(() => {
-    let isActiveLookup = true;
-    if (subsLoading) return;
-    setSubsLoading(true);
-    setSubData((prev) => ({ count: prev?.count ?? 0 }));
-
-    const fetchSubs = async (): Promise<void> => {
-      try {
-        const result = await getAllSubmissions(episodeId, 1);
-        if (isActiveLookup) {
-          setSubData(result);
-        }
-      } catch (err) {
-        if (isActiveLookup) {
-          setSubData(undefined);
-        }
-        console.error(err);
-      } finally {
-        if (isActiveLookup) {
-          setSubsLoading(false);
-        }
-      }
-    };
-
-    void fetchSubs();
-
-    return () => {
-      isActiveLookup = false;
-    };
-  }, [episodeId]);
-
-  useEffect(() => {
-    let isActiveLookup = true;
-    if (tourneySubsLoading) return;
-    setTourneySubsLoading(true);
-    setTourneySubData([]);
-
-    const fetchTourneySubs = async (): Promise<void> => {
-      try {
-        const result = await getAllUserTournamentSubmissions(episodeId);
-        if (isActiveLookup) {
-          setTourneySubData(result);
-        }
-      } catch (err) {
-        if (isActiveLookup) {
-          setTourneySubData(undefined);
-        }
-        console.error(err);
-      } finally {
-        if (isActiveLookup) {
-          setTourneySubsLoading(false);
-        }
-      }
-    };
-
-    void fetchTourneySubs();
-
-    return () => {
-      isActiveLookup = false;
-    };
-  }, [episodeId]);
-
-  useEffect(() => {
-    let isActiveLookup = true;
-    if (nextTourneyLoading) return;
-    setNextTourneyLoading(true);
-    setNextTourneyData(undefined);
-
-    const fetchNextTourney = async (): Promise<void> => {
-      try {
-        const result = await getNextTournament(episodeId);
-        if (isActiveLookup) {
-          setNextTourneyData(result);
-        }
-      } catch (err) {
-        if (isActiveLookup) {
-          setNextTourneyData(undefined);
-        }
-      } finally {
-        if (isActiveLookup) {
-          setNextTourneyLoading(false);
-        }
-      }
-    };
-
-    void fetchNextTourney();
-
-    return () => {
-      isActiveLookup = false;
-    };
-  }, [episodeId]);
+  /**
+   * Helper function to update the page number of the desired table.
+   * This is done by updating the URL (search) params.
+   */
+  function handlePage(
+    page: number,
+    key: keyof Omit<QueryParams, "search">,
+  ): void {
+    setSearchParams((prev) => ({
+      ...getParamEntries(prev),
+      [key]: page.toString(),
+    }));
+  }
 
   return (
     <div className="flex h-full w-full flex-col overflow-auto p-6">
@@ -172,7 +111,7 @@ const Submissions: React.FC = () => {
             <span>Loading...</span>
           </div>
         ) : (
-          <TournamentCountdown tournament={nextTourneyData} />
+          <TournamentCountdown tournament={nextTourneyData ?? undefined} />
         )}
       </SectionCard>
 
@@ -221,7 +160,6 @@ const Submissions: React.FC = () => {
               className="mt-4 flex flex-col gap-4"
             >
               <div>
-                {/* TODO: TOAST when upload fails! */}
                 <FormLabel required label="Choose Submission File" />
                 <input
                   type="file"
@@ -255,8 +193,8 @@ const Submissions: React.FC = () => {
                 variant="dark"
                 label="Submit"
                 type="submit"
-                loading={submitting}
-                disabled={submitting}
+                loading={uploadingSub}
+                disabled={uploadingSub}
               />
             </form>
           </>
@@ -264,7 +202,14 @@ const Submissions: React.FC = () => {
       </SectionCard>
 
       <SectionCard title="Submission History" className="mb-8">
-        <SubHistoryTable data={subData} loading={subsLoading} />
+        <SubHistoryTable
+          data={subsData}
+          loading={subsLoading}
+          page={queryParams.scrimsPage}
+          handlePage={(page) => {
+            handlePage(page, "scrimsPage");
+          }}
+        />
       </SectionCard>
 
       <SectionCard title="Tournament Submission History">

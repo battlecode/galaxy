@@ -8,6 +8,7 @@ import { useEpisodeList } from "../api/episode/useEpisode";
 import { useQueryClient } from "@tanstack/react-query";
 import { episodeQueryKeys } from "../api/episode/episodeKeys";
 import { getEpisodeInfo } from "../api/episode/episodeApi";
+import toast from "react-hot-toast";
 
 const EpisodeSwitcher: React.FC = () => {
   const queryClient = useQueryClient();
@@ -29,12 +30,11 @@ const EpisodeSwitcher: React.FC = () => {
       <Listbox
         value={episodeId}
         onChange={(newEpisodeId) => {
-          // TODO: we don't want to await this because that would block the UI from switching episodes!
-          // But... it throws lint errors if we don't await it. So we need to figure out how to do this
-          queryClient.fetchQuery({
-            queryKey: episodeQueryKeys.info({ id: newEpisodeId }),
-            queryFn: async () => await getEpisodeInfo({ id: newEpisodeId }),
-          });
+          (async () =>
+            await queryClient.fetchQuery({
+              queryKey: episodeQueryKeys.info({ id: newEpisodeId }),
+              queryFn: async () => await getEpisodeInfo({ id: newEpisodeId }),
+            }))().catch((e) => toast.error((e as Error).message));
           setEpisodeId(newEpisodeId);
           navigate(location.pathname.replace(episodeId, newEpisodeId));
         }}

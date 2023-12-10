@@ -4,6 +4,7 @@ import {
   useMutation,
   useQueryClient,
   type UseMutationResult,
+  type QueryClient,
 } from "@tanstack/react-query";
 import type {
   PaginatedTeamPublicList,
@@ -32,6 +33,7 @@ import {
   uploadUserTeamReport,
 } from "./teamApi";
 import { toast } from "react-hot-toast";
+import { isPresent } from "../../utils/utilTypes";
 
 // ---------- QUERY HOOKS ---------- //
 /**
@@ -43,7 +45,6 @@ export const useUserTeam = ({
   useQuery({
     queryKey: teamQueryKeys.myTeam({ episodeId }),
     queryFn: async () => await getUserTeamInfo({ episodeId }),
-    staleTime: 5 * 1000 * 60, // 5 minutes
   });
 
 /**
@@ -56,21 +57,39 @@ export const useTeam = ({
   useQuery({
     queryKey: teamQueryKeys.otherInfo({ episodeId, id }),
     queryFn: async () => await getTeamInfo({ episodeId, id }),
-    staleTime: 5 * 1000 * 60, // 5 minutes
   });
 
 /**
  * For searching the teams in an episode, ordered by ranking.
  */
-export const useSearchTeams = ({
-  episodeId,
-  search,
-  page,
-}: TeamTListRequest): UseQueryResult<PaginatedTeamPublicList, Error> =>
+export const useSearchTeams = (
+  { episodeId, search, page }: TeamTListRequest,
+  queryClient: QueryClient,
+): UseQueryResult<PaginatedTeamPublicList, Error> =>
   useQuery({
     queryKey: teamQueryKeys.search({ episodeId, search, page }),
-    queryFn: async () => await searchTeams({ episodeId, search, page }),
-    staleTime: 1000 * 60, // 1 minute
+    queryFn: async () => {
+      const result = await searchTeams({ episodeId, search, page });
+
+      // Prefetch the next page if it exists
+      if (isPresent(result.next)) {
+        // If no page provided, then we just fetched page 1
+        const nextPage = isPresent(page) ? page + 1 : 2;
+        // TODO: ensure correct prefetching behavior!
+        queryClient
+          .prefetchQuery({
+            queryKey: teamQueryKeys.search({
+              episodeId,
+              search,
+              page: nextPage,
+            }),
+            queryFn: async () =>
+              await searchTeams({ episodeId, search, page: nextPage }),
+          })
+          .catch((e) => toast.error((e as Error).message));
+      }
+      return result;
+    },
   });
 
 // ---------- MUTATION HOOKS ---------- //

@@ -1,4 +1,8 @@
-import { type UseQueryResult, useQuery } from "@tanstack/react-query";
+import {
+  type UseQueryResult,
+  useQuery,
+  type QueryClient,
+} from "@tanstack/react-query";
 import {
   getEpisodeInfo,
   getEpisodeList,
@@ -19,8 +23,11 @@ import type {
   GameMap,
   PaginatedEpisodeList,
   PaginatedTournamentList,
+  ResponseError,
   Tournament,
 } from "../_autogen";
+import { isPresent } from "../../utils/utilTypes";
+import toast from "react-hot-toast";
 
 // ---------- QUERY HOOKS ---------- //
 /**
@@ -44,6 +51,7 @@ export const useEpisodeList = ({
   useQuery({
     queryKey: episodeQueryKeys.list({ page }),
     queryFn: async () => await getEpisodeList({ page }),
+    staleTime: Infinity,
   });
 
 /**
@@ -62,25 +70,53 @@ export const useEpisodeMaps = ({
  */
 export const useNextTournament = ({
   episodeId,
-}: EpisodeTournamentNextRetrieveRequest): UseQueryResult<Tournament, Error> =>
+}: EpisodeTournamentNextRetrieveRequest): UseQueryResult<
+  Tournament | null,
+  Error
+> =>
   useQuery({
     queryKey: episodeQueryKeys.nextTournament({ episodeId }),
-    queryFn: async () => await getNextTournament({ episodeId }),
+    queryFn: async () => {
+      try {
+        return await getNextTournament({ episodeId });
+      } catch (err) {
+        // If there is no next tournament, just return null.
+        const responseError = err as ResponseError;
+        if (responseError.response.status === 404) return null;
+        else throw responseError;
+      }
+    },
   });
 
 /**
  * For retrieving a paginated list of the tournaments occurring during the given episode.
  */
-export const useTournamentList = ({
-  episodeId,
-  page,
-}: EpisodeTournamentListRequest): UseQueryResult<
-  PaginatedTournamentList,
-  Error
-> =>
+export const useTournamentList = (
+  { episodeId, page }: EpisodeTournamentListRequest,
+  queryClient: QueryClient,
+): UseQueryResult<PaginatedTournamentList, Error> =>
   useQuery({
     queryKey: episodeQueryKeys.tournamentList({ episodeId, page }),
-    queryFn: async () => await getTournamentList({ episodeId }),
+    queryFn: async () => {
+      const result = await getTournamentList({ episodeId, page });
+
+      // Prefetch the next page if it exists
+      if (isPresent(result.next)) {
+        // If no page provided, then we just fetched page 1
+        const nextPage = isPresent(page) ? page + 1 : 2;
+        queryClient
+          .prefetchQuery({
+            queryKey: episodeQueryKeys.tournamentList({
+              episodeId,
+              page: nextPage,
+            }),
+            queryFn: async () =>
+              await getTournamentList({ episodeId, page: nextPage }),
+          })
+          .catch((e) => toast.error((e as Error).message));
+      }
+      return result;
+    },
   });
 
 /**

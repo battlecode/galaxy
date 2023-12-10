@@ -8,7 +8,6 @@ import RatingDelta from "../../compete/RatingDelta";
 import MatchStatus from "../../compete/MatchStatus";
 import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";
-import { useCurrentTeam } from "../../../contexts/CurrentTeamContext";
 import { useEpisodeId } from "../../../contexts/EpisodeContext";
 import { useEpisodeInfo } from "../../../api/episode/useEpisode";
 import { useUserTeam } from "../../../api/team/useTeam";

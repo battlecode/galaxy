@@ -17,7 +17,7 @@ import {
   type CompeteMatchScrimmageListRequest,
   type CompeteMatchTournamentListRequest,
   type CompeteMatchListRequest,
-  CompeteSubmissionTournamentListRequest,
+  type CompeteSubmissionTournamentListRequest,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
 
