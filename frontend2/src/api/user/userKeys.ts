@@ -1,9 +1,4 @@
 import type {
-  UserPasswordResetConfirmCreateRequest,
-  UserUAvatarCreateRequest,
-  UserUCreateRequest,
-  UserUMePartialUpdateRequest,
-  UserUResumeUpdateRequest,
   UserURetrieveRequest,
   UserUTeamsRetrieveRequest,
 } from "../_autogen";
@@ -24,22 +19,21 @@ export const userQueryKeys = {
 };
 
 export const userMutationKeys = {
-  create: ({ userCreateRequest }: UserUCreateRequest) =>
-    ["user", "create", { userCreateRequest }] as const,
+  create: ({ episodeId }: { episodeId: string }) =>
+    ["user", "create", episodeId] as const,
 
-  updateCurrent: ({ patchedUserPrivateRequest }: UserUMePartialUpdateRequest) =>
-    ["user", "update", { patchedUserPrivateRequest }] as const,
+  updateCurrent: ({ episodeId }: { episodeId: string }) =>
+    ["user", "update", episodeId] as const,
 
-  resetPassword: ({
-    passwordTokenRequest,
-  }: UserPasswordResetConfirmCreateRequest) =>
-    ["user", "resetPass", { passwordTokenRequest }] as const,
+  resetPassword: ({ episodeId }: { episodeId: string }) =>
+    ["user", "resetPass", episodeId] as const,
 
-  avatarUpload: ({ userAvatarRequest }: UserUAvatarCreateRequest) =>
-    ["user", "avatar", { userAvatarRequest }] as const,
+  avatarUpload: ({ episodeId }: { episodeId: string }) =>
+    ["user", "avatar", episodeId] as const,
 
-  resumeUpload: ({ userResumeRequest }: UserUResumeUpdateRequest) =>
-    ["user", "resume", { userResumeRequest }] as const,
+  resumeUpload: ({ episodeId }: { episodeId: string }) =>
+    ["user", "resume", episodeId] as const,
 
-  resumeDownload: () => ["user", "resume", "download"] as const,
+  resumeDownload: ({ episodeId }: { episodeId: string }) =>
+    ["user", "resume", episodeId, "download"] as const,
 };

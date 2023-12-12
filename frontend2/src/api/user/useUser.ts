@@ -2,8 +2,8 @@ import {
   type UseQueryResult,
   useMutation,
   useQuery,
-  useQueryClient,
   type UseMutationResult,
+  QueryClient,
 } from "@tanstack/react-query";
 import type {
   UserPrivate,
@@ -13,7 +13,6 @@ import type {
   TeamPublic,
   UserUCreateRequest,
   UserUMePartialUpdateRequest,
-  UserCreate,
   UserPasswordResetConfirmCreateRequest,
   UserUAvatarCreateRequest,
   UserUResumeUpdateRequest,
@@ -71,47 +70,50 @@ export const useTeamsByUser = ({
 /**
  * For creating a new user. If successful, logs in the new user.
  */
-export const useCreateUser = ({
-  userCreateRequest,
-}: UserUCreateRequest): UseMutationResult<UserCreate, Error, void, unknown> =>
+export const useCreateUser = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, UserUCreateRequest, unknown> =>
   useMutation({
-    mutationKey: userMutationKeys.create({ userCreateRequest }),
-    mutationFn: async () =>
-      await toast.promise(createUser({ userCreateRequest }), {
+    mutationKey: userMutationKeys.create({ episodeId }),
+    mutationFn: async ({ userCreateRequest }: UserUCreateRequest) => {
+      const toastFn = async (): Promise<void> => {
+        try {
+          await createUser({ userCreateRequest });
+          await login(userCreateRequest.username, userCreateRequest.password);
+        } catch (err) {
+          throw err as Error;
+        } finally {
+          queryClient.refetchQueries({ queryKey: userQueryKeys.meBase });
+        }
+      };
+      await toast.promise(toastFn(), {
         loading: "Creating new user...",
-        success: (user) => `Created new user ${user.username}!`,
+        success: "Created new user!",
         error: "Error creating user.",
-      }),
-    onSuccess: async () => {
-      const queryClient = useQueryClient();
-      // Log in this new user.
-      await login(userCreateRequest.username, userCreateRequest.password);
-      // Refetch the current user's info.
-      await queryClient.refetchQueries({ queryKey: userQueryKeys.meBase });
+      });
     },
   });
 
 /**
  * For updating the currently logged in user's info.
  */
-export const useUpdateCurrentUserInfo = ({
-  patchedUserPrivateRequest,
-}: UserUMePartialUpdateRequest): UseMutationResult<
-  UserPrivate,
-  Error,
-  void,
-  unknown
-> =>
+export const useUpdateCurrentUserInfo = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, UserUMePartialUpdateRequest, unknown> =>
   useMutation({
-    mutationKey: userMutationKeys.updateCurrent({ patchedUserPrivateRequest }),
-    mutationFn: async () =>
+    mutationKey: userMutationKeys.updateCurrent({ episodeId }),
+    mutationFn: async ({
+      patchedUserPrivateRequest,
+    }: UserUMePartialUpdateRequest) => {
       await toast.promise(updateCurrentUser({ patchedUserPrivateRequest }), {
         loading: "Updating user info...",
         success: "Updated user info!",
         error: "Error updating user info.",
-      }),
+      });
+    },
     onSuccess: async (data) => {
-      const queryClient = useQueryClient();
       await queryClient.setQueryData(userQueryKeys.meBase, data);
     },
   });
@@ -120,16 +122,20 @@ export const useUpdateCurrentUserInfo = ({
  * For resetting a user's password. If successful, logs in the user.
  */
 export const useResetPassword = ({
-  passwordTokenRequest,
-}: UserPasswordResetConfirmCreateRequest): UseMutationResult<
+  episodeId,
+}: {
+  episodeId: string;
+}): UseMutationResult<
   void,
   Error,
-  void,
+  UserPasswordResetConfirmCreateRequest,
   unknown
 > =>
   useMutation({
-    mutationKey: userMutationKeys.resetPassword({ passwordTokenRequest }),
-    mutationFn: async () => {
+    mutationKey: userMutationKeys.resetPassword({ episodeId }),
+    mutationFn: async ({
+      passwordTokenRequest,
+    }: UserPasswordResetConfirmCreateRequest) => {
       await toast.promise(doResetPassword({ passwordTokenRequest }), {
         loading: "Resetting password...",
         success: "Reset password!",
@@ -141,12 +147,13 @@ export const useResetPassword = ({
 /**
  * For uploading a new avatar for the currently logged in user.
  */
-export const useAvatarUpload = ({
-  userAvatarRequest,
-}: UserUAvatarCreateRequest): UseMutationResult<void, Error, void, unknown> =>
+export const useAvatarUpload = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, UserUAvatarCreateRequest, unknown> =>
   useMutation({
-    mutationKey: userMutationKeys.avatarUpload({ userAvatarRequest }),
-    mutationFn: async () => {
+    mutationKey: userMutationKeys.avatarUpload({ episodeId }),
+    mutationFn: async ({ userAvatarRequest }: UserUAvatarCreateRequest) => {
       await toast.promise(avatarUpload({ userAvatarRequest }), {
         loading: "Uploading new avatar...",
         success: "Uploaded new avatar!",
@@ -154,7 +161,6 @@ export const useAvatarUpload = ({
       });
     },
     onSuccess: async () => {
-      const queryClient = useQueryClient();
       // Refetch the current user's info.
       await queryClient.refetchQueries({ queryKey: userQueryKeys.meBase });
     },
@@ -163,12 +169,13 @@ export const useAvatarUpload = ({
 /**
  * For uploading a new resume for the currently logged in user.
  */
-export const useResumeUpload = ({
-  userResumeRequest,
-}: UserUResumeUpdateRequest): UseMutationResult<void, Error, void, unknown> =>
+export const useResumeUpload = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+) =>
   useMutation({
-    mutationKey: userMutationKeys.resumeUpload({ userResumeRequest }),
-    mutationFn: async () => {
+    mutationKey: userMutationKeys.resumeUpload({ episodeId }),
+    mutationFn: async ({ userResumeRequest }: UserUResumeUpdateRequest) => {
       await toast.promise(resumeUpload({ userResumeRequest }), {
         loading: "Uploading new resume...",
         success: "Uploaded new resume!",
@@ -176,7 +183,6 @@ export const useResumeUpload = ({
       });
     },
     onSuccess: async () => {
-      const queryClient = useQueryClient();
       // Refetch the current user's info.
       await queryClient.refetchQueries({ queryKey: userQueryKeys.meBase });
     },

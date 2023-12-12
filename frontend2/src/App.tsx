@@ -26,7 +26,6 @@ import { CurrentUserProvider } from "./components/CurrentUserProvider";
 import PrivateRoute from "./components/PrivateRoute";
 import Queue from "./views/Queue";
 import Resources from "./views/Resources";
-import { CurrentTeamProvider } from "./contexts/CurrentTeamProvider";
 import { EpisodeProvider } from "./contexts/EpisodeProvider";
 import Scrimmaging from "./views/Scrimmaging";
 import MyTeam from "./views/MyTeam";
@@ -48,9 +47,7 @@ const App: React.FC = () => {
       <Toaster position="bottom-right" reverseOrder={false} />
       <CurrentUserProvider>
         <EpisodeProvider>
-          <CurrentTeamProvider>
-            <RouterProvider router={router} />
-          </CurrentTeamProvider>
+          <RouterProvider router={router} />
         </EpisodeProvider>
       </CurrentUserProvider>
       <ReactQueryDevtools initialIsOpen={false} />
@@ -102,7 +99,10 @@ const router = createBrowserRouter([
       },
       { path: "/:episodeId/*", element: <NotFound /> },
       { path: "/:episodeId/rankings", element: <Rankings /> },
-      { path: "/:episodeId/queue", element: <Queue /> },
+      {
+        path: "/:episodeId/queue",
+        element: <Queue />,
+      },
       { path: "/:episodeId/tournaments", element: <Tournaments /> },
       {
         path: "/:episodeId/tournament/:tournamentId",

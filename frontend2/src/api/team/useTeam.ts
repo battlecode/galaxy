@@ -8,11 +8,16 @@ import {
 } from "@tanstack/react-query";
 import type {
   PaginatedTeamPublicList,
+  PatchedTeamPrivateRequest,
+  TeamAvatarRequest,
   TeamCreate,
+  TeamJoinRequest,
   TeamPrivate,
   TeamPublic,
+  TeamReportRequest,
   TeamRequirementReportUpdateRequest,
   TeamTAvatarCreateRequest,
+  TeamTCreateRequest,
   TeamTJoinCreateRequest,
   TeamTLeaveCreateRequest,
   TeamTListRequest,
@@ -96,18 +101,20 @@ export const useSearchTeams = (
 /**
  * Creates a team, and sets the current user's team to the newly created team.
  */
-export const useCreateTeam = ({
-  episodeId,
-  name,
-}: {
-  episodeId: string;
-  name: string;
-}): UseMutationResult<TeamCreate, Error, void, unknown> => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationKey: teamMutationKeys.create({ episodeId, name }),
-    mutationFn: async () =>
+export const useCreateTeam = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+): UseMutationResult<
+  TeamCreate,
+  Error,
+  {
+    name: string;
+  },
+  unknown
+> =>
+  useMutation({
+    mutationKey: teamMutationKeys.create({ episodeId }),
+    mutationFn: async ({ name }: { name: string }) =>
       await toast.promise(createTeam({ episodeId, name }), {
         loading: "Creating team...",
         success: (team) => `Created team ${team.name}!`,
@@ -117,20 +124,17 @@ export const useCreateTeam = ({
       queryClient.setQueryData(teamQueryKeys.myTeam({ episodeId }), data);
     },
   });
-};
 
 /**
  * Join the team with the given join key & name.
  */
-export const useJoinTeam = ({
-  episodeId,
-  teamJoinRequest,
-}: TeamTJoinCreateRequest): UseMutationResult<void, Error, void, unknown> => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationKey: teamMutationKeys.join({ episodeId, teamJoinRequest }),
-    mutationFn: async () => {
+export const useJoinTeam = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, TeamJoinRequest, unknown> =>
+  useMutation({
+    mutationKey: teamMutationKeys.join({ episodeId }),
+    mutationFn: async (teamJoinRequest: TeamJoinRequest) => {
       await toast.promise(joinTeam({ episodeId, teamJoinRequest }), {
         loading: "Joining team...",
         success: "Joined team!",
@@ -143,17 +147,15 @@ export const useJoinTeam = ({
       });
     },
   });
-};
 
 /**
  * Leave the user's current team in a given episode.
  */
-export const useLeaveTeam = ({
-  episodeId,
-}: TeamTLeaveCreateRequest): UseMutationResult<void, Error, void, unknown> => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+export const useLeaveTeam = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, void, unknown> =>
+  useMutation({
     mutationKey: teamMutationKeys.leave({ episodeId }),
     mutationFn: async () => {
       await toast.promise(leaveTeam({ episodeId }), {
@@ -168,31 +170,19 @@ export const useLeaveTeam = ({
       });
     },
   });
-};
 
 /**
  * Update the current user's team for a specific episode.
  */
-export const useUpdateTeam = ({
-  episodeId,
-  patchedTeamPrivateRequest,
-}: TeamTMePartialUpdateRequest): UseMutationResult<
-  TeamPrivate,
-  Error,
-  TeamTMePartialUpdateRequest,
-  unknown
-> => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+export const useUpdateTeam = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+): UseMutationResult<TeamPrivate, Error, PatchedTeamPrivateRequest, unknown> =>
+  useMutation({
     mutationKey: teamMutationKeys.update({
       episodeId,
-      patchedTeamPrivateRequest,
     }),
-    mutationFn: async ({
-      episodeId,
-      patchedTeamPrivateRequest,
-    }: TeamTMePartialUpdateRequest) =>
+    mutationFn: async (patchedTeamPrivateRequest: PatchedTeamPrivateRequest) =>
       await toast.promise(
         updateTeamPartial({ episodeId, patchedTeamPrivateRequest }),
         {
@@ -205,20 +195,21 @@ export const useUpdateTeam = ({
       queryClient.setQueryData(teamQueryKeys.myTeam({ episodeId }), data);
     },
   });
-};
 
 /**
  * Update the current user's team avatar for a specific episode.
  */
-export const useUpdateTeamAvatar = ({
-  episodeId,
-  teamAvatarRequest,
-}: TeamTAvatarCreateRequest): UseMutationResult<void, Error, void, unknown> => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationKey: teamMutationKeys.avatar({ episodeId, teamAvatarRequest }),
-    mutationFn: async () => {
+export const useUpdateTeamAvatar = (
+  {
+    episodeId,
+  }: {
+    episodeId: string;
+  },
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, TeamAvatarRequest, unknown> =>
+  useMutation({
+    mutationKey: teamMutationKeys.avatar({ episodeId }),
+    mutationFn: async (teamAvatarRequest: TeamAvatarRequest) => {
       await toast.promise(teamAvatarUpload({ episodeId, teamAvatarRequest }), {
         loading: "Uploading team avatar...",
         success: "Uploaded team avatar!",
@@ -231,25 +222,17 @@ export const useUpdateTeamAvatar = ({
       });
     },
   });
-};
 
 /**
  * Update the current user's team report for a specific episode.
  */
-export const useUpdateTeamReport = ({
-  episodeId,
-  teamReportRequest,
-}: TeamRequirementReportUpdateRequest): UseMutationResult<
-  void,
-  Error,
-  void,
-  unknown
-> => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationKey: teamMutationKeys.report({ episodeId, teamReportRequest }),
-    mutationFn: async () => {
+export const useUpdateTeamReport = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, TeamReportRequest, unknown> =>
+  useMutation({
+    mutationKey: teamMutationKeys.report({ episodeId }),
+    mutationFn: async (teamReportRequest: TeamReportRequest) => {
       await toast.promise(
         uploadUserTeamReport({ episodeId, teamReportRequest }),
         {
@@ -265,4 +248,3 @@ export const useUpdateTeamReport = ({
       });
     },
   });
-};
