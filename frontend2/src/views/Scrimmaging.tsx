@@ -16,7 +16,7 @@ import {
   useTournamentMatchList,
   useUserScrimmageList,
 } from "../api/compete/useCompete";
-import { useSearchTeams } from "../api/team/useTeam";
+import { useSearchTeams, useUserTeam } from "../api/team/useTeam";
 import { useQueryClient } from "@tanstack/react-query";
 
 interface QueryParams {
@@ -44,6 +44,7 @@ const Scrimmaging: React.FC = () => {
     };
   }, [searchParams]);
 
+  const teamData = useUserTeam({ episodeId });
   const { data: inboxData, isLoading: inboxLoading } = useScrimmageInboxList(
     {
       episodeId,
@@ -77,6 +78,7 @@ const Scrimmaging: React.FC = () => {
     useTournamentMatchList(
       {
         episodeId,
+        teamId: teamData.data?.id,
         page: queryParams.tourneyPage,
       },
       queryClient,
@@ -181,7 +183,7 @@ const Scrimmaging: React.FC = () => {
       <div className="mb-8">
         <TournamentMatchesTable
           data={tourneyData}
-          loading={tourneyLoading}
+          loading={!teamData.isSuccess || tourneyLoading}
           page={queryParams.tourneyPage}
           handlePage={(page: number) => {
             handlePage(page, "tourneyPage");
