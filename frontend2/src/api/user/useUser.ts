@@ -3,7 +3,7 @@ import {
   useMutation,
   useQuery,
   type UseMutationResult,
-  QueryClient,
+  type QueryClient,
 } from "@tanstack/react-query";
 import type {
   UserPrivate,
@@ -84,7 +84,7 @@ export const useCreateUser = (
         } catch (err) {
           throw err as Error;
         } finally {
-          queryClient.refetchQueries({ queryKey: userQueryKeys.meBase });
+          await queryClient.refetchQueries({ queryKey: userQueryKeys.meBase });
         }
       };
       await toast.promise(toastFn(), {
@@ -172,7 +172,7 @@ export const useAvatarUpload = (
 export const useResumeUpload = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-) =>
+): UseMutationResult<void, Error, UserUResumeUpdateRequest, unknown> =>
   useMutation({
     mutationKey: userMutationKeys.resumeUpload({ episodeId }),
     mutationFn: async ({ userResumeRequest }: UserUResumeUpdateRequest) => {

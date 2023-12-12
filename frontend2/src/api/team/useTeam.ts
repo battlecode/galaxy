@@ -2,7 +2,6 @@ import {
   type UseQueryResult,
   useQuery,
   useMutation,
-  useQueryClient,
   type UseMutationResult,
   type QueryClient,
 } from "@tanstack/react-query";
@@ -15,13 +14,7 @@ import type {
   TeamPrivate,
   TeamPublic,
   TeamReportRequest,
-  TeamRequirementReportUpdateRequest,
-  TeamTAvatarCreateRequest,
-  TeamTCreateRequest,
-  TeamTJoinCreateRequest,
-  TeamTLeaveCreateRequest,
   TeamTListRequest,
-  TeamTMePartialUpdateRequest,
   TeamTMeRetrieveRequest,
   TeamTRetrieveRequest,
 } from "../_autogen";
