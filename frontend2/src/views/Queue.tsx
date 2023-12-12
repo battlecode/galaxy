@@ -10,6 +10,7 @@ import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMatchList, useTeamScrimmageList } from "../api/compete/useCompete";
 import { toast } from "react-hot-toast";
+import { isPresent } from "../utils/utilTypes";
 
 interface QueryParams {
   page: number;
@@ -31,7 +32,7 @@ const Queue: React.FC = () => {
     label: string;
   } | null>(null);
 
-  // This is a hack since we don't support filter the all matches endpoint by team
+  // This is a hack since we don't support filtering the all matches endpoint by team
   const allMatchesData = useMatchList(
     {
       episodeId,
@@ -40,7 +41,12 @@ const Queue: React.FC = () => {
     queryClient,
   );
   const teamMatchesData = useTeamScrimmageList(
-    { episodeId, teamId: selectedTeam?.value, page: queryParams.page },
+    {
+      episodeId,
+      teamId: selectedTeam?.value,
+      // This prevents this hook from looking for pages that don't exist!
+      page: isPresent(selectedTeam) ? queryParams.page : 1,
+    },
     queryClient,
   );
 
