@@ -34,12 +34,20 @@ import TournamentPage from "./views/Tournament";
 import Submissions from "./views/Submissions";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast, Toaster } from "react-hot-toast";
+import { ResponseError } from "./api/_autogen/runtime";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: (error) => toast.error(`Something went wrong: ${error.message}`),
+    onError: (error) => {
+      if (error instanceof ResponseError) {
+        if (error.response.status === 404) return;
+      }
+      toast.error(`Something went wrong: ${error.message}`);
+    },
   }),
 });
+
+queryClient.setQueryDefaults(["team"], { retry: false });
 
 const App: React.FC = () => {
   return (

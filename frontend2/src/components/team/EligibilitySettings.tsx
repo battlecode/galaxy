@@ -44,9 +44,6 @@ const EligibilitySettings: React.FC = () => {
     );
   }, [desiredEligibility, teamData]);
 
-  console.log("desiredEligibility", desiredEligibility);
-  console.log("teamData", teamData.data?.profile?.eligible_for);
-
   if (episodeData.isLoading) {
     return <Loading />;
   } else if (!episodeData.isSuccess || !teamData.isSuccess) {
