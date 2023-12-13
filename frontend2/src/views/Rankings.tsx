@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import type { EligibilityCriterion } from "../utils/types";
+import type { EligibilityCriterion } from "../api/_autogen";
 import { useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { type EligibilityCriterion } from "../utils/types";
+import { type EligibilityCriterion } from "../api/_autogen";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { dateTime } from "../utils/dateTime";
 import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";

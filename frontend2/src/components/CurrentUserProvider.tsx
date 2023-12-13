@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
-import { type UserPrivate } from "../utils/types";
+import { type UserPrivate } from "../api/_autogen";
 import {
   AuthStateEnum,
   type AuthState,
