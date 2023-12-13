@@ -6,11 +6,13 @@ import Icon from "./elements/Icon";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { SIDEBAR_ITEM_DATA } from "./sidebar";
 import EpisodeSwitcher from "./EpisodeSwitcher";
+import { logout } from "../api/auth/authApi";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Header: React.FC = () => {
-  const { authState, logout, user } = useCurrentUser();
+  const { authState, user } = useCurrentUser();
   const { episodeId } = useEpisodeId();
-
+  const queryClient = useQueryClient();
   return (
     <nav className="fixed top-0 z-30 h-16 w-full bg-gray-700">
       <div className="w-full px-2 sm:px-6 lg:px-8">
@@ -113,7 +115,9 @@ const Header: React.FC = () => {
                   </Menu.Item>
                   <Menu.Item>
                     <button
-                      onClick={logout}
+                      onClick={() => {
+                        void logout(queryClient);
+                      }}
                       className="flex w-full items-center rounded-lg px-4 py-2 sm:text-sm"
                     >
                       Sign out

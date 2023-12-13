@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
-import { login as apiLogin } from "../utils/api/auth";
+import { login } from "../api/auth/authApi";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
 import { Link, useNavigate } from "react-router-dom";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useCurrentUser, AuthStateEnum } from "../contexts/CurrentUserContext";
-import { type Maybe } from "../utils/utilTypes";
-import { getUserUserProfile } from "../utils/api/user";
+import toast from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { userQueryKeys } from "../api/user/userKeys";
 
 interface LoginFormInput {
   username: string;
@@ -18,9 +19,8 @@ interface LoginFormInput {
 const Login: React.FC = () => {
   const { register, handleSubmit } = useForm<LoginFormInput>();
   const { episodeId } = useEpisodeId();
-  const { login, authState } = useCurrentUser();
-  const [loginError, setLoginError] = useState<Maybe<string>>();
-
+  const { authState } = useCurrentUser();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,15 +31,16 @@ const Login: React.FC = () => {
   }, [authState]);
 
   const onSubmit: SubmitHandler<LoginFormInput> = async (data) => {
-    try {
-      setLoginError(undefined);
-      await apiLogin(data.username, data.password);
-      login(await getUserUserProfile());
-    } catch (error) {
-      setLoginError(
+    await toast.promise(login(data.username, data.password), {
+      loading: "Logging in...",
+      success: "Logged in!",
+      error:
         "Error logging in. Did you enter your username and password correctly?",
-      );
-    }
+    });
+    await queryClient.resetQueries({
+      queryKey: userQueryKeys.meBase,
+      exact: true,
+    });
   };
 
   return (
@@ -56,12 +57,6 @@ const Login: React.FC = () => {
         <div className="text-center text-xl font-light text-gray-700">
           Log in to Battlecode
         </div>
-        {
-          // TODO: replace this with our custom notification component
-          loginError !== undefined && (
-            <div className="text-center text-sm text-red-600">{loginError}</div>
-          )
-        }
         <Input
           label="Username"
           required

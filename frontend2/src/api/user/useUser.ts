@@ -29,9 +29,19 @@ import {
   updateCurrentUser,
 } from "./userApi";
 import { toast } from "react-hot-toast";
-import { login } from "../auth/authApi";
+import { login, loginCheck } from "../auth/authApi";
 
 // ---------- QUERY HOOKS ----------//
+
+/**
+ * For checking if a user is logged in.
+ */
+export const useIsLoggedIn = (): UseQueryResult<boolean, Error> =>
+  useQuery({
+    queryKey: userQueryKeys.tokenVerify,
+    queryFn: async () => await loginCheck(),
+  });
+
 /**
  * For retrieving the currently logged in user's info.
  */

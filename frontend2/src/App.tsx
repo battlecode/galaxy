@@ -22,7 +22,7 @@ import {
 import { DEFAULT_EPISODE } from "./utils/constants";
 import NotFound from "./views/NotFound";
 import Rankings from "./views/Rankings";
-import { CurrentUserProvider } from "./components/CurrentUserProvider";
+import { CurrentUserProvider } from "./contexts/CurrentUserProvider";
 import PrivateRoute from "./components/PrivateRoute";
 import Queue from "./views/Queue";
 import Resources from "./views/Resources";

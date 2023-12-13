@@ -1,6 +1,8 @@
 import { TokenApi } from "../_autogen";
 import Cookies from "js-cookie";
 import { DEFAULT_API_CONFIGURATION } from "../helpers";
+import { type QueryClient } from "@tanstack/react-query";
+import { userQueryKeys } from "../user/userKeys";
 
 /** This file contains all frontend authentication functions. Responsible for interacting with Cookies and expiring/setting JWT tokens. */
 const API = new TokenApi(DEFAULT_API_CONFIGURATION);
@@ -23,6 +25,21 @@ export const login = async (
 
   Cookies.set("access", res.access);
   Cookies.set("refresh", res.refresh);
+};
+
+/**
+ * Removes the access and refresh tokens in the browser's cookies.
+ * @param username The username of the user.
+ * @param password The password of the user.
+ */
+export const logout = async (queryClient: QueryClient): Promise<void> => {
+  Cookies.remove("access");
+  Cookies.remove("refresh");
+  // TODO: here, should I invalidate all queries with keys beginning w/ "user"?
+  await queryClient.resetQueries({
+    queryKey: userQueryKeys.meBase,
+    exact: true,
+  });
 };
 
 /**
