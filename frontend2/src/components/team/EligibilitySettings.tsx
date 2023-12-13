@@ -37,9 +37,15 @@ const EligibilitySettings: React.FC = () => {
       !teamData.isLoading &&
       teamData.isSuccess &&
       isPresent(desiredEligibility) &&
-      !isEqual(desiredEligibility, teamData.data.profile?.eligible_for)
+      !isEqual(
+        desiredEligibility.sort((a, b) => a - b),
+        teamData.data.profile?.eligible_for?.sort((a, b) => a - b),
+      )
     );
   }, [desiredEligibility, teamData]);
+
+  console.log("desiredEligibility", desiredEligibility);
+  console.log("teamData", teamData.data?.profile?.eligible_for);
 
   if (episodeData.isLoading) {
     return <Loading />;

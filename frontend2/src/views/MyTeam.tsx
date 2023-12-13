@@ -25,7 +25,7 @@ const MyTeam: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
 
-  const { register, handleSubmit, formState } = useForm<InfoFormInput>();
+  const { register, handleSubmit, formState, reset } = useForm<InfoFormInput>();
 
   const teamData = useUserTeam({ episodeId });
   const updateTeam = useUpdateTeam(
@@ -84,6 +84,7 @@ const MyTeam: React.FC = () => {
                       biography: data.biography,
                     },
                   });
+                  reset();
                 })().catch((e) => {
                   toast.error((e as Error).message);
                 });
