@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { type EventHandler, useMemo, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import SectionCard from "../components/SectionCard";
 import Input from "../components/elements/Input";
@@ -13,8 +13,7 @@ import { useLeaveTeam, useUpdateTeam, useUserTeam } from "../api/team/useTeam";
 import { useQueryClient } from "@tanstack/react-query";
 import JoinTeam from "./JoinTeam";
 import Loading from "../components/Loading";
-import { toast } from "react-hot-toast";
-import { useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 
 interface InfoFormInput {
   quote: string;
@@ -25,7 +24,12 @@ const MyTeam: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
 
-  const { register, handleSubmit, formState, reset } = useForm<InfoFormInput>();
+  const {
+    register,
+    handleSubmit,
+    formState: { isDirty },
+    reset,
+  } = useForm<InfoFormInput>();
 
   const teamData = useUserTeam({ episodeId });
   const updateTeam = useUpdateTeam(
@@ -62,6 +66,27 @@ const MyTeam: React.FC = () => {
     );
   }, [teamData]);
 
+  const onSubmit: SubmitHandler<InfoFormInput> = async (data) => {
+    if (updateTeam.isPending) return;
+    await updateTeam.mutateAsync({
+      profile: {
+        quote: data.quote,
+        biography: data.biography,
+      },
+    });
+    reset();
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  const onLeaveTeam: EventHandler<React.MouseEvent<HTMLButtonElement>> = async (
+    event,
+  ) => {
+    if (leaveTeam.isPending) return;
+    event.preventDefault();
+    await leaveTeam.mutateAsync();
+    setIsLeaveModalOpen(false);
+  };
+
   if (teamData.isLoading) {
     return <Loading />;
   } else if (!teamData.isSuccess) {
@@ -76,19 +101,7 @@ const MyTeam: React.FC = () => {
           <SectionCard title="Profile" className="max-w-5xl">
             <form
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onSubmit={handleSubmit((data) => {
-                (async () => {
-                  await updateTeam.mutateAsync({
-                    profile: {
-                      quote: data.quote,
-                      biography: data.biography,
-                    },
-                  });
-                  reset();
-                })().catch((e) => {
-                  toast.error((e as Error).message);
-                });
-              })}
+              onSubmit={handleSubmit(onSubmit)}
               className="flex flex-col md:flex-row md:gap-8"
             >
               <div className="flex flex-col items-center gap-6 p-4">
@@ -119,17 +132,17 @@ const MyTeam: React.FC = () => {
                 />
                 <Button
                   className={`mt-2 ${
-                    updateTeam.isPending || !formState.isDirty ? "disabled" : ""
+                    updateTeam.isPending || !isDirty
+                      ? "disabled cursor-not-allowed"
+                      : ""
                   }`}
                   variant={
-                    formState.isDirty && !updateTeam.isPending
-                      ? "dark"
-                      : "light-outline"
+                    isDirty && !updateTeam.isPending ? "dark" : "light-outline"
                   }
                   label="Save"
                   type="submit"
                   loading={updateTeam.isPending}
-                  disabled={updateTeam.isPending || !formState.isDirty}
+                  disabled={updateTeam.isPending || !isDirty}
                 />
               </div>
             </form>
@@ -162,14 +175,8 @@ const MyTeam: React.FC = () => {
           <div className="flex flex-row gap-4">
             <Button
               variant="danger-outline"
-              onClick={() => {
-                (async () => {
-                  await leaveTeam.mutateAsync();
-                  setIsLeaveModalOpen(false);
-                })().catch((e) => {
-                  toast.error((e as Error).message);
-                });
-              }}
+              // eslint-disable-next-line @typescript-eslint/no-misused-promises
+              onClick={onLeaveTeam}
               loading={leaveTeam.isPending}
               label="Leave team"
             />

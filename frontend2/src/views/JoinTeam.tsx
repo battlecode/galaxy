@@ -27,11 +27,13 @@ const JoinTeam: React.FC = () => {
     register: registerJoin,
     handleSubmit: handleJoinSubmit,
     reset: resetJoin,
+    formState: { isDirty: isJoinDirty },
   } = useForm<JoinTeamInput>();
   const {
     register: registerCreate,
     handleSubmit: handleCreateSubmit,
     reset: resetCreate,
+    formState: { isDirty: isCreateDirty },
   } = useForm<CreateTeamInput>();
 
   return (
@@ -49,6 +51,7 @@ const JoinTeam: React.FC = () => {
               <div className="flex flex-col gap-2">
                 <Input
                   label="Team Name"
+                  required
                   {...registerCreate("teamName", {
                     required: FIELD_REQUIRED_ERROR_MSG,
                   })}
@@ -56,9 +59,17 @@ const JoinTeam: React.FC = () => {
                 <Button
                   label="Create Team"
                   fullWidth
-                  className="mt-1"
+                  className={`mt-1 ${
+                    createTeam.isPending || !isCreateDirty
+                      ? "disabled cursor-not-allowed"
+                      : ""
+                  }`}
                   type="submit"
-                  variant="dark"
+                  variant={
+                    isCreateDirty && !createTeam.isPending
+                      ? "dark"
+                      : "light-outline"
+                  }
                 />
               </div>
             </SectionCard>
@@ -77,12 +88,14 @@ const JoinTeam: React.FC = () => {
               <div className="flex flex-col gap-2">
                 <Input
                   label="Team Name"
+                  required
                   {...registerJoin("teamName", {
                     required: FIELD_REQUIRED_ERROR_MSG,
                   })}
                 />
                 <Input
                   label="Team Join Key"
+                  required
                   {...registerJoin("joinKey", {
                     required: FIELD_REQUIRED_ERROR_MSG,
                   })}
@@ -90,9 +103,17 @@ const JoinTeam: React.FC = () => {
                 <Button
                   label="Join Team"
                   fullWidth
-                  className="mt-1"
+                  className={`mt-1 ${
+                    joinTeam.isPending || !isJoinDirty
+                      ? "disabled cursor-not-allowed"
+                      : ""
+                  }`}
                   type="submit"
-                  variant="dark"
+                  variant={
+                    isJoinDirty && !joinTeam.isPending
+                      ? "dark"
+                      : "light-outline"
+                  }
                 />
               </div>
             </SectionCard>

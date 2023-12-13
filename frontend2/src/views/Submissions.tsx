@@ -59,7 +59,7 @@ const Submissions: React.FC = () => {
       episodeId,
     });
 
-  const { mutate: uploadSub, isPending: uploadingSub } = useUploadSubmission(
+  const uploadSub = useUploadSubmission(
     {
       episodeId,
     },
@@ -70,12 +70,12 @@ const Submissions: React.FC = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<SubmissionFormInput>();
 
-  const onSubmit: SubmitHandler<SubmissionFormInput> = (data) => {
-    if (uploadingSub) return;
-    uploadSub({
+  const onSubmit: SubmitHandler<SubmissionFormInput> = async (data) => {
+    if (uploadSub.isPending) return;
+    await uploadSub.mutateAsync({
       episodeId,
       _package: data.packageName,
       description: data.description,
@@ -189,12 +189,18 @@ const Submissions: React.FC = () => {
                 />
               </div>
               <Button
-                className="max-w-sm"
-                variant="dark"
+                className={`max-w-sm ${
+                  uploadSub.isPending || !isDirty
+                    ? "disabled cursor-not-allowed"
+                    : ""
+                }`}
+                variant={
+                  isDirty && !uploadSub.isPending ? "dark" : "light-outline"
+                }
                 label="Submit"
                 type="submit"
-                loading={uploadingSub}
-                disabled={uploadingSub}
+                loading={uploadSub.isPending}
+                disabled={uploadSub.isPending || !isDirty}
               />
             </form>
           </>
