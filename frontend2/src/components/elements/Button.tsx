@@ -30,15 +30,18 @@ const Button: React.FC<ButtonProps> = ({
   iconName,
   fullWidth = false,
   className = "",
+  disabled,
   ...rest
 }) => {
   const variantStyle = `${VARIANTS[variant]}  ${
     fullWidth ? "w-full" : ""
   } ${className}`;
+  console.log(disabled);
   return (
     <button
       // default button type
       type="button"
+      disabled={disabled}
       className={`flex h-9 flex-row items-center justify-center gap-1.5 rounded px-2.5
         py-1.5 shadow-sm ${variantStyle} ${className}`}
       {...rest}
