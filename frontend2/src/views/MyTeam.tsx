@@ -131,18 +131,12 @@ const MyTeam: React.FC = () => {
                   defaultValue={teamData.data.profile?.biography}
                 />
                 <Button
-                  className={`mt-2 ${
-                    updateTeam.isPending || !isDirty
-                      ? "disabled cursor-not-allowed"
-                      : ""
-                  }`}
-                  variant={
-                    isDirty && !updateTeam.isPending ? "dark" : "light-outline"
-                  }
+                  className="mt-2"
+                  disabled={updateTeam.isPending || !isDirty}
+                  loading={updateTeam.isPending}
+                  variant={"dark"}
                   label="Save"
                   type="submit"
-                  loading={updateTeam.isPending}
-                  disabled={updateTeam.isPending || !isDirty}
                 />
               </div>
             </form>

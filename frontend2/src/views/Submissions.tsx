@@ -194,9 +194,7 @@ const Submissions: React.FC = () => {
                     ? "disabled cursor-not-allowed"
                     : ""
                 }`}
-                variant={
-                  isDirty && !uploadSub.isPending ? "dark" : "light-outline"
-                }
+                variant="dark"
                 label="Submit"
                 type="submit"
                 loading={uploadSub.isPending}

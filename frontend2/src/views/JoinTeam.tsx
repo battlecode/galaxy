@@ -59,17 +59,10 @@ const JoinTeam: React.FC = () => {
                 <Button
                   label="Create Team"
                   fullWidth
-                  className={`mt-1 ${
-                    createTeam.isPending || !isCreateDirty
-                      ? "disabled cursor-not-allowed"
-                      : ""
-                  }`}
+                  disabled={createTeam.isPending || !isCreateDirty}
+                  className="mt-1"
                   type="submit"
-                  variant={
-                    isCreateDirty && !createTeam.isPending
-                      ? "dark"
-                      : "light-outline"
-                  }
+                  variant="dark"
                 />
               </div>
             </SectionCard>
