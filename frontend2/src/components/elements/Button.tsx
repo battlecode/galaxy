@@ -14,7 +14,7 @@ const VARIANTS = {
 
 type VariantType = keyof typeof VARIANTS;
 
-const DISABLED = "bg-gray-200 text-gray-500 opacity-50 cursor-not-allowed";
+const DISABLED = "bg-gray-200 text-gray-500 cursor-not-allowed";
 
 interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
   variant?: VariantType;
@@ -28,12 +28,12 @@ interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
 
 const Button: React.FC<ButtonProps> = ({
   variant = "",
+  disabled = false,
   loading = false,
   label,
   iconName,
   fullWidth = false,
   className = "",
-  disabled,
   ...rest
 }) => {
   const variantStyle = `${disabled ? DISABLED : VARIANTS[variant]} ${
