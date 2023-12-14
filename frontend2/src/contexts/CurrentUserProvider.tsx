@@ -1,9 +1,5 @@
-import React, { useMemo } from "react";
-import {
-  AuthStateEnum,
-  type AuthState,
-  CurrentUserContext,
-} from "./CurrentUserContext";
+import React from "react";
+import { AuthStateEnum, CurrentUserContext } from "./CurrentUserContext";
 import { useCurrentUserInfo, useIsLoggedIn } from "../api/user/useUser";
 import _ from "lodash";
 
@@ -11,26 +7,18 @@ export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const isLoggedIn = useIsLoggedIn();
-  const authState = useMemo((): AuthState => {
-    if (!_.isNil(isLoggedIn.data) && isLoggedIn.data) {
-      return AuthStateEnum.AUTHENTICATED;
-    }
-    if (isLoggedIn.isLoading) {
-      return AuthStateEnum.LOADING;
-    }
-    return AuthStateEnum.NOT_AUTHENTICATED;
-  }, [isLoggedIn]);
+  const authState =
+    !_.isNil(isLoggedIn.data) && isLoggedIn.data
+      ? AuthStateEnum.AUTHENTICATED
+      : isLoggedIn.isLoading
+      ? AuthStateEnum.LOADING
+      : AuthStateEnum.NOT_AUTHENTICATED;
 
   const userData = useCurrentUserInfo();
-  const user = useMemo(() => {
-    if (userData.isSuccess) {
-      return userData.data;
-    }
-    return undefined;
-  }, [userData]);
+  console.log(authState, userData);
 
   return (
-    <CurrentUserContext.Provider value={{ authState, user }}>
+    <CurrentUserContext.Provider value={{ authState, user: userData.data }}>
       {children}
     </CurrentUserContext.Provider>
   );

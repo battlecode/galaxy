@@ -15,6 +15,7 @@ const API = new TokenApi(DEFAULT_API_CONFIGURATION);
 export const login = async (
   username: string,
   password: string,
+  queryClient: QueryClient,
 ): Promise<void> => {
   const tokenObtainPairRequest = {
     username,
@@ -25,6 +26,9 @@ export const login = async (
 
   Cookies.set("access", res.access);
   Cookies.set("refresh", res.refresh);
+  await queryClient.refetchQueries({
+    queryKey: userQueryKeys.meBase,
+  });
 };
 
 /**
@@ -35,10 +39,8 @@ export const login = async (
 export const logout = async (queryClient: QueryClient): Promise<void> => {
   Cookies.remove("access");
   Cookies.remove("refresh");
-  // TODO: here, should I invalidate all queries with keys beginning w/ "user"?
-  await queryClient.resetQueries({
+  await queryClient.refetchQueries({
     queryKey: userQueryKeys.meBase,
-    exact: true,
   });
 };
 

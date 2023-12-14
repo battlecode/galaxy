@@ -31,7 +31,7 @@ const Register: React.FC = () => {
     setValue,
     setError,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<UserCreateRequest>();
   const [gender, setGender] = useState<Maybe<GenderEnum>>();
   const [country, setCountry] = useState<Maybe<CountryEnum>>();
@@ -44,11 +44,11 @@ const Register: React.FC = () => {
     }
   }, [authState]);
 
-  const onSubmit: SubmitHandler<UserCreateRequest> = (data) => {
+  const onSubmit: SubmitHandler<UserCreateRequest> = async (data) => {
     if (gender === undefined || country === undefined) {
       return;
     }
-    createUser.mutate({ userCreateRequest: data });
+    await createUser.mutateAsync({ userCreateRequest: data });
   };
 
   return (
@@ -177,9 +177,10 @@ const Register: React.FC = () => {
             />
           )}
         </div>
-
         <Button
           className="mt-1"
+          loading={createUser.isPending}
+          disabled={createUser.isPending || !isDirty}
           fullWidth
           label="Register"
           type="submit"

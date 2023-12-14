@@ -17,7 +17,11 @@ interface LoginFormInput {
 }
 
 const Login: React.FC = () => {
-  const { register, handleSubmit } = useForm<LoginFormInput>();
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, isDirty },
+  } = useForm<LoginFormInput>();
   const { episodeId } = useEpisodeId();
   const { authState } = useCurrentUser();
   const queryClient = useQueryClient();
@@ -31,15 +35,11 @@ const Login: React.FC = () => {
   }, [authState]);
 
   const onSubmit: SubmitHandler<LoginFormInput> = async (data) => {
-    await toast.promise(login(data.username, data.password), {
+    await toast.promise(login(data.username, data.password, queryClient), {
       loading: "Logging in...",
       success: "Logged in!",
       error:
         "Error logging in. Did you enter your username and password correctly?",
-    });
-    await queryClient.resetQueries({
-      queryKey: userQueryKeys.meBase,
-      exact: true,
     });
   };
 
@@ -70,6 +70,8 @@ const Login: React.FC = () => {
         />
         <Button
           label="Log in"
+          loading={isSubmitting}
+          disabled={isSubmitting || !isDirty}
           fullWidth
           className="mt-1"
           type="submit"

@@ -35,6 +35,7 @@ import Submissions from "./views/Submissions";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast, Toaster } from "react-hot-toast";
 import { ResponseError } from "./api/_autogen/runtime";
+import { userQueryKeys } from "./api/user/userKeys";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -48,6 +49,7 @@ const queryClient = new QueryClient({
 });
 
 queryClient.setQueryDefaults(["team"], { retry: false });
+queryClient.setQueryDefaults(userQueryKeys.tokenVerify, { retry: false });
 
 const App: React.FC = () => {
   return (

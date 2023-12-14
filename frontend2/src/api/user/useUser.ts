@@ -40,6 +40,7 @@ export const useIsLoggedIn = (): UseQueryResult<boolean, Error> =>
   useQuery({
     queryKey: userQueryKeys.tokenVerify,
     queryFn: async () => await loginCheck(),
+    staleTime: Infinity,
   });
 
 /**
@@ -90,7 +91,11 @@ export const useCreateUser = (
       const toastFn = async (): Promise<void> => {
         try {
           await createUser({ userCreateRequest });
-          await login(userCreateRequest.username, userCreateRequest.password);
+          await login(
+            userCreateRequest.username,
+            userCreateRequest.password,
+            queryClient,
+          );
         } catch (err) {
           throw err as Error;
         } finally {
