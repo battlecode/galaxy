@@ -5,6 +5,8 @@ import type {
 
 // ---------- KEY FACTORIES ----------//
 export const userQueryKeys = {
+  tokenVerify: ["user", "me", "tokenVerify"] as const,
+
   meBase: ["user", "me"] as const,
 
   myInfo: () => [...userQueryKeys.meBase, "info"] as const,

@@ -29,9 +29,20 @@ import {
   updateCurrentUser,
 } from "./userApi";
 import { toast } from "react-hot-toast";
-import { login } from "../auth/authApi";
+import { login, loginCheck } from "../auth/authApi";
 
 // ---------- QUERY HOOKS ----------//
+
+/**
+ * For checking if a user is logged in.
+ */
+export const useIsLoggedIn = (): UseQueryResult<boolean, Error> =>
+  useQuery({
+    queryKey: userQueryKeys.tokenVerify,
+    queryFn: async () => await loginCheck(),
+    staleTime: Infinity,
+  });
+
 /**
  * For retrieving the currently logged in user's info.
  */
@@ -80,7 +91,11 @@ export const useCreateUser = (
       const toastFn = async (): Promise<void> => {
         try {
           await createUser({ userCreateRequest });
-          await login(userCreateRequest.username, userCreateRequest.password);
+          await login(
+            userCreateRequest.username,
+            userCreateRequest.password,
+            queryClient,
+          );
         } catch (err) {
           throw err as Error;
         } finally {

@@ -28,12 +28,12 @@ interface ButtonProps extends React.ComponentPropsWithoutRef<"button"> {
 
 const Button: React.FC<ButtonProps> = ({
   variant = "",
-  disabled = false,
   loading = false,
   label,
   iconName,
   fullWidth = false,
   className = "",
+  disabled,
   ...rest
 }) => {
   const variantStyle = `${disabled ? DISABLED : VARIANTS[variant]} ${

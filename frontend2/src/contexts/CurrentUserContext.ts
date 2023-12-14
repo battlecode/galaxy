@@ -12,8 +12,6 @@ export type AuthState = `${AuthStateEnum}`;
 interface CurrentUserContextType {
   authState: AuthState;
   user?: UserPrivate;
-  login: (user: UserPrivate) => void;
-  logout: () => void;
 }
 
 export const CurrentUserContext = createContext<CurrentUserContextType | null>(
