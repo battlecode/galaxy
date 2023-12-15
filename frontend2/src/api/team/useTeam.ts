@@ -88,6 +88,7 @@ export const useSearchTeams = (
       }
       return result;
     },
+    staleTime: 1000 * 30, // 30 seconds
   });
 
 // ---------- MUTATION HOOKS ---------- //

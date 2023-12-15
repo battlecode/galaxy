@@ -3,14 +3,13 @@ import { PageTitle } from "../components/elements/BattlecodeStyle";
 import { useSearchParams } from "react-router-dom";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import Button from "../components/elements/Button";
-import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
-import { loadTeamOptions } from "../utils/loadTeams";
 import QueueTable from "../components/tables/QueueTable";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMatchList, useTeamScrimmageList } from "../api/compete/useCompete";
 import { toast } from "react-hot-toast";
 import { isPresent } from "../utils/utilTypes";
+import SearchTeamsMenu from "../components/team/SearchTeamsMenu";
 
 interface QueryParams {
   page: number;
@@ -80,15 +79,12 @@ const Queue: React.FC = () => {
         />
       </div>
       <div className="mb-4 w-96 gap-5">
-        <AsyncSelectMenu<number>
+        <SearchTeamsMenu
           onChange={(team) => {
             setSelectedTeam(team);
             handlePage(1);
           }}
           selected={selectedTeam}
-          loadOptions={async (search) =>
-            await loadTeamOptions(episodeId, search, 1)
-          }
           placeholder="Search for a team..."
         />
       </div>

@@ -4,11 +4,29 @@ import FormLabel from "./FormLabel";
 import Icon from "./Icon";
 import Spinner from "../Spinner";
 import { debounce } from "lodash";
+import {
+  type UseQueryResult,
+  useQueryClient,
+  type QueryClient,
+} from "@tanstack/react-query";
+import { useEpisodeId } from "../../contexts/EpisodeContext";
 
-interface AsyncSelectMenuProps<T extends React.Key | null | undefined> {
-  loadOptions: (
-    inputValue: string,
-  ) => Promise<Array<{ value: T; label: string }>>;
+interface SearchParams {
+  episodeId: string;
+  search: string;
+  page: number;
+}
+
+interface SearchResult<K> {
+  results?: K[];
+}
+
+interface AsyncSelectMenuProps<T extends React.Key | null | undefined, K> {
+  useQueryResult: (
+    { episodeId, search, page }: SearchParams,
+    queryClient: QueryClient,
+  ) => UseQueryResult<SearchResult<K>, Error>;
+  resultToOptions: (results: K[]) => Array<{ value: T; label: string }>;
   onChange: (selection: { value: T; label: string } | null) => void;
   selected: { value: T; label: string } | null;
   label?: string;
@@ -17,20 +35,30 @@ interface AsyncSelectMenuProps<T extends React.Key | null | undefined> {
   className?: string;
 }
 
-function AsyncSelectMenu<T extends React.Key | null | undefined>({
+function AsyncSelectMenu<T extends React.Key | null | undefined, K>({
+  onChange,
+  useQueryResult,
+  resultToOptions,
   label,
   required = false,
-  loadOptions,
   selected,
   placeholder,
   className = "",
-  onChange,
-}: AsyncSelectMenuProps<T>): JSX.Element {
-  const [options, setOptions] = useState<Array<{ value: T; label: string }>>(
-    [],
-  );
-  const [loading, setLoading] = useState<boolean>(false);
+}: AsyncSelectMenuProps<T, K>): JSX.Element {
+  const { episodeId } = useEpisodeId();
+  const queryClient = useQueryClient();
+
   const [searchText, setSearchText] = useState("");
+
+  const queryData = useQueryResult(
+    { episodeId, search: searchText, page: 1 },
+    queryClient,
+  );
+
+  const options = useMemo(
+    () => resultToOptions(queryData.data?.results ?? []),
+    [queryData.data],
+  );
 
   const handleChange = (inputValue: string): void => {
     setSearchText(inputValue);
@@ -43,29 +71,6 @@ function AsyncSelectMenu<T extends React.Key | null | undefined>({
       debouncedHandleChange.cancel();
     };
   }, []);
-
-  useEffect(() => {
-    let active = true;
-    const load = async (): Promise<void> => {
-      setLoading(true);
-      try {
-        const result = await loadOptions(searchText);
-        if (active) {
-          setOptions(result);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void load();
-
-    return () => {
-      active = false;
-    };
-  }, [searchText]);
 
   return (
     <div className={`relative ${className}`}>
@@ -125,7 +130,7 @@ function AsyncSelectMenu<T extends React.Key | null | undefined>({
               bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
               sm:max-h-60 sm:text-sm"
           >
-            {loading && (
+            {queryData.isLoading && (
               <div className="my-1 flex w-full justify-center">
                 <Spinner size="xs" />
               </div>
@@ -143,7 +148,7 @@ function AsyncSelectMenu<T extends React.Key | null | undefined>({
                 </span>
               </Combobox.Option>
             ))}
-            {!loading && options.length === 0 && (
+            {!queryData.isLoading && options.length === 0 && (
               <div className="px-3 py-1 text-gray-600">No results found.</div>
             )}
           </Combobox.Options>

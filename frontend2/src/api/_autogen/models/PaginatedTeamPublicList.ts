@@ -12,13 +12,13 @@
  * Do not edit the class manually.
  */
 
-import { exists, mapValues } from '../runtime';
-import type { TeamPublic } from './TeamPublic';
+import { exists, mapValues } from "../runtime";
+import type { TeamPublic } from "./TeamPublic";
 import {
-    TeamPublicFromJSON,
-    TeamPublicFromJSONTyped,
-    TeamPublicToJSON,
-} from './TeamPublic';
+  TeamPublicFromJSON,
+  TeamPublicFromJSONTyped,
+  TeamPublicToJSON,
+} from "./TeamPublic";
 
 /**
  *
@@ -26,70 +26,80 @@ import {
  * @interface PaginatedTeamPublicList
  */
 export interface PaginatedTeamPublicList {
-    /**
-     *
-     * @type {number}
-     * @memberof PaginatedTeamPublicList
-     */
-    count?: number;
-    /**
-     *
-     * @type {string}
-     * @memberof PaginatedTeamPublicList
-     */
-    next?: string | null;
-    /**
-     *
-     * @type {string}
-     * @memberof PaginatedTeamPublicList
-     */
-    previous?: string | null;
-    /**
-     *
-     * @type {Array<TeamPublic>}
-     * @memberof PaginatedTeamPublicList
-     */
-    results?: Array<TeamPublic>;
+  /**
+   *
+   * @type {number}
+   * @memberof PaginatedTeamPublicList
+   */
+  count?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof PaginatedTeamPublicList
+   */
+  next?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof PaginatedTeamPublicList
+   */
+  previous?: string | null;
+  /**
+   *
+   * @type {Array<TeamPublic>}
+   * @memberof PaginatedTeamPublicList
+   */
+  results?: Array<TeamPublic>;
 }
 
 /**
  * Check if a given object implements the PaginatedTeamPublicList interface.
  */
 export function instanceOfPaginatedTeamPublicList(value: object): boolean {
-    let isInstance = true;
+  let isInstance = true;
 
-    return isInstance;
+  return isInstance;
 }
 
-export function PaginatedTeamPublicListFromJSON(json: any): PaginatedTeamPublicList {
-    return PaginatedTeamPublicListFromJSONTyped(json, false);
+export function PaginatedTeamPublicListFromJSON(
+  json: any,
+): PaginatedTeamPublicList {
+  return PaginatedTeamPublicListFromJSONTyped(json, false);
 }
 
-export function PaginatedTeamPublicListFromJSONTyped(json: any, ignoreDiscriminator: boolean): PaginatedTeamPublicList {
-    if ((json === undefined) || (json === null)) {
-        return json;
-    }
-    return {
-
-        'count': !exists(json, 'count') ? undefined : json['count'],
-        'next': !exists(json, 'next') ? undefined : json['next'],
-        'previous': !exists(json, 'previous') ? undefined : json['previous'],
-        'results': !exists(json, 'results') ? undefined : ((json['results'] as Array<any>).map(TeamPublicFromJSON)),
-    };
+export function PaginatedTeamPublicListFromJSONTyped(
+  json: any,
+  ignoreDiscriminator: boolean,
+): PaginatedTeamPublicList {
+  if (json === undefined || json === null) {
+    return json;
+  }
+  return {
+    count: !exists(json, "count") ? undefined : json["count"],
+    next: !exists(json, "next") ? undefined : json["next"],
+    previous: !exists(json, "previous") ? undefined : json["previous"],
+    results: !exists(json, "results")
+      ? undefined
+      : (json["results"] as Array<any>).map(TeamPublicFromJSON),
+  };
 }
 
-export function PaginatedTeamPublicListToJSON(value?: PaginatedTeamPublicList | null): any {
-    if (value === undefined) {
-        return undefined;
-    }
-    if (value === null) {
-        return null;
-    }
-    return {
-
-        'count': value.count,
-        'next': value.next,
-        'previous': value.previous,
-        'results': value.results === undefined ? undefined : ((value.results as Array<any>).map(TeamPublicToJSON)),
-    };
+export function PaginatedTeamPublicListToJSON(
+  value?: PaginatedTeamPublicList | null,
+): any {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (value === null) {
+    return null;
+  }
+  return {
+    count: value.count,
+    next: value.next,
+    previous: value.previous,
+    results:
+      value.results === undefined
+        ? undefined
+        : (value.results as Array<any>).map(TeamPublicToJSON),
+  };
 }

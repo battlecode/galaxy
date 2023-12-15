@@ -41,8 +41,10 @@ const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => {
       if (error instanceof ResponseError) {
-        if (error.response.status === 404) return;
+        // If we just have a client error, don't show a toast
+        if (error.response.status < 500) return;
       }
+      // Otherwise, show the user a failure message
       toast.error(`Something went wrong: ${error.message}`);
     },
   }),

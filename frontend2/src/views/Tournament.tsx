@@ -3,8 +3,6 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { type EligibilityCriterion } from "../api/_autogen";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { dateTime } from "../utils/dateTime";
-import AsyncSelectMenu from "../components/elements/AsyncSelectMenu";
-import { loadTeamOptions } from "../utils/loadTeams";
 import Loading from "../components/Loading";
 import SectionCard from "../components/SectionCard";
 import Tooltip from "../components/elements/Tooltip";
@@ -16,6 +14,7 @@ import TournamentResultsTable from "../components/tables/TournamentResultsTable"
 import { useEpisodeInfo, useTournamentInfo } from "../api/episode/useEpisode";
 import { useTournamentMatchList } from "../api/compete/useCompete";
 import { useQueryClient } from "@tanstack/react-query";
+import SearchTeamsMenu from "../components/team/SearchTeamsMenu";
 
 interface QueryParams {
   page: number;
@@ -33,6 +32,11 @@ const TournamentPage: React.FC = () => {
     };
   }, [searchParams]);
 
+  const [selectedTeam, setSelectedTeam] = useState<{
+    value: number;
+    label: string;
+  } | null>(null);
+
   const { data: episode } = useEpisodeInfo({
     id: episodeId,
   });
@@ -44,15 +48,11 @@ const TournamentPage: React.FC = () => {
     {
       episodeId,
       tournamentId: tournamentId ?? "",
+      teamId: selectedTeam?.value,
       page: queryParams.page,
     },
     queryClient,
   );
-
-  const [selectedTeam, setSelectedTeam] = useState<{
-    value: number;
-    label: string;
-  } | null>(null);
 
   const eligibility: {
     includes: EligibilityCriterion[];
@@ -164,7 +164,7 @@ const TournamentPage: React.FC = () => {
         </SectionCard>
         <SectionCard title="Results">
           <div className="mb-4 max-w-md gap-5">
-            <AsyncSelectMenu<number>
+            <SearchTeamsMenu
               onChange={(team) => {
                 setSelectedTeam(team);
                 setSearchParams((prev) => ({
@@ -173,9 +173,6 @@ const TournamentPage: React.FC = () => {
                 }));
               }}
               selected={selectedTeam}
-              loadOptions={async (searchString) =>
-                await loadTeamOptions(episodeId, searchString, 1)
-              }
               placeholder="Search for a team..."
             />
           </div>
