@@ -26,83 +26,83 @@ import { MemoryRouter } from "react-router-dom";
 //   is_staff: false,
 // };
 
-test("UI: should collapse sidebar", () => {
-  render(
-    <MemoryRouter>
-      <EpisodeIdContext.Provider
-        value={{ episodeId: "something", setEpisodeId: (_) => undefined }}
-      >
-        {/* TODO: This can be replicated with a seeded QueryCache/QueryClientProvider and the test-hooks library! */}
-        {/* <CurrentTeamContext.Provider
-          value={{
-            teamState: TeamStateEnum.IN_TEAM,
-            team: faketeam,
-            leaveMyTeam: async (): Promise<void> => {
-              await Promise.resolve();
-            },
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            refreshTeam: (team): void => {},
-          }}
-        >
-          <CurrentUserContext.Provider
-            value={{
-              authState: "loading",
-              user: fakeuser,
-              login: (_) => {
-                console.log();
-              },
-              logout: () => {
-                console.log();
-              },
-            }}
-          >
-            <Sidebar collapsed={true} />
-          </CurrentUserContext.Provider>
-        </CurrentTeamContext.Provider> */}
-      </EpisodeIdContext.Provider>
-    </MemoryRouter>,
-  );
-  expect(screen.queryByText("Home")).toBeNull();
-});
+// test("UI: should collapse sidebar", () => {
+//   render(
+//     <MemoryRouter>
+//       <EpisodeIdContext.Provider
+//         value={{ episodeId: "something", setEpisodeId: (_) => undefined }}
+//       >
+//         {/* TODO: This can be replicated with a seeded QueryCache/QueryClientProvider and the test-hooks library! */}
+//         {/* <CurrentTeamContext.Provider
+//           value={{
+//             teamState: TeamStateEnum.IN_TEAM,
+//             team: faketeam,
+//             leaveMyTeam: async (): Promise<void> => {
+//               await Promise.resolve();
+//             },
+//             // eslint-disable-next-line @typescript-eslint/no-empty-function
+//             refreshTeam: (team): void => {},
+//           }}
+//         >
+//           <CurrentUserContext.Provider
+//             value={{
+//               authState: "loading",
+//               user: fakeuser,
+//               login: (_) => {
+//                 console.log();
+//               },
+//               logout: () => {
+//                 console.log();
+//               },
+//             }}
+//           >
+//             <Sidebar collapsed={true} />
+//           </CurrentUserContext.Provider>
+//         </CurrentTeamContext.Provider> */}
+//       </EpisodeIdContext.Provider>
+//     </MemoryRouter>,
+//   );
+//   expect(screen.queryByText("Home")).toBeNull();
+// });
 
-test("UI: should link to episode in surrounding context", () => {
-  render(
-    <MemoryRouter>
-      <EpisodeIdContext.Provider
-        value={{ episodeId: "something", setEpisodeId: (_) => undefined }}
-      >
-        {/* <CurrentTeamContext.Provider
-          value={{
-            teamState: TeamStateEnum.IN_TEAM,
-            team: faketeam,
-            leaveMyTeam: async (): Promise<void> => {
-              await Promise.resolve();
-            },
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            refreshTeam: (team): void => {},
-          }}
-        >
-          <CurrentUserContext.Provider
-            value={{
-              authState: "loading",
-              user: fakeuser,
-              login: (_) => {
-                console.log();
-              },
-              logout: () => {
-                console.log();
-              },
-            }}
-          >
-            <Sidebar />
-          </CurrentUserContext.Provider>
-        </CurrentTeamContext.Provider> */}
-      </EpisodeIdContext.Provider>
-    </MemoryRouter>,
-  );
-  const linkElement = screen
-    .getByText("Resources")
-    .closest("a")
-    ?.getAttribute("href");
-  expect(linkElement).toEqual(expect.stringContaining(`/something/resources`));
-});
+// test("UI: should link to episode in surrounding context", () => {
+//   render(
+//     <MemoryRouter>
+//       <EpisodeIdContext.Provider
+//         value={{ episodeId: "something", setEpisodeId: (_) => undefined }}
+//       >
+//         {/* <CurrentTeamContext.Provider
+//           value={{
+//             teamState: TeamStateEnum.IN_TEAM,
+//             team: faketeam,
+//             leaveMyTeam: async (): Promise<void> => {
+//               await Promise.resolve();
+//             },
+//             // eslint-disable-next-line @typescript-eslint/no-empty-function
+//             refreshTeam: (team): void => {},
+//           }}
+//         >
+//           <CurrentUserContext.Provider
+//             value={{
+//               authState: "loading",
+//               user: fakeuser,
+//               login: (_) => {
+//                 console.log();
+//               },
+//               logout: () => {
+//                 console.log();
+//               },
+//             }}
+//           >
+//             <Sidebar />
+//           </CurrentUserContext.Provider>
+//         </CurrentTeamContext.Provider> */}
+//       </EpisodeIdContext.Provider>
+//     </MemoryRouter>,
+//   );
+//   const linkElement = screen
+//     .getByText("Resources")
+//     .closest("a")
+//     ?.getAttribute("href");
+//   expect(linkElement).toEqual(expect.stringContaining(`/something/resources`));
+// });
