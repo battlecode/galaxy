@@ -1,5 +1,5 @@
 import React from "react";
-import { type Match, StatusBccEnum } from "../../utils/types/models";
+import { type Match, StatusBccEnum } from "../../api/_autogen/models";
 import Tooltip from "../elements/Tooltip";
 
 interface StatusProps {

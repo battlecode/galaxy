@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { EpisodeIdContext } from "../../../contexts/EpisodeContext";
 import { MemoryRouter } from "react-router-dom";
-// import { Status526Enum } from "../../../utils/types";
+// import { Status526Enum } from "../../../api/_autogen";
 
 // const mem = {
 //   id: 123,

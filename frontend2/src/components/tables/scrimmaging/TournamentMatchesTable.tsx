@@ -1,5 +1,5 @@
 import React from "react";
-import type { PaginatedMatchList } from "../../../utils/types";
+import type { PaginatedMatchList } from "../../../api/_autogen";
 import type { Maybe } from "../../../utils/utilTypes";
 import Table from "../../Table";
 import TableBottom from "../../TableBottom";

@@ -174,7 +174,7 @@ const TournamentPage: React.FC = () => {
               }}
               selected={selectedTeam}
               loadOptions={async (searchString) =>
-                await loadTeamOptions(episodeId, searchString, true, 1)
+                await loadTeamOptions(episodeId, searchString, 1)
               }
               placeholder="Search for a team..."
             />

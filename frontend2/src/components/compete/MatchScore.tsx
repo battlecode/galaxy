@@ -3,7 +3,7 @@ import {
   type Match,
   StatusBccEnum,
   type MatchParticipant,
-} from "../../utils/types/models";
+} from "../../api/_autogen/models";
 
 interface MatchScoreProps {
   match: Match;

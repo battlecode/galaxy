@@ -87,7 +87,7 @@ const Queue: React.FC = () => {
           }}
           selected={selectedTeam}
           loadOptions={async (search) =>
-            await loadTeamOptions(episodeId, search, true, 1)
+            await loadTeamOptions(episodeId, search, 1)
           }
           placeholder="Search for a team..."
         />

@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";
-import type { PaginatedMatchList } from "../../../utils/types";
+import type { PaginatedMatchList } from "../../../api/_autogen";
 import type { Maybe } from "../../../utils/utilTypes";
 import Table from "../../Table";
 import TableBottom from "../../TableBottom";

@@ -2,7 +2,7 @@ import React from "react";
 import {
   type PaginatedSubmissionList,
   StatusBccEnum,
-} from "../../../utils/types";
+} from "../../../api/_autogen";
 import type { Maybe } from "../../../utils/utilTypes";
 import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";

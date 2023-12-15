@@ -15,7 +15,6 @@ export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
       : AuthStateEnum.NOT_AUTHENTICATED;
 
   const userData = useCurrentUserInfo();
-  console.log(authState, userData);
 
   return (
     <CurrentUserContext.Provider value={{ authState, user: userData.data }}>

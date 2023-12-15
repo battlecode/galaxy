@@ -10,7 +10,7 @@ import {
   type CountryEnum,
   type UserCreateRequest,
 } from "../api/_autogen";
-import { COUNTRIES } from "../utils/apiTypes";
+import { COUNTRIES } from "../api/apiTypes";
 import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
 import { useEpisodeId } from "../contexts/EpisodeContext";

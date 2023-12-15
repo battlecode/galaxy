@@ -1,4 +1,7 @@
-import { type CountryEnum, GenderEnum as GeneratedGenderEnum } from "./types";
+import {
+  type CountryEnum,
+  GenderEnum as GeneratedGenderEnum,
+} from "./_autogen";
 
 export enum GenderEnum {
   FEMALE = GeneratedGenderEnum.F,
