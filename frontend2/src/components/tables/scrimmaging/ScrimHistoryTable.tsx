@@ -11,6 +11,7 @@ import RatingDelta from "../../compete/RatingDelta";
 import { useEpisodeInfo } from "../../../api/episode/useEpisode";
 import { useEpisodeId } from "../../../contexts/EpisodeContext";
 import { useUserTeam } from "../../../api/team/useTeam";
+import { isNil } from "lodash";
 
 interface ScrimHistoryTableProps {
   data: Maybe<PaginatedMatchList>;
@@ -77,7 +78,7 @@ const ScrimHistoryTable: React.FC<ScrimHistoryTableProps> = ({
           header: "Replay",
           key: "replay",
           value: (match) =>
-            episode === undefined ? (
+            isNil(episode) || isNil(match.replay_url) ? (
               <></>
             ) : (
               <NavLink

@@ -41,7 +41,7 @@ const QueueTable: React.FC<QueueTableProps> = ({
           header: "Team (Δ)",
           key: "team1",
           value: (r) => {
-            const participant = r.participants[0];
+            const participant = r.participants?.[0];
             if (participant !== undefined) {
               return (
                 <RatingDelta participant={participant} ranked={r.is_ranked} />
@@ -58,7 +58,7 @@ const QueueTable: React.FC<QueueTableProps> = ({
           header: "Team (Δ)",
           key: "team2",
           value: (r) => {
-            const participant = r.participants[1];
+            const participant = r.participants?.[1];
             if (participant !== undefined) {
               return (
                 <RatingDelta participant={participant} ranked={r.is_ranked} />

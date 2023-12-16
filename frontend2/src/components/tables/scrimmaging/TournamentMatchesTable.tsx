@@ -11,6 +11,7 @@ import { dateTime } from "../../../utils/dateTime";
 import { useEpisodeId } from "../../../contexts/EpisodeContext";
 import { useEpisodeInfo } from "../../../api/episode/useEpisode";
 import { useUserTeam } from "../../../api/team/useTeam";
+import { isNil } from "lodash";
 
 interface TournamentMatchesTableProps {
   data: Maybe<PaginatedMatchList>;
@@ -77,7 +78,7 @@ const TournamentMatchesTable: React.FC<TournamentMatchesTableProps> = ({
           header: "Replay",
           key: "replay",
           value: (match) =>
-            episode === undefined ? (
+            isNil(episode) || isNil(match.replay_url) ? (
               <></>
             ) : (
               <NavLink
