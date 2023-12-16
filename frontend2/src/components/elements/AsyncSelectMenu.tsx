@@ -55,6 +55,7 @@ function AsyncSelectMenu<T extends React.Key | null | undefined, K>({
     queryClient,
   );
 
+  // TODO: Add a click-away event listener to set searchText to reload search="" when the user clicks away from the menu.
   const options = useMemo(
     () => resultToOptions(queryData.data?.results ?? []),
     [queryData.data],
