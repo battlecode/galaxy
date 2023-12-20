@@ -405,6 +405,7 @@ class MatchSerializerTestCase(TestCase):
                     "name": self.r_hidden.name,
                     "maps": None,
                     "release_status": self.r_hidden.release_status,
+                    "display_order": self.r_hidden.display_order,
                 },
                 "participants": [
                     {
@@ -554,6 +555,7 @@ class MatchSerializerTestCase(TestCase):
                     "name": self.r_results.name,
                     "maps": [self.map.pk],
                     "release_status": self.r_results.release_status,
+                    "display_order": self.r_results.display_order,
                 },
                 "participants": [
                     {
@@ -632,6 +634,7 @@ class MatchSerializerTestCase(TestCase):
                     "name": self.r_participants.name,
                     "maps": None,
                     "release_status": self.r_participants.release_status,
+                    "display_order": self.r_participants.display_order,
                 },
                 "participants": [
                     {
@@ -710,6 +713,7 @@ class MatchSerializerTestCase(TestCase):
                     "name": self.r_hidden.name,
                     "maps": None,
                     "release_status": self.r_hidden.release_status,
+                    "display_order": self.r_hidden.display_order,
                 },
                 "participants": None,
                 "maps": None,
