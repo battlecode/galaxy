@@ -199,7 +199,7 @@ class MatchInline(admin.TabularInline):
 
     @admin.display(description="Replay link")
     def replay_link(self, obj):
-        link = "https://releases.battlecode.org/client/{}/{}/visualizer.html?{}".format(
+        link = "https://releases.battlecode.org/client/{}/{}/index.html?gameSource={}".format(
             obj.episode.artifact_name,
             obj.episode.release_version_public,
             # Client should make this something urlencode-able, instead of the below...
