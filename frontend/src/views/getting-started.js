@@ -440,7 +440,11 @@ class GettingStarted extends Component {
                         click the
                         <code>Battlecode Client</code> application, you should
                         be able to run and watch matches. (Please don't move
-                        that application, it will be sad.)
+                        that application, it will be sad.) If you notice any
+                        severe issues with the default client, you can try
+                        setting the
+                        <code>compatibilityClient</code> gradle property to true
+                        to download the compatibility version.
                       </p>
                       <h6 className="installation-steps">
                         Developing your Bot
