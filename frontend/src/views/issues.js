@@ -127,11 +127,11 @@ class Issues extends Component {
                       once the web version of the visualizer is live, you can
                       just use the web version at{" "}
                       <a
-                        href={`https://play.battlecode.org/clients/${this.props.episode}/visualizer.html`}
+                        href={`https://play.battlecode.org/clients/${this.props.episode}/index.html`}
                         style={{ fontWeight: 700 }}
                       >
                         https://play.battlecode.org/clients/{this.props.episode}
-                        /visualizer.html
+                        /index.html
                       </a>{" "}
                       rather than the desktop application.{" "}
                     </li>

@@ -298,7 +298,7 @@ class GettingStarted extends Component {
                   </p>{" "}
                   <h6 className="installation-steps">Step 1: Install Java</h6>
                   <p>
-                    You'll need a Java Development Kit (JDK) version 8.
+                    You'll need an Oracle Java Development Kit (JDK) version 8.
                     Unfortunately, higher versions will not work.{" "}
                     <b>
                       <a
@@ -440,10 +440,11 @@ class GettingStarted extends Component {
                         click the
                         <code>Battlecode Client</code> application, you should
                         be able to run and watch matches. (Please don't move
-                        that application, it will be sad.) If you're on Linux,
-                        navigate to the <code>client</code> folder and run{" "}
-                        <code>./battlecode-visualizer</code>
-                        to launch the client.
+                        that application, it will be sad.) If you notice any
+                        severe issues with the default client, you can try
+                        setting the
+                        <code>compatibilityClient</code> gradle property to true
+                        to download the compatibility version.
                       </p>
                       <h6 className="installation-steps">
                         Developing your Bot

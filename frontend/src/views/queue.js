@@ -147,7 +147,7 @@ class QueueHistory extends Component {
                             replay_entry = (
                               <td>
                                 <a
-                                  href={`https://releases.battlecode.org/client/${this.props.episode_info.artifact_name}/${this.props.episode_info.release_version_public}/visualizer.html?${s.replay_url}`}
+                                  href={`https://releases.battlecode.org/client/${this.props.episode_info.artifact_name}/${this.props.episode_info.release_version_public}/index.html?gameSource=${s.replay_url}`}
                                   target="_blank"
                                 >
                                   Watch
