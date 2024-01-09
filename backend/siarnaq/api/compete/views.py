@@ -281,7 +281,11 @@ class MatchViewSet(
         permission_classes=(IsEpisodeMutable,),
     )
     def tournament(self, request, *, episode_id):
-        """List matches played in a tournament."""
+        """
+        List matches played in a tournament, or in all tournaments if not specified.
+        Passing the external_id_private of a tournament allows match lookup for the
+        tournament, even if it's private. Client uses the external_id_private parameter
+        """
         queryset = self.get_queryset()
 
         external_id_private = self.request.query_params.get("external_id_private")
@@ -290,6 +294,8 @@ class MatchViewSet(
             # If an external id is provided, filter tournaments by it
             tournaments = Tournament.objects.visible_to_user(is_staff=True)
             tournaments = tournaments.filter(external_id_private=external_id_private)
+            if not tournaments.exists():
+                return Response(None, status=status.HTTP_404_NOT_FOUND)
         else:
             # Otherwise filter by provided tournament id
             tournaments = Tournament.objects.visible_to_user(
@@ -298,8 +304,8 @@ class MatchViewSet(
             tournament_id = self.request.query_params.get("tournament_id")
             if tournament_id is not None:
                 tournaments = tournaments.filter(pk=tournament_id)
-        if tournaments.count() != 1:
-            return Response(None, status=status.HTTP_404_NOT_FOUND)
+                if not tournaments.exists():
+                    return Response(None, status=status.HTTP_404_NOT_FOUND)
         queryset = self.get_queryset().filter(
             tournament_round__tournament__in=Subquery(tournaments.values("pk"))
         )
