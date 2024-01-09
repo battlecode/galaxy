@@ -294,6 +294,8 @@ class MatchViewSet(
             # If an external id is provided, filter tournaments by it
             tournaments = Tournament.objects.visible_to_user(is_staff=True)
             tournaments = tournaments.filter(external_id_private=external_id_private)
+            if not tournaments.exists():
+                return Response(None, status=status.HTTP_404_NOT_FOUND)
         else:
             # Otherwise filter by provided tournament id
             tournaments = Tournament.objects.visible_to_user(
@@ -302,8 +304,8 @@ class MatchViewSet(
             tournament_id = self.request.query_params.get("tournament_id")
             if tournament_id is not None:
                 tournaments = tournaments.filter(pk=tournament_id)
-        if not tournaments.exists():
-            return Response(None, status=status.HTTP_404_NOT_FOUND)
+                if not tournaments.exists():
+                    return Response(None, status=status.HTTP_404_NOT_FOUND)
         queryset = self.get_queryset().filter(
             tournament_round__tournament__in=Subquery(tournaments.values("pk"))
         )
