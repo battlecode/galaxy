@@ -226,7 +226,7 @@ class ClassRequirementViewSet(viewsets.ReadOnlyModelViewSet):
     )
     def report(self, request, pk=None, *, episode_id):
         """Retrieve or update team strategy report"""
-        team = Team.objects.filter(members=request.user).get()
+        team = Team.objects.filter(episode=episode_id, members=request.user).get()
         profile = team.profile
         match request.method.lower():
             case "get":
