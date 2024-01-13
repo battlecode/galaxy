@@ -232,12 +232,12 @@ module "saturn_execute" {
   storage_releases_name  = var.storage_releases_name
 
   secret_id   = google_secret_manager_secret.saturn.secret_id
-  parallelism = 2
+  parallelism = 12
 
   network_vpc_id = google_compute_network.this.id
   subnetwork_ip_cidr = "172.17.0.0/16"
 
-  machine_type = "t2d-standard-4"
+  machine_type = "t2d-standard-16"
   image        = var.saturn_image
 
   max_instances = var.max_execute_instances
