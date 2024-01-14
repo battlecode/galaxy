@@ -51,7 +51,7 @@ module "production" {
   min_compile_instances = 0
   max_compile_instances = 5
   min_execute_instances = 0
-  max_execute_instances = 50
+  max_execute_instances = 10
   saturn_secrets        = var.saturn_secrets_production
   storage_releases_name = module.releases.storage_bucket_name
 
