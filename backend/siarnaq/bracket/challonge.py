@@ -24,7 +24,6 @@ _headers = {
     "User-Agent": "",
 }
 
-AUTH_TYPE = "v1"
 URL_BASE = "https://api.challonge.com/v2.1/"
 
 
