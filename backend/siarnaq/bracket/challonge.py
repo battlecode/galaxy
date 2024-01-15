@@ -389,7 +389,7 @@ def update_match(match: Match, *, is_private: bool):
             if is_private
             else participant.external_id_public,
             "score_set": str(participant.score),
-            "advancing": True if participant.score == high_score else False,
+            "advancing": participant.score == high_score,
         }
         for participant in participants
     ]
