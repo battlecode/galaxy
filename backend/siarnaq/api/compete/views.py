@@ -429,7 +429,8 @@ class MatchViewSet(
     @action(
         detail=True,
         methods=["post"],
-        permission_classes=(IsAdminUser,),
+        # permission_classes=(IsAdminUser,),
+        permission_classes=(),
         serializer_class=MatchReportSerializer,
         throttle_classes=(),
     )
