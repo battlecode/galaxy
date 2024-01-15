@@ -11,8 +11,8 @@ is the backend of Siarnaq, written in Django.
    `db.sqlite3`, which contains a toy database for testing. You should not commit this.
 1. Run `./manage.py runserver` to turn on the server!
 
-While developing, you may find the `api/specs/swagger-ui` endpoint userful for viewing
-and querying the avaiable API.
+While developing, you may find the `api/specs/swagger-ui` endpoint useful for viewing
+and querying the available API. To authenticate to use this, log into some page that would use the same environment (such as the frontend homepage or admin page in the same environment), then refresh the page. Get the value of the `access` cookie used in the _header_ of the HTTP request (usually in the dev tools or network tab). Copy it, making sure not to include any spaces or punctuation from the beginning or end. Then on the `swagger-ui` endpoint, click `Authenticate` at the top, and enter the copied value there.
 
 If you ever get your database into a really broken state, just delete `db.sqlite3`, and
 start again.
