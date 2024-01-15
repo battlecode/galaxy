@@ -124,9 +124,18 @@ def initialize(modeladmin, request, queryset):
         tournament.initialize()
 
 
+@admin.action(description="Recreate tournament(s) with same base info")
+def recreate(modeladmin, request, queryset):
+    logger.info(
+        "tournament_recreate", message="Recreating tournament(s) with same base info."
+    )
+    for tournament in queryset:
+        tournament.recreate()
+
+
 @admin.register(Tournament)
 class TournamentAdmin(admin.ModelAdmin):
-    actions = [initialize]
+    actions = [initialize, recreate]
     fieldsets = (
         (
             "General",
