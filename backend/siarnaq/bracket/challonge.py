@@ -25,7 +25,7 @@ _headers = {
 }
 
 AUTH_TYPE = "v1"
-URL_BASE = "https://api.challonge.com/v2/"
+URL_BASE = "https://api.challonge.com/v2.1/"
 
 
 def create_tournament(tournament: Tournament, *, is_private: bool):
