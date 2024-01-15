@@ -305,6 +305,50 @@ class Tournament(models.Model):
             TournamentRound.objects.bulk_create(round_objects)
             self.save(update_fields=["external_id_private", "external_id_public"])
 
+    def recreate(self):
+        """
+        Makes a new tournament, with the same "base information" as this one.
+        """
+
+        print("! recreate")
+
+        # Create a new short name, making sure to slightly edit the old one
+        # Generally append -v2 or increment this number if already present
+        name_split = self.name_short.split("-v")
+        if len(name_split) == 1:
+            # -v not found, add it
+            name_short_new = self.name_short + "-v2"
+        else:
+            # -v found. Split the name parts, and increment to the number
+            # This might be a little weird if multiple are found
+            name_prefix, version_tag = name_split
+            version_tag_number_new = int(version_tag) + 1
+            name_short_new = f"{name_prefix}-v{version_tag_number_new}"
+
+        with transaction.atomic():
+            # The info that can be manually filled from the dashboard,
+            # and not populated through automated means
+            tournament_new = Tournament.objects.create(
+                name_short=name_short_new,
+                name_long=self.name_long,
+                blurb=self.blurb,
+                episode=self.episode,
+                style=self.style,
+                require_resume=self.require_resume,
+                is_public=self.is_public,
+                display_date=self.display_date,
+                submission_freeze=self.submission_freeze,
+                submission_unfreeze=self.submission_unfreeze,
+            )
+
+            tournament_new.eligibility_includes.set(self.eligibility_includes.all())
+            tournament_new.eligibility_excludes.set(self.eligibility_excludes.all())
+
+            # Hide the old tournament, to "delete" it
+            self.is_public = False
+            self.name_long += " OLD"
+            self.save()
+
 
 class ReleaseStatus(models.IntegerChoices):
     """
