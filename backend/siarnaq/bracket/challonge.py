@@ -322,12 +322,11 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
         )
         match_objects.append(match_object)
 
-        for player_index in range(2):
+        challonge_points = challonge_match["attributes"]["points_by_participant"]
+        for (player_index, challonge_points_participant) in enumerate(challonge_points):
             # This looks ugly but it's how to parse through the Challonge-related data.
             challonge_participant_id_private = str(
-                challonge_match["attributes"]["points_by_participant"][player_index][
-                    "participant_id"
-                ]
+                challonge_points_participant["participant_id"]
             )
             challonge_participant_id_public = challonge_team_ids_private_to_public[
                 challonge_participant_id_private
