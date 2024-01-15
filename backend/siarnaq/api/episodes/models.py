@@ -309,9 +309,6 @@ class Tournament(models.Model):
         """
         Makes a new tournament, with the same "base information" as this one.
         """
-
-        print("! recreate")
-
         # Create a new short name, making sure to slightly edit the old one
         # Generally append -v2 or increment this number if already present
         name_split = self.name_short.split("-v")
