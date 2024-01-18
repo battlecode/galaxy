@@ -175,9 +175,6 @@ class MatchAdmin(admin.ModelAdmin):
             .prefetch_related("participants__team")
         )
 
-    def has_delete_permission(self, request, obj=None):
-        return False
-
 
 @admin.register(ScrimmageRequest)
 class ScrimmageRequestAdmin(admin.ModelAdmin):
