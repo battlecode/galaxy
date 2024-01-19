@@ -87,7 +87,23 @@ class Tournaments extends Component {
                   <h4 className="title">Prizes</h4>
                 </div>
                 <div className="content">
-                  <p>Prize amounts are TBD for Battlecode 2024.</p>
+                  <p>
+                    Prize amounts are approximate and will be finalized soon!
+                  </p>
+                  <ul>
+                    <li>
+                      <b>Final Tournament prizes:</b> Prizes will range from
+                      $5000 for 1st place to $500 for 16th place.
+                    </li>
+                    <li>
+                      <b>Sprint prizes:</b> Winner of each tournament will
+                      receive $250.
+                    </li>
+                    <li>
+                      <b>Newbie, High School prizes:</b> Prizes will range from
+                      $600 to $200 for the top 3 teams.
+                    </li>
+                  </ul>
                   <p>
                     If you are an international participant, please note that{" "}
                     <a href="https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/sanctioned-destinations">
