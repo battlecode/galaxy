@@ -95,7 +95,7 @@ func (t *Task) Run(ctx context.Context, r Reporter) (err error) {
 		if err != nil {
 			log.Ctx(ctx).Error().Msg(string(debug.Stack()))
 		}
-		if errReport = t.FinalizeReport(ctx, r); errReport != nil {
+		if errReport := t.FinalizeReport(ctx, r); errReport != nil {
 			err = fmt.Errorf("%v, t.FinalizeReport: %v", err, errReport)
 		}
 		if t.status.Retryable() {
