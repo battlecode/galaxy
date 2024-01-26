@@ -36,7 +36,7 @@ const EpisodeSwitcher: React.FC = () => {
               queryFn: async () => await getEpisodeInfo({ id: newEpisodeId }),
             }))().catch((e) => toast.error((e as Error).message));
           setEpisodeId(newEpisodeId);
-          navigate(location.pathname.replace(episodeId, newEpisodeId));
+          navigate(`${newEpisodeId}/home`);
         }}
       >
         <div className="relative">

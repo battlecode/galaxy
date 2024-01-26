@@ -34,12 +34,17 @@ const Login: React.FC = () => {
   }, [authState]);
 
   const onSubmit: SubmitHandler<LoginFormInput> = async (data) => {
-    await toast.promise(login(data.username, data.password, queryClient), {
-      loading: "Logging in...",
-      success: "Logged in!",
-      error:
-        "Error logging in. Did you enter your username and password correctly?",
-    });
+    try {
+      await toast.promise(login(data.username, data.password, queryClient), {
+        loading: "Logging in...",
+        success: "Logged in!",
+        error:
+          "Error logging in. Did you enter your username and password correctly?",
+      });
+      navigate(episodeId !== undefined ? `/${episodeId}/home` : "/");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

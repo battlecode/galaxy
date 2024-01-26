@@ -51,12 +51,12 @@ const queryClient = new QueryClient({
 });
 
 queryClient.setQueryDefaults(["team"], { retry: false });
-queryClient.setQueryDefaults(userQueryKeys.tokenVerify, { retry: false });
+queryClient.setQueryDefaults(userQueryKeys.meBase, { retry: false });
 
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <Toaster position="bottom-right" reverseOrder={false} />
+      <Toaster position="top-center" reverseOrder={false} />
       <CurrentUserProvider>
         <EpisodeProvider>
           <RouterProvider router={router} />
@@ -119,6 +119,10 @@ const router = createBrowserRouter([
       {
         path: "/:episodeId/tournament/:tournamentId",
         element: <TournamentPage />,
+      },
+      {
+        path: "/:episodeId/not_found",
+        element: <NotFound />,
       },
     ],
   },

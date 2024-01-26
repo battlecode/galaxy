@@ -1,4 +1,4 @@
-This is the README for the **new** API.
+This is the README for the **new** API. I would greatly recommend reading at least some of this blog before working in here as it will de-mystify a lot of the decisions made in building it out: https://tkdodo.eu/blog/practical-react-query.
 
 - \_autogen: This contains **ONLY** auto-generated code, created by calling "./generate_types.sh"! This contains types & and auto-generated Fetch APIs. We wrap these auto-generated api functions in each endpoint's sub-folder. The only thing that FE code should import from here are models and types!
 
