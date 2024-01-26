@@ -41,7 +41,6 @@ const Login: React.FC = () => {
         error:
           "Error logging in. Did you enter your username and password correctly?",
       });
-      navigate(episodeId !== undefined ? `/${episodeId}/home` : "/");
     } catch (err) {
       console.error(err);
     }
