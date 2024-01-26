@@ -1,17 +1,25 @@
 import React, { Fragment, useMemo } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import Icon from "./elements/Icon";
-import { useEpisodeId, useEpisodeList } from "../contexts/EpisodeContext";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 import { isPresent } from "../utils/utilTypes";
 import { useNavigate } from "react-router-dom";
+import { useEpisodeList } from "../api/episode/useEpisode";
+import { useQueryClient } from "@tanstack/react-query";
+import { episodeQueryKeys } from "../api/episode/episodeKeys";
+import { getEpisodeInfo } from "../api/episode/episodeApi";
+import toast from "react-hot-toast";
 
 const EpisodeSwitcher: React.FC = () => {
-  const episodeList = useEpisodeList();
+  const queryClient = useQueryClient();
   const { episodeId, setEpisodeId } = useEpisodeId();
+  const { data: episodeList } = useEpisodeList({ page: 1 });
   const navigate = useNavigate();
   const idToName = useMemo(
     () =>
-      new Map((episodeList ?? []).map((ep) => [ep.name_short, ep.name_long])),
+      new Map(
+        (episodeList?.results ?? []).map((ep) => [ep.name_short, ep.name_long]),
+      ),
     [episodeList],
   );
   if (!isPresent(episodeList)) {
@@ -22,8 +30,13 @@ const EpisodeSwitcher: React.FC = () => {
       <Listbox
         value={episodeId}
         onChange={(newEpisodeId) => {
+          (async () =>
+            await queryClient.fetchQuery({
+              queryKey: episodeQueryKeys.info({ id: newEpisodeId }),
+              queryFn: async () => await getEpisodeInfo({ id: newEpisodeId }),
+            }))().catch((e) => toast.error((e as Error).message));
           setEpisodeId(newEpisodeId);
-          navigate(location.pathname.replace(episodeId, newEpisodeId));
+          navigate(`${newEpisodeId}/home`);
         }}
       >
         <div className="relative">
@@ -53,7 +66,7 @@ const EpisodeSwitcher: React.FC = () => {
               bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
               sm:max-h-60 sm:text-sm"
             >
-              {episodeList.map((ep) => (
+              {episodeList?.results?.map((ep) => (
                 <Listbox.Option
                   className="flex cursor-default flex-row justify-between py-1.5 pl-4 pr-2 ui-active:bg-cyan-100"
                   key={ep.name_short}

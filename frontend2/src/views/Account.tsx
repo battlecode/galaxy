@@ -6,9 +6,9 @@ import TextArea from "../components/elements/TextArea";
 import { useCurrentUser } from "../contexts/CurrentUserContext";
 import SectionCard from "../components/SectionCard";
 import SelectMenu from "../components/elements/SelectMenu";
-import { COUNTRIES } from "../utils/apiTypes";
+import { COUNTRIES } from "../api/apiTypes";
 
-import { GenderEnum, type CountryEnum } from "../utils/types";
+import { GenderEnum, type CountryEnum } from "../api/_autogen";
 import Button from "../components/elements/Button";
 import FormLabel from "../components/elements/FormLabel";
 

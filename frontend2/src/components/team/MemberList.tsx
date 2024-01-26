@@ -1,5 +1,5 @@
 import React from "react";
-import { type UserPublic } from "../../utils/types";
+import { type UserPublic } from "../../api/_autogen";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
 
 interface MemberListProps {

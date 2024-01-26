@@ -5,13 +5,14 @@ import {
   StatusBccEnum,
   type PaginatedMatchList,
   type Episode,
-} from "../../utils/types";
+} from "../../api/_autogen";
 import type { Maybe } from "../../utils/utilTypes";
 import Table from "../Table";
 import TableBottom from "../TableBottom";
 import MatchScore from "../compete/MatchScore";
 import MatchStatus from "../compete/MatchStatus";
 import RatingDelta from "../compete/RatingDelta";
+import { isNil } from "lodash";
 
 interface TournamentResultsTableProps {
   data: Maybe<PaginatedMatchList>;
@@ -46,7 +47,7 @@ const TournamentResultsTable: React.FC<TournamentResultsTableProps> = ({
           header: "Team (Δ)",
           key: "team1",
           value: (r) => {
-            const participant = r.participants[0];
+            const participant = r.participants?.[0];
             if (participant !== undefined) {
               return (
                 <RatingDelta participant={participant} ranked={r.is_ranked} />
@@ -63,7 +64,7 @@ const TournamentResultsTable: React.FC<TournamentResultsTableProps> = ({
           header: "Team (Δ)",
           key: "team2",
           value: (r) => {
-            const participant = r.participants[1];
+            const participant = r.participants?.[1];
             if (participant !== undefined) {
               return (
                 <RatingDelta participant={participant} ranked={r.is_ranked} />
@@ -85,7 +86,9 @@ const TournamentResultsTable: React.FC<TournamentResultsTableProps> = ({
           header: "Replay",
           key: "replay",
           value: (match) =>
-            episode === undefined || match.status !== StatusBccEnum.Ok ? (
+            isNil(episode) ||
+            match.status !== StatusBccEnum.Ok ||
+            isNil(match.replay_url) ? (
               <></>
             ) : (
               <NavLink

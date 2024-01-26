@@ -1,27 +1,24 @@
-import { searchTeams } from "./api/team";
-import type { PaginatedTeamPublicList } from "./types";
+import { searchTeams } from "../api/team/teamApi";
+import type { PaginatedTeamPublicList } from "../api/_autogen";
 
 /**
  * Search for teams by name. Often used for the AsyncSelectMenu component.
  * @param episodeId
- * @param inputValue Team name search string.
- * @param requireActiveSubmission (Optional) Whether to only return teams with active submissions (default: true).
+ * @param search Team name search string.
  * @param page (Optional) Page number (default: 1).
  * @returns An array of value/label pairs, which is expected by the AsyncSelectMenu component.
  */
 export const loadTeamOptions = async (
   episodeId: string,
-  inputValue: string,
-  requireActiveSubmission?: boolean,
+  search: string,
   page?: number,
 ): Promise<Array<{ value: number; label: string }>> => {
   try {
-    const result: PaginatedTeamPublicList = await searchTeams(
+    const result: PaginatedTeamPublicList = await searchTeams({
       episodeId,
-      inputValue,
-      requireActiveSubmission ?? true,
-      page ?? 1,
-    );
+      search,
+      page,
+    });
     return (
       result.results?.map((t) => ({
         value: t.id,

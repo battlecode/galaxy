@@ -1,90 +1,47 @@
-import React, { useEffect, useState } from "react";
-import {
-  useCurrentTeam,
-  TeamStateEnum,
-} from "../../contexts/CurrentTeamContext";
+import React, { useMemo, useState } from "react";
 import SectionCard from "../SectionCard";
-import DescriptiveCheckbox from "../elements/DescriptiveCheckbox";
-import { useEpisode, useEpisodeId } from "../../contexts/EpisodeContext";
+import DescriptiveCheckbox, {
+  getCheckboxState,
+} from "../elements/DescriptiveCheckbox";
+import { useEpisodeId } from "../../contexts/EpisodeContext";
 import { isPresent } from "../../utils/utilTypes";
-import { updateTeamPartial } from "../../utils/api/team";
-import { determineCheckboxState } from "./EligibilitySettings";
-import { type TeamPrivate } from "../../utils/types";
+import { useUpdateTeam, useUserTeam } from "../../api/team/useTeam";
+import { useQueryClient } from "@tanstack/react-query";
+import Button from "../elements/Button";
 
 // This component should only be used when there is a logged in user with a team.
 const ScrimmageSettings: React.FC = () => {
-  const { team, teamState, refreshTeam } = useCurrentTeam();
-  const episode = useEpisode();
   const { episodeId } = useEpisodeId();
-  // true when the team has accept on, undefined when team's data hasn't loaded
-  const [ranked, setRanked] = useState<boolean | undefined>(undefined);
-  const [unranked, setUnranked] = useState<boolean | undefined>(undefined);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    // update with most current status
-    const autoRanked = team?.profile?.auto_accept_ranked;
-    if (isPresent(autoRanked)) {
-      setRanked(autoRanked);
-    }
-    const autoUnranked = team?.profile?.auto_accept_unranked;
-    if (isPresent(autoUnranked)) {
-      setUnranked(autoUnranked);
-    }
-  }, [team?.profile?.auto_accept_ranked, team?.profile?.auto_accept_unranked]);
+  const teamData = useUserTeam({ episodeId });
+  const updateTeam = useUpdateTeam(
+    {
+      episodeId,
+    },
+    queryClient,
+  );
 
-  useEffect(() => {
-    // make API calls to update only if necessary
-    if (
-      !isPresent(ranked) ||
-      !isPresent(unranked) ||
-      (team?.profile?.auto_accept_ranked === ranked &&
-        team.profile.auto_accept_unranked === unranked)
-    ) {
-      return;
-    }
+  // True when the team has accept on, undefined when team's data hasn't loaded
+  const [ranked, setRanked] = useState<boolean | undefined>();
+  const [unranked, setUnranked] = useState<boolean | undefined>();
 
-    let isActive = true;
-    const update = async (): Promise<void> => {
-      let updatedTeam: TeamPrivate;
-      try {
-        updatedTeam = await updateTeamPartial(episodeId, {
-          auto_accept_ranked: ranked,
-          auto_accept_unranked: unranked,
-        });
-      } catch (error) {
-        // TODO: Add a notif here indicating that the update failed
-        console.error(error);
-        return;
-      }
-      const newProfile = team?.profile;
-      if (isActive && isPresent(newProfile) && isPresent(team)) {
-        // only update the ranked / unranked of the team profile to avoid
-        // race conditions with other team profile updaters on this page
-        refreshTeam({
-          ...team,
-          profile: {
-            ...newProfile,
-            auto_accept_unranked: updatedTeam.profile?.auto_accept_unranked,
-            auto_accept_ranked: updatedTeam.profile?.auto_accept_ranked,
-          },
-        });
-      }
-    };
-    void update();
-    return () => {
-      isActive = false;
-    };
-  }, [ranked, unranked, episodeId]);
+  const editMode = useMemo(() => {
+    // Either ranked or unranked is different from the current (present, non-loading) team data
+    return (
+      !teamData.isLoading &&
+      teamData.isSuccess &&
+      ((isPresent(ranked) &&
+        ranked !== teamData.data.profile?.auto_accept_ranked) ||
+        (isPresent(unranked) &&
+          unranked !== teamData.data.profile?.auto_accept_unranked))
+    );
+  }, [ranked, unranked, teamData]);
 
-  if (
-    teamState !== TeamStateEnum.IN_TEAM ||
-    !isPresent(team) ||
-    !isPresent(episode) ||
-    !isPresent(ranked) ||
-    !isPresent(unranked)
-  ) {
+  if (!teamData.isSuccess) {
     return null;
   }
+
   return (
     <SectionCard title="Scrimmaging">
       <div className="flex flex-col gap-3 2xl:flex-row">
@@ -96,11 +53,17 @@ const ScrimmageSettings: React.FC = () => {
         </div>
         <div className="flex flex-1 flex-col gap-2">
           <DescriptiveCheckbox
-            status={determineCheckboxState(
-              ranked,
-              team.profile?.auto_accept_ranked ?? false,
+            status={getCheckboxState(
+              teamData.isLoading || updateTeam.isPending,
+              editMode,
+              Boolean(ranked),
+              Boolean(teamData.data.profile?.auto_accept_ranked),
             )}
             onChange={(checked) => {
+              if (!isPresent(unranked))
+                setUnranked(
+                  teamData.data?.profile?.auto_accept_unranked ?? false,
+                );
               setRanked(checked);
             }}
             title="Auto-accept ranked scrimmages"
@@ -108,17 +71,39 @@ const ScrimmageSettings: React.FC = () => {
                   ranked scrimmage requests. Ranked scrimmages affect your ELO rating."
           />
           <DescriptiveCheckbox
-            status={determineCheckboxState(
-              unranked,
-              team.profile?.auto_accept_unranked ?? true,
+            status={getCheckboxState(
+              teamData.isLoading || updateTeam.isPending,
+              editMode,
+              Boolean(unranked),
+              Boolean(teamData.data.profile?.auto_accept_unranked),
             )}
             onChange={(checked) => {
+              if (!isPresent(ranked))
+                setRanked(teamData.data.profile?.auto_accept_ranked ?? false);
               setUnranked(checked);
             }}
             title="Auto-accept unranked scrimmages"
             description="When enabled, your team will automatically accept
                   unranked scrimmage requests. Unranked scrimmages do not affect your ELO rating."
           />
+          {editMode && (
+            <Button
+              variant="dark"
+              label="Save"
+              fullWidth
+              // VERY IMPORTANT - Prevents race conditions with other team updates!
+              disabled={updateTeam.isPending}
+              loading={updateTeam.isPending}
+              onClick={() => {
+                updateTeam.mutate({
+                  profile: {
+                    auto_accept_ranked: ranked,
+                    auto_accept_unranked: unranked,
+                  },
+                });
+              }}
+            />
+          )}
         </div>
       </div>
     </SectionCard>

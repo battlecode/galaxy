@@ -1,5 +1,5 @@
 import React from "react";
-import type { TournamentSubmission } from "../../../utils/types";
+import type { TournamentSubmission } from "../../../api/_autogen";
 import type { Maybe } from "../../../utils/utilTypes";
 import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";

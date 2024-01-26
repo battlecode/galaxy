@@ -6,8 +6,8 @@
 # production
 /build
 
-# auto-generated type
-src/utils/types
+# auto-generated types/models
+src/api/_autogen
 
 /coverage
 

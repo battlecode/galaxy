@@ -1,28 +1,23 @@
-import React, { useEffect, useMemo, useState } from "react";
-import type {
-  PaginatedScrimmageRequestList,
-  PaginatedMatchList,
-  PaginatedTeamPublicList,
-} from "../utils/types/models";
+import React, { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { searchTeams } from "../utils/api/team";
-import {
-  getScrimmagesByTeam,
-  getTournamentMatches,
-  getUserScrimmagesInbox,
-  getUserScrimmagesOutbox,
-} from "../utils/api/compete";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import Collapse from "../components/elements/Collapse";
-import type { Maybe } from "../utils/utilTypes";
 import InboxTable from "../components/tables/scrimmaging/InboxTable";
 import OutboxTable from "../components/tables/scrimmaging/OutboxTable";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import TeamsTable from "../components/tables/scrimmaging/TeamsTable";
 import TournamentMatchesTable from "../components/tables/scrimmaging/TournamentMatchesTable";
 import ScrimHistoryTable from "../components/tables/scrimmaging/ScrimHistoryTable";
+import {
+  useScrimmageInboxList,
+  useScrimmageOutboxList,
+  useTournamentMatchList,
+  useUserScrimmageList,
+} from "../api/compete/useCompete";
+import { useSearchTeams, useUserTeam } from "../api/team/useTeam";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface QueryParams {
   inboxPage: number;
@@ -35,9 +30,9 @@ interface QueryParams {
 
 const Scrimmaging: React.FC = () => {
   const { episodeId } = useEpisodeId();
+  const queryClient = useQueryClient();
 
   const [searchParams, setSearchParams] = useSearchParams();
-
   const queryParams: QueryParams = useMemo(() => {
     return {
       inboxPage: parsePageParam("inboxPage", searchParams),
@@ -49,21 +44,47 @@ const Scrimmaging: React.FC = () => {
     };
   }, [searchParams]);
 
-  const [inboxLoading, setInboxLoading] = useState<boolean>(false);
-  const [outboxLoading, setOutboxLoading] = useState<boolean>(false);
+  const teamData = useUserTeam({ episodeId });
+  const { data: inboxData, isLoading: inboxLoading } = useScrimmageInboxList(
+    {
+      episodeId,
+      page: queryParams.inboxPage,
+    },
+    queryClient,
+  );
+  const { data: outboxData, isLoading: outboxLoading } = useScrimmageOutboxList(
+    {
+      episodeId,
+      page: queryParams.outboxPage,
+    },
+    queryClient,
+  );
+  const { data: teamsData, isLoading: teamsLoading } = useSearchTeams(
+    {
+      episodeId,
+      search: queryParams.search,
+      page: queryParams.teamsPage,
+    },
+    queryClient,
+  );
+  const { data: scrimsData, isLoading: scrimsLoading } = useUserScrimmageList(
+    {
+      episodeId,
+      page: queryParams.scrimsPage,
+    },
+    queryClient,
+  );
+  const { data: tourneyData, isLoading: tourneyLoading } =
+    useTournamentMatchList(
+      {
+        episodeId,
+        teamId: teamData.data?.id,
+        page: queryParams.tourneyPage,
+      },
+      queryClient,
+    );
 
   const [searchText, setSearchText] = useState<string>(queryParams.search);
-  const [teamsLoading, setTeamsLoading] = useState<boolean>(false);
-  const [scrimsLoading, setScrimsLoading] = useState<boolean>(false);
-  const [tourneyLoading, setTourneyLoading] = useState<boolean>(false);
-
-  const [inboxData, setInboxData] =
-    useState<Maybe<PaginatedScrimmageRequestList>>();
-  const [outboxData, setOutboxData] =
-    useState<Maybe<PaginatedScrimmageRequestList>>();
-  const [teamsData, setTeamsData] = useState<Maybe<PaginatedTeamPublicList>>();
-  const [scrimsData, setScrimsData] = useState<Maybe<PaginatedMatchList>>();
-  const [tourneyData, setTourneyData] = useState<Maybe<PaginatedMatchList>>();
 
   function handleSearch(): void {
     if (!teamsLoading && searchText !== queryParams.search) {
@@ -88,182 +109,6 @@ const Scrimmaging: React.FC = () => {
       [key]: page.toString(),
     }));
   }
-
-  useEffect(() => {
-    let isActiveLookup = true;
-    if (inboxLoading) return;
-    setInboxLoading(true);
-    setInboxData((prev) => ({ count: prev?.count ?? 0 }));
-
-    const fetchInbox = async (): Promise<void> => {
-      try {
-        const result = await getUserScrimmagesInbox(
-          episodeId,
-          queryParams.inboxPage,
-        );
-        if (isActiveLookup) {
-          setInboxData(result);
-        }
-      } catch (err) {
-        if (isActiveLookup) {
-          setInboxData(undefined);
-        }
-        console.error(err);
-      } finally {
-        if (isActiveLookup) {
-          setInboxLoading(false);
-        }
-      }
-    };
-
-    void fetchInbox();
-
-    return () => {
-      isActiveLookup = false;
-    };
-  }, [episodeId, queryParams.inboxPage]);
-
-  useEffect(() => {
-    let isActiveLookup = true;
-    if (outboxLoading) return;
-    setOutboxLoading(true);
-    setOutboxData((prev) => ({ count: prev?.count ?? 0 }));
-
-    const fetchOutbox = async (): Promise<void> => {
-      try {
-        const result = await getUserScrimmagesOutbox(
-          episodeId,
-          queryParams.outboxPage,
-        );
-        if (isActiveLookup) {
-          setOutboxData(result);
-        }
-      } catch (err) {
-        if (isActiveLookup) {
-          setOutboxData(undefined);
-        }
-        console.error(err);
-      } finally {
-        if (isActiveLookup) {
-          setOutboxLoading(false);
-        }
-      }
-    };
-
-    void fetchOutbox();
-
-    return () => {
-      isActiveLookup = false;
-    };
-  }, [episodeId, queryParams.outboxPage]);
-
-  useEffect(() => {
-    let isActiveLookup = true;
-    if (teamsLoading) return;
-    setTeamsLoading(true);
-    setTeamsData((prev) => ({ count: prev?.count ?? 0 }));
-
-    const fetchTeams = async (): Promise<void> => {
-      try {
-        const result = await searchTeams(
-          episodeId,
-          queryParams.search,
-          true,
-          queryParams.teamsPage,
-        );
-        if (isActiveLookup) {
-          setTeamsData(result);
-        }
-      } catch (err) {
-        if (isActiveLookup) {
-          setTeamsData(undefined);
-        }
-        console.error(err);
-      } finally {
-        if (isActiveLookup) {
-          setTeamsLoading(false);
-        }
-      }
-    };
-
-    void fetchTeams();
-
-    return () => {
-      isActiveLookup = false;
-    };
-  }, [episodeId, queryParams.search, queryParams.teamsPage]);
-
-  useEffect(() => {
-    let isActiveLookup = true;
-    if (scrimsLoading) return;
-    setScrimsLoading(true);
-    setScrimsData((prev) => ({ count: prev?.count ?? 0 }));
-
-    const fetchScrims = async (): Promise<void> => {
-      try {
-        const result = await getScrimmagesByTeam(
-          episodeId,
-          undefined,
-          queryParams.scrimsPage,
-        );
-        if (isActiveLookup) {
-          setScrimsData(result);
-        }
-      } catch (err) {
-        if (isActiveLookup) {
-          setScrimsData(undefined);
-        }
-        console.error(err);
-      } finally {
-        if (isActiveLookup) {
-          setScrimsLoading(false);
-        }
-      }
-    };
-
-    void fetchScrims();
-
-    return () => {
-      isActiveLookup = false;
-    };
-  }, [episodeId, queryParams.scrimsPage]);
-
-  useEffect(() => {
-    let isActiveLookup = true;
-    if (tourneyLoading) return;
-    setTourneyLoading(true);
-    setTourneyData((prev) => ({ count: prev?.count ?? 0 }));
-
-    const fetchTourney = async (): Promise<void> => {
-      try {
-        const result = await getTournamentMatches(
-          episodeId,
-          undefined,
-          undefined,
-          undefined,
-          queryParams.tourneyPage,
-        );
-        if (isActiveLookup) {
-          setTourneyData(result);
-        }
-      } catch (err) {
-        if (isActiveLookup) {
-          setTourneyData(undefined);
-        }
-        console.error(err);
-      } finally {
-        if (isActiveLookup) {
-          setTourneyLoading(false);
-        }
-      }
-    };
-
-    void fetchTourney();
-
-    return () => {
-      isActiveLookup = false;
-    };
-  }, [queryParams.tourneyPage]);
 
   return (
     <div className="flex h-full w-full flex-col overflow-auto p-6">
@@ -338,7 +183,7 @@ const Scrimmaging: React.FC = () => {
       <div className="mb-8">
         <TournamentMatchesTable
           data={tourneyData}
-          loading={tourneyLoading}
+          loading={!teamData.isSuccess || tourneyLoading}
           page={queryParams.tourneyPage}
           handlePage={(page: number) => {
             handlePage(page, "tourneyPage");

@@ -2,11 +2,12 @@ import React from "react";
 import {
   type PaginatedSubmissionList,
   StatusBccEnum,
-} from "../../../utils/types";
+} from "../../../api/_autogen";
 import type { Maybe } from "../../../utils/utilTypes";
 import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";
 import Table from "../../Table";
+import TableBottom from "../../TableBottom";
 
 const SubmissionStatusDisplays: Record<StatusBccEnum, string> = {
   [StatusBccEnum.New]: "Created",
@@ -21,14 +22,31 @@ const SubmissionStatusDisplays: Record<StatusBccEnum, string> = {
 interface SubHistoryTableProps {
   data: Maybe<PaginatedSubmissionList>;
   loading: boolean;
+  page: number;
+  handlePage: (page: number) => void;
 }
 
-const SubHistoryTable: React.FC<SubHistoryTableProps> = ({ data, loading }) => {
+const SubHistoryTable: React.FC<SubHistoryTableProps> = ({
+  data,
+  loading,
+  page,
+  handlePage,
+}) => {
   return (
     <Table
       data={data?.results ?? []}
       loading={loading}
       keyFromValue={(match) => match.id.toString()}
+      bottomElement={
+        <TableBottom
+          currentPage={page}
+          pageSize={10}
+          onPage={(page) => {
+            handlePage(page);
+          }}
+          totalCount={data?.count ?? 0}
+        />
+      }
       columns={[
         {
           header: "Submitted At",

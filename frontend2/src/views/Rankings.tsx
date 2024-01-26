@@ -1,16 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useEpisode, useEpisodeId } from "../contexts/EpisodeContext";
-import type {
-  EligibilityCriterion,
-  PaginatedTeamPublicList,
-} from "../utils/types";
+import React, { useMemo, useState } from "react";
+import { useEpisodeId } from "../contexts/EpisodeContext";
+import type { EligibilityCriterion } from "../api/_autogen";
 import { useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
-import { searchTeams } from "../utils/api/team";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import RankingsTable from "../components/tables/RankingsTable";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
+import { useEpisodeInfo } from "../api/episode/useEpisode";
+import { useSearchTeams } from "../api/team/useTeam";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface QueryParams {
   page: number;
@@ -19,14 +18,9 @@ interface QueryParams {
 
 const Rankings: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const episode = useEpisode();
+  const queryClient = useQueryClient();
 
   const [searchText, setSearchText] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [data, setData] = useState<PaginatedTeamPublicList | undefined>(
-    undefined,
-  );
-
   const [searchParams, setSearchParams] = useSearchParams();
 
   const queryParams: QueryParams = useMemo(() => {
@@ -35,6 +29,16 @@ const Rankings: React.FC = () => {
       search: searchParams.get("search") ?? "",
     };
   }, [searchParams]);
+
+  const { data: episode } = useEpisodeInfo({ id: episodeId });
+  const { data: rankingsData, isLoading: rankingsLoading } = useSearchTeams(
+    {
+      episodeId,
+      page: queryParams.page,
+      search: queryParams.search,
+    },
+    queryClient,
+  );
 
   /**
    * This enables us to look up eligibility criteria by index in the table component.
@@ -49,13 +53,13 @@ const Rankings: React.FC = () => {
   }, [episode]);
 
   function handlePage(page: number): void {
-    if (!loading) {
+    if (!rankingsLoading) {
       setSearchParams({ ...queryParams, page: page.toString() });
     }
   }
 
   function handleSearch(): void {
-    if (!loading && searchText !== queryParams.search) {
+    if (!rankingsLoading && searchText !== queryParams.search) {
       setSearchParams((prev) => ({
         ...getParamEntries(prev),
         search: searchText,
@@ -64,49 +68,13 @@ const Rankings: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    let isActiveLookup = true;
-    if (loading) return;
-    setLoading(true);
-    setData((prev) => ({ count: prev?.count ?? 0 }));
-
-    const search = async (): Promise<void> => {
-      try {
-        const result = await searchTeams(
-          episodeId,
-          queryParams.search,
-          false,
-          queryParams.page,
-        );
-        if (isActiveLookup) {
-          setData(result);
-        }
-      } catch (err) {
-        if (isActiveLookup) {
-          setData(undefined);
-        }
-        console.error(err);
-      } finally {
-        if (isActiveLookup) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void search();
-
-    return () => {
-      isActiveLookup = false;
-    };
-  }, [queryParams.search, queryParams.page, episodeId]);
-
   return (
     <div className="flex h-full w-full flex-col overflow-auto p-6">
       <div className="items-left flex w-4/5 flex-col">
         <PageTitle>Rankings</PageTitle>
         <div className="mb-4 flex w-3/5 flex-row">
           <Input
-            disabled={loading}
+            disabled={rankingsLoading}
             placeholder="Search for a team..."
             value={searchText}
             onChange={(ev) => {
@@ -120,7 +88,7 @@ const Rankings: React.FC = () => {
           />
           <div className="w-4" />
           <Button
-            disabled={loading}
+            disabled={rankingsLoading}
             label="Search!"
             variant="dark"
             onClick={() => {
@@ -131,8 +99,8 @@ const Rankings: React.FC = () => {
       </div>
 
       <RankingsTable
-        data={data}
-        loading={loading}
+        data={rankingsData}
+        loading={rankingsLoading}
         page={queryParams.page}
         eligibilityMap={eligibilityMap}
         handlePage={handlePage}
