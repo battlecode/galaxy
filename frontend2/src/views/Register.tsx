@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { createUser } from "../utils/api/user";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { type SubmitHandler, useForm } from "react-hook-form";
@@ -10,16 +9,21 @@ import {
   GenderEnum,
   type CountryEnum,
   type UserCreateRequest,
-} from "../utils/types";
-import { COUNTRIES } from "../utils/apiTypes";
+} from "../api/_autogen";
+import { COUNTRIES } from "../api/apiTypes";
 import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
 import { useNavigate } from "react-router-dom";
 import { useEpisodeId } from "../contexts/EpisodeContext";
+import { useCreateUser } from "../api/user/useUser";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Register: React.FC = () => {
-  const { login, authState } = useCurrentUser();
-  const navigate = useNavigate();
+  const { authState } = useCurrentUser();
   const { episodeId } = useEpisodeId();
+  const queryClient = useQueryClient();
+  const createUser = useCreateUser({ episodeId }, queryClient);
+  const navigate = useNavigate();
+
   const {
     register,
     watch,
@@ -27,11 +31,10 @@ const Register: React.FC = () => {
     setValue,
     setError,
     clearErrors,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<UserCreateRequest>();
   const [gender, setGender] = useState<Maybe<GenderEnum>>();
   const [country, setCountry] = useState<Maybe<CountryEnum>>();
-  const [formError, setFormError] = useState<Maybe<string>>();
   const watchSchool = watch("profile.school");
 
   useEffect(() => {
@@ -45,15 +48,9 @@ const Register: React.FC = () => {
     if (gender === undefined || country === undefined) {
       return;
     }
-    try {
-      const newUser = await createUser(data);
-      login(newUser);
-      setFormError(undefined);
-    } catch {
-      // TODO: display a more helpful error message once the API changes are made
-      setFormError("Unable to register");
-    }
+    await createUser.mutateAsync({ userCreateRequest: data });
   };
+
   return (
     <div className="flex h-screen flex-col items-center justify-center bg-gradient-to-tr from-cyan-200 to-cyan-700 p-2">
       <div className="flex flex-1 items-end text-center font-display text-5xl tracking-wide text-white sm:text-6xl">
@@ -74,12 +71,6 @@ const Register: React.FC = () => {
         }}
         className="m-6 flex w-11/12 flex-col gap-5 rounded-lg bg-gray-100 p-6 shadow-md sm:w-[550px]"
       >
-        {
-          // TODO: replace this with our custom notification component
-          formError !== undefined && (
-            <div className="text-center text-sm text-red-600">{formError}</div>
-          )
-        }
         <Input
           required
           placeholder="battlecode_player_6.9610"
@@ -186,9 +177,10 @@ const Register: React.FC = () => {
             />
           )}
         </div>
-
         <Button
           className="mt-1"
+          loading={createUser.isPending}
+          disabled={createUser.isPending || !isDirty}
           fullWidth
           label="Register"
           type="submit"

@@ -1,15 +1,17 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { useCurrentTeam } from "../../../contexts/CurrentTeamContext";
-import { useEpisode } from "../../../contexts/EpisodeContext";
 import { dateTime } from "../../../utils/dateTime";
-import type { PaginatedMatchList } from "../../../utils/types";
+import type { PaginatedMatchList } from "../../../api/_autogen";
 import type { Maybe } from "../../../utils/utilTypes";
 import Table from "../../Table";
 import TableBottom from "../../TableBottom";
 import MatchScore from "../../compete/MatchScore";
 import MatchStatus from "../../compete/MatchStatus";
 import RatingDelta from "../../compete/RatingDelta";
+import { useEpisodeInfo } from "../../../api/episode/useEpisode";
+import { useEpisodeId } from "../../../contexts/EpisodeContext";
+import { useUserTeam } from "../../../api/team/useTeam";
+import { isNil } from "lodash";
 
 interface ScrimHistoryTableProps {
   data: Maybe<PaginatedMatchList>;
@@ -24,8 +26,9 @@ const ScrimHistoryTable: React.FC<ScrimHistoryTableProps> = ({
   loading,
   handlePage,
 }) => {
-  const episode = useEpisode();
-  const { team: currentTeam } = useCurrentTeam();
+  const { episodeId } = useEpisodeId();
+  const { data: episode } = useEpisodeInfo({ id: episodeId });
+  const { data: currentTeam } = useUserTeam({ episodeId });
 
   return (
     <Table
@@ -75,7 +78,7 @@ const ScrimHistoryTable: React.FC<ScrimHistoryTableProps> = ({
           header: "Replay",
           key: "replay",
           value: (match) =>
-            episode === undefined ? (
+            isNil(episode) || isNil(match.replay_url) ? (
               <></>
             ) : (
               <NavLink

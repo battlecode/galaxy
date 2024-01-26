@@ -1,5 +1,5 @@
 import React from "react";
-import type { PaginatedScrimmageRequestList } from "../../../utils/types";
+import type { PaginatedScrimmageRequestList } from "../../../api/_autogen";
 import type { Maybe } from "../../../utils/utilTypes";
 import Table from "../../Table";
 

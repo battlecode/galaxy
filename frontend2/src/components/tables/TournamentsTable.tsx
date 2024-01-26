@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useEpisodeId } from "../../contexts/EpisodeContext";
-import type { PaginatedTournamentList } from "../../utils/types";
+import type { PaginatedTournamentList } from "../../api/_autogen";
 import type { Maybe } from "../../utils/utilTypes";
 import Table from "../Table";
 import TableBottom from "../TableBottom";

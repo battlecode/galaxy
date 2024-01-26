@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { type MatchParticipant } from "../../utils/types";
+import { type MatchParticipant } from "../../api/_autogen";
 import React from "react";
 import { useEpisodeId } from "../../contexts/EpisodeContext";
 

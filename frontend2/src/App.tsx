@@ -1,4 +1,9 @@
 import React from "react";
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import EpisodeLayout from "./components/EpisodeLayout";
 import Home from "./views/Home";
 import Logout from "./views/Logout";
@@ -17,27 +22,48 @@ import {
 import { DEFAULT_EPISODE } from "./utils/constants";
 import NotFound from "./views/NotFound";
 import Rankings from "./views/Rankings";
-import { CurrentUserProvider } from "./components/CurrentUserProvider";
+import { CurrentUserProvider } from "./contexts/CurrentUserProvider";
 import PrivateRoute from "./components/PrivateRoute";
 import Queue from "./views/Queue";
 import Resources from "./views/Resources";
-import { CurrentTeamProvider } from "./contexts/CurrentTeamProvider";
 import { EpisodeProvider } from "./contexts/EpisodeProvider";
 import Scrimmaging from "./views/Scrimmaging";
 import MyTeam from "./views/MyTeam";
 import Tournaments from "./views/Tournaments";
 import TournamentPage from "./views/Tournament";
 import Submissions from "./views/Submissions";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { toast, Toaster } from "react-hot-toast";
+import { ResponseError } from "./api/_autogen/runtime";
+import { userQueryKeys } from "./api/user/userKeys";
+
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      if (error instanceof ResponseError) {
+        // If we just have a client error, don't show a toast
+        if (error.response.status < 500) return;
+      }
+      // Otherwise, show the user a failure message
+      toast.error(`Something went wrong: ${error.message}`);
+    },
+  }),
+});
+
+queryClient.setQueryDefaults(["team"], { retry: false });
+queryClient.setQueryDefaults(userQueryKeys.meBase, { retry: false });
 
 const App: React.FC = () => {
   return (
-    <CurrentUserProvider>
-      <EpisodeProvider>
-        <CurrentTeamProvider>
+    <QueryClientProvider client={queryClient}>
+      <Toaster position="top-center" reverseOrder={false} />
+      <CurrentUserProvider>
+        <EpisodeProvider>
           <RouterProvider router={router} />
-        </CurrentTeamProvider>
-      </EpisodeProvider>
-    </CurrentUserProvider>
+        </EpisodeProvider>
+      </CurrentUserProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 };
 
@@ -85,11 +111,18 @@ const router = createBrowserRouter([
       },
       { path: "/:episodeId/*", element: <NotFound /> },
       { path: "/:episodeId/rankings", element: <Rankings /> },
-      { path: "/:episodeId/queue", element: <Queue /> },
+      {
+        path: "/:episodeId/queue",
+        element: <Queue />,
+      },
       { path: "/:episodeId/tournaments", element: <Tournaments /> },
       {
         path: "/:episodeId/tournament/:tournamentId",
         element: <TournamentPage />,
+      },
+      {
+        path: "/:episodeId/not_found",
+        element: <NotFound />,
       },
     ],
   },

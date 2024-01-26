@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { type UserPrivate } from "../utils/types";
+import { type UserPrivate } from "../api/_autogen";
 
 export enum AuthStateEnum {
   LOADING = "loading",
@@ -12,8 +12,6 @@ export type AuthState = `${AuthStateEnum}`;
 interface CurrentUserContextType {
   authState: AuthState;
   user?: UserPrivate;
-  login: (user: UserPrivate) => void;
-  logout: () => void;
 }
 
 export const CurrentUserContext = createContext<CurrentUserContextType | null>(

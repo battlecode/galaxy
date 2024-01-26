@@ -1,6 +1,8 @@
-import { TokenApi } from "../types";
+import { TokenApi } from "../_autogen";
 import Cookies from "js-cookie";
-import { DEFAULT_API_CONFIGURATION } from "./helpers";
+import { DEFAULT_API_CONFIGURATION } from "../helpers";
+import { type QueryClient } from "@tanstack/react-query";
+import { userQueryKeys } from "../user/userKeys";
 
 /** This file contains all frontend authentication functions. Responsible for interacting with Cookies and expiring/setting JWT tokens. */
 const API = new TokenApi(DEFAULT_API_CONFIGURATION);
@@ -13,6 +15,7 @@ const API = new TokenApi(DEFAULT_API_CONFIGURATION);
 export const login = async (
   username: string,
   password: string,
+  queryClient: QueryClient,
 ): Promise<void> => {
   const tokenObtainPairRequest = {
     username,
@@ -23,6 +26,22 @@ export const login = async (
 
   Cookies.set("access", res.access);
   Cookies.set("refresh", res.refresh);
+  await queryClient.refetchQueries({
+    queryKey: userQueryKeys.meBase,
+  });
+};
+
+/**
+ * Removes the access and refresh tokens in the browser's cookies.
+ * @param username The username of the user.
+ * @param password The password of the user.
+ */
+export const logout = async (queryClient: QueryClient): Promise<void> => {
+  Cookies.remove("access");
+  Cookies.remove("refresh");
+  await queryClient.refetchQueries({
+    queryKey: userQueryKeys.meBase,
+  });
 };
 
 /**
