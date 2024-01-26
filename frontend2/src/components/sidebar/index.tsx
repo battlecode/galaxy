@@ -4,7 +4,7 @@ import SidebarItem from "./SidebarItem";
 import { useEpisodeId } from "../../contexts/EpisodeContext";
 import { type IconName } from "../elements/Icon";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
-import { useCurrentTeam } from "../../contexts/CurrentTeamContext";
+import { useUserTeam } from "../../api/team/useTeam";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -93,12 +93,14 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
   collapsed = collapsed ?? false;
   const { episodeId } = useEpisodeId();
   const { user } = useCurrentUser();
-  const { team } = useCurrentTeam();
+
+  const teamData = useUserTeam({ episodeId });
+
   let teamManage;
 
   // construct teamManage if needed
   if (user !== undefined) {
-    if (team !== undefined) {
+    if (teamData.isSuccess) {
       teamManage = (
         <SidebarSection title="team management">
           {generateSidebarItems(6, 8, episodeId)}

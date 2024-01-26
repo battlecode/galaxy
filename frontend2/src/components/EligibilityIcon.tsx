@@ -1,5 +1,5 @@
 import React from "react";
-import type { EligibilityCriterion } from "../utils/types";
+import type { EligibilityCriterion } from "../api/_autogen";
 import Tooltip from "./elements/Tooltip";
 
 interface EligibilityIconProps {

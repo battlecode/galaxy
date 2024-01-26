@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { Configuration } from "../types";
+import { Configuration } from "./_autogen";
 
 // fall back to localhost for now
 export const BASE_URL =
@@ -27,3 +27,6 @@ export const downloadFile = async (
   aHelper.click();
   window.URL.revokeObjectURL(objUrl);
 };
+
+// TODO: implement me!
+// export const prefetchNextPage = async (queryClient: QueryClient) => {};

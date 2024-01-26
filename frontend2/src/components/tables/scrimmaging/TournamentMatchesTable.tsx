@@ -1,5 +1,5 @@
 import React from "react";
-import type { PaginatedMatchList } from "../../../utils/types";
+import type { PaginatedMatchList } from "../../../api/_autogen";
 import type { Maybe } from "../../../utils/utilTypes";
 import Table from "../../Table";
 import TableBottom from "../../TableBottom";
@@ -8,8 +8,10 @@ import RatingDelta from "../../compete/RatingDelta";
 import MatchStatus from "../../compete/MatchStatus";
 import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";
-import { useCurrentTeam } from "../../../contexts/CurrentTeamContext";
-import { useEpisode } from "../../../contexts/EpisodeContext";
+import { useEpisodeId } from "../../../contexts/EpisodeContext";
+import { useEpisodeInfo } from "../../../api/episode/useEpisode";
+import { useUserTeam } from "../../../api/team/useTeam";
+import { isNil } from "lodash";
 
 interface TournamentMatchesTableProps {
   data: Maybe<PaginatedMatchList>;
@@ -24,8 +26,9 @@ const TournamentMatchesTable: React.FC<TournamentMatchesTableProps> = ({
   loading,
   handlePage,
 }) => {
-  const episode = useEpisode();
-  const { team: currentTeam } = useCurrentTeam();
+  const { episodeId } = useEpisodeId();
+  const { data: episode } = useEpisodeInfo({ id: episodeId });
+  const { data: currentTeam } = useUserTeam({ episodeId });
 
   return (
     <Table
@@ -75,7 +78,7 @@ const TournamentMatchesTable: React.FC<TournamentMatchesTableProps> = ({
           header: "Replay",
           key: "replay",
           value: (match) =>
-            episode === undefined ? (
+            isNil(episode) || isNil(match.replay_url) ? (
               <></>
             ) : (
               <NavLink

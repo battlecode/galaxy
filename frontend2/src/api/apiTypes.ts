@@ -1,4 +1,7 @@
-import { type CountryEnum, GenderEnum as GeneratedGenderEnum } from "./types";
+import {
+  type CountryEnum,
+  GenderEnum as GeneratedGenderEnum,
+} from "./_autogen";
 
 export enum GenderEnum {
   FEMALE = GeneratedGenderEnum.F,
@@ -261,9 +264,3 @@ export const COUNTRIES: Record<CountryEnum, string> = {
   ZM: "Zambia",
   ZW: "Zimbabwe",
 } as const;
-
-export interface SubmissionUploadRequest {
-  file: File;
-  packageName: string;
-  description: string;
-}

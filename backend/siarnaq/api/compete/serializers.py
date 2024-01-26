@@ -236,9 +236,9 @@ class MatchParticipantSerializer(serializers.ModelSerializer):
 
 
 class MatchSerializer(serializers.ModelSerializer):
-    participants = MatchParticipantSerializer(many=True)
-    maps = serializers.SerializerMethodField()
-    replay_url = serializers.SerializerMethodField()
+    participants = MatchParticipantSerializer(many=True, allow_null=True)
+    maps = serializers.SerializerMethodField(allow_null=True)
+    replay_url = serializers.SerializerMethodField(allow_null=True)
     tournament_round = TournamentRoundSerializer(required=False, allow_null=True)
 
     class Meta:

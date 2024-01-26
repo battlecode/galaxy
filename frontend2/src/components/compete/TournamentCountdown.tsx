@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import type { Tournament } from "../../utils/types";
+import type { Tournament } from "../../api/_autogen";
 import { dateTime } from "../../utils/dateTime";
 import { NavLink } from "react-router-dom";
 

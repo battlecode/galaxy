@@ -9,6 +9,21 @@ export const enum CheckboxState {
   LOADING,
 }
 
+export const getCheckboxState = (
+  loading: boolean,
+  editMode: boolean,
+  manualCheck: boolean,
+  dataCheck: boolean,
+): CheckboxState => {
+  if (loading) {
+    return CheckboxState.LOADING;
+  } else if (editMode) {
+    return manualCheck ? CheckboxState.CHECKED : CheckboxState.UNCHECKED;
+  } else {
+    return dataCheck ? CheckboxState.CHECKED : CheckboxState.UNCHECKED;
+  }
+};
+
 interface DescriptiveCheckboxProps {
   status: CheckboxState;
   onChange: (checked: boolean) => void;
