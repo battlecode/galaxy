@@ -17,7 +17,7 @@ import {
   RouterProvider,
   createBrowserRouter,
   Navigate,
-  redirect,
+  type LoaderFunction,
 } from "react-router-dom";
 import { DEFAULT_EPISODE } from "./utils/constants";
 import NotFound from "./views/NotFound";
@@ -36,6 +36,8 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast, Toaster } from "react-hot-toast";
 import { ResponseError } from "./api/_autogen/runtime";
 import { userQueryKeys } from "./api/user/userKeys";
+import { episodeQueryKeys } from "./api/episode/episodeKeys";
+import { getEpisodeInfo } from "./api/episode/episodeApi";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -67,6 +69,17 @@ const App: React.FC = () => {
   );
 };
 
+const episodeLoader: LoaderFunction = async ({ params }) => {
+  // check if the episodeId is a valid one.
+  // if the episode is not found, throw an error.
+  const id = params.episodeId ?? "";
+  return await queryClient.fetchQuery({
+    queryKey: episodeQueryKeys.info({ id }),
+    queryFn: async () => await getEpisodeInfo({ id }),
+    staleTime: Infinity,
+  });
+};
+
 const router = createBrowserRouter([
   // Pages that should render without a sidebar/navbar
   { path: "/login", element: <Login /> },
@@ -74,60 +87,60 @@ const router = createBrowserRouter([
   { path: "/register", element: <Register /> },
   { path: "/password_forgot", element: <PasswordForgot /> },
   { path: "/password_change", element: <PasswordChange /> },
-  // Pages that should only be visible when logged in
+  // Account page doesn't have episode id in URL
   {
     element: <PrivateRoute />,
     children: [
       {
         element: <EpisodeLayout />,
-        children: [
-          {
-            path: "/:episodeId/submissions",
-            element: <Submissions />,
-          },
-          {
-            path: "/:episodeId/team",
-            element: <MyTeam />,
-          },
-          { path: "/:episodeId/scrimmaging", element: <Scrimmaging /> },
-          { path: "/account", element: <Account /> },
-        ],
+        children: [{ path: "/account", element: <Account /> }],
       },
     ],
   },
-  // Pages that will contain the episode specific sidebar and navbar
+  // Pages that will contain the episode sidebar and navbar (excl. account page)
   {
     element: <EpisodeLayout />,
+    path: "/:episodeId",
+    loader: episodeLoader,
+    errorElement: <NotFound />,
     children: [
+      {
+        // Pages that should only be visible when logged in
+        element: <PrivateRoute />,
+        children: [
+          {
+            path: "submissions",
+            element: <Submissions />,
+          },
+          {
+            path: "team",
+            element: <MyTeam />,
+          },
+          {
+            path: "scrimmaging",
+            element: <Scrimmaging />,
+          },
+        ],
+      },
       // Pages that should always be visible
-      { path: "/:episodeId/resources", element: <Resources /> },
-      { path: "/:episodeId/quickstart", element: <QuickStart /> },
-      { path: "/:episodeId/home", element: <Home /> },
+      { path: "", element: <Home /> },
+      { path: "home", element: <Home /> },
+      { path: "resources", element: <Resources /> },
+      { path: "quickstart", element: <QuickStart /> },
+      { path: "rankings", element: <Rankings /> },
+      { path: "queue", element: <Queue /> },
+      { path: "tournaments", element: <Tournaments /> },
       {
-        path: "/:episodeId/",
-        loader: ({ params }) => {
-          return redirect(`/${params.episodeId as string}/home`);
-        },
-      },
-      { path: "/:episodeId/*", element: <NotFound /> },
-      { path: "/:episodeId/rankings", element: <Rankings /> },
-      {
-        path: "/:episodeId/queue",
-        element: <Queue />,
-      },
-      { path: "/:episodeId/tournaments", element: <Tournaments /> },
-      {
-        path: "/:episodeId/tournament/:tournamentId",
+        path: "tournament/:tournamentId",
         element: <TournamentPage />,
       },
       {
-        path: "/:episodeId/not_found",
+        path: "*",
         element: <NotFound />,
       },
     ],
   },
-  // Pages that should redirect
-  { path: "/*", element: <Navigate to={`/${DEFAULT_EPISODE}/home`} /> },
+  { path: "/", element: <Navigate to={`/${DEFAULT_EPISODE}/home`} /> },
 ]);
 
 export default App;
