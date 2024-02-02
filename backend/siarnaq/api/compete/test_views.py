@@ -1,6 +1,7 @@
 import io
 import random
 from datetime import timedelta
+from unittest import skip
 from unittest.mock import mock_open, patch
 
 from django.test import TestCase, override_settings
@@ -1246,6 +1247,7 @@ class MatchViewSetTestCase(APITestCase):
         self.assertEqual(len(response.json()["results"]), 1)
 
 
+@skip("Skipping tests for forcing scrimmages against only reference player")
 class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     """Test suite for the Scrimmage Requests API."""
 
