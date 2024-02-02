@@ -171,6 +171,12 @@ class ScrimmageRequestForm extends Component {
                 </button>
               </div>
               <div className="modal-body">
+                <p className="text-danger">
+                  Note: only scrimmage requests against Reference Player are
+                  allowed for now. This restriction is to enable our MIT class's
+                  students to submit their bots to pass the class, and will be
+                  removed after Friday.
+                </p>
                 <div className="form-group">
                   <label>Player order</label>
                   <select
