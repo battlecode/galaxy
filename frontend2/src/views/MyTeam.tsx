@@ -1,18 +1,18 @@
 import React, { type EventHandler, useMemo, useState } from "react";
-import { PageTitle } from "../components/elements/BattlecodeStyle";
-import SectionCard from "../components/SectionCard";
-import Input from "../components/elements/Input";
-import TextArea from "../components/elements/TextArea";
-import Button from "../components/elements/Button";
+import { PageTitle } from "components/elements/BattlecodeStyle";
+import SectionCard from "components/SectionCard";
+import Input from "components/elements/Input";
+import TextArea from "components/elements/TextArea";
+import Button from "components/elements/Button";
 import MemberList from "../components/team/MemberList";
-import Modal from "../components/Modal";
-import EligibilitySettings from "../components/team/EligibilitySettings";
-import ScrimmageSettings from "../components/team/ScrimmageSettings";
-import { useEpisodeId } from "../contexts/EpisodeContext";
-import { useLeaveTeam, useUpdateTeam, useUserTeam } from "../api/team/useTeam";
+import Modal from "components/Modal";
+import EligibilitySettings from "components/team/EligibilitySettings";
+import ScrimmageSettings from "components/team/ScrimmageSettings";
+import { useEpisodeId } from "contexts/EpisodeContext";
+import { useLeaveTeam, useUpdateTeam, useUserTeam } from "api/team/useTeam";
 import { useQueryClient } from "@tanstack/react-query";
 import JoinTeam from "./JoinTeam";
-import Loading from "../components/Loading";
+import Loading from "components/Loading";
 import { type SubmitHandler, useForm } from "react-hook-form";
 
 interface InfoFormInput {

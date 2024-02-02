@@ -9,6 +9,7 @@ import TableBottom from "../TableBottom";
 import { NavLink } from "react-router-dom";
 import EligibilityIcon from "../EligibilityIcon";
 import { isPresent } from "../../utils/utilTypes";
+import { useEpisodeId } from "../../contexts/EpisodeContext";
 
 interface RankingsTableProps {
   data: Maybe<PaginatedTeamPublicList>;
@@ -32,6 +33,8 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
   eligibilityMap,
   handlePage,
 }) => {
+  const { episodeId } = useEpisodeId();
+
   return (
     <Table
       data={data?.results ?? []}
@@ -57,7 +60,10 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
           header: "Team",
           key: "team",
           value: (team) => (
-            <NavLink to={`/team/${team.id}`} className="hover:underline">
+            <NavLink
+              to={`${episodeId}/team/${team.id}`}
+              className="hover:underline"
+            >
               {team.name}
             </NavLink>
           ),
