@@ -5,7 +5,6 @@ import structlog
 from django.conf import settings
 from django.db import NotSupportedError, transaction
 from django.db.models import Exists, OuterRef, Q, Subquery
-from django.http import HttpResponseForbidden
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
@@ -543,9 +542,6 @@ class ScrimmageRequestViewSet(
     def create(self, request, *, episode_id):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        if serializer.validated_data["requested_to"].pk != 842:
-            return HttpResponseForbidden()
 
         if serializer.validated_data["is_ranked"]:
             active_statuses = {
