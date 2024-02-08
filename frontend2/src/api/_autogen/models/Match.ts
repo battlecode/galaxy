@@ -25,6 +25,12 @@ import {
     StatusBccEnumFromJSONTyped,
     StatusBccEnumToJSON,
 } from './StatusBccEnum';
+import type { TournamentRound } from './TournamentRound';
+import {
+    TournamentRoundFromJSON,
+    TournamentRoundFromJSONTyped,
+    TournamentRoundToJSON,
+} from './TournamentRound';
 
 /**
  * 
@@ -52,10 +58,10 @@ export interface Match {
     readonly episode: string;
     /**
      * 
-     * @type {number}
+     * @type {TournamentRound}
      * @memberof Match
      */
-    readonly tournament_round: number | null;
+    tournament_round?: TournamentRound | null;
     /**
      * 
      * @type {Array<MatchParticipant>}
@@ -102,7 +108,6 @@ export function instanceOfMatch(value: object): boolean {
     isInstance = isInstance && "id" in value;
     isInstance = isInstance && "status" in value;
     isInstance = isInstance && "episode" in value;
-    isInstance = isInstance && "tournament_round" in value;
     isInstance = isInstance && "participants" in value;
     isInstance = isInstance && "maps" in value;
     isInstance = isInstance && "alternate_order" in value;
@@ -126,7 +131,7 @@ export function MatchFromJSONTyped(json: any, ignoreDiscriminator: boolean): Mat
         'id': json['id'],
         'status': StatusBccEnumFromJSON(json['status']),
         'episode': json['episode'],
-        'tournament_round': json['tournament_round'],
+        'tournament_round': !exists(json, 'tournament_round') ? undefined : TournamentRoundFromJSON(json['tournament_round']),
         'participants': (json['participants'] === null ? null : (json['participants'] as Array<any>).map(MatchParticipantFromJSON)),
         'maps': json['maps'],
         'alternate_order': json['alternate_order'],
@@ -145,6 +150,7 @@ export function MatchToJSON(value?: Match | null): any {
     }
     return {
         
+        'tournament_round': TournamentRoundToJSON(value.tournament_round),
         'participants': (value.participants === null ? null : (value.participants as Array<any>).map(MatchParticipantToJSON)),
     };
 }

@@ -1,6 +1,0 @@
-{
-  "eslint.workingDirectories": ["./frontend2"],
-  "editor.detectIndentation": false,
-  "editor.tabSize": 2,
-  "editor.insertSpaces": true
-}

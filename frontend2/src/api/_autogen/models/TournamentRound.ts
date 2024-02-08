@@ -62,6 +62,12 @@ export interface TournamentRound {
      * @memberof TournamentRound
      */
     release_status?: ReleaseStatusEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof TournamentRound
+     */
+    display_order: number;
 }
 
 /**
@@ -72,6 +78,7 @@ export function instanceOfTournamentRound(value: object): boolean {
     isInstance = isInstance && "id" in value;
     isInstance = isInstance && "tournament" in value;
     isInstance = isInstance && "name" in value;
+    isInstance = isInstance && "display_order" in value;
 
     return isInstance;
 }
@@ -92,6 +99,7 @@ export function TournamentRoundFromJSONTyped(json: any, ignoreDiscriminator: boo
         'name': json['name'],
         'maps': !exists(json, 'maps') ? undefined : json['maps'],
         'release_status': !exists(json, 'release_status') ? undefined : ReleaseStatusEnumFromJSON(json['release_status']),
+        'display_order': json['display_order'],
     };
 }
 
@@ -109,6 +117,7 @@ export function TournamentRoundToJSON(value?: TournamentRound | null): any {
         'name': value.name,
         'maps': value.maps,
         'release_status': ReleaseStatusEnumToJSON(value.release_status),
+        'display_order': value.display_order,
     };
 }
 
