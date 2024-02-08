@@ -206,7 +206,10 @@ paths:
   /api/compete/{episode_id}/match/tournament/:
     get:
       operationId: compete_match_tournament_list
-      description: List matches played in a tournament.
+      description: |-
+        List matches played in a tournament, or in all tournaments if not specified.
+        Passing the external_id_private of a tournament allows match lookup for the
+        tournament, even if it's private. Client uses the external_id_private parameter
       parameters:
       - in: path
         name: episode_id
@@ -214,6 +217,11 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
+      - in: query
+        name: external_id_private
+        schema:
+          type: string
+        description: A private id to filter for.
       - name: page
         required: false
         in: query
@@ -2213,8 +2221,8 @@ components:
           type: string
           readOnly: true
         tournament_round:
-          type: integer
-          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/TournamentRound'
           nullable: true
         participants:
           type: array
@@ -2251,7 +2259,6 @@ components:
       - participants
       - replay_url
       - status
-      - tournament_round
     MatchParticipant:
       type: object
       properties:
@@ -3093,7 +3100,10 @@ components:
             type: integer
         release_status:
           $ref: '#/components/schemas/ReleaseStatusEnum'
+        display_order:
+          type: integer
       required:
+      - display_order
       - id
       - name
       - tournament

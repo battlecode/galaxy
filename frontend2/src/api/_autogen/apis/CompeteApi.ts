@@ -94,6 +94,7 @@ export interface CompeteMatchScrimmageListRequest {
 
 export interface CompeteMatchTournamentListRequest {
     episodeId: string;
+    externalIdPrivate?: string;
     page?: number;
     roundId?: number;
     teamId?: number;
@@ -470,7 +471,7 @@ export class CompeteApi extends runtime.BaseAPI {
     }
 
     /**
-     * List matches played in a tournament.
+     * List matches played in a tournament, or in all tournaments if not specified. Passing the external_id_private of a tournament allows match lookup for the tournament, even if it\'s private. Client uses the external_id_private parameter
      */
     async competeMatchTournamentListRaw(requestParameters: CompeteMatchTournamentListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedMatchList>> {
         if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
@@ -478,6 +479,10 @@ export class CompeteApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters.externalIdPrivate !== undefined) {
+            queryParameters['external_id_private'] = requestParameters.externalIdPrivate;
+        }
 
         if (requestParameters.page !== undefined) {
             queryParameters['page'] = requestParameters.page;
@@ -516,7 +521,7 @@ export class CompeteApi extends runtime.BaseAPI {
     }
 
     /**
-     * List matches played in a tournament.
+     * List matches played in a tournament, or in all tournaments if not specified. Passing the external_id_private of a tournament allows match lookup for the tournament, even if it\'s private. Client uses the external_id_private parameter
      */
     async competeMatchTournamentList(requestParameters: CompeteMatchTournamentListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedMatchList> {
         const response = await this.competeMatchTournamentListRaw(requestParameters, initOverrides);
