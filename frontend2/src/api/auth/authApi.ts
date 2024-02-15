@@ -39,7 +39,7 @@ export const login = async (
 export const logout = async (queryClient: QueryClient): Promise<void> => {
   Cookies.remove("access");
   Cookies.remove("refresh");
-  await queryClient.refetchQueries({
+  await queryClient.resetQueries({
     queryKey: userQueryKeys.meBase,
   });
 };
@@ -51,9 +51,12 @@ export const logout = async (queryClient: QueryClient): Promise<void> => {
  * Callers of this method should check this, before rendering their logged-in or un-logged-in versions.
  * If not logged in, then api calls will give 403s, this function will return false, and the website will tell you to log in anyways.
  */
-export const loginCheck = async (): Promise<boolean> => {
+export const loginCheck = async (
+  queryClient: QueryClient,
+): Promise<boolean> => {
   const accessToken = Cookies.get("access");
   if (accessToken === undefined) {
+    await logout(queryClient);
     return false;
   }
   try {
@@ -62,6 +65,7 @@ export const loginCheck = async (): Promise<boolean> => {
     });
     return true;
   } catch {
+    await logout(queryClient);
     return false;
   }
 };
