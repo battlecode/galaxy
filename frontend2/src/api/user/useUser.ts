@@ -36,10 +36,12 @@ import { login, loginCheck } from "../auth/authApi";
 /**
  * For checking if a user is logged in.
  */
-export const useIsLoggedIn = (): UseQueryResult<boolean, Error> =>
+export const useIsLoggedIn = (
+  queryClient: QueryClient,
+): UseQueryResult<boolean, Error> =>
   useQuery({
     queryKey: userQueryKeys.tokenVerify,
-    queryFn: async () => await loginCheck(),
+    queryFn: async () => await loginCheck(queryClient),
     staleTime: Infinity,
   });
 

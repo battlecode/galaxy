@@ -37,7 +37,11 @@ import { toast, Toaster } from "react-hot-toast";
 import { ResponseError } from "./api/_autogen/runtime";
 import { episodeQueryKeys } from "./api/episode/episodeKeys";
 import { getEpisodeInfo } from "./api/episode/episodeApi";
+<<<<<<< Updated upstream
 import { submissionsLoader } from "./api/loaders/submissionsLoader";
+=======
+import { loginCheck } from "./api/auth/authApi";
+>>>>>>> Stashed changes
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -73,6 +77,9 @@ const episodeLoader: LoaderFunction = async ({ params }) => {
   // check if the episodeId is a valid one.
   // if the episode is not found, throw an error.
   const id = params.episodeId ?? "";
+  // Verify that the current token is valid first!
+  await loginCheck(queryClient);
+  // Now we can fetch the episode info.
   return await queryClient.fetchQuery({
     queryKey: episodeQueryKeys.info({ id }),
     queryFn: async () => await getEpisodeInfo({ id }),
