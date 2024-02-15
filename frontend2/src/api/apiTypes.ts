@@ -1,7 +1,44 @@
+import type { QueryClient, QueryKey } from "@tanstack/react-query";
 import {
   type CountryEnum,
   GenderEnum as GeneratedGenderEnum,
 } from "./_autogen";
+
+type QueryKeyCallable<T> = {
+  key: (request: T) => QueryKey;
+  type: "callable";
+};
+type QueryKeyLiteral = {
+  key: QueryKey;
+  type: "literal";
+};
+
+export type QueryKeyBuilder<T> = QueryKeyCallable<T> | QueryKeyLiteral;
+
+export type QueryFuncBuilder<T, K = void> = (request: T) => Promise<K>;
+export type PaginatedQueryFuncBuilder<T, K = void> = (
+  request: T,
+  queryClient: QueryClient,
+  prefetchNext: boolean,
+) => Promise<K>;
+
+export type QueryFactory<T, K> = {
+  queryKey: QueryKeyBuilder<T>;
+  queryFn: QueryFuncBuilder<T, K>;
+};
+export type PaginatedQueryFactory<T, K> = {
+  queryKey: QueryKeyBuilder<T>;
+  queryFn: PaginatedQueryFuncBuilder<T, K>;
+};
+
+export interface PaginatedRequestMinimal {
+  page?: number;
+}
+export interface PaginatedResultMinimal {
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
+}
 
 export enum GenderEnum {
   FEMALE = GeneratedGenderEnum.F,

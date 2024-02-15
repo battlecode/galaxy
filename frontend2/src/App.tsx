@@ -35,9 +35,9 @@ import Submissions from "./views/Submissions";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast, Toaster } from "react-hot-toast";
 import { ResponseError } from "./api/_autogen/runtime";
-import { userQueryKeys } from "./api/user/userKeys";
 import { episodeQueryKeys } from "./api/episode/episodeKeys";
 import { getEpisodeInfo } from "./api/episode/episodeApi";
+import { submissionsLoader } from "./api/loaders/submissionsLoader";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -53,7 +53,7 @@ const queryClient = new QueryClient({
 });
 
 queryClient.setQueryDefaults(["team"], { retry: false });
-queryClient.setQueryDefaults(userQueryKeys.meBase, { retry: false });
+queryClient.setQueryDefaults(["user"], { retry: false });
 
 const App: React.FC = () => {
   return (
@@ -111,6 +111,7 @@ const router = createBrowserRouter([
           {
             path: "submissions",
             element: <Submissions />,
+            loader: submissionsLoader(queryClient),
           },
           {
             path: "team",

@@ -7,63 +7,130 @@ import type {
   CompeteSubmissionListRequest,
   CompeteSubmissionTournamentListRequest,
 } from "../_autogen";
+import { QueryKeyBuilder } from "../apiTypes";
+import { buildKey } from "../helpers";
 
-// ---------- KEY FACTORIES ---------- //
-export const competeQueryKeys = {
+type CompeteRequest =
+  | CompeteMatchListRequest
+  | CompeteMatchScrimmageListRequest
+  | CompeteMatchTournamentListRequest
+  | CompeteRequestInboxListRequest
+  | CompeteRequestOutboxListRequest
+  | CompeteSubmissionListRequest
+  | CompeteSubmissionTournamentListRequest;
+
+// ---------- KEY RECORDS ---------- //
+export const competeQueryKeys: Record<
+  string,
+  QueryKeyBuilder<CompeteRequest>
+> = {
   // --- SUBMISSIONS --- //
-  subBase: ({ episodeId }: { episodeId: string }) =>
-    ["compete", episodeId, "submissions"] as const,
+  subBase: {
+    key: ({ episodeId }: { episodeId: string }) =>
+      ["compete", episodeId, "submissions"] as const,
+    type: "callable",
+  },
 
-  subList: ({ episodeId, page }: CompeteSubmissionListRequest) =>
-    [...competeQueryKeys.subBase({ episodeId }), "list", page] as const,
+  subList: {
+    key: ({ episodeId, page = 1 }: CompeteSubmissionListRequest) =>
+      [
+        ...buildKey(competeQueryKeys.subBase, { episodeId }),
+        "list",
+        page,
+      ] as const,
+    type: "callable",
+  },
 
-  tourneySubs: ({ episodeId }: CompeteSubmissionTournamentListRequest) =>
-    [...competeQueryKeys.subBase({ episodeId }), "tournament"] as const,
+  tourneySubs: {
+    key: ({ episodeId }: CompeteSubmissionTournamentListRequest) =>
+      [
+        ...buildKey(competeQueryKeys.subBase, { episodeId }),
+        "tournament",
+      ] as const,
+    type: "callable",
+  },
 
   // --- SCRIMMAGES --- //
-  scrimBase: ({ episodeId }: { episodeId: string }) =>
-    ["compete", episodeId, "scrimmages"] as const,
+  scrimBase: {
+    key: ({ episodeId }: { episodeId: string }) =>
+      ["compete", episodeId, "scrimmages"] as const,
+    type: "callable",
+  },
 
-  inbox: ({ episodeId, page }: CompeteRequestInboxListRequest) =>
-    [...competeQueryKeys.scrimBase({ episodeId }), "inbox", page] as const,
+  inbox: {
+    key: ({ episodeId, page = 1 }: CompeteRequestInboxListRequest) =>
+      [
+        ...buildKey(competeQueryKeys.scrimBase, { episodeId }),
+        "inbox",
+        page,
+      ] as const,
+    type: "callable",
+  },
 
-  outbox: ({ episodeId, page }: CompeteRequestOutboxListRequest) =>
-    [...competeQueryKeys.scrimBase({ episodeId }), "outbox", page] as const,
+  outbox: {
+    key: ({ episodeId, page = 1 }: CompeteRequestOutboxListRequest) =>
+      [
+        ...buildKey(competeQueryKeys.scrimBase, { episodeId }),
+        "outbox",
+        page,
+      ] as const,
+    type: "callable",
+  },
 
-  scrimsMeList: ({ episodeId, page }: CompeteMatchScrimmageListRequest) =>
-    [...competeQueryKeys.scrimBase({ episodeId }), "list", "me", page] as const,
+  scrimsMeList: {
+    key: ({ episodeId, page = 1 }: CompeteMatchScrimmageListRequest) =>
+      [
+        ...buildKey(competeQueryKeys.scrimBase, { episodeId }),
+        "list",
+        "me",
+        page,
+      ] as const,
+    type: "callable",
+  },
 
-  scrimsOtherList: ({
-    episodeId,
-    teamId,
-    page,
-  }: CompeteMatchScrimmageListRequest) =>
-    [
-      ...competeQueryKeys.scrimBase({ episodeId }),
-      "list",
-      teamId,
-      page,
-    ] as const,
+  scrimsOtherList: {
+    key: ({ episodeId, teamId, page = 1 }: CompeteMatchScrimmageListRequest) =>
+      [
+        ...buildKey(competeQueryKeys.scrimBase, { episodeId }),
+        "list",
+        teamId,
+        (page = 1),
+      ] as const,
+    type: "callable",
+  },
 
   // --- MATCHES --- //
-  matchBase: ({ episodeId }: { episodeId: string }) =>
-    ["compete", episodeId, "matches"] as const,
+  matchBase: {
+    key: ({ episodeId }: { episodeId: string }) =>
+      ["compete", episodeId, "matches"] as const,
+    type: "callable",
+  },
 
-  matchList: ({ episodeId, page }: CompeteMatchListRequest) =>
-    [...competeQueryKeys.matchBase({ episodeId }), "list", page] as const,
+  matchList: {
+    key: ({ episodeId, page = 1 }: CompeteMatchListRequest) =>
+      [
+        ...buildKey(competeQueryKeys.matchBase, { episodeId }),
+        "list",
+        page,
+      ] as const,
+    type: "callable",
+  },
 
-  tourneyMatchList: ({
-    episodeId,
-    teamId,
-    tournamentId,
-    roundId,
-    page,
-  }: CompeteMatchTournamentListRequest) =>
-    [
-      ...competeQueryKeys.matchBase({ episodeId }),
-      "tournament",
-      { tournamentId, roundId, teamId, page },
-    ] as const,
+  tourneyMatchList: {
+    key: ({
+      episodeId,
+      teamId,
+      tournamentId,
+      roundId,
+      page = 1,
+    }: CompeteMatchTournamentListRequest) =>
+      [
+        ...buildKey(competeQueryKeys.matchBase, { episodeId }),
+        "tournament",
+        { tournamentId, roundId, teamId, page },
+      ] as const,
+    type: "callable",
+  },
 };
 
 export const competeMutationKeys = {

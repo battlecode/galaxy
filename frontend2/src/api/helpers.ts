@@ -1,5 +1,14 @@
 import Cookies from "js-cookie";
-import { Configuration } from "./_autogen";
+import { Configuration, ResponseError } from "./_autogen";
+import {
+  PaginatedQueryFuncBuilder,
+  PaginatedRequestMinimal,
+  PaginatedResultMinimal,
+  QueryKeyBuilder,
+} from "./apiTypes";
+import { QueryClient } from "@tanstack/react-query";
+import { isPresent } from "../utils/utilTypes";
+import toast from "react-hot-toast";
 
 // fall back to localhost for now
 export const BASE_URL =
@@ -28,5 +37,42 @@ export const downloadFile = async (
   window.URL.revokeObjectURL(objUrl);
 };
 
-// TODO: implement me!
-// export const prefetchNextPage = async (queryClient: QueryClient) => {};
+export const buildKey = <T>(keyBuilder: QueryKeyBuilder<T>, request: T) => {
+  if (keyBuilder.type === "callable") {
+    return keyBuilder.key(request);
+  }
+  return keyBuilder.key;
+};
+
+/**
+ * TODO: create spec. Note that this func handles the ispresent check for the next page!!
+ * @param request
+ * @param result
+ * @param queryKey
+ * @param queryFn
+ * @param queryClient
+ */
+export const prefetchNextPage = async <
+  T extends PaginatedRequestMinimal,
+  K extends PaginatedResultMinimal,
+>(
+  request: T,
+  result: PaginatedResultMinimal,
+  queryKey: QueryKeyBuilder<T>,
+  queryFn: PaginatedQueryFuncBuilder<T, K>,
+  queryClient: QueryClient,
+) => {
+  if (isPresent(result.next)) {
+    // If no page provided, then we just fetched page 1
+    const nextPage = isPresent(request.page) ? request.page + 1 : 2;
+    try {
+      await queryClient.prefetchQuery({
+        queryKey: buildKey(queryKey, { ...request, page: nextPage }),
+        queryFn: async () =>
+          await queryFn({ ...request, page: nextPage }, queryClient, false),
+      });
+    } catch (e) {
+      toast.error((e as ResponseError).message);
+    }
+  }
+};
