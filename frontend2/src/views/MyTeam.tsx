@@ -20,6 +20,32 @@ interface InfoFormInput {
   biography: string;
 }
 import {FlexibleWidthXYPlot, XYPlot, XAxis, YAxis, HorizontalGridLines, VerticalGridLines, LineSeries} from 'react-vis';
+// import { HistoricalRating } from "../utils/types";
+
+import { HistoricalRating, HistoricalRatingFromJSON } from '../utils/types';
+
+async function fetchHistoricalRatings(apiEndpoint) {
+  try {
+    const response = await fetch(apiEndpoint);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch data. Status: ${response.status}`);
+    }
+
+    // const data = await response.json();
+
+    // Assuming the API response is an array of historical ratings
+    // return data.map((entry: { results: any; }) => HistoricalRatingFromJSON(entry.results));
+  } catch (error) {
+    console.error('Error fetching historical ratings:', error);
+    return [];
+  }
+}
+
+// // Usage
+const apiEndpoint = 'https://api.example.com/historical-ratings';
+const historicalRatings = await fetchHistoricalRatings(apiEndpoint);
+
 
 
 const MyTeam: React.FC = () => {
@@ -112,19 +138,7 @@ const MyTeam: React.FC = () => {
     <div className="p-6">
       <PageTitle>Team Settings</PageTitle>
       <div className="grow flex-col gap-8 xl:flex-row">
-        <SectionCard title="history">
-          <div className="grow">
 
-          <FlexibleWidthXYPlot
-            height={300}>
-            <HorizontalGridLines />
-            <LineSeries
-              data={data}/>
-            <XAxis />
-            <YAxis />
-          </FlexibleWidthXYPlot>
-          </div>
-        </SectionCard>
       </div>
       <div className="flex flex-col gap-8 xl:flex-row">
         <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
@@ -175,13 +189,35 @@ const MyTeam: React.FC = () => {
           <SectionCard className="shrink xl:hidden" title="Members">
             {membersList}
           </SectionCard>
+          <SectionCard className="shrink xl:hidden" title="History">
+          <FlexibleWidthXYPlot
+            height={300}>
+            <HorizontalGridLines />
+            <LineSeries
+              data={data}/>
+            <XAxis />
+            <YAxis />
+          </FlexibleWidthXYPlot>
+        </SectionCard>
           <EligibilitySettings />
           <ScrimmageSettings />
         </div>
         {/* The members list that displays to the right side when on a big screen. */}
-        <SectionCard className="hidden w-1/3 shrink xl:block" title="Members">
+        <div className="hidden w-1/3 shrink xl:block">
+        <SectionCard title="Members">
           {membersList}
         </SectionCard>
+        <SectionCard className="mt-4" title="History">
+          <FlexibleWidthXYPlot
+            height={300}>
+            <HorizontalGridLines />
+            <LineSeries
+              data={data}/>
+            <XAxis />
+            <YAxis />
+          </FlexibleWidthXYPlot>
+        </SectionCard>
+        </div>
       </div>
       {/* The confirmation modal that pops up when a user clicks "Leave Team" */}
       <Modal
