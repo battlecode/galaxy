@@ -12,7 +12,10 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
 - Add episode to backend
   - This should be easy via the admin panel. You'll have to add various information there
 - Add tournaments to backend
-  - If exact tournaments and schedule is not known, estimates are fine. (Or you can skip this step for now.)
+  - If exact tournaments and schedule is not known, estimates are fine. Or you can skip this step for now. Make sure you come back to it though!
+  - **Tournament times / deadlines should be set to be slightly later than the nominal time. For example, if a tournament is nominally 7pm, set the submission freeze time to something like 7:00:30 or 7:01.**
+    - This allows for leniency with differences in clocks.
+    - Also, this enables an autoscrimmage round to run before the submission deadline, which can be helpful to converge seeds.
 - Create the team of Teh Devs
 - Have new devs create accounts.
 - For _only to the people who need this_, make their accounts "admin" accounts. (Any other admin can do this from the admin panel with their IDs.) Please be cautious, safe, and secure!!
@@ -25,6 +28,7 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
   - Tournament info
 - Release a new version of the frontend.
 - Release a new _private_ (at first) version of the engine and client when ready. Instructions for this should be in the respective readme. (You can ask their teams to do it -- in fact, this is arguably better, for shared knowledge.)
+- **Give, to the battlecodedownloadpackage "account", access to the scaffold.**
 - Now there are quite a few important things to test...
 - **Test that a game can be played on the website!** Create a couple teams, submit some bots, queue up a match, etc.
 - Also, **test that both clients -- web-based and native -- work!** Grab the replay from that match and load it in.
@@ -34,17 +38,35 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
 
 ### The release!
 
-- **At the start of the first IAP lecture, release a new public version of the game!**
+- **At the start of the first IAP lecture (roughly 7pm sharp), release a new _public_ version of the game!**
+  - Ensure that the release info in `release.yml` in the engine/client repository has `IS_PUBLIC: YES`.
+  - Also, have this version be v1.0.0 .
+  - You can ask the engine/client teams to do this, like with the prerelease testing versions.
 
 ## Get dev permissions
 
 TODO, tracked in #681
+
+Then, a dev with admin permissions can go to https://api.battlecode.org/admin to do a bunch of cool things.
 
 ## Add a dev to any team
 
 TODO, tracked in #681
 
 This enables lots of cool technical support things. Most notably, **this is the (currently) "unofficial-official" way to view and download a team's submissions and replays**, which is helpful in debugging.
+
+## Monitoring
+
+Occasionally things might break. Then, Discord might light on fire, and Discord notifications/pings might light on fire.
+
+Other symptoms include:
+
+- Many failed submissio compilations or match runs
+- In a Pub/Sub, lots of un-acknowledged messages
+
+## Debugging
+
+Issues with failing runs of submission compilations or matches can sometimes be resolved via a admin requeue. To do this, in the admin panel, select the checkbox for each submission/match, and then go to the dropdown above the table and select "Force requeue". This approach is quick and requires no code change, so it's always an easy place to start.
 
 ## Resetting people's passwords
 
@@ -55,3 +77,9 @@ Sometimes, password resets don't go through, since users never get the emails, d
 ## Administering Backend Emails through Mailjet
 
 If automated emails from the backend server stop sending, or if you have other issues with these emails, see `emails.md` in this folder. Feel free to add any new notes there too!
+
+## Getting competitors' email addresses
+
+TODO write me
+
+Getting a _single_ episode's email addresses of competitors is not yet supported, and is being tracked in #691.
