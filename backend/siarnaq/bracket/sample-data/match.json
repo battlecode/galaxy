@@ -1,0 +1,62 @@
+{
+  "data": {
+    "id": "350944920",
+    "type": "match",
+    "attributes": {
+      "state": "complete",
+      "round": 1,
+      "identifier": "A",
+      "scores": "0 - 1",
+      "suggested_play_order": 1,
+      "score_in_sets": [[0, 1]],
+      "points_by_participant": [
+        {
+          "participant_id": 221134365,
+          "scores": [0]
+        },
+        {
+          "participant_id": 221134366,
+          "scores": [1]
+        }
+      ],
+      "timestamps": {
+        "started_at": "2024-01-15T00:50:33.213Z",
+        "created_at": "2024-01-15T00:50:33.146Z",
+        "updated_at": "2024-01-15T01:28:34.667Z",
+        "underway_at": null
+      },
+      "winner_id": 221134366,
+      "tie": false
+    },
+    "relationships": {
+      "attachments": {
+        "data": [
+          {
+            "id": "846883",
+            "type": "match_attachment"
+          }
+        ],
+        "links": {
+          "related": "https://api.challonge.com/v2.1/tournaments/13984246/matches/350944920/attachments.json",
+          "meta": {
+            "count": 1
+          }
+        }
+      }
+    }
+  },
+  "included": [
+    {
+      "id": "846883",
+      "type": "match_attachment",
+      "attributes": {
+        "url": "https://www.google.com/maps",
+        "description": "Google Maps",
+        "timestamps": {
+          "created_at": "2024-01-15T02:17:34.853Z",
+          "updated_at": "2024-01-15T02:17:34.853Z"
+        }
+      }
+    }
+  ]
+}
