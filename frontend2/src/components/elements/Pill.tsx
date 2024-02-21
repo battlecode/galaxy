@@ -4,7 +4,7 @@ import Icon from "./Icon";
 interface PillProps {
   text: string;
   deletable?: boolean;
-  onDelete?: (ev?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onDelete?: (ev?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   className?: string;
 }
 
@@ -20,15 +20,15 @@ const Pill: React.FC<PillProps> = ({
     >
       <span>{text}</span>
       {deletable && (
-        <button
+        <div
           onClick={(ev) => {
             onDelete?.(ev);
             ev.stopPropagation();
           }}
-          className="cursor-pointer items-center rounded "
+          className="cursor-pointer items-center rounded hover:text-cyan-950"
         >
           <Icon name="x_mark" size="xs" />
-        </button>
+        </div>
       )}
     </div>
   );

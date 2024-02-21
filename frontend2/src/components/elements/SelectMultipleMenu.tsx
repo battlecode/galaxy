@@ -78,7 +78,7 @@ function SelectMultipleMenu<T extends React.Key | null | undefined>({
             </div>
             <div
               className="flex transform items-center
-              transition duration-300 ui-open:rotate-180"
+              transition duration-300 ui-open:rotate-180 ui-not-open:rotate-0"
             >
               <Icon name="chevron_down" size="sm" />
             </div>
@@ -101,7 +101,7 @@ function SelectMultipleMenu<T extends React.Key | null | undefined>({
                   value={option.value}
                 >
                   <div className="overflow-x-auto pr-2">{option.label}</div>
-                  <span className=" hidden items-center text-cyan-900 ui-selected:flex">
+                  <span className="hidden items-center text-cyan-900 ui-selected:flex">
                     <Icon name="check" size="sm" />
                   </span>
                 </Listbox.Option>

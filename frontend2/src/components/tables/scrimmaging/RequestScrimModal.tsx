@@ -13,9 +13,7 @@ import { clone } from "lodash";
 import SelectMenu from "components/elements/SelectMenu";
 import SelectMultipleMenu from "components/elements/SelectMultipleMenu";
 import Button from "components/elements/Button";
-import DescriptiveCheckbox, {
-  CheckboxState,
-} from "components/elements/DescriptiveCheckbox";
+import Checkbox from "components/elements/Checkbox";
 
 interface RequestScrimModalProps {
   teamToRequest: TeamPublic;
@@ -24,7 +22,7 @@ interface RequestScrimModalProps {
   closeModal: () => void;
 }
 
-// Team statuses that allow for ranked scrims.
+// Only allow ranked scrims against "Regular" teams.
 const ALLOWS_RANKED = Status526Enum.R;
 const MAX_MAPS_PER_SCRIM = 10;
 const ORDER_OPTIONS = [
@@ -73,82 +71,96 @@ const RequestScrimModal: React.FC<RequestScrimModalProps> = ({
       title={`Request scrimmage with ${teamToRequest.name}`}
     >
       {
-        <div className="mt-4 flex flex-col gap-2">
-          <SelectMenu
-            disabled={ranked}
-            label="Player Order"
-            options={ORDER_OPTIONS}
-            value={selectedOrder}
-            onChange={(newOrder) => {
-              setSelectedOrder(newOrder);
-            }}
-          />
-          <SelectMultipleMenu<string>
-            errorMessage={mapErrorMessage}
-            disabled={ranked}
-            label="Select Maps"
-            placeholder={ranked ? "Random 3 maps!" : "Select up to 10 maps..."}
-            options={
-              maps.map((map) => ({
-                value: map.name,
-                label: map.name,
-              })) ?? []
-            }
-            value={selectedMapNames}
-            onChange={(newMapNames) => {
-              if (newMapNames.length > MAX_MAPS_PER_SCRIM) {
-                setMapErrorMessage("You can only select up to 10 maps.");
-                return;
-              }
-              setMapErrorMessage(undefined);
-              setSelectedMapNames(newMapNames);
-            }}
-          />
-          <Button
-            disabled={ranked}
-            label={"Use random 3 maps"}
-            onClick={() => {
-              setSelectedMapNames(getRandomMaps());
-            }}
-          />
-          <DescriptiveCheckbox
-            status={ranked ? CheckboxState.CHECKED : CheckboxState.UNCHECKED}
-            title="Ranked?"
+        <div className="mt-4 flex flex-col gap-4">
+          <Checkbox
             disabled={teamToRequest.status !== ALLOWS_RANKED}
-            description="Request a ranked scrimmage. All ranked scrimmages are played with alternating player order on 3 random maps."
+            checked={ranked}
             onChange={(checked) => {
               if (checked) {
                 setSelectedOrder(PlayerOrderEnum.QuestionMark);
                 setSelectedMapNames([]);
+                setMapErrorMessage(undefined);
               } else {
                 setSelectedMapNames(getRandomMaps());
               }
               setRanked(checked);
             }}
+            label="Ranked?"
           />
-          <Button
-            label="Request Scrimmage"
-            fullWidth
-            loading={request.isPending}
-            onClick={() => {
-              void request
-                .mutateAsync({
-                  episodeId,
-                  scrimmageRequestRequest: {
-                    requested_to: teamToRequest.id,
-                    is_ranked: ranked,
-                    map_names: selectedMapNames,
-                    player_order: selectedOrder,
-                  },
-                })
-                .then(() => {
-                  closeModal();
-                })
-                .catch((err: string) => {
-                  console.error(`Error requesting scrimmage: ${err}`);
-                });
+          <SelectMenu
+            disabled={ranked}
+            label="Player order"
+            options={ORDER_OPTIONS}
+            value={selectedOrder}
+            onChange={(newOrder): void => {
+              setSelectedOrder(newOrder);
             }}
           />
+          <div className="flex flex-col gap-2">
+            <SelectMultipleMenu<string>
+              errorMessage={mapErrorMessage}
+              disabled={ranked}
+              label="Maps"
+              placeholder={
+                ranked ? "Random 3 maps!" : "Select up to 10 maps..."
+              }
+              options={
+                maps.map((map) => ({
+                  value: map.name,
+                  label: map.name,
+                })) ?? []
+              }
+              value={ranked ? [] : selectedMapNames}
+              onChange={(newMapNames) => {
+                setSelectedMapNames(newMapNames);
+                if (newMapNames.length > MAX_MAPS_PER_SCRIM) {
+                  setMapErrorMessage("You can only select up to 10 maps.");
+                } else if (newMapNames.length === 0) {
+                  setMapErrorMessage("You must select at least one map");
+                } else {
+                  setMapErrorMessage(undefined);
+                }
+              }}
+            />
+            <div
+              hidden={ranked}
+              onClick={() => {
+                setMapErrorMessage(undefined);
+                setSelectedMapNames(getRandomMaps());
+              }}
+              className="mt-0 cursor-pointer text-sm text-cyan-600"
+            >
+              [Click to use 3 random maps]
+            </div>
+          </div>
+          <div className="mt-2 flex flex-row gap-4">
+            <Button
+              label="Request Scrimmage"
+              variant="dark"
+              fullWidth
+              disabled={mapErrorMessage !== undefined}
+              loading={request.isPending}
+              onClick={() => {
+                void request
+                  .mutateAsync({
+                    episodeId,
+                    scrimmageRequestRequest: {
+                      requested_to: teamToRequest.id,
+                      is_ranked: ranked,
+                      map_names: selectedMapNames,
+                      player_order: selectedOrder,
+                    },
+                  })
+                  .then(() => {
+                    closeModal();
+                  })
+                  .catch((err: string) => {
+                    console.error(`Error requesting scrimmage: ${err}`);
+                  });
+              }}
+            />
+            <Button fullWidth label="Cancel" onClick={closeModal} />
+          </div>
         </div>
       }
     </Modal>
