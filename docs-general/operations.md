@@ -61,7 +61,7 @@ Occasionally things might break. Then, Discord might light on fire, and Discord 
 
 Other symptoms include:
 
-- Many failed submissio compilations or match runs
+- Many failed submission compilations or match runs
 - In a Pub/Sub, lots of un-acknowledged messages
 
 ## Debugging
@@ -80,6 +80,14 @@ If automated emails from the backend server stop sending, or if you have other i
 
 ## Getting competitors' email addresses
 
-TODO write me
+Announcements, first and foremost, should be made through Discord and through our own website. However, email is occasionally helpful to make announcements, but to do this, you'll need to obtain the email addresses of competitors.
+
+On the admin panel, go to the "Users" list, and find the "Export" button in the top-right. Then get the user data as a format of your choice (csv is perhaps best) and pull out the email column.
 
 Getting a _single_ episode's email addresses of competitors is not yet supported, and is being tracked in #691.
+
+## Running a tournament
+
+Instructions and tips for running a tournament can be found in the following google doc (unlike the rest of the documentation. Maybe they should be here too? But, tournament running instructions are still very unstable).
+
+https://docs.google.com/document/d/1AlunZNJ9xJ8nHBAiGBR3P-0IbkD9jxN39KtuM2v4oYs/edit
