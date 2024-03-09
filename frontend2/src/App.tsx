@@ -37,11 +37,8 @@ import { toast, Toaster } from "react-hot-toast";
 import { ResponseError } from "./api/_autogen/runtime";
 import { episodeQueryKeys } from "./api/episode/episodeKeys";
 import { getEpisodeInfo } from "./api/episode/episodeApi";
-<<<<<<< Updated upstream
-import { submissionsLoader } from "./api/loaders/submissionsLoader";
-=======
 import { loginCheck } from "./api/auth/authApi";
->>>>>>> Stashed changes
+import { submissionsLoader } from "./api/loaders/submissionsLoader";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
