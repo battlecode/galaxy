@@ -1,105 +1,124 @@
-import React from "react";
-import type { PaginatedMatchList } from "../../../api/_autogen";
-import type { Maybe } from "../../../utils/utilTypes";
-import Table from "../../Table";
-import TableBottom from "../../TableBottom";
-import MatchScore from "../../compete/MatchScore";
-import RatingDelta from "../../compete/RatingDelta";
-import MatchStatus from "../../compete/MatchStatus";
+import React, { Fragment } from "react";
+import Table from "components/Table";
+import TableBottom from "components/TableBottom";
+import MatchScore from "components/compete/MatchScore";
+import MatchStatus from "components/compete/MatchStatus";
 import { NavLink } from "react-router-dom";
-import { dateTime } from "../../../utils/dateTime";
-import { useEpisodeId } from "../../../contexts/EpisodeContext";
-import { useEpisodeInfo } from "../../../api/episode/useEpisode";
-import { useUserTeam } from "../../../api/team/useTeam";
+import { dateTime } from "utils/dateTime";
+import { useEpisodeId } from "contexts/EpisodeContext";
+import { useEpisodeInfo } from "api/episode/useEpisode";
+import { useUserTeam } from "api/team/useTeam";
 import { isNil } from "lodash";
+import { useQueryClient } from "@tanstack/react-query";
+import { useTournamentMatchList } from "api/compete/useCompete";
 
 interface TournamentMatchesTableProps {
-  data: Maybe<PaginatedMatchList>;
-  page: number;
-  loading: boolean;
-  handlePage: (page: number) => void;
+  tourneyPage: number;
+  handlePage: (page: number, key: "tourneyPage") => void;
 }
 
 const TournamentMatchesTable: React.FC<TournamentMatchesTableProps> = ({
-  data,
-  page,
-  loading,
+  tourneyPage,
   handlePage,
 }) => {
   const { episodeId } = useEpisodeId();
-  const { data: episode } = useEpisodeInfo({ id: episodeId });
-  const { data: currentTeam } = useUserTeam({ episodeId });
+  const queryClient = useQueryClient();
+  const episodeData = useEpisodeInfo({ id: episodeId });
+  const userTeamData = useUserTeam({ episodeId });
+  const matchesData = useTournamentMatchList(
+    {
+      episodeId,
+      teamId: userTeamData.data?.id,
+      page: tourneyPage,
+    },
+    queryClient,
+  );
 
   return (
-    <Table
-      data={data?.results ?? []}
-      loading={loading}
-      keyFromValue={(match) => match.id.toString()}
-      bottomElement={
-        <TableBottom
-          totalCount={data?.count ?? 0}
-          pageSize={10}
-          currentPage={page}
-          onPage={handlePage}
-        />
-      }
-      columns={[
-        {
-          header: "Score",
-          key: "score",
-          value: (match) => {
-            return <MatchScore match={match} userTeamId={currentTeam?.id} />;
+    <Fragment>
+      <h1 className="text-2xl font-bold leading-7 text-gray-900">
+        Recent Tournament Matches
+      </h1>
+      <Table
+        data={matchesData.data?.results ?? []}
+        loading={matchesData.isLoading}
+        keyFromValue={(match) => match.id.toString()}
+        bottomElement={
+          <TableBottom
+            totalCount={matchesData.data?.count ?? 0}
+            pageSize={10}
+            currentPage={tourneyPage}
+            onPage={(page) => {
+              handlePage(page, "tourneyPage");
+            }}
+          />
+        }
+        columns={[
+          {
+            header: "Score",
+            key: "score",
+            value: (match) => {
+              return (
+                <MatchScore match={match} userTeamId={userTeamData.data?.id} />
+              );
+            },
           },
-        },
-        {
-          header: "Opponent (Δ)",
-          key: "opponent",
-          value: (match) => {
-            const opponent = match.participants?.find(
-              (p) => currentTeam !== undefined && p.team !== currentTeam.id,
-            );
-            if (opponent === undefined) return;
-            return (
-              <RatingDelta participant={opponent} ranked={match.is_ranked} />
-            );
+          {
+            header: "Opponent",
+            key: "opponent",
+            value: (match) => {
+              const opponent = match.participants?.find(
+                (p) =>
+                  userTeamData.isSuccess && p.team !== userTeamData.data.id,
+              );
+              if (opponent === undefined) return;
+              return (
+                <NavLink
+                  className="hover:underline"
+                  to={`/${episodeId}/team/${opponent.team}`}
+                >
+                  {opponent.teamname}
+                </NavLink>
+              );
+            },
           },
-        },
-        {
-          header: "Ranked",
-          key: "ranked",
-          value: (match) => (match.is_ranked ? "Ranked" : "Unranked"),
-        },
-        {
-          header: "Status",
-          key: "status",
-          value: (match) => <MatchStatus match={match} />,
-        },
-        {
-          header: "Replay",
-          key: "replay",
-          value: (match) =>
-            isNil(episode) || isNil(match.replay_url) ? (
-              <></>
-            ) : (
-              <NavLink
-                className="text-cyan-600 hover:underline"
-                to={`https://releases.battlecode.org/client/${
-                  episode.artifact_name ?? ""
-                }/${episode.release_version_public ?? ""}/visualizer.html?${
-                  match.replay_url
-                }`}
-              >
-                Replay!
-              </NavLink>
-            ),
-        },
-        {
-          header: "Created",
-          key: "created",
-          value: (match) => dateTime(match.created).localFullString,
-        },
-      ]}
-    />
+          {
+            header: "Ranked",
+            key: "ranked",
+            value: (match) => (match.is_ranked ? "Ranked" : "Unranked"),
+          },
+          {
+            header: "Status",
+            key: "status",
+            value: (match) => <MatchStatus match={match} />,
+          },
+          {
+            header: "Replay",
+            key: "replay",
+            value: (match) =>
+              !episodeData.isSuccess || isNil(match.replay_url) ? (
+                <></>
+              ) : (
+                <NavLink
+                  className="text-cyan-600 hover:underline"
+                  to={`https://releases.battlecode.org/client/${
+                    episodeData.data.artifact_name ?? ""
+                  }/${
+                    episodeData.data.release_version_public ?? ""
+                  }/visualizer.html?${match.replay_url}`}
+                >
+                  Replay!
+                </NavLink>
+              ),
+          },
+          {
+            header: "Created",
+            key: "created",
+            value: (match) => dateTime(match.created).localFullString,
+          },
+        ]}
+      />
+    </Fragment>
   );
 };
 

@@ -11,7 +11,7 @@ import Table from "../Table";
 import TableBottom from "../TableBottom";
 import MatchScore from "../compete/MatchScore";
 import MatchStatus from "../compete/MatchStatus";
-import RatingDelta from "../compete/RatingDelta";
+import RatingDelta from "../compete/MatchRatingDelta";
 import { isNil } from "lodash";
 
 interface TournamentResultsTableProps {

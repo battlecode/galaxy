@@ -80,4 +80,7 @@ export const competeMutationKeys = {
 
   rejectScrim: ({ episodeId }: { episodeId: string }) =>
     ["compete", episodeId, "scrimmage", "reject"] as const,
+
+  cancelScrim: ({ episodeId }: { episodeId: string }) =>
+    ["compete", episodeId, "scrimmage", "cancel"] as const,
 };

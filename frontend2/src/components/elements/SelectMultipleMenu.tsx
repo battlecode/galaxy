@@ -1,19 +1,20 @@
-import React, { Fragment, useMemo } from "react";
 import { Listbox, Transition } from "@headlessui/react";
+import React, { Fragment, useMemo } from "react";
+import FormLabel from "./FormLabel";
+import Pill from "./Pill";
 import Icon from "./Icon";
 import FormError from "./FormError";
-import FormLabel from "./FormLabel";
 
-interface SelectMenuProps<T extends React.Key | null | undefined> {
+interface SelectMultipleMenuProps<T extends React.Key | null | undefined> {
   options: Array<{ value: T; label: string }>;
   disabled?: boolean;
   label?: string;
   required?: boolean;
-  value?: T;
+  value?: T[];
   placeholder?: string;
   className?: string;
   errorMessage?: string;
-  onChange?: (value: T) => void;
+  onChange?: (value: T[]) => void;
 }
 
 const DISABLED = "bg-gray-200 ring-gray-200 text-gray-500 cursor-not-allowed";
@@ -21,31 +22,35 @@ const INVALID = "ring-red-500 text-gray-900";
 const DEFAULT = "ring-gray-600 ring-cyan-600 text-gray-900";
 const PLACEHOLDER = "ring-gray-400 text-gray-400";
 
-function SelectMenu<T extends React.Key | null | undefined>({
+function SelectMultipleMenu<T extends React.Key | null | undefined>({
   label,
   required = false,
   options,
-  value,
   disabled = false,
+  value,
   placeholder,
   className = "",
   errorMessage,
   onChange,
-}: SelectMenuProps<T>): JSX.Element {
+}: SelectMultipleMenuProps<T>): JSX.Element {
   const valueToLabel = useMemo(
     () => new Map(options.map((option) => [option.value, option.label])),
     [options],
   );
+  const removeOption = (option: T): void => {
+    if (value === undefined || onChange === undefined) return;
+    onChange(value.filter((v) => v !== option));
+  };
   const invalid = errorMessage !== undefined;
 
   let stateStyle = DEFAULT;
   if (disabled) stateStyle = DISABLED;
   else if (invalid) stateStyle = INVALID;
-  else if (value === undefined) stateStyle = PLACEHOLDER;
+  else if (value === undefined || value.length === 0) stateStyle = PLACEHOLDER;
 
   return (
-    <div className={`relative ${invalid ? "mb-2" : ""} ${className}`}>
-      <Listbox value={value} onChange={onChange} disabled={disabled}>
+    <div className={`relative ${invalid ? "mb-4" : ""} ${className}`}>
+      <Listbox value={value} onChange={onChange} multiple disabled={disabled}>
         <div className="relative">
           {label !== undefined && (
             <Listbox.Label>
@@ -53,15 +58,26 @@ function SelectMenu<T extends React.Key | null | undefined>({
             </Listbox.Label>
           )}
           <Listbox.Button
-            className={`relative h-9 w-full truncate rounded-md bg-white py-1.5 pl-3 pr-10
-            text-left shadow-sm ring-1 ring-inset focus:outline-none focus:ring-1
+            className={`ring-insetfocus:outline-none relative flex w-full flex-row
+            items-center rounded-md bg-white py-1.5 pl-3 pr-2 shadow-sm ring-1 focus:ring-1
             sm:text-sm sm:leading-6 ${stateStyle}`}
           >
-            <span>
-              {value === undefined ? placeholder : valueToLabel.get(value)}
-            </span>
+            <div className={`flex h-full w-full flex-row flex-wrap gap-2`}>
+              {value === undefined || value.length === 0
+                ? placeholder
+                : value.map((v) => (
+                    <Pill
+                      key={v}
+                      text={valueToLabel.get(v) ?? ""}
+                      deletable
+                      onDelete={() => {
+                        removeOption(v);
+                      }}
+                    />
+                  ))}
+            </div>
             <div
-              className="absolute inset-y-0 right-0 mr-2 flex transform items-center
+              className="flex transform items-center
               transition duration-300 ui-open:rotate-180 ui-not-open:rotate-0"
             >
               <Icon name="chevron_down" size="sm" />
@@ -85,7 +101,7 @@ function SelectMenu<T extends React.Key | null | undefined>({
                   value={option.value}
                 >
                   <div className="overflow-x-auto pr-2">{option.label}</div>
-                  <span className=" hidden items-center text-cyan-900 ui-selected:flex">
+                  <span className="hidden items-center text-cyan-900 ui-selected:flex">
                     <Icon name="check" size="sm" />
                   </span>
                 </Listbox.Option>
@@ -99,4 +115,4 @@ function SelectMenu<T extends React.Key | null | undefined>({
   );
 }
 
-export default SelectMenu;
+export default SelectMultipleMenu;
