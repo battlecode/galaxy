@@ -1,5 +1,5 @@
-import { QueryClient } from "@tanstack/react-query";
-import { LoaderFunction } from "react-router-dom";
+import type { QueryClient } from "@tanstack/react-query";
+import type { LoaderFunction } from "react-router-dom";
 
 export const myTeamLoader =
   (queryClient: QueryClient): LoaderFunction =>
@@ -7,6 +7,8 @@ export const myTeamLoader =
     const episodeId = params.episodeId;
 
     if (episodeId === undefined) return null;
+
+    // needs: useUserTeam
 
     return null;
   };
