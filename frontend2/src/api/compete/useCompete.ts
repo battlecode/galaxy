@@ -30,18 +30,10 @@ import type {
 } from "../_autogen";
 import {
   acceptScrimmage,
-  getAllUserTournamentSubmissions,
-  getMatchesList,
-  getScrimmagesListByTeam,
-  getSubmissionsList,
-  getTournamentMatchesList,
-  getUserScrimmagesInboxList,
-  getUserScrimmagesOutboxList,
   rejectScrimmage,
   requestScrimmage,
   uploadSubmission,
 } from "./competeApi";
-import { isPresent } from "../../utils/utilTypes";
 import toast from "react-hot-toast";
 import { buildKey } from "../helpers";
 import {
@@ -130,7 +122,11 @@ export const useUserScrimmageList = (
   useQuery({
     queryKey: buildKey(userScrimmageListFactory.queryKey, { episodeId, page }),
     queryFn: async () =>
-      userScrimmageListFactory.queryFn({ episodeId, page }, queryClient, true),
+      await userScrimmageListFactory.queryFn(
+        { episodeId, page },
+        queryClient,
+        true,
+      ),
   });
 
 /**

@@ -4,32 +4,29 @@ import {
   GenderEnum as GeneratedGenderEnum,
 } from "./_autogen";
 
-type QueryKeyCallable<T> = {
+export interface QueryKeyBuilder<T> {
   key: (request: T) => QueryKey;
-  type: "callable";
-};
-type QueryKeyLiteral = {
-  key: QueryKey;
-  type: "literal";
-};
-
-export type QueryKeyBuilder<T> = QueryKeyCallable<T> | QueryKeyLiteral;
+}
+export interface QueryKeyHolder {
+  key: () => QueryKey;
+}
 
 export type QueryFuncBuilder<T, K = void> = (request: T) => Promise<K>;
+
 export type PaginatedQueryFuncBuilder<T, K = void> = (
   request: T,
   queryClient: QueryClient,
   prefetchNext: boolean,
 ) => Promise<K>;
 
-export type QueryFactory<T, K> = {
-  queryKey: QueryKeyBuilder<T>;
+export interface QueryFactory<T, K> {
+  queryKey: QueryKeyHolder | QueryKeyBuilder<T>;
   queryFn: QueryFuncBuilder<T, K>;
-};
-export type PaginatedQueryFactory<T, K> = {
+}
+export interface PaginatedQueryFactory<T, K> {
   queryKey: QueryKeyBuilder<T>;
   queryFn: PaginatedQueryFuncBuilder<T, K>;
-};
+}
 
 export interface PaginatedRequestMinimal {
   page?: number;

@@ -1,12 +1,12 @@
 import Cookies from "js-cookie";
-import { Configuration, ResponseError } from "./_autogen";
-import {
+import { Configuration, type ResponseError } from "./_autogen";
+import type {
   PaginatedQueryFuncBuilder,
   PaginatedRequestMinimal,
   PaginatedResultMinimal,
   QueryKeyBuilder,
 } from "./apiTypes";
-import { QueryClient } from "@tanstack/react-query";
+import type { QueryClient, QueryKey } from "@tanstack/react-query";
 import { isPresent } from "../utils/utilTypes";
 import toast from "react-hot-toast";
 
@@ -37,20 +37,20 @@ export const downloadFile = async (
   window.URL.revokeObjectURL(objUrl);
 };
 
-export const buildKey = <T>(keyBuilder: QueryKeyBuilder<T>, request: T) => {
-  if (keyBuilder.type === "callable") {
-    return keyBuilder.key(request);
-  }
-  return keyBuilder.key;
+export const buildKey = <T>(
+  keyBuilder: QueryKeyBuilder<T>,
+  request: T,
+): QueryKey => {
+  return keyBuilder.key(request);
 };
 
 /**
- * TODO: create spec. Note that this func handles the ispresent check for the next page!!
- * @param request
- * @param result
- * @param queryKey
- * @param queryFn
- * @param queryClient
+ * Given a paginated query result, prefetch the next page of table data if it exists.
+ * @param request the original request
+ * @param result the result of the original request
+ * @param queryKey the `QueryKeyBuilder` for converting the request into a hashable key
+ * @param queryFn the function to call to fetch the next page
+ * @param queryClient the reference to the query client
  */
 export const prefetchNextPage = async <
   T extends PaginatedRequestMinimal,
@@ -61,7 +61,7 @@ export const prefetchNextPage = async <
   queryKey: QueryKeyBuilder<T>,
   queryFn: PaginatedQueryFuncBuilder<T, K>,
   queryClient: QueryClient,
-) => {
+): Promise<void> => {
   if (isPresent(result.next)) {
     // If no page provided, then we just fetched page 1
     const nextPage = isPresent(request.page) ? request.page + 1 : 2;
