@@ -27,7 +27,8 @@ export const login = async (
   Cookies.set("access", res.access);
   Cookies.set("refresh", res.refresh);
   await queryClient.refetchQueries({
-    queryKey: userQueryKeys.meBase,
+    // OK to call KEY.key() here as we are refetching all user-me queries.
+    queryKey: userQueryKeys.meBase.key(),
   });
 };
 
@@ -40,7 +41,8 @@ export const logout = async (queryClient: QueryClient): Promise<void> => {
   Cookies.remove("access");
   Cookies.remove("refresh");
   await queryClient.resetQueries({
-    queryKey: userQueryKeys.meBase,
+    // OK to call KEY.key() here as we are resetting all user-me queries.
+    queryKey: userQueryKeys.meBase.key(),
   });
 };
 

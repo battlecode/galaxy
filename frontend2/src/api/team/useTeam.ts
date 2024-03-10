@@ -18,20 +18,22 @@ import type {
   TeamTMeRetrieveRequest,
   TeamTRetrieveRequest,
 } from "../_autogen";
-import { teamMutationKeys, teamQueryKeys } from "./teamKeys";
+import { teamMutationKeys } from "./teamKeys";
 import {
   createTeam,
-  getTeamInfo,
-  getUserTeamInfo,
   joinTeam,
   leaveTeam,
-  searchTeams,
   teamAvatarUpload,
   updateTeamPartial,
   uploadUserTeamReport,
 } from "./teamApi";
 import { toast } from "react-hot-toast";
-import { isPresent } from "../../utils/utilTypes";
+import {
+  myTeamFactory,
+  otherTeamInfoFactory,
+  searchTeamsFactory,
+} from "./teamFactories";
+import { buildKey } from "../helpers";
 
 // ---------- QUERY HOOKS ---------- //
 /**
@@ -41,8 +43,8 @@ export const useUserTeam = ({
   episodeId,
 }: TeamTMeRetrieveRequest): UseQueryResult<TeamPrivate, Error> =>
   useQuery({
-    queryKey: teamQueryKeys.myTeam({ episodeId }),
-    queryFn: async () => await getUserTeamInfo({ episodeId }),
+    queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
+    queryFn: async () => await myTeamFactory.queryFn({ episodeId }),
   });
 
 /**
@@ -53,8 +55,8 @@ export const useTeam = ({
   id,
 }: TeamTRetrieveRequest): UseQueryResult<TeamPublic, Error> =>
   useQuery({
-    queryKey: teamQueryKeys.otherInfo({ episodeId, id }),
-    queryFn: async () => await getTeamInfo({ episodeId, id }),
+    queryKey: buildKey(otherTeamInfoFactory.queryKey, { episodeId, id }),
+    queryFn: async () => await otherTeamInfoFactory.queryFn({ episodeId, id }),
   });
 
 /**
@@ -65,29 +67,17 @@ export const useSearchTeams = (
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedTeamPublicList, Error> =>
   useQuery({
-    queryKey: teamQueryKeys.search({ episodeId, search, page }),
-    queryFn: async () => {
-      const result = await searchTeams({ episodeId, search, page });
-
-      // Prefetch the next page if it exists
-      if (isPresent(result.next)) {
-        // If no page provided, then we just fetched page 1
-        const nextPage = isPresent(page) ? page + 1 : 2;
-        // TODO: ensure correct prefetching behavior!
-        queryClient
-          .prefetchQuery({
-            queryKey: teamQueryKeys.search({
-              episodeId,
-              search,
-              page: nextPage,
-            }),
-            queryFn: async () =>
-              await searchTeams({ episodeId, search, page: nextPage }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-      }
-      return result;
-    },
+    queryKey: buildKey(searchTeamsFactory.queryKey, {
+      episodeId,
+      search,
+      page,
+    }),
+    queryFn: async () =>
+      await searchTeamsFactory.queryFn(
+        { episodeId, search, page },
+        queryClient,
+        true,
+      ),
     staleTime: 1000 * 30, // 30 seconds
   });
 
@@ -115,7 +105,10 @@ export const useCreateTeam = (
         error: "Error creating team.",
       }),
     onSuccess: (data) => {
-      queryClient.setQueryData(teamQueryKeys.myTeam({ episodeId }), data);
+      queryClient.setQueryData(
+        buildKey(myTeamFactory.queryKey, { episodeId }),
+        data,
+      );
     },
   });
 
@@ -137,7 +130,7 @@ export const useJoinTeam = (
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({
-        queryKey: teamQueryKeys.myTeam({ episodeId }),
+        queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
       });
     },
   });
@@ -160,7 +153,7 @@ export const useLeaveTeam = (
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: teamQueryKeys.myTeam({ episodeId }),
+        queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
       });
     },
   });
@@ -186,7 +179,10 @@ export const useUpdateTeam = (
         },
       ),
     onSuccess: (data) => {
-      queryClient.setQueryData(teamQueryKeys.myTeam({ episodeId }), data);
+      queryClient.setQueryData(
+        buildKey(myTeamFactory.queryKey, { episodeId }),
+        data,
+      );
     },
   });
 
@@ -212,7 +208,7 @@ export const useUpdateTeamAvatar = (
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({
-        queryKey: teamQueryKeys.myTeam({ episodeId }),
+        queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
       });
     },
   });
@@ -238,7 +234,7 @@ export const useUpdateTeamReport = (
     },
     onSuccess: async () => {
       await queryClient.refetchQueries({
-        queryKey: teamQueryKeys.myTeam({ episodeId }),
+        queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
       });
     },
   });
