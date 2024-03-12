@@ -6,14 +6,14 @@ import { isPresent } from "../utils/utilTypes";
 import { useNavigate } from "react-router-dom";
 import { useEpisodeList } from "../api/episode/useEpisode";
 import { useQueryClient } from "@tanstack/react-query";
-import { episodeQueryKeys } from "../api/episode/episodeKeys";
-import { getEpisodeInfo } from "../api/episode/episodeApi";
 import toast from "react-hot-toast";
+import { episodeInfoFactory } from "../api/episode/episodeFactories";
+import { buildKey } from "../api/helpers";
 
 const EpisodeSwitcher: React.FC = () => {
   const queryClient = useQueryClient();
   const { episodeId, setEpisodeId } = useEpisodeId();
-  const { data: episodeList } = useEpisodeList({ page: 1 });
+  const { data: episodeList } = useEpisodeList({ page: 1 }, queryClient);
   const navigate = useNavigate();
   const idToName = useMemo(
     () =>
@@ -32,8 +32,11 @@ const EpisodeSwitcher: React.FC = () => {
         onChange={(newEpisodeId) => {
           (async () =>
             await queryClient.fetchQuery({
-              queryKey: episodeQueryKeys.info({ id: newEpisodeId }),
-              queryFn: async () => await getEpisodeInfo({ id: newEpisodeId }),
+              queryKey: buildKey(episodeInfoFactory.queryKey, {
+                id: newEpisodeId,
+              }),
+              queryFn: async () =>
+                await episodeInfoFactory.queryFn({ id: newEpisodeId }),
             }))().catch((e) => toast.error((e as Error).message));
           setEpisodeId(newEpisodeId);
           navigate(`/${newEpisodeId}/home`);

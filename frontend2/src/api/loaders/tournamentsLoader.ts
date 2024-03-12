@@ -1,19 +1,19 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { LoaderFunction } from "react-router-dom";
-import { myTeamFactory } from "../team/teamFactories";
+import { tournamentListFactory } from "../episode/episodeFactories";
 import { buildKey } from "../helpers";
 
-export const myTeamLoader =
+export const tournamentsLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
     const episodeId = params.episodeId;
-
     if (episodeId === undefined) return null;
 
-    // My team info
+    // Tournament list
     void queryClient.ensureQueryData({
-      queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
-      queryFn: async () => await myTeamFactory.queryFn({ episodeId }),
+      queryKey: buildKey(tournamentListFactory.queryKey, { episodeId }),
+      queryFn: async () =>
+        await tournamentListFactory.queryFn({ episodeId }, queryClient, true),
     });
 
     return null;

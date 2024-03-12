@@ -37,6 +37,14 @@ export const downloadFile = async (
   window.URL.revokeObjectURL(objUrl);
 };
 
+/**
+ * Build a hashable `QueryKey` from a request object and a `QueryKeyBuilder`.
+ * This is the preferred way to build a `QueryKey`, as not all `QueryKeyBuilder`s are directly callable
+ *  (i.e. `builder.key(request)` may throw a static error).
+ * @param keyBuilder the `QueryKeyBuilder` to use a a template for building the key
+ * @param request the request object to populate the determining fields of the key
+ * @returns a hashable `QueryKey` that can be used as a `queryKey` in a `useQuery` hook
+ */
 export const buildKey = <T>(
   keyBuilder: QueryKeyBuilder<T>,
   request: T,

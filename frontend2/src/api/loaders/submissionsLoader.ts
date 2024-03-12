@@ -16,19 +16,19 @@ export const submissionsLoader =
 
     if (episodeId === undefined) return null;
 
-    try {
-      void queryClient.ensureQueryData({
-        queryKey: buildKey(subsListFactory.queryKey, { episodeId, page }),
-        queryFn: async () =>
-          await subsListFactory.queryFn({ episodeId, page }, queryClient, true),
-      });
-      void queryClient.ensureQueryData({
-        queryKey: buildKey(tournamentSubsListFactory.queryKey, { episodeId }),
-        queryFn: async () =>
-          await tournamentSubsListFactory.queryFn({ episodeId }),
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    // Submissions list
+    void queryClient.ensureQueryData({
+      queryKey: buildKey(subsListFactory.queryKey, { episodeId, page }),
+      queryFn: async () =>
+        await subsListFactory.queryFn({ episodeId, page }, queryClient, true),
+    });
+
+    // Tournament submissions list
+    void queryClient.ensureQueryData({
+      queryKey: buildKey(tournamentSubsListFactory.queryKey, { episodeId }),
+      queryFn: async () =>
+        await tournamentSubsListFactory.queryFn({ episodeId }),
+    });
+
     return null;
   };
