@@ -30,8 +30,8 @@ const Rankings: React.FC = () => {
     };
   }, [searchParams]);
 
-  const { data: episode } = useEpisodeInfo({ id: episodeId });
-  const { data: rankingsData, isLoading: rankingsLoading } = useSearchTeams(
+  const episodeData = useEpisodeInfo({ id: episodeId });
+  const rankingsData = useSearchTeams(
     {
       episodeId,
       page: queryParams.page,
@@ -44,22 +44,22 @@ const Rankings: React.FC = () => {
    * This enables us to look up eligibility criteria by index in the table component.
    */
   const eligibilityMap: Map<number, EligibilityCriterion> = useMemo(() => {
-    if (episode === undefined) {
+    if (!episodeData.isSuccess) {
       return new Map<number, EligibilityCriterion>();
     }
     return new Map(
-      episode.eligibility_criteria.map((crit, idx) => [idx, crit]),
+      episodeData.data.eligibility_criteria.map((crit, idx) => [idx, crit]),
     );
-  }, [episode]);
+  }, [episodeData]);
 
   function handlePage(page: number): void {
-    if (!rankingsLoading) {
+    if (!rankingsData.isLoading) {
       setSearchParams({ ...queryParams, page: page.toString() });
     }
   }
 
   function handleSearch(): void {
-    if (!rankingsLoading && searchText !== queryParams.search) {
+    if (!rankingsData.isLoading && searchText !== queryParams.search) {
       setSearchParams((prev) => ({
         ...getParamEntries(prev),
         search: searchText,
@@ -74,7 +74,7 @@ const Rankings: React.FC = () => {
         <PageTitle>Rankings</PageTitle>
         <div className="mb-4 flex w-3/5 flex-row">
           <Input
-            disabled={rankingsLoading}
+            disabled={rankingsData.isLoading}
             placeholder="Search for a team..."
             value={searchText}
             onChange={(ev) => {
@@ -88,7 +88,7 @@ const Rankings: React.FC = () => {
           />
           <div className="w-4" />
           <Button
-            disabled={rankingsLoading}
+            disabled={rankingsData.isLoading}
             label="Search!"
             variant="dark"
             onClick={() => {
@@ -99,8 +99,8 @@ const Rankings: React.FC = () => {
       </div>
 
       <RankingsTable
-        data={rankingsData}
-        loading={rankingsLoading}
+        data={rankingsData.data}
+        loading={rankingsData.isLoading}
         page={queryParams.page}
         eligibilityMap={eligibilityMap}
         handlePage={handlePage}

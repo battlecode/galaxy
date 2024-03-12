@@ -7,6 +7,7 @@ import {
 export interface QueryKeyBuilder<T> {
   key: (request: T) => QueryKey;
 }
+
 export interface QueryKeyHolder {
   key: () => QueryKey;
 }
@@ -19,10 +20,28 @@ export type PaginatedQueryFuncBuilder<T, K = void> = (
   prefetchNext: boolean,
 ) => Promise<K>;
 
+/**
+ * Contains all of the information needed to represent a single useQuery hook.
+ * - `queryKey`: a container for the query key, which should be "built" using `helpers.buildKey`
+ * - `queryFn`: the function that will be called to fetch the data. This function should take a
+ *  single argument, the `request` of type `K`, and return a `Promise<T>`.
+ */
 export interface QueryFactory<T, K> {
   queryKey: QueryKeyHolder | QueryKeyBuilder<T>;
   queryFn: QueryFuncBuilder<T, K>;
 }
+
+/**
+ * Contains all of the information needed to represent a single paginated useQuery hook.
+ *
+ * Note that this interface is similar to `QueryFactory`, but includes a PaginatedQueryFuncBuilder<T, K>
+ * which enables automatic prefetching of the next page of table data.
+ * - `queryKey`: a container for the query key, which should be "built" using `helpers.buildKey`
+ * - `queryFn`: the function that will be called to fetch the data. This function should take
+ *  the `request` of type `T`, the `queryClient`, and a `prefetchNext` boolean, and return a `Promise<K>`.
+ *
+ * If `prefetchNext` is true, the query function will prefetch the next page of data.
+ */
 export interface PaginatedQueryFactory<T, K> {
   queryKey: QueryKeyBuilder<T>;
   queryFn: PaginatedQueryFuncBuilder<T, K>;

@@ -3,15 +3,6 @@ import {
   useQuery,
   type QueryClient,
 } from "@tanstack/react-query";
-import {
-  getEpisodeInfo,
-  getEpisodeList,
-  getEpisodeMaps,
-  getNextTournament,
-  getTournamentInfo,
-  getTournamentList,
-} from "./episodeApi";
-import { episodeQueryKeys } from "./episodeKeys";
 import type {
   Episode,
   EpisodeEListRequest,
@@ -23,11 +14,17 @@ import type {
   GameMap,
   PaginatedEpisodeList,
   PaginatedTournamentList,
-  ResponseError,
   Tournament,
 } from "../_autogen";
-import { isPresent } from "../../utils/utilTypes";
-import toast from "react-hot-toast";
+import { buildKey } from "../helpers";
+import {
+  episodeInfoFactory,
+  episodeListFactory,
+  episodeMapsFactory,
+  nextTournamentFactory,
+  tournamentInfoFactory,
+  tournamentListFactory,
+} from "./episodeFactories";
 
 // ---------- QUERY HOOKS ---------- //
 /**
@@ -37,20 +34,22 @@ export const useEpisodeInfo = ({
   id,
 }: EpisodeERetrieveRequest): UseQueryResult<Episode, Error> =>
   useQuery({
-    queryKey: episodeQueryKeys.info({ id }),
-    queryFn: async () => await getEpisodeInfo({ id }),
+    queryKey: buildKey(episodeInfoFactory.queryKey, { id }),
+    queryFn: async () => await episodeInfoFactory.queryFn({ id }),
     staleTime: 5 * 1000 * 60, // 5 minutes
   });
 
 /**
  * For retrieving a paginated list of Battlecode episodes.
  */
-export const useEpisodeList = ({
-  page,
-}: EpisodeEListRequest): UseQueryResult<PaginatedEpisodeList, Error> =>
+export const useEpisodeList = (
+  { page }: EpisodeEListRequest,
+  queryClient: QueryClient,
+): UseQueryResult<PaginatedEpisodeList, Error> =>
   useQuery({
-    queryKey: episodeQueryKeys.list({ page }),
-    queryFn: async () => await getEpisodeList({ page }),
+    queryKey: buildKey(episodeListFactory.queryKey, { page }),
+    queryFn: async () =>
+      await episodeListFactory.queryFn({ page }, queryClient, true),
     staleTime: Infinity,
   });
 
@@ -61,8 +60,8 @@ export const useEpisodeMaps = ({
   episodeId,
 }: EpisodeMapListRequest): UseQueryResult<GameMap[], Error> =>
   useQuery({
-    queryKey: episodeQueryKeys.maps({ episodeId }),
-    queryFn: async () => await getEpisodeMaps({ episodeId }),
+    queryKey: buildKey(episodeMapsFactory.queryKey, { episodeId }),
+    queryFn: async () => await episodeMapsFactory.queryFn({ episodeId }),
   });
 
 /**
@@ -75,17 +74,8 @@ export const useNextTournament = ({
   Error
 > =>
   useQuery({
-    queryKey: episodeQueryKeys.nextTournament({ episodeId }),
-    queryFn: async () => {
-      try {
-        return await getNextTournament({ episodeId });
-      } catch (err) {
-        // If there is no next tournament, just return null.
-        const responseError = err as ResponseError;
-        if (responseError.response.status === 404) return null;
-        else throw responseError;
-      }
-    },
+    queryKey: buildKey(nextTournamentFactory.queryKey, { episodeId }),
+    queryFn: async () => await nextTournamentFactory.queryFn({ episodeId }),
   });
 
 /**
@@ -96,27 +86,13 @@ export const useTournamentList = (
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedTournamentList, Error> =>
   useQuery({
-    queryKey: episodeQueryKeys.tournamentList({ episodeId, page }),
-    queryFn: async () => {
-      const result = await getTournamentList({ episodeId, page });
-
-      // Prefetch the next page if it exists
-      if (isPresent(result.next)) {
-        // If no page provided, then we just fetched page 1
-        const nextPage = isPresent(page) ? page + 1 : 2;
-        queryClient
-          .prefetchQuery({
-            queryKey: episodeQueryKeys.tournamentList({
-              episodeId,
-              page: nextPage,
-            }),
-            queryFn: async () =>
-              await getTournamentList({ episodeId, page: nextPage }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-      }
-      return result;
-    },
+    queryKey: buildKey(tournamentListFactory.queryKey, { episodeId, page }),
+    queryFn: async () =>
+      await tournamentListFactory.queryFn(
+        { episodeId, page },
+        queryClient,
+        true,
+      ),
   });
 
 /**
@@ -127,6 +103,6 @@ export const useTournamentInfo = ({
   id,
 }: EpisodeTournamentRetrieveRequest): UseQueryResult<Tournament, Error> =>
   useQuery({
-    queryKey: episodeQueryKeys.tournamentInfo({ episodeId, id }),
-    queryFn: async () => await getTournamentInfo({ episodeId, id }),
+    queryKey: buildKey(tournamentInfoFactory.queryKey, { episodeId, id }),
+    queryFn: async () => await tournamentInfoFactory.queryFn({ episodeId, id }),
   });
