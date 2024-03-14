@@ -17,10 +17,14 @@ import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import Button from "../components/elements/Button";
 import FormLabel from "../components/elements/FormLabel";
-import { useUpdateCurrentUserInfo, useAvatarUpload, useResumeUpload } from "../api/user/useUser";
+import {
+  useUpdateCurrentUserInfo,
+  useAvatarUpload,
+  useResumeUpload,
+} from "../api/user/useUser";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { type QueryClient } from '@tanstack/query-core';
+import { type QueryClient } from "@tanstack/query-core";
 // import {
 //   downloadResume
 // } from "../api/user/userApi";
@@ -39,15 +43,11 @@ const Account: React.FC = () => {
   // const resumeLink = downloadResume();
   // console.log(resumeLink);
 
-  const {
-    register: avatarRegister,
-    handleSubmit: handleAvatarSubmit,
-  } = useForm<FileInput>();
+  const { register: avatarRegister, handleSubmit: handleAvatarSubmit } =
+    useForm<FileInput>();
 
-  const {
-    register: resumeRegister,
-    handleSubmit: handleResumeSubmit
-  } = useForm<FileInput>();
+  const { register: resumeRegister, handleSubmit: handleResumeSubmit } =
+    useForm<FileInput>();
 
   const onAvatarSubmit: SubmitHandler<FileInput> = async (data) => {
     if (uploadAvatar.isPending) return;
@@ -63,7 +63,11 @@ const Account: React.FC = () => {
     <div className="p-6">
       <PageTitle>User Settings</PageTitle>
       <div className="flex flex-col gap-8 xl:flex-row">
-        {user !== undefined ? <ProfileForm episodeId={episodeId} queryClient={queryClient} /> : <Loading />}
+        {user !== undefined ? (
+          <ProfileForm episodeId={episodeId} queryClient={queryClient} />
+        ) : (
+          <Loading />
+        )}
 
         <SectionCard title="File Upload">
           <div className="flex flex-row gap-10 xl:flex-col ">
@@ -76,10 +80,9 @@ const Account: React.FC = () => {
                 type="file"
                 accept="image/*"
                 className="w-full"
-                {...avatarRegister("file"
-                  , { required: FIELD_REQUIRED_ERROR_MSG }
-                )
-                }
+                {...avatarRegister("file", {
+                  required: FIELD_REQUIRED_ERROR_MSG,
+                })}
               />
               <Button
                 className="mt-2"
@@ -99,9 +102,9 @@ const Account: React.FC = () => {
                 type="file"
                 accept=".pdf"
                 className="w-full"
-                {...resumeRegister("file"
-                  , { required: FIELD_REQUIRED_ERROR_MSG }
-                )}
+                {...resumeRegister("file", {
+                  required: FIELD_REQUIRED_ERROR_MSG,
+                })}
               />
               <Button
                 className="mt-2"
@@ -111,8 +114,9 @@ const Account: React.FC = () => {
                 disabled={uploadResume.isPending}
               />
               <p className="text-sm">
-                {(user?.profile?.has_resume ?? false) ? "Resume uploaded!" : "No resume uploaded."}
-
+                {user?.profile?.has_resume ?? false
+                  ? "Resume uploaded!"
+                  : "No resume uploaded."}
               </p>
               {/* <p>
                 {resumeLink}
@@ -123,15 +127,17 @@ const Account: React.FC = () => {
       </div>
     </div>
   );
-
 };
 
-
 const ProfileForm: React.FC<{
-  episodeId: string, queryClient: QueryClient
+  episodeId: string;
+  queryClient: QueryClient;
 }> = ({ episodeId, queryClient }) => {
   const { user } = useCurrentUser();
-  const updateCurrentUser = useUpdateCurrentUserInfo({ episodeId }, queryClient);
+  const updateCurrentUser = useUpdateCurrentUserInfo(
+    { episodeId },
+    queryClient,
+  );
 
   const {
     register,
@@ -141,28 +147,34 @@ const ProfileForm: React.FC<{
     formState: { errors },
   } = useForm<PatchedUserPrivateRequest>({
     defaultValues: {
-      "email": user?.email,
-      "first_name": user?.first_name,
-      "last_name": user?.last_name,
-      "profile": {
-        "school": user?.profile?.school,
-        "kerberos": user?.profile?.kerberos,
-        "biography": user?.profile?.biography,
+      email: user?.email,
+      first_name: user?.first_name,
+      last_name: user?.last_name,
+      profile: {
+        school: user?.profile?.school,
+        kerberos: user?.profile?.kerberos,
+        biography: user?.profile?.biography,
       },
-    }
+    },
   });
 
   const watchFirstName = watch("first_name");
   const watchLastName = watch("last_name");
-  const [gender, setGender] = useState<Maybe<GenderEnum>>(user?.profile?.gender);
-  const [country, setCountry] = useState<Maybe<CountryEnum>>(user?.profile?.country);
+  const [gender, setGender] = useState<Maybe<GenderEnum>>(
+    user?.profile?.gender,
+  );
+  const [country, setCountry] = useState<Maybe<CountryEnum>>(
+    user?.profile?.country,
+  );
 
-  const onProfileSubmit: SubmitHandler<PatchedUserPrivateRequest> = async (data) => {
+  const onProfileSubmit: SubmitHandler<PatchedUserPrivateRequest> = async (
+    data,
+  ) => {
     await updateCurrentUser.mutateAsync({ patchedUserPrivateRequest: data });
   };
 
   return (
-    < SectionCard title="Profile" className="max-w-5xl flex-1" >
+    <SectionCard title="Profile" className="max-w-5xl flex-1">
       <div className="flex flex-col lg:flex-row lg:gap-8">
         <div className="flex flex-col items-center gap-6 p-4">
           <img
@@ -191,7 +203,9 @@ const ProfileForm: React.FC<{
               required
               label="First name"
               errorMessage={errors.first_name?.message}
-              {...register("first_name", { required: FIELD_REQUIRED_ERROR_MSG })}
+              {...register("first_name", {
+                required: FIELD_REQUIRED_ERROR_MSG,
+              })}
             />
             <Input
               required
@@ -214,14 +228,8 @@ const ProfileForm: React.FC<{
                 label: name,
               }))}
             />
-            <Input
-              label="School"
-              {...register("profile.school")}
-            />
-            <Input
-              label="Kerberos"
-              {...register("profile.kerberos")}
-            />
+            <Input label="School" {...register("profile.school")} />
+            <Input label="Kerberos" {...register("profile.kerberos")} />
             <SelectMenu<GenderEnum>
               required
               onChange={(newGender) => {
@@ -251,19 +259,17 @@ const ProfileForm: React.FC<{
             )}
           </div>
 
-          <TextArea
-            label="User biography"
-            {...register("profile.biography")}
-          />
+          <TextArea label="User biography" {...register("profile.biography")} />
           <Button
             className="mt-2"
             loading={updateCurrentUser.isPending}
             disabled={updateCurrentUser.isPending}
             label="Save"
-            type="submit" />
+            type="submit"
+          />
         </form>
       </div>
-    </SectionCard >
+    </SectionCard>
   );
 };
 
