@@ -66,7 +66,6 @@ models/TokenVerifyRequest.ts
 models/Tournament.ts
 models/TournamentRound.ts
 models/TournamentSubmission.ts
-models/UserAvatarRequest.ts
 models/UserCreate.ts
 models/UserCreateRequest.ts
 models/UserPassed.ts
@@ -79,6 +78,5 @@ models/UserProfilePublicRequest.ts
 models/UserPublic.ts
 models/UserPublicRequest.ts
 models/UserResume.ts
-models/UserResumeRequest.ts
 models/index.ts
 runtime.ts

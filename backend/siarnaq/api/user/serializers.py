@@ -34,7 +34,7 @@ class UserPublicSerializer(serializers.ModelSerializer):
 class UserProfilePrivateSerializer(UserProfilePublicSerializer):
     # Couuntry field requires special serialization.
     # See https://github.com/SmileyChris/django-countries#django-rest-framework
-    country = CountryField(name_only=True)
+    country = CountryField()
 
     class Meta:
         model = UserProfile
