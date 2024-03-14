@@ -23,14 +23,12 @@ import type {
   ResetToken,
   ResetTokenRequest,
   TeamPublic,
-  UserAvatarRequest,
   UserCreate,
   UserCreateRequest,
   UserPrivate,
   UserPrivateRequest,
   UserPublic,
   UserResume,
-  UserResumeRequest,
 } from '../models';
 import {
     EmailFromJSON,
@@ -49,8 +47,6 @@ import {
     ResetTokenRequestToJSON,
     TeamPublicFromJSON,
     TeamPublicToJSON,
-    UserAvatarRequestFromJSON,
-    UserAvatarRequestToJSON,
     UserCreateFromJSON,
     UserCreateToJSON,
     UserCreateRequestFromJSON,
@@ -63,8 +59,6 @@ import {
     UserPublicToJSON,
     UserResumeFromJSON,
     UserResumeToJSON,
-    UserResumeRequestFromJSON,
-    UserResumeRequestToJSON,
 } from '../models';
 
 export interface UserPasswordResetConfirmCreateRequest {
@@ -80,7 +74,7 @@ export interface UserPasswordResetValidateTokenCreateRequest {
 }
 
 export interface UserUAvatarCreateRequest {
-    userAvatarRequest: UserAvatarRequest;
+    avatar?: Blob;
 }
 
 export interface UserUCreateRequest {
@@ -96,7 +90,7 @@ export interface UserUMeUpdateRequest {
 }
 
 export interface UserUResumeUpdateRequest {
-    userResumeRequest: UserResumeRequest;
+    resume?: Blob;
 }
 
 export interface UserURetrieveRequest {
@@ -215,15 +209,9 @@ export class UserApi extends runtime.BaseAPI {
      * Update uploaded avatar.
      */
     async userUAvatarCreateRaw(requestParameters: UserUAvatarCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        if (requestParameters.userAvatarRequest === null || requestParameters.userAvatarRequest === undefined) {
-            throw new runtime.RequiredError('userAvatarRequest','Required parameter requestParameters.userAvatarRequest was null or undefined when calling userUAvatarCreate.');
-        }
-
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -233,12 +221,32 @@ export class UserApi extends runtime.BaseAPI {
                 headerParameters["Authorization"] = `Bearer ${tokenString}`;
             }
         }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters.avatar !== undefined) {
+            formParams.append('avatar', requestParameters.avatar as any);
+        }
+
         const response = await this.request({
             path: `/api/user/u/avatar/`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: UserAvatarRequestToJSON(requestParameters.userAvatarRequest),
+            body: formParams,
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -247,7 +255,7 @@ export class UserApi extends runtime.BaseAPI {
     /**
      * Update uploaded avatar.
      */
-    async userUAvatarCreate(requestParameters: UserUAvatarCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async userUAvatarCreate(requestParameters: UserUAvatarCreateRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.userUAvatarCreateRaw(requestParameters, initOverrides);
     }
 
@@ -442,15 +450,9 @@ export class UserApi extends runtime.BaseAPI {
      * Retrieve or update the uploaded resume.
      */
     async userUResumeUpdateRaw(requestParameters: UserUResumeUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserResume>> {
-        if (requestParameters.userResumeRequest === null || requestParameters.userResumeRequest === undefined) {
-            throw new runtime.RequiredError('userResumeRequest','Required parameter requestParameters.userResumeRequest was null or undefined when calling userUResumeUpdate.');
-        }
-
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -460,12 +462,32 @@ export class UserApi extends runtime.BaseAPI {
                 headerParameters["Authorization"] = `Bearer ${tokenString}`;
             }
         }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters.resume !== undefined) {
+            formParams.append('resume', requestParameters.resume as any);
+        }
+
         const response = await this.request({
             path: `/api/user/u/resume/`,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
-            body: UserResumeRequestToJSON(requestParameters.userResumeRequest),
+            body: formParams,
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => UserResumeFromJSON(jsonValue));
@@ -474,7 +496,7 @@ export class UserApi extends runtime.BaseAPI {
     /**
      * Retrieve or update the uploaded resume.
      */
-    async userUResumeUpdate(requestParameters: UserUResumeUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserResume> {
+    async userUResumeUpdate(requestParameters: UserUResumeUpdateRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserResume> {
         const response = await this.userUResumeUpdateRaw(requestParameters, initOverrides);
         return await response.value();
     }
