@@ -1678,16 +1678,13 @@ paths:
       - user
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserAvatarRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/UserAvatarRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UserAvatarRequest'
-        required: true
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
       security:
       - jwtAuth: []
       responses:
@@ -1781,16 +1778,13 @@ paths:
       - user
       requestBody:
         content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserResumeRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/UserResumeRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UserResumeRequest'
-        required: true
+              type: object
+              properties:
+                resume:
+                  type: string
+                  format: binary
       security:
       - jwtAuth: []
       responses:
@@ -3165,15 +3159,6 @@ components:
       - tournament
       - user
       - username
-    UserAvatarRequest:
-      type: object
-      properties:
-        avatar:
-          type: string
-          format: binary
-          writeOnly: true
-      required:
-      - avatar
     UserCreate:
       type: object
       properties:
@@ -3462,15 +3447,6 @@ components:
       - ready
       - reason
       - url
-    UserResumeRequest:
-      type: object
-      properties:
-        resume:
-          type: string
-          format: binary
-          writeOnly: true
-      required:
-      - resume
   securitySchemes:
     jwtAuth:
       type: http

@@ -90,7 +90,7 @@ export function UserProfilePrivateRequestFromJSONTyped(json: any, ignoreDiscrimi
         return json;
     }
     return {
-        
+
         'gender': GenderEnumFromJSON(json['gender']),
         'gender_details': !exists(json, 'gender_details') ? undefined : json['gender_details'],
         'school': !exists(json, 'school') ? undefined : json['school'],
@@ -108,7 +108,7 @@ export function UserProfilePrivateRequestToJSON(value?: UserProfilePrivateReques
         return null;
     }
     return {
-        
+
         'gender': GenderEnumToJSON(value.gender),
         'gender_details': value.gender_details,
         'school': value.school,

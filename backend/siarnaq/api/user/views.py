@@ -96,6 +96,14 @@ class UserViewSet(
         teams_dict = {team["episode"]: team for team in serializer.data}
         return Response(teams_dict)
 
+    @extend_schema(request={
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "resume": {"type": "string", "format": "binary"},
+                },
+            }
+        },)
     @action(
         detail=False,
         methods=["get", "put"],
@@ -144,7 +152,14 @@ class UserViewSet(
             case _:
                 raise RuntimeError(f"Fallthrough! Was {request.method} implemented?")
 
-    @extend_schema(responses={status.HTTP_204_NO_CONTENT: None})
+    @extend_schema(responses={status.HTTP_204_NO_CONTENT: None}, request={
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "avatar": {"type": "string", "format": "binary"},
+                },
+            }
+        },)
     @action(
         detail=False,
         methods=["post"],

@@ -190,8 +190,8 @@ export const useAvatarUpload = (
 ): UseMutationResult<void, Error, UserUAvatarCreateRequest, unknown> =>
   useMutation({
     mutationKey: userMutationKeys.avatarUpload({ episodeId }),
-    mutationFn: async ({ userAvatarRequest }: UserUAvatarCreateRequest) => {
-      await toast.promise(avatarUpload({ userAvatarRequest }), {
+    mutationFn: async (userAvatarRequest: UserUAvatarCreateRequest) => {
+      await toast.promise(avatarUpload(userAvatarRequest), {
         loading: "Uploading new avatar...",
         success: "Uploaded new avatar!",
         error: "Error uploading new avatar.",
@@ -214,8 +214,8 @@ export const useResumeUpload = (
 ): UseMutationResult<void, Error, UserUResumeUpdateRequest, unknown> =>
   useMutation({
     mutationKey: userMutationKeys.resumeUpload({ episodeId }),
-    mutationFn: async ({ userResumeRequest }: UserUResumeUpdateRequest) => {
-      await toast.promise(resumeUpload({ userResumeRequest }), {
+    mutationFn: async (userResumeRequest: UserUResumeUpdateRequest) => {
+      await toast.promise(resumeUpload(userResumeRequest), {
         loading: "Uploading new resume...",
         success: "Uploaded new resume!",
         error: "Error uploading new resume.",
