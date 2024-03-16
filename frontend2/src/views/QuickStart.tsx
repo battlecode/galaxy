@@ -1,9 +1,20 @@
 import React from "react";
 import DocumentationPage from "../components/DocumentationPage";
-import { BC23_QUICKSTART } from "../content/bc23";
+import {
+  quickStartText,
+  defaultQuickStartText,
+} from "../content/ManageContent";
+
+import { useEpisodeId } from "../contexts/EpisodeContext";
 
 const QuickStart: React.FC = () => {
-  return <DocumentationPage text={BC23_QUICKSTART} />;
+  const { episodeId } = useEpisodeId();
+
+  return (
+    <DocumentationPage
+      text={quickStartText[episodeId] ?? defaultQuickStartText}
+    />
+  );
 };
 
 export default QuickStart;
