@@ -22,24 +22,29 @@ import {
   avatarUpload,
   createUser,
   doResetPassword,
-  getCurrentUserInfo,
-  getTeamsByUser,
-  getUserInfoById,
   resumeUpload,
   updateCurrentUser,
 } from "./userApi";
 import { toast } from "react-hot-toast";
-import { login, loginCheck } from "../auth/authApi";
+import { login } from "../auth/authApi";
+import {
+  myUserInfoFactory,
+  otherUserInfoFactory,
+  otherUserTeamsFactory,
+  tokenVerifyFactory,
+} from "./userFactories";
+import { buildKey } from "../helpers";
 
 // ---------- QUERY HOOKS ----------//
-
 /**
  * For checking if a user is logged in.
  */
-export const useIsLoggedIn = (): UseQueryResult<boolean, Error> =>
+export const useIsLoggedIn = (
+  queryClient: QueryClient,
+): UseQueryResult<boolean, Error> =>
   useQuery({
-    queryKey: userQueryKeys.tokenVerify,
-    queryFn: async () => await loginCheck(),
+    queryKey: buildKey(tokenVerifyFactory.queryKey, { queryClient }),
+    queryFn: async () => await tokenVerifyFactory.queryFn({ queryClient }),
     staleTime: Infinity,
   });
 
@@ -48,8 +53,9 @@ export const useIsLoggedIn = (): UseQueryResult<boolean, Error> =>
  */
 export const useCurrentUserInfo = (): UseQueryResult<UserPrivate, Error> =>
   useQuery({
-    queryKey: userQueryKeys.meBase,
-    queryFn: async () => await getCurrentUserInfo(),
+    // These empty objects are necessary to make the generic typing work :p
+    queryKey: buildKey(myUserInfoFactory.queryKey, {}),
+    queryFn: async () => await myUserInfoFactory.queryFn({}),
   });
 
 /**
@@ -59,8 +65,8 @@ export const useUserInfoById = ({
   id,
 }: UserURetrieveRequest): UseQueryResult<UserPublic, Error> =>
   useQuery({
-    queryKey: userQueryKeys.otherInfo({ id }),
-    queryFn: async () => await getUserInfoById({ id }),
+    queryKey: buildKey(otherUserInfoFactory.queryKey, { id }),
+    queryFn: async () => await otherUserInfoFactory.queryFn({ id }),
   });
 
 /**
@@ -73,8 +79,10 @@ export const useTeamsByUser = ({
   Error
 > =>
   useQuery({
-    queryKey: userQueryKeys.otherTeams({ id }),
-    queryFn: async () => await getTeamsByUser({ id }),
+    // queryKey: userQueryKeys.otherTeams({ id }),
+    // queryFn: async () => await getTeamsByUser({ id }),
+    queryKey: buildKey(otherUserTeamsFactory.queryKey, { id }),
+    queryFn: async () => await otherUserTeamsFactory.queryFn({ id }),
   });
 
 // ---------- MUTATION HOOKS ----------//
@@ -99,7 +107,10 @@ export const useCreateUser = (
         } catch (err) {
           throw err as Error;
         } finally {
-          await queryClient.refetchQueries({ queryKey: userQueryKeys.meBase });
+          await queryClient.refetchQueries({
+            // OK to call KEY.key() here as we are refetching all user-me queries.
+            queryKey: userQueryKeys.meBase.key(),
+          });
         }
       };
       await toast.promise(toastFn(), {
@@ -116,20 +127,31 @@ export const useCreateUser = (
 export const useUpdateCurrentUserInfo = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, UserUMePartialUpdateRequest, unknown> =>
+): UseMutationResult<
+  UserPrivate,
+  Error,
+  UserUMePartialUpdateRequest,
+  unknown
+> =>
   useMutation({
     mutationKey: userMutationKeys.updateCurrent({ episodeId }),
     mutationFn: async ({
       patchedUserPrivateRequest,
     }: UserUMePartialUpdateRequest) => {
-      await toast.promise(updateCurrentUser({ patchedUserPrivateRequest }), {
-        loading: "Updating user info...",
-        success: "Updated user info!",
-        error: "Error updating user info.",
-      });
+      return await toast.promise(
+        updateCurrentUser({ patchedUserPrivateRequest }),
+        {
+          loading: "Updating user info...",
+          success: "Updated user info!",
+          error: "Error updating user info.",
+        },
+      );
     },
     onSuccess: async (data) => {
-      await queryClient.setQueryData(userQueryKeys.meBase, data);
+      await queryClient.setQueryData(
+        buildKey(myUserInfoFactory.queryKey, { episodeId }),
+        data,
+      );
     },
   });
 
@@ -177,7 +199,9 @@ export const useAvatarUpload = (
     },
     onSuccess: async () => {
       // Refetch the current user's info.
-      await queryClient.refetchQueries({ queryKey: userQueryKeys.meBase });
+      await queryClient.refetchQueries({
+        queryKey: buildKey(myUserInfoFactory.queryKey, { episodeId }),
+      });
     },
   });
 
@@ -199,6 +223,8 @@ export const useResumeUpload = (
     },
     onSuccess: async () => {
       // Refetch the current user's info.
-      await queryClient.refetchQueries({ queryKey: userQueryKeys.meBase });
+      await queryClient.refetchQueries({
+        queryKey: buildKey(myUserInfoFactory.queryKey, { episodeId }),
+      });
     },
   });

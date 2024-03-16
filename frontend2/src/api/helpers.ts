@@ -1,5 +1,14 @@
 import Cookies from "js-cookie";
-import { Configuration } from "./_autogen";
+import { Configuration, type ResponseError } from "./_autogen";
+import type {
+  PaginatedQueryFuncBuilder,
+  PaginatedRequestMinimal,
+  PaginatedResultMinimal,
+  QueryKeyBuilder,
+} from "./apiTypes";
+import type { QueryClient, QueryKey } from "@tanstack/react-query";
+import { isPresent } from "../utils/utilTypes";
+import toast from "react-hot-toast";
 
 // fall back to localhost for now
 export const BASE_URL =
@@ -28,5 +37,50 @@ export const downloadFile = async (
   window.URL.revokeObjectURL(objUrl);
 };
 
-// TODO: implement me!
-// export const prefetchNextPage = async (queryClient: QueryClient) => {};
+/**
+ * Build a hashable `QueryKey` from a request object and a `QueryKeyBuilder`.
+ * This is the preferred way to build a `QueryKey`, as not all `QueryKeyBuilder`s are directly callable
+ *  (i.e. `builder.key(request)` may throw a static error).
+ * @param keyBuilder the `QueryKeyBuilder` to use a a template for building the key
+ * @param request the request object to populate the determining fields of the key
+ * @returns a hashable `QueryKey` that can be used as a `queryKey` in a `useQuery` hook
+ */
+export const buildKey = <T>(
+  keyBuilder: QueryKeyBuilder<T>,
+  request: T,
+): QueryKey => {
+  return keyBuilder.key(request);
+};
+
+/**
+ * Given a paginated query result, prefetch the next page of table data if it exists.
+ * @param request the original request
+ * @param result the result of the original request
+ * @param queryKey the `QueryKeyBuilder` for converting the request into a hashable key
+ * @param queryFn the function to call to fetch the next page
+ * @param queryClient the reference to the query client
+ */
+export const prefetchNextPage = async <
+  T extends PaginatedRequestMinimal,
+  K extends PaginatedResultMinimal,
+>(
+  request: T,
+  result: PaginatedResultMinimal,
+  queryKey: QueryKeyBuilder<T>,
+  queryFn: PaginatedQueryFuncBuilder<T, K>,
+  queryClient: QueryClient,
+): Promise<void> => {
+  if (isPresent(result.next)) {
+    // If no page provided, then we just fetched page 1
+    const nextPage = isPresent(request.page) ? request.page + 1 : 2;
+    try {
+      await queryClient.prefetchQuery({
+        queryKey: buildKey(queryKey, { ...request, page: nextPage }),
+        queryFn: async () =>
+          await queryFn({ ...request, page: nextPage }, queryClient, false),
+      });
+    } catch (e) {
+      toast.error((e as ResponseError).message);
+    }
+  }
+};
