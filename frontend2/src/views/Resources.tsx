@@ -1,9 +1,16 @@
 import React from "react";
-import { BC23_RESOURCES } from "../content/bc23";
+import { defaultResourcesText, resourcesText } from "../content/ManageContent";
 import DocumentationPage from "../components/DocumentationPage";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 
 const Resources = (): JSX.Element => {
-  return <DocumentationPage text={BC23_RESOURCES} />;
+  const { episodeId } = useEpisodeId();
+
+  return (
+    <DocumentationPage
+      text={resourcesText[episodeId] ?? defaultResourcesText}
+    />
+  );
 };
 
 export default Resources;
