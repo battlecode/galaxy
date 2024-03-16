@@ -46,6 +46,21 @@ export const logout = async (queryClient: QueryClient): Promise<void> => {
   });
 };
 
+export const tokenVerify = async (): Promise<boolean> => {
+  const accessToken = Cookies.get("access");
+  if (accessToken === undefined) {
+    return false;
+  }
+  try {
+    await API.tokenVerifyCreate({
+      tokenVerifyRequest: { token: accessToken },
+    });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 /**
  * Checks whether the currently held JWT access token is still valid (by posting it to the verify endpoint),
  * hence whether or not the frontend still has logged-in access.
@@ -56,18 +71,9 @@ export const logout = async (queryClient: QueryClient): Promise<void> => {
 export const loginCheck = async (
   queryClient: QueryClient,
 ): Promise<boolean> => {
-  const accessToken = Cookies.get("access");
-  if (accessToken === undefined) {
+  const verified = await tokenVerify();
+  if (!verified) {
     await logout(queryClient);
-    return false;
   }
-  try {
-    await API.tokenVerifyCreate({
-      tokenVerifyRequest: { token: accessToken },
-    });
-    return true;
-  } catch {
-    await logout(queryClient);
-    return false;
-  }
+  return verified;
 };

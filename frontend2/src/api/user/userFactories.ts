@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { QueryFactory } from "../apiTypes";
 import { userQueryKeys } from "./userKeys";
-import { loginCheck } from "../auth/authApi";
+import { tokenVerify } from "../auth/authApi";
 import type {
   TeamPublic,
   UserPrivate,
@@ -16,7 +16,7 @@ export const tokenVerifyFactory: QueryFactory<
   boolean
 > = {
   queryKey: userQueryKeys.tokenVerify,
-  queryFn: async ({ queryClient }) => await loginCheck(queryClient),
+  queryFn: async () => await tokenVerify(),
 } as const;
 
 export const myUserInfoFactory: QueryFactory<unknown, UserPrivate> = {
