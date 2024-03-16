@@ -32,6 +32,9 @@ import MyTeam from "./views/MyTeam";
 import Tournaments from "./views/Tournaments";
 import TournamentPage from "./views/Tournament";
 import Submissions from "./views/Submissions";
+import DebuggingTips from "./views/DebuggingTips";
+import CommonIssues from "./views/CommonIssues";
+
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast, Toaster } from "react-hot-toast";
 import { ResponseError } from "./api/_autogen/runtime";
@@ -187,6 +190,8 @@ const router = createBrowserRouter([
           },
         ],
       },
+      { path: "debuggingtips", element: <DebuggingTips /> },
+      { path: "commonissues", element: <CommonIssues /> },
       // Pages that should always be visible
       {
         path: "",

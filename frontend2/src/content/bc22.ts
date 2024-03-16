@@ -1,14 +1,14 @@
 import type { TourneyPageKey } from "./ContentStruct";
 
-export const BC23_QUICKSTART = `# Quick Start
+export const BC22_QUICKSTART = `# Quick Start 22
 
-This is the Battlecode 2023 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
+This is the Battlecode 2022 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
 
 ## Create an account and team
 
 To participate in Battlecode, you need an account and a team. Each team can consist of 1 to 4 people.
 
-[Create an account](/register) on this website, and then go to the [team section](/bc23/team) to either create or join a team.
+[Create an account](/register) on this website, and then go to the [team section](/bc22/team) to either create or join a team.
 
 ## Installation
 
@@ -22,13 +22,13 @@ If you're unsure how to install the JDK, you can find instructions for all opera
 
 ### Step 2: Download Battlecode
 
-Next, you should download the [Battlecode 2023 scaffold](https://github.com/battlecode/battlecode23-scaffold). To get up and running quickly, you can click "Clone or download" and then "Download ZIP," and move on to the next step.
+Next, you should download the [Battlecode 2022 scaffold](https://github.com/battlecode/battlecode22-scaffold). To get up and running quickly, you can click "Clone or download" and then "Download ZIP," and move on to the next step.
 
 TODO: the rest of the page
 
 `;
 
-export const BC23_RESOURCES = `# Markdown syntax guide
+export const BC22_RESOURCES = `# Markdown syntax guide 22
 
 # This is a Heading h1
 ## This is a Heading h2
@@ -69,10 +69,10 @@ alert(message);
 this is \`an inline code block\`
 `;
 
-export const BC23_TOURNAMENTS: Record<TourneyPageKey, string> = {
-  schedule: `# Battlecode 2023 Tournament Schedule
+export const BC22_TOURNAMENTS: Record<TourneyPageKey, string> = {
+  schedule: `# Battlecode 2022 Tournament Schedule
 
-  Battlecode 2023 will have several tournaments throughout the month! We stream and commentate all tournaments online. The deadline to submit code for each non-final tournament is usually 7 pm EST the day before the tournament.
+  Battlecode 2022 will have several tournaments throughout the month! We stream and commentate all tournaments online. The deadline to submit code for each non-final tournament is usually 7 pm EST the day before the tournament.
   `,
   prizes: `# Prizes
 
