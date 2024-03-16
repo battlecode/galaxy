@@ -82,7 +82,9 @@ const episodeLoader: LoaderFunction = async ({ params }) => {
   // if the episode is not found, throw an error.
   const id = params.episodeId ?? "";
   // Verify that the current token is valid first!
-  await loginCheck(queryClient);
+  if (!await loginCheck(queryClient)) {
+    console.log("user was not logged in");
+  }
   // Now we can fetch the episode info.
   return await queryClient.fetchQuery({
     queryKey: buildKey(episodeInfoFactory.queryKey, { id }),
