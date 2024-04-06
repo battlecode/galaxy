@@ -5,6 +5,8 @@ import SectionCard from "../components/SectionCard";
 import CountdownDigital from "../components/CountdownDigital";
 import Spinner from "../components/Spinner";
 import { SocialIcon } from "react-social-icons";
+import TeamChart from "../components/tables/chart/TeamChart";
+import * as random_data from "../components/tables/chart/randomData";
 
 const Home: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -53,6 +55,22 @@ const Home: React.FC = () => {
               />
               <SocialIcon url="https://discord.gg/N86mxkH" className={SOCIAL} />
             </div>
+          </SectionCard>
+          <SectionCard title="Performance History">
+            <TeamChart
+              yAxisLabel="Performance"
+              values={{
+                "Gone Sharkin": random_data.randomData1,
+                bruteforcer: random_data.randomData2,
+                Bear: random_data.randomData3,
+                "cout for clout": random_data.randomData4,
+                "don't eat my nonorientable shapes": random_data.randomData5,
+                "I ran out of team names": random_data.randomData6,
+                "I ran out of team names 2": random_data.randomData7,
+                "I ran out of team names 3": random_data.randomData8,
+                "I ran out of team names 4": random_data.randomData9,
+              }}
+            />
           </SectionCard>
           {/* <SectionCard title="Announcements">ANNOUNCEMENTS (TODO)</SectionCard> */}
         </div>
