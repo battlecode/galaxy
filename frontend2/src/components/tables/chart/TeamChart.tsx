@@ -1,7 +1,7 @@
 import React from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import * as chart from "./chart";
+import * as chart from "./Chart";
 
 type UTCMilliTimestamp = number;
 
