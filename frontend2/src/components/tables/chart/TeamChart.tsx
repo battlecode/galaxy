@@ -1,7 +1,7 @@
 import React from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import * as chart from "./Chart";
+import * as chart from "./chartUtil";
 
 type UTCMilliTimestamp = number;
 
@@ -41,6 +41,10 @@ const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
     },
     title: {
       text: "",
+    },
+    credits: {
+      href: "https://jmerle.github.io/battlecode-2024-statistics/",
+      text: "Inspired by jmerle",
     },
     tooltip: {
       ...chart.highchartsOptionsBase.tooltip,

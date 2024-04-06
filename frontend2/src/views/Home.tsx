@@ -6,7 +6,7 @@ import CountdownDigital from "../components/CountdownDigital";
 import Spinner from "../components/Spinner";
 import { SocialIcon } from "react-social-icons";
 import TeamChart from "../components/tables/chart/TeamChart";
-import * as random_data from "../components/tables/chart/RandomData";
+import * as random_data from "../components/tables/chart/randomData";
 
 const Home: React.FC = () => {
   const { episodeId } = useEpisodeId();

@@ -21,6 +21,9 @@ export const dummyData = [
   ["2024-02-01T10:06:43.283346-05:00", 0],
 ]; // From Lowell
 
+// These are waypoints that are layered on top of the chart so it is easy to
+// tell when certain dates occured. The data to the right is formatted to
+// %Y-%m-%dT%H:%M:%S
 export const tournaments = [
   ["Sprint 1", "2023-01-18T19:00:00-05:00"],
   ["Sprint 2", "2023-01-20T19:00:00-05:00"],
