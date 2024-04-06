@@ -5,7 +5,7 @@ go 1.18
 require (
 	cloud.google.com/go/storage v1.28.1
 	github.com/baruwa-enterprise/clamd v1.0.1
-	github.com/cloudevents/sdk-go/v2 v2.12.0
+	github.com/cloudevents/sdk-go/v2 v2.15.2
 	github.com/rs/zerolog v1.28.0
 )
 
