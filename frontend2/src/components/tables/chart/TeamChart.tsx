@@ -5,9 +5,15 @@ import * as chart from "./chartUtil";
 
 type UTCMilliTimestamp = number;
 
+// `yAxisLabel` is the name that is shown to the right of the graph.
+//
+// `values` holds a dict where the string keys are the name of the team, and
+// the value is an array of arrays where the first spot is a UTC timestampm and
+// the second is the ranking of that team. Example:
+//
+// { "Gone Sharkin" : [ [ 1673826806000.0, 1000 ], [1673826805999.0, 900], ... ], ...}
 export interface TeamChartProps {
   yAxisLabel: string;
-
   values: Record<string, Array<[UTCMilliTimestamp, number]>>;
 }
 
