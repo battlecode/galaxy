@@ -35,8 +35,8 @@ export const dummyData = [
 
 
 export const tournaments = [
-  ["Sprint 1", "2023-01-25T19:00:00-05:00"],
-  ["Sprint 2", "2023-01-26T19:00:00-05:00"],
+  ["Sprint 1", "2023-01-18T19:00:00-05:00"],
+  ["Sprint 2", "2023-01-20T19:00:00-05:00"],
 ];
 
 export const formatNumber = (value: number, decimals = 0): string => {
