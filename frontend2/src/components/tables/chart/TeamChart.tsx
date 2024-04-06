@@ -1,9 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import HighchartsAccessibility from "highcharts/modules/accessibility";
 import * as chart from "./chart";
-import * as random_data from "./random_data";
 
 type UTCMilliTimestamp = number;
 

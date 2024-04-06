@@ -1,7 +1,4 @@
-import React, { Component } from "react";
 import type Highcharts from "highcharts";
-import HighchartsReact from "highcharts-react-official";
-import HighchartsAccessibility from "highcharts/modules/accessibility";
 
 export const dummyData = [
   ["2023-01-07T23:40:23.724944-05:00", 213],
@@ -23,16 +20,6 @@ export const dummyData = [
   ["2024-01-27T23:35:48.751288-05:00", 0],
   ["2024-02-01T10:06:43.283346-05:00", 0],
 ]; // From Lowell
-
-
-
-
-
-
-
-
-
-
 
 export const tournaments = [
   ["Sprint 1", "2023-01-18T19:00:00-05:00"],
@@ -108,7 +95,7 @@ export const highchartsOptionsBase: Highcharts.Options = {
     allowDecimals: false,
   },
   tooltip: {
-	split: true,
+    split: true,
     valueDecimals: 0,
   },
 
