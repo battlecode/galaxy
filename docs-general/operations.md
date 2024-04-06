@@ -43,6 +43,31 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
   - Also, have this version be v1.0.0 .
   - You can ask the engine/client teams to do this, like with the prerelease testing versions.
 
+### Before final tournament
+
+- **Remove any devs from regular teams!!!!** If a dev is on a regular team (and hasn't submitted a resume), the dev could invalidate the team from being eligible for prizes.
+
+- Set up custom eligibility criterion for the final tournaments
+
+  - To pull only a specific set of teams (ie the finalists)
+  - NB: Finalists will not be seeded in order of finish during quals, but instead, using current rankings (including any laddering after quals). This is probably fine. But if people object, consider working around this
+
+- Prepare for students getting grades!
+  - Set up ReferencePlayer
+    - Create the team
+    - Put the `referenceplayer` user on that team
+    - Upload the bot
+  - Select maps for students to use while challenging `referenceplayer`
+  - **Input this into a ClassRequirement on the database**
+  - Announce to students that ReferencePlayer is ready, along with some instructions, including:
+    - **the scrimmage request must be an unranked scrimmage request**
+    - **the maps of the scrimmage must exactly match the maps on the ClassRequirement**
+      - Users don't have access to view the ClassRequirement, so you should spell out the users here
+    - And perhaps other stuff that I can't think of rn. Check with the presidents!
+  - Monitor that people are passing the class
+    - Use this endpoint to get results: `https://api.battlecode.org/api/team/{episode}/requirement/{requirementId}/compute/`
+  - Get final grades (whenever deemed fit) using that same endpoint
+
 ## Get dev permissions
 
 TODO, tracked in #681
@@ -67,6 +92,14 @@ Other symptoms include:
 ## Debugging
 
 Issues with failing runs of submission compilations or matches can sometimes be resolved via a admin requeue. To do this, in the admin panel, select the checkbox for each submission/match, and then go to the dropdown above the table and select "Force requeue". This approach is quick and requires no code change, so it's always an easy place to start.
+
+## Deleting things from the database
+
+Generally this is discouraged, but in desperate situations, it can be a helpful measure.
+
+You can delete any submissions as you please. Do this from the admin panel (go to the list, check boxes, click the dropdown, etc)
+
+_You can only delete a suffix of matches -- ie, only the last N matches for any N -- in the database_. Again this is done through the admin panel.
 
 ## Resetting people's passwords
 
