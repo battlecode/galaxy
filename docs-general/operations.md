@@ -27,7 +27,8 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
   - Sponsors
   - Tournament info
 - Release a new version of the frontend.
-- Release a new _private_ (at first) version of the engine and client when ready. Instructions for this should be in the respective readme. (You can ask their teams to do it -- in fact, this is arguably better, for shared knowledge.)
+- Release a new _private_ (at first) version of the engine and client when ready. In particular, **set IS_PUBLIC=NO in release.yml, and have the release number be below 1.0.0**
+  - Instructions for this should be in the respective readme. (You can ask their teams to do it -- in fact, this is arguably better, for shared knowledge.)
 - **Give, to the battlecodedownloadpackage "account", access to the scaffold.**
 - Now there are quite a few important things to test...
 - **Test that a game can be played on the website!** Create a couple teams, submit some bots, queue up a match, etc.
@@ -42,6 +43,8 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
   - Ensure that the release info in `release.yml` in the engine/client repository has `IS_PUBLIC: YES`.
   - Also, have this version be v1.0.0 .
   - You can ask the engine/client teams to do this, like with the prerelease testing versions.
+- Add the maps we'll be releasing: https://api.battlecode.org/admin/episodes/map/add/
+- Fill in the autoscrim schedule: https://api.battlecode.org/admin/episodes/episode/{episodeId}/change/
 
 ### Before final tournament
 
