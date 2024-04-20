@@ -31,6 +31,8 @@ import type {
 } from "../_autogen";
 import {
   acceptScrimmage,
+  cancelScrimmage,
+  getUserScrimmagesOutboxList,
   rejectScrimmage,
   requestScrimmage,
   uploadSubmission,
@@ -445,16 +447,25 @@ export const useCancelScrimmage = (
         // Invalidate the outbox query
         queryClient
           .invalidateQueries({
-            queryKey: competeQueryKeys.outbox({ episodeId }),
+            queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
+              episodeId,
+            }),
           })
           .catch((e) => toast.error((e as Error).message));
 
         // Prefetch the first page of the outbox list
         queryClient
           .prefetchQuery({
-            queryKey: competeQueryKeys.outbox({ episodeId, page: 1 }),
+            queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
+              episodeId,
+              page: 1,
+            }),
             queryFn: async () =>
-              await getUserScrimmagesOutboxList({ episodeId, page: 1 }),
+              await scrimmageOutboxListFactory.queryFn(
+                { episodeId, page: 1 },
+                queryClient,
+                true,
+              ),
           })
           .catch((e) => toast.error((e as Error).message));
       };
