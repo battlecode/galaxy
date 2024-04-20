@@ -18,6 +18,7 @@ import {
   type CompeteMatchTournamentListRequest,
   type CompeteMatchListRequest,
   type CompeteSubmissionTournamentListRequest,
+  type CompeteRequestDestroyRequest,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
 
@@ -109,6 +110,18 @@ export const rejectScrimmage = async ({
   id,
 }: CompeteRequestRejectCreateRequest): Promise<void> => {
   await API.competeRequestRejectCreate({ episodeId, id });
+};
+
+/**
+ * Cancel a scrimmage request.
+ * @param episodeId The current episode's ID.
+ * @param id The scrimmage's ID to cancel.
+ */
+export const cancelScrimmage = async ({
+  episodeId,
+  id,
+}: CompeteRequestDestroyRequest): Promise<void> => {
+  await API.competeRequestDestroy({ episodeId, id });
 };
 
 /**

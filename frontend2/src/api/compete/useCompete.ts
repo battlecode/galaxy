@@ -14,6 +14,7 @@ import type {
   CompeteMatchTournamentListRequest,
   CompeteRequestAcceptCreateRequest,
   CompeteRequestCreateRequest,
+  CompeteRequestDestroyRequest,
   CompeteRequestInboxListRequest,
   CompeteRequestOutboxListRequest,
   CompeteRequestRejectCreateRequest,
@@ -29,6 +30,7 @@ import type {
 } from "../_autogen";
 import {
   acceptScrimmage,
+  cancelScrimmage,
   getAllUserTournamentSubmissions,
   getMatchesList,
   getScrimmagesListByTeam,
@@ -403,7 +405,6 @@ export const useRequestScrimmage = (
         });
 
         // Invalidate the outbox query
-        // TODO: ensure correct invalidation behavior!
         queryClient
           .invalidateQueries({
             queryKey: competeQueryKeys.outbox({ episodeId }),
@@ -425,7 +426,7 @@ export const useRequestScrimmage = (
       return await toast.promise(toastFn(), {
         loading: "Requesting scrimmage...",
         success: "Scrimmage requested!",
-        error: "Error requesting scrimmage.",
+        error: "Error requesting scrimmage. Is the requested team eligible?",
       });
     },
   });
@@ -497,7 +498,6 @@ export const useRejectScrimmage = (
         await rejectScrimmage({ episodeId, id });
 
         // Invalidate the inbox query
-        // TODO: ensure correct invalidation behavior!
         queryClient
           .invalidateQueries({
             queryKey: competeQueryKeys.inbox({ episodeId }),
@@ -518,6 +518,44 @@ export const useRejectScrimmage = (
         loading: "Rejecting scrimmage...",
         success: "Scrimmage rejected!",
         error: "Error rejecting scrimmage.",
+      });
+    },
+  });
+
+/**
+ * For cancelling a scrimmage request.
+ */
+export const useCancelScrimmage = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, CompeteRequestDestroyRequest, unknown> =>
+  useMutation({
+    mutationKey: competeMutationKeys.cancelScrim({ episodeId }),
+    mutationFn: async ({ episodeId, id }: CompeteRequestDestroyRequest) => {
+      const toastFn = async (): Promise<void> => {
+        await cancelScrimmage({ episodeId, id });
+
+        // Invalidate the outbox query
+        queryClient
+          .invalidateQueries({
+            queryKey: competeQueryKeys.outbox({ episodeId }),
+          })
+          .catch((e) => toast.error((e as Error).message));
+
+        // Prefetch the first page of the outbox list
+        queryClient
+          .prefetchQuery({
+            queryKey: competeQueryKeys.outbox({ episodeId, page: 1 }),
+            queryFn: async () =>
+              await getUserScrimmagesOutboxList({ episodeId, page: 1 }),
+          })
+          .catch((e) => toast.error((e as Error).message));
+      };
+
+      await toast.promise(toastFn(), {
+        loading: "Cancelling scrimmage...",
+        success: "Scrimmage cancelled!",
+        error: "Error cancelling scrimmage.",
       });
     },
   });

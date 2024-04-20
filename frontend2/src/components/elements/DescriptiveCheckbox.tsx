@@ -25,6 +25,7 @@ export const getCheckboxState = (
 };
 
 interface DescriptiveCheckboxProps {
+  disabled?: boolean;
   status: CheckboxState;
   onChange: (checked: boolean) => void;
   title: string;
@@ -32,6 +33,7 @@ interface DescriptiveCheckboxProps {
 }
 
 const DescriptiveCheckbox: React.FC<DescriptiveCheckboxProps> = ({
+  disabled = false,
   status,
   onChange,
   title,
@@ -41,13 +43,13 @@ const DescriptiveCheckbox: React.FC<DescriptiveCheckboxProps> = ({
     <Switch
       checked={status === CheckboxState.CHECKED}
       onChange={onChange}
-      disabled={status === CheckboxState.LOADING}
+      disabled={disabled || status === CheckboxState.LOADING}
       className={`flex w-full
       flex-row items-center justify-between gap-3 rounded-lg px-6 py-4 shadow ring-2 ring-inset
-       ring-cyan-600/20 transition-all ui-checked:bg-cyan-900/80 ui-checked:ring-0`}
+       ring-cyan-600/20 transition-all disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 disabled:ring-gray-400 ui-checked:bg-cyan-900/80 ui-checked:ring-0`}
     >
       <div className="flex flex-col gap-2 text-left">
-        <div className="font-semibold ui-checked:text-white ">{title}</div>
+        <div className="font-semibold ui-checked:text-white">{title}</div>
         <div className="text-sm text-cyan-700 ui-checked:text-cyan-100">
           {description}
         </div>
