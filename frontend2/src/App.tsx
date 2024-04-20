@@ -46,6 +46,7 @@ import { queueLoader } from "./api/loaders/queueLoader";
 import { tournamentsLoader } from "./api/loaders/tournamentsLoader";
 import { tournamentLoader } from "./api/loaders/tournamentLoader";
 import { homeLoader } from "./api/loaders/homeLoader";
+import ErrorBoundary from "./views/ErrorBoundary";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -63,6 +64,9 @@ const queryClient = new QueryClient({
 queryClient.setQueryDefaults(["team"], { retry: false });
 queryClient.setQueryDefaults(["user"], { retry: false });
 
+// Run a check to see if the user has an invalid token
+await loginCheck(queryClient);
+
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -77,32 +81,40 @@ const App: React.FC = () => {
   );
 };
 
-const episodeLoader: LoaderFunction = async ({ params }) => {
+const episodeLoader: LoaderFunction = ({ params }) => {
   // check if the episodeId is a valid one.
   // if the episode is not found, throw an error.
   const id = params.episodeId ?? "";
-  // Verify that the current token is valid first!
-  if (!await loginCheck(queryClient)) {
-    console.log("user was not logged in");
-  }
-  // Now we can fetch the episode info.
-  return await queryClient.fetchQuery({
+
+  // Prefetch the episode info.
+  void queryClient.ensureQueryData({
     queryKey: buildKey(episodeInfoFactory.queryKey, { id }),
     queryFn: async () => await episodeInfoFactory.queryFn({ id }),
     staleTime: Infinity,
   });
+
+  return null;
 };
 
 const router = createBrowserRouter([
   // Pages that should render without a sidebar/navbar
-  { path: "/login", element: <Login /> },
-  { path: "/logout", element: <Logout /> },
-  { path: "/register", element: <Register /> },
-  { path: "/password_forgot", element: <PasswordForgot /> },
-  { path: "/password_change", element: <PasswordChange /> },
+  { path: "/login", element: <Login />, errorElement: <ErrorBoundary /> },
+  { path: "/logout", element: <Logout />, errorElement: <ErrorBoundary /> },
+  { path: "/register", element: <Register />, errorElement: <ErrorBoundary /> },
+  {
+    path: "/password_forgot",
+    element: <PasswordForgot />,
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: "/password_change",
+    element: <PasswordChange />,
+    errorElement: <ErrorBoundary />,
+  },
   // Account page doesn't have episode id in URL
   {
     element: <PrivateRoute />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         element: <EpisodeLayout />,
@@ -113,9 +125,9 @@ const router = createBrowserRouter([
   // Pages that will contain the episode sidebar and navbar (excl. account page)
   {
     element: <EpisodeLayout />,
+    errorElement: <ErrorBoundary />,
     path: "/:episodeId",
     loader: episodeLoader,
-    errorElement: <NotFound />,
     children: [
       {
         // Pages that should only be visible when logged in
@@ -139,8 +151,16 @@ const router = createBrowserRouter([
         ],
       },
       // Pages that should always be visible
-      { path: "", element: <Home />, loader: homeLoader(queryClient) },
-      { path: "home", element: <Home />, loader: homeLoader(queryClient) },
+      {
+        path: "",
+        element: <Home />,
+        loader: homeLoader(queryClient),
+      },
+      {
+        path: "home",
+        element: <Home />,
+        loader: homeLoader(queryClient),
+      },
       { path: "resources", element: <Resources /> },
       { path: "quickstart", element: <QuickStart /> },
       {
@@ -148,7 +168,11 @@ const router = createBrowserRouter([
         element: <Rankings />,
         loader: rankingsLoader(queryClient),
       },
-      { path: "queue", element: <Queue />, loader: queueLoader(queryClient) },
+      {
+        path: "queue",
+        element: <Queue />,
+        loader: queueLoader(queryClient),
+      },
       {
         path: "tournaments",
         element: <Tournaments />,
@@ -165,7 +189,11 @@ const router = createBrowserRouter([
       },
     ],
   },
-  { path: "/", element: <Navigate to={`/${DEFAULT_EPISODE}/home`} /> },
+  {
+    path: "/",
+    element: <Navigate to={`/${DEFAULT_EPISODE}/home`} />,
+    errorElement: <ErrorBoundary />,
+  },
 ]);
 
 export default App;

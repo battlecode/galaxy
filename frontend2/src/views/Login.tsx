@@ -22,16 +22,8 @@ const Login: React.FC = () => {
     formState: { isSubmitting, isDirty },
   } = useForm<LoginFormInput>();
   const { episodeId } = useEpisodeId();
-  const { authState } = useCurrentUser();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // redirect to home if already logged in
-    if (authState === AuthStateEnum.AUTHENTICATED) {
-      navigate(episodeId !== undefined ? `/${episodeId}/home` : "/");
-    }
-  }, [authState]);
 
   const onSubmit: SubmitHandler<LoginFormInput> = async (data) => {
     try {
@@ -41,6 +33,7 @@ const Login: React.FC = () => {
         error:
           "Error logging in. Did you enter your username and password correctly?",
       });
+      navigate(episodeId !== undefined ? `/${episodeId}/home` : "/");
     } catch (err) {
       console.error(err);
     }
