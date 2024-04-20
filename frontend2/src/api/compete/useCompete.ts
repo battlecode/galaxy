@@ -32,7 +32,6 @@ import type {
 import {
   acceptScrimmage,
   cancelScrimmage,
-  getUserScrimmagesOutboxList,
   rejectScrimmage,
   requestScrimmage,
   uploadSubmission,
