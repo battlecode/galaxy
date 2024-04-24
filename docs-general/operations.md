@@ -52,6 +52,8 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
 - Release a new _private_ (at first) version of the engine and client when ready. In particular, **set IS_PUBLIC=NO in release.yml, and have the release number be below 1.0.0**
   - Instructions for this should be in the respective readme. (You can ask their teams to do it -- in fact, this is arguably better, for shared knowledge.)
 - **Give, to the battlecodedownloadpackage "account", access to the scaffold. This is necessary for testing before the public release**
+- Add maps that we plan to release too, which is helpful for testing.
+  - Add them here: https://api.battlecode.org/admin/episodes/map/add/
 
 #### Class setup
 
@@ -77,7 +79,18 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
   - Also, have this version be v1.0.0 .
   - You can ask the engine/client teams to do this, like with the prerelease testing versions.
 - Add and publish the maps we'll be releasing. Maps must be published through the admin dashboard before competitors can scrimmage with them. See here: https://api.battlecode.org/admin/episodes/map/add/
-- Fill in the autoscrim schedule: https://api.battlecode.org/admin/episodes/episode/{episodeId}/change/
+- Update the versions that the backend and infrastructure use. Go to https://api.battlecode.org/admin/episodes/episode/{episodeId}/change/ and update `Release version public` and `Release version saturn` to 1.0.0
+- Fill in the autoscrim schedule, in the episode info: https://api.battlecode.org/admin/episodes/episode/{episodeId}/change/
+  - The schedule is specified in the syntax for a cron job (unfortunately, cuz the backend hands the episode info schedule to Google's Cloud Scheduler, which uses cron job syntax)
+  - Take this with a grain of salt, this might be wrong. But: To do every 4 hours, specify as `0 */4 * * *`.
+
+### Each tournament
+
+Instructions and tips for running a tournament can be found in the following google doc (unlike the rest of the documentation. Maybe they should be here too? But, tournament running instructions are still very unstable).
+
+**Before the first tournament, read over this in its entirety. It is helpful to also do a full practice run as well.**
+
+https://docs.google.com/document/d/1AlunZNJ9xJ8nHBAiGBR3P-0IbkD9jxN39KtuM2v4oYs/edit
 
 ### Before final tournament
 
@@ -106,17 +119,15 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
     - Use this endpoint to get results: `https://api.battlecode.org/api/team/{episode}/requirement/{requirementId}/compute/`
   - Get final grades (whenever deemed fit) using that same endpoint
 
+## "Customer Support"
+
+There's a bunch of stuff that competitors will experience and might ask. Here are a bunch of tools and methods to help them.
+
 ## Get dev permissions
 
 TODO, tracked in #681
 
 Then, a dev with admin permissions can go to https://api.battlecode.org/admin to do a bunch of cool things.
-
-## Add a dev to any team
-
-TODO, tracked in #681
-
-This enables lots of cool technical support things. Most notably, **this is the (currently) "unofficial-official" way to view and download a team's submissions and replays**, which is helpful in debugging.
 
 ## Monitoring
 
@@ -126,6 +137,32 @@ Other symptoms include:
 
 - Many failed submission compilations or match runs
 - In a Pub/Sub, lots of un-acknowledged messages
+
+### Add yourself (as a dev) to any team
+
+**Only do this with a team's permission** (and also, if anyone else sees this, feel free to call the dev out).
+
+Also, when you're done, **make sure to undo this**
+
+As a dev you can join any team even with the wrong join key. Just keyboard mash into “join key” and you’re all set. Once you’re done, rejoin the dev team, as this clears up some eligibility complications down the road.
+
+This enables lots of cool technical support things. Scroll down for more!
+
+### Viewing any submission
+
+There's a couple of ways to do this.
+
+Get the submission ID in question. Then
+
+Or, join the relevant team, and scroll through their submission history.
+
+### Viewing any match
+
+Obtain the match ID (the hex string). You can ask this from the team, or get this by joining their team and scrolling around.
+
+Then, load it ino the web-based client, specifying the ID in the URL.
+
+**Note: Match IDs are generally confidential** (which is why they are long hex strings in the first place). Don't share match IDs unnecessarily.
 
 ## Debugging
 
