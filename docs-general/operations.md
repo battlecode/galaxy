@@ -62,15 +62,13 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
   - “admin” will be the only member of Reference Player.
   - On api.battlecode.org/admin, set the team type to Invisible. you don’t want anyone to try to scrim against it yet
   - I forgot “admin”’s password but you can reset it at api.battlecode.org/admin. The password should be “good” because the account has at least as many permissions as yours, if not more.
-  - NB! Teams with no members will get deactivated. Your personal account should stay on Teh Dev team.This is why “admin” exists: so that Reference Player can exist without needing you to stay on it.
+  - NB! Teams with no members will get deactivated. Your personal account should stay on Teh Dev team. This is why “admin” exists: so that Reference Player can exist without needing you to stay on it.
 
 #### Pre-release testing
 
 - **Test that a game can be played on the website!** Create a couple teams, submit some bots, queue up a match, etc.
 - Also, **test that both clients -- web-based and native -- work!** Grab the replay from that match and load it in.
-  - (The native client, especially its deploy, are sort of )
-
-<!-- TODO scour through the past couple weeks of slack, in each channel -->
+  - (Building and deploying the native client is an especially complex process, and so it benefits from some extra attention.)
 
 ### The release!
 
@@ -124,8 +122,6 @@ https://docs.google.com/document/d/1AlunZNJ9xJ8nHBAiGBR3P-0IbkD9jxN39KtuM2v4oYs/
 There's a bunch of stuff that competitors will experience and might ask. Here are a bunch of tools and methods to help them.
 
 ## Get dev permissions
-
-TODO, tracked in #681
 
 Then, a dev with admin permissions can go to https://api.battlecode.org/admin to do a bunch of cool things.
 
