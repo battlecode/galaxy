@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"runtime/debug"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -92,10 +93,10 @@ func (t *Task) Run(ctx context.Context, r Reporter) (err error) {
 			panic(r)
 		}
 		if err != nil {
-			// TODO: log a traceback
+			log.Ctx(ctx).Error().Msg(string(debug.Stack()))
 		}
-		if err = t.FinalizeReport(ctx, r); err != nil {
-			err = fmt.Errorf("t.FinalizeReport: %v", err)
+		if errReport := t.FinalizeReport(ctx, r); errReport != nil {
+			err = fmt.Errorf("%v, t.FinalizeReport: %v", err, errReport)
 		}
 		if t.status.Retryable() {
 			err = fmt.Errorf("task not complete: %v", err)
