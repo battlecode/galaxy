@@ -1,4 +1,4 @@
-import { TourneyPageKey, TourneyPage } from "./ContentStruct";
+import type { TourneyPageKey } from "./ContentStruct";
 
 export const BC22_QUICKSTART = `# Quick Start 22
 
