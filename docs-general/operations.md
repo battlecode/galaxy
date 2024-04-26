@@ -30,7 +30,7 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
   - Input all **eligibility criteria** for each tournament. Also, in order to do that, **create each eligibility criteria in the database table**.
     - Competitors are able to select the criteria they fit through their team page.
   - Remember to **check the box `Require resume` for all non-sprint tournaments.**
-  - Submission freezes are usually at 7pm the day before the displayed tournament date. Set the submission unfreeze to be after the tournament is streamed live.
+  - Submission deadlines are usually **a little bit after 7pm** the day before the displayed tournament date. The displayed date is when the tournament is streamed live, during normal lecture time. Set the submission unfreeze to be after the tournament is streamed live.
   - **Tournament submission freeze times (ie submission deadlines) should be set to be slightly later than the nominal time. For example, if a tournament is nominally 7pm, set the submission freeze time to something like 7:00:30 or 7:01.**
     - This allows for leniency with differences in clocks.
     - Also, this enables an autoscrimmage round to run before the submission deadline, which can be helpful to converge seeds.
