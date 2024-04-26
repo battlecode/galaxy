@@ -5,7 +5,7 @@ import {
   tournamentsText,
   defaultTournamentsText,
 } from "../content/ManageContent";
-import { TourneyPageKey, TourneyPage } from "../content/ContentStruct";
+import { TourneyPage } from "../content/ContentStruct";
 import Markdown from "../components/elements/Markdown";
 import SectionCard from "../components/SectionCard";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
