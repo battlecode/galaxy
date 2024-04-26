@@ -28,6 +28,9 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
   - Input each tournament, especially along with its time
   - Typically, only the sprint tournaments are single elimination, and all other tournaments are double elimination.
   - Input all **eligibility criteria** for each tournament. Also, in order to do that, **create each eligibility criteria in the database table**.
+    - When creating an eligibility criteria, design it so that its meaning _defaults to "No", and so that teams explicitly have to say "Yes" in order to join tournaments._ This is because, by default, a new team will not state that they satisfy any eligibility criteria. Instead, they have to actively check some boxes in order to indicate satisfaction.
+      - For example, a good eligibility criterion is "Is High Schooler?", because a team must explicitly check the box to participate in the High School tournament. If they fail to check the box (which they likely might, by forgetting, or by leaving the competition before tournament season), then they will not be added to the tournament.
+      - Eligibility criteria from previous episodes may be helpful here.
     - Competitors are able to select the criteria they fit through their team page.
   - Remember to **check the box `Require resume` for all non-sprint tournaments.**
   - Submission deadlines are usually **a little bit after 7pm** the day before the displayed tournament date. The displayed date is when the tournament is streamed live, during normal lecture time. Set the submission unfreeze to be after the tournament is streamed live.
