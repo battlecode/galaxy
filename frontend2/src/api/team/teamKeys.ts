@@ -3,19 +3,47 @@ import type {
   TeamTMeRetrieveRequest,
   TeamTRetrieveRequest,
 } from "../_autogen";
+import type { QueryKeyBuilder } from "../apiTypes";
 
-export const teamQueryKeys = {
-  myTeam: ({ episodeId }: TeamTMeRetrieveRequest) =>
-    ["team", "me", { episodeId }] as const,
+interface TeamKeys {
+  teamBase: QueryKeyBuilder<{ episodeId: string }>;
+  myTeam: QueryKeyBuilder<TeamTMeRetrieveRequest>;
+  otherBase: QueryKeyBuilder<TeamTRetrieveRequest>;
+  otherInfo: QueryKeyBuilder<TeamTRetrieveRequest>;
+  search: QueryKeyBuilder<TeamTListRequest>;
+}
 
-  otherBase: ({ episodeId, id }: TeamTRetrieveRequest) =>
-    ["team", id, { episodeId }] as const,
+// ---------- KEY RECORDS ---------- //
+export const teamQueryKeys: TeamKeys = {
+  teamBase: {
+    key: ({ episodeId }: { episodeId: string }) => ["team", episodeId] as const,
+  },
 
-  otherInfo: ({ episodeId, id }: TeamTRetrieveRequest) =>
-    [...teamQueryKeys.otherBase({ episodeId, id }), "info"] as const,
+  myTeam: {
+    key: ({ episodeId }: TeamTMeRetrieveRequest) =>
+      [...teamQueryKeys.teamBase.key({ episodeId }), "me"] as const,
+  },
 
-  search: ({ episodeId, search, page }: TeamTListRequest) =>
-    ["team", "search", { episodeId, search, page }] as const,
+  otherBase: {
+    key: ({ episodeId, id }: TeamTRetrieveRequest) =>
+      [...teamQueryKeys.teamBase.key({ episodeId }), id] as const,
+  },
+
+  otherInfo: {
+    key: ({ episodeId, id }: TeamTRetrieveRequest) =>
+      [...teamQueryKeys.otherBase.key({ episodeId, id }), "info"] as const,
+  },
+
+  search: {
+    key: ({ episodeId, search = "", page = 1 }: TeamTListRequest) =>
+      [
+        ...teamQueryKeys.teamBase.key({ episodeId }),
+        "search",
+        search,
+        page,
+      ] as const,
+    // ["team", "search", { episodeId, search, page }] as const,
+  },
 };
 
 export const teamMutationKeys = {

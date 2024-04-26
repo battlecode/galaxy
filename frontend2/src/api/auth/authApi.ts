@@ -27,7 +27,8 @@ export const login = async (
   Cookies.set("access", res.access);
   Cookies.set("refresh", res.refresh);
   await queryClient.refetchQueries({
-    queryKey: userQueryKeys.meBase,
+    // OK to call KEY.key() here as we are refetching all user-me queries.
+    queryKey: userQueryKeys.meBase.key(),
   });
 };
 
@@ -39,19 +40,13 @@ export const login = async (
 export const logout = async (queryClient: QueryClient): Promise<void> => {
   Cookies.remove("access");
   Cookies.remove("refresh");
-  await queryClient.refetchQueries({
-    queryKey: userQueryKeys.meBase,
+  await queryClient.resetQueries({
+    // OK to call KEY.key() here as we are resetting all user-me queries.
+    queryKey: userQueryKeys.meBase.key(),
   });
 };
 
-/**
- * Checks whether the currently held JWT access token is still valid (by posting it to the verify endpoint),
- * hence whether or not the frontend still has logged-in access.
- * @returns true or false
- * Callers of this method should check this, before rendering their logged-in or un-logged-in versions.
- * If not logged in, then api calls will give 403s, this function will return false, and the website will tell you to log in anyways.
- */
-export const loginCheck = async (): Promise<boolean> => {
+export const tokenVerify = async (): Promise<boolean> => {
   const accessToken = Cookies.get("access");
   if (accessToken === undefined) {
     return false;
@@ -64,4 +59,21 @@ export const loginCheck = async (): Promise<boolean> => {
   } catch {
     return false;
   }
+};
+
+/**
+ * Checks whether the currently held JWT access token is still valid (by posting it to the verify endpoint),
+ * hence whether or not the frontend still has logged-in access.
+ * @returns true or false
+ * Callers of this method should check this, before rendering their logged-in or un-logged-in versions.
+ * If not logged in, then api calls will give 403s, this function will return false, and the website will tell you to log in anyways.
+ */
+export const loginCheck = async (
+  queryClient: QueryClient,
+): Promise<boolean> => {
+  const verified = await tokenVerify();
+  if (!verified) {
+    await logout(queryClient);
+  }
+  return verified;
 };

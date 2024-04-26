@@ -1,7 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect } from "react";
-import { episodeQueryKeys } from "../api/episode/episodeKeys";
 import { useEpisodeId } from "../contexts/EpisodeContext";
+import { buildKey } from "../api/helpers";
+import { nextTournamentFactory } from "../api/episode/episodeFactories";
 
 interface CountdownDigitalProps {
   date: Date;
@@ -30,7 +31,7 @@ const CountdownDigital: React.FC<CountdownDigitalProps> = ({
   useEffect(() => {
     const interval = setInterval(() => {
       void queryClient.refetchQueries({
-        queryKey: episodeQueryKeys.nextTournament({ episodeId }),
+        queryKey: buildKey(nextTournamentFactory.queryKey, { episodeId }),
       });
     }, 1000 * 30);
     return () => {

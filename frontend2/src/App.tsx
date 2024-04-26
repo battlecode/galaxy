@@ -35,9 +35,18 @@ import Submissions from "./views/Submissions";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast, Toaster } from "react-hot-toast";
 import { ResponseError } from "./api/_autogen/runtime";
-import { userQueryKeys } from "./api/user/userKeys";
-import { episodeQueryKeys } from "./api/episode/episodeKeys";
-import { getEpisodeInfo } from "./api/episode/episodeApi";
+import { loginCheck } from "./api/auth/authApi";
+import { submissionsLoader } from "./api/loaders/submissionsLoader";
+import { myTeamLoader } from "./api/loaders/myTeamLoader";
+import { scrimmagingLoader } from "./api/loaders/scrimmagingLoader";
+import { rankingsLoader } from "./api/loaders/rankingsLoader";
+import { episodeInfoFactory } from "./api/episode/episodeFactories";
+import { buildKey } from "./api/helpers";
+import { queueLoader } from "./api/loaders/queueLoader";
+import { tournamentsLoader } from "./api/loaders/tournamentsLoader";
+import { tournamentLoader } from "./api/loaders/tournamentLoader";
+import { homeLoader } from "./api/loaders/homeLoader";
+import ErrorBoundary from "./views/ErrorBoundary";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -53,7 +62,10 @@ const queryClient = new QueryClient({
 });
 
 queryClient.setQueryDefaults(["team"], { retry: false });
-queryClient.setQueryDefaults(userQueryKeys.meBase, { retry: false });
+queryClient.setQueryDefaults(["user"], { retry: false });
+
+// Run a check to see if the user has an invalid token
+await loginCheck(queryClient);
 
 const App: React.FC = () => {
   return (
@@ -69,27 +81,40 @@ const App: React.FC = () => {
   );
 };
 
-const episodeLoader: LoaderFunction = async ({ params }) => {
+const episodeLoader: LoaderFunction = ({ params }) => {
   // check if the episodeId is a valid one.
   // if the episode is not found, throw an error.
   const id = params.episodeId ?? "";
-  return await queryClient.fetchQuery({
-    queryKey: episodeQueryKeys.info({ id }),
-    queryFn: async () => await getEpisodeInfo({ id }),
+
+  // Prefetch the episode info.
+  void queryClient.ensureQueryData({
+    queryKey: buildKey(episodeInfoFactory.queryKey, { id }),
+    queryFn: async () => await episodeInfoFactory.queryFn({ id }),
     staleTime: Infinity,
   });
+
+  return null;
 };
 
 const router = createBrowserRouter([
   // Pages that should render without a sidebar/navbar
-  { path: "/login", element: <Login /> },
-  { path: "/logout", element: <Logout /> },
-  { path: "/register", element: <Register /> },
-  { path: "/password_forgot", element: <PasswordForgot /> },
-  { path: "/password_change", element: <PasswordChange /> },
+  { path: "/login", element: <Login />, errorElement: <ErrorBoundary /> },
+  { path: "/logout", element: <Logout />, errorElement: <ErrorBoundary /> },
+  { path: "/register", element: <Register />, errorElement: <ErrorBoundary /> },
+  {
+    path: "/password_forgot",
+    element: <PasswordForgot />,
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: "/password_change",
+    element: <PasswordChange />,
+    errorElement: <ErrorBoundary />,
+  },
   // Account page doesn't have episode id in URL
   {
     element: <PrivateRoute />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
         element: <EpisodeLayout />,
@@ -100,9 +125,9 @@ const router = createBrowserRouter([
   // Pages that will contain the episode sidebar and navbar (excl. account page)
   {
     element: <EpisodeLayout />,
+    errorElement: <ErrorBoundary />,
     path: "/:episodeId",
     loader: episodeLoader,
-    errorElement: <NotFound />,
     children: [
       {
         // Pages that should only be visible when logged in
@@ -111,28 +136,52 @@ const router = createBrowserRouter([
           {
             path: "submissions",
             element: <Submissions />,
+            loader: submissionsLoader(queryClient),
           },
           {
             path: "team",
             element: <MyTeam />,
+            loader: myTeamLoader(queryClient),
           },
           {
             path: "scrimmaging",
             element: <Scrimmaging />,
+            loader: scrimmagingLoader(queryClient),
           },
         ],
       },
       // Pages that should always be visible
-      { path: "", element: <Home /> },
-      { path: "home", element: <Home /> },
+      {
+        path: "",
+        element: <Home />,
+        loader: homeLoader(queryClient),
+      },
+      {
+        path: "home",
+        element: <Home />,
+        loader: homeLoader(queryClient),
+      },
       { path: "resources", element: <Resources /> },
       { path: "quickstart", element: <QuickStart /> },
-      { path: "rankings", element: <Rankings /> },
-      { path: "queue", element: <Queue /> },
-      { path: "tournaments", element: <Tournaments /> },
+      {
+        path: "rankings",
+        element: <Rankings />,
+        loader: rankingsLoader(queryClient),
+      },
+      {
+        path: "queue",
+        element: <Queue />,
+        loader: queueLoader(queryClient),
+      },
+      {
+        path: "tournaments",
+        element: <Tournaments />,
+        loader: tournamentsLoader(queryClient),
+      },
       {
         path: "tournament/:tournamentId",
         element: <TournamentPage />,
+        loader: tournamentLoader(queryClient),
       },
       {
         path: "*",
@@ -140,7 +189,11 @@ const router = createBrowserRouter([
       },
     ],
   },
-  { path: "/", element: <Navigate to={`/${DEFAULT_EPISODE}/home`} /> },
+  {
+    path: "/",
+    element: <Navigate to={`/${DEFAULT_EPISODE}/home`} />,
+    errorElement: <ErrorBoundary />,
+  },
 ]);
 
 export default App;

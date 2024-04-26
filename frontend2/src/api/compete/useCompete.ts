@@ -24,6 +24,7 @@ import type {
   PaginatedMatchList,
   PaginatedScrimmageRequestList,
   PaginatedSubmissionList,
+  ResponseError,
   ScrimmageRequest,
   Submission,
   TournamentSubmission,
@@ -31,19 +32,22 @@ import type {
 import {
   acceptScrimmage,
   cancelScrimmage,
-  getAllUserTournamentSubmissions,
-  getMatchesList,
-  getScrimmagesListByTeam,
-  getSubmissionsList,
-  getTournamentMatchesList,
-  getUserScrimmagesInboxList,
-  getUserScrimmagesOutboxList,
   rejectScrimmage,
   requestScrimmage,
   uploadSubmission,
 } from "./competeApi";
-import { isPresent } from "../../utils/utilTypes";
 import toast from "react-hot-toast";
+import { buildKey } from "../helpers";
+import {
+  matchListFactory,
+  scrimmageInboxListFactory,
+  scrimmageOutboxListFactory,
+  subsListFactory,
+  teamScrimmageListFactory,
+  tournamentMatchListFactory,
+  tournamentSubsListFactory,
+  userScrimmageListFactory,
+} from "./competeFactories";
 
 // ---------- QUERY HOOKS ---------- //
 /**
@@ -54,28 +58,9 @@ export const useSubmissionsList = (
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedSubmissionList, Error> =>
   useQuery({
-    queryKey: competeQueryKeys.subList({ episodeId, page }),
-    queryFn: async () => {
-      const result = await getSubmissionsList({ episodeId, page });
-
-      // Prefetch the next page if it exists
-      if (isPresent(result.next)) {
-        // If no page provided, then we just fetched page 1
-        const nextPage = isPresent(page) ? page + 1 : 2;
-        // TODO: ensure correct prefetching behavior!
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.subList({
-              episodeId,
-              page: nextPage,
-            }),
-            queryFn: async () =>
-              await getSubmissionsList({ episodeId, page: nextPage }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-      }
-      return result;
-    },
+    queryKey: buildKey(subsListFactory.queryKey, { episodeId, page }),
+    queryFn: async () =>
+      await subsListFactory.queryFn({ episodeId, page }, queryClient, true),
   });
 
 /**
@@ -88,8 +73,8 @@ export const useTournamentSubmissions = ({
   Error
 > =>
   useQuery({
-    queryKey: competeQueryKeys.tourneySubs({ episodeId }),
-    queryFn: async () => await getAllUserTournamentSubmissions({ episodeId }),
+    queryKey: buildKey(tournamentSubsListFactory.queryKey, { episodeId }),
+    queryFn: async () => await tournamentSubsListFactory.queryFn({ episodeId }),
   });
 
 /**
@@ -100,28 +85,13 @@ export const useScrimmageInboxList = (
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedScrimmageRequestList, Error> =>
   useQuery({
-    queryKey: competeQueryKeys.inbox({ episodeId, page }),
-    queryFn: async () => {
-      const result = await getUserScrimmagesInboxList({ episodeId, page });
-
-      // Prefetch the next page if it exists
-      if (isPresent(result.next)) {
-        // If no page provided, then we just fetched page 1
-        const nextPage = isPresent(page) ? page + 1 : 2;
-        // TODO: ensure correct prefetching behavior!
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.inbox({
-              episodeId,
-              page: nextPage,
-            }),
-            queryFn: async () =>
-              await getUserScrimmagesInboxList({ episodeId, page: nextPage }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-      }
-      return result;
-    },
+    queryKey: buildKey(scrimmageInboxListFactory.queryKey, { episodeId, page }),
+    queryFn: async () =>
+      await scrimmageInboxListFactory.queryFn(
+        { episodeId, page },
+        queryClient,
+        true,
+      ),
   });
 
 /**
@@ -132,28 +102,16 @@ export const useScrimmageOutboxList = (
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedScrimmageRequestList, Error> =>
   useQuery({
-    queryKey: competeQueryKeys.outbox({ episodeId, page }),
-    queryFn: async () => {
-      const result = await getUserScrimmagesOutboxList({ episodeId, page });
-
-      // Prefetch the next page if it exists
-      if (isPresent(result.next)) {
-        // If no page provided, then we just fetched page 1
-        const nextPage = isPresent(page) ? page + 1 : 2;
-        // TODO: ensure correct prefetching behavior!
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.outbox({
-              episodeId,
-              page: nextPage,
-            }),
-            queryFn: async () =>
-              await getUserScrimmagesOutboxList({ episodeId, page: nextPage }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-      }
-      return result;
-    },
+    queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
+      episodeId,
+      page,
+    }),
+    queryFn: async () =>
+      await scrimmageOutboxListFactory.queryFn(
+        { episodeId, page },
+        queryClient,
+        true,
+      ),
   });
 
 /**
@@ -164,28 +122,13 @@ export const useUserScrimmageList = (
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedMatchList, Error> =>
   useQuery({
-    queryKey: competeQueryKeys.scrimsMeList({ episodeId, page }),
-    queryFn: async () => {
-      const result = await getScrimmagesListByTeam({ episodeId, page });
-
-      // Prefetch the next page if it exists
-      if (isPresent(result.next)) {
-        // If no page provided, then we just fetched page 1
-        const nextPage = isPresent(page) ? page + 1 : 2;
-        // TODO: ensure correct prefetching behavior!
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.scrimsMeList({
-              episodeId,
-              page: nextPage,
-            }),
-            queryFn: async () =>
-              await getScrimmagesListByTeam({ episodeId, page: nextPage }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-      }
-      return result;
-    },
+    queryKey: buildKey(userScrimmageListFactory.queryKey, { episodeId, page }),
+    queryFn: async () =>
+      await userScrimmageListFactory.queryFn(
+        { episodeId, page },
+        queryClient,
+        true,
+      ),
   });
 
 /**
@@ -196,33 +139,17 @@ export const useTeamScrimmageList = (
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedMatchList, Error> =>
   useQuery({
-    queryKey: competeQueryKeys.scrimsOtherList({ episodeId, teamId, page }),
-    queryFn: async () => {
-      const result = await getScrimmagesListByTeam({ episodeId, teamId, page });
-
-      // Prefetch the next page if it exists
-      if (isPresent(result.next)) {
-        // If no page provided, then we just fetched page 1
-        const nextPage = isPresent(page) ? page + 1 : 2;
-        // TODO: ensure correct prefetching behavior!
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.scrimsOtherList({
-              episodeId,
-              teamId,
-              page: nextPage,
-            }),
-            queryFn: async () =>
-              await getScrimmagesListByTeam({
-                episodeId,
-                teamId,
-                page: nextPage,
-              }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-      }
-      return result;
-    },
+    queryKey: buildKey(teamScrimmageListFactory.queryKey, {
+      episodeId,
+      teamId,
+      page,
+    }),
+    queryFn: async () =>
+      await teamScrimmageListFactory.queryFn(
+        { episodeId, teamId, page },
+        queryClient,
+        true,
+      ),
   });
 
 /**
@@ -233,28 +160,9 @@ export const useMatchList = (
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedMatchList, Error> =>
   useQuery({
-    queryKey: competeQueryKeys.matchList({ episodeId, page }),
-    queryFn: async () => {
-      const result = await getMatchesList({ episodeId, page });
-
-      // Prefetch the next page if it exists
-      if (isPresent(result.next)) {
-        // If no page provided, then we just fetched page 1
-        const nextPage = isPresent(page) ? page + 1 : 2;
-        // TODO: ensure correct prefetching behavior!
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.matchList({
-              episodeId,
-              page: nextPage,
-            }),
-            queryFn: async () =>
-              await getMatchesList({ episodeId, page: nextPage }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-      }
-      return result;
-    },
+    queryKey: buildKey(matchListFactory.queryKey, { episodeId, page }),
+    queryFn: async () =>
+      await matchListFactory.queryFn({ episodeId, page }, queryClient, true),
   });
 
 /**
@@ -271,49 +179,19 @@ export const useTournamentMatchList = (
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedMatchList, Error> =>
   useQuery({
-    queryKey: competeQueryKeys.tourneyMatchList({
+    queryKey: buildKey(tournamentMatchListFactory.queryKey, {
       episodeId,
       teamId,
       tournamentId,
       roundId,
       page,
     }),
-    queryFn: async () => {
-      const result = await getTournamentMatchesList({
-        episodeId,
-        teamId,
-        tournamentId,
-        roundId,
-        page,
-      });
-
-      // Prefetch the next page if it exists
-      if (isPresent(result.next)) {
-        // If no page provided, then we just fetched page 1
-        const nextPage = isPresent(page) ? page + 1 : 2;
-        // TODO: ensure correct prefetching behavior!
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.tourneyMatchList({
-              episodeId,
-              teamId,
-              tournamentId,
-              roundId,
-              page: nextPage,
-            }),
-            queryFn: async () =>
-              await getTournamentMatchesList({
-                episodeId,
-                teamId,
-                tournamentId,
-                roundId,
-                page: nextPage,
-              }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-      }
-      return result;
-    },
+    queryFn: async () =>
+      await tournamentMatchListFactory.queryFn(
+        { episodeId, teamId, tournamentId, roundId, page },
+        queryClient,
+        true,
+      ),
   });
 
 // ---------- MUTATION HOOKS ---------- //
@@ -349,21 +227,27 @@ export const useUploadSubmission = (
           sourceCode,
         });
 
-        // Invalidate all submissions queries
-        queryClient
-          .invalidateQueries({
-            queryKey: competeQueryKeys.subBase({ episodeId }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-
-        // Prefetch the first page of the submissions list
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.subList({ episodeId, page: 1 }),
+        try {
+          // Invalidate all submissions queries
+          await queryClient.invalidateQueries({
+            queryKey: buildKey(competeQueryKeys.subBase, { episodeId }),
+          });
+          // Then prefetch the first page of the submissions list
+          await queryClient.prefetchQuery({
+            queryKey: buildKey(subsListFactory.queryKey, {
+              episodeId,
+              page: 1,
+            }),
             queryFn: async () =>
-              await getSubmissionsList({ episodeId, page: 1 }),
-          })
-          .catch((e) => toast.error((e as Error).message));
+              await subsListFactory.queryFn(
+                { episodeId, page: 1 },
+                queryClient,
+                true,
+              ),
+          });
+        } catch (e) {
+          toast.error((e as ResponseError).message);
+        }
 
         return result;
       };
@@ -404,21 +288,29 @@ export const useRequestScrimmage = (
           scrimmageRequestRequest,
         });
 
-        // Invalidate the outbox query
-        queryClient
-          .invalidateQueries({
-            queryKey: competeQueryKeys.outbox({ episodeId }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-
-        // Prefetch the first page of the outbox list
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.outbox({ episodeId, page: 1 }),
+        try {
+          // Invalidate the outbox query
+          await queryClient.invalidateQueries({
+            queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
+              episodeId,
+            }),
+          });
+          // Prefetch the first page of the outbox list
+          await queryClient.prefetchQuery({
+            queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
+              episodeId,
+              page: 1,
+            }),
             queryFn: async () =>
-              await getUserScrimmagesOutboxList({ episodeId, page: 1 }),
-          })
-          .catch((e) => toast.error((e as Error).message));
+              await scrimmageOutboxListFactory.queryFn(
+                { episodeId, page: 1 },
+                queryClient,
+                true,
+              ),
+          });
+        } catch (e) {
+          toast.error((e as ResponseError).message);
+        }
 
         return result;
       };
@@ -451,22 +343,29 @@ export const useAcceptScrimmage = (
       const toastFn = async (): Promise<void> => {
         await acceptScrimmage({ episodeId, id });
 
-        // Invalidate the inbox query
-        // TODO: ensure correct invalidation behavior!
-        queryClient
-          .invalidateQueries({
-            queryKey: competeQueryKeys.inbox({ episodeId }),
-          })
-          .catch((e) => toast.error((e as Error).message));
-
-        // Prefetch the first page of the inbox list
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.inbox({ episodeId, page: 1 }),
+        try {
+          // Invalidate the inbox query
+          await queryClient.invalidateQueries({
+            queryKey: buildKey(scrimmageInboxListFactory.queryKey, {
+              episodeId,
+            }),
+          });
+          // Prefetch the first page of the inbox list
+          await queryClient.prefetchQuery({
+            queryKey: buildKey(scrimmageInboxListFactory.queryKey, {
+              episodeId,
+              page: 1,
+            }),
             queryFn: async () =>
-              await getUserScrimmagesInboxList({ episodeId, page: 1 }),
-          })
-          .catch((e) => toast.error((e as Error).message));
+              await scrimmageInboxListFactory.queryFn(
+                { episodeId, page: 1 },
+                queryClient,
+                true,
+              ),
+          });
+        } catch (e) {
+          toast.error((e as ResponseError).message);
+        }
       };
 
       await toast.promise(toastFn(), {
@@ -497,21 +396,30 @@ export const useRejectScrimmage = (
       const toastFn = async (): Promise<void> => {
         await rejectScrimmage({ episodeId, id });
 
-        // Invalidate the inbox query
-        queryClient
-          .invalidateQueries({
-            queryKey: competeQueryKeys.inbox({ episodeId }),
-          })
-          .catch((e) => toast.error((e as Error).message));
+        try {
+          // Invalidate the inbox query
+          await queryClient.invalidateQueries({
+            queryKey: buildKey(scrimmageInboxListFactory.queryKey, {
+              episodeId,
+            }),
+          });
 
-        // Prefetch the first page of the inbox list
-        queryClient
-          .prefetchQuery({
-            queryKey: competeQueryKeys.inbox({ episodeId, page: 1 }),
+          // Prefetch the first page of the inbox list
+          await queryClient.prefetchQuery({
+            queryKey: buildKey(scrimmageInboxListFactory.queryKey, {
+              episodeId,
+              page: 1,
+            }),
             queryFn: async () =>
-              await getUserScrimmagesInboxList({ episodeId, page: 1 }),
-          })
-          .catch((e) => toast.error((e as Error).message));
+              await scrimmageInboxListFactory.queryFn(
+                { episodeId, page: 1 },
+                queryClient,
+                true,
+              ),
+          });
+        } catch (e) {
+          toast.error((e as ResponseError).message);
+        }
       };
 
       await toast.promise(toastFn(), {
@@ -538,16 +446,25 @@ export const useCancelScrimmage = (
         // Invalidate the outbox query
         queryClient
           .invalidateQueries({
-            queryKey: competeQueryKeys.outbox({ episodeId }),
+            queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
+              episodeId,
+            }),
           })
           .catch((e) => toast.error((e as Error).message));
 
         // Prefetch the first page of the outbox list
         queryClient
           .prefetchQuery({
-            queryKey: competeQueryKeys.outbox({ episodeId, page: 1 }),
+            queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
+              episodeId,
+              page: 1,
+            }),
             queryFn: async () =>
-              await getUserScrimmagesOutboxList({ episodeId, page: 1 }),
+              await scrimmageOutboxListFactory.queryFn(
+                { episodeId, page: 1 },
+                queryClient,
+                true,
+              ),
           })
           .catch((e) => toast.error((e as Error).message));
       };

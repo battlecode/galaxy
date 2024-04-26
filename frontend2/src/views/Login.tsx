@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { login } from "../api/auth/authApi";
@@ -6,7 +6,6 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { FIELD_REQUIRED_ERROR_MSG } from "../utils/constants";
 import { Link, useNavigate } from "react-router-dom";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import { useCurrentUser, AuthStateEnum } from "../contexts/CurrentUserContext";
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -22,16 +21,8 @@ const Login: React.FC = () => {
     formState: { isSubmitting, isDirty },
   } = useForm<LoginFormInput>();
   const { episodeId } = useEpisodeId();
-  const { authState } = useCurrentUser();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // redirect to home if already logged in
-    if (authState === AuthStateEnum.AUTHENTICATED) {
-      navigate(episodeId !== undefined ? `/${episodeId}/home` : "/");
-    }
-  }, [authState]);
 
   const onSubmit: SubmitHandler<LoginFormInput> = async (data) => {
     try {
@@ -41,6 +32,7 @@ const Login: React.FC = () => {
         error:
           "Error logging in. Did you enter your username and password correctly?",
       });
+      navigate(episodeId !== undefined ? `/${episodeId}/home` : "/");
     } catch (err) {
       console.error(err);
     }

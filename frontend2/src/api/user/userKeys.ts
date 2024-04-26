@@ -2,22 +2,44 @@ import type {
   UserURetrieveRequest,
   UserUTeamsRetrieveRequest,
 } from "../_autogen";
+import type { QueryKeyBuilder, QueryKeyHolder } from "../apiTypes";
+
+interface UserKeys {
+  tokenVerify: QueryKeyHolder;
+  meBase: QueryKeyHolder;
+  myInfo: QueryKeyHolder;
+  otherBase: QueryKeyBuilder<UserURetrieveRequest>;
+  otherInfo: QueryKeyBuilder<UserURetrieveRequest>;
+  otherTeams: QueryKeyBuilder<UserUTeamsRetrieveRequest>;
+}
 
 // ---------- KEY FACTORIES ----------//
-export const userQueryKeys = {
-  tokenVerify: ["user", "me", "tokenVerify"] as const,
+export const userQueryKeys: UserKeys = {
+  meBase: {
+    key: () => ["user", "me"] as const,
+  },
 
-  meBase: ["user", "me"] as const,
+  tokenVerify: {
+    key: () => [...userQueryKeys.meBase.key(), "tokenVerify"] as const,
+  },
 
-  myInfo: () => [...userQueryKeys.meBase, "info"] as const,
+  myInfo: {
+    key: () => [...userQueryKeys.meBase.key(), "myInfo"] as const,
+  },
 
-  otherBase: ({ id }: UserURetrieveRequest) => ["user", { id }] as const,
+  otherBase: {
+    key: ({ id }: UserURetrieveRequest) => ["user", id] as const,
+  },
 
-  otherInfo: ({ id }: UserURetrieveRequest) =>
-    [...userQueryKeys.otherBase({ id }), "info"] as const,
+  otherInfo: {
+    key: ({ id }: UserURetrieveRequest) =>
+      [...userQueryKeys.otherBase.key({ id }), "info"] as const,
+  },
 
-  otherTeams: ({ id }: UserUTeamsRetrieveRequest) =>
-    [...userQueryKeys.otherBase({ id }), "teams"] as const,
+  otherTeams: {
+    key: ({ id }: UserUTeamsRetrieveRequest) =>
+      [...userQueryKeys.otherBase.key({ id }), "teams"] as const,
+  },
 };
 
 export const userMutationKeys = {
