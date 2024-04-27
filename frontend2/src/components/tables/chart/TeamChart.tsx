@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useMemo } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import * as chart from "./chartUtil";
 
 type UTCMilliTimestamp = number;
+
+export type ChartData = [UTCMilliTimestamp, number];
 
 // `yAxisLabel` is the name that is shown to the right of the graph.
 //
@@ -14,15 +16,14 @@ type UTCMilliTimestamp = number;
 // { "Gone Sharkin" : [ [ 1673826806000.0, 1000 ], [1673826805999.0, 900], ... ], ...}
 export interface TeamChartProps {
   yAxisLabel: string;
-  values: Record<string, Array<[UTCMilliTimestamp, number]>>;
+  values?: Record<string, ChartData[]>;
 }
 
 const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
-  const seriesData: Highcharts.SeriesOptionsType[] = [];
-
   // Translate values into Highcharts compatible options
-  for (const team in values) {
-    const formattedEntry: Highcharts.SeriesOptionsType = {
+  const seriesData: Highcharts.SeriesOptionsType[] | undefined = useMemo(() => {
+    if (values === undefined) return undefined;
+    return Object.keys(values).map((team) => ({
       type: "line",
       name: team,
       data: values[team],
@@ -30,12 +31,22 @@ const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
         enabled: false,
         symbol: "circle",
       },
-    };
-    seriesData.push(formattedEntry);
-  }
+    }));
+  }, [values]);
 
+  // TODO: get loading to work! Ideally with a loading spinner :)
   const options: Highcharts.Options = {
     ...chart.highchartsOptionsBase,
+    lang: {
+      noData: "Loading...",
+    },
+    noData: {
+      style: {
+        fontWeight: "bold",
+        fontSize: "18px",
+        color: "teal",
+      },
+    },
     chart: {
       ...chart.highchartsOptionsBase.chart,
       height: 400,
@@ -86,7 +97,7 @@ const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
         return names;
       },
     },
-    series: seriesData,
+    series: seriesData ?? [],
 
     legend: {
       layout: "vertical",

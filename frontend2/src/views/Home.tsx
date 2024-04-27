@@ -1,20 +1,40 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useEpisodeInfo, useNextTournament } from "../api/episode/useEpisode";
 import SectionCard from "../components/SectionCard";
 import CountdownDigital from "../components/CountdownDigital";
 import Spinner from "../components/Spinner";
 import { SocialIcon } from "react-social-icons";
-import TeamChart from "../components/tables/chart/TeamChart";
-import * as random_data from "../components/tables/chart/randomData";
+import TeamChart, {
+  type ChartData,
+} from "../components/tables/chart/TeamChart";
+import { useQueryClient } from "@tanstack/react-query";
+import { useTopRatingHistoryList } from "api/compete/useCompete";
 
 const Home: React.FC = () => {
   const { episodeId } = useEpisodeId();
+  const queryClient = useQueryClient();
   const episode = useEpisodeInfo({ id: episodeId });
   const nextTournament = useNextTournament({ episodeId });
+  const topRatingHistory = useTopRatingHistoryList({ episodeId }, queryClient);
 
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";
+
+  const ratingData: Record<string, ChartData[]> | undefined = useMemo(() => {
+    if (!topRatingHistory.isSuccess) return undefined;
+    const ratingRecord: Record<string, ChartData[]> = {};
+    return topRatingHistory.data.reduce((record, teamData) => {
+      if (teamData.team_rating !== undefined) {
+        record[teamData.team_rating.team.name] =
+          teamData.team_rating.rating_history.map((match) => [
+            match.timestamp.getTime(),
+            match.rating,
+          ]);
+      }
+      return record;
+    }, ratingRecord);
+  }, [topRatingHistory]);
 
   return (
     <div className="p-6">
@@ -56,21 +76,8 @@ const Home: React.FC = () => {
               <SocialIcon url="https://discord.gg/N86mxkH" className={SOCIAL} />
             </div>
           </SectionCard>
-          <SectionCard title="Performance History">
-            <TeamChart
-              yAxisLabel="Performance"
-              values={{
-                "Gone Sharkin": random_data.randomData1,
-                bruteforcer: random_data.randomData2,
-                Bear: random_data.randomData3,
-                "cout for clout": random_data.randomData4,
-                "don't eat my nonorientable shapes": random_data.randomData5,
-                "I ran out of team names": random_data.randomData6,
-                "I ran out of team names 2": random_data.randomData7,
-                "I ran out of team names 3": random_data.randomData8,
-                "I ran out of team names 4": random_data.randomData9,
-              }}
-            />
+          <SectionCard title="Top Teams">
+            <TeamChart yAxisLabel="Rating" values={ratingData} />
           </SectionCard>
           {/* <SectionCard title="Announcements">ANNOUNCEMENTS (TODO)</SectionCard> */}
         </div>
