@@ -21,7 +21,7 @@ from siarnaq.api.compete.models import (
 from siarnaq.api.episodes.models import Map, ReleaseStatus
 from siarnaq.api.episodes.serializers import TournamentRoundSerializer
 from siarnaq.api.teams.models import Team, TeamStatus
-from siarnaq.api.teams.serializers import RatingField
+from siarnaq.api.teams.serializers import RatingField, TeamPublicSerializer
 
 logger = structlog.get_logger(__name__)
 
@@ -466,9 +466,19 @@ class ScrimmageRequestSerializer(serializers.ModelSerializer):
         super().save(*args, **kwargs)
 
 
-class HistoricalRatingSerializer(serializers.Serializer):
+class MatchRatingSerializer(serializers.Serializer):
     rating = RatingField()
     timestamp = serializers.DateTimeField()
+
+
+class TeamRatingSerializer(serializers.Serializer):
+    team = TeamPublicSerializer()
+    rating_history = MatchRatingSerializer(many=True)
+
+
+class HistoricalRatingSerializer(serializers.Serializer):
+    team_id = serializers.IntegerField()
+    team_rating = TeamRatingSerializer(default=None)
 
 
 class EmptySerializer(serializers.Serializer):

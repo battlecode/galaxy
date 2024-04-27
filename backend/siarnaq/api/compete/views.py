@@ -388,30 +388,34 @@ class MatchViewSet(
     @extend_schema(
         parameters=[
             OpenApiParameter(
-                name="team_id",
+                name="team_ids",
                 type=int,
-                description="A team to filter for. Defaults to your own team.",
+                description="A list of teams to filter for. Defaults to your own team.",
+                many=True,
             ),
         ],
         responses={
             status.HTTP_204_NO_CONTENT: OpenApiResponse(
                 description="No ranked matches found."
             ),
-            status.HTTP_200_OK: HistoricalRatingSerializer(),
+            status.HTTP_200_OK: HistoricalRatingSerializer(many=True),
         },
     )
     @action(
         detail=False,
         methods=["get"],
         permission_classes=(IsEpisodeMutable,),
+        # needed so that the generated schema is not paginated
+        pagination_class=None,
     )
     def historical_rating(self, request, pk=None, *, episode_id):
-        """List the historical rating of a team."""
+        """List the historical ratings of a list of teams."""
         queryset = Match.objects.all().filter(tournament_round__isnull=True)
 
-        team_id = parse_int(self.request.query_params.get("team_id"))
-        if team_id is not None:
-            queryset = queryset.filter(participants__team=team_id)
+        team_ids = self.request.query_params.getlist("team_ids")
+        if team_ids is not None and len(team_ids) > 0:
+            team_ids = {parse_int(team_id) for team_id in team_ids}
+            queryset = queryset.filter(participants__team__in=team_ids)
         elif request.user.pk is not None:
             queryset = queryset.filter(participants__team__members=request.user.pk)
         else:
@@ -420,21 +424,30 @@ class MatchViewSet(
             participants__team__status=TeamStatus.INVISIBLE
         )
         queryset = queryset.exclude(pk__in=Subquery(has_invisible.values("pk")))
-        queryset = queryset.filter(is_ranked=True)
+        queryset = queryset.filter(is_ranked=True).filter(
+            participants__rating__isnull=False
+        )
 
-        matches = queryset.all().order_by("created")
+        matches = queryset.all().order_by("-created")
+        grouped = {
+            team_id: {"team_id": team_id, "team_rating": None} for team_id in team_ids
+        }
 
-        ordered = [
-            {
-                "timestamp": match.created,
-                "rating": match.participants.get(team=team_id).rating
-                if team_id is not None
-                else match.participants.get(team__members__pk=request.user.pk).rating,
-            }
-            for match in matches
-        ]
+        for match in matches:
+            matching_participants = match.participants.filter(team__in=team_ids).all()
+            for participant in matching_participants:
+                match_info = {"timestamp": match.created, "rating": participant.rating}
+                if grouped[participant.team.id]["team_rating"] is None:
+                    grouped[participant.team.id]["team_rating"] = {
+                        "team": participant.team,
+                        "rating_history": [match_info],
+                    }
+                else:
+                    grouped[participant.team.id]["team_rating"][
+                        "rating_history"
+                    ].append(match_info)
 
-        results = HistoricalRatingSerializer(ordered, many=True).data
+        results = HistoricalRatingSerializer(grouped.values(), many=True).data
         return Response(results, status=status.HTTP_200_OK)
 
     @extend_schema(
