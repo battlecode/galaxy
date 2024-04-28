@@ -1,9 +1,8 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
+import NoDataToDisplay from "highcharts/modules/no-data-to-display";
 import * as chart from "./chartUtil";
-
 
 NoDataToDisplay(Highcharts);
 
@@ -21,14 +20,21 @@ export type ChartData = [UTCMilliTimestamp, number];
 export interface TeamChartProps {
   yAxisLabel: string;
   values?: Record<string, ChartData[]>;
+  loading?: boolean;
+  loadingMessage?: string;
 }
 
-const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
+const TeamChart: React.FC<TeamChartProps> = ({
+  yAxisLabel,
+  values,
+  loading = false,
+  loadingMessage,
+}) => {
   // Translate values into Highcharts compatible options
-  const [myChart, setChart] = React.useState<Highcharts.Chart>();
+  const [myChart, setChart] = useState<Highcharts.Chart>();
 
-  const seriesData: Highcharts.SeriesOptionsType[] | undefined = useMemo(() => {
-    if (values === undefined) return undefined;
+  const seriesData: Highcharts.SeriesOptionsType[] = useMemo(() => {
+    if (values === undefined) return [];
     return Object.keys(values).map((team) => ({
       type: "line",
       name: team,
@@ -41,23 +47,26 @@ const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
   }, [values]);
 
   if (myChart !== undefined) {
-    if (seriesData === undefined) 
-		myChart.showLoading();
-    else myChart.hideLoading();
+    try {
+      if (loading) myChart.showLoading(loadingMessage ?? "Loading...");
+      else myChart.hideLoading();
+    } catch (e) {
+      // Ignore internal highcharts errors...
+    }
   }
 
   const options: Highcharts.Options = {
     ...chart.highchartsOptionsBase,
-    lang:  {
-      loading: "Loading Team Data...",
-	  noData: "There is no data to display :("
+    lang: {
+      loading: loadingMessage ?? "Loading...",
+      noData: "No data found to display.",
     },
-	noData: {
-        style: {
-            fontWeight: 'bold',
-            fontSize: '15px',
-            color: 'red'
-        }
+    noData: {
+      style: {
+        fontWeight: "bold",
+        fontSize: "15px",
+        color: "red",
+      },
     },
     loading: {
       style: {

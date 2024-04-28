@@ -77,7 +77,12 @@ const Home: React.FC = () => {
             </div>
           </SectionCard>
           <SectionCard title="Top Teams">
-            <TeamChart yAxisLabel="Rating" values={ratingData} />
+            <TeamChart
+              yAxisLabel="Rating"
+              values={ratingData}
+              loading={topRatingHistory.isLoading}
+              loadingMessage="Loading rankings data..."
+            />
           </SectionCard>
           {/* <SectionCard title="Announcements">ANNOUNCEMENTS (TODO)</SectionCard> */}
         </div>
