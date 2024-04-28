@@ -13,6 +13,7 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
 - Determine various info about the episode, especially prize and tournament info. (This should be done by the presidents, etc. You can also do this later.)
 - Have new devs create accounts.
 - For _only to the people who need this_, make their accounts "admin" accounts. (Ask around if you don't know how to do this.) Please be cautious, safe, and secure!!
+- For _only to the people who need this_, give them permissions to our Google Cloud account. (Ask around if you don't know how to do this.) Please be cautious, safe, and secure!!
 
 #### Backend
 
