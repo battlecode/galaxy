@@ -1,7 +1,11 @@
 import React, { useMemo } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
+import NoDataToDisplay from 'highcharts/modules/no-data-to-display';
 import * as chart from "./chartUtil";
+
+
+NoDataToDisplay(Highcharts);
 
 type UTCMilliTimestamp = number;
 
@@ -21,6 +25,8 @@ export interface TeamChartProps {
 
 const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
   // Translate values into Highcharts compatible options
+  const [myChart, setChart] = React.useState<Highcharts.Chart>();
+
   const seriesData: Highcharts.SeriesOptionsType[] | undefined = useMemo(() => {
     if (values === undefined) return undefined;
     return Object.keys(values).map((team) => ({
@@ -34,13 +40,26 @@ const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
     }));
   }, [values]);
 
-  // TODO: get loading to work! Ideally with a loading spinner :)
+  if (myChart !== undefined) {
+    if (seriesData === undefined) 
+		myChart.showLoading();
+    else myChart.hideLoading();
+  }
+
   const options: Highcharts.Options = {
     ...chart.highchartsOptionsBase,
-    lang: {
-      noData: "Loading...",
+    lang:  {
+      loading: "Loading Team Data...",
+	  noData: "There is no data to display :("
     },
-    noData: {
+	noData: {
+        style: {
+            fontWeight: 'bold',
+            fontSize: '15px',
+            color: 'red'
+        }
+    },
+    loading: {
       style: {
         fontWeight: "bold",
         fontSize: "18px",
@@ -111,7 +130,13 @@ const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
 
   return (
     <div>
-      <HighchartsReact highcharts={Highcharts} options={options} />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={options}
+        callback={(chart: Highcharts.Chart) => {
+          setChart(chart);
+        }}
+      />
     </div>
   );
 };
