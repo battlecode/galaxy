@@ -87,20 +87,20 @@ export const updateCurrentUser = async ({
  * Upload a new avatar for the currently logged in user.
  * @param userAvatarRequest The avatar file.
  */
-export const avatarUpload = async ({
-  userAvatarRequest,
-}: UserUAvatarCreateRequest): Promise<void> => {
-  await API.userUAvatarCreate({ userAvatarRequest });
+export const avatarUpload = async (
+  userAvatarRequest: UserUAvatarCreateRequest,
+): Promise<void> => {
+  await API.userUAvatarCreate(userAvatarRequest);
 };
 
 /**
  * Upload a resume for the currently logged in user.
  * @param userResumeRequest The resume file.
  */
-export const resumeUpload = async ({
-  userResumeRequest,
-}: UserUResumeUpdateRequest): Promise<void> => {
-  await API.userUResumeUpdate({ userResumeRequest });
+export const resumeUpload = async (
+  userResumeRequest: UserUResumeUpdateRequest,
+): Promise<void> => {
+  await API.userUResumeUpdate(userResumeRequest);
 };
 
 /**
