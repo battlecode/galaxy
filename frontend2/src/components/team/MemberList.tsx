@@ -41,9 +41,10 @@ const MemberList: React.FC<MemberListProps> = ({ members, className = "" }) => {
   return (
     <div className={`flex flex-col gap-6 ${className}`}>
       {/* display current user first */}
-      {currentUser !== undefined && (
-        <UserRow isCurrentUser user={currentUser} />
-      )}
+      {currentUser !== undefined &&
+        members.find((user) => user.id === currentUser.id) !== undefined && (
+          <UserRow isCurrentUser user={currentUser} />
+        )}
       {members.map(
         (member) =>
           member.id !== currentUser?.id && (

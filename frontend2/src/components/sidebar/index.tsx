@@ -48,7 +48,7 @@ export const SIDEBAR_ITEM_DATA: Array<{
   {
     iconName: "user_group",
     text: "My Team",
-    linkTo: "team",
+    linkTo: "my_team",
   },
   {
     iconName: "arrow_up_tray",
