@@ -62,6 +62,9 @@ const queryClient = new QueryClient({
   }),
 });
 
+queryClient.setQueryDefaults(["episode"], {
+  retry: 1,
+});
 queryClient.setQueryDefaults(["team"], { retry: false });
 queryClient.setQueryDefaults(["user"], { retry: false });
 
@@ -82,17 +85,13 @@ const App: React.FC = () => {
   );
 };
 
-const episodeLoader: LoaderFunction = ({ params }) => {
+const episodeLoader: LoaderFunction = async ({ params }) => {
   // check if the episodeId is a valid one.
   // if the episode is not found, throw an error.
   const id = params.episodeId ?? "";
-
-  // Prefetch the episode info.
-  void queryClient.ensureQueryData({
-    queryKey: buildKey(episodeInfoFactory.queryKey, { id }),
-    queryFn: async () => await episodeInfoFactory.queryFn({ id }),
-    staleTime: Infinity,
-  });
+  if (id === "") {
+    throw new Error("Episode not found");
+  }
 
   // Prefetch the top 10 ranked teams' rating histories.
   void queryClient.ensureQueryData({
@@ -105,7 +104,12 @@ const episodeLoader: LoaderFunction = ({ params }) => {
       ),
   });
 
-  return null;
+  // Prefetch the episode info.
+  return await queryClient.ensureQueryData({
+    queryKey: buildKey(episodeInfoFactory.queryKey, { id }),
+    queryFn: async () => await episodeInfoFactory.queryFn({ id }),
+    staleTime: Infinity,
+  });
 };
 
 const router = createBrowserRouter([
@@ -137,13 +141,14 @@ const router = createBrowserRouter([
   // Pages that will contain the episode sidebar and navbar (excl. account page)
   {
     element: <EpisodeLayout />,
-    errorElement: <ErrorBoundary />,
+    errorElement: <NotFound />,
     path: "/:episodeId",
     loader: episodeLoader,
     children: [
       {
         // Pages that should only be visible when logged in
         element: <PrivateRoute />,
+        errorElement: <ErrorBoundary />,
         children: [
           {
             path: "submissions",

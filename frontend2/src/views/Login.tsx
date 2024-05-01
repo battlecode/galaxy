@@ -75,7 +75,7 @@ const Login: React.FC = () => {
         <div>
           <hr />
           <div className="mt-3 flex flex-row justify-between text-sm text-cyan-600">
-            <Link to="/forgot_password">Forgot password?</Link>
+            <Link to="/password_forgot">Forgot password?</Link>
             <Link to={episodeId !== undefined ? `/${episodeId}/home` : "/"}>
               Back to home
             </Link>
