@@ -14,7 +14,7 @@ To participate in Battlecode, you need an account and a team. Each team can cons
 
 ## Installation
 
-Check [common issues](/bc24/common-issues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
+Check [common issues](/bc24/commonissues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
 
 ### Step 1: Install Java
 
@@ -64,7 +64,7 @@ There should now be a folder called \`client\` in your scaffold folder; if you g
 
 ### Developing Your Bot
 Place each version of your robot in a new subfolder in the \`src\` folder. Make sure every version has a \`RobotPlayer.java\`.
-Check [debugging tips](bc24/debugging-tips) if you experience problems while developing, or ask on the Discord.
+Check [debugging tips](/bc24/debuggingtips) if you experience problems while developing, or ask on the Discord.
 
 ### RUNNING BATTLECODE FROM THE CLIENT
 Open the client as described in Step 3. Navigate to the runner tab, select which bots and maps to run, and hit Run Game! Finally, click the play/pause button to view the replay.
@@ -88,12 +88,12 @@ export const BC24_RESOURCES = `
 
 ### Coding Resources
 
-If you're just starting out, check out the [getting started](/bc24/getting-started) page!
+If you're just starting out, check out the [getting started](/bc24/quickstart) page!
 
 For more helpful resources while coding, see:
 
-- [Common Issues](/bc24/common-issues)
-- [Debugging Tips](/bc24/debugging-tips)
+- [Common Issues](/bc24/commonissues)
+- [Debugging Tips](/bc24/debuggingtips)
 
 ### Third-party Tools
 
@@ -108,6 +108,226 @@ If you make a new tool that could be useful to others, please post it in the [#o
 Battlecode 2024 will be holding lectures, where a dev will be going over possible strategy, coding up an example player, answering questions, etc. Lectures are streamed on Twitch. More details coming soon!
 
 All lectures are streamed live on [our Twitch account](https://twitch.tv/mitbattlecode), and are later uploaded to [our YouTube channel](https://youtube.com/channel/UCOrfTSnyimIXfYzI8j_-CTQ).
+
+`;
+
+export const BC24_DEBUGGINGTIPS = `
+## Debugging
+
+Using a “debugger” lets you pause your code while its running and inspect its state - what your variables are set to, what methods you're calling, and so on. You can walk through your code step-by-step, and run arbitrary commands.
+
+Battlecode supports “remote debugging”, which means that you start up the battlecode server and tell it to pause, then connect to it with Eclipse or Intellij. It's easy to set up.
+
+Following this guide, you'll be able to view the game in the client as you are debugging. Just keep the client open and the game should automatically play (up until your breakpoint).
+
+### Debugging vocabulary
+
+Debugging has some new words that you might not know:
+
+A **debugger** is a tool that runs your code and pauses when you tell it to. You'll be using Eclipse or Intellij as a debugger for battlecode (unless you're particularly hardcore.)
+
+A **breakpoint** is an automatic pause point in the code. When the debugger gets to that line of code, it will pause, and wait for you to tell it what to do.
+
+**Stepping** is telling the debugger to take a single “step” in the code, and then pause again.
+
+You can also **resume** code, to keep running until you hit another breakpoint.
+
+The **stack** and **stack frames** are fancy words for, basically, the list of methods that are currently being called. So, if you have the methods:
+
+\` void doSomething() {goSomewhere();}void goSomewhere() {goLeft();}void goLeft() {rc.move(LEFT);}\`
+
+And you call \`doSomething()\`, the stack will look like:
+
+\`  ... ^ rc.move(LEFT) ^ goLeft() ^ goSomewhere() ^ doSomething() \`
+
+If you have questions, ask in IRC.
+
+### Starting the server in debug mode
+
+Do \`./gradlew runDebug -PteamA=examplefuncsplayer -PteamB=examplefuncsplayer -Pmaps=FourLakeLand\` in a terminal. (Or equivalent, for the teams and maps you want.) (This works exactly like \`./gradlew run\`.) If you're in IntelliJ, you can just run the \`runDebug\` Gradle task there.
+
+It should say \`Listening for transport dt_socket at address: 5005\` and pause.
+
+This means that the server has started, and is waiting for the Eclipse or IntelliJ debugger to connect.
+
+(You have to do this every time you want to debug.)
+
+### Debugging in Intellij
+
+#### Initial setup
+
+- Go into IntelliJ
+- Set a breakpoint by clicking on the area beside the line numbers to the left of your code.
+- Right click the breakpoint and select \`Suspend / Thread\`, and then click “Make default.” (This lets battlecode keep working while your code is paused.)
+- Go to Run > Edit Configurations…
+- Hit the “+” icon and select “Remote”
+  - Give it a name like “Debug Battlecode”
+  - In “Settings”:
+    - Set Host to \`localhost\`
+    - Set Port to \`5005\`
+  - Hit OK
+- In the top right corner of the screen, you should be able to select “Debug Battlecode” or equivalent from the little dropdown, and then hit the bug icon
+- If it works:
+  - IntelliJ should highlight the line you put a breakpoint on and pause. You should see a “Debug” window at the bottom of the screen. Congratulations! You're debugging.
+- If it doesn't work:
+  - If the match just runs and nothing happens, then make sure that your breakpoint is in a place that will actually run during the match (e.g. at the top of \`RobotPlayer::run\`.)
+  - If you get \`Unable to open debugger port (localhost:5005): java.net.ConnectException "Connection refused"\`, make sure you've actually started the server in \`runDebug\` mode, and that your port is set correctly. (You may also have to mess with your firewall settings, but try the other stuff first.)
+
+#### Ignoring battlecode internals
+
+Sometimes you can step into battlecode internal stuff by accident. To avoid that:
+- Go into Settings or Preferences > Build, Execution, Deployment > Debugger > Stepping
+- Select the “Skip class loaders” button
+- Select all the “Do not step into the classes…” options
+- Add the following packages by hitting the \`+\`
+  - \`battlecode.*\`
+  - \`net.sf.*\`
+  - \`gnu.trove.*\`
+  - \`org.objectweb.*\`
+
+#### How to use the debugger
+
+When the debugger is paused, you should be able to see a “Debug” window. It has the following stuff in it:
+
+- The “Frames” tab, which shows all the methods that have been called to get to where we are. (You can ignore the methods below “run”; they're battlecode magic.)
+- The “Variables” tab, which shows the values of variables that are currently available.
+- A line of icons:
+  - “Step over”, which goes to the next line in the current file, ignoring any methods you call.
+  - “Step into”, which goes into whatever method you call next.
+  - “Force step into”, which does the same thing as Step into, but also shows you inscrutable JVM internals while it goes. You shouldn't need this.
+  - “Step out”, which leaves the current method.
+  - “Drop Frame”, which pretends to rewind, but doesn't really. Don't use this unless you know what you're doing.
+  - “Run to Cursor”, which runs until the code hits the line the cursor is on.
+  - “Evaluate Expression”, which lets you put in any code you want and see what its value is.
+- The “Threads” tab, which you shouldn't mess with, because you might break the server.
+
+To learn more about these tools, see the [Intellij documentation](https://www.jetbrains.com/help/idea/2016.3/debugger-basics.html).
+
+#### Conditional breakpoints
+
+Sometimes, you might only want to pause if your robot is on team A, or the game is in round 537, or if you have fewer than a thousand bytecodes left. To make these changes, right click the breakpoint, and in the condition field, put the condition; you can use any variables in the surrounding code. If I have the method:
+
+### Debugging in Eclipse
+
+#### Initial setup
+
+- Go into Eclipse
+- Set a breakpoint in your code by clicking on the margin to the left of it so that a blue bubble appears
+- Go to Run > Debug configurations
+- Select “Remote Java Application”
+- Hit the “new” button
+- Set up the debug configuration:
+  - Give it a name (i.e. Debug Battlecode Bot)
+  - Hit Browse, and select your project
+  - Make sure connection type is “Standard”
+  - Set Host to \`localhost\`
+  - Set Port to \`5005\`
+  - If there's an error about selecting preferred launcher type at the bottom of the dialog, pick one; scala if you have scala code, java otherwise; although they should both work.
+- Hit “Apply”
+- Hit “Debug”
+  - If it works:
+    - Eclipse should ask to open the “Debug” view; let it.
+    - You should see new and exciting windows, and eclipse should pause and highlight a line of your code.
+    - Congratulations; you're debugging.
+  - If it doesn't:
+    - You may get a “failed to connect to VM; connection refused.” Make sure you've [started the server in debug mode](#starting-the-server-in-debug-mode).
+
+You can also start debugging by selecting the little triangle next to the beetle in the toolbar and selecting “Debug Battlecode Bot”.
+
+#### Ignoring battlecode internals
+
+Oftentimes while debugging you can often step into classes you don't care about - battlecode internal classes, or java classes. To avoid this, right click a stack frame in the “Debug” window - i.e. the thing beneath a Thread labeled \`RobotPlayer.run\` or whatever - and:
+- Select “Use Step Filters”
+- Select “Edit Step Filters”.
+- Select all the predefined ones
+- Add filter…
+  - \`battlecode.*\`
+  - \`net.sf.*\`
+  - \`gnu.trove.*\`
+  - \`org.objectweb.*\`
+- Hit “Ok”
+
+And you should be good to go!
+
+#### Using the debugger.
+
+See the [eclipse documentation](http://help.eclipse.org/neon/index.jsp?topic=%2Forg.eclipse.jdt.doc.user%2Freference%2Fviews%2Fdebug%2Fref-debug_view.htm).
+
+#### Conditional Breakpoints
+
+Sometimes, you might only want to pause if your robot is on team A, or the game is in round 537, or if you have fewer than a thousand bytecodes left. To make these changes:
+- Right click the breakpoint
+- Go to “Breakpoint Properties”
+- Check “Conditional”
+- Write a condition in the text box
+
+If I have the method:
+
+\`\`\`java
+import battlecode.common.Clock;
+import battlecode.common.RobotController;
+class RobotPlayer {
+  // ...
+  public static void sayHi(RobotController rc) {
+    rc.broadcast(rc.getID(), rc.getType().ordinal());
+  }
+}
+\`\`\`
+I could make the following conditions: - \`rc.getTeam() == Team.A\` - \`rc.getRoundNum() == 537\` - \`Clock.getBytecodesLeft() < 1000\` - \`rc.getTeam() == Team.A && rc.getRoundNum() == 537 && Clock.getBytecodesLeft() < 1000\`
+
+## Second Method: Debugging with IntelliJ
+
+This method probably does not allow you to view the game in the client at the same time. We recommend following the instructions above.
+
+Add the gradle run task as a configuration:
+- In the dropdown near the hammer, play, and bug icons, select \`edit configurations\`
+- Hit the plus and select \`gradle\`
+- Give the configuration a name, e.g. "RunBattlecode"
+- Next to the \`gradle project\` field, click the folder icon and select \`battlecode24-scaffold\`
+- In the \`Tasks\` field, type \`run\`
+- Click \`Apply\`, \`Ok\`
+
+When your configuration is selected from the dropdown menu, clicking play will run the game, the same way double clicking run in the gradle window does. Clicking on the bug icon next to the play button will run the game in debug mode in the ide. Use breakpoints and the debuging interface to walk through your code. For more info on debugging with intelliJ, see [here](https://www.jetbrains.com/help/idea/debugging-code.html) You can specify the map and teams to run in the \`gradle.properties\` file.
+
+`;
+export const BC24_COMMONISSUES = `
+#### Installation Issues
+
+Known errors, with solutions:
+
+- \`Exception in thread "examplefuncsplayer.RobotPlayer #0" java.lang.IllegalArgumentException\`. This means that Gradle is not finding a Java 8 JDK. This could be if you installed a newer version of Java, or if you already had a newer version of Java installed from earlier. We will add instructions here shortly, but for now, ask on the Discord for the fix.
+  - Before doing the following two suggestions, try adding the line \`org.gradle.java.home=<path to your java 8 jdk>\` to your \`gradle.properties\` file
+  - For Windows, try following [these instructions](https://www.theserverside.com/feature/How-to-set-JAVA_HOME-in-Windows-and-echo-the-result).
+  - Try setting \`org.gradle.java.home=/path_to_jdk_1.8_directory\`. You need to know your \`JAVA_HOME\` (try [this guide](https://www.baeldung.com/find-java-home)).
+- \`Exception in thread "WebsocketSelector14" java.lang.NullPointerException\`. A common error in java, but sometimes happens if you close the client while a game is running. The solution is to run \`./gradlew --stop\` to stop all of the Gradle daemons and the next time you open the client it will use a fresh one.
+- \`Exception in thread "WebsocketSelector14" java.lang.NullPointerException at battlecode.server.NetServer.onError(NetServer.java:165)\`. This probably means that you're running two instances of the engine at the same time. Try running \`./gradlew --stop\` (if you're running things in IntelliJ, click the elephant in the Gradle Tool Window (the right-hand sidebar) and then execute \`gradle --stop\` in the window that pops up). If that doesn't work, ask on the Discord.
+
+If your error is not listed above, ask on [the Discord](https://discord.gg/N86mxkH).
+
+#### Client Issues
+
+If you're experiencing memory problems with the client, please try:
+
+- Making .bc24 files with the engine directly and uploading them to the client's match queue, rather than using the client's runner. With this method, once the web version of the visualizer is live, you can just use the web version at [https://play.battlecode.org/clients/bc24/index.html](https://play.battlecode.org/clients/bc24/index.html) rather than the desktop application.
+#### Other Issues
+- *After an update, IntelliJ doesn't recognize new API functions (e.g. \`rc.getMapWidth\`).* You need to refresh dependencies. Right-click on the project name (most likely \`battlecode24-scaffold\`) in the Gradle Tool Window (the right-hand sidebar), and click \`Refresh Gradle Dependencies\`. It is good to do this after every update.
+- You can enable auto-updates in IntelliJ by navigating to \`settings > build, execution, deployment > Gradle\` and checking \`Automatically import this project on changes in build script files\`, or the button that says something similar if you have an older version.
+
+#### Things to Try When Nothing Else Helps
+
+(Note, Gradle tasks are written as \`./gradlew taskname\` here, but you can also run \`taskname\` in your IDE.)
+
+Always follow each of the below Gradle commands with \`./gradlew build\`.
+
+- Are you on the latest version of Battlecode? try \`./gradlew update\`
+- Did you download the Oracle JDK 8 listed in [the installation instructions](/bc24/quickstart)?
+- Did you set your \`JAVA_HOME\` correctly?
+- \`./gradlew clean\` (always good to try)
+- \`./gradlew cleanEclipse\` (if Eclipse)
+- \`Refresh Gradle Dependencies\` in IntelliJ (see above)
+- \`./gradlew --stop\` (stops Gradle daemons)
+- \`rm -r ~/.gradle\` (removes the Gradle cache)
+- Redownload **[the scaffold](https://github.com/battlecode/battlecode24-scaffold)**.
 
 `;
 
@@ -160,34 +380,3 @@ export const BC24_TOURNAMENTS: Record<TourneyPageKey, string> = {
   Contact us on [Discord](https://discord.gg/N86mxkH) or at [battlecode@mit.edu](mailto:battlecode@mit.edu) if you are unsure of your eligibility.
   `,
 };
-
-/*
-### Battlecode 2024 Tournament Schedule
-
-
-### Prizes
-
-### Tournament Format
-
-### Eligibility Rules
-
-Anyone can write a bot, create a team, and participate in scrimmage matches/rankings. The Sprint Tournaments are open to everyone, but the other tournaments have stricter eligibility rules.
-
-Your team must meet **all three conditions** by a tournament's submission deadline to be eligible for it:
-
-1. Have uploaded a bot
-2. Have correctly indicated your eligibility on your Team Profile page
-3. Have all members upload a resume, at your personal profile page (This condition does not apply to the Sprint Tournaments).
-
-Additionally, tournament specific eligibility is listed below:
-
-- **Sprint Tournament:** All teams are eligible.
-- **US Qualifier:** Teams must **consist entirely of US college students** studying full-time, or in a transition phase.
-- **International Qualifier:** Teams must **consist entirely of college students** studying full-time, or in a transition phase, where at least one team member is not a US student.
-- **MIT Newbie Tournament:** Teams must **consist entirely of MIT students** who have never competed in Battlecode before.
-- **High School Tournament:** Teams must **consist entirely of high school students**.
-- **Final Tournament:** Teams must have qualified via the US or International Qualifier. The final match of the Newbie and High School tournaments will also be played at the final tournament.
-
-Contact us on [Discord](https://discord.gg/N86mxkH) or at [battlecode@mit.edu](mailto:battlecode@mit.edu) if you are unsure of your eligibility.
-
-*/
