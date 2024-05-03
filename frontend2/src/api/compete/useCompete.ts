@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-query";
 import { competeMutationKeys, competeQueryKeys } from "./competeKeys";
 import type {
+  CompeteMatchHistoricalRatingListRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
   CompeteMatchTournamentListRequest,
@@ -21,9 +22,11 @@ import type {
   CompeteSubmissionCreateRequest,
   CompeteSubmissionListRequest,
   CompeteSubmissionTournamentListRequest,
+  HistoricalRating,
   PaginatedMatchList,
   PaginatedScrimmageRequestList,
   PaginatedSubmissionList,
+  PaginatedTeamPublicList,
   ResponseError,
   ScrimmageRequest,
   Submission,
@@ -40,6 +43,8 @@ import toast from "react-hot-toast";
 import { buildKey } from "../helpers";
 import {
   matchListFactory,
+  ratingHistoryMeFactory,
+  ratingHistoryTopFactory,
   scrimmageInboxListFactory,
   scrimmageOutboxListFactory,
   subsListFactory,
@@ -48,6 +53,8 @@ import {
   tournamentSubsListFactory,
   userScrimmageListFactory,
 } from "./competeFactories";
+import { searchTeamsFactory } from "api/team/teamFactories";
+import { isPresent } from "utils/utilTypes";
 
 // ---------- QUERY HOOKS ---------- //
 /**
@@ -192,6 +199,56 @@ export const useTournamentMatchList = (
         queryClient,
         true,
       ),
+  });
+
+/**
+ * For retrieving a list of the top 10 teams' historical ratings in a given episode.
+ */
+export const useTopRatingHistoryList = (
+  { episodeId }: CompeteMatchHistoricalRatingListRequest,
+  queryClient: QueryClient,
+): UseQueryResult<HistoricalRating[], Error> =>
+  useQuery({
+    queryKey: buildKey(ratingHistoryTopFactory.queryKey, { episodeId }),
+    queryFn: async () => {
+      // Get the query data for the top 10 teams in this episode
+      const topTeamsData: PaginatedTeamPublicList | undefined =
+        await queryClient.ensureQueryData({
+          queryKey: buildKey(searchTeamsFactory.queryKey, { episodeId }),
+          queryFn: async () =>
+            await searchTeamsFactory.queryFn(
+              { episodeId, page: 1 },
+              queryClient,
+              false, // We don't want to prefetch teams 11-20
+            ),
+        });
+      // Fetch their rating histories
+      if (isPresent(topTeamsData) && isPresent(topTeamsData.results)) {
+        const topTeamsIds = topTeamsData.results.map((team) => team.id);
+        return await ratingHistoryTopFactory.queryFn({
+          episodeId,
+          teamIds: topTeamsIds,
+        });
+      } else {
+        return [];
+      }
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+/**
+ * For retrieving a list of the currently logged in user's team's historical rating in a given episode.
+ */
+export const useUserRatingHistoryList = ({
+  episodeId,
+}: CompeteMatchHistoricalRatingListRequest): UseQueryResult<
+  HistoricalRating[],
+  Error
+> =>
+  useQuery({
+    queryKey: buildKey(ratingHistoryMeFactory.queryKey, { episodeId }),
+    queryFn: async () => await ratingHistoryMeFactory.queryFn({ episodeId }),
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
 // ---------- MUTATION HOOKS ---------- //

@@ -143,8 +143,8 @@ paths:
           description: This match was already finalized
   /api/compete/{episode_id}/match/historical_rating/:
     get:
-      operationId: compete_match_historical_rating_retrieve
-      description: List the historical rating of a team.
+      operationId: compete_match_historical_rating_list
+      description: List the historical ratings of a list of teams.
       parameters:
       - in: path
         name: episode_id
@@ -153,10 +153,12 @@ paths:
           pattern: ^[^\/.]+$
         required: true
       - in: query
-        name: team_id
+        name: team_ids
         schema:
-          type: integer
-        description: A team to filter for. Defaults to your own team.
+          type: array
+          items:
+            type: integer
+        description: A list of teams to filter for. Defaults to just your own team.
       tags:
       - compete
       security:
@@ -168,7 +170,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HistoricalRating'
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoricalRating'
           description: ''
   /api/compete/{episode_id}/match/scrimmage/:
     get:
@@ -1817,6 +1821,8 @@ components:
             type: integer
         min_score:
           type: integer
+          maximum: 32767
+          minimum: 0
       required:
       - episode
       - maps
@@ -2187,15 +2193,12 @@ components:
     HistoricalRating:
       type: object
       properties:
-        rating:
-          type: number
-          format: double
-        timestamp:
-          type: string
-          format: date-time
+        team_id:
+          type: integer
+        team_rating:
+          $ref: '#/components/schemas/TeamRating'
       required:
-      - rating
-      - timestamp
+      - team_id
     LanguageEnum:
       enum:
       - java8
@@ -2292,6 +2295,18 @@ components:
       - submission
       - team
       - teamname
+    MatchRating:
+      type: object
+      properties:
+        rating:
+          type: number
+          format: double
+        timestamp:
+          type: string
+          format: date-time
+      required:
+      - rating
+      - timestamp
     MatchReportRequest:
       type: object
       properties:
@@ -2962,6 +2977,18 @@ components:
       - members
       - name
       - status
+    TeamRating:
+      type: object
+      properties:
+        team:
+          $ref: '#/components/schemas/TeamPublic'
+        rating_history:
+          type: array
+          items:
+            $ref: '#/components/schemas/MatchRating'
+      required:
+      - rating_history
+      - team
     TeamReportRequest:
       type: object
       properties:
@@ -3084,6 +3111,8 @@ components:
           type: string
         external_id:
           type: integer
+          maximum: 32767
+          minimum: -32768
           nullable: true
         name:
           type: string
@@ -3093,9 +3122,14 @@ components:
           items:
             type: integer
         release_status:
-          $ref: '#/components/schemas/ReleaseStatusEnum'
+          allOf:
+          - $ref: '#/components/schemas/ReleaseStatusEnum'
+          minimum: -2147483648
+          maximum: 2147483647
         display_order:
           type: integer
+          maximum: 32767
+          minimum: 0
       required:
       - display_order
       - id

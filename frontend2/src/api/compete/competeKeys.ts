@@ -1,4 +1,5 @@
 import type {
+  CompeteMatchHistoricalRatingListRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
   CompeteMatchTournamentListRequest,
@@ -10,17 +11,24 @@ import type {
 import type { QueryKeyBuilder } from "../apiTypes";
 
 interface CompeteKeys {
+  // --- SUBMISSIONS --- //
   subBase: QueryKeyBuilder<{ episodeId: string }>;
   subList: QueryKeyBuilder<CompeteSubmissionListRequest>;
   tourneySubs: QueryKeyBuilder<CompeteSubmissionTournamentListRequest>;
+  // --- SCRIMMAGES --- //
   scrimBase: QueryKeyBuilder<{ episodeId: string }>;
   inbox: QueryKeyBuilder<CompeteRequestInboxListRequest>;
   outbox: QueryKeyBuilder<CompeteRequestOutboxListRequest>;
   scrimsMeList: QueryKeyBuilder<CompeteMatchScrimmageListRequest>;
   scrimsOtherList: QueryKeyBuilder<CompeteMatchScrimmageListRequest>;
+  // --- MATCHES --- //
   matchBase: QueryKeyBuilder<{ episodeId: string }>;
   matchList: QueryKeyBuilder<CompeteMatchListRequest>;
   tourneyMatchList: QueryKeyBuilder<CompeteMatchTournamentListRequest>;
+  // --- PERFORMANCE --- //
+  ratingHistoryBase: QueryKeyBuilder<{ episodeId: string }>;
+  ratingHistoryTopList: QueryKeyBuilder<CompeteMatchHistoricalRatingListRequest>;
+  ratingHistoryMeList: QueryKeyBuilder<CompeteMatchHistoricalRatingListRequest>;
 }
 
 // ---------- KEY RECORDS ---------- //
@@ -112,6 +120,25 @@ export const competeQueryKeys: CompeteKeys = {
         teamId,
         page,
       ] as const,
+  },
+
+  // --- PERFORMANCE --- //
+  ratingHistoryBase: {
+    key: ({ episodeId }: { episodeId: string }) =>
+      ["compete", episodeId, "ratingHistory"] as const,
+  },
+
+  ratingHistoryTopList: {
+    key: ({ episodeId }: CompeteMatchHistoricalRatingListRequest) =>
+      [
+        ...competeQueryKeys.ratingHistoryBase.key({ episodeId }),
+        "top",
+      ] as const,
+  },
+
+  ratingHistoryMeList: {
+    key: ({ episodeId }: CompeteMatchHistoricalRatingListRequest) =>
+      [...competeQueryKeys.ratingHistoryBase.key({ episodeId }), "me"] as const,
   },
 };
 

@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { TeamRating } from './TeamRating';
+import {
+    TeamRatingFromJSON,
+    TeamRatingFromJSONTyped,
+    TeamRatingToJSON,
+} from './TeamRating';
+
 /**
  * 
  * @export
@@ -24,13 +31,13 @@ export interface HistoricalRating {
      * @type {number}
      * @memberof HistoricalRating
      */
-    rating: number;
+    team_id: number;
     /**
      * 
-     * @type {Date}
+     * @type {TeamRating}
      * @memberof HistoricalRating
      */
-    timestamp: Date;
+    team_rating?: TeamRating;
 }
 
 /**
@@ -38,8 +45,7 @@ export interface HistoricalRating {
  */
 export function instanceOfHistoricalRating(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "rating" in value;
-    isInstance = isInstance && "timestamp" in value;
+    isInstance = isInstance && "team_id" in value;
 
     return isInstance;
 }
@@ -54,8 +60,8 @@ export function HistoricalRatingFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'rating': json['rating'],
-        'timestamp': (new Date(json['timestamp'])),
+        'team_id': json['team_id'],
+        'team_rating': !exists(json, 'team_rating') ? undefined : TeamRatingFromJSON(json['team_rating']),
     };
 }
 
@@ -68,8 +74,8 @@ export function HistoricalRatingToJSON(value?: HistoricalRating | null): any {
     }
     return {
         
-        'rating': value.rating,
-        'timestamp': (value.timestamp.toISOString()),
+        'team_id': value.team_id,
+        'team_rating': TeamRatingToJSON(value.team_rating),
     };
 }
 

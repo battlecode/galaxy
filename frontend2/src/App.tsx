@@ -47,6 +47,7 @@ import { tournamentsLoader } from "./api/loaders/tournamentsLoader";
 import { tournamentLoader } from "./api/loaders/tournamentLoader";
 import { homeLoader } from "./api/loaders/homeLoader";
 import ErrorBoundary from "./views/ErrorBoundary";
+import { searchTeamsFactory } from "api/team/teamFactories";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -91,6 +92,17 @@ const episodeLoader: LoaderFunction = ({ params }) => {
     queryKey: buildKey(episodeInfoFactory.queryKey, { id }),
     queryFn: async () => await episodeInfoFactory.queryFn({ id }),
     staleTime: Infinity,
+  });
+
+  // Prefetch the top 10 ranked teams' rating histories.
+  void queryClient.ensureQueryData({
+    queryKey: buildKey(searchTeamsFactory.queryKey, { episodeId: id, page: 1 }),
+    queryFn: async () =>
+      await searchTeamsFactory.queryFn(
+        { episodeId: id, page: 1 },
+        queryClient,
+        false, // We don't want to prefetch teams 11-20
+      ),
   });
 
   return null;

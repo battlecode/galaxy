@@ -19,6 +19,8 @@ import {
   type CompeteMatchListRequest,
   type CompeteSubmissionTournamentListRequest,
   type CompeteRequestDestroyRequest,
+  type CompeteMatchHistoricalRatingListRequest,
+  type HistoricalRating,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
 
@@ -209,3 +211,16 @@ export const getMatchesList = async ({
   page,
 }: CompeteMatchListRequest): Promise<PaginatedMatchList> =>
   await API.competeMatchList({ episodeId, page });
+
+/**
+ * Get the rating history for a list of teams in a given episode.
+ * Defaults to the logged in user's team if no team IDs are provided.
+ *
+ * @param episodeId The episode ID to retrieve rating data for.
+ * @param teamIds The team IDs to retrieve rating data for.
+ */
+export const getRatingList = async ({
+  episodeId,
+  teamIds,
+}: CompeteMatchHistoricalRatingListRequest): Promise<HistoricalRating[]> =>
+  await API.competeMatchHistoricalRatingList({ episodeId, teamIds });

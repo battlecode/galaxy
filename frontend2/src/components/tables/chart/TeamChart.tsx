@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
+import NoDataToDisplay from "highcharts/modules/no-data-to-display";
 import * as chart from "./chartUtil";
 
+NoDataToDisplay(Highcharts);
+
 type UTCMilliTimestamp = number;
+
+export type ChartData = [UTCMilliTimestamp, number];
 
 // `yAxisLabel` is the name that is shown to the right of the graph.
 //
@@ -14,15 +19,23 @@ type UTCMilliTimestamp = number;
 // { "Gone Sharkin" : [ [ 1673826806000.0, 1000 ], [1673826805999.0, 900], ... ], ...}
 export interface TeamChartProps {
   yAxisLabel: string;
-  values: Record<string, Array<[UTCMilliTimestamp, number]>>;
+  values?: Record<string, ChartData[]>;
+  loading?: boolean;
+  loadingMessage?: string;
 }
 
-const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
-  const seriesData: Highcharts.SeriesOptionsType[] = [];
-
+const TeamChart: React.FC<TeamChartProps> = ({
+  yAxisLabel,
+  values,
+  loading = false,
+  loadingMessage,
+}) => {
   // Translate values into Highcharts compatible options
-  for (const team in values) {
-    const formattedEntry: Highcharts.SeriesOptionsType = {
+  const [myChart, setChart] = useState<Highcharts.Chart>();
+
+  const seriesData: Highcharts.SeriesOptionsType[] = useMemo(() => {
+    if (values === undefined) return [];
+    return Object.keys(values).map((team) => ({
       type: "line",
       name: team,
       data: values[team],
@@ -30,12 +43,38 @@ const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
         enabled: false,
         symbol: "circle",
       },
-    };
-    seriesData.push(formattedEntry);
+    }));
+  }, [values]);
+
+  if (myChart !== undefined) {
+    try {
+      if (loading) myChart.showLoading(loadingMessage ?? "Loading...");
+      else myChart.hideLoading();
+    } catch (e) {
+      // Ignore internal highcharts errors...
+    }
   }
 
   const options: Highcharts.Options = {
     ...chart.highchartsOptionsBase,
+    lang: {
+      loading: loadingMessage ?? "Loading...",
+      noData: "No data found to display.",
+    },
+    noData: {
+      style: {
+        fontWeight: "bold",
+        fontSize: "15px",
+        color: "red",
+      },
+    },
+    loading: {
+      style: {
+        fontWeight: "bold",
+        fontSize: "18px",
+        color: "teal",
+      },
+    },
     chart: {
       ...chart.highchartsOptionsBase.chart,
       height: 400,
@@ -86,7 +125,7 @@ const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
         return names;
       },
     },
-    series: seriesData,
+    series: seriesData ?? [],
 
     legend: {
       layout: "vertical",
@@ -100,7 +139,13 @@ const TeamChart = ({ yAxisLabel, values }: TeamChartProps): JSX.Element => {
 
   return (
     <div>
-      <HighchartsReact highcharts={Highcharts} options={options} />
+      <HighchartsReact
+        highcharts={Highcharts}
+        options={options}
+        callback={(chart: Highcharts.Chart) => {
+          setChart(chart);
+        }}
+      />
     </div>
   );
 };
