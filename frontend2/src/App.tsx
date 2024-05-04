@@ -93,6 +93,13 @@ const episodeLoader: LoaderFunction = async ({ params }) => {
     throw new Error("Episode not found");
   }
 
+  // Await the episode info so we can be sure that it exists.
+  const episodeInfo = await queryClient.ensureQueryData({
+    queryKey: buildKey(episodeInfoFactory.queryKey, { id }),
+    queryFn: async () => await episodeInfoFactory.queryFn({ id }),
+    staleTime: Infinity,
+  });
+
   // Prefetch the top 10 ranked teams' rating histories.
   void queryClient.ensureQueryData({
     queryKey: buildKey(searchTeamsFactory.queryKey, { episodeId: id, page: 1 }),
@@ -104,12 +111,7 @@ const episodeLoader: LoaderFunction = async ({ params }) => {
       ),
   });
 
-  // Prefetch the episode info.
-  return await queryClient.ensureQueryData({
-    queryKey: buildKey(episodeInfoFactory.queryKey, { id }),
-    queryFn: async () => await episodeInfoFactory.queryFn({ id }),
-    staleTime: Infinity,
-  });
+  return episodeInfo;
 };
 
 const router = createBrowserRouter([
