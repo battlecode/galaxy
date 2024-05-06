@@ -31,7 +31,7 @@ resource "google_eventarc_trigger" "this" {
   for_each = toset(var.storage_names)
 
   name            = "${var.name}-${each.value}"
-  location        = "us"
+  location        = var.gcp_region
   service_account = google_service_account.this.email
   labels          = var.labels
 
