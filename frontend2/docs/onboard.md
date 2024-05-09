@@ -56,6 +56,8 @@ We also use Routes, which is React's concept of translating URLs and paths into 
 
 Contexts are a way to store and share information across React components. For example, we can store info about the user in a context, and can pass this to the Typescript of React files to work with it. Learn more here: https://react.dev/learn/passing-data-deeply-with-context.
 
+For deeper info about specific topics we love to use, check out https://tkdodo.eu/blog.
+
 ## Battlecode-specific web dev
 
 Here are (some) specifics about Battlecode's frontend -- about how the codebase is set up, how it works, etc.
