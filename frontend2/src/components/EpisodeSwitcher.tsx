@@ -4,24 +4,27 @@ import Icon from "./elements/Icon";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { isPresent } from "../utils/utilTypes";
 import { useNavigate } from "react-router-dom";
-import { useEpisodeList } from "../api/episode/useEpisode";
+import { useEpisodeInfo, useEpisodeList } from "../api/episode/useEpisode";
 import { useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
-import { episodeInfoFactory } from "../api/episode/episodeFactories";
-import { buildKey } from "../api/helpers";
+import Spinner from "./Spinner";
 
 const EpisodeSwitcher: React.FC = () => {
   const queryClient = useQueryClient();
   const { episodeId, setEpisodeId } = useEpisodeId();
-  const { data: episodeList } = useEpisodeList({ page: 1 }, queryClient);
+  const episodeList = useEpisodeList({ page: 1 }, queryClient);
+  const episodeInfo = useEpisodeInfo({ id: episodeId });
   const navigate = useNavigate();
   const idToName = useMemo(
     () =>
       new Map(
-        (episodeList?.results ?? []).map((ep) => [ep.name_short, ep.name_long]),
+        (episodeList?.data?.results ?? []).map((ep) => [
+          ep.name_short,
+          ep.name_long,
+        ]),
       ),
     [episodeList],
   );
+
   if (!isPresent(episodeList)) {
     return null;
   }
@@ -30,27 +33,24 @@ const EpisodeSwitcher: React.FC = () => {
       <Listbox
         value={episodeId}
         onChange={(newEpisodeId) => {
-          (async () =>
-            await queryClient.fetchQuery({
-              queryKey: buildKey(episodeInfoFactory.queryKey, {
-                id: newEpisodeId,
-              }),
-              queryFn: async () =>
-                await episodeInfoFactory.queryFn({ id: newEpisodeId }),
-            }))().catch((e) => toast.error((e as Error).message));
           setEpisodeId(newEpisodeId);
           navigate(`/${newEpisodeId}/home`);
         }}
       >
         <div className="relative">
           <Listbox.Button
-            className={`relative h-9 w-full truncate rounded-full bg-gray-900/80 py-1.5
+            className={`relative flex h-9 w-full flex-row items-center justify-center gap-3 truncate rounded-full bg-gray-900/80 py-1.5
             pl-3.5 pr-8 text-left text-gray-100 shadow-sm focus:outline-none
             sm:text-sm sm:leading-6`}
           >
             <span className="text-sm font-semibold">
               {idToName.get(episodeId)}
             </span>
+            {(episodeList.isLoading || episodeInfo.isLoading) && (
+              <div className="my-1 flex w-full justify-center">
+                <Spinner size="xs" />
+              </div>
+            )}
             <div
               className="absolute inset-y-0 right-0 mr-2 flex transform items-center
               transition duration-300 ui-open:rotate-180"
@@ -69,7 +69,7 @@ const EpisodeSwitcher: React.FC = () => {
               bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
               sm:max-h-60 sm:text-sm"
             >
-              {episodeList?.results?.map((ep) => (
+              {episodeList?.data?.results?.map((ep) => (
                 <Listbox.Option
                   className="flex cursor-default flex-row justify-between py-1.5 pl-4 pr-2 ui-active:bg-cyan-100"
                   key={ep.name_short}
