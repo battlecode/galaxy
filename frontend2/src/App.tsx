@@ -20,7 +20,7 @@ import {
   type LoaderFunction,
 } from "react-router-dom";
 import { DEFAULT_EPISODE } from "./utils/constants";
-import NotFound from "./views/NotFound";
+import EpisodeNotFound from "./views/EpisodeNotFound";
 import Rankings from "./views/Rankings";
 import { CurrentUserProvider } from "./contexts/CurrentUserProvider";
 import PrivateRoute from "./components/PrivateRoute";
@@ -48,6 +48,7 @@ import { tournamentLoader } from "./api/loaders/tournamentLoader";
 import { homeLoader } from "./api/loaders/homeLoader";
 import ErrorBoundary from "./views/ErrorBoundary";
 import { searchTeamsFactory } from "api/team/teamFactories";
+import PageNotFound from "views/PageNotFound";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -90,7 +91,9 @@ const episodeLoader: LoaderFunction = async ({ params }) => {
   // if the episode is not found, throw an error.
   const id = params.episodeId ?? "";
   if (id === "") {
-    throw new Error("Episode not found");
+    throw new ResponseError(
+      new Response("Episode not found.", { status: 404 }),
+    );
   }
 
   // Await the episode info so we can be sure that it exists.
@@ -102,7 +105,10 @@ const episodeLoader: LoaderFunction = async ({ params }) => {
 
   // Prefetch the top 10 ranked teams' rating histories.
   void queryClient.ensureQueryData({
-    queryKey: buildKey(searchTeamsFactory.queryKey, { episodeId: id, page: 1 }),
+    queryKey: buildKey(searchTeamsFactory.queryKey, {
+      episodeId: id,
+      page: 1,
+    }),
     queryFn: async () =>
       await searchTeamsFactory.queryFn(
         { episodeId: id, page: 1 },
@@ -143,7 +149,7 @@ const router = createBrowserRouter([
   // Pages that will contain the episode sidebar and navbar (excl. account page)
   {
     element: <EpisodeLayout />,
-    errorElement: <NotFound />,
+    errorElement: <EpisodeNotFound />,
     path: "/:episodeId",
     loader: episodeLoader,
     children: [
@@ -204,7 +210,7 @@ const router = createBrowserRouter([
       },
       {
         path: "*",
-        element: <NotFound />,
+        element: <PageNotFound />,
       },
     ],
   },
