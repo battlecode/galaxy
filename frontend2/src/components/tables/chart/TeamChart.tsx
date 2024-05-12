@@ -18,11 +18,15 @@ export type ChartData = [UTCMilliTimestamp, number];
 // the second is the ranking of that team. Example:
 //
 // { "Gone Sharkin" : [ [ 1673826806000.0, 1000 ], [1673826805999.0, 900], ... ], ...}
+//
+// `plotLines` holds the tournament lines. You use them like this:
+// [ ["Tournament 1", 122342982341], ["Tournament 2", 122345081100], ...]
 export interface TeamChartProps {
   yAxisLabel: string;
   values?: Record<string, ChartData[]>;
   loading?: boolean;
   loadingMessage?: string;
+  plotLines?: Array<[string, UTCMilliTimestamp]>
 }
 
 const TeamChart: React.FC<TeamChartProps> = ({
@@ -30,6 +34,7 @@ const TeamChart: React.FC<TeamChartProps> = ({
   values,
   loading = false,
   loadingMessage,
+  plotLines
 }) => {
   // Translate values into Highcharts compatible options
   const [myChart, setChart] = useState<Highcharts.Chart>();
@@ -135,6 +140,43 @@ const TeamChart: React.FC<TeamChartProps> = ({
       maxHeight: 1e6,
       alignColumns: false,
     },
+
+	xAxis: {
+		type: "datetime",
+		title: {
+		  text: "Local Date & Time",
+		},
+		crosshair: {
+		  width: 1,
+		},
+		dateTimeLabelFormats: {
+		  day: "%e %b",
+		  hour: "%I:%M %P",
+		  minute: "%I:%M:%S %P",
+		},
+		plotLines: plotLines?.map(([name, timestamp]) => ({
+		  color: "#ccd6eb",
+		  zIndex: 1000,
+		  value: timestamp,
+		  label: {
+			text: name,
+			useHTML: true,
+			x: 12,
+			y: 0,
+			rotation: 270,
+			align: "left",
+			verticalAlign: "bottom",
+			style: {
+			  background: "rgba(255, 255, 255, 0.5)",
+			  color: "#000000",
+			  padding: "3px",
+			  border: "1px solid #ccd6eb",
+			  borderTop: "0",
+			},
+		  },
+		})),
+	}
+	
   };
 
   return (
