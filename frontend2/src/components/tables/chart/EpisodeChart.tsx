@@ -1,51 +1,73 @@
-import React from "react";
+import React, { useMemo, useState, Fragment } from "react";
+import { Listbox, Transition } from "@headlessui/react";
 import Highcharts from "highcharts";
+import { useEpisodeList } from "api/episode/useEpisode";
+import Icon from "../../elements/Icon";
+import SelectMenu from "../../elements/SelectMenu";
 import HighchartsReact from "highcharts-react-official";
-import TeamChart from "./TeamChart";
+import TeamChart, { type ChartData } from "./TeamChart";
 import { useSearchTeams } from "api/team/useTeam";
+import { useTopRatingHistoryList } from "api/compete/useCompete";
 import { useQueryClient } from "@tanstack/react-query";
 import * as chart from "./chartUtil";
 import * as random_data from "./randomData";
 
-export interface EpisodeChartProps {
-  episodes: string[];
-}
-
-const EpisodeChart = ({ episodes }: EpisodeChartProps): JSX.Element => {
+const EpisodeChart = (): JSX.Element => {
   const queryClient = useQueryClient();
-  const { data: rankingsData, isLoading: rankingsLoading } = useSearchTeams(
-    {
-      episodeId: "bc23",
-      search: "",
-      page: 1,
-    },
+  const [episode, setEpisode] = useState("bc23");
+  const { data: episodeList } = useEpisodeList({ page: 1 }, queryClient);
+  const topRatingHistory = useTopRatingHistoryList(
+    { episodeId: episode },
     queryClient,
   );
+  const idToName = useMemo(
+    () =>
+      new Map(
+        (episodeList?.results ?? []).map((ep) => [ep.name_short, ep.name_long]),
+      ),
+    [episodeList],
+  );
 
-  if (!rankingsLoading && rankingsData?.results !== undefined) {
-    for (const team of rankingsData.results) {
-      console.log(team.id);
-    }
-    console.log(rankingsData);
-    return (
-      <TeamChart
-        yAxisLabel="Performance"
-        values={{
-          "Gone Sharkin": random_data.randomData1,
-          bruteforcer: random_data.randomData2,
-          Bear: random_data.randomData3,
-          "cout for clout": random_data.randomData4,
-          "don't eat my nonorientable shapes": random_data.randomData5,
-          "I ran out of team names": random_data.randomData6,
-          "I ran out of team names 2": random_data.randomData7,
-          "I ran out of team names 3": random_data.randomData8,
-          "I ran out of team names 100": random_data.randomData9,
-        }}
-      />
-    );
+
+  const ratingData: Record<string, ChartData[]> | undefined = useMemo(() => {
+    if (!topRatingHistory.isSuccess) return undefined;
+    const ratingRecord: Record<string, ChartData[]> = {};
+    return topRatingHistory.data.reduce((record, teamData) => {
+      if (teamData.team_rating !== undefined) {
+        record[teamData.team_rating.team.name] =
+          teamData.team_rating.rating_history.map((match) => [
+            match.timestamp.getTime(),
+            match.rating,
+          ]);
+      }
+      return record;
+    }, ratingRecord);
+  }, [topRatingHistory]);
+
+  let options = [{value: "", label: ""}];
+
+  if (episodeList?.results !== undefined) {
+	  options = episodeList.results.map((e) => {return {value: e.name_short, label: e.name_long};});
   }
 
-  return <TeamChart yAxisLabel="Performance" values={{}} />;
+
+  return (
+    <div>
+      <SelectMenu
+        options={options}
+        label={"Select Year"}
+        value={episode}
+        onChange={setEpisode}
+      />
+
+      <TeamChart
+        yAxisLabel="Rating"
+        values={ratingData}
+        loading={topRatingHistory.isLoading}
+        loadingMessage="Loading rankings data..."
+      />
+    </div>
+  );
 };
 
 export default EpisodeChart;
