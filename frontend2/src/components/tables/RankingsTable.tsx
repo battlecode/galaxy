@@ -61,7 +61,7 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
           key: "team",
           value: (team) => (
             <NavLink
-              to={`${episodeId}/team/${team.id}`}
+              to={`/${episodeId}/team/${team.id}`}
               className="hover:underline"
             >
               {team.name}

@@ -40,6 +40,7 @@ import { submissionsLoader } from "./api/loaders/submissionsLoader";
 import { myTeamLoader } from "./api/loaders/myTeamLoader";
 import { scrimmagingLoader } from "./api/loaders/scrimmagingLoader";
 import { rankingsLoader } from "./api/loaders/rankingsLoader";
+import { teamProfileLoader } from "./api/loaders/teamProfileLoader";
 import { episodeInfoFactory } from "./api/episode/episodeFactories";
 import { buildKey } from "./api/helpers";
 import { queueLoader } from "./api/loaders/queueLoader";
@@ -49,6 +50,7 @@ import { homeLoader } from "./api/loaders/homeLoader";
 import ErrorBoundary from "./views/ErrorBoundary";
 import { searchTeamsFactory } from "api/team/teamFactories";
 import PageNotFound from "views/PageNotFound";
+import TeamProfile from "views/TeamProfile";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -164,7 +166,7 @@ const router = createBrowserRouter([
             loader: submissionsLoader(queryClient),
           },
           {
-            path: "team",
+            path: "my_team",
             element: <MyTeam />,
             loader: myTeamLoader(queryClient),
           },
@@ -207,6 +209,11 @@ const router = createBrowserRouter([
         path: "tournament/:tournamentId",
         element: <TournamentPage />,
         loader: tournamentLoader(queryClient),
+      },
+      {
+        path: "team/:teamId",
+        element: <TeamProfile />,
+        loader: teamProfileLoader(queryClient),
       },
       {
         path: "*",
