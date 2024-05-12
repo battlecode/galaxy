@@ -44,6 +44,8 @@ const EpisodeChart = (): JSX.Element => {
     }, ratingRecord);
   }, [topRatingHistory]);
 
+  console.log(ratingData);
+
   let options = [{value: "", label: ""}];
 
   if (episodeList?.results !== undefined) {
@@ -65,6 +67,10 @@ const EpisodeChart = (): JSX.Element => {
         values={ratingData}
         loading={topRatingHistory.isLoading}
         loadingMessage="Loading rankings data..."
+		plotLines={[
+		["Tournament 1", 1673156004189],
+		["Tournament 2", 1673164004189],
+		]}
       />
     </div>
   );
