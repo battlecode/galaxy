@@ -1,11 +1,13 @@
 import type {
+  UserPasswordResetValidateTokenCreateRequest,
   UserURetrieveRequest,
   UserUTeamsRetrieveRequest,
 } from "../_autogen";
 import type { QueryKeyBuilder, QueryKeyHolder } from "../apiTypes";
 
 interface UserKeys {
-  tokenVerify: QueryKeyHolder;
+  loginTokenVerify: QueryKeyHolder;
+  passwordResetTokenVerify: QueryKeyBuilder<UserPasswordResetValidateTokenCreateRequest>;
   meBase: QueryKeyHolder;
   myInfo: QueryKeyHolder;
   otherBase: QueryKeyBuilder<UserURetrieveRequest>;
@@ -19,8 +21,17 @@ export const userQueryKeys: UserKeys = {
     key: () => ["user", "me"] as const,
   },
 
-  tokenVerify: {
-    key: () => [...userQueryKeys.meBase.key(), "tokenVerify"] as const,
+  loginTokenVerify: {
+    key: () => [...userQueryKeys.meBase.key(), "loginTokenVerify"] as const,
+  },
+
+  passwordResetTokenVerify: {
+    key: ({ resetTokenRequest }: UserPasswordResetValidateTokenCreateRequest) =>
+      [
+        ...userQueryKeys.meBase.key(),
+        "passwordResetTokenVerify",
+        resetTokenRequest.token,
+      ] as const,
   },
 
   myInfo: {
@@ -48,6 +59,9 @@ export const userMutationKeys = {
 
   updateCurrent: ({ episodeId }: { episodeId: string }) =>
     ["user", "update", episodeId] as const,
+
+  forgotPassword: ({ episodeId }: { episodeId: string }) =>
+    ["user", "forgotPass", episodeId] as const,
 
   resetPassword: ({ episodeId }: { episodeId: string }) =>
     ["user", "resetPass", episodeId] as const,

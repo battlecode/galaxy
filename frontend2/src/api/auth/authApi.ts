@@ -46,7 +46,7 @@ export const logout = async (queryClient: QueryClient): Promise<void> => {
   });
 };
 
-export const tokenVerify = async (): Promise<boolean> => {
+export const loginTokenVerify = async (): Promise<boolean> => {
   const accessToken = Cookies.get("access");
   if (accessToken === undefined) {
     return false;
@@ -71,7 +71,7 @@ export const tokenVerify = async (): Promise<boolean> => {
 export const loginCheck = async (
   queryClient: QueryClient,
 ): Promise<boolean> => {
-  const verified = await tokenVerify();
+  const verified = await loginTokenVerify();
   if (!verified) {
     await logout(queryClient);
   }
