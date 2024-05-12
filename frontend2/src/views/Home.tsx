@@ -8,6 +8,7 @@ import { SocialIcon } from "react-social-icons";
 import TeamChart, {
   type ChartData,
 } from "../components/tables/chart/TeamChart";
+import EpisodeChart from "../components/tables/chart/EpisodeChart";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useTopRatingHistoryList,
@@ -28,37 +29,22 @@ const Home: React.FC = () => {
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";
 
-  const userTeamRatingData: Record<string, ChartData[]> | undefined =
-    useMemo(() => {
-      if (!userTeamRatingHistory.isSuccess) return undefined;
-      const ratingRecord: Record<string, ChartData[]> = {};
-      return userTeamRatingHistory.data.reduce((record, teamData) => {
-        if (teamData.team_rating !== undefined) {
-          record[teamData.team_rating.team.name] =
-            teamData.team_rating.rating_history.map((match) => [
-              match.timestamp.getTime(),
-              match.rating,
-            ]);
-        }
-        return record;
-      }, ratingRecord);
-    }, [userTeamRatingHistory]);
-
-  const topTeamRatingData: Record<string, ChartData[]> | undefined =
-    useMemo(() => {
-      if (!topRatingHistory.isSuccess) return undefined;
-      const ratingRecord: Record<string, ChartData[]> = {};
-      return topRatingHistory.data.reduce((record, teamData) => {
-        if (teamData.team_rating !== undefined) {
-          record[teamData.team_rating.team.name] =
-            teamData.team_rating.rating_history.map((match) => [
-              match.timestamp.getTime(),
-              match.rating,
-            ]);
-        }
-        return record;
-      }, ratingRecord);
-    }, [topRatingHistory]);
+/*
+  const ratingData: Record<string, ChartData[]> | undefined = useMemo(() => {
+    if (!topRatingHistory.isSuccess) return undefined;
+    const ratingRecord: Record<string, ChartData[]> = {};
+    return topRatingHistory.data.reduce((record, teamData) => {
+      if (teamData.team_rating !== undefined) {
+        record[teamData.team_rating.team.name] =
+          teamData.team_rating.rating_history.map((match) => [
+            match.timestamp.getTime(),
+            match.rating,
+          ]);
+      }
+      return record;
+    }, ratingRecord);
+  }, [topRatingHistory]);
+*/
 
   return (
     <div className="p-6">
@@ -114,12 +100,7 @@ const Home: React.FC = () => {
             </div>
           </SectionCard>
           <SectionCard title="Top Teams">
-            <TeamChart
-              yAxisLabel="Rating"
-              values={topTeamRatingData}
-              loading={topRatingHistory.isLoading}
-              loadingMessage="Loading rankings data..."
-            />
+            <EpisodeChart/>
           </SectionCard>
           {/* <SectionCard title="Announcements">ANNOUNCEMENTS (TODO)</SectionCard> */}
         </div>
