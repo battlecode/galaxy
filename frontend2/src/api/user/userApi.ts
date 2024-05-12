@@ -12,6 +12,8 @@ import {
   type UserUMePartialUpdateRequest,
   type UserUAvatarCreateRequest,
   type UserUResumeUpdateRequest,
+  type UserPasswordResetValidateTokenCreateRequest,
+  type ResetToken,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
 
@@ -27,6 +29,15 @@ export const createUser = async ({
   userCreateRequest,
 }: UserUCreateRequest): Promise<UserCreate> =>
   await API.userUCreate({ userCreateRequest });
+
+/**
+ * Verify that a password reset token is valid and not expired.
+ * @param resetTokenRequest The password reset token to verify.
+ */
+export const passwordResetTokenVerify = async (
+  resetTokenRequest: UserPasswordResetValidateTokenCreateRequest,
+): Promise<ResetToken> =>
+  await API.userPasswordResetValidateTokenCreate(resetTokenRequest);
 
 /**
  * Confirm resetting a user's password.
