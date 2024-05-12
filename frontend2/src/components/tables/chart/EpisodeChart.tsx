@@ -28,7 +28,6 @@ const EpisodeChart = (): JSX.Element => {
     [episodeList],
   );
 
-
   const ratingData: Record<string, ChartData[]> | undefined = useMemo(() => {
     if (!topRatingHistory.isSuccess) return undefined;
     const ratingRecord: Record<string, ChartData[]> = {};
@@ -46,12 +45,13 @@ const EpisodeChart = (): JSX.Element => {
 
   console.log(ratingData);
 
-  let options = [{value: "", label: ""}];
+  let options = [{ value: "", label: "" }];
 
   if (episodeList?.results !== undefined) {
-	  options = episodeList.results.map((e) => {return {value: e.name_short, label: e.name_long};});
+    options = episodeList.results.map((e) => {
+      return { value: e.name_short, label: e.name_long };
+    });
   }
-
 
   return (
     <div>
@@ -67,10 +67,10 @@ const EpisodeChart = (): JSX.Element => {
         values={ratingData}
         loading={topRatingHistory.isLoading}
         loadingMessage="Loading rankings data..."
-		plotLines={[
-		["Tournament 1", 1673156004189],
-		["Tournament 2", 1673164004189],
-		]}
+        plotLines={[
+          ["Tournament 1", 1673156004189],
+          ["Tournament 2", 1673164004189],
+        ]}
       />
     </div>
   );
