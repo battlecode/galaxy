@@ -26,7 +26,7 @@ export interface TeamChartProps {
   values?: Record<string, ChartData[]>;
   loading?: boolean;
   loadingMessage?: string;
-  plotLines?: Array<[string, UTCMilliTimestamp]>
+  plotLines?: Array<[string, UTCMilliTimestamp]>;
 }
 
 const TeamChart: React.FC<TeamChartProps> = ({
@@ -34,7 +34,7 @@ const TeamChart: React.FC<TeamChartProps> = ({
   values,
   loading = false,
   loadingMessage,
-  plotLines
+  plotLines,
 }) => {
   // Translate values into Highcharts compatible options
   const [myChart, setChart] = useState<Highcharts.Chart>();
@@ -141,42 +141,41 @@ const TeamChart: React.FC<TeamChartProps> = ({
       alignColumns: false,
     },
 
-	xAxis: {
-		type: "datetime",
-		title: {
-		  text: "Local Date & Time",
-		},
-		crosshair: {
-		  width: 1,
-		},
-		dateTimeLabelFormats: {
-		  day: "%e %b",
-		  hour: "%I:%M %P",
-		  minute: "%I:%M:%S %P",
-		},
-		plotLines: plotLines?.map(([name, timestamp]) => ({
-		  color: "#ccd6eb",
-		  zIndex: 1000,
-		  value: timestamp,
-		  label: {
-			text: name,
-			useHTML: true,
-			x: 12,
-			y: 0,
-			rotation: 270,
-			align: "left",
-			verticalAlign: "bottom",
-			style: {
-			  background: "rgba(255, 255, 255, 0.5)",
-			  color: "#000000",
-			  padding: "3px",
-			  border: "1px solid #ccd6eb",
-			  borderTop: "0",
-			},
-		  },
-		})),
-	}
-	
+    xAxis: {
+      type: "datetime",
+      title: {
+        text: "Local Date & Time",
+      },
+      crosshair: {
+        width: 1,
+      },
+      dateTimeLabelFormats: {
+        day: "%e %b",
+        hour: "%I:%M %P",
+        minute: "%I:%M:%S %P",
+      },
+      plotLines: plotLines?.map(([name, timestamp]) => ({
+        color: "#ccd6eb",
+        zIndex: 1000,
+        value: timestamp,
+        label: {
+          text: name,
+          useHTML: true,
+          x: 12,
+          y: 0,
+          rotation: 270,
+          align: "left",
+          verticalAlign: "bottom",
+          style: {
+            background: "rgba(255, 255, 255, 0.5)",
+            color: "#000000",
+            padding: "3px",
+            border: "1px solid #ccd6eb",
+            borderTop: "0",
+          },
+        },
+      })),
+    },
   };
 
   return (
