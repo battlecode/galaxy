@@ -39,6 +39,7 @@ models/ReleaseStatusEnum.ts
 models/ResetToken.ts
 models/ResetTokenRequest.ts
 models/SaturnInvocationRequest.ts
+models/ScrimmageRecord.ts
 models/ScrimmageRequest.ts
 models/ScrimmageRequestRequest.ts
 models/ScrimmageStatusEnum.ts

@@ -2,6 +2,7 @@ import type {
   CompeteMatchHistoricalRatingListRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
+  CompeteMatchScrimmagingRecordRetrieveRequest,
   CompeteMatchTournamentListRequest,
   CompeteRequestInboxListRequest,
   CompeteRequestOutboxListRequest,
@@ -29,6 +30,7 @@ interface CompeteKeys {
   ratingHistoryBase: QueryKeyBuilder<{ episodeId: string }>;
   ratingHistoryTopList: QueryKeyBuilder<CompeteMatchHistoricalRatingListRequest>;
   ratingHistoryMeList: QueryKeyBuilder<CompeteMatchHistoricalRatingListRequest>;
+  scrimmagingRecord: QueryKeyBuilder<CompeteMatchScrimmagingRecordRetrieveRequest>;
 }
 
 // ---------- KEY RECORDS ---------- //
@@ -139,6 +141,21 @@ export const competeQueryKeys: CompeteKeys = {
   ratingHistoryMeList: {
     key: ({ episodeId }: CompeteMatchHistoricalRatingListRequest) =>
       [...competeQueryKeys.ratingHistoryBase.key({ episodeId }), "me"] as const,
+  },
+
+  scrimmagingRecord: {
+    key: ({
+      episodeId,
+      teamId,
+      scrimmageType,
+    }: CompeteMatchScrimmagingRecordRetrieveRequest) =>
+      [
+        ...competeQueryKeys.scrimBase.key({ episodeId }),
+        "record",
+        teamId ?? "me",
+        "scrimmageType",
+        scrimmageType,
+      ] as const,
   },
 };
 

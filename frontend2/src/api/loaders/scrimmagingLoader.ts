@@ -3,11 +3,13 @@ import type { LoaderFunction } from "react-router-dom";
 import {
   scrimmageInboxListFactory,
   scrimmageOutboxListFactory,
+  scrimmagingRecordFactory,
   tournamentMatchListFactory,
   userScrimmageListFactory,
 } from "../compete/competeFactories";
 import { buildKey } from "../helpers";
 import { myTeamFactory, searchTeamsFactory } from "../team/teamFactories";
+import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_autogen";
 
 export const scrimmagingLoader =
   (queryClient: QueryClient): LoaderFunction =>
@@ -60,6 +62,53 @@ export const scrimmagingLoader =
     const myTeamInfo = await queryClient.ensureQueryData({
       queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
       queryFn: async () => await myTeamFactory.queryFn({ episodeId }),
+    });
+
+    // Scrimmaging record (all types)
+    void queryClient.ensureQueryData({
+      queryKey: buildKey(scrimmagingRecordFactory.queryKey, {
+        episodeId,
+        teamId: myTeamInfo.id,
+        scrimmageType:
+          CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
+      }),
+      queryFn: async () =>
+        await scrimmagingRecordFactory.queryFn({
+          episodeId,
+          teamId: myTeamInfo.id,
+          scrimmageType:
+            CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
+        }),
+    });
+    void queryClient.ensureQueryData({
+      queryKey: buildKey(scrimmagingRecordFactory.queryKey, {
+        episodeId,
+        teamId: myTeamInfo.id,
+        scrimmageType:
+          CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked,
+      }),
+      queryFn: async () =>
+        await scrimmagingRecordFactory.queryFn({
+          episodeId,
+          teamId: myTeamInfo.id,
+          scrimmageType:
+            CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked,
+        }),
+    });
+    void queryClient.ensureQueryData({
+      queryKey: buildKey(scrimmagingRecordFactory.queryKey, {
+        episodeId,
+        teamId: myTeamInfo.id,
+        scrimmageType:
+          CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked,
+      }),
+      queryFn: async () =>
+        await scrimmagingRecordFactory.queryFn({
+          episodeId,
+          teamId: myTeamInfo.id,
+          scrimmageType:
+            CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked,
+        }),
     });
 
     // Tournament match list

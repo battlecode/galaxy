@@ -9,7 +9,12 @@ import TeamChart, {
   type ChartData,
 } from "../components/tables/chart/TeamChart";
 import { useQueryClient } from "@tanstack/react-query";
-import { useTopRatingHistoryList } from "api/compete/useCompete";
+import {
+  useTopRatingHistoryList,
+  useUserRatingHistoryList,
+} from "api/compete/useCompete";
+import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
+import { useUserTeam } from "api/team/useTeam";
 
 const Home: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -17,24 +22,43 @@ const Home: React.FC = () => {
   const episode = useEpisodeInfo({ id: episodeId });
   const nextTournament = useNextTournament({ episodeId });
   const topRatingHistory = useTopRatingHistoryList({ episodeId }, queryClient);
+  const userTeam = useUserTeam({ episodeId });
+  const userTeamRatingHistory = useUserRatingHistoryList({ episodeId });
 
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";
 
-  const ratingData: Record<string, ChartData[]> | undefined = useMemo(() => {
-    if (!topRatingHistory.isSuccess) return undefined;
-    const ratingRecord: Record<string, ChartData[]> = {};
-    return topRatingHistory.data.reduce((record, teamData) => {
-      if (teamData.team_rating !== undefined) {
-        record[teamData.team_rating.team.name] =
-          teamData.team_rating.rating_history.map((match) => [
-            match.timestamp.getTime(),
-            match.rating,
-          ]);
-      }
-      return record;
-    }, ratingRecord);
-  }, [topRatingHistory]);
+  const userTeamRatingData: Record<string, ChartData[]> | undefined =
+    useMemo(() => {
+      if (!userTeamRatingHistory.isSuccess) return undefined;
+      const ratingRecord: Record<string, ChartData[]> = {};
+      return userTeamRatingHistory.data.reduce((record, teamData) => {
+        if (teamData.team_rating !== undefined) {
+          record[teamData.team_rating.team.name] =
+            teamData.team_rating.rating_history.map((match) => [
+              match.timestamp.getTime(),
+              match.rating,
+            ]);
+        }
+        return record;
+      }, ratingRecord);
+    }, [userTeamRatingHistory]);
+
+  const topTeamRatingData: Record<string, ChartData[]> | undefined =
+    useMemo(() => {
+      if (!topRatingHistory.isSuccess) return undefined;
+      const ratingRecord: Record<string, ChartData[]> = {};
+      return topRatingHistory.data.reduce((record, teamData) => {
+        if (teamData.team_rating !== undefined) {
+          record[teamData.team_rating.team.name] =
+            teamData.team_rating.rating_history.map((match) => [
+              match.timestamp.getTime(),
+              match.rating,
+            ]);
+        }
+        return record;
+      }, ratingRecord);
+    }, [topRatingHistory]);
 
   return (
     <div className="p-6">
@@ -49,10 +73,19 @@ const Home: React.FC = () => {
               "No upcoming submission deadlines."
             )}
           </SectionCard>
-          {/* <SectionCard title="Match Statistics">MATCH STATISTICS (TODO)</SectionCard> */}
-          {/* <SectionCard title="Current Ranking">
-            RANKINGS GRAPH (TODO)
-          </SectionCard> */}
+          {userTeam.isSuccess && (
+            <SectionCard title="Scrimmaging Record">
+              <ScrimmagingRecord team={userTeam.data} />
+            </SectionCard>
+          )}
+          <SectionCard title="Rating History">
+            <TeamChart
+              yAxisLabel="Rating"
+              values={userTeamRatingData}
+              loading={userTeamRatingHistory.isLoading}
+              loadingMessage="Loading rating history..."
+            />
+          </SectionCard>
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
           <SectionCard title="Welcome!">
@@ -79,7 +112,7 @@ const Home: React.FC = () => {
           <SectionCard title="Top Teams">
             <TeamChart
               yAxisLabel="Rating"
-              values={ratingData}
+              values={topTeamRatingData}
               loading={topRatingHistory.isLoading}
               loadingMessage="Loading rankings data..."
             />

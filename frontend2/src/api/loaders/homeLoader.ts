@@ -5,6 +5,7 @@ import {
   episodeInfoFactory,
   nextTournamentFactory,
 } from "../episode/episodeFactories";
+import { ratingHistoryMeFactory } from "api/compete/competeFactories";
 
 export const homeLoader =
   (queryClient: QueryClient): LoaderFunction =>
@@ -22,6 +23,12 @@ export const homeLoader =
     void queryClient.ensureQueryData({
       queryKey: buildKey(nextTournamentFactory.queryKey, { episodeId }),
       queryFn: async () => await nextTournamentFactory.queryFn({ episodeId }),
+    });
+
+    // User Team Rating History
+    void queryClient.ensureQueryData({
+      queryKey: buildKey(ratingHistoryMeFactory.queryKey, { episodeId }),
+      queryFn: async () => await ratingHistoryMeFactory.queryFn({ episodeId }),
     });
 
     return null;
