@@ -141,6 +141,7 @@ export const useJoinTeam = (
 export const useLeaveTeam = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
+  onSuccess?: () => void,
 ): UseMutationResult<void, Error, void, unknown> =>
   useMutation({
     mutationKey: teamMutationKeys.leave({ episodeId }),
@@ -152,6 +153,7 @@ export const useLeaveTeam = (
       });
     },
     onSuccess: async () => {
+      onSuccess?.();
       await queryClient.invalidateQueries({
         queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
       });

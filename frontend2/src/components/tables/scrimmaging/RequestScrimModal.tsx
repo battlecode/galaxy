@@ -39,7 +39,9 @@ const RequestScrimModal: React.FC<RequestScrimModalProps> = ({
 }) => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
-  const request = useRequestScrimmage({ episodeId }, queryClient);
+  const request = useRequestScrimmage({ episodeId }, queryClient, () => {
+    closeModal();
+  });
 
   const getRandomMaps: () => string[] = useCallback(() => {
     const possibleMaps = clone(maps);
@@ -141,22 +143,15 @@ const RequestScrimModal: React.FC<RequestScrimModalProps> = ({
               disabled={mapErrorMessage !== undefined}
               loading={request.isPending}
               onClick={() => {
-                void request
-                  .mutateAsync({
-                    episodeId,
-                    scrimmageRequestRequest: {
-                      requested_to: teamToRequest.id,
-                      is_ranked: ranked,
-                      map_names: selectedMapNames,
-                      player_order: selectedOrder,
-                    },
-                  })
-                  .then(() => {
-                    closeModal();
-                  })
-                  .catch((err: string) => {
-                    console.error(`Error requesting scrimmage: ${err}`);
-                  });
+                request.mutate({
+                  episodeId,
+                  scrimmageRequestRequest: {
+                    requested_to: teamToRequest.id,
+                    is_ranked: ranked,
+                    map_names: selectedMapNames,
+                    player_order: selectedOrder,
+                  },
+                });
               }}
             />
             <Button fullWidth label="Cancel" onClick={closeModal} />

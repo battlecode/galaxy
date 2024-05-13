@@ -73,9 +73,9 @@ const Submissions: React.FC = () => {
     formState: { errors, isDirty },
   } = useForm<SubmissionFormInput>();
 
-  const onSubmit: SubmitHandler<SubmissionFormInput> = async (data) => {
+  const onSubmit: SubmitHandler<SubmissionFormInput> = (data) => {
     if (uploadSub.isPending) return;
-    await uploadSub.mutateAsync({
+    uploadSub.mutate({
       episodeId,
       _package: data.packageName,
       description: data.description,

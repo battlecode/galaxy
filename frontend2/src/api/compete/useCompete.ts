@@ -327,6 +327,7 @@ export const useRequestScrimmage = (
     episodeId: string;
   },
   queryClient: QueryClient,
+  onSuccess?: () => void,
 ): UseMutationResult<
   ScrimmageRequest,
   Error,
@@ -378,6 +379,7 @@ export const useRequestScrimmage = (
         error: "Error requesting scrimmage. Is the requested team eligible?",
       });
     },
+    onSuccess,
   });
 
 /**
