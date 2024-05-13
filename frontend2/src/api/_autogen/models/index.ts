@@ -32,6 +32,7 @@ export * from './ReleaseStatusEnum';
 export * from './ResetToken';
 export * from './ResetTokenRequest';
 export * from './SaturnInvocationRequest';
+export * from './ScrimmageRecord';
 export * from './ScrimmageRequest';
 export * from './ScrimmageRequestRequest';
 export * from './ScrimmageStatusEnum';

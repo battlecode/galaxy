@@ -21,6 +21,8 @@ import {
   type CompeteRequestDestroyRequest,
   type CompeteMatchHistoricalRatingListRequest,
   type HistoricalRating,
+  type CompeteMatchScrimmagingRecordRetrieveRequest,
+  type ScrimmageRecord,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
 
@@ -224,3 +226,21 @@ export const getRatingList = async ({
   teamIds,
 }: CompeteMatchHistoricalRatingListRequest): Promise<HistoricalRating[]> =>
   await API.competeMatchHistoricalRatingList({ episodeId, teamIds });
+
+/**
+ * Get a team's win-loss-tie record in scrimmages in a given episode. Defaults to the logged in user's team.
+ * Defaults to all scrimmage types.
+ * @param episodeId The episode ID to retrieve record data for.
+ * @param teamId The team ID to retrieve record data for.
+ * @param scrimmageType The type of scrimmage to retrieve record data for.
+ */
+export const getScrimmagingRecord = async ({
+  episodeId,
+  teamId,
+  scrimmageType,
+}: CompeteMatchScrimmagingRecordRetrieveRequest): Promise<ScrimmageRecord> =>
+  await API.competeMatchScrimmagingRecordRetrieve({
+    episodeId,
+    teamId,
+    scrimmageType,
+  });

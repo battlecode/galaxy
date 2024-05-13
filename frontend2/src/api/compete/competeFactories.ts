@@ -2,6 +2,7 @@ import type {
   CompeteMatchHistoricalRatingListRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
+  CompeteMatchScrimmagingRecordRetrieveRequest,
   CompeteMatchTournamentListRequest,
   CompeteRequestInboxListRequest,
   CompeteRequestOutboxListRequest,
@@ -12,6 +13,7 @@ import type {
   PaginatedScrimmageRequestList,
   PaginatedSubmissionList,
   TournamentSubmission,
+  ScrimmageRecord,
 } from "../_autogen";
 import type { PaginatedQueryFactory, QueryFactory } from "../apiTypes";
 import { competeQueryKeys } from "./competeKeys";
@@ -20,6 +22,7 @@ import {
   getMatchesList,
   getRatingList,
   getScrimmagesListByTeam,
+  getScrimmagingRecord,
   getSubmissionsList,
   getTournamentMatchesList,
   getUserScrimmagesInboxList,
@@ -207,4 +210,14 @@ export const ratingHistoryMeFactory: QueryFactory<
   queryKey: competeQueryKeys.ratingHistoryMeList,
   queryFn: async ({ episodeId }) =>
     await getRatingList({ episodeId, teamIds: undefined }),
+} as const;
+
+export const scrimmagingRecordFactory: QueryFactory<
+  CompeteMatchScrimmagingRecordRetrieveRequest,
+  ScrimmageRecord
+> = {
+  queryKey: competeQueryKeys.scrimmagingRecord,
+  queryFn: async ({ episodeId, teamId, scrimmageType }) => {
+    return await getScrimmagingRecord({ episodeId, teamId, scrimmageType });
+  },
 } as const;

@@ -12,6 +12,7 @@ import type {
   CompeteMatchHistoricalRatingListRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
+  CompeteMatchScrimmagingRecordRetrieveRequest,
   CompeteMatchTournamentListRequest,
   CompeteRequestAcceptCreateRequest,
   CompeteRequestCreateRequest,
@@ -29,6 +30,7 @@ import type {
   PaginatedSubmissionList,
   PaginatedTeamPublicList,
   ResponseError,
+  ScrimmageRecord,
   ScrimmageRequest,
   Submission,
   TournamentSubmission,
@@ -49,6 +51,7 @@ import {
   ratingHistoryTopFactory,
   scrimmageInboxListFactory,
   scrimmageOutboxListFactory,
+  scrimmagingRecordFactory,
   subsListFactory,
   teamScrimmageListFactory,
   tournamentMatchListFactory,
@@ -251,6 +254,31 @@ export const useUserRatingHistoryList = ({
     queryKey: buildKey(ratingHistoryMeFactory.queryKey, { episodeId }),
     queryFn: async () => await ratingHistoryMeFactory.queryFn({ episodeId }),
     staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+/**
+ * For retrieving the given team's scrimmaging record in a given episode. Defaults to the currently logged in user's team.
+ */
+export const useScrimmagingRecord = ({
+  episodeId,
+  teamId,
+  scrimmageType,
+}: CompeteMatchScrimmagingRecordRetrieveRequest): UseQueryResult<
+  ScrimmageRecord,
+  Error
+> =>
+  useQuery({
+    queryKey: buildKey(scrimmagingRecordFactory.queryKey, {
+      episodeId,
+      teamId,
+      scrimmageType,
+    }),
+    queryFn: async () =>
+      await scrimmagingRecordFactory.queryFn({
+        episodeId,
+        teamId,
+        scrimmageType,
+      }),
   });
 
 // ---------- MUTATION HOOKS ---------- //

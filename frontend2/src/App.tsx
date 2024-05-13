@@ -48,7 +48,7 @@ import { tournamentsLoader } from "./api/loaders/tournamentsLoader";
 import { tournamentLoader } from "./api/loaders/tournamentLoader";
 import { homeLoader } from "./api/loaders/homeLoader";
 import ErrorBoundary from "./views/ErrorBoundary";
-import { searchTeamsFactory } from "api/team/teamFactories";
+import { myTeamFactory, searchTeamsFactory } from "api/team/teamFactories";
 import PageNotFound from "views/PageNotFound";
 import TeamProfile from "views/TeamProfile";
 
@@ -72,7 +72,7 @@ queryClient.setQueryDefaults(["team"], { retry: false });
 queryClient.setQueryDefaults(["user"], { retry: false });
 
 // Run a check to see if the user has an invalid token
-await loginCheck(queryClient);
+const loggedIn = await loginCheck(queryClient);
 
 const App: React.FC = () => {
   return (
@@ -118,6 +118,14 @@ const episodeLoader: LoaderFunction = async ({ params }) => {
         false, // We don't want to prefetch teams 11-20
       ),
   });
+
+  // Prefetch the user's team.
+  if (loggedIn) {
+    void queryClient.ensureQueryData({
+      queryKey: buildKey(myTeamFactory.queryKey, { episodeId: id }),
+      queryFn: async () => await myTeamFactory.queryFn({ episodeId: id }),
+    });
+  }
 
   return episodeInfo;
 };
