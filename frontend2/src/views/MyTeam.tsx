@@ -14,6 +14,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import JoinTeam from "./JoinTeam";
 import Loading from "components/Loading";
 import { type SubmitHandler, useForm } from "react-hook-form";
+import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 
 interface InfoFormInput {
   quote: string;
@@ -148,10 +149,18 @@ const MyTeam: React.FC = () => {
           <EligibilitySettings />
           <ScrimmageSettings />
         </div>
-        {/* The members list that displays to the right side when on a big screen. */}
-        <SectionCard className="hidden w-1/3 shrink xl:block" title="Members">
-          {membersList}
-        </SectionCard>
+        <div className="flex w-1/3 flex-col gap-8">
+          {/* The members list that displays to the right side when on a big screen. */}
+          <SectionCard className="hidden shrink xl:block" title="Members">
+            {membersList}
+          </SectionCard>
+          <SectionCard
+            className="hidden shrink xl:block"
+            title="Scrimmaging Record"
+          >
+            <ScrimmagingRecord team={teamData.data} hideTeamName />
+          </SectionCard>
+        </div>
       </div>
       {/* The confirmation modal that pops up when a user clicks "Leave Team" */}
       <Modal

@@ -49,14 +49,14 @@ const Account: React.FC = () => {
   const { register: resumeRegister, handleSubmit: handleResumeSubmit } =
     useForm<FileInput>();
 
-  const onAvatarSubmit: SubmitHandler<FileInput> = async (data) => {
+  const onAvatarSubmit: SubmitHandler<FileInput> = (data) => {
     if (uploadAvatar.isPending) return;
-    await uploadAvatar.mutateAsync({ avatar: data.file[0] });
+    uploadAvatar.mutate({ avatar: data.file[0] });
   };
 
-  const onResumeSubmit: SubmitHandler<FileInput> = async (data) => {
+  const onResumeSubmit: SubmitHandler<FileInput> = (data) => {
     if (uploadResume.isPending) return;
-    await uploadResume.mutateAsync({ resume: data.file[0] });
+    uploadResume.mutate({ resume: data.file[0] });
   };
 
   return (
