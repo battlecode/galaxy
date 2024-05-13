@@ -42,8 +42,8 @@ const JoinTeam: React.FC = () => {
         <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
           <form
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onSubmit={handleCreateSubmit(async (data) => {
-              await createTeam.mutateAsync({ name: data.teamName });
+            onSubmit={handleCreateSubmit((data) => {
+              createTeam.mutate({ name: data.teamName });
               resetCreate();
             })}
           >
@@ -69,8 +69,8 @@ const JoinTeam: React.FC = () => {
           </form>
           <form
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onSubmit={handleJoinSubmit(async (data) => {
-              await joinTeam.mutateAsync({
+            onSubmit={handleJoinSubmit((data) => {
+              joinTeam.mutate({
                 name: data.teamName,
                 join_key: data.joinKey,
               });

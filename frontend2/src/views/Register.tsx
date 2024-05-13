@@ -44,11 +44,11 @@ const Register: React.FC = () => {
     }
   }, [authState]);
 
-  const onSubmit: SubmitHandler<UserCreateRequest> = async (data) => {
+  const onSubmit: SubmitHandler<UserCreateRequest> = (data) => {
     if (gender === undefined || country === undefined) {
       return;
     }
-    await createUser.mutateAsync({ userCreateRequest: data });
+    createUser.mutate({ userCreateRequest: data });
   };
 
   return (

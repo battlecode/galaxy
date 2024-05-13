@@ -31,6 +31,8 @@ const MyTeam: React.FC = () => {
     reset,
   } = useForm<InfoFormInput>();
 
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
+
   const teamData = useUserTeam({ episodeId });
   const updateTeam = useUpdateTeam(
     {
@@ -43,9 +45,10 @@ const MyTeam: React.FC = () => {
       episodeId,
     },
     queryClient,
+    () => {
+      setIsLeaveModalOpen(false);
+    },
   );
-
-  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
 
   const membersList = useMemo(() => {
     return (
@@ -66,9 +69,9 @@ const MyTeam: React.FC = () => {
     );
   }, [teamData]);
 
-  const onSubmit: SubmitHandler<InfoFormInput> = async (data) => {
+  const onSubmit: SubmitHandler<InfoFormInput> = (data) => {
     if (updateTeam.isPending) return;
-    await updateTeam.mutateAsync({
+    updateTeam.mutate({
       profile: {
         quote: data.quote,
         biography: data.biography,
@@ -78,13 +81,12 @@ const MyTeam: React.FC = () => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  const onLeaveTeam: EventHandler<React.MouseEvent<HTMLButtonElement>> = async (
+  const onLeaveTeam: EventHandler<React.MouseEvent<HTMLButtonElement>> = (
     event,
   ) => {
     if (leaveTeam.isPending) return;
     event.preventDefault();
-    await leaveTeam.mutateAsync();
-    setIsLeaveModalOpen(false);
+    leaveTeam.mutate();
   };
 
   if (teamData.isLoading) {
@@ -108,7 +110,6 @@ const MyTeam: React.FC = () => {
                 <img
                   className="h-24 w-24 rounded-full bg-gray-400 md:h-48 md:w-48"
                   src={teamData.data.profile?.avatar_url}
-                  // TODO: open add avatar modal on click! With hover effect!
                 />
                 <div className="text-center text-xl font-semibold">
                   {teamData.data.name}
