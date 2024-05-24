@@ -88,11 +88,13 @@ Some of these tasks may fall outside the dominion of webinfra. If they looks lik
 
 ### Each tournament
 
-Instructions and tips for running a tournament can be found in the following google doc (unlike the rest of the documentation. Maybe they should be here too? But, tournament running instructions are still very unstable).
+Instructions and tips for running a tournament can be found in the following google doc.
 
 **Before the first tournament, read over this in its entirety. It is helpful to also do a full practice run as well.**
 
 https://docs.google.com/document/d/1AlunZNJ9xJ8nHBAiGBR3P-0IbkD9jxN39KtuM2v4oYs/edit
+
+(If you are developing the tournament server, see `backend/docs/tournament-development.md` for notes on that.)
 
 ### Before final tournament
 
