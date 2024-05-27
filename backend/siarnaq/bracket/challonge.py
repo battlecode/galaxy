@@ -84,9 +84,7 @@ def bulk_add_teams(tournament: Tournament, teams: Iterable[Team], *, is_private:
         {
             "name": team.name,
             "seed": idx + 1,
-            "misc": json.dumps(
-                {"team_id": team.id, "submission_id": team.active_submission}
-            ),
+            "misc": json.dumps({"team_id": team.id}),
         }
         for (idx, team) in enumerate(teams)
     ]
