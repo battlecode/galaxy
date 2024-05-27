@@ -92,7 +92,7 @@ def bulk_add_teams(tournament: Tournament, teams: Iterable[Team], *, is_private:
 
     payload = {
         "data": {
-            "type": "Participant",
+            "type": "Participants",
             "attributes": {
                 "participants": participants_for_challonge,
             },
