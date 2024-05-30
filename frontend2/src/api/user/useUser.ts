@@ -24,6 +24,7 @@ import {
   doResetPassword,
   resumeUpload,
   updateCurrentUser,
+  downloadResume
 } from "./userApi";
 import { toast } from "react-hot-toast";
 import { login } from "../auth/authApi";
@@ -225,6 +226,23 @@ export const useResumeUpload = (
       // Refetch the current user's info.
       await queryClient.refetchQueries({
         queryKey: buildKey(myUserInfoFactory.queryKey, { episodeId }),
+      });
+    },
+  });
+
+/**
+ * For downloading the resume of the currently logged in user.
+ */
+export const useDownloadResume = (
+  { episodeId }: { episodeId: string },
+): UseMutationResult<void, Error, UserURetrieveRequest, unknown> =>
+  useMutation({
+    mutationKey: userMutationKeys.resumeDownload({ episodeId }),
+    mutationFn: async () => {
+      await toast.promise(downloadResume(), {
+        loading: "Downloading resume...",
+        success: "Downloaded resume!",
+        error: "Error downloading resume.",
       });
     },
   });

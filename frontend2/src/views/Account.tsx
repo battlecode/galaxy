@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { type EventHandler, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import Input from "../components/elements/Input";
 import TextArea from "../components/elements/TextArea";
@@ -18,6 +18,7 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import Button from "../components/elements/Button";
 import FormLabel from "../components/elements/FormLabel";
 import {
+  useDownloadResume,
   useUpdateCurrentUserInfo,
   useAvatarUpload,
   useResumeUpload,
@@ -25,9 +26,6 @@ import {
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useQueryClient } from "@tanstack/react-query";
 import { type QueryClient } from "@tanstack/query-core";
-// import {
-//   downloadResume
-// } from "../api/user/userApi";
 
 interface FileInput {
   file: FileList;
@@ -38,10 +36,9 @@ const Account: React.FC = () => {
   const queryClient = useQueryClient();
   const uploadAvatar = useAvatarUpload({ episodeId }, queryClient);
   const uploadResume = useResumeUpload({ episodeId }, queryClient);
+  const downloadResume = useDownloadResume({ episodeId });
   const { user } = useCurrentUser();
-  // TODO: fix downloadResume() - this is not working
-  // const resumeLink = downloadResume();
-  // console.log(resumeLink);
+
 
   const { register: avatarRegister, handleSubmit: handleAvatarSubmit } =
     useForm<FileInput>();
@@ -57,6 +54,11 @@ const Account: React.FC = () => {
   const onResumeSubmit: SubmitHandler<FileInput> = (data) => {
     if (uploadResume.isPending) return;
     uploadResume.mutate({ resume: data.file[0] });
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  const onResumeDownload: EventHandler<React.MouseEvent<HTMLButtonElement>> = async () => {
+    await downloadResume.mutateAsync({ id: user?.id ?? 0 });
   };
 
   return (
@@ -113,19 +115,19 @@ const Account: React.FC = () => {
                 loading={uploadResume.isPending}
                 disabled={uploadResume.isPending}
               />
-              <p className="text-sm">
-                {user?.profile?.has_resume ?? false
-                  ? "Resume uploaded!"
-                  : "No resume uploaded."}
-              </p>
-              {/* <p>
-                {resumeLink}
-              </p> */}
+              {user?.profile?.has_resume ?? false
+
+                ? (<p className="text-sm">
+                  Resume uploaded! <button className="text-cyan-600 hover:underline"
+                    onClick={onResumeDownload}>Download</button>
+                </p>)
+                : <p className="text-sm">No resume uploaded.</p>
+              }
             </form>
           </div>
         </SectionCard>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 
