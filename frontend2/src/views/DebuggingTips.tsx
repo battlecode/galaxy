@@ -1,16 +1,19 @@
 import React from "react";
-import { defaultResourcesText, resourcesText } from "../content/ManageContent";
+import {
+  defaultDebuggingTipsText,
+  debuggingTipsText,
+} from "../content/ManageContent";
 import DocumentationPage from "../components/DocumentationPage";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 
-const Resources = (): JSX.Element => {
+const DebuggingTips = (): JSX.Element => {
   const { episodeId } = useEpisodeId();
 
   return (
     <DocumentationPage
-      text={resourcesText[episodeId] ?? defaultResourcesText}
+      text={debuggingTipsText[episodeId] ?? defaultDebuggingTipsText}
     />
   );
 };
 
-export default Resources;
+export default DebuggingTips;
