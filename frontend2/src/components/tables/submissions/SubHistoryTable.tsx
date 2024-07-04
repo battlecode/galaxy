@@ -3,6 +3,10 @@ import {
   type PaginatedSubmissionList,
   StatusBccEnum,
 } from "../../../api/_autogen";
+import { useEpisodeId } from "contexts/EpisodeContext";
+import {
+  useDownloadSubmission
+} from "../../../api/compete/useCompete";
 import type { Maybe } from "../../../utils/utilTypes";
 import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";
@@ -26,12 +30,19 @@ interface SubHistoryTableProps {
   handlePage: (page: number) => void;
 }
 
+
+
+// TODO: should i pass episodeId down as a prop?
 const SubHistoryTable: React.FC<SubHistoryTableProps> = ({
   data,
   loading,
   page,
   handlePage,
+  // downloadSubmission,
 }) => {
+  const { episodeId } = useEpisodeId();
+  const downloadSubmission = useDownloadSubmission({ episodeId });
+
   return (
     <Table
       data={data?.results ?? []}
@@ -100,7 +111,10 @@ const SubHistoryTable: React.FC<SubHistoryTableProps> = ({
         {
           header: "",
           key: "download",
-          value: (sub) => "Download",
+          value: (sub) => <button className="text-cyan-600 hover:underline"
+            onClick={
+              () => { downloadSubmission.mutate({ episodeId, id: sub.id.toString() }); }
+            } > Download</button >,
         },
       ]}
     />

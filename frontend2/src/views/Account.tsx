@@ -1,4 +1,4 @@
-import React, { type EventHandler, useState } from "react";
+import React, { useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import Input from "../components/elements/Input";
 import TextArea from "../components/elements/TextArea";
@@ -54,11 +54,6 @@ const Account: React.FC = () => {
   const onResumeSubmit: SubmitHandler<FileInput> = (data) => {
     if (uploadResume.isPending) return;
     uploadResume.mutate({ resume: data.file[0] });
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  const onResumeDownload: EventHandler<React.MouseEvent<HTMLButtonElement>> = async () => {
-    await downloadResume.mutateAsync({ id: user?.id ?? 0 });
   };
 
   return (
@@ -119,7 +114,11 @@ const Account: React.FC = () => {
 
                 ? (<p className="text-sm">
                   Resume uploaded! <button className="text-cyan-600 hover:underline"
-                    onClick={onResumeDownload}>Download</button>
+                    onClick={
+                      () => {
+                        if (user !== undefined) downloadResume.mutate({ id: user.id });
+                      }
+                    }>Download</button>
                 </p>)
                 : <p className="text-sm">No resume uploaded.</p>
               }
