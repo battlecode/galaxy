@@ -20,7 +20,7 @@ import FormLabel from "../components/elements/FormLabel";
 import {
   useDownloadResume,
   useUpdateCurrentUserInfo,
-  useAvatarUpload,
+  useUpdateUserAvatar,
   useResumeUpload,
 } from "../api/user/useUser";
 import { useEpisodeId } from "../contexts/EpisodeContext";
@@ -34,11 +34,10 @@ interface FileInput {
 const Account: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
-  const uploadAvatar = useAvatarUpload({ episodeId }, queryClient);
+  const uploadAvatar = useUpdateUserAvatar({ episodeId }, queryClient);
   const uploadResume = useResumeUpload({ episodeId }, queryClient);
   const downloadResume = useDownloadResume({ episodeId });
   const { user } = useCurrentUser();
-
 
   const { register: avatarRegister, handleSubmit: handleAvatarSubmit } =
     useForm<FileInput>();
@@ -67,7 +66,7 @@ const Account: React.FC = () => {
         )}
 
         <SectionCard title="File Upload">
-          <div className="flex flex-row gap-10 xl:flex-col ">
+          <div className="flex flex-row gap-10 xl:flex-col">
             <form
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onSubmit={handleAvatarSubmit(onAvatarSubmit)}
@@ -110,23 +109,27 @@ const Account: React.FC = () => {
                 loading={uploadResume.isPending}
                 disabled={uploadResume.isPending}
               />
-              {user?.profile?.has_resume ?? false
-
-                ? (<p className="text-sm">
-                  Resume uploaded! <button className="text-cyan-600 hover:underline"
-                    onClick={
-                      () => {
-                        if (user !== undefined) downloadResume.mutate({ id: user.id });
-                      }
-                    }>Download</button>
-                </p>)
-                : <p className="text-sm">No resume uploaded.</p>
-              }
+              {user?.profile?.has_resume ?? false ? (
+                <p className="text-sm">
+                  Resume uploaded!{" "}
+                  <button
+                    className="text-cyan-600 hover:underline"
+                    onClick={() => {
+                      if (user !== undefined)
+                        downloadResume.mutate({ id: user.id });
+                    }}
+                  >
+                    Download
+                  </button>
+                </p>
+              ) : (
+                <p className="text-sm">No resume uploaded.</p>
+              )}
             </form>
           </div>
         </SectionCard>
-      </div >
-    </div >
+      </div>
+    </div>
   );
 };
 

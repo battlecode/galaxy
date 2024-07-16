@@ -59,7 +59,7 @@ export const teamMutationKeys = {
   update: ({ episodeId }: { episodeId: string }) =>
     ["team", "update", episodeId] as const,
 
-  avatar: ({ episodeId }: { episodeId: string }) =>
+  avatarUpload: ({ episodeId }: { episodeId: string }) =>
     ["team", "avatar", episodeId] as const,
 
   report: ({ episodeId }: { episodeId: string }) =>

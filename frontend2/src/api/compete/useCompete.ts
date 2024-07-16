@@ -541,11 +541,18 @@ export const useCancelScrimmage = (
 /**
  * For downloading a submission.
  */
-export const useDownloadSubmission = (
-  { episodeId }: { episodeId: string },
-): UseMutationResult<void, Error, CompeteSubmissionDownloadRetrieveRequest, unknown> =>
+export const useDownloadSubmission = ({
+  episodeId,
+}: {
+  episodeId: string;
+}): UseMutationResult<
+  void,
+  Error,
+  CompeteSubmissionDownloadRetrieveRequest,
+  unknown
+> =>
   useMutation({
-    mutationKey: competeMutationKeys.acceptScrim({ episodeId }),
+    mutationKey: competeMutationKeys.downloadSub({ episodeId }),
     mutationFn: async ({
       episodeId,
       id,

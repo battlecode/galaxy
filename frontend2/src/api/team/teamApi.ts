@@ -151,13 +151,10 @@ export const searchTeams = async ({
 /**
  * Upload a new avatar for the currently logged in user's team.
  * @param episodeId The current episode's ID.
- * @param avatar The avatar file.
+ * @param teamAvatarRequest The avatar file.
  */
-export const teamAvatarUpload = async ({
-  episodeId,
-  teamAvatarRequest,
-}: TeamTAvatarCreateRequest): Promise<void> => {
-  await API.teamTAvatarCreate({ episodeId, teamAvatarRequest });
+export const teamAvatarUpload = async (teamAvatarRequest: TeamTAvatarCreateRequest): Promise<void> => {
+  await API.teamTAvatarCreate(teamAvatarRequest);
 };
 
 /**

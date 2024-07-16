@@ -19,7 +19,6 @@ import type {
   PaginatedClassRequirementList,
   PaginatedTeamPublicList,
   PatchedTeamPrivateRequest,
-  TeamAvatarRequest,
   TeamCreate,
   TeamCreateRequest,
   TeamJoinRequest,
@@ -38,8 +37,6 @@ import {
     PaginatedTeamPublicListToJSON,
     PatchedTeamPrivateRequestFromJSON,
     PatchedTeamPrivateRequestToJSON,
-    TeamAvatarRequestFromJSON,
-    TeamAvatarRequestToJSON,
     TeamCreateFromJSON,
     TeamCreateToJSON,
     TeamCreateRequestFromJSON,
@@ -89,7 +86,7 @@ export interface TeamRequirementRetrieveRequest {
 
 export interface TeamTAvatarCreateRequest {
     episodeId: string;
-    teamAvatarRequest: TeamAvatarRequest;
+    avatar?: Blob;
 }
 
 export interface TeamTCreateRequest {
@@ -394,15 +391,9 @@ export class TeamApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling teamTAvatarCreate.');
         }
 
-        if (requestParameters.teamAvatarRequest === null || requestParameters.teamAvatarRequest === undefined) {
-            throw new runtime.RequiredError('teamAvatarRequest','Required parameter requestParameters.teamAvatarRequest was null or undefined when calling teamTAvatarCreate.');
-        }
-
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -412,12 +403,32 @@ export class TeamApi extends runtime.BaseAPI {
                 headerParameters["Authorization"] = `Bearer ${tokenString}`;
             }
         }
+        const consumes: runtime.Consume[] = [
+            { contentType: 'multipart/form-data' },
+        ];
+        // @ts-ignore: canConsumeForm may be unused
+        const canConsumeForm = runtime.canConsumeForm(consumes);
+
+        let formParams: { append(param: string, value: any): any };
+        let useForm = false;
+        // use FormData to transmit files using content-type "multipart/form-data"
+        useForm = canConsumeForm;
+        if (useForm) {
+            formParams = new FormData();
+        } else {
+            formParams = new URLSearchParams();
+        }
+
+        if (requestParameters.avatar !== undefined) {
+            formParams.append('avatar', requestParameters.avatar as any);
+        }
+
         const response = await this.request({
             path: `/api/team/{episode_id}/t/avatar/`.replace(`{${"episode_id"}}`, encodeURIComponent(String(requestParameters.episodeId))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: TeamAvatarRequestToJSON(requestParameters.teamAvatarRequest),
+            body: formParams,
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);

@@ -8,7 +8,7 @@ import {
 import type {
   PaginatedTeamPublicList,
   PatchedTeamPrivateRequest,
-  TeamAvatarRequest,
+  TeamTAvatarCreateRequest,
   TeamCreate,
   TeamJoinRequest,
   TeamPrivate,
@@ -198,11 +198,12 @@ export const useUpdateTeamAvatar = (
     episodeId: string;
   },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, TeamAvatarRequest, unknown> =>
+): UseMutationResult<void, Error, Blob, unknown> =>
   useMutation({
-    mutationKey: teamMutationKeys.avatar({ episodeId }),
-    mutationFn: async (teamAvatarRequest: TeamAvatarRequest) => {
-      await toast.promise(teamAvatarUpload({ episodeId, teamAvatarRequest }), {
+    mutationKey: teamMutationKeys.avatarUpload({ episodeId }),
+    // We pass in a Blob because we already have the episodeId
+    mutationFn: async (avatar: Blob) => {
+      await toast.promise(teamAvatarUpload({ episodeId, avatar }), {
         loading: "Uploading team avatar...",
         success: "Uploaded team avatar!",
         error: "Error uploading team avatar.",
