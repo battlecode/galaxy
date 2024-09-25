@@ -30,13 +30,13 @@ const WinLossTie: React.FC<WinLossTieProps> = ({
       <div className="col-span-3 text-lg font-semibold">
         {scrimmageTypeToName[scrimmageType]}
       </div>
-      <span className="w-full rounded-tl-lg border-b-2 border-l-2 border-r-[1px] border-t-2 border-solid border-cyan-400 text-center">
+      <span className="w-full rounded-tl-lg border-b-2 border-l-2 border-r-[1px] border-t-2 border-solid border-cyan-600 text-center">
         Wins
       </span>
-      <span className="w-full border-b-2 border-l-[1px] border-r-[1px] border-t-2 border-solid border-cyan-400 text-center">
+      <span className="w-full border-b-2 border-l-[1px] border-r-[1px] border-t-2 border-solid border-cyan-600 text-center">
         Losses
       </span>
-      <span className="w-full rounded-tr-lg border-b-2 border-l-[1px] border-r-2 border-t-2 border-solid border-cyan-400 text-center">
+      <span className="w-full rounded-tr-lg border-b-2 border-l-[1px] border-r-2 border-t-2 border-solid border-cyan-600 text-center">
         Ties
       </span>
       <div className="w-full rounded-bl-lg bg-green-200 text-center font-semibold">
