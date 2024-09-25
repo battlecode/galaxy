@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { useParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import { useTeam } from "api/team/useTeam";
 import { isNil } from "lodash";
 import SectionCard from "components/SectionCard";
@@ -57,7 +56,6 @@ const TeamProfile: React.FC = () => {
                 <img
                   className="h-24 w-24 rounded-full bg-gray-400 md:h-48 md:w-48"
                   src={team.data.profile?.avatar_url}
-                  // TODO: open add avatar modal on click! With hover effect!
                 />
                 <div className="mt-6 text-center text-xl font-semibold">
                   {team.data.name}

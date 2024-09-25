@@ -122,7 +122,10 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
             header: "Team",
             key: "team",
             value: (team) => (
-              <NavLink to={`/${episodeId}/team/${team.id}`} className="hover:underline">
+              <NavLink
+                to={`/${episodeId}/team/${team.id}`}
+                className="hover:underline"
+              >
                 {trimString(team.name, 13)}
               </NavLink>
             ),

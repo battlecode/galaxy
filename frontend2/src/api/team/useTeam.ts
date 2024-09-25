@@ -8,7 +8,6 @@ import {
 import type {
   PaginatedTeamPublicList,
   PatchedTeamPrivateRequest,
-  TeamTAvatarCreateRequest,
   TeamCreate,
   TeamJoinRequest,
   TeamPrivate,
