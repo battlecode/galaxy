@@ -42,7 +42,7 @@ const TeamProfile: React.FC = () => {
       ) ?? [],
     [episode, team],
   );
-  if (isNil(team.data)) {
+  if (isNil(team.data) && !team.isLoading) {
     return <TeamNotFound />;
   }
 
@@ -56,13 +56,13 @@ const TeamProfile: React.FC = () => {
               <div className="flex flex-col items-center p-4">
                 <img
                   className="h-24 w-24 rounded-full bg-gray-400 md:h-48 md:w-48"
-                  src={team.data.profile?.avatar_url}
+                  src={team.data?.profile?.avatar_url}
                   // TODO: open add avatar modal on click! With hover effect!
                 />
                 <div className="mt-6 text-center text-xl font-semibold">
-                  {team.data.name}
+                  {team.data?.name}
                 </div>
-                {team.data.status === Status526Enum.S && (
+                {team.data?.status === Status526Enum.S && (
                   <div className="text-sm font-light text-gray-500">
                     (staff team)
                   </div>
@@ -72,24 +72,24 @@ const TeamProfile: React.FC = () => {
                 <div>
                   <div className="font-medium">Team quote</div>
                   <div className="text-sm text-gray-800">
-                    {isNilOrEmptyStr(team.data.profile?.quote) ? (
+                    {isNilOrEmptyStr(team.data?.profile?.quote) ? (
                       <span className="italic text-gray-500">
                         This team does not have a quote
                       </span>
                     ) : (
-                      team.data.profile?.quote
+                      team.data?.profile?.quote
                     )}
                   </div>
                 </div>
                 <div>
                   <div className="font-medium">Team biography</div>
                   <div className="text-sm text-gray-800">
-                    {isNilOrEmptyStr(team.data.profile?.biography) ? (
+                    {isNilOrEmptyStr(team.data?.profile?.biography) ? (
                       <span className="italic text-gray-500">
                         This team does not have a biography
                       </span>
                     ) : (
-                      team.data.profile?.biography
+                      team.data?.profile?.biography
                     )}
                   </div>
                 </div>
