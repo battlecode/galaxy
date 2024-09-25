@@ -16,6 +16,10 @@ Furthermore, the Battlecode webinfra team tends to have more trouble getting han
 
 Compounding this, the webinfra team must allot their efforts to frontend, backend, infra, deploy / release engineering, and much more.
 
+### Deadlines, planning, etc
+
+For information on webinfra's deadlines throughout the years, and tips and tricks for hitting those deadlines, see here: https://docs.google.com/document/d/16bxwyXN5ZFv4aPFMoNAWLVbaKS2S1D_Chk2lK9RvFJc/edit
+
 ## Coding Principles
 
 Write **well-written code**. In particular, prefer code that's **ETU**, SFB, and RFC (thanks 6.031!). Especially here, _simplicity is good_, especially given lack of working resources.

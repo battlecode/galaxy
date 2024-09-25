@@ -2,7 +2,7 @@
 
 ## Mailing Lists
 
-Battlecode maintains various email lists of competitors each year, as well as a general interest list. These lists are generally administered by presidents or directors of operation (although webinfra devs may certainly help with these tasks). More information and instructions about these lists can be found in our Google Drive.
+Battlecode maintains various email lists of competitors each year, as well as a general interest list. These lists are generally administered by presidents or directors of operation. More information and instructions about these lists can be found at https://docs.google.com/document/d/1wzxFF308kQoPed11UQvRbzyHz9rykQd69IcVms4uwa4/edit.
 
 However, sets of competitor emails are derived from our backend, and so it is webinfra's job to produce these. To do this:
 

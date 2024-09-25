@@ -113,3 +113,9 @@ You can also mix and match environments, if you're just developing one component
 - When developing and testing the infra, it's hard to make quick changes. But in order to test the effects of this on the backend, you can spoof the results, using a HTTP development environment of your choice such as Postman.
 
 Other more advanced combinations may exist. If you find them, feel free to spread the word, and list them here!
+
+### Amazon Web Services
+
+We also have an account on Amazon Web Services (AWS), as we used to do filestorage and deploys in AWS. Accordingly, there are still old databases, replays, submissions, game specs, etc, in AWS.
+
+An interesting and helpful project one day is to migrate all this old data into GCP. Even if the old databases don't become merged with our primary GCP database, it would still be good to have all _data_ live in GCP instead.
