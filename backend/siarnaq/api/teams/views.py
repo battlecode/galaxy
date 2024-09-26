@@ -159,7 +159,17 @@ class TeamViewSet(
         logger.debug("team_join", message="User has joined team.", team=team.pk)
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
-    @extend_schema(responses={status.HTTP_204_NO_CONTENT: None})
+    @extend_schema(
+        responses={status.HTTP_204_NO_CONTENT: None},
+        request={
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "avatar": {"type": "string", "format": "binary"},
+                },
+            }
+        },
+    )
     @action(
         detail=False,
         methods=["post"],

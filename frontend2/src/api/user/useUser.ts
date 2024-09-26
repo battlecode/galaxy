@@ -19,11 +19,12 @@ import type {
 } from "../_autogen";
 import { userMutationKeys, userQueryKeys } from "./userKeys";
 import {
-  avatarUpload,
   createUser,
   doResetPassword,
   resumeUpload,
   updateCurrentUser,
+  downloadResume,
+  userAvatarUpload,
 } from "./userApi";
 import { toast } from "react-hot-toast";
 import { login } from "../auth/authApi";
@@ -184,14 +185,14 @@ export const useResetPassword = ({
 /**
  * For uploading a new avatar for the currently logged in user.
  */
-export const useAvatarUpload = (
+export const useUpdateUserAvatar = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
 ): UseMutationResult<void, Error, UserUAvatarCreateRequest, unknown> =>
   useMutation({
     mutationKey: userMutationKeys.avatarUpload({ episodeId }),
     mutationFn: async (userAvatarRequest: UserUAvatarCreateRequest) => {
-      await toast.promise(avatarUpload(userAvatarRequest), {
+      await toast.promise(userAvatarUpload(userAvatarRequest), {
         loading: "Uploading new avatar...",
         success: "Uploaded new avatar!",
         error: "Error uploading new avatar.",
@@ -225,6 +226,25 @@ export const useResumeUpload = (
       // Refetch the current user's info.
       await queryClient.refetchQueries({
         queryKey: buildKey(myUserInfoFactory.queryKey, { episodeId }),
+      });
+    },
+  });
+
+/**
+ * For downloading the resume of the currently logged in user.
+ */
+export const useDownloadResume = ({
+  episodeId,
+}: {
+  episodeId: string;
+}): UseMutationResult<void, Error, UserURetrieveRequest, unknown> =>
+  useMutation({
+    mutationKey: userMutationKeys.resumeDownload({ episodeId }),
+    mutationFn: async () => {
+      await toast.promise(downloadResume(), {
+        loading: "Downloading resume...",
+        success: "Downloaded resume!",
+        error: "Error downloading resume.",
       });
     },
   });

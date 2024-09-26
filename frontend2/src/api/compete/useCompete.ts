@@ -22,6 +22,7 @@ import type {
   CompeteSubmissionCreateRequest,
   CompeteSubmissionListRequest,
   CompeteSubmissionTournamentListRequest,
+  CompeteSubmissionDownloadRetrieveRequest,
   HistoricalRating,
   PaginatedMatchList,
   PaginatedScrimmageRequestList,
@@ -38,6 +39,7 @@ import {
   rejectScrimmage,
   requestScrimmage,
   uploadSubmission,
+  downloadSubmission,
 } from "./competeApi";
 import toast from "react-hot-toast";
 import { buildKey } from "../helpers";
@@ -532,6 +534,33 @@ export const useCancelScrimmage = (
         loading: "Cancelling scrimmage...",
         success: "Scrimmage cancelled!",
         error: "Error cancelling scrimmage.",
+      });
+    },
+  });
+
+/**
+ * For downloading a submission.
+ */
+export const useDownloadSubmission = ({
+  episodeId,
+}: {
+  episodeId: string;
+}): UseMutationResult<
+  void,
+  Error,
+  CompeteSubmissionDownloadRetrieveRequest,
+  unknown
+> =>
+  useMutation({
+    mutationKey: competeMutationKeys.downloadSub({ episodeId }),
+    mutationFn: async ({
+      episodeId,
+      id,
+    }: CompeteSubmissionDownloadRetrieveRequest) => {
+      await toast.promise(downloadSubmission({ episodeId, id }), {
+        loading: "Downloading submission...",
+        success: "Downloaded submission!",
+        error: "Error downloading submission.",
       });
     },
   });

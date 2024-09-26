@@ -87,7 +87,7 @@ export const updateCurrentUser = async ({
  * Upload a new avatar for the currently logged in user.
  * @param userAvatarRequest The avatar file.
  */
-export const avatarUpload = async (
+export const userAvatarUpload = async (
   userAvatarRequest: UserUAvatarCreateRequest,
 ): Promise<void> => {
   await API.userUAvatarCreate(userAvatarRequest);

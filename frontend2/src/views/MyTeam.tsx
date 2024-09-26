@@ -9,15 +9,26 @@ import Modal from "components/Modal";
 import EligibilitySettings from "components/team/EligibilitySettings";
 import ScrimmageSettings from "components/team/ScrimmageSettings";
 import { useEpisodeId } from "contexts/EpisodeContext";
-import { useLeaveTeam, useUpdateTeam, useUserTeam } from "api/team/useTeam";
+import {
+  useLeaveTeam,
+  useUpdateTeam,
+  useUserTeam,
+  useUpdateTeamAvatar,
+} from "api/team/useTeam";
 import { useQueryClient } from "@tanstack/react-query";
 import JoinTeam from "./JoinTeam";
 import Loading from "components/Loading";
 import { type SubmitHandler, useForm } from "react-hook-form";
+import { FIELD_REQUIRED_ERROR_MSG } from "utils/constants";
+import FormLabel from "components/elements/FormLabel";
 
 interface InfoFormInput {
   quote: string;
   biography: string;
+}
+
+interface AvatarInput {
+  file: FileList;
 }
 
 const MyTeam: React.FC = () => {
@@ -25,10 +36,10 @@ const MyTeam: React.FC = () => {
   const queryClient = useQueryClient();
 
   const {
-    register,
-    handleSubmit,
-    formState: { isDirty },
-    reset,
+    register: registerInfo,
+    handleSubmit: handleInfoSubmit,
+    formState: { isDirty: isInfoDirty },
+    reset: resetInfo,
   } = useForm<InfoFormInput>();
 
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
@@ -50,6 +61,27 @@ const MyTeam: React.FC = () => {
     },
   );
 
+  const onInfoSubmit: SubmitHandler<InfoFormInput> = async (data) => {
+    if (updateTeam.isPending) return;
+    await updateTeam.mutateAsync({
+      profile: {
+        quote: data.quote,
+        biography: data.biography,
+      },
+    });
+    resetInfo();
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  const onLeaveTeam: EventHandler<React.MouseEvent<HTMLButtonElement>> = async (
+    event,
+  ) => {
+    if (leaveTeam.isPending) return;
+    event.preventDefault();
+    await leaveTeam.mutateAsync();
+    setIsLeaveModalOpen(false);
+  };
+
   const membersList = useMemo(() => {
     return (
       <div className="flex flex-col gap-8">
@@ -69,26 +101,6 @@ const MyTeam: React.FC = () => {
     );
   }, [teamData]);
 
-  const onSubmit: SubmitHandler<InfoFormInput> = (data) => {
-    if (updateTeam.isPending) return;
-    updateTeam.mutate({
-      profile: {
-        quote: data.quote,
-        biography: data.biography,
-      },
-    });
-    reset();
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  const onLeaveTeam: EventHandler<React.MouseEvent<HTMLButtonElement>> = (
-    event,
-  ) => {
-    if (leaveTeam.isPending) return;
-    event.preventDefault();
-    leaveTeam.mutate();
-  };
-
   if (teamData.isLoading) {
     return <Loading />;
   } else if (!teamData.isSuccess) {
@@ -103,7 +115,7 @@ const MyTeam: React.FC = () => {
           <SectionCard title="Profile" className="max-w-5xl">
             <form
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={handleInfoSubmit(onInfoSubmit)}
               className="flex flex-col md:flex-row md:gap-8"
             >
               <div className="flex flex-col items-center gap-6 p-4">
@@ -123,17 +135,17 @@ const MyTeam: React.FC = () => {
                 />
                 <Input
                   label="Team quote"
-                  {...register("quote")}
+                  {...registerInfo("quote")}
                   defaultValue={teamData.data.profile?.quote}
                 />
                 <TextArea
                   label="Team biography"
-                  {...register("biography")}
+                  {...registerInfo("biography")}
                   defaultValue={teamData.data.profile?.biography}
                 />
                 <Button
                   className="mt-2"
-                  disabled={updateTeam.isPending || !isDirty}
+                  disabled={updateTeam.isPending || !isInfoDirty}
                   loading={updateTeam.isPending}
                   variant={"dark"}
                   label="Save"
@@ -142,17 +154,23 @@ const MyTeam: React.FC = () => {
               </div>
             </form>
           </SectionCard>
-          {/* The members list that displays when on a smaller screen */}
+          {/* The members list and file upload that display when on a smaller screen */}
           <SectionCard className="shrink xl:hidden" title="Members">
             {membersList}
+          </SectionCard>
+          <SectionCard className="shrink xl:hidden" title="File Upload">
+            <TeamAvatar />
           </SectionCard>
           <EligibilitySettings />
           <ScrimmageSettings />
         </div>
-        {/* The members list that displays to the right side when on a big screen. */}
-        <SectionCard className="hidden w-1/3 shrink xl:block" title="Members">
-          {membersList}
-        </SectionCard>
+        {/* Display the members list and file upload to the right when on a big screen. */}
+        <div className="flex hidden max-w-2xl flex-1 flex-col gap-8 xl:flex">
+          <SectionCard title="Members">{membersList}</SectionCard>
+          <SectionCard title="File Upload">
+            <TeamAvatar />
+          </SectionCard>
+        </div>
       </div>
       {/* The confirmation modal that pops up when a user clicks "Leave Team" */}
       <Modal
@@ -186,6 +204,51 @@ const MyTeam: React.FC = () => {
         </div>
       </Modal>
     </div>
+  );
+};
+
+const TeamAvatar: React.FC = () => {
+  const { episodeId } = useEpisodeId();
+  const queryClient = useQueryClient();
+
+  const uploadTeamAvatar = useUpdateTeamAvatar({ episodeId }, queryClient);
+
+  const {
+    register: registerAvatar,
+    handleSubmit: handleAvatarSubmit,
+    reset: resetAvatar,
+    formState: { isDirty: isAvatarDirty },
+  } = useForm<AvatarInput>();
+
+  const onAvatarSubmit: SubmitHandler<AvatarInput> = (data) => {
+    if (uploadTeamAvatar.isPending) return;
+    uploadTeamAvatar.mutate(data.file[0]);
+    resetAvatar();
+  };
+
+  return (
+    <form
+      className="pb-1"
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      onSubmit={handleAvatarSubmit(onAvatarSubmit)}
+    >
+      <FormLabel label="Team Avatar" />
+      <input
+        type="file"
+        accept="image/*"
+        className="w-full"
+        {...registerAvatar("file", {
+          required: FIELD_REQUIRED_ERROR_MSG,
+        })}
+      />
+      <Button
+        className="mt-4"
+        label="Save avatar"
+        type="submit"
+        loading={uploadTeamAvatar.isPending}
+        disabled={uploadTeamAvatar.isPending || !isAvatarDirty}
+      />
+    </form>
   );
 };
 

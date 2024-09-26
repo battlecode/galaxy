@@ -147,6 +147,9 @@ export const competeMutationKeys = {
   uploadSub: ({ episodeId }: { episodeId: string }) =>
     ["compete", episodeId, "submit"] as const,
 
+  downloadSub: ({ episodeId }: { episodeId: string }) =>
+    ["compete", episodeId, "submit", "download"] as const,
+
   // --- SCRIMMAGES --- //
   requestScrim: ({ episodeId }: { episodeId: string }) =>
     ["compete", episodeId, "scrimmage", "request"] as const,

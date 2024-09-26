@@ -1,11 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { LoaderFunction } from "react-router-dom";
-import { matchListFactory } from "../compete/competeFactories";
 import { buildKey } from "../helpers";
-import {
-  otherTeamInfoFactory,
-  searchTeamsFactory,
-} from "../team/teamFactories";
+import { otherTeamInfoFactory } from "../team/teamFactories";
 
 // loader for other team's public profile pages
 export const teamProfileLoader =
