@@ -6,7 +6,6 @@ import {
 import { useScrimmagingRecord } from "api/compete/useCompete";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import WinLossTie from "./WinLossTie";
-import Spinner from "components/Spinner";
 
 interface ScrimmagingRecordProps {
   team: Pick<TeamPublic, "id" | "name" | "profile">;
@@ -57,11 +56,11 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
           <div className="text-xl font-semibold">{team.name}</div>
         </div>
       )}
-      {!scrimmagingRecordAll.isSuccess ||
-      !scrimmagingRecordUnranked.isSuccess ||
-      !scrimmagingRecordRanked.isSuccess ? (
+      {scrimmagingRecordAll.isError ||
+      scrimmagingRecordUnranked.isError ||
+      scrimmagingRecordRanked.isError ? (
         <div className="mb-2 mt-4 flex w-full flex-row items-center justify-center gap-3 text-gray-400">
-          Loading... <Spinner size="lg" />
+          Error fetching scrimmaging record.
         </div>
       ) : (
         <div className="flex w-full flex-row items-center justify-center gap-3 md:flex-col">
@@ -70,9 +69,10 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
               scrimmageType={
                 CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All
               }
-              wins={scrimmagingRecordAll.data.wins ?? 0}
-              losses={scrimmagingRecordAll.data.losses ?? 0}
-              ties={scrimmagingRecordAll.data.ties ?? 0}
+              loading={scrimmagingRecordAll.isFetching}
+              wins={scrimmagingRecordAll.data?.wins ?? 0}
+              losses={scrimmagingRecordAll.data?.losses ?? 0}
+              ties={scrimmagingRecordAll.data?.ties ?? 0}
             />
           )}
           {!hideUnranked && (
@@ -80,9 +80,10 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
               scrimmageType={
                 CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked
               }
-              wins={scrimmagingRecordUnranked.data.wins ?? 0}
-              losses={scrimmagingRecordUnranked.data.losses ?? 0}
-              ties={scrimmagingRecordUnranked.data.ties ?? 0}
+              loading={scrimmagingRecordUnranked.isFetching}
+              wins={scrimmagingRecordUnranked.data?.wins ?? 0}
+              losses={scrimmagingRecordUnranked.data?.losses ?? 0}
+              ties={scrimmagingRecordUnranked.data?.ties ?? 0}
             />
           )}
           {!hideRanked && (
@@ -90,9 +91,10 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
               scrimmageType={
                 CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked
               }
-              wins={scrimmagingRecordRanked.data.wins ?? 0}
-              losses={scrimmagingRecordRanked.data.losses ?? 0}
-              ties={scrimmagingRecordRanked.data.ties ?? 0}
+              loading={scrimmagingRecordRanked.isFetching}
+              wins={scrimmagingRecordRanked.data?.wins ?? 0}
+              losses={scrimmagingRecordRanked.data?.losses ?? 0}
+              ties={scrimmagingRecordRanked.data?.ties ?? 0}
             />
           )}
         </div>
