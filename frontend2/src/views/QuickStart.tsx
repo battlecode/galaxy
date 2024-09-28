@@ -11,26 +11,40 @@ import Markdown from "../components/elements/Markdown";
 
 const QuickStart: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const currentQuickStartText = 
-  quickStartText[episodeId] ?? defaultQuickStartText;
+  const currentQuickStartText =
+    quickStartText[episodeId] ?? defaultQuickStartText;
 
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
         <SectionCard>
-          <Markdown text={`${currentQuickStartText[QuickStartedPage.OVERVIEW]}`} />
+          <Markdown
+            text={`${currentQuickStartText[QuickStartedPage.OVERVIEW]}`}
+          />
         </SectionCard>
         <SectionCard>
-          <Markdown text={`${currentQuickStartText[QuickStartedPage.ACCOUNT_AND_TEAM_CREATION]}`} />
+          <Markdown
+            text={`${
+              currentQuickStartText[QuickStartedPage.ACCOUNT_AND_TEAM_CREATION]
+            }`}
+          />
         </SectionCard>
         <SectionCard>
-          <Markdown text={`${currentQuickStartText[QuickStartedPage.INSTALLATION]}`} />
+          <Markdown
+            text={`${currentQuickStartText[QuickStartedPage.INSTALLATION]}`}
+          />
         </SectionCard>
         <SectionCard>
-          <Markdown text={`${currentQuickStartText[QuickStartedPage.RESOURCES]}`} />
+          <Markdown
+            text={`${currentQuickStartText[QuickStartedPage.RESOURCES]}`}
+          />
         </SectionCard>
         <SectionCard>
-          <Markdown text={`${currentQuickStartText[QuickStartedPage.JOIN_THE_COMMUNITY]}`} />
+          <Markdown
+            text={`${
+              currentQuickStartText[QuickStartedPage.JOIN_THE_COMMUNITY]
+            }`}
+          />
         </SectionCard>
       </div>
     </div>

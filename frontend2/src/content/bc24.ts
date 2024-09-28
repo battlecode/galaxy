@@ -1,13 +1,20 @@
-import type { TourneyPageKey, QuickStartedPageKey } from "./ContentStruct";
+import type {
+  CommonIssuesPageKey,
+  DebuggingTipsPageKey,
+  QuickStartedPageKey,
+  ResourcesPageKey,
+  TourneyPageKey,
+} from "./ContentStruct";
+
 export const BC24_QUICKSTART: Record<QuickStartedPageKey, string> = {
   overview: `# Overview
 This is the Battlecode 2023 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
 `,
-creation:`# Account and Team Creation
+  creation: `# Account and Team Creation
 To participate in Battlecode, you need an account and a team. Each team can consist of 1 to 4 people.
 
 [Create an account](/register) on this website, and then go to the [team section](/bc24/team) to either create or join a team.`,
-installation: `# Installation
+  installation: `# Installation
 
   Check [common issues](/bc24/commonissues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
 
@@ -69,17 +76,19 @@ You can run games directly from the terminal with the gradle task \`./gradlew ru
 Once you're all set up, make sure to check out the [resources](/bc24/resources/) page!
 `,
   community: `# Join the Community
-Battlecode has a Discord server! Everyone is encouraged to join. Announcements, strategy discussions, bug fixes and ~memes~ all happen on Discord. Follow this invite link to join: [https://discord.gg/N86mxkH](https://discord.gg/N86mxkH).`
+Battlecode has a Discord server! Everyone is encouraged to join. Announcements, strategy discussions, bug fixes and ~memes~ all happen on Discord. Follow this invite link to join: [https://discord.gg/N86mxkH](https://discord.gg/N86mxkH).`,
 };
 
-export const BC24_RESOURCES = `
+export const BC24_RESOURCES: Record<ResourcesPageKey, string> = {
+  specification: `
 ### Game Specifications
 
 [Specifications for Battlecode 2024!](https://releases.battlecode.org/specs/battlecode24/3.0.5/specs.md.html)
 
 [Javadocs for Battlecode 2024!](https://releases.battlecode.org/javadoc/battlecode24/3.0.5/index.html)
 
-### Coding Resources
+`,
+  resources: `### Coding Resources
 
 If you're just starting out, check out the [quick start](/bc24/quickstart) page!
 
@@ -88,6 +97,8 @@ For more helpful resources while coding, see:
 - [Common Issues](/bc24/commonissues)
 - [Debugging Tips](/bc24/debuggingtips)
 
+`,
+  tools: `
 ### Third-party Tools
 
 The tools below were made by contestants! They haven't been tested by the devs, but might prove to be very helpful in developing your bot.
@@ -96,15 +107,17 @@ If you make a new tool that could be useful to others, please post it in the [#o
 
 - There is nothing here yet...
 
-### Lectures
+`,
+  lectures: `### Lectures
 
 Battlecode 2024 will be holding lectures, where a dev will be going over possible strategy, coding up an example player, answering questions, etc. Lectures are streamed on Twitch. More details coming soon!
 
 All lectures are streamed live on [our Twitch account](https://twitch.tv/mitbattlecode), and are later uploaded to [our YouTube channel](https://youtube.com/channel/UCOrfTSnyimIXfYzI8j_-CTQ).
+`,
+};
 
-`;
-
-export const BC24_DEBUGGINGTIPS = `
+export const BC24_DEBUGGINGTIPS: Record<DebuggingTipsPageKey, string> = {
+  debugging: `
 ## Debugging
 
 Using a “debugger” lets you pause your code while its running and inspect its state - what your variables are set to, what methods you're calling, and so on. You can walk through your code step-by-step, and run arbitrary commands.
@@ -144,7 +157,8 @@ It should say \`Listening for transport dt_socket at address: 5005\` and pause.
 This means that the server has started, and is waiting for the Eclipse or IntelliJ debugger to connect.
 
 (You have to do this every time you want to debug.)
-
+`,
+  intellij: `
 ### Debugging in Intellij
 
 #### Initial setup
@@ -199,7 +213,8 @@ To learn more about these tools, see the [Intellij documentation](https://www.je
 #### Conditional breakpoints
 
 Sometimes, you might only want to pause if your robot is on team A, or the game is in round 537, or if you have fewer than a thousand bytecodes left. To make these changes, right click the breakpoint, and in the condition field, put the condition; you can use any variables in the surrounding code. If I have the method:
-
+`,
+  eclipse: `
 ### Debugging in Eclipse
 
 #### Initial setup
@@ -267,7 +282,8 @@ class RobotPlayer {
 }
 \`\`\`
 I could make the following conditions: - \`rc.getTeam() == Team.A\` - \`rc.getRoundNum() == 537\` - \`Clock.getBytecodesLeft() < 1000\` - \`rc.getTeam() == Team.A && rc.getRoundNum() == 537 && Clock.getBytecodesLeft() < 1000\`
-
+`,
+  second_method: `
 ## Second Method: Debugging with IntelliJ
 
 This method probably does not allow you to view the game in the client at the same time. We recommend following the instructions above.
@@ -282,9 +298,11 @@ Add the gradle run task as a configuration:
 
 When your configuration is selected from the dropdown menu, clicking play will run the game, the same way double clicking run in the gradle window does. Clicking on the bug icon next to the play button will run the game in debug mode in the ide. Use breakpoints and the debuging interface to walk through your code. For more info on debugging with intelliJ, see [here](https://www.jetbrains.com/help/idea/debugging-code.html) You can specify the map and teams to run in the \`gradle.properties\` file.
 
-`;
-export const BC24_COMMONISSUES = `
-#### Installation Issues
+`,
+};
+
+export const BC24_COMMONISSUES: Record<CommonIssuesPageKey, string> = {
+  installation: `#### Installation Issues
 
 Known errors, with solutions:
 
@@ -296,16 +314,18 @@ Known errors, with solutions:
 - \`Exception in thread "WebsocketSelector14" java.lang.NullPointerException at battlecode.server.NetServer.onError(NetServer.java:165)\`. This probably means that you're running two instances of the engine at the same time. Try running \`./gradlew --stop\` (if you're running things in IntelliJ, click the elephant in the Gradle Tool Window (the right-hand sidebar) and then execute \`gradle --stop\` in the window that pops up). If that doesn't work, ask on the Discord.
 
 If your error is not listed above, ask on [the Discord](https://discord.gg/N86mxkH).
-
-#### Client Issues
+`,
+  client: `#### Client Issues
 
 If you're experiencing memory problems with the client, please try:
 
 - Making .bc24 files with the engine directly and uploading them to the client's match queue, rather than using the client's runner. With this method, once the web version of the visualizer is live, you can just use the web version at [https://play.battlecode.org/clients/bc24/index.html](https://play.battlecode.org/clients/bc24/index.html) rather than the desktop application.
-#### Other Issues
+`,
+  other: `#### Other Issues
 - *After an update, IntelliJ doesn't recognize new API functions (e.g. \`rc.getMapWidth\`).* You need to refresh dependencies. Right-click on the project name (most likely \`battlecode24-scaffold\`) in the Gradle Tool Window (the right-hand sidebar), and click \`Refresh Gradle Dependencies\`. It is good to do this after every update.
 - You can enable auto-updates in IntelliJ by navigating to \`settings > build, execution, deployment > Gradle\` and checking \`Automatically import this project on changes in build script files\`, or the button that says something similar if you have an older version.
-
+`,
+  things: `
 #### Things to Try When Nothing Else Helps
 
 (Note, Gradle tasks are written as \`./gradlew taskname\` here, but you can also run \`taskname\` in your IDE.)
@@ -322,7 +342,8 @@ Always follow each of the below Gradle commands with \`./gradlew build\`.
 - \`rm -r ~/.gradle\` (removes the Gradle cache)
 - Redownload **[the scaffold](https://github.com/battlecode/battlecode24-scaffold)**.
 
-`;
+`,
+};
 
 export const BC24_TOURNAMENTS: Record<TourneyPageKey, string> = {
   schedule: `# Battlecode 2024 Tournament Schedule
