@@ -1,3 +1,5 @@
+import type { TourneyPageKey, QuickStartedPageKey } from "./ContentStruct";
+
 import {
   BC24_QUICKSTART,
   BC24_RESOURCES,
@@ -7,12 +9,12 @@ import {
 } from "./bc24";
 import { BC23_QUICKSTART, BC23_RESOURCES, BC23_TOURNAMENTS } from "./bc23";
 import { BC22_QUICKSTART, BC22_RESOURCES, BC22_TOURNAMENTS } from "./bc22";
-import type { TourneyPageKey } from "./ContentStruct";
-export const defaultQuickStartText = BC23_QUICKSTART;
-export const quickStartText: Record<string, string> = {
+
+export const defaultQuickStartText = BC24_QUICKSTART;
+export const quickStartText: Record<string, Record<QuickStartedPageKey, string>> = {
   bc24: BC24_QUICKSTART,
-  bc23: BC23_QUICKSTART,
-  bc22: BC22_QUICKSTART,
+  // bc23: BC23_QUICKSTART,
+  // bc22: BC22_QUICKSTART,
 };
 
 export const defaultResourcesText = BC24_RESOURCES;

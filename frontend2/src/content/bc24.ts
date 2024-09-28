@@ -1,20 +1,15 @@
-import type { TourneyPageKey } from "./ContentStruct";
-
-export const BC24_QUICKSTART = `# Quick Start
-
-## Overview
-
+import type { TourneyPageKey, QuickStartedPageKey } from "./ContentStruct";
+export const BC24_QUICKSTART: Record<QuickStartedPageKey, string> = {
+  overview: `# Overview
 This is the Battlecode 2023 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
-
-## Account and Team Creation
-
+`,
+creation:`# Account and Team Creation
 To participate in Battlecode, you need an account and a team. Each team can consist of 1 to 4 people.
 
-[Create an account](/register) on this website, and then go to the [team section](/bc24/team) to either create or join a team.
+[Create an account](/register) on this website, and then go to the [team section](/bc24/team) to either create or join a team.`,
+installation: `# Installation
 
-## Installation
-
-Check [common issues](/bc24/commonissues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
+  Check [common issues](/bc24/commonissues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
 
 ### Step 1: Install Java
 
@@ -69,15 +64,13 @@ Check [debugging tips](/bc24/debuggingtips) if you experience problems while dev
 ### RUNNING BATTLECODE FROM THE CLIENT
 Open the client as described in Step 3. Navigate to the runner tab, select which bots and maps to run, and hit Run Game! Finally, click the play/pause button to view the replay.
 You can run games directly from the terminal with the gradle task \`./gradlew run -Pmaps=[map] -PteamA=[Team A] -PteamB=[Team B]\`. If you don't include the map or team flags, Battlecode will default to whatever is listed in \`gradle.properties\`. Running the same gradle task from your IDE will also work.
-
-## Resources
+  `,
+  resources: `# Resources
 Once you're all set up, make sure to check out the [resources](/bc24/resources/) page!
-
-
-## Join the Community
-Battlecode has a Discord server! Everyone is encouraged to join. Announcements, strategy discussions, bug fixes and ~memes~ all happen on Discord. Follow this invite link to join: [https://discord.gg/N86mxkH](https://discord.gg/N86mxkH).
-
-`;
+`,
+  community: `# Join the Community
+Battlecode has a Discord server! Everyone is encouraged to join. Announcements, strategy discussions, bug fixes and ~memes~ all happen on Discord. Follow this invite link to join: [https://discord.gg/N86mxkH](https://discord.gg/N86mxkH).`
+};
 
 export const BC24_RESOURCES = `
 ### Game Specifications
@@ -88,7 +81,7 @@ export const BC24_RESOURCES = `
 
 ### Coding Resources
 
-If you're just starting out, check out the [getting started](/bc24/quickstart) page!
+If you're just starting out, check out the [quick start](/bc24/quickstart) page!
 
 For more helpful resources while coding, see:
 
