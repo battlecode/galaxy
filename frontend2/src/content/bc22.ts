@@ -1,80 +1,11 @@
 import type { TourneyPageKey } from "./ContentStruct";
 
-export const BC22_QUICKSTART = `# Quick Start 22
-
-This is the Battlecode 2022 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
-
-## Create an account and team
-
-To participate in Battlecode, you need an account and a team. Each team can consist of 1 to 4 people.
-
-[Create an account](/register) on this website, and then go to the [team section](/bc22/team) to either create or join a team.
-
-## Installation
-
-### Step 1: Install Java
-
-You'll need a Java Development Kit (JDK) version 8. Unfortunately, higher versions will not work. [Download it here](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). You may need to create an Oracle account.
-
-- Alternatively, you can install a JDK yourself using your favorite package manager. Make sure it's an Oracle JDK — we don't support anything else — and is compatible with Java 8.
-
-If you're unsure how to install the JDK, you can find instructions for all operating systems [here](https://docs.oracle.com/javase/8/docs/technotes/guides/install/install_overview.html) (pay attention to \`PATH\` and \`CLASSPATH\`).
-
-### Step 2: Download Battlecode
-
-Next, you should download the [Battlecode 2022 scaffold](https://github.com/battlecode/battlecode22-scaffold). To get up and running quickly, you can click "Clone or download" and then "Download ZIP," and move on to the next step.
-
-TODO: the rest of the page
-
-`;
-
-export const BC22_RESOURCES = `# Markdown syntax guide 22
-
-# This is a Heading h1
-## This is a Heading h2
-###### This is a Heading h6
-
-*This text will be italic*
-_This will also be italic_
-
-**This text will be bold**
-__This will also be bold__
-
-_You **can** combine them_
-
-### Unordered List
-
-* Item 1
-* Item 2
-* Item 2a
-* Item 2b
-
-### Ordered List
-
-1. Item 1
-1. Item 2
-1. Item 3
-  1. Item 3a
-  1. Item 3b
-
-![This is an alt text for an image.](/image/sample.png "This is a sample image.")
-
-[This links to example.com](https://example.com).
-
-\`\`\`
-let message = 'Hello world';
-alert(message);
-\`\`\`
-
-this is \`an inline code block\`
-`;
-
-export const BC22_TOURNAMENTS: Record<TourneyPageKey, string> = {
-  schedule: `# Battlecode 2022 Tournament Schedule
+export const BC22_TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
+  "Tournament Schedule": `# Battlecode 2022 Tournament Schedule
 
   Battlecode 2022 will have several tournaments throughout the month! We stream and commentate all tournaments online. The deadline to submit code for each non-final tournament is usually 7 pm EST the day before the tournament.
   `,
-  prizes: `# Prizes
+  Prizes: `# Prizes
 
   Prize amounts are approximate and will be finalized soon!
 
@@ -96,7 +27,7 @@ export const BC22_TOURNAMENTS: Record<TourneyPageKey, string> = {
   If you are an international participant, please note that [US export regulations](https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/sanctioned-destinations)
   may restrict our ability to award prizes to students from certain countries.
   `,
-  format: `# Tournament Format
+  "Tournament Format": `# Tournament Format
 
   Each match within a tournament will consist of at least 3 games, each on a different map, and the team that wins the most games will advance.
 
@@ -106,7 +37,7 @@ export const BC22_TOURNAMENTS: Record<TourneyPageKey, string> = {
 
   Even if you miss earlier tournaments, you can participate in later tournaments (except the Final Tournament). This includes the Qualifying Tournament — you can participate even if you miss every other tournament (your seed will be determined by your scrimmage rank).
   `,
-  rules: `# Eligibility Rules
+  "Eligibility Rules": `# Eligibility Rules
 
   Anyone can write a bot, create a team, and participate in scrimmage matches/rankings. The Sprint Tournaments are
   open to everyone, but the other tournaments have stricter eligibility rules.

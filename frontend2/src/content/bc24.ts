@@ -1,20 +1,22 @@
-import type { TourneyPageKey } from "./ContentStruct";
+import type {
+  CommonIssuesPageKey,
+  DebuggingTipsPageKey,
+  QuickStartPageKey,
+  ResourcesPageKey,
+  TourneyPageKey,
+} from "./ContentStruct";
 
-export const BC24_QUICKSTART = `# Quick Start
-
-## Overview
-
+export const BC24_QUICKSTART: Partial<Record<QuickStartPageKey, string>> = {
+  Overview: `
 This is the Battlecode 2023 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
-
-## Account and Team Creation
-
+`,
+  "Account and Team Creation": `
 To participate in Battlecode, you need an account and a team. Each team can consist of 1 to 4 people.
 
-[Create an account](/register) on this website, and then go to the [team section](/bc24/team) to either create or join a team.
+[Create an account](/register) on this website, and then go to the [team section](/bc24/team) to either create or join a team.`,
+  Installation: `
 
-## Installation
-
-Check [common issues](/bc24/commonissues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
+  Check [common issues](/bc24/common_issues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
 
 ### Step 1: Install Java
 
@@ -69,33 +71,33 @@ Check [debugging tips](/bc24/debuggingtips) if you experience problems while dev
 ### RUNNING BATTLECODE FROM THE CLIENT
 Open the client as described in Step 3. Navigate to the runner tab, select which bots and maps to run, and hit Run Game! Finally, click the play/pause button to view the replay.
 You can run games directly from the terminal with the gradle task \`./gradlew run -Pmaps=[map] -PteamA=[Team A] -PteamB=[Team B]\`. If you don't include the map or team flags, Battlecode will default to whatever is listed in \`gradle.properties\`. Running the same gradle task from your IDE will also work.
-
-## Resources
+  `,
+  Resources: `
 Once you're all set up, make sure to check out the [resources](/bc24/resources/) page!
+`,
+  "Join the Community!": `
+Battlecode has a Discord server! Everyone is encouraged to join. Announcements, strategy discussions, bug fixes and ~memes~ all happen on Discord. Follow this invite link to join: [https://discord.gg/N86mxkH](https://discord.gg/N86mxkH).`,
+};
 
-
-## Join the Community
-Battlecode has a Discord server! Everyone is encouraged to join. Announcements, strategy discussions, bug fixes and ~memes~ all happen on Discord. Follow this invite link to join: [https://discord.gg/N86mxkH](https://discord.gg/N86mxkH).
-
-`;
-
-export const BC24_RESOURCES = `
-### Game Specifications
+export const BC24_RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
+  "Game Specifications": `
 
 [Specifications for Battlecode 2024!](https://releases.battlecode.org/specs/battlecode24/3.0.5/specs.md.html)
 
 [Javadocs for Battlecode 2024!](https://releases.battlecode.org/javadoc/battlecode24/3.0.5/index.html)
 
-### Coding Resources
+`,
+  "Coding Resources": `
 
-If you're just starting out, check out the [getting started](/bc24/quickstart) page!
+If you're just starting out, check out the [quick start](/bc24/quickstart) page!
 
 For more helpful resources while coding, see:
 
-- [Common Issues](/bc24/commonissues)
-- [Debugging Tips](/bc24/debuggingtips)
+- [Common Issues](/bc24/common_issues)
+- [Debugging Tips](/bc24/debugging_tips)
 
-### Third-party Tools
+`,
+  "Third-party Tools": `
 
 The tools below were made by contestants! They haven't been tested by the devs, but might prove to be very helpful in developing your bot.
 
@@ -103,16 +105,18 @@ If you make a new tool that could be useful to others, please post it in the [#o
 
 - There is nothing here yet...
 
-### Lectures
+`,
+  Lectures: `
 
 Battlecode 2024 will be holding lectures, where a dev will be going over possible strategy, coding up an example player, answering questions, etc. Lectures are streamed on Twitch. More details coming soon!
 
 All lectures are streamed live on [our Twitch account](https://twitch.tv/mitbattlecode), and are later uploaded to [our YouTube channel](https://youtube.com/channel/UCOrfTSnyimIXfYzI8j_-CTQ).
+`,
+};
 
-`;
-
-export const BC24_DEBUGGINGTIPS = `
-## Debugging
+export const BC24_DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> =
+  {
+    Debugging: `
 
 Using a “debugger” lets you pause your code while its running and inspect its state - what your variables are set to, what methods you're calling, and so on. You can walk through your code step-by-step, and run arbitrary commands.
 
@@ -151,8 +155,8 @@ It should say \`Listening for transport dt_socket at address: 5005\` and pause.
 This means that the server has started, and is waiting for the Eclipse or IntelliJ debugger to connect.
 
 (You have to do this every time you want to debug.)
-
-### Debugging in Intellij
+`,
+    "Debugging in IntelliJ": `
 
 #### Initial setup
 
@@ -206,8 +210,8 @@ To learn more about these tools, see the [Intellij documentation](https://www.je
 #### Conditional breakpoints
 
 Sometimes, you might only want to pause if your robot is on team A, or the game is in round 537, or if you have fewer than a thousand bytecodes left. To make these changes, right click the breakpoint, and in the condition field, put the condition; you can use any variables in the surrounding code. If I have the method:
-
-### Debugging in Eclipse
+`,
+    "Debugging in Eclipse": `
 
 #### Initial setup
 
@@ -274,8 +278,8 @@ class RobotPlayer {
 }
 \`\`\`
 I could make the following conditions: - \`rc.getTeam() == Team.A\` - \`rc.getRoundNum() == 537\` - \`Clock.getBytecodesLeft() < 1000\` - \`rc.getTeam() == Team.A && rc.getRoundNum() == 537 && Clock.getBytecodesLeft() < 1000\`
-
-## Second Method: Debugging with IntelliJ
+`,
+    "Second Method: Debugging in IntelliJ": `
 
 This method probably does not allow you to view the game in the client at the same time. We recommend following the instructions above.
 
@@ -289,9 +293,11 @@ Add the gradle run task as a configuration:
 
 When your configuration is selected from the dropdown menu, clicking play will run the game, the same way double clicking run in the gradle window does. Clicking on the bug icon next to the play button will run the game in debug mode in the ide. Use breakpoints and the debuging interface to walk through your code. For more info on debugging with intelliJ, see [here](https://www.jetbrains.com/help/idea/debugging-code.html) You can specify the map and teams to run in the \`gradle.properties\` file.
 
-`;
-export const BC24_COMMONISSUES = `
-#### Installation Issues
+`,
+  };
+
+export const BC24_COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
+  "Installation Issues": `
 
 Known errors, with solutions:
 
@@ -303,16 +309,18 @@ Known errors, with solutions:
 - \`Exception in thread "WebsocketSelector14" java.lang.NullPointerException at battlecode.server.NetServer.onError(NetServer.java:165)\`. This probably means that you're running two instances of the engine at the same time. Try running \`./gradlew --stop\` (if you're running things in IntelliJ, click the elephant in the Gradle Tool Window (the right-hand sidebar) and then execute \`gradle --stop\` in the window that pops up). If that doesn't work, ask on the Discord.
 
 If your error is not listed above, ask on [the Discord](https://discord.gg/N86mxkH).
-
-#### Client Issues
+`,
+  "Client Issues": `
 
 If you're experiencing memory problems with the client, please try:
 
 - Making .bc24 files with the engine directly and uploading them to the client's match queue, rather than using the client's runner. With this method, once the web version of the visualizer is live, you can just use the web version at [https://play.battlecode.org/clients/bc24/index.html](https://play.battlecode.org/clients/bc24/index.html) rather than the desktop application.
-#### Other Issues
+`,
+  "Other Issues": `
 - *After an update, IntelliJ doesn't recognize new API functions (e.g. \`rc.getMapWidth\`).* You need to refresh dependencies. Right-click on the project name (most likely \`battlecode24-scaffold\`) in the Gradle Tool Window (the right-hand sidebar), and click \`Refresh Gradle Dependencies\`. It is good to do this after every update.
 - You can enable auto-updates in IntelliJ by navigating to \`settings > build, execution, deployment > Gradle\` and checking \`Automatically import this project on changes in build script files\`, or the button that says something similar if you have an older version.
-
+`,
+  "Things to Try When Nothing Else Helps": `
 #### Things to Try When Nothing Else Helps
 
 (Note, Gradle tasks are written as \`./gradlew taskname\` here, but you can also run \`taskname\` in your IDE.)
@@ -329,16 +337,17 @@ Always follow each of the below Gradle commands with \`./gradlew build\`.
 - \`rm -r ~/.gradle\` (removes the Gradle cache)
 - Redownload **[the scaffold](https://github.com/battlecode/battlecode24-scaffold)**.
 
-`;
+`,
+};
 
-export const BC24_TOURNAMENTS: Record<TourneyPageKey, string> = {
-  schedule: `# Battlecode 2024 Tournament Schedule
+export const BC24_TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
+  "Tournament Schedule": `
   Battlecode 2024 will have several tournaments throughout the month! We stream and commentate all tournaments online.
 
   The deadline to submit code for each non-final tournament is usually 7 pm EST *the day before* the tournament.
 
   `,
-  prizes: `# Prizes
+  Prizes: `
 
   Prize amounts are approximate and will be finalized soon!
 
@@ -349,7 +358,7 @@ export const BC24_TOURNAMENTS: Record<TourneyPageKey, string> = {
   If you are an international participant, please note that [US export regulations](https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/sanctioned-destinations) may restrict our ability to award prizes to students from certain countries.
 
   `,
-  format: `# Tournament Format
+  "Tournament Format": `
 
   Each match within a tournament will consist of at least 3 games, each on a different map, and the team that wins the most games will advance.
 
@@ -359,7 +368,7 @@ export const BC24_TOURNAMENTS: Record<TourneyPageKey, string> = {
 
   Even if you miss earlier tournaments, you can participate in later tournaments (except the Final Tournament). This includes the Qualifying Tournament — you can participate even if you miss every other tournament (your seed will be determined by your scrimmage rank).
   `,
-  rules: `# Eligibility Rules
+  "Eligibility Rules": `
   Anyone can write a bot, create a team, and participate in scrimmage matches/rankings. The Sprint Tournaments are open to everyone, but the other tournaments have stricter eligibility rules.
 
   Your team must meet **all three conditions** by a tournament's submission deadline to be eligible for it:
