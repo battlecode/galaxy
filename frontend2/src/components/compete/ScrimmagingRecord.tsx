@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum,
+  type ScrimmageRecord,
   type TeamPublic,
 } from "api/_autogen";
-import { useScrimmagingRecord } from "api/compete/useCompete";
-import { useEpisodeId } from "contexts/EpisodeContext";
 import WinLossTie from "./WinLossTie";
+import { useEpisodeId } from "contexts/EpisodeContext";
+import { useQueryClient } from "@tanstack/react-query";
+import { scrimmagingRecordFactory } from "api/compete/competeFactories";
+import { buildKey } from "api/helpers";
+import { isNil } from "lodash";
 
 interface ScrimmagingRecordProps {
   team: Pick<TeamPublic, "id" | "name" | "profile">;
@@ -25,23 +29,27 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
   className = "",
 }) => {
   const { episodeId } = useEpisodeId();
-  const scrimmagingRecordAll = useScrimmagingRecord({
-    episodeId,
-    teamId: team.id,
-    scrimmageType: CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
-  });
-  const scrimmagingRecordUnranked = useScrimmagingRecord({
-    episodeId,
-    teamId: team.id,
-    scrimmageType:
-      CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked,
-  });
-  const scrimmagingRecordRanked = useScrimmagingRecord({
-    episodeId,
-    teamId: team.id,
-    scrimmageType:
-      CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked,
-  });
+  const queryClient = useQueryClient();
+
+  const scrimTypeToCheck = useMemo(() => {
+    if (!isNil(hideAllScrimmages) && !hideAllScrimmages) {
+      return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All;
+    } else if (!isNil(hideRanked) && !hideRanked) {
+      return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked;
+    } else if (!isNil(hideUnranked) && !hideUnranked) {
+      return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked;
+    } else {
+      return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All;
+    }
+  }, [hideAllScrimmages, hideRanked, hideUnranked]);
+
+  const recordWatcher = queryClient.getQueryState<ScrimmageRecord>(
+    buildKey(scrimmagingRecordFactory.queryKey, {
+      episodeId,
+      teamId: team.id,
+      scrimmageType: scrimTypeToCheck,
+    }),
+  );
 
   return (
     <div
@@ -56,9 +64,7 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
           <div className="text-xl font-semibold">{team.name}</div>
         </div>
       )}
-      {scrimmagingRecordAll.isError ||
-      scrimmagingRecordUnranked.isError ||
-      scrimmagingRecordRanked.isError ? (
+      {!isNil(recordWatcher) && !isNil(recordWatcher.error) ? (
         <div className="mb-2 mt-4 flex w-full flex-row items-center justify-center gap-3 text-gray-400">
           Error fetching scrimmaging record.
         </div>
@@ -69,10 +75,7 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
               scrimmageType={
                 CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All
               }
-              loading={scrimmagingRecordAll.isFetching}
-              wins={scrimmagingRecordAll.data?.wins ?? 0}
-              losses={scrimmagingRecordAll.data?.losses ?? 0}
-              ties={scrimmagingRecordAll.data?.ties ?? 0}
+              teamId={team.id}
             />
           )}
           {!hideUnranked && (
@@ -80,10 +83,7 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
               scrimmageType={
                 CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked
               }
-              loading={scrimmagingRecordUnranked.isFetching}
-              wins={scrimmagingRecordUnranked.data?.wins ?? 0}
-              losses={scrimmagingRecordUnranked.data?.losses ?? 0}
-              ties={scrimmagingRecordUnranked.data?.ties ?? 0}
+              teamId={team.id}
             />
           )}
           {!hideRanked && (
@@ -91,10 +91,7 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
               scrimmageType={
                 CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked
               }
-              loading={scrimmagingRecordRanked.isFetching}
-              wins={scrimmagingRecordRanked.data?.wins ?? 0}
-              losses={scrimmagingRecordRanked.data?.losses ?? 0}
-              ties={scrimmagingRecordRanked.data?.ties ?? 0}
+              teamId={team.id}
             />
           )}
         </div>

@@ -160,7 +160,11 @@ const MyTeam: React.FC = () => {
             {membersList}
           </SectionCard>
           <SectionCard className="shrink xl:hidden" title="Scrimmaging Record">
-            <ScrimmagingRecord team={teamData.data} />
+            <ScrimmagingRecord
+              team={teamData.data}
+              hideTeamName={true}
+              hideAllScrimmages={true}
+            />
           </SectionCard>
           <SectionCard className="shrink xl:hidden" title="File Upload">
             <TeamAvatar />
@@ -172,7 +176,11 @@ const MyTeam: React.FC = () => {
         <div className="flex hidden max-w-2xl flex-1 flex-col gap-8 xl:flex">
           <SectionCard title="Members">{membersList}</SectionCard>
           <SectionCard title="Scrimmaging Record">
-            <ScrimmagingRecord team={teamData.data} />
+            <ScrimmagingRecord
+              team={teamData.data}
+              hideTeamName={true}
+              hideAllScrimmages={true}
+            />
           </SectionCard>
           <SectionCard title="File Upload">
             <TeamAvatar />

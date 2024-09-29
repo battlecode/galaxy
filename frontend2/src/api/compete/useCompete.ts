@@ -279,6 +279,7 @@ export const useScrimmagingRecord = ({
         teamId,
         scrimmageType,
       }),
+    staleTime: 1000 * 30, // 30 seconds
   });
 
 // ---------- MUTATION HOOKS ---------- //

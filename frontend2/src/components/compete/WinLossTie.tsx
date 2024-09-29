@@ -2,13 +2,12 @@ import React, { useMemo } from "react";
 import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_autogen";
 import Spinner from "components/Spinner";
 import { isNil } from "lodash";
+import { useScrimmagingRecord } from "api/compete/useCompete";
+import { useEpisodeId } from "contexts/EpisodeContext";
 
 interface WinLossTieProps {
   scrimmageType: CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum;
-  wins: number;
-  losses: number;
-  ties: number;
-  loading?: boolean;
+  teamId: number;
   className?: string;
 }
 
@@ -21,27 +20,33 @@ const scrimmageTypeToName = {
 
 const WinLossTie: React.FC<WinLossTieProps> = ({
   scrimmageType,
-  wins,
-  losses,
-  ties,
-  loading,
+  teamId,
   className = "",
 }) => {
+  const { episodeId } = useEpisodeId();
+  const scrimRecord = useScrimmagingRecord({
+    episodeId,
+    teamId,
+    scrimmageType,
+  });
+
   const HEADER =
     "w-full border-t-2 border-b-2 border-solid border-cyan-600 text-center";
 
   const dataClassName = useMemo(() => {
     const baseClassName = "w-full p-1";
-    if (!isNil(loading) && loading) {
+    if (scrimRecord.isLoading) {
       return `${baseClassName} flex flex-row items-center justify-center`;
     } else {
       return `${baseClassName} text-center font-semibold`;
     }
-  }, [loading]);
+  }, [scrimRecord.isLoading]);
 
-  const dataOrLoading = (count: number): JSX.Element => {
-    if (!isNil(loading) && loading) {
+  const dataOrLoading = (count?: number): JSX.Element => {
+    if (scrimRecord.isLoading) {
       return <Spinner size="sm" />;
+    } else if (isNil(count)) {
+      return <>—</>;
     } else {
       return <>{count}</>;
     }
@@ -64,13 +69,13 @@ const WinLossTie: React.FC<WinLossTieProps> = ({
         Ties
       </span>
       <div className={`rounded-bl-lg bg-green-200 ${dataClassName}`}>
-        {dataOrLoading(wins)}
+        {dataOrLoading(scrimRecord.data?.wins)}
       </div>
       <div className={`bg-red-200 ${dataClassName}`}>
-        {dataOrLoading(losses)}
+        {dataOrLoading(scrimRecord.data?.losses)}
       </div>
       <div className={`rounded-br-lg bg-gray-200 ${dataClassName}`}>
-        {dataOrLoading(ties)}
+        {dataOrLoading(scrimRecord.data?.ties)}
       </div>
     </div>
   );

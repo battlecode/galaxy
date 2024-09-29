@@ -5,7 +5,11 @@ import {
   episodeInfoFactory,
   nextTournamentFactory,
 } from "../episode/episodeFactories";
-import { ratingHistoryMeFactory } from "api/compete/competeFactories";
+import {
+  ratingHistoryMeFactory,
+  scrimmagingRecordFactory,
+} from "api/compete/competeFactories";
+import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_autogen";
 
 export const homeLoader =
   (queryClient: QueryClient): LoaderFunction =>
@@ -29,6 +33,21 @@ export const homeLoader =
     void queryClient.ensureQueryData({
       queryKey: buildKey(ratingHistoryMeFactory.queryKey, { episodeId }),
       queryFn: async () => await ratingHistoryMeFactory.queryFn({ episodeId }),
+    });
+
+    // User Team Scrimmage Record
+    void queryClient.ensureQueryData({
+      queryKey: buildKey(scrimmagingRecordFactory.queryKey, {
+        episodeId,
+        scrimmageType:
+          CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
+      }),
+      queryFn: async () =>
+        await scrimmagingRecordFactory.queryFn({
+          episodeId,
+          scrimmageType:
+            CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
+        }),
     });
 
     return null;

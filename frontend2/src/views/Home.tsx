@@ -75,7 +75,11 @@ const Home: React.FC = () => {
           </SectionCard>
           {userTeam.isSuccess && (
             <SectionCard title="Scrimmaging Record">
-              <ScrimmagingRecord team={userTeam.data} />
+              <ScrimmagingRecord
+                team={userTeam.data}
+                hideRanked={true}
+                hideUnranked={true}
+              />
             </SectionCard>
           )}
           <SectionCard title="Rating History">
