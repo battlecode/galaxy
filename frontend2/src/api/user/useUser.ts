@@ -51,6 +51,7 @@ export const useIsLoggedIn = (
     queryKey: buildKey(loginTokenVerifyFactory.queryKey, { queryClient }),
     queryFn: async () => await loginTokenVerifyFactory.queryFn({ queryClient }),
     staleTime: Infinity,
+    refetchOnWindowFocus:false
   });
 
 export const usePasswordResetTokenValid = ({
@@ -66,6 +67,7 @@ export const usePasswordResetTokenValid = ({
     queryFn: async () =>
       await passwordResetTokenVerifyFactory.queryFn({ resetTokenRequest }),
     staleTime: Infinity,
+    refetchOnWindowFocus:false
   });
 
 /**
