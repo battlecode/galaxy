@@ -1,22 +1,46 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { QueryFactory } from "../apiTypes";
 import { userQueryKeys } from "./userKeys";
-import { tokenVerify } from "../auth/authApi";
+import { loginTokenVerify } from "../auth/authApi";
 import type {
+  ResetToken,
   TeamPublic,
+  UserPasswordResetValidateTokenCreateRequest,
   UserPrivate,
   UserPublic,
   UserURetrieveRequest,
   UserUTeamsRetrieveRequest,
 } from "../_autogen";
-import { getCurrentUserInfo, getTeamsByUser, getUserInfoById } from "./userApi";
+import {
+  getCurrentUserInfo,
+  getTeamsByUser,
+  getUserInfoById,
+  passwordResetTokenVerify,
+} from "./userApi";
+import toast from "react-hot-toast";
 
-export const tokenVerifyFactory: QueryFactory<
+export const loginTokenVerifyFactory: QueryFactory<
   { queryClient: QueryClient },
   boolean
 > = {
-  queryKey: userQueryKeys.tokenVerify,
-  queryFn: async () => await tokenVerify(),
+  queryKey: userQueryKeys.loginTokenVerify,
+  queryFn: async () => await loginTokenVerify(),
+} as const;
+
+export const passwordResetTokenVerifyFactory: QueryFactory<
+  UserPasswordResetValidateTokenCreateRequest,
+  ResetToken
+> = {
+  queryKey: userQueryKeys.passwordResetTokenVerify,
+  queryFn: async ({ resetTokenRequest }) => {
+    const toastFn = async (): Promise<ResetToken> =>
+      await passwordResetTokenVerify({ resetTokenRequest });
+    return await toast.promise(toastFn(), {
+      loading: "Verifying token...",
+      success: "Token verified!",
+      error: "Error verifying token. Is it expired?",
+    });
+  },
 } as const;
 
 export const myUserInfoFactory: QueryFactory<unknown, UserPrivate> = {

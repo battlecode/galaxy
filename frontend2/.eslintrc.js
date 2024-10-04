@@ -29,6 +29,7 @@ module.exports = {
   plugins: ["react"],
   rules: {
     semi: ["error", "always"], // require semicolons ending statements
+    "@typescript-eslint/no-unused-vars": ["warn", { varsIgnorePattern: "^_" }],
   },
   settings: {
     react: {

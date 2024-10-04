@@ -16,11 +16,14 @@ import type {
   UserPasswordResetConfirmCreateRequest,
   UserUAvatarCreateRequest,
   UserUResumeUpdateRequest,
+  UserPasswordResetValidateTokenCreateRequest,
+  ResetToken,
 } from "../_autogen";
 import { userMutationKeys, userQueryKeys } from "./userKeys";
 import {
   createUser,
   doResetPassword,
+  forgotPassword,
   resumeUpload,
   updateCurrentUser,
   downloadResume,
@@ -32,7 +35,8 @@ import {
   myUserInfoFactory,
   otherUserInfoFactory,
   otherUserTeamsFactory,
-  tokenVerifyFactory,
+  loginTokenVerifyFactory,
+  passwordResetTokenVerifyFactory,
 } from "./userFactories";
 import { buildKey } from "../helpers";
 
@@ -44,9 +48,26 @@ export const useIsLoggedIn = (
   queryClient: QueryClient,
 ): UseQueryResult<boolean, Error> =>
   useQuery({
-    queryKey: buildKey(tokenVerifyFactory.queryKey, { queryClient }),
-    queryFn: async () => await tokenVerifyFactory.queryFn({ queryClient }),
+    queryKey: buildKey(loginTokenVerifyFactory.queryKey, { queryClient }),
+    queryFn: async () => await loginTokenVerifyFactory.queryFn({ queryClient }),
     staleTime: Infinity,
+    refetchOnWindowFocus: false,
+  });
+
+export const usePasswordResetTokenValid = ({
+  resetTokenRequest,
+}: UserPasswordResetValidateTokenCreateRequest): UseQueryResult<
+  ResetToken,
+  Error
+> =>
+  useQuery({
+    queryKey: buildKey(passwordResetTokenVerifyFactory.queryKey, {
+      resetTokenRequest,
+    }),
+    queryFn: async () =>
+      await passwordResetTokenVerifyFactory.queryFn({ resetTokenRequest }),
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
   });
 
 /**
@@ -157,7 +178,28 @@ export const useUpdateCurrentUserInfo = (
   });
 
 /**
- * For resetting a user's password. If successful, logs in the user.
+ * For requesting a password reset token to be sent to the provided email. If successful, sends an email.
+ */
+export const useForgotPassword = ({
+  episodeId,
+}: {
+  episodeId: string;
+}): UseMutationResult<void, Error, string, unknown> =>
+  useMutation({
+    mutationKey: userMutationKeys.forgotPassword({ episodeId }),
+    mutationFn: async (email: string) => {
+      await toast.promise(forgotPassword({ emailRequest: { email } }), {
+        loading: "Sending password reset email...",
+        success:
+          "Sent password reset email!\nWait a few minutes for it to arrive.",
+        error:
+          "Error sending password reset email.\nDid you enter the correct email?",
+      });
+    },
+  });
+
+/**
+ * For resetting a user's password. If successful, navigates to the login page.
  */
 export const useResetPassword = ({
   episodeId,
@@ -179,6 +221,7 @@ export const useResetPassword = ({
         success: "Reset password!",
         error: "Error resetting password.",
       });
+      window.location.href = "/login";
     },
   });
 

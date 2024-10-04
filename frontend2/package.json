@@ -31,8 +31,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "npm run _eslint && npm run _prettier -- --check",
-    "format": "npm run _eslint -- --fix && npm run _prettier -- --write",
+    "lint": "npm run _eslint -- --max-warnings=0 && npm run _prettier -- --check",
+    "format": "npm run _eslint -- --max-warnings=0 --fix && npm run _prettier -- --write",
     "_eslint": "eslint --ext .ts,.tsx ./src",
     "_prettier": "prettier \"**/*.{ts,js,tsx,md,json}\""
   },

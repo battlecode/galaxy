@@ -51,6 +51,7 @@ import ErrorBoundary from "./views/ErrorBoundary";
 import { searchTeamsFactory } from "api/team/teamFactories";
 import PageNotFound from "views/PageNotFound";
 import TeamProfile from "views/TeamProfile";
+import { passwordForgotLoader } from "api/loaders/passwordForgotLoader";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -131,6 +132,7 @@ const router = createBrowserRouter([
     path: "/password_forgot",
     element: <PasswordForgot />,
     errorElement: <ErrorBoundary />,
+    loader: passwordForgotLoader(queryClient),
   },
   {
     path: "/password_change",
