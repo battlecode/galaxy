@@ -25,12 +25,6 @@ const PasswordForgot: React.FC = () => {
     <div className="flex h-screen flex-col items-center justify-center bg-gradient-to-tr from-cyan-200 to-cyan-700 p-2">
       <span className="items-end text-center font-display tracking-wide text-white">
         <div className="mb-6 text-5xl sm:text-6xl">BATTLECODE</div>
-        <div className="text-lg sm:text-xl">
-          Enter your email below to receive a password reset email.
-        </div>
-        <div className="mb-3 text-lg sm:text-xl">
-          Contact battlecode@mit.edu if you encounter any issues.
-        </div>
       </span>
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -42,6 +36,10 @@ const PasswordForgot: React.FC = () => {
       >
         <div className="text-center text-xl font-light text-gray-700">
           Forgot Password
+          <div className="mt-3 text-sm font-normal text-gray-600">
+            Enter your email below to receive a password reset email. Contact
+            battlecode@mit.edu if you encounter any issues.
+          </div>
         </div>
         <Input
           label="Email"
