@@ -24,7 +24,6 @@ const PasswordChange: React.FC = () => {
     formState: { isSubmitting, isDirty, errors },
     reset,
     getValues,
-    setError,
   } = useForm<PasswordChangeFormInput>();
   const { episodeId } = useEpisodeId();
 
