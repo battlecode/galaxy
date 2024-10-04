@@ -21,6 +21,7 @@ import type {
   PaginatedMatchList,
   PaginatedScrimmageRequestList,
   PaginatedSubmissionList,
+  ScrimmageRecord,
   ScrimmageRequest,
   ScrimmageRequestRequest,
   Submission,
@@ -41,6 +42,8 @@ import {
     PaginatedScrimmageRequestListToJSON,
     PaginatedSubmissionListFromJSON,
     PaginatedSubmissionListToJSON,
+    ScrimmageRecordFromJSON,
+    ScrimmageRecordToJSON,
     ScrimmageRequestFromJSON,
     ScrimmageRequestToJSON,
     ScrimmageRequestRequestFromJSON,
@@ -89,6 +92,12 @@ export interface CompeteMatchRetrieveRequest {
 export interface CompeteMatchScrimmageListRequest {
     episodeId: string;
     page?: number;
+    teamId?: number;
+}
+
+export interface CompeteMatchScrimmagingRecordRetrieveRequest {
+    episodeId: string;
+    scrimmageType?: CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum;
     teamId?: number;
 }
 
@@ -467,6 +476,52 @@ export class CompeteApi extends runtime.BaseAPI {
      */
     async competeMatchScrimmageList(requestParameters: CompeteMatchScrimmageListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedMatchList> {
         const response = await this.competeMatchScrimmageListRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * List the scrimmaging win-loss-tie record of a team.
+     */
+    async competeMatchScrimmagingRecordRetrieveRaw(requestParameters: CompeteMatchScrimmagingRecordRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ScrimmageRecord>> {
+        if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
+            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling competeMatchScrimmagingRecordRetrieve.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.scrimmageType !== undefined) {
+            queryParameters['scrimmage_type'] = requestParameters.scrimmageType;
+        }
+
+        if (requestParameters.teamId !== undefined) {
+            queryParameters['team_id'] = requestParameters.teamId;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/compete/{episode_id}/match/scrimmaging_record/`.replace(`{${"episode_id"}}`, encodeURIComponent(String(requestParameters.episodeId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ScrimmageRecordFromJSON(jsonValue));
+    }
+
+    /**
+     * List the scrimmaging win-loss-tie record of a team.
+     */
+    async competeMatchScrimmagingRecordRetrieve(requestParameters: CompeteMatchScrimmagingRecordRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ScrimmageRecord> {
+        const response = await this.competeMatchScrimmagingRecordRetrieveRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -1059,4 +1114,14 @@ export class CompeteApi extends runtime.BaseAPI {
         return await response.value();
     }
 
+}
+
+/**
+  * @export
+  * @enum {string}
+  */
+export enum CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum {
+    All = 'all',
+    Ranked = 'ranked',
+    Unranked = 'unranked'
 }

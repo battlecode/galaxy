@@ -76,7 +76,7 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
               <>
                 <NavLink
                   key={idx}
-                  to={`/user/${member.id}`}
+                  to={`/${episodeId}/user/${member.id}`}
                   className="hover:underline"
                 >
                   {trimString(member.username, 13)}
