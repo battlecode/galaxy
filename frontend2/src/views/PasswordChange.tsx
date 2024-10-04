@@ -21,8 +21,10 @@ const PasswordChange: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, isDirty },
+    formState: { isSubmitting, isDirty, errors },
     reset,
+    getValues,
+    setError,
   } = useForm<PasswordChangeFormInput>();
   const { episodeId } = useEpisodeId();
 
@@ -80,21 +82,31 @@ const PasswordChange: React.FC = () => {
           <>
             <div className="text-center text-xl font-light text-gray-700">
               Reset Password
-            </div>
-            <div className="mt-3 text-sm font-normal text-gray-600">
-              Enter a new password below to reset your password.
+              <div className="mt-3 text-sm font-normal text-gray-600">
+                Enter a new password below to reset your password.
+              </div>
             </div>
             <Input
               label="New Password"
               required
+              errorMessage={errors.password?.message}
               {...register("password", { required: FIELD_REQUIRED_ERROR_MSG })}
+              type="password"
             />
             <Input
               label="Confirm Password"
               required
+              errorMessage={errors.passwordConfirm?.message}
               {...register("passwordConfirm", {
                 required: FIELD_REQUIRED_ERROR_MSG,
+                validate: () => {
+                  if (getValues("password") !== getValues("passwordConfirm")) {
+                    return "Confirmation password does not match";
+                  }
+                  return true;
+                },
               })}
+              type="password"
             />
             <Button
               label="Submit"

@@ -15,7 +15,7 @@ const PasswordForgot: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, isDirty },
+    formState: { isSubmitting, isDirty, errors },
     reset,
   } = useForm<PasswordForgotFormInput>();
   const { episodeId } = useEpisodeId();
@@ -44,6 +44,8 @@ const PasswordForgot: React.FC = () => {
         <Input
           label="Email"
           required
+          type="email"
+          errorMessage={errors.email?.message}
           {...register("email", { required: FIELD_REQUIRED_ERROR_MSG })}
         />
         <Button
