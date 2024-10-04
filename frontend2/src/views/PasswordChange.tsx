@@ -42,9 +42,6 @@ const PasswordChange: React.FC = () => {
     <div className="flex h-screen flex-col items-center justify-center bg-gradient-to-tr from-cyan-200 to-cyan-700 p-2">
       <span className="items-end text-center font-display tracking-wide text-white">
         <div className="mb-6 text-5xl sm:text-6xl">BATTLECODE</div>
-        <div className="mb-3 text-lg sm:text-xl">
-          Enter a new password below to reset your password.
-        </div>
       </span>
       <form
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -68,12 +65,13 @@ const PasswordChange: React.FC = () => {
               </div>
             )}
             {resetTokenValid.isError && (
-              <div className="flex flex-col items-center justify-center gap-3 text-center">
-                <span>Invalid Token!</span>
-                <span>
+              <div className="text-center text-xl font-light text-red-700">
+                Invalid Token!
+                <div className="mt-3 text-sm font-normal text-gray-600">
                   Your password reset token may be expired. Try requesting a new
-                  token.
-                </span>
+                  token or contact battlecode@mit.edu if you encounter further
+                  issues.
+                </div>
               </div>
             )}
           </>
@@ -82,6 +80,9 @@ const PasswordChange: React.FC = () => {
           <>
             <div className="text-center text-xl font-light text-gray-700">
               Reset Password
+            </div>
+            <div className="mt-3 text-sm font-normal text-gray-600">
+              Enter a new password below to reset your password.
             </div>
             <Input
               label="New Password"
