@@ -1,6 +1,6 @@
 import type {
   CommonIssuesPageKey,
-  QuickStartedPageKey,
+  QuickStartPageKey,
   ResourcesPageKey,
   TourneyPageKey,
 } from "./ContentStruct";

@@ -1,7 +1,7 @@
 import type {
   DebuggingTipsPageKey,
   TourneyPageKey,
-  QuickStartedPageKey,
+  QuickStartPageKey,
   ResourcesPageKey,
   CommonIssuesPageKey,
 } from "./ContentStruct";
@@ -19,7 +19,7 @@ import { BC22_TOURNAMENTS } from "./bc22";
 export const defaultQuickStartText = BC24_QUICKSTART;
 export const quickStartText: Record<
   string,
-  Record<QuickStartedPageKey, string>
+  Record<QuickStartPageKey, string>
 > = {
   bc24: BC24_QUICKSTART,
 };

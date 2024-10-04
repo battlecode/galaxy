@@ -4,7 +4,7 @@ import {
   quickStartText,
   defaultQuickStartText,
 } from "../content/ManageContent";
-import { QuickStartedPage } from "../content/ContentStruct";
+import { QuickStartPage } from "../content/ContentStruct";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import SectionCard from "../components/SectionCard";
 import Markdown from "../components/elements/Markdown";
@@ -19,30 +19,30 @@ const QuickStart: React.FC = () => {
       <div className="flex flex-1 flex-col gap-8">
         <SectionCard>
           <Markdown
-            text={`${currentQuickStartText[QuickStartedPage.OVERVIEW]}`}
+            text={`${currentQuickStartText[QuickStartPage.OVERVIEW]}`}
           />
         </SectionCard>
         <SectionCard>
           <Markdown
             text={`${
-              currentQuickStartText[QuickStartedPage.ACCOUNT_AND_TEAM_CREATION]
+              currentQuickStartText[QuickStartPage.ACCOUNT_AND_TEAM_CREATION]
             }`}
           />
         </SectionCard>
         <SectionCard>
           <Markdown
-            text={`${currentQuickStartText[QuickStartedPage.INSTALLATION]}`}
+            text={`${currentQuickStartText[QuickStartPage.INSTALLATION]}`}
           />
         </SectionCard>
         <SectionCard>
           <Markdown
-            text={`${currentQuickStartText[QuickStartedPage.RESOURCES]}`}
+            text={`${currentQuickStartText[QuickStartPage.RESOURCES]}`}
           />
         </SectionCard>
         <SectionCard>
           <Markdown
             text={`${
-              currentQuickStartText[QuickStartedPage.JOIN_THE_COMMUNITY]
+              currentQuickStartText[QuickStartPage.JOIN_THE_COMMUNITY]
             }`}
           />
         </SectionCard>

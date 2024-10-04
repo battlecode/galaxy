@@ -1,10 +1,10 @@
-export type QuickStartedPageKey =
+export type QuickStartPageKey =
   | "overview"
   | "creation"
   | "installation"
   | "resources"
   | "community";
-export enum QuickStartedPage {
+export enum QuickStartPage {
   OVERVIEW = "overview",
   ACCOUNT_AND_TEAM_CREATION = "creation",
   INSTALLATION = "installation",

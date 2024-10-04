@@ -1,12 +1,12 @@
 import type {
   CommonIssuesPageKey,
   DebuggingTipsPageKey,
-  QuickStartedPageKey,
+  QuickStartPageKey,
   ResourcesPageKey,
   TourneyPageKey,
 } from "./ContentStruct";
 
-export const BC24_QUICKSTART: Record<QuickStartedPageKey, string> = {
+export const BC24_QUICKSTART: Record<QuickStartPageKey, string> = {
   overview: `# Overview
 This is the Battlecode 2023 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
 `,
