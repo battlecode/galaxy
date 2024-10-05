@@ -180,8 +180,8 @@ const router = createBrowserRouter([
           },
         ],
       },
-      { path: "debuggingtips", element: <DebuggingTips /> },
-      { path: "commonissues", element: <CommonIssues /> },
+      { path: "debugging_tips", element: <DebuggingTips /> },
+      { path: "common_issues", element: <CommonIssues /> },
       // Pages that should always be visible
       {
         path: "",
@@ -194,7 +194,7 @@ const router = createBrowserRouter([
         loader: homeLoader(queryClient),
       },
       { path: "resources", element: <Resources /> },
-      { path: "quickstart", element: <QuickStart /> },
+      { path: "quick_start", element: <QuickStart /> },
       {
         path: "rankings",
         element: <Rankings />,

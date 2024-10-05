@@ -10,7 +10,6 @@ import SectionCard from "../components/SectionCard";
 import { CommonIssuesPage } from "../content/ContentStruct";
 
 const CommmonIssues: React.FC = () => {
-
   const { episodeId } = useEpisodeId();
   const currentCommonIssuesText =
     commonIssuesText[episodeId] ?? defaultCommonIssuesText;
@@ -19,9 +18,7 @@ const CommmonIssues: React.FC = () => {
       <div className="flex flex-1 flex-col gap-8">
         <SectionCard title={CommonIssuesPage.INSTALLATION_ISSUES}>
           <Markdown
-            text={
-              currentCommonIssuesText[CommonIssuesPage.INSTALLATION_ISSUES]
-            }
+            text={currentCommonIssuesText[CommonIssuesPage.INSTALLATION_ISSUES]}
           />
         </SectionCard>
         <SectionCard title={CommonIssuesPage.CLIENT_ISSUES}>

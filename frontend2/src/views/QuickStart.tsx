@@ -17,9 +17,7 @@ const QuickStart: React.FC = () => {
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
         <SectionCard title={QuickStartPage.OVERVIEW}>
-          <Markdown
-            text={currentQuickStartText[QuickStartPage.OVERVIEW]}
-          />
+          <Markdown text={currentQuickStartText[QuickStartPage.OVERVIEW]} />
         </SectionCard>
         <SectionCard title={QuickStartPage.ACCOUNT_AND_TEAM_CREATION}>
           <Markdown
@@ -29,20 +27,14 @@ const QuickStart: React.FC = () => {
           />
         </SectionCard>
         <SectionCard title={QuickStartPage.INSTALLATION}>
-          <Markdown
-            text={currentQuickStartText[QuickStartPage.INSTALLATION]}
-          />
+          <Markdown text={currentQuickStartText[QuickStartPage.INSTALLATION]} />
         </SectionCard>
         <SectionCard title={QuickStartPage.RESOURCES}>
-          <Markdown
-            text={currentQuickStartText[QuickStartPage.RESOURCES]}
-          />
+          <Markdown text={currentQuickStartText[QuickStartPage.RESOURCES]} />
         </SectionCard>
         <SectionCard title={QuickStartPage.JOIN_THE_COMMUNITY}>
           <Markdown
-            text={
-              currentQuickStartText[QuickStartPage.JOIN_THE_COMMUNITY]
-            }
+            text={currentQuickStartText[QuickStartPage.JOIN_THE_COMMUNITY]}
           />
         </SectionCard>
       </div>

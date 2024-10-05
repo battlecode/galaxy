@@ -9,7 +9,6 @@ import Markdown from "../components/elements/Markdown";
 import { DebuggingTipsPage } from "../content/ContentStruct";
 
 const DebuggingTips: React.FC = () => {
-
   const { episodeId } = useEpisodeId();
   const currentDebuggingTipsText =
     debuggingTipsText[episodeId] ?? defaultDebuggingTipsText;
@@ -34,9 +33,7 @@ const DebuggingTips: React.FC = () => {
         </SectionCard>
         <SectionCard title={DebuggingTipsPage.SECOND_METHOD}>
           <Markdown
-            text={
-              currentDebuggingTipsText[DebuggingTipsPage.SECOND_METHOD]
-            }
+            text={currentDebuggingTipsText[DebuggingTipsPage.SECOND_METHOD]}
           />
         </SectionCard>
       </div>

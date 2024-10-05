@@ -13,7 +13,7 @@ export enum ResourcesPage {
   THIRD_PARTY_TOOLS = "Third-party Tools",
   LECTURES = "Lectures",
 }
-export type ResourcesPageKey = `${ResourcesPage}`
+export type ResourcesPageKey = `${ResourcesPage}`;
 
 export enum CommonIssuesPage {
   INSTALLATION_ISSUES = "Installation Issues",
@@ -21,7 +21,7 @@ export enum CommonIssuesPage {
   OTHER_ISSUES = "Other Issues",
   THINGS_TO_TRY = "Things to Try When Nothing Else Helps",
 }
-export type CommonIssuesPageKey = `${CommonIssuesPage}`
+export type CommonIssuesPageKey = `${CommonIssuesPage}`;
 
 export enum DebuggingTipsPage {
   DEBUGGING = "Debugging",
@@ -29,7 +29,7 @@ export enum DebuggingTipsPage {
   ECLIPSE = "Debugging in Eclipse",
   SECOND_METHOD = "Second Method: Debugging in IntelliJ",
 }
-export type DebuggingTipsPageKey = `${DebuggingTipsPage}`
+export type DebuggingTipsPageKey = `${DebuggingTipsPage}`;
 
 export enum TourneyPage {
   SCHEDULE = "Tournament Schedule",
@@ -37,4 +37,4 @@ export enum TourneyPage {
   FORMAT = "Tournament Format",
   RULES = "Eligibility Rules",
 }
-export type TourneyPageKey = `${TourneyPage}`
+export type TourneyPageKey = `${TourneyPage}`;
