@@ -9,7 +9,8 @@ import Markdown from "../components/elements/Markdown";
 import SectionCard from "../components/SectionCard";
 import { CommonIssuesPage } from "../content/ContentStruct";
 
-const DebuggingTips = (): JSX.Element => {
+const CommmonIssues: React.FC = () => {
+
   const { episodeId } = useEpisodeId();
   const currentCommonIssuesText =
     commonIssuesText[episodeId] ?? defaultCommonIssuesText;
@@ -43,4 +44,4 @@ const DebuggingTips = (): JSX.Element => {
   );
 };
 
-export default DebuggingTips;
+export default CommmonIssues;

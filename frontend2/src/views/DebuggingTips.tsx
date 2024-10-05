@@ -8,7 +8,8 @@ import SectionCard from "../components/SectionCard";
 import Markdown from "../components/elements/Markdown";
 import { DebuggingTipsPage } from "../content/ContentStruct";
 
-const DebuggingTips = (): JSX.Element => {
+const DebuggingTips: React.FC = () => {
+
   const { episodeId } = useEpisodeId();
   const currentDebuggingTipsText =
     debuggingTipsText[episodeId] ?? defaultDebuggingTipsText;

@@ -5,7 +5,8 @@ import Markdown from "../components/elements/Markdown";
 import SectionCard from "../components/SectionCard";
 import { ResourcesPage } from "../content/ContentStruct";
 
-const Resources = (): JSX.Element => {
+const Resources: React.FC = () => {
+
   const { episodeId } = useEpisodeId();
 
   const currentResourcesText = resourcesText[episodeId] ?? defaultResourcesText;
