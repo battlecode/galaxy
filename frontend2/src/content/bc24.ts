@@ -6,7 +6,7 @@ import type {
   TourneyPageKey,
 } from "./ContentStruct";
 
-export const BC24_QUICKSTART: Record<QuickStartPageKey, string> = {
+export const BC24_QUICKSTART: Partial<Record<QuickStartPageKey, string>> = {
   Overview: `
 This is the Battlecode 2023 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
 `,
@@ -16,7 +16,7 @@ To participate in Battlecode, you need an account and a team. Each team can cons
 [Create an account](/register) on this website, and then go to the [team section](/bc24/team) to either create or join a team.`,
   Installation: `
 
-  Check [common issues](/bc24/commonissues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
+  Check [common issues](/bc24/common_issues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
 
 ### Step 1: Install Java
 
@@ -79,7 +79,7 @@ Once you're all set up, make sure to check out the [resources](/bc24/resources/)
 Battlecode has a Discord server! Everyone is encouraged to join. Announcements, strategy discussions, bug fixes and ~memes~ all happen on Discord. Follow this invite link to join: [https://discord.gg/N86mxkH](https://discord.gg/N86mxkH).`,
 };
 
-export const BC24_RESOURCES: Record<ResourcesPageKey, string> = {
+export const BC24_RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
   "Game Specifications": `
 
 [Specifications for Battlecode 2024!](https://releases.battlecode.org/specs/battlecode24/3.0.5/specs.md.html)
@@ -93,8 +93,8 @@ If you're just starting out, check out the [quick start](/bc24/quickstart) page!
 
 For more helpful resources while coding, see:
 
-- [Common Issues](/bc24/commonissues)
-- [Debugging Tips](/bc24/debuggingtips)
+- [Common Issues](/bc24/common_issues)
+- [Debugging Tips](/bc24/debugging_tips)
 
 `,
   "Third-party Tools": `
@@ -114,8 +114,9 @@ All lectures are streamed live on [our Twitch account](https://twitch.tv/mitbatt
 `,
 };
 
-export const BC24_DEBUGGINGTIPS: Record<DebuggingTipsPageKey, string> = {
-  Debugging: `
+export const BC24_DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> =
+  {
+    Debugging: `
 
 Using a “debugger” lets you pause your code while its running and inspect its state - what your variables are set to, what methods you're calling, and so on. You can walk through your code step-by-step, and run arbitrary commands.
 
@@ -155,7 +156,7 @@ This means that the server has started, and is waiting for the Eclipse or Intell
 
 (You have to do this every time you want to debug.)
 `,
-  "Debugging in IntelliJ": `
+    "Debugging in IntelliJ": `
 
 #### Initial setup
 
@@ -210,7 +211,7 @@ To learn more about these tools, see the [Intellij documentation](https://www.je
 
 Sometimes, you might only want to pause if your robot is on team A, or the game is in round 537, or if you have fewer than a thousand bytecodes left. To make these changes, right click the breakpoint, and in the condition field, put the condition; you can use any variables in the surrounding code. If I have the method:
 `,
-  "Debugging in Eclipse": `
+    "Debugging in Eclipse": `
 
 #### Initial setup
 
@@ -278,7 +279,7 @@ class RobotPlayer {
 \`\`\`
 I could make the following conditions: - \`rc.getTeam() == Team.A\` - \`rc.getRoundNum() == 537\` - \`Clock.getBytecodesLeft() < 1000\` - \`rc.getTeam() == Team.A && rc.getRoundNum() == 537 && Clock.getBytecodesLeft() < 1000\`
 `,
-  "Second Method: Debugging in IntelliJ": `
+    "Second Method: Debugging in IntelliJ": `
 
 This method probably does not allow you to view the game in the client at the same time. We recommend following the instructions above.
 
@@ -293,9 +294,9 @@ Add the gradle run task as a configuration:
 When your configuration is selected from the dropdown menu, clicking play will run the game, the same way double clicking run in the gradle window does. Clicking on the bug icon next to the play button will run the game in debug mode in the ide. Use breakpoints and the debuging interface to walk through your code. For more info on debugging with intelliJ, see [here](https://www.jetbrains.com/help/idea/debugging-code.html) You can specify the map and teams to run in the \`gradle.properties\` file.
 
 `,
-};
+  };
 
-export const BC24_COMMONISSUES: Record<CommonIssuesPageKey, string> = {
+export const BC24_COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
   "Installation Issues": `
 
 Known errors, with solutions:
@@ -339,7 +340,7 @@ Always follow each of the below Gradle commands with \`./gradlew build\`.
 `,
 };
 
-export const BC24_TOURNAMENTS: Record<TourneyPageKey, string> = {
+export const BC24_TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
   "Tournament Schedule": `
   Battlecode 2024 will have several tournaments throughout the month! We stream and commentate all tournaments online.
 

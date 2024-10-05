@@ -1,6 +1,6 @@
 import type { TourneyPageKey } from "./ContentStruct";
 
-export const BC23_TOURNAMENTS: Record<TourneyPageKey, string> = {
+export const BC23_TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
   "Tournament Schedule": `# Battlecode 2023 Tournament Schedule
 
   Battlecode 2023 will have several tournaments throughout the month! We stream and commentate all tournaments online. The deadline to submit code for each non-final tournament is usually 7 pm EST the day before the tournament.

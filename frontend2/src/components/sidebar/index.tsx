@@ -23,7 +23,7 @@ export const SIDEBAR_ITEM_DATA: Array<{
   {
     iconName: "map",
     text: "Quick Start",
-    linkTo: "quickstart",
+    linkTo: "quick_start",
   },
   {
     iconName: "clipboard_document",

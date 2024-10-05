@@ -4,8 +4,7 @@ import {
   debuggingTipsText,
 } from "../content/ManageContent";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import SectionCard from "../components/SectionCard";
-import Markdown from "../components/elements/Markdown";
+import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
 import { DebuggingTipsPage } from "../content/ContentStruct";
 
 const DebuggingTips: React.FC = () => {
@@ -16,26 +15,27 @@ const DebuggingTips: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
-        <SectionCard title={DebuggingTipsPage.DEBUGGING}>
-          <Markdown
-            text={currentDebuggingTipsText[DebuggingTipsPage.DEBUGGING]}
-          />
-        </SectionCard>
-        <SectionCard title={DebuggingTipsPage.INTELLIJ}>
-          <Markdown
-            text={currentDebuggingTipsText[DebuggingTipsPage.INTELLIJ]}
-          />
-        </SectionCard>
-        <SectionCard title={DebuggingTipsPage.ECLIPSE}>
-          <Markdown
-            text={currentDebuggingTipsText[DebuggingTipsPage.ECLIPSE]}
-          />
-        </SectionCard>
-        <SectionCard title={DebuggingTipsPage.SECOND_METHOD}>
-          <Markdown
-            text={currentDebuggingTipsText[DebuggingTipsPage.SECOND_METHOD]}
-          />
-        </SectionCard>
+
+        <OptionalSectionCardMarkdown
+          title={DebuggingTipsPage.DEBUGGING}
+          textRecord={currentDebuggingTipsText}
+        ></OptionalSectionCardMarkdown>
+
+        <OptionalSectionCardMarkdown
+          title={DebuggingTipsPage.INTELLIJ}
+          textRecord={currentDebuggingTipsText}
+        ></OptionalSectionCardMarkdown>
+
+        <OptionalSectionCardMarkdown
+          title={DebuggingTipsPage.ECLIPSE}
+          textRecord={currentDebuggingTipsText}
+        ></OptionalSectionCardMarkdown>
+
+        <OptionalSectionCardMarkdown
+          title={DebuggingTipsPage.SECOND_METHOD}
+          textRecord={currentDebuggingTipsText}
+        ></OptionalSectionCardMarkdown>
+        
       </div>
     </div>
   );
