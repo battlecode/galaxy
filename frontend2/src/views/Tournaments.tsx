@@ -40,7 +40,7 @@ const Tournaments: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
-        <SectionCard>
+        <SectionCard title={TourneyPage.SCHEDULE}>
           <Markdown text={currentTournamentText[TourneyPage.SCHEDULE]} />
           <TournamentsTable
             data={schedule}
@@ -54,14 +54,14 @@ const Tournaments: React.FC = () => {
             }}
           />
         </SectionCard>
-        <SectionCard>
-          <Markdown text={`${currentTournamentText[TourneyPage.PRIZES]}`} />
+        <SectionCard title={TourneyPage.PRIZES}>
+          <Markdown text={currentTournamentText[TourneyPage.PRIZES]} />
         </SectionCard>
-        <SectionCard>
-          <Markdown text={`${currentTournamentText[TourneyPage.FORMAT]}`} />
+        <SectionCard title={TourneyPage.FORMAT}>
+          <Markdown text={currentTournamentText[TourneyPage.FORMAT]} />
         </SectionCard>
-        <SectionCard>
-          <Markdown text={`${currentTournamentText[TourneyPage.RULES]}`} />
+        <SectionCard title={TourneyPage.RULES}>
+          <Markdown text={currentTournamentText[TourneyPage.RULES]} />
         </SectionCard>
       </div>
     </div>

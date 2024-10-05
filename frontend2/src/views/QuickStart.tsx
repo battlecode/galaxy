@@ -1,5 +1,4 @@
 import React from "react";
-import DocumentationPage from "../components/DocumentationPage";
 import {
   quickStartText,
   defaultQuickStartText,
@@ -17,33 +16,33 @@ const QuickStart: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
-        <SectionCard>
+        <SectionCard title={QuickStartPage.OVERVIEW}>
           <Markdown
-            text={`${currentQuickStartText[QuickStartPage.OVERVIEW]}`}
+            text={currentQuickStartText[QuickStartPage.OVERVIEW]}
           />
         </SectionCard>
-        <SectionCard>
+        <SectionCard title={QuickStartPage.ACCOUNT_AND_TEAM_CREATION}>
           <Markdown
-            text={`${
+            text={
               currentQuickStartText[QuickStartPage.ACCOUNT_AND_TEAM_CREATION]
-            }`}
+            }
           />
         </SectionCard>
-        <SectionCard>
+        <SectionCard title={QuickStartPage.INSTALLATION}>
           <Markdown
-            text={`${currentQuickStartText[QuickStartPage.INSTALLATION]}`}
+            text={currentQuickStartText[QuickStartPage.INSTALLATION]}
           />
         </SectionCard>
-        <SectionCard>
+        <SectionCard title={QuickStartPage.RESOURCES}>
           <Markdown
-            text={`${currentQuickStartText[QuickStartPage.RESOURCES]}`}
+            text={currentQuickStartText[QuickStartPage.RESOURCES]}
           />
         </SectionCard>
-        <SectionCard>
+        <SectionCard title={QuickStartPage.JOIN_THE_COMMUNITY}>
           <Markdown
-            text={`${
+            text={
               currentQuickStartText[QuickStartPage.JOIN_THE_COMMUNITY]
-            }`}
+            }
           />
         </SectionCard>
       </div>

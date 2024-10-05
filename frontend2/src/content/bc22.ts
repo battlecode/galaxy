@@ -1,16 +1,13 @@
 import type {
-  CommonIssuesPageKey,
-  QuickStartPageKey,
-  ResourcesPageKey,
   TourneyPageKey,
 } from "./ContentStruct";
 
 export const BC22_TOURNAMENTS: Record<TourneyPageKey, string> = {
-  schedule: `# Battlecode 2022 Tournament Schedule
+  'Tournament Schedule': `# Battlecode 2022 Tournament Schedule
 
   Battlecode 2022 will have several tournaments throughout the month! We stream and commentate all tournaments online. The deadline to submit code for each non-final tournament is usually 7 pm EST the day before the tournament.
   `,
-  prizes: `# Prizes
+  'Prizes': `# Prizes
 
   Prize amounts are approximate and will be finalized soon!
 
@@ -32,7 +29,7 @@ export const BC22_TOURNAMENTS: Record<TourneyPageKey, string> = {
   If you are an international participant, please note that [US export regulations](https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/sanctioned-destinations)
   may restrict our ability to award prizes to students from certain countries.
   `,
-  format: `# Tournament Format
+  'Tournament Format': `# Tournament Format
 
   Each match within a tournament will consist of at least 3 games, each on a different map, and the team that wins the most games will advance.
 
@@ -42,7 +39,7 @@ export const BC22_TOURNAMENTS: Record<TourneyPageKey, string> = {
 
   Even if you miss earlier tournaments, you can participate in later tournaments (except the Final Tournament). This includes the Qualifying Tournament — you can participate even if you miss every other tournament (your seed will be determined by your scrimmage rank).
   `,
-  rules: `# Eligibility Rules
+  'Eligibility Rules': `# Eligibility Rules
 
   Anyone can write a bot, create a team, and participate in scrimmage matches/rankings. The Sprint Tournaments are
   open to everyone, but the other tournaments have stricter eligibility rules.

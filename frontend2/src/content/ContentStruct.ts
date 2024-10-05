@@ -1,40 +1,40 @@
 export enum QuickStartPage {
-  OVERVIEW = "overview",
-  ACCOUNT_AND_TEAM_CREATION = "creation",
-  INSTALLATION = "installation",
-  RESOURCES = "resources",
-  JOIN_THE_COMMUNITY = "community",
+  OVERVIEW = "Overview",
+  ACCOUNT_AND_TEAM_CREATION = "Account and Team Creation",
+  INSTALLATION = "Installation",
+  RESOURCES = "Resources",
+  JOIN_THE_COMMUNITY = "Join the Community!",
 }
 export type QuickStartPageKey = `${QuickStartPage}`;
 
 export enum ResourcesPage {
-  GAME_SPECIFICATION = "specification",
-  CODING_RESOURCES = "resources",
-  THIRD_PARTY_TOOLS = "tools",
-  LECTURES = "lectures",
+  GAME_SPECIFICATION = "Game Specifications",
+  CODING_RESOURCES = "Coding Resources",
+  THIRD_PARTY_TOOLS = "Third-party Tools",
+  LECTURES = "Lectures",
 }
 export type ResourcesPageKey = `${ResourcesPage}`
 
 export enum CommonIssuesPage {
-  INSTALLATION_ISSUES = "installation",
-  CLIENT_ISSUES = "client",
-  OTHER_ISSUES = "other",
-  THINGS_TO_TRY = "things",
+  INSTALLATION_ISSUES = "Installation Issues",
+  CLIENT_ISSUES = "Client Issues",
+  OTHER_ISSUES = "Other Issues",
+  THINGS_TO_TRY = "Things to Try When Nothing Else Helps",
 }
 export type CommonIssuesPageKey = `${CommonIssuesPage}`
 
 export enum DebuggingTipsPage {
-  DEBUGGING = "debugging",
-  INTELLIJ = "intellij",
-  ECLIPSE = "eclipse",
-  SECOND_METHOD = "second_method",
+  DEBUGGING = "Debugging",
+  INTELLIJ = "Debugging in IntelliJ",
+  ECLIPSE = "Debugging in Eclipse",
+  SECOND_METHOD = "Second Method: Debugging in IntelliJ",
 }
 export type DebuggingTipsPageKey = `${DebuggingTipsPage}`
 
 export enum TourneyPage {
-  SCHEDULE = "schedule",
-  PRIZES = "prizes",
-  FORMAT = "format",
-  RULES = "rules",
+  SCHEDULE = "Tournament Schedule",
+  PRIZES = "Prizes",
+  FORMAT = "Tournament Format",
+  RULES = "Eligibility Rules",
 }
 export type TourneyPageKey = `${TourneyPage}`

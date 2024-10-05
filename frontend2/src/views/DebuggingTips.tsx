@@ -3,7 +3,6 @@ import {
   defaultDebuggingTipsText,
   debuggingTipsText,
 } from "../content/ManageContent";
-import DocumentationPage from "../components/DocumentationPage";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import SectionCard from "../components/SectionCard";
 import Markdown from "../components/elements/Markdown";
@@ -17,26 +16,26 @@ const DebuggingTips = (): JSX.Element => {
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
-        <SectionCard>
+        <SectionCard title={DebuggingTipsPage.DEBUGGING}>
           <Markdown
-            text={`${currentDebuggingTipsText[DebuggingTipsPage.DEBUGGING]}`}
+            text={currentDebuggingTipsText[DebuggingTipsPage.DEBUGGING]}
           />
         </SectionCard>
-        <SectionCard>
+        <SectionCard title={DebuggingTipsPage.INTELLIJ}>
           <Markdown
-            text={`${currentDebuggingTipsText[DebuggingTipsPage.INTELLIJ]}`}
+            text={currentDebuggingTipsText[DebuggingTipsPage.INTELLIJ]}
           />
         </SectionCard>
-        <SectionCard>
+        <SectionCard title={DebuggingTipsPage.ECLIPSE}>
           <Markdown
-            text={`${currentDebuggingTipsText[DebuggingTipsPage.ECLIPSE]}`}
+            text={currentDebuggingTipsText[DebuggingTipsPage.ECLIPSE]}
           />
         </SectionCard>
-        <SectionCard>
+        <SectionCard title={DebuggingTipsPage.SECOND_METHOD}>
           <Markdown
-            text={`${
+            text={
               currentDebuggingTipsText[DebuggingTipsPage.SECOND_METHOD]
-            }`}
+            }
           />
         </SectionCard>
       </div>
