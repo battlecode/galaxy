@@ -180,8 +180,6 @@ const router = createBrowserRouter([
           },
         ],
       },
-      { path: "debugging_tips", element: <DebuggingTips /> },
-      { path: "common_issues", element: <CommonIssues /> },
       // Pages that should always be visible
       {
         path: "",
@@ -220,6 +218,8 @@ const router = createBrowserRouter([
         element: <TeamProfile />,
         loader: teamProfileLoader(queryClient),
       },
+      { path: "debugging_tips", element: <DebuggingTips /> },
+      { path: "common_issues", element: <CommonIssues /> },
       {
         path: "*",
         element: <PageNotFound />,
