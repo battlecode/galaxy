@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  defaultCommonIssuesText,
   commonIssuesText,
 } from "../content/ManageContent";
 
@@ -11,7 +10,7 @@ import { CommonIssuesPage } from "../content/ContentStruct";
 const CommmonIssues: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const currentCommonIssuesText =
-    commonIssuesText[episodeId] ?? defaultCommonIssuesText;
+    commonIssuesText[episodeId];
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">

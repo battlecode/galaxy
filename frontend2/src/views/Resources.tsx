@@ -1,5 +1,5 @@
 import React from "react";
-import { defaultResourcesText, resourcesText } from "../content/ManageContent";
+import { resourcesText } from "../content/ManageContent";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
 import { ResourcesPage } from "../content/ContentStruct";
@@ -7,7 +7,7 @@ import { ResourcesPage } from "../content/ContentStruct";
 const Resources: React.FC = () => {
   const { episodeId } = useEpisodeId();
 
-  const currentResourcesText = resourcesText[episodeId] ?? defaultResourcesText;
+  const currentResourcesText = resourcesText[episodeId];
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">

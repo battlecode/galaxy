@@ -1,7 +1,6 @@
 import React from "react";
 import {
   quickStartText,
-  defaultQuickStartText,
 } from "../content/ManageContent";
 import { QuickStartPage } from "../content/ContentStruct";
 import { useEpisodeId } from "../contexts/EpisodeContext";
@@ -10,7 +9,7 @@ import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdo
 const QuickStart: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const currentQuickStartText =
-    quickStartText[episodeId] ?? defaultQuickStartText;
+    quickStartText[episodeId];
 
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">

@@ -3,7 +3,6 @@ import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useSearchParams } from "react-router-dom";
 import {
   tournamentsText,
-  defaultTournamentsText,
 } from "../content/ManageContent";
 import { TourneyPage } from "../content/ContentStruct";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
@@ -35,7 +34,7 @@ const Tournaments: React.FC = () => {
     queryClient,
   );
   const currentTournamentText =
-    tournamentsText[episodeId] ?? defaultTournamentsText;
+    tournamentsText[episodeId];
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">

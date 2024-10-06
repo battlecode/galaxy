@@ -1,4 +1,22 @@
-import type { TourneyPageKey } from "./ContentStruct";
+import type {
+  CommonIssuesPageKey,
+  DebuggingTipsPageKey,
+  QuickStartPageKey,
+  ResourcesPageKey,
+  TourneyPageKey,
+} from "./ContentStruct";
+
+export const BC23_QUICKSTART: Partial<Record<QuickStartPageKey, string>> = {
+};
+
+export const BC23_RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
+};
+
+export const BC23_DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> = {
+};
+
+export const BC23_COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
+};
 
 export const BC23_TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
   "Tournament Schedule": `# Battlecode 2023 Tournament Schedule

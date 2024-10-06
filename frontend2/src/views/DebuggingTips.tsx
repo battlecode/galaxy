@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  defaultDebuggingTipsText,
   debuggingTipsText,
 } from "../content/ManageContent";
 import { useEpisodeId } from "../contexts/EpisodeContext";
@@ -10,7 +9,7 @@ import { DebuggingTipsPage } from "../content/ContentStruct";
 const DebuggingTips: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const currentDebuggingTipsText =
-    debuggingTipsText[episodeId] ?? defaultDebuggingTipsText;
+    debuggingTipsText[episodeId];
 
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
