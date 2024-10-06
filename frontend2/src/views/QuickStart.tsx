@@ -1,20 +1,16 @@
 import React from "react";
-import {
-  quickStartText,
-} from "../content/ManageContent";
+import { quickStartText } from "../content/ManageContent";
 import { QuickStartPage } from "../content/ContentStruct";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
 
 const QuickStart: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const currentQuickStartText =
-    quickStartText[episodeId];
+  const currentQuickStartText = quickStartText[episodeId];
 
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
-
         <OptionalSectionCardMarkdown
           title={QuickStartPage.OVERVIEW}
           textRecord={currentQuickStartText}
@@ -34,12 +30,11 @@ const QuickStart: React.FC = () => {
           title={QuickStartPage.RESOURCES}
           textRecord={currentQuickStartText}
         ></OptionalSectionCardMarkdown>
-        
+
         <OptionalSectionCardMarkdown
           title={QuickStartPage.JOIN_THE_COMMUNITY}
           textRecord={currentQuickStartText}
         ></OptionalSectionCardMarkdown>
-        
       </div>
     </div>
   );

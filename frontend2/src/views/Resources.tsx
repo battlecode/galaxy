@@ -11,8 +11,7 @@ const Resources: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
-
-      <OptionalSectionCardMarkdown
+        <OptionalSectionCardMarkdown
           title={ResourcesPage.GAME_SPECIFICATION}
           textRecord={currentResourcesText}
         ></OptionalSectionCardMarkdown>
@@ -31,7 +30,6 @@ const Resources: React.FC = () => {
           title={ResourcesPage.LECTURES}
           textRecord={currentResourcesText}
         ></OptionalSectionCardMarkdown>
-
       </div>
     </div>
   );

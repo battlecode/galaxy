@@ -114,9 +114,8 @@ All lectures are streamed live on [our Twitch account](https://twitch.tv/mitbatt
 `,
 };
 
-export const DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> =
-  {
-    Debugging: `
+export const DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> = {
+  Debugging: `
 
 Using a “debugger” lets you pause your code while its running and inspect its state - what your variables are set to, what methods you're calling, and so on. You can walk through your code step-by-step, and run arbitrary commands.
 
@@ -156,7 +155,7 @@ This means that the server has started, and is waiting for the Eclipse or Intell
 
 (You have to do this every time you want to debug.)
 `,
-    "Debugging in IntelliJ": `
+  "Debugging in IntelliJ": `
 
 #### Initial setup
 
@@ -211,7 +210,7 @@ To learn more about these tools, see the [Intellij documentation](https://www.je
 
 Sometimes, you might only want to pause if your robot is on team A, or the game is in round 537, or if you have fewer than a thousand bytecodes left. To make these changes, right click the breakpoint, and in the condition field, put the condition; you can use any variables in the surrounding code. If I have the method:
 `,
-    "Debugging in Eclipse": `
+  "Debugging in Eclipse": `
 
 #### Initial setup
 
@@ -279,7 +278,7 @@ class RobotPlayer {
 \`\`\`
 I could make the following conditions: - \`rc.getTeam() == Team.A\` - \`rc.getRoundNum() == 537\` - \`Clock.getBytecodesLeft() < 1000\` - \`rc.getTeam() == Team.A && rc.getRoundNum() == 537 && Clock.getBytecodesLeft() < 1000\`
 `,
-    "Second Method: Debugging in IntelliJ": `
+  "Second Method: Debugging in IntelliJ": `
 
 This method probably does not allow you to view the game in the client at the same time. We recommend following the instructions above.
 
@@ -294,7 +293,7 @@ Add the gradle run task as a configuration:
 When your configuration is selected from the dropdown menu, clicking play will run the game, the same way double clicking run in the gradle window does. Clicking on the bug icon next to the play button will run the game in debug mode in the ide. Use breakpoints and the debuging interface to walk through your code. For more info on debugging with intelliJ, see [here](https://www.jetbrains.com/help/idea/debugging-code.html) You can specify the map and teams to run in the \`gradle.properties\` file.
 
 `,
-  };
+};
 
 export const COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
   "Installation Issues": `
