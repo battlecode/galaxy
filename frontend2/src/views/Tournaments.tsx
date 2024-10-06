@@ -1,17 +1,14 @@
 import React, { useMemo } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useSearchParams } from "react-router-dom";
-import {
-  tournamentsText,
-  defaultTournamentsText,
-} from "../content/ManageContent";
+import { tournamentsText } from "../content/ManageContent";
 import { TourneyPage } from "../content/ContentStruct";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import TournamentsTable from "../components/tables/TournamentsTable";
 import { useTournamentList } from "../api/episode/useEpisode";
 import { useQueryClient } from "@tanstack/react-query";
-
+import NoContentLegacyEpisode from "./NoContentLegacyEpisode";
 interface QueryParams {
   schedulePage: number;
 }
@@ -34,13 +31,17 @@ const Tournaments: React.FC = () => {
     },
     queryClient,
   );
-  const currentTournamentText =
-    tournamentsText[episodeId] ?? defaultTournamentsText;
+  const currentTournamentText = tournamentsText[episodeId];
+  const hasContent = Object.values(currentTournamentText).some(
+    (value) => value !== "",
+  );
+  if (!hasContent) {
+    return <NoContentLegacyEpisode />;
+  }
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
-
-      <OptionalSectionCardMarkdown
+        <OptionalSectionCardMarkdown
           title={TourneyPage.SCHEDULE}
           textRecord={currentTournamentText}
         >
@@ -55,24 +56,22 @@ const Tournaments: React.FC = () => {
               }));
             }}
           />
-
         </OptionalSectionCardMarkdown>
 
         <OptionalSectionCardMarkdown
           title={TourneyPage.PRIZES}
           textRecord={currentTournamentText}
-        ></OptionalSectionCardMarkdown>
+        />
 
         <OptionalSectionCardMarkdown
           title={TourneyPage.FORMAT}
           textRecord={currentTournamentText}
-        ></OptionalSectionCardMarkdown>
+        />
 
         <OptionalSectionCardMarkdown
           title={TourneyPage.RULES}
           textRecord={currentTournamentText}
-        ></OptionalSectionCardMarkdown>
-        
+        />
       </div>
     </div>
   );

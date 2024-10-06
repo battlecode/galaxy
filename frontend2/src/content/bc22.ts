@@ -1,6 +1,20 @@
-import type { TourneyPageKey } from "./ContentStruct";
+import type {
+  CommonIssuesPageKey,
+  DebuggingTipsPageKey,
+  QuickStartPageKey,
+  ResourcesPageKey,
+  TourneyPageKey,
+} from "./ContentStruct";
 
-export const BC22_TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
+export const QUICKSTART: Partial<Record<QuickStartPageKey, string>> = {};
+
+export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {};
+
+export const DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> = {};
+
+export const COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {};
+
+export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
   "Tournament Schedule": `# Battlecode 2022 Tournament Schedule
 
   Battlecode 2022 will have several tournaments throughout the month! We stream and commentate all tournaments online. The deadline to submit code for each non-final tournament is usually 7 pm EST the day before the tournament.

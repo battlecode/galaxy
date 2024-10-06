@@ -4,56 +4,34 @@ import type {
   QuickStartPageKey,
   ResourcesPageKey,
   CommonIssuesPageKey,
+  PageKey,
 } from "./ContentStruct";
 
-import {
-  BC24_QUICKSTART,
-  BC24_RESOURCES,
-  BC24_TOURNAMENTS,
-  BC24_DEBUGGINGTIPS,
-  BC24_COMMONISSUES,
-} from "./bc24";
-import { BC23_TOURNAMENTS } from "./bc23";
-import { BC22_TOURNAMENTS } from "./bc22";
+import * as BC24 from "./bc24";
+import * as BC23 from "./bc23";
+import * as BC22 from "./bc22";
 
-export const defaultQuickStartText = BC24_QUICKSTART;
-export const quickStartText: Record<
-  string,
-  Partial<Record<QuickStartPageKey, string>>
-> = {
-  bc24: BC24_QUICKSTART,
+const bcVersions: Record<string, typeof BC24 | typeof BC23 | typeof BC22> = {
+  bc24: BC24,
+  bc23: BC23,
+  bc22: BC22,
 };
 
-export const defaultResourcesText = BC24_RESOURCES;
-export const resourcesText: Record<
-  string,
-  Partial<Record<ResourcesPageKey, string>>
-> = {
-  bc24: BC24_RESOURCES,
-};
+function createTextRecord<K extends PageKey>(
+  key: string,
+): Record<string, Partial<Record<K, string>>> {
+  return Object.fromEntries(
+    Object.entries(bcVersions).map(([version, content]) => [
+      version,
+      content[key as keyof typeof content] as Partial<Record<K, string>>,
+    ]),
+  ) as Record<string, Partial<Record<K, string>>>;
+}
 
-export const defaultTournamentsText = BC24_TOURNAMENTS;
-export const tournamentsText: Record<
-  string,
-  Partial<Record<TourneyPageKey, string>>
-> = {
-  bc24: BC24_TOURNAMENTS,
-  bc23: BC23_TOURNAMENTS,
-  bc22: BC22_TOURNAMENTS,
-};
-
-export const defaultDebuggingTipsText = BC24_DEBUGGINGTIPS;
-export const debuggingTipsText: Record<
-  string,
-  Partial<Record<DebuggingTipsPageKey, string>>
-> = {
-  bc24: BC24_DEBUGGINGTIPS,
-};
-
-export const defaultCommonIssuesText = BC24_COMMONISSUES;
-export const commonIssuesText: Record<
-  string,
-  Partial<Record<CommonIssuesPageKey, string>>
-> = {
-  bc24: BC24_COMMONISSUES,
-};
+export const quickStartText = createTextRecord<QuickStartPageKey>("QUICKSTART");
+export const resourcesText = createTextRecord<ResourcesPageKey>("RESOURCES");
+export const tournamentsText = createTextRecord<TourneyPageKey>("TOURNAMENTS");
+export const debuggingTipsText =
+  createTextRecord<DebuggingTipsPageKey>("DEBUGGINGTIPS");
+export const commonIssuesText =
+  createTextRecord<CommonIssuesPageKey>("COMMONISSUES");

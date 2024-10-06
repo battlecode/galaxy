@@ -24,7 +24,7 @@ const OptionalSectionCardMarkdown: React.FC<
       </SectionCard>
     );
   } else {
-    return null;
+    return <></>;
   }
 };
 

@@ -38,3 +38,10 @@ export enum TourneyPage {
   RULES = "Eligibility Rules",
 }
 export type TourneyPageKey = `${TourneyPage}`;
+
+export type PageKey =
+  | QuickStartPageKey
+  | ResourcesPageKey
+  | TourneyPageKey
+  | DebuggingTipsPageKey
+  | CommonIssuesPageKey;
