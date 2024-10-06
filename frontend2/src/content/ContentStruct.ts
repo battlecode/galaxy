@@ -38,3 +38,6 @@ export enum TourneyPage {
   RULES = "Eligibility Rules",
 }
 export type TourneyPageKey = `${TourneyPage}`;
+
+export type PageKey = QuickStartPageKey | ResourcesPageKey | TourneyPageKey | DebuggingTipsPageKey | CommonIssuesPageKey;
+// export type BCVersion = 'bc24' | 'bc23' | 'bc22' | 'bc24test'; //maybe make useEpisodeId return this type instead of string?

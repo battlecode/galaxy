@@ -6,19 +6,19 @@ import type {
     TourneyPageKey,
   } from "./ContentStruct";
   
-  export const BC24TEST_QUICKSTART: Partial<Record<QuickStartPageKey, string>> = {
+  export const QUICKSTART: Partial<Record<QuickStartPageKey, string>> = {
   };
   
-  export const BC24TEST_RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
+  export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
   };
   
-  export const BC24TEST_DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> = {
+  export const DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> = {
   };
   
-  export const BC24TEST_COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
+  export const COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
   };
   
-  export const BC24TEST_TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
+  export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
     'Tournament Schedule': ''
   };
   

@@ -6,7 +6,7 @@ import type {
   TourneyPageKey,
 } from "./ContentStruct";
 
-export const BC24_QUICKSTART: Partial<Record<QuickStartPageKey, string>> = {
+export const QUICKSTART: Partial<Record<QuickStartPageKey, string>> = {
   Overview: `
 This is the Battlecode 2023 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
 `,
@@ -79,7 +79,7 @@ Once you're all set up, make sure to check out the [resources](/bc24/resources/)
 Battlecode has a Discord server! Everyone is encouraged to join. Announcements, strategy discussions, bug fixes and ~memes~ all happen on Discord. Follow this invite link to join: [https://discord.gg/N86mxkH](https://discord.gg/N86mxkH).`,
 };
 
-export const BC24_RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
+export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
   "Game Specifications": `
 
 [Specifications for Battlecode 2024!](https://releases.battlecode.org/specs/battlecode24/3.0.5/specs.md.html)
@@ -114,7 +114,7 @@ All lectures are streamed live on [our Twitch account](https://twitch.tv/mitbatt
 `,
 };
 
-export const BC24_DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> =
+export const DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> =
   {
     Debugging: `
 
@@ -296,7 +296,7 @@ When your configuration is selected from the dropdown menu, clicking play will r
 `,
   };
 
-export const BC24_COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
+export const COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
   "Installation Issues": `
 
 Known errors, with solutions:
@@ -340,7 +340,7 @@ Always follow each of the below Gradle commands with \`./gradlew build\`.
 `,
 };
 
-export const BC24_TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
+export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
   "Tournament Schedule": `
   Battlecode 2024 will have several tournaments throughout the month! We stream and commentate all tournaments online.
 
