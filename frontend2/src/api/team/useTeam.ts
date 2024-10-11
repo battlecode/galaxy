@@ -175,6 +175,9 @@ export const useLeaveTeam = (
       await queryClient.invalidateQueries({
         queryKey: competeQueryKeys.scrimBase.key({ episodeId }),
       });
+      if (onSuccess !== undefined) {
+        onSuccess();
+      }
     },
   });
 
