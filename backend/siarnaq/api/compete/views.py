@@ -1,3 +1,4 @@
+from functools import reduce
 from typing import Optional
 
 import google.cloud.storage as storage
@@ -28,6 +29,7 @@ from siarnaq.api.compete.serializers import (
     HistoricalRatingSerializer,
     MatchReportSerializer,
     MatchSerializer,
+    ScrimmageRecordSerializer,
     ScrimmageRequestSerializer,
     SubmissionDownloadSerializer,
     SubmissionReportSerializer,
@@ -417,6 +419,12 @@ class MatchViewSet(
             team_ids = {parse_int(team_id) for team_id in team_ids}
             queryset = queryset.filter(participants__team__in=team_ids)
         elif request.user.pk is not None:
+            team_ids = {
+                team.id
+                for team in Team.objects.filter(members__pk=request.user.pk).filter(
+                    episode_id=episode_id
+                )
+            }
             queryset = queryset.filter(participants__team__members=request.user.pk)
         else:
             return Response([])
@@ -448,6 +456,91 @@ class MatchViewSet(
                     ].append(match_info)
 
         results = HistoricalRatingSerializer(grouped.values(), many=True).data
+        return Response(results, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="team_id",
+                type=int,
+                description="A team to filter for. Defaults to your own team.",
+            ),
+            OpenApiParameter(
+                name="scrimmage_type",
+                enum=["ranked", "unranked", "all"],
+                default="all",
+                description="Which type of scrimmages to filter for. Defaults to all.",
+            ),
+        ],
+        responses={
+            status.HTTP_200_OK: ScrimmageRecordSerializer(),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                description="No team found with the given ID."
+            ),
+        },
+    )
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=(IsEpisodeMutable,),
+    )
+    def scrimmaging_record(self, request, pk=None, *, episode_id):
+        """List the scrimmaging win-loss-tie record of a team."""
+        queryset = self.get_queryset().filter(tournament_round__isnull=True)
+
+        scrimmage_type = self.request.query_params.get("scrimmage_type")
+        if scrimmage_type is not None:
+            if scrimmage_type == "ranked":
+                queryset = queryset.filter(is_ranked=True)
+            elif scrimmage_type == "unranked":
+                queryset = queryset.filter(is_ranked=False)
+
+        team_id = parse_int(self.request.query_params.get("team_id"))
+        if team_id is None and request.user.pk is not None:
+            team_id = (
+                Team.objects.filter(members__pk=request.user.pk)
+                .filter(episode_id=episode_id)
+                .first()
+                .id
+            )
+            if team_id is None:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+        if team_id is not None:
+            queryset = queryset.filter(participants__team=team_id)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        has_invisible = self.get_queryset().filter(
+            participants__team__status=TeamStatus.INVISIBLE
+        )
+        queryset = queryset.exclude(pk__in=Subquery(has_invisible.values("pk")))
+
+        def match_handler(record, match):
+            """Mutate the win-loss-tie record based on the match outcome."""
+            this_team = match.participants.filter(team=team_id).first()
+            other_team = match.participants.exclude(team=team_id).first()
+            if this_team is None or other_team is None:
+                return record
+            if this_team.score is None or other_team.score is None:
+                return record
+            if this_team.score > other_team.score:
+                record["wins"] += 1
+            elif this_team.score < other_team.score:
+                record["losses"] += 1
+            else:
+                record["ties"] += 1
+            return record
+
+        win_loss_tie = reduce(
+            match_handler,
+            queryset.all(),
+            {
+                "team_id": team_id,
+                "wins": 0,
+                "losses": 0,
+                "ties": 0,
+            },
+        )
+        results = ScrimmageRecordSerializer(win_loss_tie).data
         return Response(results, status=status.HTTP_200_OK)
 
     @extend_schema(

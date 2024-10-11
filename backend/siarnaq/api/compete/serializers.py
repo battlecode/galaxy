@@ -481,5 +481,12 @@ class HistoricalRatingSerializer(serializers.Serializer):
     team_rating = TeamRatingSerializer(default=None)
 
 
+class ScrimmageRecordSerializer(serializers.Serializer):
+    team_id = serializers.IntegerField()
+    wins = serializers.IntegerField()
+    losses = serializers.IntegerField()
+    ties = serializers.IntegerField()
+
+
 class EmptySerializer(serializers.Serializer):
     pass

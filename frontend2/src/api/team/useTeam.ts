@@ -33,6 +33,8 @@ import {
   searchTeamsFactory,
 } from "./teamFactories";
 import { buildKey } from "../helpers";
+import { ratingHistoryMeFactory } from "api/compete/competeFactories";
+import { competeQueryKeys } from "api/compete/competeKeys";
 
 // ---------- QUERY HOOKS ---------- //
 /**
@@ -128,8 +130,17 @@ export const useJoinTeam = (
       });
     },
     onSuccess: async () => {
+      // Refetch the user's team
       await queryClient.refetchQueries({
         queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
+      });
+      // Refetch the user's rating history
+      await queryClient.refetchQueries({
+        queryKey: buildKey(ratingHistoryMeFactory.queryKey, { episodeId }),
+      });
+      // Refetch all scrimmage-related data
+      await queryClient.refetchQueries({
+        queryKey: competeQueryKeys.scrimBase.key({ episodeId }),
       });
     },
   });
@@ -152,9 +163,17 @@ export const useLeaveTeam = (
       });
     },
     onSuccess: async () => {
-      onSuccess?.();
+      // Invalidate the user's team
       await queryClient.invalidateQueries({
         queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
+      });
+      // Invalidate the user's rating history
+      await queryClient.invalidateQueries({
+        queryKey: buildKey(ratingHistoryMeFactory.queryKey, { episodeId }),
+      });
+      // Invalidate all scrimmage-related data
+      await queryClient.invalidateQueries({
+        queryKey: competeQueryKeys.scrimBase.key({ episodeId }),
       });
     },
   });

@@ -21,6 +21,7 @@ import Loading from "components/Loading";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FIELD_REQUIRED_ERROR_MSG } from "utils/constants";
 import FormLabel from "components/elements/FormLabel";
+import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 
 interface InfoFormInput {
   quote: string;
@@ -61,9 +62,9 @@ const MyTeam: React.FC = () => {
     },
   );
 
-  const onInfoSubmit: SubmitHandler<InfoFormInput> = async (data) => {
+  const onInfoSubmit: SubmitHandler<InfoFormInput> = (data) => {
     if (updateTeam.isPending) return;
-    await updateTeam.mutateAsync({
+    updateTeam.mutate({
       profile: {
         quote: data.quote,
         biography: data.biography,
@@ -72,13 +73,13 @@ const MyTeam: React.FC = () => {
     resetInfo();
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  const onLeaveTeam: EventHandler<React.MouseEvent<HTMLButtonElement>> = async (
+  const onLeaveTeam: EventHandler<React.MouseEvent<HTMLButtonElement>> = (
     event,
   ) => {
     if (leaveTeam.isPending) return;
     event.preventDefault();
-    await leaveTeam.mutateAsync();
+    event.stopPropagation();
+    leaveTeam.mutate();
     setIsLeaveModalOpen(false);
   };
 
@@ -154,9 +155,16 @@ const MyTeam: React.FC = () => {
               </div>
             </form>
           </SectionCard>
-          {/* The members list and file upload that display when on a smaller screen */}
+          {/* The members list, file upload, and win/loss that display when on a smaller screen */}
           <SectionCard className="shrink xl:hidden" title="Members">
             {membersList}
+          </SectionCard>
+          <SectionCard className="shrink xl:hidden" title="Scrimmaging Record">
+            <ScrimmagingRecord
+              team={teamData.data}
+              hideTeamName={true}
+              hideAllScrimmages={true}
+            />
           </SectionCard>
           <SectionCard className="shrink xl:hidden" title="File Upload">
             <TeamAvatar />
@@ -164,9 +172,16 @@ const MyTeam: React.FC = () => {
           <EligibilitySettings />
           <ScrimmageSettings />
         </div>
-        {/* Display the members list and file upload to the right when on a big screen. */}
+        {/* Display the members list, file upload, and win/loss to the right when on a big screen. */}
         <div className="flex hidden max-w-2xl flex-1 flex-col gap-8 xl:flex">
           <SectionCard title="Members">{membersList}</SectionCard>
+          <SectionCard title="Scrimmaging Record">
+            <ScrimmagingRecord
+              team={teamData.data}
+              hideTeamName={true}
+              hideAllScrimmages={true}
+            />
+          </SectionCard>
           <SectionCard title="File Upload">
             <TeamAvatar />
           </SectionCard>
@@ -188,7 +203,6 @@ const MyTeam: React.FC = () => {
           <div className="flex flex-row gap-4">
             <Button
               variant="danger-outline"
-              // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onClick={onLeaveTeam}
               loading={leaveTeam.isPending}
               label="Leave team"
