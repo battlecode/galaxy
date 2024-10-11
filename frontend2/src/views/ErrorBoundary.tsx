@@ -11,7 +11,7 @@ const ErrorBoundary: React.FC = () => {
         <PageTitle>Oops, something went wrong.</PageTitle>
         <p>
           Please reach out on Discord or to battlecode@mit.edu with the
-          following error message:
+          following error message: Beshr
         </p>
         <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
           {error.message}
