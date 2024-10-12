@@ -1,5 +1,3 @@
-// ---------- QUERY HOOKS ---------- //
-
 import {
   type UseMutationResult,
   type UseQueryResult,
@@ -28,7 +26,6 @@ import type {
   PaginatedMatchList,
   PaginatedScrimmageRequestList,
   PaginatedSubmissionList,
-  PaginatedTeamPublicList,
   ResponseError,
   ScrimmageRecord,
   ScrimmageRequest,
@@ -48,7 +45,7 @@ import { buildKey } from "../helpers";
 import {
   matchListFactory,
   ratingHistoryMeFactory,
-  ratingHistoryTopFactory,
+  ratingHistoryTeamsFactory,
   scrimmageInboxListFactory,
   scrimmageOutboxListFactory,
   scrimmagingRecordFactory,
@@ -58,8 +55,6 @@ import {
   tournamentSubsListFactory,
   userScrimmageListFactory,
 } from "./competeFactories";
-import { searchTeamsFactory } from "api/team/teamFactories";
-import { isPresent } from "utils/utilTypes";
 
 // ---------- QUERY HOOKS ---------- //
 /**
@@ -207,37 +202,22 @@ export const useTournamentMatchList = (
   });
 
 /**
- * For retrieving a list of the top 10 teams' historical ratings in a given episode.
+ * For retrieving the hisotrical rating for the given team's in the given episode.
  */
-export const useTopRatingHistoryList = (
-  { episodeId }: CompeteMatchHistoricalRatingListRequest,
-  queryClient: QueryClient,
-): UseQueryResult<HistoricalRating[], Error> =>
+export const useTeamsRatingHistoryList = ({
+  episodeId,
+  teamIds,
+}: CompeteMatchHistoricalRatingListRequest): UseQueryResult<
+  HistoricalRating[],
+  Error
+> =>
   useQuery({
-    queryKey: buildKey(ratingHistoryTopFactory.queryKey, { episodeId }),
-    queryFn: async () => {
-      // Get the query data for the top 10 teams in this episode
-      const topTeamsData: PaginatedTeamPublicList | undefined =
-        await queryClient.ensureQueryData({
-          queryKey: buildKey(searchTeamsFactory.queryKey, { episodeId }),
-          queryFn: async () =>
-            await searchTeamsFactory.queryFn(
-              { episodeId, page: 1 },
-              queryClient,
-              false, // We don't want to prefetch teams 11-20
-            ),
-        });
-      // Fetch their rating histories
-      if (isPresent(topTeamsData) && isPresent(topTeamsData.results)) {
-        const topTeamsIds = topTeamsData.results.map((team) => team.id);
-        return await ratingHistoryTopFactory.queryFn({
-          episodeId,
-          teamIds: topTeamsIds,
-        });
-      } else {
-        return [];
-      }
-    },
+    queryKey: buildKey(ratingHistoryTeamsFactory.queryKey, {
+      episodeId,
+      teamIds,
+    }),
+    queryFn: async () =>
+      await ratingHistoryTeamsFactory.queryFn({ episodeId, teamIds }),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 

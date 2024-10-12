@@ -1,12 +1,18 @@
 import React, { useMemo, useState } from "react";
 import { useEpisodeList, useTournamentList } from "api/episode/useEpisode";
 import SelectMenu from "../../elements/SelectMenu";
-import TeamChart, { type ChartData } from "./TeamChart";
+import ChartBase from "./ChartBase";
 import { useUserRatingHistoryList } from "api/compete/useCompete";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEpisodeId } from "contexts/EpisodeContext";
+import {
+  formatRatingHistory,
+  formatTournamentList,
+  type PlotLine,
+  type ChartData,
+} from "./chartUtils";
 
-const EpisodeChart: React.FC = () => {
+const UserChart: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
 
@@ -23,18 +29,13 @@ const EpisodeChart: React.FC = () => {
 
   const ratingData: Record<string, ChartData[]> | undefined = useMemo(() => {
     if (!ratingHistory.isSuccess) return undefined;
-    const ratingRecord: Record<string, ChartData[]> = {};
-    return ratingHistory.data.reduce((record, teamData) => {
-      if (teamData.team_rating !== undefined) {
-        record[teamData.team_rating.team.name] =
-          teamData.team_rating.rating_history.map((match) => [
-            match.timestamp.getTime(),
-            match.rating,
-          ]);
-      }
-      return record;
-    }, ratingRecord);
+    return formatRatingHistory(ratingHistory.data);
   }, [ratingHistory]);
+
+  const tournamentData: PlotLine[] | undefined = useMemo(() => {
+    if (!tournamentList.isSuccess) return undefined;
+    return formatTournamentList(tournamentList.data.results ?? []);
+  }, [tournamentList]);
 
   return (
     <div className="flex flex-1 flex-col gap-8">
@@ -51,14 +52,15 @@ const EpisodeChart: React.FC = () => {
         loading={tournamentList.isLoading}
       />
 
-      <TeamChart
+      <ChartBase
         yAxisLabel="Rating"
         values={ratingData}
         loading={ratingHistory.isLoading}
-        loadingMessage="Loading rankings data..."
+        loadingMessage="Loading rating data..."
+        plotLines={tournamentData}
       />
     </div>
   );
 };
 
-export default EpisodeChart;
+export default UserChart;
