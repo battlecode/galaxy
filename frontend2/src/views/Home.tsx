@@ -1,64 +1,25 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useEpisodeInfo, useNextTournament } from "../api/episode/useEpisode";
 import SectionCard from "../components/SectionCard";
 import CountdownDigital from "../components/CountdownDigital";
 import Spinner from "../components/Spinner";
 import { SocialIcon } from "react-social-icons";
-import TeamChart, {
-  type ChartData,
-} from "../components/tables/chart/TeamChart";
+import TeamChart from "../components/compete/chart/TeamChart";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  useTopRatingHistoryList,
-  useUserRatingHistoryList,
-} from "api/compete/useCompete";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
-import { useUserTeam } from "api/team/useTeam";
+import { useSearchTeams, useUserTeam } from "api/team/useTeam";
 
 const Home: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
   const episode = useEpisodeInfo({ id: episodeId });
   const nextTournament = useNextTournament({ episodeId });
-  const topRatingHistory = useTopRatingHistoryList({ episodeId }, queryClient);
+  const topTeams = useSearchTeams({ episodeId, page: 1 }, queryClient);
   const userTeam = useUserTeam({ episodeId });
-  const userTeamRatingHistory = useUserRatingHistoryList({ episodeId });
 
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";
-
-  const userTeamRatingData: Record<string, ChartData[]> | undefined =
-    useMemo(() => {
-      if (!userTeamRatingHistory.isSuccess) return undefined;
-      const ratingRecord: Record<string, ChartData[]> = {};
-      return userTeamRatingHistory.data.reduce((record, teamData) => {
-        if (teamData.team_rating !== undefined) {
-          record[teamData.team_rating.team.name] =
-            teamData.team_rating.rating_history.map((match) => [
-              match.timestamp.getTime(),
-              match.rating,
-            ]);
-        }
-        return record;
-      }, ratingRecord);
-    }, [userTeamRatingHistory]);
-
-  const topTeamRatingData: Record<string, ChartData[]> | undefined =
-    useMemo(() => {
-      if (!topRatingHistory.isSuccess) return undefined;
-      const ratingRecord: Record<string, ChartData[]> = {};
-      return topRatingHistory.data.reduce((record, teamData) => {
-        if (teamData.team_rating !== undefined) {
-          record[teamData.team_rating.team.name] =
-            teamData.team_rating.rating_history.map((match) => [
-              match.timestamp.getTime(),
-              match.rating,
-            ]);
-        }
-        return record;
-      }, ratingRecord);
-    }, [topRatingHistory]);
 
   return (
     <div className="p-6">
@@ -84,10 +45,8 @@ const Home: React.FC = () => {
           )}
           <SectionCard title="Rating History">
             <TeamChart
-              yAxisLabel="Rating"
-              values={userTeamRatingData}
-              loading={userTeamRatingHistory.isLoading}
-              loadingMessage="Loading rating history..."
+              teamIds={userTeam.isSuccess ? [userTeam.data.id] : []}
+              loading={userTeam.isLoading}
             />
           </SectionCard>
         </div>
@@ -115,10 +74,8 @@ const Home: React.FC = () => {
           </SectionCard>
           <SectionCard title="Top Teams">
             <TeamChart
-              yAxisLabel="Rating"
-              values={topTeamRatingData}
-              loading={topRatingHistory.isLoading}
-              loadingMessage="Loading rankings data..."
+              teamIds={topTeams.data?.results?.map((t) => t.id) ?? []}
+              loading={topTeams.isLoading}
             />
           </SectionCard>
           {/* <SectionCard title="Announcements">ANNOUNCEMENTS (TODO)</SectionCard> */}
