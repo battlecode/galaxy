@@ -1,5 +1,3 @@
-// ---------- QUERY HOOKS ---------- //
-
 import {
   type UseMutationResult,
   type UseQueryResult,
@@ -207,7 +205,7 @@ export const useTournamentMatchList = (
   });
 
 /**
- * For retrieving a list of the top 10 teams' historical ratings in a given episode.
+ * For retrieving the hisotrical rating for the given team's in the given episode.
  */
 export const useTopRatingHistoryList = ({
   episodeId,

@@ -1,24 +1,13 @@
-import type React from "react";
-import { useMemo } from "react";
+import React from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import {
-  useEpisodeInfo,
-  useNextTournament,
-  useTournamentList,
-} from "../api/episode/useEpisode";
+import { useEpisodeInfo, useNextTournament } from "../api/episode/useEpisode";
 import SectionCard from "../components/SectionCard";
 import CountdownDigital from "../components/CountdownDigital";
 import { SocialIcon } from "react-social-icons";
-import TeamChart, {
-  type ChartData,
-} from "../components/compete/chart/TeamChart";
+import TeamChart from "../components/compete/chart/TeamChart";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  useTopRatingHistoryList,
-  useRatingHistoryList,
-} from "api/compete/useCompete";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
-import { useUserTeam } from "api/team/useTeam";
+import { useSearchTeams, useUserTeam } from "api/team/useTeam";
 import { isPresent } from "utils/utilTypes";
 
 const Home: React.FC = () => {
@@ -27,27 +16,9 @@ const Home: React.FC = () => {
   const nextTournament = useNextTournament({ episodeId });
   const topRatingHistory = useTopRatingHistoryList({ episodeId, n: 10 });
   const userTeam = useUserTeam({ episodeId });
-  const userTeamRatingHistory = useUserRatingHistoryList({ episodeId });
-  const tournamentList = useTournamentList({ episodeId }, queryClient);
 
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";
-
-  // TODO: create a function in chart utils that does this nicer :)
-  const ratingData: Record<string, ChartData[]> | undefined = useMemo(() => {
-    if (!topRatingHistory.isSuccess) return undefined;
-    const ratingRecord: Record<string, ChartData[]> = {};
-    return topRatingHistory.data.reduce((record, teamData) => {
-      if (teamData.team_rating !== undefined) {
-        record[teamData.team_rating.team.name] =
-          teamData.team_rating.rating_history.map((match) => [
-            match.timestamp.getTime(),
-            match.rating,
-          ]);
-      }
-      return record;
-    }, ratingRecord);
-  }, [topRatingHistory]);
 
   return (
     <div className="p-6">
@@ -80,12 +51,10 @@ const Home: React.FC = () => {
             )}
           </SectionCard>
           <SectionCard title="Rating History">
-            {/* <TeamChart
-              yAxisLabel="Rating"
-              values={ratingData}
-              loading={userTeamRatingHistory.isLoading}
-              loadingMessage="Loading rating history..."
-            /> */}
+            <TeamChart
+              teamIds={userTeam.isSuccess ? [userTeam.data.id] : []}
+              loading={userTeam.isLoading}
+            />
           </SectionCard>
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
@@ -118,14 +87,8 @@ const Home: React.FC = () => {
           </SectionCard>
           <SectionCard title="Top Teams">
             <TeamChart
-              yAxisLabel="Rating"
-              values={ratingData}
-              loading={topRatingHistory.isLoading}
-              loadingMessage="Loading rankings data..."
-              plotLines={tournamentList.data?.results?.map((t) => [
-                t.name_long,
-                t.display_date.getUTCDate(),
-              ])}
+              teamIds={topTeams.data?.results?.map((t) => t.id) ?? []}
+              loading={topTeams.isLoading}
             />
           </SectionCard>
         </div>

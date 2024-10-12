@@ -159,15 +159,16 @@ const MyTeam: React.FC = () => {
           >
             {membersList}
           </SectionCard>
+          <SectionCard className="shrink xl:hidden" title="File Upload">
+            <TeamAvatar />
+          </SectionCard>
+
           <SectionCard className="shrink xl:hidden" title="Scrimmaging Record">
             <ScrimmagingRecord
               team={teamData.data}
               hideTeamName={true}
               hideAllScrimmages={true}
             />
-          </SectionCard>
-          <SectionCard className="shrink xl:hidden" title="File Upload">
-            <TeamAvatar />
           </SectionCard>
           <EligibilitySettings />
           <ScrimmageSettings />
