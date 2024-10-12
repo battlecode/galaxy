@@ -6,7 +6,7 @@ const PageNotFound: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col overflow-auto p-6">
       <p>
-        That page was not found.{" "}
+        That page was not found. Hello World!{" "}
         <NavLink to={`/${DEFAULT_EPISODE}/home`} className="hover:underline">
           Go Home?
         </NavLink>
