@@ -1,14 +1,17 @@
 import type React from "react";
 import { useMemo } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import { useEpisodeInfo, useNextTournament } from "../api/episode/useEpisode";
+import {
+  useEpisodeInfo,
+  useNextTournament,
+  useTournamentList,
+} from "../api/episode/useEpisode";
 import SectionCard from "../components/SectionCard";
 import CountdownDigital from "../components/CountdownDigital";
 import { SocialIcon } from "react-social-icons";
 import TeamChart, {
   type ChartData,
-} from "../components/tables/chart/TeamChart";
-import EpisodeChart from "../components/tables/chart/EpisodeChart";
+} from "../components/compete/chart/TeamChart";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   useTopRatingHistoryList,
@@ -24,15 +27,13 @@ const Home: React.FC = () => {
   const nextTournament = useNextTournament({ episodeId });
   const topRatingHistory = useTopRatingHistoryList({ episodeId, n: 10 });
   const userTeam = useUserTeam({ episodeId });
-  const userTeamRatingHistory = useRatingHistoryList({
-    episodeId,
-    teamId: undefined,
-  });
+  const userTeamRatingHistory = useUserRatingHistoryList({ episodeId });
+  const tournamentList = useTournamentList({ episodeId }, queryClient);
 
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";
 
-/*
+  // TODO: create a function in chart utils that does this nicer :)
   const ratingData: Record<string, ChartData[]> | undefined = useMemo(() => {
     if (!topRatingHistory.isSuccess) return undefined;
     const ratingRecord: Record<string, ChartData[]> = {};
@@ -47,7 +48,6 @@ const Home: React.FC = () => {
       return record;
     }, ratingRecord);
   }, [topRatingHistory]);
-*/
 
   return (
     <div className="p-6">
@@ -80,12 +80,12 @@ const Home: React.FC = () => {
             )}
           </SectionCard>
           <SectionCard title="Rating History">
-            <TeamChart
+            {/* <TeamChart
               yAxisLabel="Rating"
-              values={userTeamRatingData}
+              values={ratingData}
               loading={userTeamRatingHistory.isLoading}
               loadingMessage="Loading rating history..."
-            />
+            /> */}
           </SectionCard>
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
@@ -117,7 +117,16 @@ const Home: React.FC = () => {
             </div>
           </SectionCard>
           <SectionCard title="Top Teams">
-            <EpisodeChart/>
+            <TeamChart
+              yAxisLabel="Rating"
+              values={ratingData}
+              loading={topRatingHistory.isLoading}
+              loadingMessage="Loading rankings data..."
+              plotLines={tournamentList.data?.results?.map((t) => [
+                t.name_long,
+                t.display_date.getUTCDate(),
+              ])}
+            />
           </SectionCard>
         </div>
       </div>

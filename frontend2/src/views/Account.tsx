@@ -26,11 +26,13 @@ import {
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useQueryClient } from "@tanstack/react-query";
 import type { QueryClient } from "@tanstack/query-core";
+import EpisodeChart from "components/compete/chart/EpisodeChart";
 
 interface FileInput {
   file: FileList;
 }
 
+// TODO: create account loader!
 const Account: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
@@ -88,46 +90,11 @@ const Account: React.FC = () => {
                 disabled={uploadAvatar.isPending}
               />
             </form>
-
-            <form
-              onSubmit={(e) => {
-                void handleResumeSubmit(onResumeSubmit)(e);
-              }}
-            >
-              <FormLabel label="Resume" />
-              <input
-                type="file"
-                accept=".pdf"
-                className="w-full"
-                {...resumeRegister("file", {
-                  required: FIELD_REQUIRED_ERROR_MSG,
-                })}
-              />
-              <Button
-                className="mt-2"
-                label="Save resume"
-                type="submit"
-                loading={uploadResume.isPending}
-                disabled={uploadResume.isPending}
-              />
-              {user?.profile?.has_resume ?? false ? (
-                <p className="text-sm">
-                  Resume uploaded!{" "}
-                  <button
-                    className="text-cyan-600 hover:underline"
-                    onClick={() => {
-                      if (user !== undefined)
-                        downloadResume.mutate({ id: user.id });
-                    }}
-                  >
-                    Download
-                  </button>
-                </p>
-              ) : (
-                <p className="text-sm">No resume uploaded.</p>
-              )}
-            </form>
           </div>
+        </SectionCard>
+
+        <SectionCard title="Rating History" className="w-full flex-1">
+          <EpisodeChart />
         </SectionCard>
       </div>
     </div>

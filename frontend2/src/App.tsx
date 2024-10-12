@@ -149,6 +149,7 @@ const router = createBrowserRouter([
           {
             path: "my_team",
             element: <MyTeam />,
+            errorElement: <ErrorBoundary />,
             loader: myTeamLoader(queryClient),
           },
           {
