@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import NoDataToDisplay from "highcharts/modules/no-data-to-display";
-import * as chart from "./chartUtil";
+import * as chart from "./chartUtils";
 
 NoDataToDisplay(Highcharts);
 
@@ -133,15 +133,16 @@ const TeamChart: React.FC<TeamChartProps> = ({
     series: seriesData ?? [],
 
     legend: {
-      layout: "vertical",
-      align: "right",
-      verticalAlign: "top",
-      width: 250,
+      layout: "horizontal",
+      align: "center",
+      verticalAlign: "bottom",
+      // width: 100,
       maxHeight: 1e6,
       alignColumns: false,
     },
 
     xAxis: {
+      ...chart.highchartsOptionsBase.xAxis,
       type: "datetime",
       title: {
         text: "Local Date & Time",
@@ -181,6 +182,7 @@ const TeamChart: React.FC<TeamChartProps> = ({
   return (
     <div>
       <HighchartsReact
+        classname="w-full"
         highcharts={Highcharts}
         options={options}
         callback={(chart: Highcharts.Chart) => {
