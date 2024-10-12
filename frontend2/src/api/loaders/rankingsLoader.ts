@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { LoaderFunction } from "react-router-dom";
 import { episodeInfoFactory } from "../episode/episodeFactories";
-import { buildKey } from "../helpers";
+import { safeEnsureQueryData } from "../helpers";
 import { searchTeamsFactory } from "../team/teamFactories";
 
 export const rankingsLoader =
@@ -12,17 +12,10 @@ export const rankingsLoader =
     if (episodeId === undefined) return null;
 
     // Episode info
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(episodeInfoFactory.queryKey, { id: episodeId }),
-      queryFn: async () => await episodeInfoFactory.queryFn({ id: episodeId }),
-    });
+    safeEnsureQueryData({ id: episodeId }, episodeInfoFactory, queryClient);
 
     // Team list (rankings)
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(searchTeamsFactory.queryKey, { episodeId }),
-      queryFn: async () =>
-        await searchTeamsFactory.queryFn({ episodeId }, queryClient, true),
-    });
+    safeEnsureQueryData({ episodeId }, searchTeamsFactory, queryClient);
 
     return null;
   };

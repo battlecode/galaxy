@@ -3,7 +3,7 @@ import { loginCheck } from "api/auth/authApi";
 import { type LoaderFunction } from "react-router-dom";
 import { DEFAULT_EPISODE } from "utils/constants";
 
-export const passwordForgotLoader =
+export const homeIfLoggedIn =
   (queryClient: QueryClient): LoaderFunction =>
   async () => {
     // Check if user is logged in

@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { LoaderFunction } from "react-router-dom";
-import { buildKey } from "../helpers";
+import { safeEnsureQueryData } from "../helpers";
 import { otherTeamInfoFactory } from "../team/teamFactories";
 
 // loader for other team's public profile pages
@@ -12,13 +12,14 @@ export const teamProfileLoader =
     if (teamId === undefined || episodeId === undefined) return null;
 
     // All teams
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(otherTeamInfoFactory.queryKey, {
+    safeEnsureQueryData(
+      {
         episodeId,
         id: teamId,
-      }),
-      queryFn: async () =>
-        await otherTeamInfoFactory.queryFn({ episodeId, id: teamId }),
-    });
+      },
+      otherTeamInfoFactory,
+      queryClient,
+    );
+
     return null;
   };

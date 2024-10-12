@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { LoaderFunction } from "react-router-dom";
-import { buildKey } from "../helpers";
+import { safeEnsureQueryData } from "../helpers";
 import {
   episodeInfoFactory,
   tournamentInfoFactory,
@@ -15,34 +15,27 @@ export const tournamentLoader =
     if (episodeId === undefined || tournamentId === undefined) return null;
 
     // Episode Info
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(episodeInfoFactory.queryKey, { id: episodeId }),
-      queryFn: async () => await episodeInfoFactory.queryFn({ id: episodeId }),
-    });
+    safeEnsureQueryData({ id: episodeId }, episodeInfoFactory, queryClient);
 
     // Tournament Info
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(tournamentInfoFactory.queryKey, {
+    safeEnsureQueryData(
+      {
         episodeId,
         id: tournamentId,
-      }),
-      queryFn: async () =>
-        await tournamentInfoFactory.queryFn({ episodeId, id: tournamentId }),
-    });
+      },
+      tournamentInfoFactory,
+      queryClient,
+    );
 
     // Tournament Match List
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(tournamentMatchListFactory.queryKey, {
+    safeEnsureQueryData(
+      {
         episodeId,
         tournamentId,
-      }),
-      queryFn: async () =>
-        await tournamentMatchListFactory.queryFn(
-          { episodeId, tournamentId },
-          queryClient,
-          true,
-        ),
-    });
+      },
+      tournamentMatchListFactory,
+      queryClient,
+    );
 
     return null;
   };
