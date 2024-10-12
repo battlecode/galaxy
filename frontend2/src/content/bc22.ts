@@ -15,9 +15,9 @@ export const DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> = {};
 export const COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {};
 
 export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
-  "Tournament Schedule": `
+  "Tournament Schedule": `# Battlecode 2022 Tournament Schedule
 
-  Battlecode 2023 will have several tournaments throughout the month! We stream and commentate all tournaments online. The deadline to submit code for each non-final tournament is usually 7 pm EST the day before the tournament.
+  Battlecode 2022 will have several tournaments throughout the month! We stream and commentate all tournaments online. The deadline to submit code for each non-final tournament is usually 7 pm EST the day before the tournament.
   `,
   Prizes: `# Prizes
 

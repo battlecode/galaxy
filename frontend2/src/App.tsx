@@ -32,6 +32,9 @@ import MyTeam from "./views/MyTeam";
 import Tournaments from "./views/Tournaments";
 import TournamentPage from "./views/Tournament";
 import Submissions from "./views/Submissions";
+import DebuggingTips from "./views/DebuggingTips";
+import CommonIssues from "./views/CommonIssues";
+
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { toast, Toaster } from "react-hot-toast";
 import { ResponseError } from "./api/_autogen/runtime";
@@ -199,7 +202,7 @@ const router = createBrowserRouter([
         loader: homeLoader(queryClient),
       },
       { path: "resources", element: <Resources /> },
-      { path: "quickstart", element: <QuickStart /> },
+      { path: "quick_start", element: <QuickStart /> },
       {
         path: "rankings",
         element: <Rankings />,
@@ -225,6 +228,8 @@ const router = createBrowserRouter([
         element: <TeamProfile />,
         loader: teamProfileLoader(queryClient),
       },
+      { path: "debugging_tips", element: <DebuggingTips /> },
+      { path: "common_issues", element: <CommonIssues /> },
       {
         path: "*",
         element: <PageNotFound />,

@@ -1,14 +1,13 @@
 import React from "react";
-import { resourcesText } from "../content/ManageContent";
+import { debuggingTipsText } from "../content/ManageContent";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
-import { ResourcesPage } from "../content/ContentStruct";
+import { DebuggingTipsPage } from "../content/ContentStruct";
 import NoContentLegacyEpisode from "./NoContentLegacyEpisode";
-
-const Resources: React.FC = () => {
+const DebuggingTips: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const currentResourcesText = resourcesText[episodeId];
-  const hasContent = Object.values(currentResourcesText).some(
+  const currentDebuggingTipsText = debuggingTipsText[episodeId];
+  const hasContent = Object.values(currentDebuggingTipsText).some(
     (value) => value !== "",
   );
   if (!hasContent) {
@@ -18,27 +17,27 @@ const Resources: React.FC = () => {
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
         <OptionalSectionCardMarkdown
-          title={ResourcesPage.GAME_SPECIFICATION}
-          textRecord={currentResourcesText}
+          title={DebuggingTipsPage.DEBUGGING}
+          textRecord={currentDebuggingTipsText}
         />
 
         <OptionalSectionCardMarkdown
-          title={ResourcesPage.CODING_RESOURCES}
-          textRecord={currentResourcesText}
+          title={DebuggingTipsPage.INTELLIJ}
+          textRecord={currentDebuggingTipsText}
         />
 
         <OptionalSectionCardMarkdown
-          title={ResourcesPage.THIRD_PARTY_TOOLS}
-          textRecord={currentResourcesText}
+          title={DebuggingTipsPage.ECLIPSE}
+          textRecord={currentDebuggingTipsText}
         />
 
         <OptionalSectionCardMarkdown
-          title={ResourcesPage.LECTURES}
-          textRecord={currentResourcesText}
+          title={DebuggingTipsPage.SECOND_METHOD}
+          textRecord={currentDebuggingTipsText}
         />
       </div>
     </div>
   );
 };
 
-export default Resources;
+export default DebuggingTips;
