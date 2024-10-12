@@ -4,7 +4,7 @@ import {
   subsListFactory,
   tournamentSubsListFactory,
 } from "../compete/competeFactories";
-import { buildKey } from "../helpers";
+import { safeLoader } from "../helpers";
 
 export const submissionsLoader =
   (queryClient: QueryClient): LoaderFunction =>
@@ -17,18 +17,10 @@ export const submissionsLoader =
     if (episodeId === undefined) return null;
 
     // Submissions list
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(subsListFactory.queryKey, { episodeId, page }),
-      queryFn: async () =>
-        await subsListFactory.queryFn({ episodeId, page }, queryClient, true),
-    });
+    safeLoader({ episodeId, page }, subsListFactory, queryClient);
 
     // Tournament submissions list
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(tournamentSubsListFactory.queryKey, { episodeId }),
-      queryFn: async () =>
-        await tournamentSubsListFactory.queryFn({ episodeId }),
-    });
+    safeLoader({ episodeId }, tournamentSubsListFactory, queryClient);
 
     return null;
   };

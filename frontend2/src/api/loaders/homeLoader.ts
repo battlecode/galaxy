@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { LoaderFunction } from "react-router-dom";
-import { buildKey } from "../helpers";
+import { safeLoader } from "../helpers";
 import {
   episodeInfoFactory,
   nextTournamentFactory,
@@ -18,37 +18,24 @@ export const homeLoader =
     if (episodeId === undefined) return null;
 
     // Episode Info
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(episodeInfoFactory.queryKey, { id: episodeId }),
-      queryFn: async () => await episodeInfoFactory.queryFn({ id: episodeId }),
-    });
+    safeLoader({ id: episodeId }, episodeInfoFactory, queryClient);
 
     // Next Tournament
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(nextTournamentFactory.queryKey, { episodeId }),
-      queryFn: async () => await nextTournamentFactory.queryFn({ episodeId }),
-    });
+    safeLoader({ episodeId }, nextTournamentFactory, queryClient);
 
     // User Team Rating History
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(ratingHistoryMeFactory.queryKey, { episodeId }),
-      queryFn: async () => await ratingHistoryMeFactory.queryFn({ episodeId }),
-    });
+    safeLoader({ episodeId }, ratingHistoryMeFactory, queryClient);
 
     // User Team Scrimmage Record
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(scrimmagingRecordFactory.queryKey, {
+    safeLoader(
+      {
         episodeId,
         scrimmageType:
           CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
-      }),
-      queryFn: async () =>
-        await scrimmagingRecordFactory.queryFn({
-          episodeId,
-          scrimmageType:
-            CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
-        }),
-    });
+      },
+      scrimmagingRecordFactory,
+      queryClient,
+    );
 
     return null;
   };

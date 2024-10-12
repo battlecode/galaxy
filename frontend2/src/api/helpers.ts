@@ -1,9 +1,11 @@
 import Cookies from "js-cookie";
 import { Configuration, type ResponseError } from "./_autogen";
 import type {
+  PaginatedQueryFactory,
   PaginatedQueryFuncBuilder,
   PaginatedRequestMinimal,
   PaginatedResultMinimal,
+  QueryFactory,
   QueryKeyBuilder,
 } from "./apiTypes";
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
@@ -83,4 +85,43 @@ export const prefetchNextPage = async <
       toast.error((e as ResponseError).message);
     }
   }
+};
+
+const safeLoaderHelper = async <T, K>(
+  request: T,
+  factory: QueryFactory<T, K> | PaginatedQueryFactory<T, K>,
+  queryClient: QueryClient,
+): Promise<void> => {
+  try {
+    await queryClient.ensureQueryData({
+      queryKey: buildKey(factory.queryKey, request),
+      queryFn: async () => await factory.queryFn(request, queryClient, true),
+    });
+  } catch (err) {
+    if ((err as ResponseError).response.status > 500) {
+      toast.error((err as ResponseError).message);
+    }
+  }
+};
+
+/**
+ * Given a request and query identification, safely ensure that the query data exists
+ * or is fetched with no risk of throwing a Runtime Error. If the request has a server
+ * error, it will be displayed as a toast.
+ * @param request the parameters of the request
+ * @param queryKey
+ * @param queryFn
+ * @param queryClient
+ */
+export const safeLoader = <T, K>(
+  request: T,
+  factory: QueryFactory<T, K> | PaginatedQueryFactory<T, K>,
+  queryClient: QueryClient,
+): void => {
+  safeLoaderHelper(request, factory, queryClient).catch((error) => {
+    let _ = 0;
+    if (isPresent(error)) {
+      _ += 1;
+    }
+  });
 };
