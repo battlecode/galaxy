@@ -1,7 +1,7 @@
 import type { QueryClient } from "@tanstack/react-query";
 import type { LoaderFunction } from "react-router-dom";
 import { tournamentListFactory } from "../episode/episodeFactories";
-import { buildKey } from "../helpers";
+import { safeEnsureQueryData } from "../helpers";
 
 export const tournamentsLoader =
   (queryClient: QueryClient): LoaderFunction =>
@@ -10,11 +10,7 @@ export const tournamentsLoader =
     if (episodeId === undefined) return null;
 
     // Tournament list
-    void queryClient.ensureQueryData({
-      queryKey: buildKey(tournamentListFactory.queryKey, { episodeId }),
-      queryFn: async () =>
-        await tournamentListFactory.queryFn({ episodeId }, queryClient, true),
-    });
+    safeEnsureQueryData({ episodeId }, tournamentListFactory, queryClient);
 
     return null;
   };
