@@ -194,11 +194,11 @@ export const tournamentMatchListFactory: PaginatedQueryFactory<
   },
 } as const;
 
-export const ratingHistoryTopFactory: QueryFactory<
+export const ratingHistoryTeamsFactory: QueryFactory<
   CompeteMatchHistoricalRatingListRequest,
   HistoricalRating[]
 > = {
-  queryKey: competeQueryKeys.ratingHistoryTopList,
+  queryKey: competeQueryKeys.ratingHistoryTeamsList,
   queryFn: async ({ episodeId, teamIds }) =>
     await getRatingList({ episodeId, teamIds }),
 } as const;
