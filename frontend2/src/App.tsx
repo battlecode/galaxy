@@ -51,6 +51,7 @@ import PageNotFound from "views/PageNotFound";
 import TeamProfile from "views/TeamProfile";
 import { homeIfLoggedIn } from "api/loaders/homeIfLoggedIn";
 import { episodeLoader } from "api/loaders/episodeLoader";
+import UserProfile from "views/UserProfile";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -191,6 +192,11 @@ const router = createBrowserRouter([
       },
       { path: "debugging_tips", element: <DebuggingTips /> },
       { path: "common_issues", element: <CommonIssues /> },
+      {
+        path: "user/:userId",
+        element: <UserProfile />,
+        // loader: teamProfileLoader(queryClient),
+      },
       {
         path: "*",
         element: <PageNotFound />,

@@ -1,6 +1,7 @@
 import React from "react";
 import { type UserPublic } from "../../api/_autogen";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
+import { Link } from "react-router-dom";
 
 interface MemberListProps {
   members: UserPublic[];
@@ -13,11 +14,13 @@ interface UserRowProps {
 }
 const UserRow: React.FC<UserRowProps> = ({ user, isCurrentUser = false }) => {
   return (
+    <Link to={`user/${user.id}`} >
     <div className="flex flex-row items-center rounded">
       <img
         className="h-8 w-8 rounded-full bg-blue-100"
         src={user.profile?.avatar_url}
       />
+
       <div className="ml-6 font-semibold">
         {user.username}
         {isCurrentUser && (
@@ -31,6 +34,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, isCurrentUser = false }) => {
         {user.profile?.school}
       </div>
     </div>
+      </Link>
   );
 };
 
@@ -39,7 +43,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, isCurrentUser = false }) => {
 const MemberList: React.FC<MemberListProps> = ({ members, className = "" }) => {
   const { user: currentUser } = useCurrentUser();
   return (
-    <div className={`flex flex-col gap-6 ${className}`}>
+    <div className={`flex flex-col gap-2 ${className}`}>
       {/* display current user first */}
       {currentUser !== undefined &&
         members.find((user) => user.id === currentUser.id) !== undefined && (

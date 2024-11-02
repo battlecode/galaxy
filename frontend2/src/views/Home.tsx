@@ -10,7 +10,7 @@ import TeamChart, {
 } from "../components/tables/chart/TeamChart";
 import {
   useTopRatingHistoryList,
-  useUserRatingHistoryList,
+  useRatingHistoryList,
 } from "api/compete/useCompete";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 import { useUserTeam } from "api/team/useTeam";
@@ -21,7 +21,7 @@ const Home: React.FC = () => {
   const nextTournament = useNextTournament({ episodeId });
   const topRatingHistory = useTopRatingHistoryList({ episodeId, n: 10 });
   const userTeam = useUserTeam({ episodeId });
-  const userTeamRatingHistory = useUserRatingHistoryList({ episodeId });
+  const userTeamRatingHistory = useRatingHistoryList({ episodeId, teamId: undefined });
 
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";

@@ -90,6 +90,10 @@ const TeamChart: React.FC<TeamChartProps> = ({
     credits: {
       href: "https://jmerle.github.io/battlecode-2024-statistics/",
       text: "Inspired by jmerle",
+      position: {
+        align: "left",
+        x:15
+      }
     },
     tooltip: {
       ...chart.highchartsOptionsBase.tooltip,
@@ -131,7 +135,6 @@ const TeamChart: React.FC<TeamChartProps> = ({
       layout: "vertical",
       align: "right",
       verticalAlign: "top",
-      width: 250,
       maxHeight: 1e6,
       alignColumns: false,
     },

@@ -6,7 +6,7 @@ import {
   nextTournamentFactory,
 } from "../episode/episodeFactories";
 import {
-  ratingHistoryMeFactory,
+  ratingHistoryFactory,
   scrimmagingRecordFactory,
 } from "api/compete/competeFactories";
 import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_autogen";
@@ -24,7 +24,8 @@ export const homeLoader =
     safeEnsureQueryData({ episodeId }, nextTournamentFactory, queryClient);
 
     // User Team Rating History
-    safeEnsureQueryData({ episodeId }, ratingHistoryMeFactory, queryClient);
+    // TODO: make { episodeId, teamIds: undefined } a variable of sorts?
+    safeEnsureQueryData({ episodeId, teamIds: undefined }, ratingHistoryFactory, queryClient);
 
     // User Team Scrimmage Record
     safeEnsureQueryData(
