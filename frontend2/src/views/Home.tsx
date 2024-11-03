@@ -8,7 +8,6 @@ import { SocialIcon } from "react-social-icons";
 import TeamChart, {
   type ChartData,
 } from "../components/tables/chart/TeamChart";
-import { useQueryClient } from "@tanstack/react-query";
 import {
   useTopRatingHistoryList,
   useUserRatingHistoryList,
@@ -18,10 +17,9 @@ import { useUserTeam } from "api/team/useTeam";
 
 const Home: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const queryClient = useQueryClient();
   const episode = useEpisodeInfo({ id: episodeId });
   const nextTournament = useNextTournament({ episodeId });
-  const topRatingHistory = useTopRatingHistoryList({ episodeId }, queryClient);
+  const topRatingHistory = useTopRatingHistoryList({ episodeId });
   const userTeam = useUserTeam({ episodeId });
   const userTeamRatingHistory = useUserRatingHistoryList({ episodeId });
 

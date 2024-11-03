@@ -63,6 +63,10 @@ export interface CompeteMatchHistoricalRatingListRequest {
     teamIds?: Array<number>;
 }
 
+export interface CompeteMatchHistoricalRatingTop10ListRequest {
+    episodeId: string;
+}
+
 export interface CompeteMatchListRequest {
     episodeId: string;
     page?: number;
@@ -216,6 +220,44 @@ export class CompeteApi extends runtime.BaseAPI {
      */
     async competeMatchHistoricalRatingList(requestParameters: CompeteMatchHistoricalRatingListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<HistoricalRating>> {
         const response = await this.competeMatchHistoricalRatingListRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * List the historical top 10 rankings
+     */
+    async competeMatchHistoricalRatingTop10ListRaw(requestParameters: CompeteMatchHistoricalRatingTop10ListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<HistoricalRating>>> {
+        if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
+            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling competeMatchHistoricalRatingTop10List.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/compete/{episode_id}/match/historical_rating_top10/`.replace(`{${"episode_id"}}`, encodeURIComponent(String(requestParameters.episodeId))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(HistoricalRatingFromJSON));
+    }
+
+    /**
+     * List the historical top 10 rankings
+     */
+    async competeMatchHistoricalRatingTop10List(requestParameters: CompeteMatchHistoricalRatingTop10ListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<HistoricalRating>> {
+        const response = await this.competeMatchHistoricalRatingTop10ListRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -19,6 +19,7 @@ import {
   type CompeteMatchListRequest,
   type CompeteSubmissionTournamentListRequest,
   type CompeteRequestDestroyRequest,
+  type CompeteMatchHistoricalRatingTop10ListRequest,
   type CompeteMatchHistoricalRatingListRequest,
   type HistoricalRating,
   type CompeteMatchScrimmagingRecordRetrieveRequest,
@@ -213,6 +214,16 @@ export const getMatchesList = async ({
   page,
 }: CompeteMatchListRequest): Promise<PaginatedMatchList> =>
   await API.competeMatchList({ episodeId, page });
+
+/**
+ * Get the rating history for top 10 teams in a given episode.
+ *
+ * @param episodeId The episode ID to retrieve rating data for.
+ */
+export const getRatingTop10List = async ({
+  episodeId,
+}: CompeteMatchHistoricalRatingTop10ListRequest): Promise<HistoricalRating[]> =>
+  await API.competeMatchHistoricalRatingTop10List({ episodeId });
 
 /**
  * Get the rating history for a list of teams in a given episode.
