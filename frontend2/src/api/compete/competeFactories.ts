@@ -200,17 +200,17 @@ export const ratingHistoryTop10Factory: QueryFactory<
   CompeteMatchHistoricalRatingTop10ListRequest,
   HistoricalRating[]
 > = {
-  queryKey: competeQueryKeys.ratingHistoryTopList,
+  queryKey: competeQueryKeys.ratingHistoryTop10List,
   queryFn: async ({ episodeId }) => await getRatingTop10List({ episodeId }),
 } as const;
 
-export const ratingHistoryTopFactory: QueryFactory<
+export const ratingHistoryFactory: QueryFactory<
   CompeteMatchHistoricalRatingListRequest,
   HistoricalRating[]
 > = {
   queryKey: competeQueryKeys.ratingHistoryTopList,
-  queryFn: async ({ episodeId, teamIds }) =>
-    await getRatingList({ episodeId, teamIds }),
+  queryFn: async ({ episodeId, teamId }) =>
+    await getRatingList({ episodeId, teamId }),
 } as const;
 
 export const ratingHistoryMeFactory: QueryFactory<
@@ -219,7 +219,7 @@ export const ratingHistoryMeFactory: QueryFactory<
 > = {
   queryKey: competeQueryKeys.ratingHistoryMeList,
   queryFn: async ({ episodeId }) =>
-    await getRatingList({ episodeId, teamIds: undefined }),
+    await getRatingList({ episodeId, teamId: undefined }),
 } as const;
 
 export const scrimmagingRecordFactory: QueryFactory<

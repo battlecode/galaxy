@@ -389,7 +389,26 @@ class MatchViewSet(
         return self.get_paginated_response(serializer.data)
 
     def get_historical_rating_ranking(self, episode_id, queryset, limit=None):
+        """
+        Retrieve historical ratings for teams in a specific episode, sorted by
+        highest rating.
 
+        This function processes a set of matches to calculate and return historical
+        ratings for teams participating in a given episode. The results are ordered
+        by the maximum rating achieved, in descending order.
+
+        Parameters:
+        - episode_id (int): The identifier of the episode to filter teams by.
+        - queryset (QuerySet): A collection of match objects used to compute
+                               historical ratings.
+        - limit (int, optional): The maximum number of team ratings to return.
+
+        Returns:
+        - List[Dict]: A list of dictionaries containing team information and
+                      their historical ratings, sorted by highest rating in
+                      descending order. The number of items is capped by
+                      the 'limit' parameter if provided.
+        """
         has_invisible = self.get_queryset().filter(
             participants__team__status=TeamStatus.INVISIBLE
         )
@@ -446,10 +465,10 @@ class MatchViewSet(
     @extend_schema(
         parameters=[
             OpenApiParameter(
-                name="team_ids",
+                name="team_id",
                 type=int,
-                description="A list of teams to filter for. Defaults to your own team.",
-                many=True,
+                description="Optional teamID to filter for. Defaults to your own team.",
+                required=False,
             ),
         ],
         responses={
@@ -463,14 +482,15 @@ class MatchViewSet(
         detail=False,
         methods=["get"],
         permission_classes=(IsEpisodeMutable,),
-        # needed so that the generated schema is not paginated
         pagination_class=None,
     )
     def historical_rating(self, request, pk=None, *, episode_id):
-        """List the historical ratings of a list of teams."""
-        team_ids = self.request.query_params.getlist("team_ids")
-        if team_ids is not None and len(team_ids) > 0:
-            team_ids = {parse_int(team_id) for team_id in team_ids}
+        """List the historical ratings of a team."""
+        team_id = self.request.query_params.get("team_id")
+
+        if team_id is not None:
+            team_id = parse_int(team_id)
+            team_ids = {team_id}
         elif request.user.pk is not None:
             team_ids = {
                 team.id

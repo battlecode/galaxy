@@ -60,7 +60,7 @@ import {
 
 export interface CompeteMatchHistoricalRatingListRequest {
     episodeId: string;
-    teamIds?: Array<number>;
+    teamId?: number;
 }
 
 export interface CompeteMatchHistoricalRatingTop10ListRequest {
@@ -182,7 +182,7 @@ export interface CompeteSubmissionTournamentListRequest {
 export class CompeteApi extends runtime.BaseAPI {
 
     /**
-     * List the historical ratings of a list of teams.
+     * List the historical ratings of a team.
      */
     async competeMatchHistoricalRatingListRaw(requestParameters: CompeteMatchHistoricalRatingListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<HistoricalRating>>> {
         if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
@@ -191,8 +191,8 @@ export class CompeteApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
-        if (requestParameters.teamIds) {
-            queryParameters['team_ids'] = requestParameters.teamIds;
+        if (requestParameters.teamId !== undefined) {
+            queryParameters['team_id'] = requestParameters.teamId;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -216,7 +216,7 @@ export class CompeteApi extends runtime.BaseAPI {
     }
 
     /**
-     * List the historical ratings of a list of teams.
+     * List the historical ratings of a team.
      */
     async competeMatchHistoricalRatingList(requestParameters: CompeteMatchHistoricalRatingListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<HistoricalRating>> {
         const response = await this.competeMatchHistoricalRatingListRaw(requestParameters, initOverrides);

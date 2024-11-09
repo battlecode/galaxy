@@ -1,4 +1,5 @@
 import type {
+  CompeteMatchHistoricalRatingTop10ListRequest,
   CompeteMatchHistoricalRatingListRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
@@ -28,6 +29,7 @@ interface CompeteKeys {
   tourneyMatchList: QueryKeyBuilder<CompeteMatchTournamentListRequest>;
   // --- PERFORMANCE --- //
   ratingHistoryBase: QueryKeyBuilder<{ episodeId: string }>;
+  ratingHistoryTop10List: QueryKeyBuilder<CompeteMatchHistoricalRatingTop10ListRequest>;
   ratingHistoryTopList: QueryKeyBuilder<CompeteMatchHistoricalRatingListRequest>;
   ratingHistoryMeList: QueryKeyBuilder<CompeteMatchHistoricalRatingListRequest>;
   scrimmagingRecord: QueryKeyBuilder<CompeteMatchScrimmagingRecordRetrieveRequest>;
@@ -128,6 +130,14 @@ export const competeQueryKeys: CompeteKeys = {
   ratingHistoryBase: {
     key: ({ episodeId }: { episodeId: string }) =>
       ["compete", episodeId, "ratingHistory"] as const,
+  },
+
+  ratingHistoryTop10List: {
+    key: ({ episodeId }: CompeteMatchHistoricalRatingTop10ListRequest) =>
+      [
+        ...competeQueryKeys.ratingHistoryBase.key({ episodeId }),
+        "top",
+      ] as const,
   },
 
   ratingHistoryTopList: {

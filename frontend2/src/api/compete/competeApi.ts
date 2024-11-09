@@ -226,17 +226,17 @@ export const getRatingTop10List = async ({
   await API.competeMatchHistoricalRatingTop10List({ episodeId });
 
 /**
- * Get the rating history for a list of teams in a given episode.
- * Defaults to the logged in user's team if no team IDs are provided.
+ * Get the rating history for a teamsin a given episode.
+ * Defaults to the logged in user's team if no team ID are provided.
  *
  * @param episodeId The episode ID to retrieve rating data for.
- * @param teamIds The team IDs to retrieve rating data for.
+ * @param teamId The team ID to retrieve rating data for.
  */
 export const getRatingList = async ({
   episodeId,
-  teamIds,
+  teamId,
 }: CompeteMatchHistoricalRatingListRequest): Promise<HistoricalRating[]> =>
-  await API.competeMatchHistoricalRatingList({ episodeId, teamIds });
+  await API.competeMatchHistoricalRatingList({ episodeId, teamId });
 
 /**
  * Get a team's win-loss-tie record in scrimmages in a given episode. Defaults to the logged in user's team.

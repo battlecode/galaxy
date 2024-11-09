@@ -144,7 +144,7 @@ paths:
   /api/compete/{episode_id}/match/historical_rating/:
     get:
       operationId: compete_match_historical_rating_list
-      description: List the historical ratings of a list of teams.
+      description: List the historical ratings of a team.
       parameters:
       - in: path
         name: episode_id
@@ -153,12 +153,10 @@ paths:
           pattern: ^[^\/.]+$
         required: true
       - in: query
-        name: team_ids
+        name: team_id
         schema:
-          type: array
-          items:
-            type: integer
-        description: A list of teams to filter for. Defaults to your own team.
+          type: integer
+        description: An optional team ID to filter for. Defaults to your own team.
       tags:
       - compete
       security:
