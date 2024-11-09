@@ -184,7 +184,7 @@ const ProfileForm: React.FC<{
         <div className="flex flex-col items-center gap-6 p-4">
           <img
             className="h-24 w-24 rounded-full bg-gray-400 lg:h-48 lg:w-48"
-            src={user?.profile?.avatar_url}
+            src={user?.profile?.avatar_url ?? "/default_profile_picture.png"}
           />
           <div className="text-center text-xl font-semibold">
             {`${watchFirstName ?? ""} ${watchLastName ?? ""}`}
