@@ -1,15 +1,11 @@
 import React from "react";
-import { useRouteError, useNavigate } from "react-router-dom";
+import { useRouteError, Link } from "react-router-dom";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
-import { DEFAULT_EPISODE } from "../utils/constants";
+import { useEpisodeId } from "../contexts/EpisodeContext";
 
 const ErrorBoundary: React.FC = () => {
   const error = useRouteError();
-  const navigate = useNavigate(); // Initialize useNavigate
-
-  const handleGoHome = (): void => {
-    navigate(`/${DEFAULT_EPISODE}/home`); // Navigate to home
-  };
+  const { episodeId } = useEpisodeId();
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-white p-6">
@@ -26,12 +22,9 @@ const ErrorBoundary: React.FC = () => {
         ) : (
           <span className="text-red-600 text-center block">An unknown error occurred.</span>
         )}
-        <button
-          onClick={handleGoHome}
-          className="mt-4 rounded bg-blue-500 text-white px-3 py-1 hover:bg-blue-600 transition mx-auto"
-        >
-          Go to Home
-        </button>
+        <Link to={episodeId !== undefined ? `/${episodeId}/home` : "/"}>
+              Back to home
+        </Link>
       </div>
     </div>
   );
