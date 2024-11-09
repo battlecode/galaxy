@@ -40,6 +40,7 @@ const TeamChart: React.FC<TeamChartProps> = ({ teamIds, loading = false }) => {
       loading={loading || teamRatingHistories.isLoading}
       loadingMessage="Loading rating data..."
       plotLines={tournamentData}
+      crownTop={true}
     />
   );
 };

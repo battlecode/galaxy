@@ -205,7 +205,7 @@ export const useTournamentMatchList = (
   });
 
 /**
- * For retrieving the hisotrical rating for the given team's in the given episode.
+ * For retrieving the historical rating of the given teams in the given episode.
  */
 export const useTopRatingHistoryList = ({
   episodeId,

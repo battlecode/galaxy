@@ -54,6 +54,7 @@ import { episodeLoader } from "api/loaders/episodeLoader";
 import UserProfile from "views/UserProfile";
 import { userProfileLoader } from "api/loaders/userProfileLoader";
 import { HttpStatusCode } from "api/apiTypes";
+import { accountLoader } from "api/loaders/accountLoader";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -120,7 +121,7 @@ const router = createBrowserRouter([
     children: [
       {
         element: <PrivateRoute />,
-        children: [{ path: "/account", element: <Account /> }],
+        children: [{ path: "/account", element: <Account />, loader: accountLoader(queryClient) }],
       },
       {
         path: "user/:userId",

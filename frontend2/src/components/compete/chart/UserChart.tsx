@@ -12,8 +12,13 @@ import {
   type PlotLine,
   type ChartData,
 } from "./chartUtils";
+import { useTeamsByUser } from "api/user/useUser";
 
-const UserChart: React.FC = () => {
+interface UserChartProps {
+  userId: number;
+}
+
+const UserChart: React.FC<UserChartProps> = ({ userId }) => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
 
@@ -24,6 +29,7 @@ const UserChart: React.FC = () => {
     { episodeId: selectedEpisode },
     queryClient,
   );
+  const teamList = useTeamsByUser({ id: userId });
   const ratingHistory = useUserRatingHistoryList({
     episodeId: selectedEpisode,
   });
@@ -38,11 +44,24 @@ const UserChart: React.FC = () => {
     return formatTournamentList(tournamentList.data.results ?? []);
   }, [tournamentList]);
 
+  const teamListMap = useMemo(
+    () => new Map(Object.entries(teamList.data ?? {})),
+    [teamList],
+  );
+
+  const episodeListFiltered = useMemo(
+    () =>
+      (episodeList.data?.results ?? []).filter((ep) =>
+        teamListMap.has(ep.name_short),
+      ),
+    [episodeList],
+  );
+
   return (
     <div className="flex flex-1 flex-col gap-8">
       <SelectMenu
         options={
-          episodeList.data?.results?.map((ep) => ({
+          episodeListFiltered.map((ep) => ({
             value: ep.name_short,
             label: ep.name_long,
           })) ?? []
@@ -53,12 +72,22 @@ const UserChart: React.FC = () => {
         loading={tournamentList.isLoading}
       />
 
+      {(episodeList.isLoading || teamList.isLoading) && (
+        <span className="text-center text-xl italic">Loading team...</span>
+      )}
+      {episodeList.isSuccess && teamList.isSuccess && (
+        <span className="text-center text-xl font-semibold">
+          {teamListMap.get(selectedEpisode)?.name ?? "ERROR"}
+        </span>
+      )}
+
       <ChartBase
         yAxisLabel="Rating"
         values={ratingData}
         loading={ratingHistory.isLoading}
         loadingMessage="Loading rating data..."
         plotLines={tournamentData}
+        crownTop={false}
       />
     </div>
   );

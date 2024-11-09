@@ -22,6 +22,7 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { FIELD_REQUIRED_ERROR_MSG } from "utils/constants";
 import FormLabel from "components/elements/FormLabel";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
+import TeamChart from "components/compete/chart/TeamChart";
 
 interface InfoFormInput {
   quote: string;
@@ -159,10 +160,11 @@ const MyTeam: React.FC = () => {
           >
             {membersList}
           </SectionCard>
+          <EligibilitySettings />
+          <ScrimmageSettings />
           <SectionCard className="shrink xl:hidden" title="File Upload">
             <TeamAvatar />
           </SectionCard>
-
           <SectionCard className="shrink xl:hidden" title="Scrimmaging Record">
             <ScrimmagingRecord
               team={teamData.data}
@@ -170,12 +172,20 @@ const MyTeam: React.FC = () => {
               hideAllScrimmages={true}
             />
           </SectionCard>
-          <EligibilitySettings />
-          <ScrimmageSettings />
+          <SectionCard className="shrink xl:hidden" title="Scrimmaging Record">
+            <ScrimmagingRecord
+              team={teamData.data}
+              hideTeamName={true}
+              hideAllScrimmages={true}
+            />
+          </SectionCard>
         </div>
         {/* Display the members list, file upload, and win/loss to the right when on a big screen. */}
         <div className="hidden max-w-2xl gap-8 xl:flex xl:flex-1 xl:flex-col">
           <SectionCard title="Members">{membersList}</SectionCard>
+          <SectionCard title="File Upload">
+            <TeamAvatar />
+          </SectionCard>
           <SectionCard title="Scrimmaging Record">
             <ScrimmagingRecord
               team={teamData.data}
@@ -183,8 +193,11 @@ const MyTeam: React.FC = () => {
               hideAllScrimmages={true}
             />
           </SectionCard>
-          <SectionCard title="File Upload">
-            <TeamAvatar />
+          <SectionCard title="Rating History">
+            <TeamChart
+              teamIds={teamData.isSuccess ? [teamData.data.id] : []}
+              loading={teamData.isLoading}
+            />
           </SectionCard>
         </div>
       </div>

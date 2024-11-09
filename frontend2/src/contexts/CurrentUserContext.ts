@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
-import type { UserPrivate } from "../api/_autogen";
+import { type UserPrivate } from "../api/_autogen";
+import { type UseQueryResult } from "@tanstack/react-query";
 
 export enum AuthStateEnum {
   LOADING = "loading",
@@ -11,7 +12,7 @@ export type AuthState = `${AuthStateEnum}`;
 
 interface CurrentUserContextType {
   authState: AuthState;
-  user?: UserPrivate;
+  user: UseQueryResult<UserPrivate, Error>;
 }
 
 export const CurrentUserContext = createContext<CurrentUserContextType | null>(

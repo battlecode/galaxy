@@ -19,7 +19,7 @@ export const CurrentUserProvider: React.FC<{ children: React.ReactNode }> = ({
   const userData = useCurrentUserInfo();
 
   return (
-    <CurrentUserContext.Provider value={{ authState, user: userData.data }}>
+    <CurrentUserContext.Provider value={{ authState, user: userData }}>
       {children}
     </CurrentUserContext.Provider>
   );

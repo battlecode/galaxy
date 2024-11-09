@@ -16,6 +16,7 @@ export interface ChartBaseProps {
   loading?: boolean;
   loadingMessage?: string;
   plotLines?: PlotLine[];
+  crownTop?: boolean;
 }
 
 const ChartBase: React.FC<ChartBaseProps> = ({
@@ -24,6 +25,7 @@ const ChartBase: React.FC<ChartBaseProps> = ({
   loading = false,
   loadingMessage,
   plotLines,
+  crownTop = false,
 }) => {
   // Translate values into Highcharts compatible options
   const [myChart, setChart] = useState<Highcharts.Chart>();
@@ -115,7 +117,8 @@ const ChartBase: React.FC<ChartBaseProps> = ({
           );
         });
 
-        if (index !== -1) names[index + 1] = "👑 " + names[index + 1];
+        if (index !== -1 && crownTop)
+          names[index + 1] = "👑 " + names[index + 1];
 
         return names;
       },
