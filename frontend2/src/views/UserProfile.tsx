@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import { isNil } from "lodash";
 import SectionCard from "components/SectionCard";
 import { PageTitle } from "components/elements/BattlecodeStyle";
-import { useEpisodeInfo } from "api/episode/useEpisode";
 import TeamChart, { type ChartData } from "components/tables/chart/TeamChart";
 import { useRatingHistoryList } from "api/compete/useCompete";
 import { useUserInfoById, useTeamsByUser } from "api/user/useUser";
@@ -17,8 +16,6 @@ const isNilOrEmptyStr = (str: string | undefined | null): boolean => {
 const UserProfile: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const { userId } = useParams();
-  // TODO: in user loader, prefetch user teams useTeamsByUser?
-  const episode = useEpisodeInfo({ id: episodeId });
   const id = parseInt(userId ?? "", 10);
   const user = useUserInfoById({ id });
   const userTeam = useTeamsByUser({id});

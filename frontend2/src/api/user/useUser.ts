@@ -101,8 +101,6 @@ export const useTeamsByUser = ({
   Error
 > =>
   useQuery({
-    // queryKey: userQueryKeys.otherTeams({ id }),
-    // queryFn: async () => await getTeamsByUser({ id }),
     queryKey: buildKey(otherUserTeamsFactory.queryKey, { id }),
     queryFn: async () => await otherUserTeamsFactory.queryFn({ id }),
   });

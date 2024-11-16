@@ -52,6 +52,7 @@ import TeamProfile from "views/TeamProfile";
 import { homeIfLoggedIn } from "api/loaders/homeIfLoggedIn";
 import { episodeLoader } from "api/loaders/episodeLoader";
 import UserProfile from "views/UserProfile";
+import { userProfileLoader } from "api/loaders/userProfileLoader";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -123,6 +124,11 @@ const router = createBrowserRouter([
       },
     ],
   },
+  // {
+  //   path: "user/:userId",
+  //   element: <UserProfile />,
+  //   loader: userProfileLoader(queryClient),
+  // },
   // Pages that will contain the episode sidebar and navbar (excl. account page)
   {
     element: <EpisodeLayout />,
@@ -192,11 +198,6 @@ const router = createBrowserRouter([
       },
       { path: "debugging_tips", element: <DebuggingTips /> },
       { path: "common_issues", element: <CommonIssues /> },
-      {
-        path: "user/:userId",
-        element: <UserProfile />,
-        // loader: teamProfileLoader(queryClient),
-      },
       {
         path: "*",
         element: <PageNotFound />,
