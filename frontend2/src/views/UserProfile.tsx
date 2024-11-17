@@ -1,11 +1,9 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useEpisodeId } from "contexts/EpisodeContext";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { isNil } from "lodash";
 import SectionCard from "components/SectionCard";
 import { PageTitle } from "components/elements/BattlecodeStyle";
-import TeamChart, { type ChartData } from "components/tables/chart/TeamChart";
-import { useRatingHistoryList } from "api/compete/useCompete";
 import { useUserInfoById, useTeamsByUser } from "api/user/useUser";
 
 const isNilOrEmptyStr = (str: string | undefined | null): boolean => {
@@ -18,34 +16,12 @@ const UserProfile: React.FC = () => {
   const { userId } = useParams();
   const id = parseInt(userId ?? "", 10);
   const user = useUserInfoById({ id });
-  const userTeam = useTeamsByUser({id});
-  const userTeamRatingHistory = useRatingHistoryList({ episodeId, teamId: userTeam.data?.[episodeId]?.id ?? -1 });
-  // this is copypasted right now from home.tsx. make it not copypasted later?
-  const userTeamRatingData: Record<string, ChartData[]> | undefined =
-    useMemo(() => {
-      console.log(userTeamRatingHistory);
-      if (!userTeamRatingHistory.isSuccess) return undefined;
-      const ratingRecord: Record<string, ChartData[]> = {};
-      return userTeamRatingHistory.data.reduce((record, teamData) => {
-        if (teamData.team_rating !== undefined) {
-          record[teamData.team_rating.team.name] =
-            teamData.team_rating.rating_history.map((match) => [
-              match.timestamp.getTime(),
-              match.rating,
-            ]);
-        }
-        return record;
-      }, ratingRecord);
-    }, [userTeamRatingHistory]);
-
+  const userTeam = useTeamsByUser({ id });
   if (isNil(user.data) || isNaN(id)) {
-    console.log(user);
-    console.log(id);
     return <UserNotFound />;
   }
 
   return (
-
     <div className="p-6">
       <PageTitle>User Profile</PageTitle>
       <div className="flex flex-col gap-8 xl:flex-row">
@@ -61,40 +37,47 @@ const UserProfile: React.FC = () => {
                   {user.data.username}
                 </div>
               </div>
-              <div className="flex flex-1 flex-col gap-4">
+              <div className="flex flex-1 flex-col gap-4 text-sm text-gray-800">
                 <div>
-                  <div className="text-sm text-gray-800">
-                  <div className="font-medium">Biography</div>
-                    {isNilOrEmptyStr(user.data.profile?.biography) ? (
-                      <span className="italic text-gray-500">
-                        This user does not have a biography.
-                      </span>
-                    ) : (
-                      user.data.profile?.biography
-                    )}
-                  </div>
-                  <div className="text-sm text-gray-800">
-                  <div className="font-medium">School</div>
-                    {isNilOrEmptyStr(user.data.profile?.school) ? (
-                      <span className="italic text-gray-500">
-                        This user does not have a school.
-                      </span>
-                    ) : (
-                      user.data.profile?.biography
-                    )}
-                  </div>
+                  <div className="font-semibold">Team</div>
+                  {isNilOrEmptyStr(userTeam.data?.[episodeId]?.name) ? (
+                    <span className="italic text-gray-500">
+                      This user does not have a team.
+                    </span>
+                  ) : (
+                    <Link
+                      to={`/${episodeId}/team/${
+                        userTeam.data?.[episodeId]?.id ?? 0
+                      }`}
+                    >
+                      {userTeam.data?.[episodeId]?.name}
+                    </Link>
+                  )}
+                </div>
+                <div>
+                  <div className="font-semibold">Biography</div>
+                  {isNilOrEmptyStr(user.data.profile?.biography) ? (
+                    <span className="italic text-gray-500">
+                      This user does not have a biography.
+                    </span>
+                  ) : (
+                    user.data.profile?.biography
+                  )}
+                </div>
+                <div>
+                  <div className="font-semibold">School</div>
+                  {isNilOrEmptyStr(user.data.profile?.school) ? (
+                    <span className="italic text-gray-500">
+                      This user does not have a school.
+                    </span>
+                  ) : (
+                    user.data.profile?.school
+                  )}
                 </div>
               </div>
             </div>
           </SectionCard>
-          <SectionCard title="Rating History">
-          <TeamChart
-              yAxisLabel="Rating"
-              values={userTeamRatingData}
-              loading={userTeamRatingHistory.isLoading}
-              loadingMessage="Loading rating history..."
-            />
-          </SectionCard>
+          <SectionCard title="Rating History"></SectionCard>
         </div>
       </div>
     </div>

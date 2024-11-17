@@ -115,20 +115,20 @@ const router = createBrowserRouter([
   },
   // Account page doesn't have episode id in URL
   {
-    element: <PrivateRoute />,
+    element: <EpisodeLayout />,
     errorElement: <ErrorBoundary />,
     children: [
       {
-        element: <EpisodeLayout />,
+        element: <PrivateRoute />,
         children: [{ path: "/account", element: <Account /> }],
+      },
+      {
+        path: "user/:userId",
+        element: <UserProfile />,
+        loader: userProfileLoader(queryClient),
       },
     ],
   },
-  // {
-  //   path: "user/:userId",
-  //   element: <UserProfile />,
-  //   loader: userProfileLoader(queryClient),
-  // },
   // Pages that will contain the episode sidebar and navbar (excl. account page)
   {
     element: <EpisodeLayout />,
