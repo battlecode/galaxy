@@ -14,6 +14,8 @@ import {
   InformationCircleIcon as InformationCircleIcon24,
   Bars3Icon as Bars3Icon24,
   XMarkIcon as XMarkIcon24,
+  EyeIcon as EyeIcon24,
+  EyeSlashIcon as EyeSlashIcon24,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -31,6 +33,8 @@ import {
   InformationCircleIcon as InformationCircleIcon20,
   Bars3Icon as Bars3Icon20,
   XMarkIcon as XMarkIcon20,
+  EyeIcon as EyeIcon20,
+  EyeSlashIcon as EyeSlashIcon20,
 } from "@heroicons/react/20/solid";
 
 const icons24 = {
@@ -48,6 +52,8 @@ const icons24 = {
   information_circle: InformationCircleIcon24,
   bars_3: Bars3Icon24,
   x_mark: XMarkIcon24,
+  eye: EyeIcon24,
+  eye_slash: EyeSlashIcon24,
 };
 
 const icons20 = {
@@ -65,6 +71,8 @@ const icons20 = {
   information_circle: InformationCircleIcon20,
   bars_3: Bars3Icon20,
   x_mark: XMarkIcon20,
+  eye: EyeIcon20,
+  eye_slash: EyeSlashIcon20,
 };
 
 export type IconName = keyof typeof icons24;

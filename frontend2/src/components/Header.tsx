@@ -1,7 +1,7 @@
 import type React from "react";
 import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import Icon from "./elements/Icon";
 import { useEpisodeId } from "../contexts/EpisodeContext";
@@ -14,6 +14,7 @@ const Header: React.FC = () => {
   const { authState, user } = useCurrentUser();
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   return (
     <nav className="fixed top-0 z-30 h-16 w-full bg-gray-700">
       <div className="w-full px-2 sm:px-6 lg:px-8">
@@ -118,6 +119,7 @@ const Header: React.FC = () => {
                     <button
                       onClick={() => {
                         void logout(queryClient);
+                        navigate(`/${episodeId}/home`);
                       }}
                       className="flex w-full items-center rounded-lg px-4 py-2 sm:text-sm"
                     >

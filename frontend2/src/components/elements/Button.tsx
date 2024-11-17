@@ -10,6 +10,7 @@ const VARIANTS = {
     "bg-red-50 text-red-800 hover:bg-red-100 hover:ring-red-700 ring-red-500 ring-1 ring-inset",
   "light-outline":
     "ring-2 ring-inset ring-gray-200 text-gray-200 hover:bg-gray-100/20",
+  "no-outline": "text-gray-800 px-0 py-0 hover:bg-gray-100/20",
 } as const;
 
 type VariantType = keyof typeof VARIANTS;
