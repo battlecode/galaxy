@@ -19,7 +19,7 @@ const Home: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const episode = useEpisodeInfo({ id: episodeId });
   const nextTournament = useNextTournament({ episodeId });
-  const topRatingHistory = useTopRatingHistoryList({ episodeId });
+  const topRatingHistory = useTopRatingHistoryList({ episodeId, n: 10 });
   const userTeam = useUserTeam({ episodeId });
   const userTeamRatingHistory = useUserRatingHistoryList({ episodeId });
 

@@ -2,7 +2,7 @@ import { type QueryClient } from "@tanstack/react-query";
 import { ResponseError } from "api/_autogen";
 import { loginCheck } from "api/auth/authApi";
 import { episodeInfoFactory } from "api/episode/episodeFactories";
-import { ratingHistoryTop10Factory } from "api/compete/competeFactories";
+import { ratingHistoryTopNFactory } from "api/compete/competeFactories";
 import { buildKey, safeEnsureQueryData } from "api/helpers";
 import { searchTeamsFactory, myTeamFactory } from "api/team/teamFactories";
 import { type LoaderFunction } from "react-router-dom";
@@ -39,8 +39,8 @@ export const episodeLoader =
       queryClient,
     );
     safeEnsureQueryData(
-      { episodeId: id },
-      ratingHistoryTop10Factory,
+      { episodeId: id, n: 10 },
+      ratingHistoryTopNFactory,
       queryClient,
     );
 

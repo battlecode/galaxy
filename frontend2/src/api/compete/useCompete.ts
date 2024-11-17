@@ -9,7 +9,7 @@ import {
 } from "@tanstack/react-query";
 import { competeMutationKeys, competeQueryKeys } from "./competeKeys";
 import type {
-  CompeteMatchHistoricalRatingTop10ListRequest,
+  CompeteMatchHistoricalRatingTopNListRequest,
   CompeteMatchHistoricalRatingListRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
@@ -47,7 +47,7 @@ import toast from "react-hot-toast";
 import { buildKey } from "../helpers";
 import {
   matchListFactory,
-  ratingHistoryTop10Factory,
+  ratingHistoryTopNFactory,
   ratingHistoryMeFactory,
   scrimmageInboxListFactory,
   scrimmageOutboxListFactory,
@@ -209,15 +209,17 @@ export const useTournamentMatchList = (
  */
 export const useTopRatingHistoryList = ({
   episodeId,
-}: CompeteMatchHistoricalRatingTop10ListRequest): UseQueryResult<
+  n,
+}: CompeteMatchHistoricalRatingTopNListRequest): UseQueryResult<
   HistoricalRating[],
   Error
 > =>
   useQuery({
-    queryKey: buildKey(ratingHistoryTop10Factory.queryKey, { episodeId }),
+    queryKey: buildKey(ratingHistoryTopNFactory.queryKey, { episodeId, n }),
     queryFn: async () => {
-      return await ratingHistoryTop10Factory.queryFn({
+      return await ratingHistoryTopNFactory.queryFn({
         episodeId,
+        n,
       });
     },
     staleTime: 1000 * 60 * 5, // 5 minutes

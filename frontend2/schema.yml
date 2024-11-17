@@ -156,7 +156,7 @@ paths:
         name: team_id
         schema:
           type: integer
-        description: An optional team ID to filter for. Defaults to your own team.
+        description: Optional teamID to filter for. Defaults to your own team.
       tags:
       - compete
       security:
@@ -172,11 +172,16 @@ paths:
                 items:
                   $ref: '#/components/schemas/HistoricalRating'
           description: ''
-  /api/compete/{episode_id}/match/historical_rating_top10/:
+  /api/compete/{episode_id}/match/historical_rating_topN/:
     get:
-      operationId: compete_match_historical_rating_top10_list
-      description: List the historical top 10 rankings
+      operationId: compete_match_historical_rating_topN_list
+      description: List the historical top N rankings
       parameters:
+      - in: query
+        name: N
+        schema:
+          type: integer
+        description: number of top teams to get ratings for, defaults to 10
       - in: path
         name: episode_id
         schema:

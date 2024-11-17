@@ -1,5 +1,5 @@
 import type {
-  CompeteMatchHistoricalRatingTop10ListRequest,
+  CompeteMatchHistoricalRatingTopNListRequest,
   CompeteMatchHistoricalRatingListRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
@@ -21,7 +21,7 @@ import { competeQueryKeys } from "./competeKeys";
 import {
   getAllUserTournamentSubmissions,
   getMatchesList,
-  getRatingTop10List,
+  getRatingTopNList,
   getRatingList,
   getScrimmagesListByTeam,
   getScrimmagingRecord,
@@ -196,12 +196,13 @@ export const tournamentMatchListFactory: PaginatedQueryFactory<
   },
 } as const;
 
-export const ratingHistoryTop10Factory: QueryFactory<
-  CompeteMatchHistoricalRatingTop10ListRequest,
+export const ratingHistoryTopNFactory: QueryFactory<
+  CompeteMatchHistoricalRatingTopNListRequest,
   HistoricalRating[]
 > = {
-  queryKey: competeQueryKeys.ratingHistoryTop10List,
-  queryFn: async ({ episodeId }) => await getRatingTop10List({ episodeId }),
+  queryKey: competeQueryKeys.ratingHistoryTopNList,
+  queryFn: async ({ episodeId, n }) =>
+    await getRatingTopNList({ episodeId, n }),
 } as const;
 
 export const ratingHistoryFactory: QueryFactory<

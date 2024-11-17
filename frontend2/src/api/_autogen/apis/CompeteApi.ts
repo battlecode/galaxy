@@ -63,8 +63,9 @@ export interface CompeteMatchHistoricalRatingListRequest {
     teamId?: number;
 }
 
-export interface CompeteMatchHistoricalRatingTop10ListRequest {
+export interface CompeteMatchHistoricalRatingTopNListRequest {
     episodeId: string;
+    n?: number;
 }
 
 export interface CompeteMatchListRequest {
@@ -224,14 +225,18 @@ export class CompeteApi extends runtime.BaseAPI {
     }
 
     /**
-     * List the historical top 10 rankings
+     * List the historical top N rankings
      */
-    async competeMatchHistoricalRatingTop10ListRaw(requestParameters: CompeteMatchHistoricalRatingTop10ListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<HistoricalRating>>> {
+    async competeMatchHistoricalRatingTopNListRaw(requestParameters: CompeteMatchHistoricalRatingTopNListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<HistoricalRating>>> {
         if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
-            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling competeMatchHistoricalRatingTop10List.');
+            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling competeMatchHistoricalRatingTopNList.');
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters.n !== undefined) {
+            queryParameters['N'] = requestParameters.n;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -244,7 +249,7 @@ export class CompeteApi extends runtime.BaseAPI {
             }
         }
         const response = await this.request({
-            path: `/api/compete/{episode_id}/match/historical_rating_top10/`.replace(`{${"episode_id"}}`, encodeURIComponent(String(requestParameters.episodeId))),
+            path: `/api/compete/{episode_id}/match/historical_rating_topN/`.replace(`{${"episode_id"}}`, encodeURIComponent(String(requestParameters.episodeId))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -254,10 +259,10 @@ export class CompeteApi extends runtime.BaseAPI {
     }
 
     /**
-     * List the historical top 10 rankings
+     * List the historical top N rankings
      */
-    async competeMatchHistoricalRatingTop10List(requestParameters: CompeteMatchHistoricalRatingTop10ListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<HistoricalRating>> {
-        const response = await this.competeMatchHistoricalRatingTop10ListRaw(requestParameters, initOverrides);
+    async competeMatchHistoricalRatingTopNList(requestParameters: CompeteMatchHistoricalRatingTopNListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<HistoricalRating>> {
+        const response = await this.competeMatchHistoricalRatingTopNListRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

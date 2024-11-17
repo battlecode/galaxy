@@ -6,7 +6,7 @@ import structlog
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import NotSupportedError, transaction
-from django.db.models import Exists, F, Max, OuterRef, Q, Subquery
+from django.db.models import Exists, F, OuterRef, Q, Subquery
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
@@ -424,9 +424,17 @@ class MatchViewSet(
             .order_by("-created")
         )
 
-        # query aggregate rating history per each team order by
-        # max_rating and limit by 10
         matching_participants = MatchParticipant.objects.all().filter(match__in=matches)
+        # Subquery to get the last rating value
+        last_rating_subquery = (
+            matching_participants.filter(team_id=OuterRef("team_id"))
+            .values("rating__value")
+            .order_by("-match__created")
+            .values("rating__value")[:1]
+        )
+
+        # query aggregate rating history per each team order by
+        # last_rating and limit by 'limit'
         rating_history = (
             matching_participants.values("team_id")
             .annotate(
@@ -434,10 +442,10 @@ class MatchViewSet(
                     F("match__created"), ordering="match__created"
                 ),
                 ratings_pk_list=ArrayAgg(F("rating__pk"), ordering="match__created"),
-                max_rating=Max("rating__value"),
+                last_rating_value=Subquery(last_rating_subquery),
             )
             .all()
-            .order_by("-max_rating")[:limit]
+            .order_by("-last_rating_value")[:limit]
         )
         # parse query result in format required by serializer
         # query returns team, rating as pk but we serializer
@@ -507,11 +515,22 @@ class MatchViewSet(
         return Response(results, status=status.HTTP_200_OK)
 
     @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="N",
+                type=int,
+                description="number of top teams to get ratings for, defaults to 10",
+                required=False,
+            ),
+        ],
         responses={
             status.HTTP_204_NO_CONTENT: OpenApiResponse(
                 description="No ranked matches found."
             ),
             status.HTTP_200_OK: HistoricalRatingSerializer(many=True),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                description="Invalid parameter: N must be less than or equal to 10"
+            ),
         },
     )
     @action(
@@ -521,13 +540,27 @@ class MatchViewSet(
         # needed so that the generated schema is not paginated
         pagination_class=None,
     )
-    def historical_rating_top10(self, request, pk=None, *, episode_id):
-        """List the historical top 10 rankings"""
-        # filter matches
+    def historical_rating_topN(self, request, pk=None, *, episode_id):
+        """List the historical top N rankings, N should be <= 10 and defaults to 10"""
+        N = request.query_params.get("N", 10)
+
+        try:
+            N = int(N)
+        except ValueError:
+            return Response(
+                {"error": "Invalid parameter: N must be an integer"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if N > 10:
+            return Response(
+                {"error": "Invalid parameter: N must be less than or equal to 10"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         queryset = Match.objects.all()
         grouped = self.get_historical_rating_ranking(
-            episode_id=episode_id, queryset=queryset, limit=10
+            episode_id=episode_id, queryset=queryset, limit=N
         )
         results = HistoricalRatingSerializer(grouped, many=True).data
         return Response(results, status=status.HTTP_200_OK)
