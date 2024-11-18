@@ -1,4 +1,5 @@
-import React, { Fragment } from "react";
+import type React from "react";
+import { Fragment } from "react";
 import Table from "components/Table";
 import {
   useAcceptScrimmage,
@@ -86,28 +87,26 @@ const InboxTable: React.FC<InboxTableProps> = ({ inboxPage, handlePage }) => {
           {
             header: "",
             key: "accept_reject",
-            value: (req) => {
-              return (
-                <div className="flex flex-row gap-2">
-                  <Button
-                    variant="dark"
-                    label="Accept"
-                    loading={accept.variables?.id === req.id.toString()}
-                    onClick={() => {
-                      accept.mutate({ episodeId, id: req.id.toString() });
-                    }}
-                  />
-                  <Button
-                    variant="danger-outline"
-                    label="Reject"
-                    loading={reject.variables?.id === req.id.toString()}
-                    onClick={() => {
-                      reject.mutate({ episodeId, id: req.id.toString() });
-                    }}
-                  />
-                </div>
-              );
-            },
+            value: (req) => (
+              <div className="flex flex-row gap-2">
+                <Button
+                  variant="dark"
+                  label="Accept"
+                  loading={accept.variables?.id === req.id.toString()}
+                  onClick={() => {
+                    accept.mutate({ episodeId, id: req.id.toString() });
+                  }}
+                />
+                <Button
+                  variant="danger-outline"
+                  label="Reject"
+                  loading={reject.variables?.id === req.id.toString()}
+                  onClick={() => {
+                    reject.mutate({ episodeId, id: req.id.toString() });
+                  }}
+                />
+              </div>
+            ),
           },
         ]}
       />

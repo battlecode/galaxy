@@ -2,7 +2,7 @@ import { useForgotPassword } from "api/user/useUser";
 import Button from "components/elements/Button";
 import Input from "components/elements/Input";
 import { useEpisodeId } from "contexts/EpisodeContext";
-import React from "react";
+import type React from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { FIELD_REQUIRED_ERROR_MSG } from "utils/constants";
@@ -27,11 +27,12 @@ const PasswordForgot: React.FC = () => {
         <div className="mb-6 text-5xl sm:text-6xl">BATTLECODE</div>
       </span>
       <form
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onSubmit={handleSubmit((data) => {
-          forgot.mutate(data.email);
-          reset();
-        })}
+        onSubmit={(e) => {
+          void handleSubmit((data) => {
+            forgot.mutate(data.email);
+            reset();
+          })(e);
+        }}
         className="flex w-11/12 flex-col gap-5 rounded-lg bg-gray-100 p-6 shadow-md sm:w-[350px]"
       >
         <div className="text-center text-xl font-light text-gray-700">
@@ -61,9 +62,7 @@ const PasswordForgot: React.FC = () => {
           <hr />
           <div className="mt-3 flex flex-row justify-between text-sm text-cyan-600">
             <Link to="/login">Login</Link>
-            <Link to={episodeId !== undefined ? `/${episodeId}/home` : "/"}>
-              Back to home
-            </Link>
+            <Link to={`/${episodeId}/home`}>Back to home</Link>
           </div>
         </div>
       </form>

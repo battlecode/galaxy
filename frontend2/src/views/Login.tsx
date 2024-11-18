@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { login } from "../api/auth/authApi";
@@ -32,9 +32,9 @@ const Login: React.FC = () => {
         error:
           "Error logging in. Did you enter your username and password correctly?",
       });
-      navigate(episodeId !== undefined ? `/${episodeId}/home` : "/");
-    } catch (err) {
-      console.error(err);
+      navigate(`/${episodeId}/home`);
+    } catch (_) {
+      // We only want to toast this error
     }
   };
 
@@ -43,10 +43,10 @@ const Login: React.FC = () => {
       <div className="mb-6 flex flex-1 items-end text-center font-display text-5xl tracking-wide text-white sm:text-6xl">
         BATTLECODE
       </div>
-      {/* https://github.com/orgs/react-hook-form/discussions/8622 */}
       <form
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e);
+        }}
         className="flex w-11/12 flex-col gap-5 rounded-lg bg-gray-100 p-6 shadow-md sm:w-[350px]"
       >
         <div className="text-center text-xl font-light text-gray-700">
@@ -76,9 +76,7 @@ const Login: React.FC = () => {
           <hr />
           <div className="mt-3 flex flex-row justify-between text-sm text-cyan-600">
             <Link to="/password_forgot">Forgot password?</Link>
-            <Link to={episodeId !== undefined ? `/${episodeId}/home` : "/"}>
-              Back to home
-            </Link>
+            <Link to={`/${episodeId}/home`}>Back to home</Link>
           </div>
         </div>
       </form>

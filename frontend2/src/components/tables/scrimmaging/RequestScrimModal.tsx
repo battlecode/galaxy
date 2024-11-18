@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from "react";
+import type React from "react";
+import { useCallback, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   type GameMap,
@@ -23,7 +24,7 @@ interface RequestScrimModalProps {
 }
 
 // Only allow ranked scrims against "Regular" teams.
-const ALLOWS_RANKED = Status526Enum.R;
+const { R: ALLOWS_RANKED } = Status526Enum;
 const MAX_MAPS_PER_SCRIM = 10;
 const ORDER_OPTIONS = [
   { label: "Alternating", value: PlayerOrderEnum.QuestionMark },
@@ -37,8 +38,11 @@ const RequestScrimModal: React.FC<RequestScrimModalProps> = ({
   isOpen,
   closeModal,
 }) => {
+  const MAP_COUNT = 3;
+
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
+
   const request = useRequestScrimmage({ episodeId }, queryClient, () => {
     closeModal();
   });
@@ -47,7 +51,7 @@ const RequestScrimModal: React.FC<RequestScrimModalProps> = ({
     const possibleMaps = clone(maps);
     // Pick a random subset of 3 maps, assuming that there are at least 3 possible maps.
     const randomMaps: GameMap[] = [];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < MAP_COUNT; i++) {
       const randomIndex = Math.floor(Math.random() * possibleMaps.length);
       const randomMap = possibleMaps[randomIndex];
       randomMaps.push(randomMap);
@@ -106,12 +110,10 @@ const RequestScrimModal: React.FC<RequestScrimModalProps> = ({
               placeholder={
                 ranked ? "Random 3 maps!" : "Select up to 10 maps..."
               }
-              options={
-                maps.map((map) => ({
-                  value: map.name,
-                  label: map.name,
-                })) ?? []
-              }
+              options={maps.map((map) => ({
+                value: map.name,
+                label: map.name,
+              }))}
               value={ranked ? [] : selectedMapNames}
               onChange={(newMapNames) => {
                 setSelectedMapNames(newMapNames);

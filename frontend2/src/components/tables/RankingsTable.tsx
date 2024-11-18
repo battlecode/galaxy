@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import type {
   EligibilityCriterion,
   PaginatedTeamPublicList,
@@ -34,6 +34,8 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
   handlePage,
 }) => {
   const { episodeId } = useEpisodeId();
+
+  const MAX_NAME_LENGTH = 13;
 
   return (
     <Table
@@ -79,7 +81,7 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
                   to={`/user/${member.id}`}
                   className="hover:underline"
                 >
-                  {trimString(member.username, 13)}
+                  {trimString(member.username, MAX_NAME_LENGTH)}
                 </NavLink>
                 {idx !== team.members.length - 1 ? ", " : ""}
               </>
@@ -121,7 +123,7 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
           key: "auto_accept_unranked",
           value: (team) =>
             team.profile?.auto_accept_unranked !== undefined &&
-            team.profile?.auto_accept_unranked
+            team.profile.auto_accept_unranked
               ? "Yes"
               : "No",
         },

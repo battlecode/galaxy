@@ -7,10 +7,10 @@ import { otherUserTeamsFactory } from "../user/userFactories";
 export const userProfileLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
-    const episodeId = params.episodeId;
-    const userId = params.userId;
+    const { episodeId } = params;
+    const { userId } = params;
     if (userId === undefined || episodeId === undefined) return null;
-    const id = parseInt(userId ?? "", 10);
+    const id = parseInt(userId, 10);
 
     // All teams
     safeEnsureQueryData(

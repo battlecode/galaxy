@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import AsyncSelectMenu from "../elements/AsyncSelectMenu";
 import { useSearchTeams } from "../../api/team/useTeam";
 import type { TeamPublic } from "../../api/_autogen";
@@ -19,24 +19,22 @@ const SearchTeamsMenu: React.FC<SearchMenuProps> = ({
   required,
   placeholder,
   className,
-}) => {
-  return (
-    <AsyncSelectMenu<number, TeamPublic>
-      useQueryResult={useSearchTeams}
-      resultToOptions={(result) =>
-        result.map((team) => ({
-          value: team.id,
-          label: team.name,
-        }))
-      }
-      onChange={onChange}
-      selected={selected}
-      label={label}
-      required={required}
-      placeholder={placeholder}
-      className={className}
-    />
-  );
-};
+}) => (
+  <AsyncSelectMenu<number, TeamPublic>
+    useQueryResult={useSearchTeams}
+    resultToOptions={(result) =>
+      result.map((team) => ({
+        value: team.id,
+        label: team.name,
+      }))
+    }
+    onChange={onChange}
+    selected={selected}
+    label={label}
+    required={required}
+    placeholder={placeholder}
+    className={className}
+  />
+);
 
 export default SearchTeamsMenu;

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import Input from "../components/elements/Input";
 import TextArea from "../components/elements/TextArea";
@@ -6,7 +7,7 @@ import Loading from "../components/Loading";
 import { useCurrentUser } from "../contexts/CurrentUserContext";
 import SectionCard from "../components/SectionCard";
 import SelectMenu from "../components/elements/SelectMenu";
-import { type Maybe } from "../utils/utilTypes";
+import type { Maybe } from "../utils/utilTypes";
 import {
   GenderEnum,
   type CountryEnum,
@@ -25,7 +26,7 @@ import {
 } from "../api/user/useUser";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useQueryClient } from "@tanstack/react-query";
-import { type QueryClient } from "@tanstack/query-core";
+import type { QueryClient } from "@tanstack/query-core";
 
 interface FileInput {
   file: FileList;
@@ -68,8 +69,9 @@ const Account: React.FC = () => {
         <SectionCard title="File Upload">
           <div className="flex flex-row gap-10 xl:flex-col">
             <form
-              // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onSubmit={handleAvatarSubmit(onAvatarSubmit)}
+              onSubmit={(e) => {
+                void handleAvatarSubmit(onAvatarSubmit)(e);
+              }}
             >
               <FormLabel label="Profile picture" />
               <input
@@ -90,8 +92,9 @@ const Account: React.FC = () => {
             </form>
 
             <form
-              // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onSubmit={handleResumeSubmit(onResumeSubmit)}
+              onSubmit={(e) => {
+                void handleResumeSubmit(onResumeSubmit)(e);
+              }}
             >
               <FormLabel label="Resume" />
               <input
@@ -189,8 +192,9 @@ const ProfileForm: React.FC<{
         </div>
 
         <form
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onSubmit={handleSubmit(onProfileSubmit)}
+          onSubmit={(e) => {
+            void handleSubmit(onProfileSubmit)(e);
+          }}
           className="flex flex-1 flex-col gap-4"
         >
           <div className="grid grid-cols-2 gap-5">

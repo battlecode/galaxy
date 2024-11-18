@@ -25,18 +25,21 @@ import {
   tournamentInfoFactory,
   tournamentListFactory,
 } from "./episodeFactories";
+import { MILLIS_SECOND, SECONDS_MINUTE } from "utils/utilTypes";
 
 // ---------- QUERY HOOKS ---------- //
+const EPISODE_WAIT_TIME = 5;
+
 /**
  * For retrieving the given episode's info.
  */
 export const useEpisodeInfo = ({
   id,
-}: EpisodeERetrieveRequest): UseQueryResult<Episode, Error> =>
+}: EpisodeERetrieveRequest): UseQueryResult<Episode> =>
   useQuery({
     queryKey: buildKey(episodeInfoFactory.queryKey, { id }),
     queryFn: async () => await episodeInfoFactory.queryFn({ id }),
-    staleTime: 5 * 1000 * 60, // 5 minutes
+    staleTime: EPISODE_WAIT_TIME * MILLIS_SECOND * SECONDS_MINUTE,
   });
 
 /**
@@ -45,7 +48,7 @@ export const useEpisodeInfo = ({
 export const useEpisodeList = (
   { page }: EpisodeEListRequest,
   queryClient: QueryClient,
-): UseQueryResult<PaginatedEpisodeList, Error> =>
+): UseQueryResult<PaginatedEpisodeList> =>
   useQuery({
     queryKey: buildKey(episodeListFactory.queryKey, { page }),
     queryFn: async () =>
@@ -58,7 +61,7 @@ export const useEpisodeList = (
  */
 export const useEpisodeMaps = ({
   episodeId,
-}: EpisodeMapListRequest): UseQueryResult<GameMap[], Error> =>
+}: EpisodeMapListRequest): UseQueryResult<GameMap[]> =>
   useQuery({
     queryKey: buildKey(episodeMapsFactory.queryKey, { episodeId }),
     queryFn: async () => await episodeMapsFactory.queryFn({ episodeId }),
@@ -69,10 +72,7 @@ export const useEpisodeMaps = ({
  */
 export const useNextTournament = ({
   episodeId,
-}: EpisodeTournamentNextRetrieveRequest): UseQueryResult<
-  Tournament | null,
-  Error
-> =>
+}: EpisodeTournamentNextRetrieveRequest): UseQueryResult<Tournament | null> =>
   useQuery({
     queryKey: buildKey(nextTournamentFactory.queryKey, { episodeId }),
     queryFn: async () => await nextTournamentFactory.queryFn({ episodeId }),
@@ -84,7 +84,7 @@ export const useNextTournament = ({
 export const useTournamentList = (
   { episodeId, page }: EpisodeTournamentListRequest,
   queryClient: QueryClient,
-): UseQueryResult<PaginatedTournamentList, Error> =>
+): UseQueryResult<PaginatedTournamentList> =>
   useQuery({
     queryKey: buildKey(tournamentListFactory.queryKey, { episodeId, page }),
     queryFn: async () =>
@@ -101,7 +101,7 @@ export const useTournamentList = (
 export const useTournamentInfo = ({
   episodeId,
   id,
-}: EpisodeTournamentRetrieveRequest): UseQueryResult<Tournament, Error> =>
+}: EpisodeTournamentRetrieveRequest): UseQueryResult<Tournament> =>
   useQuery({
     queryKey: buildKey(tournamentInfoFactory.queryKey, { episodeId, id }),
     queryFn: async () => await tournamentInfoFactory.queryFn({ episodeId, id }),

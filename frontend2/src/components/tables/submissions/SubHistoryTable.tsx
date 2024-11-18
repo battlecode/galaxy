@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import {
   type PaginatedSubmissionList,
   StatusBccEnum,
@@ -62,7 +62,7 @@ const SubHistoryTable: React.FC<SubHistoryTableProps> = ({
           header: "Status",
           key: "status",
           value: (sub) =>
-            sub.status === "OK!"
+            sub.status === StatusBccEnum.Ok
               ? sub.accepted
                 ? "Accepted"
                 : "Rejected"

@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import InboxTable from "components/tables/scrimmaging/InboxTable";
 import OutboxTable from "components/tables/scrimmaging/OutboxTable";
@@ -29,27 +30,27 @@ const Scrimmaging: React.FC = () => {
     return classes.filter(Boolean).join(" ");
   }
 
-  const tabClassName = ({ selected }: { selected: boolean }): string => {
-    return classNames(
+  const tabClassName = ({ selected }: { selected: boolean }): string =>
+    classNames(
       "w-full rounded-lg py-2.5 text-sm font-medium leading-5",
       "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
       selected
         ? "bg-white text-cyan-700 shadow"
         : "text-cyan-100 hover:bg-white/[0.12] hover:text-white",
     );
-  };
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryParams: QueryParams = useMemo(() => {
-    return {
+  const queryParams: QueryParams = useMemo(
+    () => ({
       inboxPage: parsePageParam("inboxPage", searchParams),
       outboxPage: parsePageParam("outboxPage", searchParams),
       teamsPage: parsePageParam("teamsPage", searchParams),
       scrimsPage: parsePageParam("scrimsPage", searchParams),
       tourneyPage: parsePageParam("tourneyPage", searchParams),
       search: searchParams.get("search") ?? "",
-    };
-  }, [searchParams]);
+    }),
+    [searchParams],
+  );
 
   function handleSearch(search: string): void {
     setSearchParams((prev) => ({

@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from "react";
+import type React from "react";
+import { useState, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { type EligibilityCriterion } from "../api/_autogen";
+import type { EligibilityCriterion } from "../api/_autogen";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { dateTime } from "../utils/dateTime";
 import Loading from "../components/Loading";
@@ -26,11 +27,12 @@ const TournamentPage: React.FC = () => {
 
   const { tournamentId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryParams: QueryParams = useMemo(() => {
-    return {
+  const queryParams: QueryParams = useMemo(
+    () => ({
       page: parsePageParam("page", searchParams),
-    };
-  }, [searchParams]);
+    }),
+    [searchParams],
+  );
 
   const [selectedTeam, setSelectedTeam] = useState<{
     value: number;
@@ -63,14 +65,15 @@ const TournamentPage: React.FC = () => {
       return { includes: [], excludes: [], isEligible: false };
     }
     const includes =
-      tourneyData.data.eligibility_includes
-        ?.map((inc) => episode.eligibility_criteria[inc])
-        .filter((inc) => inc !== null && inc !== undefined) ?? [];
+      tourneyData.data.eligibility_includes?.map(
+        (inc) => episode.eligibility_criteria[inc],
+      ) ?? [];
     const excludes =
-      tourneyData.data.eligibility_excludes
-        ?.map((exc) => episode.eligibility_criteria[exc])
-        .filter((exc) => exc !== null && exc !== undefined) ?? [];
-    const isEligible = tourneyData.data?.is_eligible ?? false;
+      tourneyData.data.eligibility_excludes?.map(
+        (exc) => episode.eligibility_criteria[exc],
+      ) ?? [];
+    const isEligible = tourneyData.data.is_eligible;
+
     return { includes, excludes, isEligible };
   }, [tourneyData.data, episode]);
 
@@ -90,7 +93,7 @@ const TournamentPage: React.FC = () => {
                 <div className="grid max-w-4xl grid-cols-2 gap-2">
                   <p>Tournament Date:</p>
                   <p>
-                    {dateTime(tourneyData.data?.display_date).localFullString}
+                    {dateTime(tourneyData.data.display_date).localFullString}
                   </p>
 
                   <p>Eligible?:</p>
@@ -142,7 +145,7 @@ const TournamentPage: React.FC = () => {
                   <p>Submission Freeze:</p>
                   <p>
                     {
-                      dateTime(tourneyData.data?.submission_freeze)
+                      dateTime(tourneyData.data.submission_freeze)
                         .localFullString
                     }
                   </p>
@@ -150,7 +153,7 @@ const TournamentPage: React.FC = () => {
                   <p>Submission Unfreeze:</p>
                   <p>
                     {
-                      dateTime(tourneyData.data?.submission_unfreeze)
+                      dateTime(tourneyData.data.submission_unfreeze)
                         .localFullString
                     }
                   </p>

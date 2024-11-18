@@ -37,8 +37,7 @@ export const searchTeamsFactory: PaginatedQueryFactory<
       await prefetchNextPage(
         request,
         result,
-        teamQueryKeys.search,
-        searchTeamsFactory.queryFn,
+        { queryKey: teamQueryKeys.search, queryFn: searchTeamsFactory.queryFn },
         queryClient,
       );
     }

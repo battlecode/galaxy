@@ -1,4 +1,5 @@
-import React, { Fragment, useCallback, useState } from "react";
+import type React from "react";
+import { Fragment, useCallback, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Table from "components/Table";
 import TableBottom from "components/TableBottom";
@@ -7,7 +8,7 @@ import { useEpisodeId } from "contexts/EpisodeContext";
 import { useSearchTeams, useUserTeam } from "api/team/useTeam";
 import Input from "components/elements/Input";
 import Button from "components/elements/Button";
-import { type TeamPublic } from "api/_autogen";
+import type { TeamPublic } from "api/_autogen";
 import RequestScrimModal from "./RequestScrimModal";
 import { useEpisodeInfo, useEpisodeMaps } from "api/episode/useEpisode";
 
@@ -31,6 +32,8 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
   handlePage,
   handleSearch,
 }) => {
+  const MAX_NAME_LENGTH = 13;
+
   const { episodeId } = useEpisodeId();
   const episodeInfo = useEpisodeInfo({ id: episodeId });
   const queryClient = useQueryClient();
@@ -126,7 +129,7 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
                 to={`/${episodeId}/team/${team.id}`}
                 className="hover:underline"
               >
-                {trimString(team.name, 13)}
+                {trimString(team.name, MAX_NAME_LENGTH)}
               </NavLink>
             ),
           },
@@ -141,7 +144,7 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
                     to={`/user/${member.id}`}
                     className="hover:underline"
                   >
-                    {trimString(member.username, 13)}
+                    {trimString(member.username, MAX_NAME_LENGTH)}
                   </NavLink>
                   {idx !== team.members.length - 1 ? ", " : ""}
                 </>
@@ -166,7 +169,7 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
             key: "auto_accept_unranked",
             value: (team) =>
               team.profile?.auto_accept_unranked !== undefined &&
-              team.profile?.auto_accept_unranked
+              team.profile.auto_accept_unranked
                 ? "Yes"
                 : "No",
           },
@@ -191,7 +194,7 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
       />
       {teamToRequest !== null && maps.isSuccess && (
         <RequestScrimModal
-          isOpen={teamToRequest !== null}
+          isOpen
           teamToRequest={teamToRequest}
           maps={maps.data}
           closeModal={() => {

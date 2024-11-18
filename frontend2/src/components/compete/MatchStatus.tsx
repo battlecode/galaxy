@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { type Match, StatusBccEnum } from "../../api/_autogen/models";
 import Tooltip from "../elements/Tooltip";
 
@@ -17,7 +17,7 @@ const MatchStatusDisplays: Record<StatusBccEnum, string> = {
 };
 
 const MatchStatus: React.FC<StatusProps> = ({ match }: StatusProps) => {
-  const displayStatus = MatchStatusDisplays[match.status];
+  const { [match.status]: displayStatus } = MatchStatusDisplays;
 
   return (
     <>

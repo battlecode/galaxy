@@ -1,10 +1,6 @@
-import type { URLSearchParams } from "url";
-
 export const getParamEntries = (
   prev: URLSearchParams,
-): Record<string, string> => {
-  return Object.fromEntries(prev);
-};
+): Record<string, string> => Object.fromEntries(prev);
 
 export const parsePageParam = (
   paramName: string,

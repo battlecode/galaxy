@@ -1,4 +1,5 @@
-import React, { useCallback } from "react";
+import type React from "react";
+import { useCallback } from "react";
 import type { Tournament } from "../../api/_autogen";
 import { dateTime } from "../../utils/dateTime";
 import { NavLink } from "react-router-dom";
@@ -10,9 +11,10 @@ interface TournamentCountdownProps {
 const TournamentCountdown: React.FC<TournamentCountdownProps> = ({
   tournament,
 }) => {
-  const dateHasPassed = useCallback((date: Date) => {
-    return date.getTime() > new Date().getTime();
-  }, []);
+  const dateHasPassed = useCallback(
+    (date: Date) => date.getTime() > new Date().getTime(),
+    [],
+  );
 
   return (
     <div>

@@ -7,7 +7,7 @@ import { searchTeamsFactory } from "../team/teamFactories";
 export const queueLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
-    const episodeId = params.episodeId;
+    const { episodeId } = params;
     if (episodeId === undefined) return null;
 
     // All matches

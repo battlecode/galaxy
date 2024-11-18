@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { resourcesText } from "../content/ManageContent";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";

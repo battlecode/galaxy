@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import type React from "react";
+import { useMemo, useState } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import type { EligibilityCriterion } from "../api/_autogen";
 import { useSearchParams } from "react-router-dom";
@@ -23,12 +24,13 @@ const Rankings: React.FC = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const queryParams: QueryParams = useMemo(() => {
-    return {
+  const queryParams: QueryParams = useMemo(
+    () => ({
       page: parsePageParam("page", searchParams),
       search: searchParams.get("search") ?? "",
-    };
-  }, [searchParams]);
+    }),
+    [searchParams],
+  );
 
   const episodeData = useEpisodeInfo({ id: episodeId });
   const rankingsData = useSearchTeams(

@@ -1,5 +1,5 @@
-import { type MatchParticipant } from "api/_autogen";
-import React from "react";
+import type { MatchParticipant } from "api/_autogen";
+import type React from "react";
 import TeamWithRating from "./TeamWithRating";
 
 interface RatingDeltaProps {
@@ -16,6 +16,9 @@ const MatchRatingDelta: React.FC<RatingDeltaProps> = ({
   let newRating = 0;
   if (ranked) {
     newRating =
+      /* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition --
+       * We need this check for ranked matches against staff teams
+       */
       participant.rating !== null
         ? Math.round(participant.rating)
         : Math.round(participant.old_rating);
@@ -23,6 +26,9 @@ const MatchRatingDelta: React.FC<RatingDeltaProps> = ({
     newRating = Math.round(participant.old_rating);
   }
   const oldRating =
+    /* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition --
+     * We need this check for ranked matches against staff teams
+     */
     participant.old_rating !== null ? Math.round(participant.old_rating) : 0;
   const ratingDelta = Math.abs(newRating - oldRating);
 

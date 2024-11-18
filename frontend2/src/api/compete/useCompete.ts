@@ -58,15 +58,18 @@ import {
   tournamentSubsListFactory,
   userScrimmageListFactory,
 } from "./competeFactories";
+import { MILLIS_SECOND, SECONDS_MINUTE } from "utils/utilTypes";
 
 // ---------- QUERY HOOKS ---------- //
+const STATISTICS_WAIT_MINUTES = 5;
+
 /**
  * For retrieving a list of the currently logged in user's submissions.
  */
 export const useSubmissionsList = (
   { episodeId, page }: CompeteSubmissionListRequest,
   queryClient: QueryClient,
-): UseQueryResult<PaginatedSubmissionList, Error> =>
+): UseQueryResult<PaginatedSubmissionList> =>
   useQuery({
     queryKey: buildKey(subsListFactory.queryKey, { episodeId, page }),
     queryFn: async () =>
@@ -79,8 +82,7 @@ export const useSubmissionsList = (
 export const useTournamentSubmissions = ({
   episodeId,
 }: CompeteSubmissionTournamentListRequest): UseQueryResult<
-  TournamentSubmission[],
-  Error
+  TournamentSubmission[]
 > =>
   useQuery({
     queryKey: buildKey(tournamentSubsListFactory.queryKey, { episodeId }),
@@ -93,7 +95,7 @@ export const useTournamentSubmissions = ({
 export const useScrimmageInboxList = (
   { episodeId, page }: CompeteRequestInboxListRequest,
   queryClient: QueryClient,
-): UseQueryResult<PaginatedScrimmageRequestList, Error> =>
+): UseQueryResult<PaginatedScrimmageRequestList> =>
   useQuery({
     queryKey: buildKey(scrimmageInboxListFactory.queryKey, { episodeId, page }),
     queryFn: async () =>
@@ -110,7 +112,7 @@ export const useScrimmageInboxList = (
 export const useScrimmageOutboxList = (
   { episodeId, page }: CompeteRequestOutboxListRequest,
   queryClient: QueryClient,
-): UseQueryResult<PaginatedScrimmageRequestList, Error> =>
+): UseQueryResult<PaginatedScrimmageRequestList> =>
   useQuery({
     queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
       episodeId,
@@ -130,7 +132,7 @@ export const useScrimmageOutboxList = (
 export const useUserScrimmageList = (
   { episodeId, page }: CompeteMatchScrimmageListRequest,
   queryClient: QueryClient,
-): UseQueryResult<PaginatedMatchList, Error> =>
+): UseQueryResult<PaginatedMatchList> =>
   useQuery({
     queryKey: buildKey(userScrimmageListFactory.queryKey, { episodeId, page }),
     queryFn: async () =>
@@ -147,7 +149,7 @@ export const useUserScrimmageList = (
 export const useTeamScrimmageList = (
   { episodeId, teamId, page }: CompeteMatchScrimmageListRequest,
   queryClient: QueryClient,
-): UseQueryResult<PaginatedMatchList, Error> =>
+): UseQueryResult<PaginatedMatchList> =>
   useQuery({
     queryKey: buildKey(teamScrimmageListFactory.queryKey, {
       episodeId,
@@ -168,7 +170,7 @@ export const useTeamScrimmageList = (
 export const useMatchList = (
   { episodeId, page }: CompeteMatchListRequest,
   queryClient: QueryClient,
-): UseQueryResult<PaginatedMatchList, Error> =>
+): UseQueryResult<PaginatedMatchList> =>
   useQuery({
     queryKey: buildKey(matchListFactory.queryKey, { episodeId, page }),
     queryFn: async () =>
@@ -187,7 +189,7 @@ export const useTournamentMatchList = (
     page,
   }: CompeteMatchTournamentListRequest,
   queryClient: QueryClient,
-): UseQueryResult<PaginatedMatchList, Error> =>
+): UseQueryResult<PaginatedMatchList> =>
   useQuery({
     queryKey: buildKey(tournamentMatchListFactory.queryKey, {
       episodeId,
@@ -211,18 +213,16 @@ export const useTopRatingHistoryList = ({
   episodeId,
   n,
 }: CompeteMatchHistoricalRatingTopNListRequest): UseQueryResult<
-  HistoricalRating[],
-  Error
+  HistoricalRating[]
 > =>
   useQuery({
     queryKey: buildKey(ratingHistoryTopNFactory.queryKey, { episodeId, n }),
-    queryFn: async () => {
-      return await ratingHistoryTopNFactory.queryFn({
+    queryFn: async () =>
+      await ratingHistoryTopNFactory.queryFn({
         episodeId,
         n,
-      });
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+      }),
+    staleTime: MILLIS_SECOND * SECONDS_MINUTE * STATISTICS_WAIT_MINUTES,
   });
 
 /**
@@ -232,14 +232,13 @@ export const useRatingHistoryList = ({
   episodeId,
   teamId,
 }: CompeteMatchHistoricalRatingListRequest): UseQueryResult<
-  HistoricalRating[],
-  Error
+  HistoricalRating[]
 > =>
   useQuery({
     queryKey: buildKey(ratingHistoryFactory.queryKey, { episodeId, teamId }),
     queryFn: async () =>
       await ratingHistoryFactory.queryFn({ episodeId, teamId }),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: MILLIS_SECOND * SECONDS_MINUTE * STATISTICS_WAIT_MINUTES,
   });
 
 /**
@@ -249,10 +248,7 @@ export const useScrimmagingRecord = ({
   episodeId,
   teamId,
   scrimmageType,
-}: CompeteMatchScrimmagingRecordRetrieveRequest): UseQueryResult<
-  ScrimmageRecord,
-  Error
-> =>
+}: CompeteMatchScrimmagingRecordRetrieveRequest): UseQueryResult<ScrimmageRecord> =>
   useQuery({
     queryKey: buildKey(scrimmagingRecordFactory.queryKey, {
       episodeId,
@@ -265,7 +261,7 @@ export const useScrimmagingRecord = ({
         teamId,
         scrimmageType,
       }),
-    staleTime: 1000 * 30, // 30 seconds
+    staleTime: MILLIS_SECOND * SECONDS_MINUTE * STATISTICS_WAIT_MINUTES,
   });
 
 // ---------- MUTATION HOOKS ---------- //
@@ -279,12 +275,7 @@ export const useUploadSubmission = (
     episodeId: string;
   },
   queryClient: QueryClient,
-): UseMutationResult<
-  Submission,
-  Error,
-  CompeteSubmissionCreateRequest,
-  unknown
-> =>
+): UseMutationResult<Submission, Error, CompeteSubmissionCreateRequest> =>
   useMutation({
     mutationKey: competeMutationKeys.uploadSub({ episodeId }),
     mutationFn: async ({
@@ -345,12 +336,7 @@ export const useRequestScrimmage = (
   },
   queryClient: QueryClient,
   onSuccess?: () => void,
-): UseMutationResult<
-  ScrimmageRequest,
-  Error,
-  CompeteRequestCreateRequest,
-  unknown
-> =>
+): UseMutationResult<ScrimmageRequest, Error, CompeteRequestCreateRequest> =>
   useMutation({
     mutationKey: competeMutationKeys.requestScrim({ episodeId }),
     mutationFn: async ({
@@ -409,7 +395,7 @@ export const useAcceptScrimmage = (
     episodeId: string;
   },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, CompeteRequestAcceptCreateRequest, unknown> =>
+): UseMutationResult<void, Error, CompeteRequestAcceptCreateRequest> =>
   useMutation({
     mutationKey: competeMutationKeys.acceptScrim({ episodeId }),
     mutationFn: async ({
@@ -462,7 +448,7 @@ export const useRejectScrimmage = (
     episodeId: string;
   },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, CompeteRequestRejectCreateRequest, unknown> =>
+): UseMutationResult<void, Error, CompeteRequestRejectCreateRequest> =>
   useMutation({
     mutationKey: competeMutationKeys.rejectScrim({ episodeId }),
     mutationFn: async ({
@@ -512,7 +498,7 @@ export const useRejectScrimmage = (
 export const useCancelScrimmage = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, CompeteRequestDestroyRequest, unknown> =>
+): UseMutationResult<void, Error, CompeteRequestDestroyRequest> =>
   useMutation({
     mutationKey: competeMutationKeys.cancelScrim({ episodeId }),
     mutationFn: async ({ episodeId, id }: CompeteRequestDestroyRequest) => {
@@ -560,12 +546,7 @@ export const useDownloadSubmission = ({
   episodeId,
 }: {
   episodeId: string;
-}): UseMutationResult<
-  void,
-  Error,
-  CompeteSubmissionDownloadRetrieveRequest,
-  unknown
-> =>
+}): UseMutationResult<void, Error, CompeteSubmissionDownloadRetrieveRequest> =>
   useMutation({
     mutationKey: competeMutationKeys.downloadSub({ episodeId }),
     mutationFn: async ({

@@ -1,4 +1,5 @@
-import React, { Fragment } from "react";
+import type React from "react";
+import { Fragment } from "react";
 import Table from "components/Table";
 import TableBottom from "components/TableBottom";
 import MatchScore from "components/compete/MatchScore";
@@ -57,11 +58,9 @@ const TournamentMatchesTable: React.FC<TournamentMatchesTableProps> = ({
           {
             header: "Score",
             key: "score",
-            value: (match) => {
-              return (
-                <MatchScore match={match} userTeamId={userTeamData.data?.id} />
-              );
-            },
+            value: (match) => (
+              <MatchScore match={match} userTeamId={userTeamData.data?.id} />
+            ),
           },
           {
             header: "Opponent",

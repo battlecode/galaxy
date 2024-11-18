@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 interface PageTitleProps {
   children?: React.ReactNode;
@@ -6,10 +6,8 @@ interface PageTitleProps {
 
 export const PageTitle: React.FC<PageTitleProps> = ({
   children,
-}: PageTitleProps) => {
-  return (
-    <h1 className="mb-2 text-3xl font-bold leading-7 text-gray-900">
-      {children}
-    </h1>
-  );
-};
+}: PageTitleProps) => (
+  <h1 className="mb-2 text-3xl font-bold leading-7 text-gray-900">
+    {children}
+  </h1>
+);

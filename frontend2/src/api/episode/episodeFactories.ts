@@ -12,7 +12,11 @@ import type {
   ResponseError,
   Tournament,
 } from "../_autogen";
-import type { PaginatedQueryFactory, QueryFactory } from "../apiTypes";
+import {
+  HttpStatusCode,
+  type PaginatedQueryFactory,
+  type QueryFactory,
+} from "../apiTypes";
 import { prefetchNextPage } from "../helpers";
 import {
   getEpisodeInfo,
@@ -36,8 +40,10 @@ export const episodeListFactory: PaginatedQueryFactory<
       await prefetchNextPage(
         { page },
         result,
-        episodeQueryKeys.list,
-        episodeListFactory.queryFn,
+        {
+          queryKey: episodeQueryKeys.list,
+          queryFn: episodeListFactory.queryFn,
+        },
         queryClient,
       );
     }
@@ -51,9 +57,7 @@ export const episodeInfoFactory: QueryFactory<
   Episode
 > = {
   queryKey: episodeQueryKeys.info,
-  queryFn: async ({ id }) => {
-    return await getEpisodeInfo({ id });
-  },
+  queryFn: async ({ id }) => await getEpisodeInfo({ id }),
 } as const;
 
 export const episodeMapsFactory: QueryFactory<
@@ -61,9 +65,7 @@ export const episodeMapsFactory: QueryFactory<
   GameMap[]
 > = {
   queryKey: episodeQueryKeys.maps,
-  queryFn: async ({ episodeId }) => {
-    return await getEpisodeMaps({ episodeId });
-  },
+  queryFn: async ({ episodeId }) => await getEpisodeMaps({ episodeId }),
 } as const;
 
 export const tournamentListFactory: PaginatedQueryFactory<
@@ -78,8 +80,10 @@ export const tournamentListFactory: PaginatedQueryFactory<
       await prefetchNextPage(
         request,
         result,
-        episodeQueryKeys.tournamentList,
-        tournamentListFactory.queryFn,
+        {
+          queryKey: episodeQueryKeys.tournamentList,
+          queryFn: tournamentListFactory.queryFn,
+        },
         queryClient,
       );
     }
@@ -99,7 +103,8 @@ export const nextTournamentFactory: QueryFactory<
     } catch (err) {
       // If there is no next tournament, just return null.
       const responseError = err as ResponseError;
-      if (responseError.response.status === 404) return null;
+      if (responseError.response.status === HttpStatusCode.NOT_FOUND)
+        return null;
       else throw responseError;
     }
   },
@@ -110,7 +115,6 @@ export const tournamentInfoFactory: QueryFactory<
   Tournament
 > = {
   queryKey: episodeQueryKeys.tournamentInfo,
-  queryFn: async ({ episodeId, id }) => {
-    return await getTournamentInfo({ episodeId, id });
-  },
+  queryFn: async ({ episodeId, id }) =>
+    await getTournamentInfo({ episodeId, id }),
 } as const;

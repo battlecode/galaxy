@@ -7,7 +7,7 @@ import { searchTeamsFactory } from "../team/teamFactories";
 export const rankingsLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
-    const episodeId = params.episodeId;
+    const { episodeId } = params;
 
     if (episodeId === undefined) return null;
 

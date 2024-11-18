@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
 
@@ -12,36 +12,34 @@ const isInternalLink = (to: string): boolean => {
   return url.hostname === window.location.hostname;
 };
 
-const Markdown: React.FC<MarkdownProps> = ({ text, className = "" }) => {
-  return (
-    <ReactMarkdown
-      className={className}
-      components={{
-        a: ({ href, ...props }) => {
-          const target = href ?? "";
-          if (isInternalLink(target)) {
-            return (
-              <Link
-                className="text-cyan-600 hover:underline"
-                to={target}
-                {...props}
-              />
-            );
-          } else {
-            return (
-              <a
-                className="text-cyan-600 hover:underline"
-                href={target}
-                {...props}
-              />
-            );
-          }
-        },
-      }}
-    >
-      {text}
-    </ReactMarkdown>
-  );
-};
+const Markdown: React.FC<MarkdownProps> = ({ text, className = "" }) => (
+  <ReactMarkdown
+    className={className}
+    components={{
+      a: ({ href, ...props }) => {
+        const target = href ?? "";
+        if (isInternalLink(target)) {
+          return (
+            <Link
+              className="text-cyan-600 hover:underline"
+              to={target}
+              {...props}
+            />
+          );
+        } else {
+          return (
+            <a
+              className="text-cyan-600 hover:underline"
+              href={target}
+              {...props}
+            />
+          );
+        }
+      },
+    }}
+  >
+    {text}
+  </ReactMarkdown>
+);
 
 export default Markdown;

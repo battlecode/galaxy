@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import type React from "react";
+import { useMemo, useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import { useSearchParams } from "react-router-dom";
 import { useEpisodeId } from "../contexts/EpisodeContext";
@@ -20,11 +21,12 @@ const Queue: React.FC = () => {
   const queryClient = useQueryClient();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryParams: QueryParams = useMemo(() => {
-    return {
+  const queryParams: QueryParams = useMemo(
+    () => ({
       page: parsePageParam("page", searchParams),
-    };
-  }, [searchParams]);
+    }),
+    [searchParams],
+  );
 
   const [selectedTeam, setSelectedTeam] = useState<{
     value: number;

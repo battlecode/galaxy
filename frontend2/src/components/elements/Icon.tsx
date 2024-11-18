@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import {
   ClipboardDocumentIcon as ClipboardDocumentIcon24,
   HomeIcon as HomeIcon24,
@@ -67,7 +67,7 @@ const icons20 = {
   x_mark: XMarkIcon20,
 };
 
-export type IconName = keyof typeof icons24 | keyof typeof icons20;
+export type IconName = keyof typeof icons24;
 
 export interface IconProps {
   name: IconName;

@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 // Example usage
 // <Tooltip text="This will be displayed inside the tooltip" location="left">
@@ -25,31 +25,31 @@ const TOOLTIP_TRIANGLE_CLASSES = {
   right: "-left-1 top-1/2 -translate-y-1/2",
 };
 
+const HOVER_DELAY_MILLIS = 400;
+
 const Tooltip: React.FC<TooltipProps> = ({
   children,
   // the string to display inside the tooltip
   text,
-  // delay between hover and tooltip appearance, in ms.
-  delay = 400,
+  // delay between hover and tooltip appearance
+  delay = HOVER_DELAY_MILLIS,
   // the location that the tooltip will appear (relative to the children)
   location = "top",
-}) => {
-  return (
-    <div className={`group relative h-max w-max`}>
-      {children}
-      <div
-        className={`pointer-events-none absolute z-20 mb-1 w-max max-w-[200px] rounded bg-gray-800 px-2 py-1
+}) => (
+  <div className={`group relative h-max w-max`}>
+    {children}
+    <div
+      className={`pointer-events-none absolute z-20 mb-1 w-max max-w-[200px] rounded bg-gray-800 px-2 py-1
         text-center text-sm text-gray-50 opacity-0 transition-opacity delay-0 group-hover:opacity-100
         group-hover:delay-[${delay}ms] ${TOOLTIP_CLASSES[location]}`}
-      >
-        {text}
-        <div
-          className={`absolute z-20 h-2.5 w-2.5 rotate-45 transform
+    >
+      {text}
+      <div
+        className={`absolute z-20 h-2.5 w-2.5 rotate-45 transform
           bg-gray-800 ${TOOLTIP_TRIANGLE_CLASSES[location]}`}
-        />
-      </div>
+      />
     </div>
-  );
-};
+  </div>
+);
 
 export default Tooltip;

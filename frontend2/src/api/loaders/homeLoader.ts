@@ -14,7 +14,7 @@ import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_aut
 export const homeLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
-    const episodeId = params.episodeId;
+    const { episodeId } = params;
     if (episodeId === undefined) return null;
 
     // Episode Info

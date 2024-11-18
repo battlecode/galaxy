@@ -1,11 +1,12 @@
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import {
   type Match,
   StatusBccEnum,
   type MatchParticipant,
 } from "../../api/_autogen/models";
 import { isNil } from "lodash";
-import { type Maybe } from "../../utils/utilTypes";
+import type { Maybe } from "../../utils/utilTypes";
 
 interface MatchScoreProps {
   match: Match;
@@ -54,7 +55,7 @@ const MatchScore: React.FC<MatchScoreProps> = ({
       !isNil(secondTeam.score)
     ) {
       // If this match is completed and we have scores for both teams, display the scores
-      return `${firstTeam?.score} - ${secondTeam?.score}`;
+      return `${firstTeam.score} - ${secondTeam.score}`;
     } else {
       // If this match is completed but we don't have scores for both teams, display "Hidden"
       // Typically tournament matches which are hidden!

@@ -46,7 +46,7 @@ import { buildKey } from "../helpers";
  */
 export const useIsLoggedIn = (
   queryClient: QueryClient,
-): UseQueryResult<boolean, Error> =>
+): UseQueryResult<boolean> =>
   useQuery({
     queryKey: buildKey(loginTokenVerifyFactory.queryKey, { queryClient }),
     queryFn: async () => await loginTokenVerifyFactory.queryFn({ queryClient }),
@@ -56,10 +56,7 @@ export const useIsLoggedIn = (
 
 export const usePasswordResetTokenValid = ({
   resetTokenRequest,
-}: UserPasswordResetValidateTokenCreateRequest): UseQueryResult<
-  ResetToken,
-  Error
-> =>
+}: UserPasswordResetValidateTokenCreateRequest): UseQueryResult<ResetToken> =>
   useQuery({
     queryKey: buildKey(passwordResetTokenVerifyFactory.queryKey, {
       resetTokenRequest,
@@ -73,7 +70,7 @@ export const usePasswordResetTokenValid = ({
 /**
  * For retrieving the currently logged in user's info.
  */
-export const useCurrentUserInfo = (): UseQueryResult<UserPrivate, Error> =>
+export const useCurrentUserInfo = (): UseQueryResult<UserPrivate> =>
   useQuery({
     // These empty objects are necessary to make the generic typing work :p
     queryKey: buildKey(myUserInfoFactory.queryKey, {}),
@@ -85,7 +82,7 @@ export const useCurrentUserInfo = (): UseQueryResult<UserPrivate, Error> =>
  */
 export const useUserInfoById = ({
   id,
-}: UserURetrieveRequest): UseQueryResult<UserPublic, Error> =>
+}: UserURetrieveRequest): UseQueryResult<UserPublic> =>
   useQuery({
     queryKey: buildKey(otherUserInfoFactory.queryKey, { id }),
     queryFn: async () => await otherUserInfoFactory.queryFn({ id }),
@@ -96,10 +93,7 @@ export const useUserInfoById = ({
  */
 export const useTeamsByUser = ({
   id,
-}: UserUTeamsRetrieveRequest): UseQueryResult<
-  Record<string, TeamPublic>,
-  Error
-> =>
+}: UserUTeamsRetrieveRequest): UseQueryResult<Record<string, TeamPublic>> =>
   useQuery({
     queryKey: buildKey(otherUserTeamsFactory.queryKey, { id }),
     queryFn: async () => await otherUserTeamsFactory.queryFn({ id }),
@@ -112,7 +106,7 @@ export const useTeamsByUser = ({
 export const useCreateUser = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, UserUCreateRequest, unknown> =>
+): UseMutationResult<void, Error, UserUCreateRequest> =>
   useMutation({
     mutationKey: userMutationKeys.create({ episodeId }),
     mutationFn: async ({ userCreateRequest }: UserUCreateRequest) => {
@@ -147,26 +141,17 @@ export const useCreateUser = (
 export const useUpdateCurrentUserInfo = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-): UseMutationResult<
-  UserPrivate,
-  Error,
-  UserUMePartialUpdateRequest,
-  unknown
-> =>
+): UseMutationResult<UserPrivate, Error, UserUMePartialUpdateRequest> =>
   useMutation({
     mutationKey: userMutationKeys.updateCurrent({ episodeId }),
     mutationFn: async ({
       patchedUserPrivateRequest,
-    }: UserUMePartialUpdateRequest) => {
-      return await toast.promise(
-        updateCurrentUser({ patchedUserPrivateRequest }),
-        {
-          loading: "Updating user info...",
-          success: "Updated user info!",
-          error: "Error updating user info.",
-        },
-      );
-    },
+    }: UserUMePartialUpdateRequest) =>
+      await toast.promise(updateCurrentUser({ patchedUserPrivateRequest }), {
+        loading: "Updating user info...",
+        success: "Updated user info!",
+        error: "Error updating user info.",
+      }),
     onSuccess: async (data) => {
       await queryClient.setQueryData(
         buildKey(myUserInfoFactory.queryKey, { episodeId }),
@@ -182,7 +167,7 @@ export const useForgotPassword = ({
   episodeId,
 }: {
   episodeId: string;
-}): UseMutationResult<void, Error, string, unknown> =>
+}): UseMutationResult<void, Error, string> =>
   useMutation({
     mutationKey: userMutationKeys.forgotPassword({ episodeId }),
     mutationFn: async (email: string) => {
@@ -203,12 +188,7 @@ export const useResetPassword = ({
   episodeId,
 }: {
   episodeId: string;
-}): UseMutationResult<
-  void,
-  Error,
-  UserPasswordResetConfirmCreateRequest,
-  unknown
-> =>
+}): UseMutationResult<void, Error, UserPasswordResetConfirmCreateRequest> =>
   useMutation({
     mutationKey: userMutationKeys.resetPassword({ episodeId }),
     mutationFn: async ({
@@ -229,7 +209,7 @@ export const useResetPassword = ({
 export const useUpdateUserAvatar = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, UserUAvatarCreateRequest, unknown> =>
+): UseMutationResult<void, Error, UserUAvatarCreateRequest> =>
   useMutation({
     mutationKey: userMutationKeys.avatarUpload({ episodeId }),
     mutationFn: async (userAvatarRequest: UserUAvatarCreateRequest) => {
@@ -253,7 +233,7 @@ export const useUpdateUserAvatar = (
 export const useResumeUpload = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, UserUResumeUpdateRequest, unknown> =>
+): UseMutationResult<void, Error, UserUResumeUpdateRequest> =>
   useMutation({
     mutationKey: userMutationKeys.resumeUpload({ episodeId }),
     mutationFn: async (userResumeRequest: UserUResumeUpdateRequest) => {
@@ -278,7 +258,7 @@ export const useDownloadResume = ({
   episodeId,
 }: {
   episodeId: string;
-}): UseMutationResult<void, Error, UserURetrieveRequest, unknown> =>
+}): UseMutationResult<void, Error, UserURetrieveRequest> =>
   useMutation({
     mutationKey: userMutationKeys.resumeDownload({ episodeId }),
     mutationFn: async () => {

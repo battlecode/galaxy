@@ -2,7 +2,6 @@ import Cookies from "js-cookie";
 import { Configuration, type ResponseError } from "./_autogen";
 import type {
   PaginatedQueryFactory,
-  PaginatedQueryFuncBuilder,
   PaginatedRequestMinimal,
   PaginatedResultMinimal,
   QueryFactory,
@@ -13,12 +12,11 @@ import { isPresent } from "../utils/utilTypes";
 import toast from "react-hot-toast";
 import { isNil } from "lodash";
 
-// fall back to localhost for now
-export const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+export const BASE_URL = import.meta.env.VITE_BACKEND_URL as string | undefined;
 
 export const DEFAULT_API_CONFIGURATION = new Configuration({
   basePath: BASE_URL,
-  accessToken: () => Cookies.get("access") as string,
+  accessToken: () => Cookies.get("access") ?? "",
 });
 
 export const downloadFile = async (
@@ -50,9 +48,7 @@ export const downloadFile = async (
 export const buildKey = <T>(
   keyBuilder: QueryKeyBuilder<T>,
   request: T,
-): QueryKey => {
-  return keyBuilder.key(request);
-};
+): QueryKey => keyBuilder.key(request);
 
 /**
  * Given a paginated query result, prefetch the next page of table data if it exists.
@@ -62,19 +58,18 @@ export const buildKey = <T>(
  * @param queryFn the function to call to fetch the next page
  * @param queryClient the reference to the query client
  */
-export const prefetchNextPage = async <
+export async function prefetchNextPage<
   T extends PaginatedRequestMinimal,
   K extends PaginatedResultMinimal,
 >(
   request: T,
   result: PaginatedResultMinimal,
-  queryKey: QueryKeyBuilder<T>,
-  queryFn: PaginatedQueryFuncBuilder<T, K>,
+  { queryKey, queryFn }: PaginatedQueryFactory<T, K>,
   queryClient: QueryClient,
-): Promise<void> => {
+): Promise<void> {
   if (isPresent(result.next)) {
     // If no page provided, then we just fetched page 1
-    const nextPage = isPresent(request.page) ? request.page + 1 : 2;
+    const nextPage = (request.page ?? 1) + 1;
     try {
       await queryClient.prefetchQuery({
         queryKey: buildKey(queryKey, { ...request, page: nextPage }),
@@ -85,7 +80,7 @@ export const prefetchNextPage = async <
       toast.error((e as ResponseError).message);
     }
   }
-};
+}
 
 const safeEnsureQueryDataHelper = async <T, K>(
   request: T,
@@ -98,7 +93,7 @@ const safeEnsureQueryDataHelper = async <T, K>(
       // TypeScript allows passing in extra params so this works for regular & paginated
       queryFn: async () => await factory.queryFn(request, queryClient, true),
     });
-  } catch (err) {
+  } catch (_) {
     // This error will have toasted from the QueryClient if necessary
   }
 };
@@ -120,6 +115,5 @@ export const safeEnsureQueryData = <T, K>(
   void safeEnsureQueryDataHelper(request, factory, queryClient);
 };
 
-export const isNilOrEmptyStr = (str: string | undefined | null): boolean => {
-  return isNil(str) || str === "";
-};
+export const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
+  isNil(str) || str === "";

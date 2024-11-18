@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { Link, useParams } from "react-router-dom";
 import { isNil } from "lodash";

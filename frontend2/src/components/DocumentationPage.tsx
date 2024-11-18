@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
 
@@ -11,37 +11,35 @@ interface DocumentationPageProps {
   text: string;
 }
 
-const DocumentationPage: React.FC<DocumentationPageProps> = ({ text }) => {
-  return (
-    <div className="h-full w-full overflow-auto bg-white p-6">
-      <ReactMarkdown
-        components={{
-          a: ({ href, ...props }) => {
-            const target = href ?? "";
-            if (isInternalLink(target)) {
-              return (
-                <Link
-                  className="text-cyan-600 hover:underline"
-                  to={target}
-                  {...props}
-                />
-              );
-            } else {
-              return (
-                <a
-                  className="text-cyan-600 hover:underline"
-                  href={target}
-                  {...props}
-                />
-              );
-            }
-          },
-        }}
-      >
-        {text}
-      </ReactMarkdown>
-    </div>
-  );
-};
+const DocumentationPage: React.FC<DocumentationPageProps> = ({ text }) => (
+  <div className="h-full w-full overflow-auto bg-white p-6">
+    <ReactMarkdown
+      components={{
+        a: ({ href, ...props }) => {
+          const target = href ?? "";
+          if (isInternalLink(target)) {
+            return (
+              <Link
+                className="text-cyan-600 hover:underline"
+                to={target}
+                {...props}
+              />
+            );
+          } else {
+            return (
+              <a
+                className="text-cyan-600 hover:underline"
+                href={target}
+                {...props}
+              />
+            );
+          }
+        },
+      }}
+    >
+      {text}
+    </ReactMarkdown>
+  </div>
+);
 
 export default DocumentationPage;

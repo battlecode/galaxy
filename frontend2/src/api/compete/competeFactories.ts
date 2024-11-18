@@ -44,8 +44,10 @@ export const subsListFactory: PaginatedQueryFactory<
       await prefetchNextPage(
         request,
         result,
-        competeQueryKeys.subList,
-        subsListFactory.queryFn,
+        {
+          queryKey: competeQueryKeys.subList,
+          queryFn: subsListFactory.queryFn,
+        },
         queryClient,
       );
     }
@@ -59,9 +61,8 @@ export const tournamentSubsListFactory: QueryFactory<
   TournamentSubmission[]
 > = {
   queryKey: competeQueryKeys.tourneySubs,
-  queryFn: async (request: CompeteSubmissionTournamentListRequest) => {
-    return await getAllUserTournamentSubmissions(request);
-  },
+  queryFn: async (request: CompeteSubmissionTournamentListRequest) =>
+    await getAllUserTournamentSubmissions(request),
 } as const;
 
 export const scrimmageInboxListFactory: PaginatedQueryFactory<
@@ -76,8 +77,10 @@ export const scrimmageInboxListFactory: PaginatedQueryFactory<
       await prefetchNextPage(
         request,
         result,
-        competeQueryKeys.inbox,
-        scrimmageInboxListFactory.queryFn,
+        {
+          queryKey: competeQueryKeys.inbox,
+          queryFn: scrimmageInboxListFactory.queryFn,
+        },
         queryClient,
       );
     }
@@ -98,8 +101,10 @@ export const scrimmageOutboxListFactory: PaginatedQueryFactory<
       await prefetchNextPage(
         request,
         result,
-        competeQueryKeys.outbox,
-        scrimmageOutboxListFactory.queryFn,
+        {
+          queryKey: competeQueryKeys.outbox,
+          queryFn: scrimmageOutboxListFactory.queryFn,
+        },
         queryClient,
       );
     }
@@ -120,8 +125,10 @@ export const userScrimmageListFactory: PaginatedQueryFactory<
       await prefetchNextPage(
         { episodeId, page },
         result,
-        competeQueryKeys.scrimsMeList,
-        userScrimmageListFactory.queryFn,
+        {
+          queryKey: competeQueryKeys.scrimsMeList,
+          queryFn: userScrimmageListFactory.queryFn,
+        },
         queryClient,
       );
     }
@@ -142,8 +149,10 @@ export const teamScrimmageListFactory: PaginatedQueryFactory<
       await prefetchNextPage(
         request,
         result,
-        competeQueryKeys.scrimsOtherList,
-        teamScrimmageListFactory.queryFn,
+        {
+          queryKey: competeQueryKeys.scrimsOtherList,
+          queryFn: teamScrimmageListFactory.queryFn,
+        },
         queryClient,
       );
     }
@@ -164,8 +173,10 @@ export const matchListFactory: PaginatedQueryFactory<
       await prefetchNextPage(
         request,
         result,
-        competeQueryKeys.matchList,
-        matchListFactory.queryFn,
+        {
+          queryKey: competeQueryKeys.matchList,
+          queryFn: matchListFactory.queryFn,
+        },
         queryClient,
       );
     }
@@ -186,8 +197,10 @@ export const tournamentMatchListFactory: PaginatedQueryFactory<
       await prefetchNextPage(
         request,
         result,
-        competeQueryKeys.tourneyMatchList,
-        tournamentMatchListFactory.queryFn,
+        {
+          queryKey: competeQueryKeys.tourneyMatchList,
+          queryFn: tournamentMatchListFactory.queryFn,
+        },
         queryClient,
       );
     }
@@ -219,7 +232,6 @@ export const scrimmagingRecordFactory: QueryFactory<
   ScrimmageRecord
 > = {
   queryKey: competeQueryKeys.scrimmagingRecord,
-  queryFn: async ({ episodeId, teamId, scrimmageType }) => {
-    return await getScrimmagingRecord({ episodeId, teamId, scrimmageType });
-  },
+  queryFn: async ({ episodeId, teamId, scrimmageType }) =>
+    await getScrimmagingRecord({ episodeId, teamId, scrimmageType }),
 } as const;
