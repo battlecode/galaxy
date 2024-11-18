@@ -144,7 +144,7 @@ paths:
   /api/compete/{episode_id}/match/historical_rating/:
     get:
       operationId: compete_match_historical_rating_list
-      description: List the historical ratings of a list of teams.
+      description: List the historical ratings of a team.
       parameters:
       - in: path
         name: episode_id
@@ -153,12 +153,41 @@ paths:
           pattern: ^[^\/.]+$
         required: true
       - in: query
-        name: team_ids
+        name: team_id
         schema:
-          type: array
-          items:
-            type: integer
-        description: A list of teams to filter for. Defaults to your own team.
+          type: integer
+        description: Optional teamID to filter for. Defaults to your own team.
+      tags:
+      - compete
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No ranked matches found.
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HistoricalRating'
+          description: ''
+  /api/compete/{episode_id}/match/historical_rating_topN/:
+    get:
+      operationId: compete_match_historical_rating_topN_list
+      description: List the historical top N rankings
+      parameters:
+      - in: query
+        name: N
+        schema:
+          type: integer
+        description: number of top teams to get ratings for, defaults to 10
+      - in: path
+        name: episode_id
+        schema:
+          type: string
+          pattern: ^[^\/.]+$
+        required: true
       tags:
       - compete
       security:
@@ -1857,8 +1886,6 @@ components:
             type: integer
         min_score:
           type: integer
-          maximum: 32767
-          minimum: 0
       required:
       - episode
       - maps
@@ -3154,8 +3181,6 @@ components:
           type: string
         external_id:
           type: integer
-          maximum: 32767
-          minimum: -32768
           nullable: true
         name:
           type: string
@@ -3165,14 +3190,9 @@ components:
           items:
             type: integer
         release_status:
-          allOf:
-          - $ref: '#/components/schemas/ReleaseStatusEnum'
-          minimum: -2147483648
-          maximum: 2147483647
+          $ref: '#/components/schemas/ReleaseStatusEnum'
         display_order:
           type: integer
-          maximum: 32767
-          minimum: 0
       required:
       - display_order
       - id

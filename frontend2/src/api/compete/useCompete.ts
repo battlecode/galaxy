@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-query";
 import { competeMutationKeys, competeQueryKeys } from "./competeKeys";
 import type {
+  CompeteMatchHistoricalRatingTopNListRequest,
   CompeteMatchHistoricalRatingListRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
@@ -28,7 +29,6 @@ import type {
   PaginatedMatchList,
   PaginatedScrimmageRequestList,
   PaginatedSubmissionList,
-  PaginatedTeamPublicList,
   ResponseError,
   ScrimmageRecord,
   ScrimmageRequest,
@@ -47,8 +47,8 @@ import toast from "react-hot-toast";
 import { buildKey } from "../helpers";
 import {
   matchListFactory,
+  ratingHistoryTopNFactory,
   ratingHistoryMeFactory,
-  ratingHistoryTopFactory,
   scrimmageInboxListFactory,
   scrimmageOutboxListFactory,
   scrimmagingRecordFactory,
@@ -58,8 +58,6 @@ import {
   tournamentSubsListFactory,
   userScrimmageListFactory,
 } from "./competeFactories";
-import { searchTeamsFactory } from "api/team/teamFactories";
-import { isPresent } from "utils/utilTypes";
 
 // ---------- QUERY HOOKS ---------- //
 /**
@@ -209,34 +207,20 @@ export const useTournamentMatchList = (
 /**
  * For retrieving a list of the top 10 teams' historical ratings in a given episode.
  */
-export const useTopRatingHistoryList = (
-  { episodeId }: CompeteMatchHistoricalRatingListRequest,
-  queryClient: QueryClient,
-): UseQueryResult<HistoricalRating[], Error> =>
+export const useTopRatingHistoryList = ({
+  episodeId,
+  n,
+}: CompeteMatchHistoricalRatingTopNListRequest): UseQueryResult<
+  HistoricalRating[],
+  Error
+> =>
   useQuery({
-    queryKey: buildKey(ratingHistoryTopFactory.queryKey, { episodeId }),
+    queryKey: buildKey(ratingHistoryTopNFactory.queryKey, { episodeId, n }),
     queryFn: async () => {
-      // Get the query data for the top 10 teams in this episode
-      const topTeamsData: PaginatedTeamPublicList | undefined =
-        await queryClient.ensureQueryData({
-          queryKey: buildKey(searchTeamsFactory.queryKey, { episodeId }),
-          queryFn: async () =>
-            await searchTeamsFactory.queryFn(
-              { episodeId, page: 1 },
-              queryClient,
-              false, // We don't want to prefetch teams 11-20
-            ),
-        });
-      // Fetch their rating histories
-      if (isPresent(topTeamsData) && isPresent(topTeamsData.results)) {
-        const topTeamsIds = topTeamsData.results.map((team) => team.id);
-        return await ratingHistoryTopFactory.queryFn({
-          episodeId,
-          teamIds: topTeamsIds,
-        });
-      } else {
-        return [];
-      }
+      return await ratingHistoryTopNFactory.queryFn({
+        episodeId,
+        n,
+      });
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

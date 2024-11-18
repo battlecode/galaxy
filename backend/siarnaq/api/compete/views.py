@@ -4,8 +4,9 @@ from typing import Optional
 import google.cloud.storage as storage
 import structlog
 from django.conf import settings
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import NotSupportedError, transaction
-from django.db.models import Exists, OuterRef, Q, Subquery
+from django.db.models import Exists, F, OuterRef, Q, Subquery
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
@@ -38,7 +39,7 @@ from siarnaq.api.compete.serializers import (
 )
 from siarnaq.api.episodes.models import ReleaseStatus, Tournament
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable, IsEpisodeMutable
-from siarnaq.api.teams.models import Team, TeamStatus
+from siarnaq.api.teams.models import Rating, Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.gcloud import titan
 
@@ -387,13 +388,95 @@ class MatchViewSet(
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
+    def get_historical_rating_ranking(self, episode_id, queryset, limit=None):
+        """
+        Retrieve historical ratings for teams in a specific episode, sorted by
+        highest rating.
+
+        This function processes a set of matches to calculate and return historical
+        ratings for teams participating in a given episode. The results are ordered
+        by the maximum rating achieved, in descending order.
+
+        Parameters:
+        - episode_id (int): The identifier of the episode to filter teams by.
+        - queryset (QuerySet): A collection of match objects used to compute
+                               historical ratings.
+        - limit (int, optional): The maximum number of team ratings to return.
+
+        Returns:
+        - List[Dict]: A list of dictionaries containing team information and
+                      their historical ratings, sorted by highest rating in
+                      descending order. The number of items is capped by
+                      the 'limit' parameter if provided.
+        """
+        has_invisible = self.get_queryset().filter(
+            participants__team__status=TeamStatus.INVISIBLE
+        )
+        matches = (
+            (
+                queryset.filter(episode=episode_id)
+                .filter(tournament_round__isnull=True)
+                .exclude(pk__in=Subquery(has_invisible.values("pk")))
+                .filter(is_ranked=True)
+                .filter(participants__rating__isnull=False)
+            )
+            .all()
+            .order_by("-created")
+        )
+
+        matching_participants = MatchParticipant.objects.all().filter(match__in=matches)
+        # Subquery to get the last rating value
+        last_rating_subquery = (
+            matching_participants.filter(team_id=OuterRef("team_id"))
+            .values("rating__value")
+            .order_by("-match__created")
+            .values("rating__value")[:1]
+        )
+
+        # query aggregate rating history per each team order by
+        # last_rating and limit by 'limit'
+        rating_history = (
+            matching_participants.values("team_id")
+            .annotate(
+                timestamps_list=ArrayAgg(
+                    F("match__created"), ordering="match__created"
+                ),
+                ratings_pk_list=ArrayAgg(F("rating__pk"), ordering="match__created"),
+                last_rating_value=Subquery(last_rating_subquery),
+            )
+            .all()
+            .order_by("-last_rating_value")[:limit]
+        )
+        # parse query result in format required by serializer
+        # query returns team, rating as pk but we serializer
+        # needs pointer to team, rating objects
+        grouped = [
+            {
+                "team_id": team_data["team_id"],
+                "team_rating": {
+                    "team": Team.objects.get(pk=team_data["team_id"]),
+                    "rating_history": [
+                        {
+                            "timestamp": timestamp,
+                            "rating": Rating.objects.get(pk=rating_pk),
+                        }
+                        for rating_pk, timestamp in zip(
+                            team_data["ratings_pk_list"], team_data["timestamps_list"]
+                        )
+                    ],
+                },
+            }
+            for team_data in rating_history
+        ]
+        return grouped
+
     @extend_schema(
         parameters=[
             OpenApiParameter(
-                name="team_ids",
+                name="team_id",
                 type=int,
-                description="A list of teams to filter for. Defaults to your own team.",
-                many=True,
+                description="Optional teamID to filter for. Defaults to your own team.",
+                required=False,
             ),
         ],
         responses={
@@ -407,17 +490,15 @@ class MatchViewSet(
         detail=False,
         methods=["get"],
         permission_classes=(IsEpisodeMutable,),
-        # needed so that the generated schema is not paginated
         pagination_class=None,
     )
     def historical_rating(self, request, pk=None, *, episode_id):
-        """List the historical ratings of a list of teams."""
-        queryset = Match.objects.all().filter(tournament_round__isnull=True)
+        """List the historical ratings of a team."""
+        team_id = self.request.query_params.get("team_id")
 
-        team_ids = self.request.query_params.getlist("team_ids")
-        if team_ids is not None and len(team_ids) > 0:
-            team_ids = {parse_int(team_id) for team_id in team_ids}
-            queryset = queryset.filter(participants__team__in=team_ids)
+        if team_id is not None:
+            team_id = parse_int(team_id)
+            team_ids = {team_id}
         elif request.user.pk is not None:
             team_ids = {
                 team.id
@@ -425,37 +506,63 @@ class MatchViewSet(
                     episode_id=episode_id
                 )
             }
-            queryset = queryset.filter(participants__team__members=request.user.pk)
         else:
             return Response([])
-        has_invisible = self.get_queryset().filter(
-            participants__team__status=TeamStatus.INVISIBLE
+
+        queryset = Match.objects.all().filter(participants__team__in=team_ids)
+        grouped = self.get_historical_rating_ranking(episode_id, queryset)
+        results = HistoricalRatingSerializer(grouped, many=True).data
+        return Response(results, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="N",
+                type=int,
+                description="number of top teams to get ratings for, defaults to 10",
+                required=False,
+            ),
+        ],
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="No ranked matches found."
+            ),
+            status.HTTP_200_OK: HistoricalRatingSerializer(many=True),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                description="Invalid parameter: N must be less than or equal to 10"
+            ),
+        },
+    )
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=(IsEpisodeMutable,),
+        # needed so that the generated schema is not paginated
+        pagination_class=None,
+    )
+    def historical_rating_topN(self, request, pk=None, *, episode_id):
+        """List the historical top N rankings, N should be <= 10 and defaults to 10"""
+        N = request.query_params.get("N", 10)
+
+        try:
+            N = int(N)
+        except ValueError:
+            return Response(
+                {"error": "Invalid parameter: N must be an integer"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if N > 10:
+            return Response(
+                {"error": "Invalid parameter: N must be less than or equal to 10"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        queryset = Match.objects.all()
+        grouped = self.get_historical_rating_ranking(
+            episode_id=episode_id, queryset=queryset, limit=N
         )
-        queryset = queryset.exclude(pk__in=Subquery(has_invisible.values("pk")))
-        queryset = queryset.filter(is_ranked=True).filter(
-            participants__rating__isnull=False
-        )
-
-        matches = queryset.all().order_by("-created")
-        grouped = {
-            team_id: {"team_id": team_id, "team_rating": None} for team_id in team_ids
-        }
-
-        for match in matches:
-            matching_participants = match.participants.filter(team__in=team_ids).all()
-            for participant in matching_participants:
-                match_info = {"timestamp": match.created, "rating": participant.rating}
-                if grouped[participant.team.id]["team_rating"] is None:
-                    grouped[participant.team.id]["team_rating"] = {
-                        "team": participant.team,
-                        "rating_history": [match_info],
-                    }
-                else:
-                    grouped[participant.team.id]["team_rating"][
-                        "rating_history"
-                    ].append(match_info)
-
-        results = HistoricalRatingSerializer(grouped.values(), many=True).data
+        results = HistoricalRatingSerializer(grouped, many=True).data
         return Response(results, status=status.HTTP_200_OK)
 
     @extend_schema(

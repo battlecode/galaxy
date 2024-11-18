@@ -19,6 +19,7 @@ import {
   type CompeteMatchListRequest,
   type CompeteSubmissionTournamentListRequest,
   type CompeteRequestDestroyRequest,
+  type CompeteMatchHistoricalRatingTopNListRequest,
   type CompeteMatchHistoricalRatingListRequest,
   type HistoricalRating,
   type CompeteMatchScrimmagingRecordRetrieveRequest,
@@ -215,17 +216,28 @@ export const getMatchesList = async ({
   await API.competeMatchList({ episodeId, page });
 
 /**
- * Get the rating history for a list of teams in a given episode.
- * Defaults to the logged in user's team if no team IDs are provided.
+ * Get the rating history for top 10 teams in a given episode.
  *
  * @param episodeId The episode ID to retrieve rating data for.
- * @param teamIds The team IDs to retrieve rating data for.
+ */
+export const getRatingTopNList = async ({
+  episodeId,
+  n,
+}: CompeteMatchHistoricalRatingTopNListRequest): Promise<HistoricalRating[]> =>
+  await API.competeMatchHistoricalRatingTopNList({ episodeId, n });
+
+/**
+ * Get the rating history for a teamsin a given episode.
+ * Defaults to the logged in user's team if no team ID are provided.
+ *
+ * @param episodeId The episode ID to retrieve rating data for.
+ * @param teamId The team ID to retrieve rating data for.
  */
 export const getRatingList = async ({
   episodeId,
-  teamIds,
+  teamId,
 }: CompeteMatchHistoricalRatingListRequest): Promise<HistoricalRating[]> =>
-  await API.competeMatchHistoricalRatingList({ episodeId, teamIds });
+  await API.competeMatchHistoricalRatingList({ episodeId, teamId });
 
 /**
  * Get a team's win-loss-tie record in scrimmages in a given episode. Defaults to the logged in user's team.
