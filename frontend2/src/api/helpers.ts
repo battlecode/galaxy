@@ -14,8 +14,7 @@ import toast from "react-hot-toast";
 import { isNil } from "lodash";
 
 // fall back to localhost for now
-export const BASE_URL =
-  process.env.REACT_APP_BACKEND_URL ?? "http://localhost:8000";
+export const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const DEFAULT_API_CONFIGURATION = new Configuration({
   basePath: BASE_URL,
