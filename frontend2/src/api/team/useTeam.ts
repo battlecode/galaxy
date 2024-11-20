@@ -33,7 +33,7 @@ import {
   searchTeamsFactory,
 } from "./teamFactories";
 import { buildKey } from "../helpers";
-import { ratingHistoryFactory } from "api/compete/competeFactories";
+import { userRatingHistoryFactory } from "api/compete/competeFactories";
 import { competeQueryKeys } from "api/compete/competeKeys";
 import { MILLIS_SECOND } from "utils/utilTypes";
 
@@ -138,10 +138,7 @@ export const useJoinTeam = (
       });
       // Refetch the user's rating history
       await queryClient.refetchQueries({
-        queryKey: buildKey(ratingHistoryFactory.queryKey, {
-          episodeId,
-          teamId: undefined,
-        }),
+        queryKey: buildKey(userRatingHistoryFactory.queryKey, { episodeId }),
       });
       // Refetch all scrimmage-related data
       await queryClient.refetchQueries({
@@ -174,10 +171,7 @@ export const useLeaveTeam = (
       });
       // Invalidate the user's rating history
       await queryClient.invalidateQueries({
-        queryKey: buildKey(ratingHistoryFactory.queryKey, {
-          episodeId,
-          teamId: undefined,
-        }),
+        queryKey: buildKey(userRatingHistoryFactory.queryKey, { episodeId }),
       });
       // Invalidate all scrimmage-related data
       await queryClient.invalidateQueries({

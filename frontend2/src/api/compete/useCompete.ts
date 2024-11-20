@@ -8,7 +8,7 @@ import {
 import { competeMutationKeys, competeQueryKeys } from "./competeKeys";
 import type {
   CompeteMatchHistoricalRatingTopNListRequest,
-  CompeteMatchHistoricalRatingListRequest,
+  CompeteMatchHistoricalRatingRetrieveRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
   CompeteMatchScrimmagingRecordRetrieveRequest,
@@ -46,7 +46,7 @@ import { buildKey } from "../helpers";
 import {
   matchListFactory,
   ratingHistoryTopNFactory,
-  ratingHistoryFactory,
+  userRatingHistoryFactory,
   scrimmageInboxListFactory,
   scrimmageOutboxListFactory,
   scrimmagingRecordFactory,
@@ -55,6 +55,7 @@ import {
   tournamentMatchListFactory,
   tournamentSubsListFactory,
   userScrimmageListFactory,
+  ratingHistoryFactory,
 } from "./competeFactories";
 import { MILLIS_SECOND, SECONDS_MINUTE } from "utils/utilTypes";
 
@@ -205,7 +206,7 @@ export const useTournamentMatchList = (
   });
 
 /**
- * For retrieving the historical rating of the given teams in the given episode.
+ * For retrieving a list of the top n teams' historical ratings in a given episode.
  */
 export const useTopRatingHistoryList = ({
   episodeId,
@@ -224,19 +225,35 @@ export const useTopRatingHistoryList = ({
   });
 
 /**
- * For retrieving a list of a team's historical rating in a given episode. If teamId is undefined, defaults to the current user.
+ * For retrieving the given team's historical rating in a given episode.
  */
-export const useRatingHistoryList = ({
+export const useTeamRatingHistory = ({
   episodeId,
   teamId,
-}: CompeteMatchHistoricalRatingListRequest): UseQueryResult<
-  HistoricalRating[]
+}: CompeteMatchHistoricalRatingRetrieveRequest): UseQueryResult<
+  HistoricalRating,
+  Error
 > =>
   useQuery({
     queryKey: buildKey(ratingHistoryFactory.queryKey, { episodeId, teamId }),
     queryFn: async () =>
       await ratingHistoryFactory.queryFn({ episodeId, teamId }),
     staleTime: MILLIS_SECOND * SECONDS_MINUTE * STATISTICS_WAIT_MINUTES,
+  });
+
+/**
+ * For retrieving the currently logged in user's team's historical rating in a given episode.
+ */
+export const useUserRatingHistory = ({
+  episodeId,
+}: CompeteMatchHistoricalRatingRetrieveRequest): UseQueryResult<
+  HistoricalRating,
+  Error
+> =>
+  useQuery({
+    queryKey: buildKey(userRatingHistoryFactory.queryKey, { episodeId }),
+    queryFn: async () => await userRatingHistoryFactory.queryFn({ episodeId }),
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
 /**

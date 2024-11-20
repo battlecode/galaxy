@@ -10,6 +10,9 @@ import MemberList from "components/team/MemberList";
 import { Status526Enum } from "api/_autogen";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 import PageNotFound from "./PageNotFound";
+import TeamChart from "components/compete/chart/TeamChart";
+import { useTeamRatingHistory } from "api/compete/useCompete";
+import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 
 const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
   isNil(str) || str === "";
@@ -17,19 +20,23 @@ const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
 // rendered at /:episodeId/team/:teamId
 const TeamProfile: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const { teamId } = useParams();
+  const { teamId } = useParams(); // Always defined, else loader will redirect
 
   const episode = useEpisodeInfo({ id: episodeId });
   const team = useTeam({ episodeId, id: teamId ?? "" });
+  const teamRating = useTeamRatingHistory({
+    episodeId,
+    teamId: parseInt(teamId ?? ""),
+  });
 
   const membersList = useMemo(() => {
-    if (!team.isSuccess) return null;
     return (
       <div className="flex flex-col gap-8">
-        <MemberList members={team.data.members} />
+        <MemberList members={team.data?.members ?? []} />
       </div>
-    );
-  }, [team]);
+    )},
+    [team],
+  );
 
   const eligibles = useMemo(
     () =>
@@ -132,25 +139,31 @@ const TeamProfile: React.FC = () => {
               </div>
             )}
           </SectionCard>
-          <SectionCard title="Rating"></SectionCard>
-          {/* The members list that displays when on a smaller screen */}
-          <SectionCard
-            className="shrink xl:hidden"
-            title="Members"
-            loading={team.isLoading}
-          >
-            {team.isSuccess && membersList}
+          <SectionCard title="Rating History" loading={teamRating.isLoading}>
+            {teamRating.isSuccess && <TeamChart
+              teamRatings={[teamRating.data]}
+            />}
           </SectionCard>
+          {/* The members list/record that displays when on a smaller screen */}
+          <div className="flex shrink flex-col gap-8 xl:hidden">
+            <SectionCard title="Members">{membersList}</SectionCard>
+            <SectionCard title="Record">
+              {team.isSuccess && (
+                <ScrimmagingRecord team={team.data} hideTeamName />
+              )}
+            </SectionCard>
+          </div>
         </div>
 
-        {/* The members list that displays to the right side when on a big screen. */}
-        <SectionCard
-          className="hidden w-1/3 shrink xl:block"
-          title="Members"
-          loading={team.isLoading}
-        >
-          {team.isSuccess && membersList}
-        </SectionCard>
+        {/* The members list/record that displays to the right side when on a big screen. */}
+        <div className="hidden w-1/3 shrink gap-8 xl:flex xl:flex-col">
+          <SectionCard title="Members">{membersList}</SectionCard>
+          <SectionCard title="Record">
+            {team.isSuccess && (
+              <ScrimmagingRecord team={team.data} hideTeamName />
+            )}
+          </SectionCard>
+        </div>
       </div>
     </div>
   );

@@ -58,7 +58,7 @@ import {
     TournamentSubmissionToJSON,
 } from '../models';
 
-export interface CompeteMatchHistoricalRatingListRequest {
+export interface CompeteMatchHistoricalRatingRetrieveRequest {
     episodeId: string;
     teamId?: number;
 }
@@ -185,9 +185,9 @@ export class CompeteApi extends runtime.BaseAPI {
     /**
      * List the historical ratings of a team.
      */
-    async competeMatchHistoricalRatingListRaw(requestParameters: CompeteMatchHistoricalRatingListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<HistoricalRating>>> {
+    async competeMatchHistoricalRatingRetrieveRaw(requestParameters: CompeteMatchHistoricalRatingRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HistoricalRating>> {
         if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
-            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling competeMatchHistoricalRatingList.');
+            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling competeMatchHistoricalRatingRetrieve.');
         }
 
         const queryParameters: any = {};
@@ -213,19 +213,19 @@ export class CompeteApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(HistoricalRatingFromJSON));
+        return new runtime.JSONApiResponse(response, (jsonValue) => HistoricalRatingFromJSON(jsonValue));
     }
 
     /**
      * List the historical ratings of a team.
      */
-    async competeMatchHistoricalRatingList(requestParameters: CompeteMatchHistoricalRatingListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<HistoricalRating>> {
-        const response = await this.competeMatchHistoricalRatingListRaw(requestParameters, initOverrides);
+    async competeMatchHistoricalRatingRetrieve(requestParameters: CompeteMatchHistoricalRatingRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HistoricalRating> {
+        const response = await this.competeMatchHistoricalRatingRetrieveRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
     /**
-     * List the historical top N rankings
+     * List the historical top N rankings, N should be <= 10 and defaults to 10
      */
     async competeMatchHistoricalRatingTopNListRaw(requestParameters: CompeteMatchHistoricalRatingTopNListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<HistoricalRating>>> {
         if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
@@ -259,7 +259,7 @@ export class CompeteApi extends runtime.BaseAPI {
     }
 
     /**
-     * List the historical top N rankings
+     * List the historical top N rankings, N should be <= 10 and defaults to 10
      */
     async competeMatchHistoricalRatingTopNList(requestParameters: CompeteMatchHistoricalRatingTopNListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<HistoricalRating>> {
         const response = await this.competeMatchHistoricalRatingTopNListRaw(requestParameters, initOverrides);

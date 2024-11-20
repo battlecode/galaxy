@@ -143,7 +143,7 @@ paths:
           description: This match was already finalized
   /api/compete/{episode_id}/match/historical_rating/:
     get:
-      operationId: compete_match_historical_rating_list
+      operationId: compete_match_historical_rating_retrieve
       description: List the historical ratings of a team.
       parameters:
         - in: path
@@ -172,10 +172,15 @@ paths:
                 items:
                   $ref: "#/components/schemas/HistoricalRating"
           description: ""
+                $ref: '#/components/schemas/HistoricalRating'
+          description: ''
+        '400':
+          description: Could not find requested team.
   /api/compete/{episode_id}/match/historical_rating_topN/:
     get:
       operationId: compete_match_historical_rating_topN_list
-      description: List the historical top N rankings
+      description: List the historical top N rankings, N should be <= 10 and defaults
+        to 10
       parameters:
         - in: query
           name: N
@@ -203,6 +208,10 @@ paths:
                 items:
                   $ref: "#/components/schemas/HistoricalRating"
           description: ""
+                  $ref: '#/components/schemas/HistoricalRating'
+          description: ''
+        '400':
+          description: 'Invalid parameter: N must be less than or equal to 10'
   /api/compete/{episode_id}/match/scrimmage/:
     get:
       operationId: compete_match_scrimmage_list
@@ -1888,6 +1897,8 @@ components:
             type: integer
         min_score:
           type: integer
+          maximum: 32767
+          minimum: 0
       required:
         - episode
         - maps
@@ -3183,6 +3194,8 @@ components:
           type: string
         external_id:
           type: integer
+          maximum: 32767
+          minimum: -32768
           nullable: true
         name:
           type: string
@@ -3192,9 +3205,14 @@ components:
           items:
             type: integer
         release_status:
-          $ref: "#/components/schemas/ReleaseStatusEnum"
+          allOf:
+          - $ref: '#/components/schemas/ReleaseStatusEnum'
+          minimum: -2147483648
+          maximum: 2147483647
         display_order:
           type: integer
+          maximum: 32767
+          minimum: 0
       required:
         - display_order
         - id

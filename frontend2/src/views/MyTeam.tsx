@@ -23,6 +23,7 @@ import { FIELD_REQUIRED_ERROR_MSG } from "utils/constants";
 import FormLabel from "components/elements/FormLabel";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 import TeamChart from "components/compete/chart/TeamChart";
+import { useUserRatingHistory } from "api/compete/useCompete";
 
 interface InfoFormInput {
   quote: string;
@@ -47,6 +48,8 @@ const MyTeam: React.FC = () => {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
 
   const teamData = useUserTeam({ episodeId });
+  const teamRatingHistory = useUserRatingHistory({ episodeId });
+
   const updateTeam = useUpdateTeam(
     {
       episodeId,
@@ -195,8 +198,10 @@ const MyTeam: React.FC = () => {
           </SectionCard>
           <SectionCard title="Rating History">
             <TeamChart
-              teamIds={teamData.isSuccess ? [teamData.data.id] : []}
-              loading={teamData.isLoading}
+              teamRatings={
+                teamRatingHistory.isSuccess ? [teamRatingHistory.data] : []
+              }
+              loading={teamRatingHistory.isLoading}
             />
           </SectionCard>
         </div>

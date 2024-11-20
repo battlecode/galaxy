@@ -5,17 +5,22 @@ import SectionCard from "../components/SectionCard";
 import CountdownDigital from "../components/CountdownDigital";
 import { SocialIcon } from "react-social-icons";
 import TeamChart from "../components/compete/chart/TeamChart";
-import { useQueryClient } from "@tanstack/react-query";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
-import { useSearchTeams, useUserTeam } from "api/team/useTeam";
+import { useUserTeam } from "api/team/useTeam";
+import { useTopRatingHistoryList } from "api/compete/useCompete";
+import UserChart from "components/compete/chart/UserChart";
+import { useCurrentUser } from "contexts/CurrentUserContext";
 import { isPresent } from "utils/utilTypes";
 
 const Home: React.FC = () => {
+  const TOP_TEAMS = 10;
+
   const { episodeId } = useEpisodeId();
   const episode = useEpisodeInfo({ id: episodeId });
   const nextTournament = useNextTournament({ episodeId });
-  const topRatingHistory = useTopRatingHistoryList({ episodeId, n: 10 });
+  const topRatingHistory = useTopRatingHistoryList({ episodeId, n: TOP_TEAMS });
   const userTeam = useUserTeam({ episodeId });
+  const currentUser = useCurrentUser();
 
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";
@@ -50,11 +55,16 @@ const Home: React.FC = () => {
               "Join a team to scrimmage other teams!"
             )}
           </SectionCard>
-          <SectionCard title="Rating History">
-            <TeamChart
-              teamIds={userTeam.isSuccess ? [userTeam.data.id] : []}
-              loading={userTeam.isLoading}
-            />
+          <SectionCard
+            title="Rating History"
+            loading={currentUser.user.isLoading}
+          >
+            {currentUser.user.isSuccess && (
+              <UserChart
+                userId={currentUser.user.data.id}
+                lockedEpisode={episodeId}
+              />
+            )}
           </SectionCard>
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
@@ -87,8 +97,9 @@ const Home: React.FC = () => {
           </SectionCard>
           <SectionCard title="Top Teams">
             <TeamChart
-              teamIds={topTeams.data?.results?.map((t) => t.id) ?? []}
-              loading={topTeams.isLoading}
+              teamRatings={topRatingHistory.data ?? []}
+              loading={topRatingHistory.isLoading}
+              crownTop
             />
           </SectionCard>
         </div>
