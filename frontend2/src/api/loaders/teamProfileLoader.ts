@@ -10,7 +10,7 @@ export const teamProfileLoader =
     const { teamId, episodeId } = params;
     if (teamId === undefined || episodeId === undefined) return null;
 
-    // All teams
+    // Load the team's info
     safeEnsureQueryData(
       {
         episodeId,

@@ -7,11 +7,13 @@ import type {
   PageKey,
 } from "./ContentStruct";
 
+import * as BC25 from "./bc25";
 import * as BC24 from "./bc24";
 import * as BC23 from "./bc23";
 import * as BC22 from "./bc22";
 
 const bcVersions: Record<string, typeof BC24 | typeof BC23 | typeof BC22> = {
+  bc25: BC25,
   bc24: BC24,
   bc23: BC23,
   bc22: BC22,

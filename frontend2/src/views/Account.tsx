@@ -3,8 +3,7 @@ import { useState } from "react";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import Input from "../components/elements/Input";
 import TextArea from "../components/elements/TextArea";
-import Loading from "../components/Loading";
-import { useCurrentUser } from "../contexts/CurrentUserContext";
+import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import SectionCard from "../components/SectionCard";
 import SelectMenu from "../components/elements/SelectMenu";
 import type { Maybe } from "../utils/utilTypes";
@@ -38,7 +37,7 @@ const Account: React.FC = () => {
   const uploadAvatar = useUpdateUserAvatar({ episodeId }, queryClient);
   const uploadResume = useResumeUpload({ episodeId }, queryClient);
   const downloadResume = useDownloadResume({ episodeId });
-  const { user } = useCurrentUser();
+  const { authState, user } = useCurrentUser();
 
   const { register: avatarRegister, handleSubmit: handleAvatarSubmit } =
     useForm<FileInput>();
@@ -60,13 +59,12 @@ const Account: React.FC = () => {
     <div className="p-6">
       <PageTitle>User Settings</PageTitle>
       <div className="flex flex-col gap-8 xl:flex-row">
-        {user !== undefined ? (
-          <ProfileForm episodeId={episodeId} queryClient={queryClient} />
-        ) : (
-          <Loading />
-        )}
+        <ProfileForm episodeId={episodeId} queryClient={queryClient} />
 
-        <SectionCard title="File Upload">
+        <SectionCard
+          title="File Upload"
+          loading={authState === AuthStateEnum.LOADING}
+        >
           <div className="flex flex-row gap-10 xl:flex-col">
             <form
               onSubmit={(e) => {

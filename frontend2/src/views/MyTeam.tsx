@@ -18,7 +18,6 @@ import {
 } from "api/team/useTeam";
 import { useQueryClient } from "@tanstack/react-query";
 import JoinTeam from "./JoinTeam";
-import Loading from "components/Loading";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { FIELD_REQUIRED_ERROR_MSG } from "utils/constants";
 import FormLabel from "components/elements/FormLabel";
@@ -84,14 +83,11 @@ const MyTeam: React.FC = () => {
     setIsLeaveModalOpen(false);
   };
 
-  const membersList = useMemo(
-    () => (
+  const membersList = useMemo(() => {
+    if (!teamData.isSuccess) return null;
+    return (
       <div className="flex flex-col gap-8">
-        {!teamData.isSuccess ? (
-          <Loading />
-        ) : (
-          <MemberList members={teamData.data.members} />
-        )}
+        <MemberList members={teamData.data.members} />
         <Button
           className="self-start"
           onClick={() => {
@@ -100,13 +96,10 @@ const MyTeam: React.FC = () => {
           label="Leave team"
         />
       </div>
-    ),
-    [teamData],
-  );
+    );
+  }, [teamData]);
 
-  if (teamData.isLoading) {
-    return <Loading />;
-  } else if (!teamData.isSuccess) {
+  if (!teamData.isSuccess) {
     return <JoinTeam />;
   }
 
@@ -159,7 +152,11 @@ const MyTeam: React.FC = () => {
             </form>
           </SectionCard>
           {/* The members list, file upload, and win/loss that display when on a smaller screen */}
-          <SectionCard className="shrink xl:hidden" title="Members">
+          <SectionCard
+            className="shrink xl:hidden"
+            title="Members"
+            loading={teamData.isLoading}
+          >
             {membersList}
           </SectionCard>
           <SectionCard className="shrink xl:hidden" title="Scrimmaging Record">
@@ -176,7 +173,7 @@ const MyTeam: React.FC = () => {
           <ScrimmageSettings />
         </div>
         {/* Display the members list, file upload, and win/loss to the right when on a big screen. */}
-        <div className="hidden max-w-2xl flex-1 flex-col gap-8 xl:flex">
+        <div className="hidden max-w-2xl gap-8 xl:flex xl:flex-1 xl:flex-col">
           <SectionCard title="Members">{membersList}</SectionCard>
           <SectionCard title="Scrimmaging Record">
             <ScrimmagingRecord

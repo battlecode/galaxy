@@ -4,7 +4,6 @@ import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useEpisodeInfo, useNextTournament } from "../api/episode/useEpisode";
 import SectionCard from "../components/SectionCard";
 import CountdownDigital from "../components/CountdownDigital";
-import Spinner from "../components/Spinner";
 import { SocialIcon } from "react-social-icons";
 import TeamChart, {
   type ChartData,
@@ -73,6 +72,7 @@ const Home: React.FC = () => {
                 ? `Welcome to ${episode.data.name_long}!`
                 : "Welcome!"
             }
+            loading={episode.isLoading}
           >
             <span>
               {episode.isSuccess && isPresent(episode.data.blurb)
@@ -81,15 +81,17 @@ const Home: React.FC = () => {
             </span>
           </SectionCard>
 
-          {userTeam.isSuccess && (
-            <SectionCard title="Scrimmaging Record">
+          <SectionCard title="Scrimmaging Record" loading={userTeam.isLoading}>
+            {userTeam.isSuccess ? (
               <ScrimmagingRecord
                 team={userTeam.data}
                 hideRanked={true}
                 hideUnranked={true}
               />
-            </SectionCard>
-          )}
+            ) : (
+              "Join a team to scrimmage other teams!"
+            )}
+          </SectionCard>
           <SectionCard title="Rating History">
             <TeamChart
               yAxisLabel="Rating"
@@ -100,10 +102,11 @@ const Home: React.FC = () => {
           </SectionCard>
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
-          <SectionCard title="Next Submission Deadline">
-            {nextTournament.isLoading ? (
-              <Spinner size="md" />
-            ) : nextTournament.isSuccess && nextTournament.data !== null ? (
+          <SectionCard
+            title="Next Submission Deadline"
+            loading={nextTournament.isLoading}
+          >
+            {nextTournament.isSuccess && nextTournament.data !== null ? (
               <CountdownDigital date={nextTournament.data.submission_freeze} />
             ) : (
               "No upcoming submission deadlines."
@@ -134,7 +137,6 @@ const Home: React.FC = () => {
               loadingMessage="Loading rankings data..."
             />
           </SectionCard>
-          {/* <SectionCard title="Announcements">ANNOUNCEMENTS (TODO)</SectionCard> */}
         </div>
       </div>
     </div>

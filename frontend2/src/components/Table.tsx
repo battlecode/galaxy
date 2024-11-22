@@ -30,7 +30,7 @@ function Table<T>({
 }: TableProps<T>): React.ReactElement {
   return (
     <div className="pl-50 w-full">
-      <table className="w-full text-left text-sm text-gray-500">
+      <table className="w-full border-collapse overflow-hidden rounded-t-lg border border-white text-left text-sm text-gray-500">
         <thead className="border-b bg-cyan-400 text-xs uppercase text-gray-700">
           <tr>
             {columns.map((col) => (
