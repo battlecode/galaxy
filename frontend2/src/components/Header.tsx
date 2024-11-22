@@ -1,20 +1,30 @@
-import type React from "react";
-import { Fragment } from "react";
+import React, { Fragment, useMemo } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import Icon from "./elements/Icon";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import { SIDEBAR_ITEM_DATA } from "./sidebar";
+import { ALL_SIDEBAR_ITEMS, renderableItems } from "./sidebar";
 import EpisodeSwitcher from "./EpisodeSwitcher";
 import { logout } from "../api/auth/authApi";
 import { useQueryClient } from "@tanstack/react-query";
+import { useUserTeam } from "api/team/useTeam";
+import { useEpisodeInfo } from "api/episode/useEpisode";
 
 const Header: React.FC = () => {
   const { authState, user } = useCurrentUser();
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const teamData = useUserTeam({ episodeId });
+  const episodeData = useEpisodeInfo({ id: episodeId });
+
+  const renderedItems = useMemo(
+    () => renderableItems(ALL_SIDEBAR_ITEMS, episodeData, teamData),
+    [episodeData, teamData],
+  );
+
   return (
     <nav className="fixed top-0 z-30 h-16 w-full bg-gray-700">
       <div className="w-full px-2 sm:px-6 lg:px-8">
@@ -38,7 +48,7 @@ const Header: React.FC = () => {
               leaveTo="opacity-0"
             >
               <Menu.Items className="absolute left-1 top-12 z-10 mt-2 w-64 gap-2 rounded-md bg-white p-2 font-light shadow-lg sm:hidden">
-                {SIDEBAR_ITEM_DATA.map(({ iconName, text, linkTo }, index) => (
+                {renderedItems.map(({ iconName, text, linkTo }, index) => (
                   <Menu.Item key={index}>
                     <NavLink
                       className={({ isActive }) =>

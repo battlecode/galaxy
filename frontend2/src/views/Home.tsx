@@ -15,6 +15,7 @@ import {
 } from "api/compete/useCompete";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 import { useUserTeam } from "api/team/useTeam";
+import { isPresent } from "utils/utilTypes";
 
 const Home: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -66,15 +67,14 @@ const Home: React.FC = () => {
     <div className="p-6">
       <div className="flex flex-col gap-6 xl:flex-row">
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
-          <SectionCard title="Next Submission Deadline">
-            {nextTournament.isLoading ? (
-              <Spinner size="md" />
-            ) : nextTournament.isSuccess && nextTournament.data !== null ? (
-              <CountdownDigital date={nextTournament.data.submission_freeze} />
-            ) : (
-              "No upcoming submission deadlines."
-            )}
+          <SectionCard title="Welcome!">
+            <span>
+              {episode.isSuccess && isPresent(episode.data.blurb)
+                ? episode.data.blurb
+                : `Welcome!`}
+            </span>
           </SectionCard>
+
           {userTeam.isSuccess && (
             <SectionCard title="Scrimmaging Record">
               <ScrimmagingRecord
@@ -94,9 +94,14 @@ const Home: React.FC = () => {
           </SectionCard>
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
-          <SectionCard title="Welcome!">
-            <span>Welcome to {episode.data?.name_long}!</span>
-            <span>{episode.data?.blurb}</span>
+          <SectionCard title="Next Submission Deadline">
+            {nextTournament.isLoading ? (
+              <Spinner size="md" />
+            ) : nextTournament.isSuccess && nextTournament.data !== null ? (
+              <CountdownDigital date={nextTournament.data.submission_freeze} />
+            ) : (
+              "No upcoming submission deadlines."
+            )}
           </SectionCard>
           <SectionCard title="Social Medias">
             <div className="flex w-full flex-row items-center gap-10">
