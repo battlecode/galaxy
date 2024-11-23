@@ -150,11 +150,11 @@ export const competeQueryKeys: CompeteKeys = {
   },
 
   ratingHistoryList: {
-    key: ({ episodeId, teamIds }: CompeteMatchHistoricalRatingListRequest) =>
+    key: ({ episodeId, teamId }: CompeteMatchHistoricalRatingListRequest) =>
       [
         ...competeQueryKeys.ratingHistoryBase.key({ episodeId }),
-        "teams",
-        teamIds,
+        "team",
+        teamId,
       ] as const,
   },
 

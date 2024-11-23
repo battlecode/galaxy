@@ -138,7 +138,7 @@ export const useJoinTeam = (
       await queryClient.refetchQueries({
         queryKey: buildKey(ratingHistoryFactory.queryKey, {
           episodeId,
-          teamIds: undefined,
+          teamId: undefined,
         }),
       });
       // Refetch all scrimmage-related data
@@ -174,7 +174,7 @@ export const useLeaveTeam = (
       await queryClient.invalidateQueries({
         queryKey: buildKey(ratingHistoryFactory.queryKey, {
           episodeId,
-          teamIds: undefined,
+          teamId: undefined,
         }),
       });
       // Invalidate all scrimmage-related data
