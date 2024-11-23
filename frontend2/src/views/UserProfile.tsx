@@ -7,7 +7,6 @@ import { PageTitle } from "components/elements/BattlecodeStyle";
 import { useUserInfoById, useTeamsByUser } from "api/user/useUser";
 import { isNilOrEmptyStr } from "api/helpers";
 
-
 // rendered at /:episodeId/user/:userId
 const UserProfile: React.FC = () => {
   const { episodeId } = useEpisodeId();

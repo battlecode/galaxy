@@ -121,7 +121,6 @@ export const safeEnsureQueryData = <T, K>(
   void safeEnsureQueryDataHelper(request, factory, queryClient);
 };
 
-
 export const isNilOrEmptyStr = (str: string | undefined | null): boolean => {
   return isNil(str) || str === "";
 };
