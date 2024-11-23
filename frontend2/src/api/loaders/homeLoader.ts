@@ -24,7 +24,6 @@ export const homeLoader =
     safeEnsureQueryData({ episodeId }, nextTournamentFactory, queryClient);
 
     // User Team Rating History
-    // TODO: make { episodeId, teamIds: undefined } a variable of sorts?
     safeEnsureQueryData(
       { episodeId, teamId: undefined },
       ratingHistoryFactory,

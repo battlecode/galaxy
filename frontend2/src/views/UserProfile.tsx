@@ -5,10 +5,8 @@ import { isNil } from "lodash";
 import SectionCard from "components/SectionCard";
 import { PageTitle } from "components/elements/BattlecodeStyle";
 import { useUserInfoById, useTeamsByUser } from "api/user/useUser";
+import { isNilOrEmptyStr } from "api/helpers";
 
-const isNilOrEmptyStr = (str: string | undefined | null): boolean => {
-  return isNil(str) || str === "";
-};
 
 // rendered at /:episodeId/user/:userId
 const UserProfile: React.FC = () => {
