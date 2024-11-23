@@ -151,7 +151,11 @@ export const competeQueryKeys: CompeteKeys = {
 
   ratingHistoryList: {
     key: ({ episodeId, teamIds }: CompeteMatchHistoricalRatingListRequest) =>
-      [...competeQueryKeys.ratingHistoryBase.key({ episodeId }), "teams", teamIds] as const,
+      [
+        ...competeQueryKeys.ratingHistoryBase.key({ episodeId }),
+        "teams",
+        teamIds,
+      ] as const,
   },
 
   scrimmagingRecord: {

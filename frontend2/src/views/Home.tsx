@@ -21,7 +21,10 @@ const Home: React.FC = () => {
   const nextTournament = useNextTournament({ episodeId });
   const topRatingHistory = useTopRatingHistoryList({ episodeId, n: 10 });
   const userTeam = useUserTeam({ episodeId });
-  const userTeamRatingHistory = useRatingHistoryList({ episodeId, teamId: undefined });
+  const userTeamRatingHistory = useRatingHistoryList({
+    episodeId,
+    teamId: undefined,
+  });
 
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";

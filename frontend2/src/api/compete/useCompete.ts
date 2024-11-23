@@ -229,14 +229,16 @@ export const useTopRatingHistoryList = ({
  * For retrieving a list of a team's historical rating in a given episode. If teamId is undefined, defaults to the current user.
  */
 export const useRatingHistoryList = ({
-  episodeId, teamId
+  episodeId,
+  teamId,
 }: CompeteMatchHistoricalRatingListRequest): UseQueryResult<
   HistoricalRating[],
   Error
 > =>
   useQuery({
-    queryKey: buildKey(ratingHistoryFactory.queryKey, { episodeId , teamId}),
-    queryFn: async () => await ratingHistoryFactory.queryFn({ episodeId, teamId }),
+    queryKey: buildKey(ratingHistoryFactory.queryKey, { episodeId, teamId }),
+    queryFn: async () =>
+      await ratingHistoryFactory.queryFn({ episodeId, teamId }),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 

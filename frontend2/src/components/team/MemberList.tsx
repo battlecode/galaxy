@@ -14,27 +14,27 @@ interface UserRowProps {
 }
 const UserRow: React.FC<UserRowProps> = ({ user, isCurrentUser = false }) => {
   return (
-    <Link to={`user/${user.id}`} >
-    <div className="flex flex-row items-center rounded">
-      <img
-        className="h-8 w-8 rounded-full bg-blue-100"
-        src={user.profile?.avatar_url}
-      />
+    <Link to={`user/${user.id}`}>
+      <div className="flex flex-row items-center rounded">
+        <img
+          className="h-8 w-8 rounded-full bg-blue-100"
+          src={user.profile?.avatar_url}
+        />
 
-      <div className="ml-6 font-semibold">
-        {user.username}
-        {isCurrentUser && (
-          <span className="ml-1 font-normal text-gray-600">(you)</span>
-        )}
-        {user.is_staff && (
-          <span className="ml-1 font-normal text-gray-600">(staff)</span>
-        )}
+        <div className="ml-6 font-semibold">
+          {user.username}
+          {isCurrentUser && (
+            <span className="ml-1 font-normal text-gray-600">(you)</span>
+          )}
+          {user.is_staff && (
+            <span className="ml-1 font-normal text-gray-600">(staff)</span>
+          )}
+        </div>
+        <div className="ml-12 flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap text-end text-gray-600">
+          {user.profile?.school}
+        </div>
       </div>
-      <div className="ml-12 flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap text-end text-gray-600">
-        {user.profile?.school}
-      </div>
-    </div>
-      </Link>
+    </Link>
   );
 };
 

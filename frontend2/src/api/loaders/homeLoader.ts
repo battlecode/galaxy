@@ -25,7 +25,11 @@ export const homeLoader =
 
     // User Team Rating History
     // TODO: make { episodeId, teamIds: undefined } a variable of sorts?
-    safeEnsureQueryData({ episodeId, teamIds: undefined }, ratingHistoryFactory, queryClient);
+    safeEnsureQueryData(
+      { episodeId, teamIds: undefined },
+      ratingHistoryFactory,
+      queryClient,
+    );
 
     // User Team Scrimmage Record
     safeEnsureQueryData(

@@ -92,8 +92,8 @@ const TeamChart: React.FC<TeamChartProps> = ({
       text: "Inspired by jmerle",
       position: {
         align: "left",
-        x:15
-      }
+        x: 15,
+      },
     },
     tooltip: {
       ...chart.highchartsOptionsBase.tooltip,
