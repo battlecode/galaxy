@@ -51,6 +51,8 @@ import PageNotFound from "views/PageNotFound";
 import TeamProfile from "views/TeamProfile";
 import { homeIfLoggedIn } from "api/loaders/homeIfLoggedIn";
 import { episodeLoader } from "api/loaders/episodeLoader";
+import UserProfile from "views/UserProfile";
+import { userProfileLoader } from "api/loaders/userProfileLoader";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -113,12 +115,17 @@ const router = createBrowserRouter([
   },
   // Account page doesn't have episode id in URL
   {
-    element: <PrivateRoute />,
+    element: <EpisodeLayout />,
     errorElement: <ErrorBoundary />,
     children: [
       {
-        element: <EpisodeLayout />,
+        element: <PrivateRoute />,
         children: [{ path: "/account", element: <Account /> }],
+      },
+      {
+        path: "user/:userId",
+        element: <UserProfile />,
+        loader: userProfileLoader(queryClient),
       },
     ],
   },

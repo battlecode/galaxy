@@ -1,6 +1,7 @@
 import React from "react";
 import { type UserPublic } from "../../api/_autogen";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
+import { Link } from "react-router-dom";
 
 interface MemberListProps {
   members: UserPublic[];
@@ -13,24 +14,27 @@ interface UserRowProps {
 }
 const UserRow: React.FC<UserRowProps> = ({ user, isCurrentUser = false }) => {
   return (
-    <div className="flex flex-row items-center rounded">
-      <img
-        className="h-8 w-8 rounded-full bg-blue-100"
-        src={user.profile?.avatar_url}
-      />
-      <div className="ml-6 font-semibold">
-        {user.username}
-        {isCurrentUser && (
-          <span className="ml-1 font-normal text-gray-600">(you)</span>
-        )}
-        {user.is_staff && (
-          <span className="ml-1 font-normal text-gray-600">(staff)</span>
-        )}
+    <Link to={`user/${user.id}`}>
+      <div className="flex flex-row items-center rounded">
+        <img
+          className="h-8 w-8 rounded-full bg-blue-100"
+          src={user.profile?.avatar_url}
+        />
+
+        <div className="ml-6 font-semibold">
+          {user.username}
+          {isCurrentUser && (
+            <span className="ml-1 font-normal text-gray-600">(you)</span>
+          )}
+          {user.is_staff && (
+            <span className="ml-1 font-normal text-gray-600">(staff)</span>
+          )}
+        </div>
+        <div className="ml-12 flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap text-end text-gray-600">
+          {user.profile?.school}
+        </div>
       </div>
-      <div className="ml-12 flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap text-end text-gray-600">
-        {user.profile?.school}
-      </div>
-    </div>
+    </Link>
   );
 };
 
@@ -39,7 +43,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, isCurrentUser = false }) => {
 const MemberList: React.FC<MemberListProps> = ({ members, className = "" }) => {
   const { user: currentUser } = useCurrentUser();
   return (
-    <div className={`flex flex-col gap-6 ${className}`}>
+    <div className={`flex flex-col gap-2 ${className}`}>
       {/* display current user first */}
       {currentUser !== undefined &&
         members.find((user) => user.id === currentUser.id) !== undefined && (

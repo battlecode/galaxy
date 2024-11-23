@@ -11,6 +11,7 @@ import type {
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
 import { isPresent } from "../utils/utilTypes";
 import toast from "react-hot-toast";
+import { isNil } from "lodash";
 
 // fall back to localhost for now
 export const BASE_URL =
@@ -118,4 +119,8 @@ export const safeEnsureQueryData = <T, K>(
   queryClient: QueryClient,
 ): void => {
   void safeEnsureQueryDataHelper(request, factory, queryClient);
+};
+
+export const isNilOrEmptyStr = (str: string | undefined | null): boolean => {
+  return isNil(str) || str === "";
 };

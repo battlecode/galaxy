@@ -131,7 +131,6 @@ const TeamChart: React.FC<TeamChartProps> = ({
       layout: "vertical",
       align: "right",
       verticalAlign: "top",
-      width: 250,
       maxHeight: 1e6,
       alignColumns: false,
     },

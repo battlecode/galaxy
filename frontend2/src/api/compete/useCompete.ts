@@ -48,7 +48,7 @@ import { buildKey } from "../helpers";
 import {
   matchListFactory,
   ratingHistoryTopNFactory,
-  ratingHistoryMeFactory,
+  ratingHistoryFactory,
   scrimmageInboxListFactory,
   scrimmageOutboxListFactory,
   scrimmagingRecordFactory,
@@ -226,17 +226,19 @@ export const useTopRatingHistoryList = ({
   });
 
 /**
- * For retrieving a list of the currently logged in user's team's historical rating in a given episode.
+ * For retrieving a list of a team's historical rating in a given episode. If teamId is undefined, defaults to the current user.
  */
-export const useUserRatingHistoryList = ({
+export const useRatingHistoryList = ({
   episodeId,
+  teamId,
 }: CompeteMatchHistoricalRatingListRequest): UseQueryResult<
   HistoricalRating[],
   Error
 > =>
   useQuery({
-    queryKey: buildKey(ratingHistoryMeFactory.queryKey, { episodeId }),
-    queryFn: async () => await ratingHistoryMeFactory.queryFn({ episodeId }),
+    queryKey: buildKey(ratingHistoryFactory.queryKey, { episodeId, teamId }),
+    queryFn: async () =>
+      await ratingHistoryFactory.queryFn({ episodeId, teamId }),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
