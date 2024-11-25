@@ -7,8 +7,7 @@ import { otherTeamInfoFactory } from "../team/teamFactories";
 export const teamProfileLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
-    const { episodeId } = params;
-    const { teamId } = params;
+    const { teamId, episodeId } = params;
     if (teamId === undefined || episodeId === undefined) return null;
 
     // All teams

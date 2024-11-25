@@ -92,6 +92,7 @@ export default [
         },
       ],
       "@typescript-eslint/non-nullable-type-assertion-style": "off",
+      "@typescript-eslint/no-non-null-assertion": "error",
     },
   },
   {
@@ -103,6 +104,7 @@ export default [
       "**/vite.config.ts",
       "**/tsconfig.json",
       "**/vite-env.d.ts",
+      "**/*.yml",
     ],
   },
 ];

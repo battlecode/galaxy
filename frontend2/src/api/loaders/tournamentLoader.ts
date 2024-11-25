@@ -10,8 +10,7 @@ import { tournamentMatchListFactory } from "../compete/competeFactories";
 export const tournamentLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
-    const { episodeId } = params;
-    const { tournamentId } = params;
+    const { episodeId, tournamentId } = params;
     if (episodeId === undefined || tournamentId === undefined) return null;
 
     // Episode Info
