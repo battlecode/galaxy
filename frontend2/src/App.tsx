@@ -121,7 +121,13 @@ const router = createBrowserRouter([
     children: [
       {
         element: <PrivateRoute />,
-        children: [{ path: "/account", element: <Account />, loader: accountLoader(queryClient) }],
+        children: [
+          {
+            path: "/account",
+            element: <Account />,
+            loader: accountLoader(queryClient),
+          },
+        ],
       },
       {
         path: "user/:userId",

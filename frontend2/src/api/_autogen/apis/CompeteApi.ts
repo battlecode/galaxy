@@ -183,7 +183,7 @@ export interface CompeteSubmissionTournamentListRequest {
 export class CompeteApi extends runtime.BaseAPI {
 
     /**
-     * List the historical ratings of a team.
+     * Provides a list of historical ratings for a team in a given episode. Supports filtering by team ID or defaults to the current user\'s team if no team ID is provided.  Parameters:     - request (Request) - The HTTP request object.     - pk (int, optional) - The primary key of the object. Defaults to None.     - episode_id (int) - The ID of the episode to filter the ratings by.  Query Parameters:     - team_id (int, optional) - The team ID for which to retrieve     historical ratings. If not provided, defaults to the team of the     requesting user.  Returns:     Response: A JSON response containing:         - 200 OK: Returns a serialized representation of the team\'s         historical ratings if found.         - 204 No Content: If no ranked matches are found for the specified team.         - 400 Bad Request: If the specified team could not be found.  Raises:     - 400 Bad Request: If neither a valid team ID is provided nor can a team be     determined from the current user.  Permissions:     Requires `IsEpisodeMutable` permission class.  Notes:     - The function does not paginate results.     - The function returns an empty list if no valid team is found.     - Historical ratings are ordered by match creation date.
      */
     async competeMatchHistoricalRatingRetrieveRaw(requestParameters: CompeteMatchHistoricalRatingRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<HistoricalRating>> {
         if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
@@ -217,7 +217,7 @@ export class CompeteApi extends runtime.BaseAPI {
     }
 
     /**
-     * List the historical ratings of a team.
+     * Provides a list of historical ratings for a team in a given episode. Supports filtering by team ID or defaults to the current user\'s team if no team ID is provided.  Parameters:     - request (Request) - The HTTP request object.     - pk (int, optional) - The primary key of the object. Defaults to None.     - episode_id (int) - The ID of the episode to filter the ratings by.  Query Parameters:     - team_id (int, optional) - The team ID for which to retrieve     historical ratings. If not provided, defaults to the team of the     requesting user.  Returns:     Response: A JSON response containing:         - 200 OK: Returns a serialized representation of the team\'s         historical ratings if found.         - 204 No Content: If no ranked matches are found for the specified team.         - 400 Bad Request: If the specified team could not be found.  Raises:     - 400 Bad Request: If neither a valid team ID is provided nor can a team be     determined from the current user.  Permissions:     Requires `IsEpisodeMutable` permission class.  Notes:     - The function does not paginate results.     - The function returns an empty list if no valid team is found.     - Historical ratings are ordered by match creation date.
      */
     async competeMatchHistoricalRatingRetrieve(requestParameters: CompeteMatchHistoricalRatingRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<HistoricalRating> {
         const response = await this.competeMatchHistoricalRatingRetrieveRaw(requestParameters, initOverrides);
