@@ -14,7 +14,7 @@ interface UserRowProps {
 }
 const UserRow: React.FC<UserRowProps> = ({ user, isCurrentUser = false }) => {
   return (
-    <Link to={`user/${user.id}`}>
+    <Link to={`/user/${user.id}`}>
       <div className="flex flex-row items-center rounded">
         <img
           className="h-8 w-8 rounded-full bg-blue-100"
