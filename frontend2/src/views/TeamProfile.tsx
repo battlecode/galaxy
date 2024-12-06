@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 import type React from "react";
 import { useEffect, useMemo } from "react";
+=======
+import React, { useMemo } from "react";
+>>>>>>> f821dda (rebased and fixed page loading)
 import { useEpisodeId } from "contexts/EpisodeContext";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useTeam } from "api/team/useTeam";
 import { isNil } from "lodash";
 import SectionCard from "components/SectionCard";
@@ -10,6 +14,7 @@ import MemberList from "components/team/MemberList";
 import { Status526Enum } from "api/_autogen";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 import toast from "react-hot-toast";
+import PageNotFound from "./PageNotFound";
 
 const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
   isNil(str) || str === "";
@@ -18,10 +23,10 @@ const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
 const TeamProfile: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const { teamId } = useParams();
-  const navigate = useNavigate();
 
   const episode = useEpisodeInfo({ id: episodeId });
   const team = useTeam({ episodeId, id: teamId ?? "" });
+
   const membersList = useMemo(() => {
     if (!team.isSuccess) return null;
     return (
@@ -30,6 +35,7 @@ const TeamProfile: React.FC = () => {
       </div>
     );
   }, [team]);
+
   const eligibles = useMemo(
     () =>
       episode.data?.eligibility_criteria.filter(
@@ -41,21 +47,9 @@ const TeamProfile: React.FC = () => {
     [episode, team],
   );
 
-  useEffect(() => {
-    let isActiveLoad = true;
-
-    /* eslint-disable-next-line @typescript-eslint/no-unnecessary-condition --
-     * isActiveLoad protects us from toasting twice in development mode
-     */
-    if (team.isError && isActiveLoad) {
-      toast.error("Could not find team.");
-      navigate(`/${episodeId}/home`);
-    }
-
-    return () => {
-      isActiveLoad = false;
-    };
-  }, [team]);
+  if (team.isError) {
+    return <PageNotFound />;
+  }
 
   return (
     <div className="p-6">
