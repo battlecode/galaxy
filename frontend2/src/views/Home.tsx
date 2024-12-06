@@ -67,7 +67,13 @@ const Home: React.FC = () => {
     <div className="p-6">
       <div className="flex flex-col gap-6 xl:flex-row">
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
-          <SectionCard title="Welcome!">
+          <SectionCard
+            title={
+              episode.isSuccess
+                ? `Welcome to ${episode.data.name_long}!`
+                : "Welcome!"
+            }
+          >
             <span>
               {episode.isSuccess && isPresent(episode.data.blurb)
                 ? episode.data.blurb
