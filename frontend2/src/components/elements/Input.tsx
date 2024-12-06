@@ -1,5 +1,5 @@
 import type React from "react";
-import { forwardRef } from "react";
+import { forwardRef, type ReactElement } from "react";
 import FormError from "./FormError";
 import FormLabel from "./FormLabel";
 
@@ -8,10 +8,11 @@ interface InputProps extends React.ComponentPropsWithoutRef<"input"> {
   required?: boolean;
   className?: string;
   errorMessage?: string;
+  endButton?: ReactElement;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { label, required = false, className = "", errorMessage, ...rest },
+  { label, required = false, className = "", errorMessage, endButton, ...rest },
   ref,
 ) {
   const invalid = errorMessage !== undefined;
@@ -19,7 +20,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     <div className={`relative ${invalid ? "mb-1" : ""} ${className}`}>
       <label>
         <FormLabel label={label} required={required} />
-        <div className="relative rounded-md shadow-sm">
+        <div className="flex w-full flex-row gap-2">
           <input
             ref={ref}
             aria-invalid={errorMessage !== undefined ? "true" : "false"}
@@ -34,6 +35,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             }`}
             {...rest}
           />
+          {endButton}
         </div>
         {invalid && <FormError message={errorMessage} />}
       </label>

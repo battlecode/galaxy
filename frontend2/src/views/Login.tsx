@@ -1,4 +1,5 @@
 import type React from "react";
+import { useState } from "react";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { login } from "../api/auth/authApi";
@@ -38,6 +39,8 @@ const Login: React.FC = () => {
     }
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <div className="flex h-screen flex-col items-center justify-center bg-gradient-to-tr from-cyan-200 to-cyan-700 p-2">
       <div className="mb-6 flex flex-1 items-end text-center font-display text-5xl tracking-wide text-white sm:text-6xl">
@@ -61,7 +64,17 @@ const Login: React.FC = () => {
           label="Password"
           required
           {...register("password", { required: FIELD_REQUIRED_ERROR_MSG })}
-          type="password"
+          type={showPassword ? "text" : "password"}
+          endButton={
+            <Button
+              iconName={showPassword ? "eye_slash" : "eye"}
+              onClick={() => {
+                setShowPassword((prevShow) => !prevShow);
+              }}
+              variant="no-outline"
+              className="rounded-xl"
+            />
+          }
         />
         <Button
           label="Log in"
