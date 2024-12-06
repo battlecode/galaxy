@@ -5,19 +5,20 @@ import {
   type UseMutationResult,
   type QueryClient,
 } from "@tanstack/react-query";
-import type {
-  UserPrivate,
-  UserPublic,
-  UserURetrieveRequest,
-  UserUTeamsRetrieveRequest,
-  TeamPublic,
-  UserUCreateRequest,
-  UserUMePartialUpdateRequest,
-  UserPasswordResetConfirmCreateRequest,
-  UserUAvatarCreateRequest,
-  UserUResumeUpdateRequest,
-  UserPasswordResetValidateTokenCreateRequest,
-  ResetToken,
+import {
+  type UserPrivate,
+  type UserPublic,
+  type UserURetrieveRequest,
+  type UserUTeamsRetrieveRequest,
+  type TeamPublic,
+  type UserUCreateRequest,
+  type UserUMePartialUpdateRequest,
+  type UserPasswordResetConfirmCreateRequest,
+  type UserUAvatarCreateRequest,
+  type UserUResumeUpdateRequest,
+  type UserPasswordResetValidateTokenCreateRequest,
+  type ResetToken,
+  ResponseError,
 } from "../_autogen";
 import { userMutationKeys, userQueryKeys } from "./userKeys";
 import {
@@ -119,6 +120,17 @@ export const useCreateUser = (
             queryClient,
           );
         } catch (err) {
+          if (err instanceof ResponseError) {
+            const errBody = (await err.response.json()) as {
+              email?: string;
+              username?: string;
+            };
+            if (errBody.username !== undefined) {
+              throw Error(errBody.username);
+            } else if (errBody.email !== undefined) {
+              throw Error(errBody.email);
+            }
+          }
           throw err as Error;
         } finally {
           await queryClient.refetchQueries({
@@ -130,7 +142,12 @@ export const useCreateUser = (
       await toast.promise(toastFn(), {
         loading: "Creating new user...",
         success: "Created new user!",
-        error: "Error creating user.",
+        error: (err) => {
+          if (err instanceof Error) {
+            return err.message;
+          }
+          return "Error creating user.";
+        },
       });
     },
   });
