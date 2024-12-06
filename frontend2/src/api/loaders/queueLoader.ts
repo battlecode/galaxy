@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 export const queueLoader =
   (queryClient: QueryClient): LoaderFunction =>
   async ({ params }) => {
-    const episodeId = params.episodeId;
+    const { episodeId } = params;
     if (episodeId === undefined) return null;
 
     // Ensure that this page is available for the episode

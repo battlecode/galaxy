@@ -13,7 +13,7 @@ import toast from "react-hot-toast";
 export const submissionsLoader =
   (queryClient: QueryClient): LoaderFunction =>
   async ({ params }) => {
-    const episodeId = params.episodeId;
+    const { episodeId } = params;
     const page = !isNaN(parseInt(params.page ?? ""))
       ? parseInt(params.page ?? "")
       : 1;

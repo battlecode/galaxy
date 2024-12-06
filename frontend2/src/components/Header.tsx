@@ -1,4 +1,5 @@
-import React, { Fragment, useMemo } from "react";
+import type React from "react";
+import { Fragment, useMemo } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
@@ -21,7 +22,7 @@ const Header: React.FC = () => {
   const episodeData = useEpisodeInfo({ id: episodeId });
 
   const renderedItems = useMemo(
-    () => renderableItems(ALL_SIDEBAR_ITEMS, episodeData, teamData),
+    () => renderableItems(ALL_SIDEBAR_ITEMS, episodeData, authState, teamData),
     [episodeData, teamData],
   );
 

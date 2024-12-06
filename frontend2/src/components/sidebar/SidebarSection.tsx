@@ -1,9 +1,11 @@
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import { renderableItems, type SidebarItemData } from ".";
 import SidebarItem from "./SidebarItem";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { useUserTeam } from "api/team/useTeam";
 import { useEpisodeInfo } from "api/episode/useEpisode";
+import { useCurrentUser } from "contexts/CurrentUserContext";
 
 interface SidebarSectionProps {
   items: SidebarItemData[];
@@ -13,11 +15,12 @@ interface SidebarSectionProps {
 const SidebarSection: React.FC<SidebarSectionProps> = ({ items, title }) => {
   const { episodeId } = useEpisodeId();
 
+  const { authState } = useCurrentUser();
   const teamData = useUserTeam({ episodeId });
   const episodeData = useEpisodeInfo({ id: episodeId });
 
   const renderedItems = useMemo(
-    () => renderableItems(items, episodeData, teamData),
+    () => renderableItems(items, episodeData, authState, teamData),
     [items, episodeData, teamData],
   );
 

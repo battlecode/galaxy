@@ -1,15 +1,18 @@
-/* eslint-disable --
- * TODO: this file will be corrected in https://github.com/battlecode/galaxy/pull/853
- */
-
 import type React from "react";
 import SidebarSection from "./SidebarSection";
-import { type IconName } from "../elements/Icon";
+import type { IconName } from "../elements/Icon";
 import type { Episode, TeamPrivate } from "api/_autogen";
 import type { UseQueryResult } from "@tanstack/react-query";
+import { type AuthState, AuthStateEnum } from "contexts/CurrentUserContext";
 
 interface SidebarProps {
   collapsed?: boolean;
+}
+
+enum UserAuthLevel {
+  LOGGED_OUT,
+  LOGGED_IN_NO_TEAM,
+  LOGGED_IN_HAS_TEAM,
 }
 
 export interface SidebarItemData {
@@ -17,7 +20,7 @@ export interface SidebarItemData {
   text: string;
   linkTo: string;
   requireGameReleased: boolean;
-  requireUserTeam: boolean;
+  userAuthLevel: UserAuthLevel;
 }
 
 const GENERAL_ITEMS: SidebarItemData[] = [
@@ -26,21 +29,21 @@ const GENERAL_ITEMS: SidebarItemData[] = [
     text: "Home",
     linkTo: "home",
     requireGameReleased: false,
-    requireUserTeam: false,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
   {
     iconName: "map",
     text: "Quick Start",
     linkTo: "quick_start",
     requireGameReleased: false,
-    requireUserTeam: false,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
   {
     iconName: "clipboard_document",
     text: "Resources",
     linkTo: "resources",
     requireGameReleased: false,
-    requireUserTeam: false,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
 ];
 const COMPETE_ITEMS: SidebarItemData[] = [
@@ -49,21 +52,21 @@ const COMPETE_ITEMS: SidebarItemData[] = [
     text: "Tournaments",
     linkTo: "tournaments",
     requireGameReleased: true,
-    requireUserTeam: false,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
   {
     iconName: "chart_bar",
     text: "Rankings",
     linkTo: "rankings",
     requireGameReleased: true,
-    requireUserTeam: false,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
   {
     iconName: "clock",
     text: "Queue",
     linkTo: "queue",
     requireGameReleased: true,
-    requireUserTeam: false,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
 ];
 const TEAM_MANAGEMENT_ITEMS: SidebarItemData[] = [
@@ -72,21 +75,21 @@ const TEAM_MANAGEMENT_ITEMS: SidebarItemData[] = [
     text: "My Team",
     linkTo: "my_team",
     requireGameReleased: false,
-    requireUserTeam: false,
+    userAuthLevel: UserAuthLevel.LOGGED_IN_NO_TEAM,
   },
   {
     iconName: "arrow_up_tray",
     text: "Submissions",
     linkTo: "submissions",
     requireGameReleased: true,
-    requireUserTeam: true,
+    userAuthLevel: UserAuthLevel.LOGGED_IN_HAS_TEAM,
   },
   {
     iconName: "play_circle",
     text: "Scrimmaging",
     linkTo: "scrimmaging",
     requireGameReleased: true,
-    requireUserTeam: true,
+    userAuthLevel: UserAuthLevel.LOGGED_IN_HAS_TEAM,
   },
 ];
 
@@ -99,31 +102,39 @@ export const ALL_SIDEBAR_ITEMS: SidebarItemData[] = [
 export const renderableItems = (
   items: SidebarItemData[],
   episode: UseQueryResult<Episode>,
+  authState: AuthState,
   userTeam: UseQueryResult<TeamPrivate>,
 ): SidebarItemData[] => {
   const gameReleased =
     episode.isSuccess && episode.data.game_release.getTime() < Date.now();
+
+  const loggedIn = authState === AuthStateEnum.AUTHENTICATED;
 
   const userHasTeam = userTeam.isSuccess;
 
   return items.filter((itemData) => {
     // Ensure that we are allowed to render this item
     if (itemData.requireGameReleased && !gameReleased) return false;
-    if (itemData.requireUserTeam && !userHasTeam) return false;
+    if (itemData.userAuthLevel > UserAuthLevel.LOGGED_OUT && !loggedIn)
+      return false;
+    if (
+      itemData.userAuthLevel > UserAuthLevel.LOGGED_IN_NO_TEAM &&
+      !userHasTeam
+    )
+      return false;
 
     return true;
   });
 };
 
 // IMPORTANT: When changing this file, also remember to change the mobile menu that appears on small screens.
-const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) => {
-  return collapsed ? null : (
+const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) =>
+  collapsed ? null : (
     <nav className="fixed top-16 z-10 hidden h-full w-52 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">
       <SidebarSection title="" items={GENERAL_ITEMS} />
       <SidebarSection title="compete" items={COMPETE_ITEMS} />
       <SidebarSection title="team management" items={TEAM_MANAGEMENT_ITEMS} />
     </nav>
   );
-};
 
 export default Sidebar;
