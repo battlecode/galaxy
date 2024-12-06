@@ -106,7 +106,10 @@ const Header: React.FC = () => {
                   <span className="sr-only">Open user menu</span>
                   <img
                     className="h-8 w-8 rounded-full bg-white"
-                    src={user?.profile?.avatar_url}
+                    src={
+                      user?.profile?.avatar_url ??
+                      "/default_profile_picture.png"
+                    }
                     alt="Profile Picture"
                   />
                 </Menu.Button>
