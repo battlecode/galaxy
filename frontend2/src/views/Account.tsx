@@ -26,7 +26,7 @@ import {
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useQueryClient } from "@tanstack/react-query";
 import type { QueryClient } from "@tanstack/query-core";
-import EpisodeChart from "components/compete/chart/EpisodeChart";
+import UserChart from "components/compete/chart/UserChart";
 
 interface FileInput {
   file: FileList;
@@ -59,79 +59,86 @@ const Account: React.FC = () => {
   return (
     <div className="p-6">
       <PageTitle>User Settings</PageTitle>
-        <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
-          <ProfileForm episodeId={episodeId} queryClient={queryClient} />
-          <SectionCard title="File Upload" loading={authState === AuthStateEnum.LOADING}>
-            <div className="flex flex-row gap-10 xl:flex-col">
-              <form
-                onSubmit={(e) => {
-                  void handleAvatarSubmit(onAvatarSubmit)(e);
-                }}
-              >
-                <FormLabel label="Profile picture" />
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="w-full"
-                  {...avatarRegister("file", {
-                    required: FIELD_REQUIRED_ERROR_MSG,
-                  })}
-                />
-                <Button
-                  className="mt-2"
-                  label="Save profile picture"
-                  type="submit"
-                  loading={uploadAvatar.isPending}
-                  disabled={uploadAvatar.isPending}
-                />
-              </form>
+      <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
+        <ProfileForm episodeId={episodeId} queryClient={queryClient} />
+        <SectionCard
+          title="File Upload"
+          loading={authState === AuthStateEnum.LOADING}
+        >
+          <div className="flex flex-row gap-10 xl:flex-col">
+            <form
+              onSubmit={(e) => {
+                void handleAvatarSubmit(onAvatarSubmit)(e);
+              }}
+            >
+              <FormLabel label="Profile picture" />
+              <input
+                type="file"
+                accept="image/*"
+                className="w-full"
+                {...avatarRegister("file", {
+                  required: FIELD_REQUIRED_ERROR_MSG,
+                })}
+              />
+              <Button
+                className="mt-2"
+                label="Save profile picture"
+                type="submit"
+                loading={uploadAvatar.isPending}
+                disabled={uploadAvatar.isPending}
+              />
+            </form>
 
-              <form
-                onSubmit={(e) => {
-                  void handleResumeSubmit(onResumeSubmit)(e);
-                }}
-              >
-                <FormLabel label="Resume" />
-                <input
-                  type="file"
-                  accept=".pdf"
-                  className="w-full"
-                  {...resumeRegister("file", {
-                    required: FIELD_REQUIRED_ERROR_MSG,
-                  })}
-                />
-                <Button
-                  className="mt-2"
-                  label="Save resume"
-                  type="submit"
-                  loading={uploadResume.isPending}
-                  disabled={uploadResume.isPending}
-                />
-                {user.data?.profile?.has_resume ?? false ? (
-                  <p className="text-sm">
-                    Resume uploaded!{" "}
-                    <button
-                      className="text-cyan-600 hover:underline"
-                      onClick={() => {
-                        if (user.isSuccess)
-                          downloadResume.mutate({ id: user.data.id });
-                      }}
-                    >
-                      Download
-                    </button>
-                  </p>
-                ) : (
-                  <p className="text-sm">No resume uploaded.</p>
-                )}
-              </form>
-            </div>
-          </SectionCard>
-        </div>
-
-        <SectionCard title="Rating History" className="w-full flex-1">
-          <EpisodeChart />
+            <form
+              onSubmit={(e) => {
+                void handleResumeSubmit(onResumeSubmit)(e);
+              }}
+            >
+              <FormLabel label="Resume" />
+              <input
+                type="file"
+                accept=".pdf"
+                className="w-full"
+                {...resumeRegister("file", {
+                  required: FIELD_REQUIRED_ERROR_MSG,
+                })}
+              />
+              <Button
+                className="mt-2"
+                label="Save resume"
+                type="submit"
+                loading={uploadResume.isPending}
+                disabled={uploadResume.isPending}
+              />
+              {user.data?.profile?.has_resume ?? false ? (
+                <p className="text-sm">
+                  Resume uploaded!{" "}
+                  <button
+                    className="text-cyan-600 hover:underline"
+                    onClick={() => {
+                      if (user.isSuccess)
+                        downloadResume.mutate({ id: user.data.id });
+                    }}
+                  >
+                    Download
+                  </button>
+                </p>
+              ) : (
+                <p className="text-sm">No resume uploaded.</p>
+              )}
+            </form>
+          </div>
         </SectionCard>
       </div>
+
+      <SectionCard
+        title="Rating History"
+        className="w-full flex-1"
+        loading={user.isLoading}
+      >
+        {user.isSuccess && <UserChart userId={user.data.id} />}
+      </SectionCard>
+    </div>
   );
 };
 
@@ -183,7 +190,9 @@ const ProfileForm: React.FC<{
         <div className="flex flex-col items-center gap-6 p-4">
           <img
             className="h-24 w-24 rounded-full bg-gray-400 lg:h-48 lg:w-48"
-            src={user.data?.profile?.avatar_url ?? "/default_profile_picture.png"}
+            src={
+              user.data?.profile?.avatar_url ?? "/default_profile_picture.png"
+            }
           />
           <div className="text-center text-xl font-semibold">
             {`${watchFirstName ?? ""} ${watchLastName ?? ""}`}

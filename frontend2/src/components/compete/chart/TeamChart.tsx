@@ -1,7 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useTournamentList } from "api/episode/useEpisode";
 import { useEpisodeId } from "contexts/EpisodeContext";
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import {
   type ChartData,
   type PlotLine,
@@ -9,7 +10,7 @@ import {
   formatTournamentList,
 } from "./chartUtils";
 import ChartBase from "./ChartBase";
-import { type HistoricalRating } from "api/_autogen";
+import type { HistoricalRating } from "api/_autogen";
 
 interface TeamChartProps {
   teamRatings: HistoricalRating[];
@@ -27,9 +28,10 @@ const TeamChart: React.FC<TeamChartProps> = ({
 
   const tournamentList = useTournamentList({ episodeId }, queryClient);
 
-  const ratingData: Record<string, ChartData[]> | undefined = useMemo(() => {
-    return formatRatingHistory(teamRatings);
-  }, [teamRatings]);
+  const ratingData: Record<string, ChartData[]> | undefined = useMemo(
+    () => formatRatingHistory(teamRatings),
+    [teamRatings],
+  );
 
   const tournamentData: PlotLine[] | undefined = useMemo(() => {
     if (!tournamentList.isSuccess) return undefined;

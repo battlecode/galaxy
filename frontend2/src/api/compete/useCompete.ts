@@ -230,10 +230,7 @@ export const useTopRatingHistoryList = ({
 export const useTeamRatingHistory = ({
   episodeId,
   teamId,
-}: CompeteMatchHistoricalRatingRetrieveRequest): UseQueryResult<
-  HistoricalRating,
-  Error
-> =>
+}: CompeteMatchHistoricalRatingRetrieveRequest): UseQueryResult<HistoricalRating> =>
   useQuery({
     queryKey: buildKey(ratingHistoryFactory.queryKey, { episodeId, teamId }),
     queryFn: async () =>
@@ -246,14 +243,11 @@ export const useTeamRatingHistory = ({
  */
 export const useUserRatingHistory = ({
   episodeId,
-}: CompeteMatchHistoricalRatingRetrieveRequest): UseQueryResult<
-  HistoricalRating,
-  Error
-> =>
+}: CompeteMatchHistoricalRatingRetrieveRequest): UseQueryResult<HistoricalRating> =>
   useQuery({
     queryKey: buildKey(userRatingHistoryFactory.queryKey, { episodeId }),
     queryFn: async () => await userRatingHistoryFactory.queryFn({ episodeId }),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: MILLIS_SECOND * SECONDS_MINUTE * STATISTICS_WAIT_MINUTES,
   });
 
 /**

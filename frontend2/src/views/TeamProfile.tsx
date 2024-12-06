@@ -29,12 +29,12 @@ const TeamProfile: React.FC = () => {
     teamId: parseInt(teamId ?? ""),
   });
 
-  const membersList = useMemo(() => {
-    return (
+  const membersList = useMemo(
+    () => (
       <div className="flex flex-col gap-8">
         <MemberList members={team.data?.members ?? []} />
       </div>
-    )},
+    ),
     [team],
   );
 

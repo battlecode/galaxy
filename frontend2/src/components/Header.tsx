@@ -107,7 +107,7 @@ const Header: React.FC = () => {
                   <img
                     className="h-8 w-8 rounded-full bg-white"
                     src={
-                      user?.profile?.avatar_url ??
+                      user.data?.profile?.avatar_url ??
                       "/default_profile_picture.png"
                     }
                     alt="Profile Picture"

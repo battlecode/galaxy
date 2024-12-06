@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import type React from "react";
+import { useMemo, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import NoDataToDisplay from "highcharts/modules/no-data-to-display";
@@ -47,7 +48,7 @@ const ChartBase: React.FC<ChartBaseProps> = ({
     try {
       if (loading) myChart.showLoading(loadingMessage ?? "Loading...");
       else myChart.hideLoading();
-    } catch (e) {
+    } catch (_) {
       // Ignore internal highcharts errors...
     }
   }
@@ -94,7 +95,7 @@ const ChartBase: React.FC<ChartBaseProps> = ({
         // Add crown emoji on the top player at the time
 
         // Very first element is the header at the bottom
-        const x: string | undefined = this?.x?.toString();
+        const x: string | undefined = this.x?.toString();
         let header = "ERROR";
         if (x !== undefined)
           header = Highcharts.dateFormat("%A, %e %b, %l:%M %p", Number(x));
@@ -103,9 +104,9 @@ const ChartBase: React.FC<ChartBaseProps> = ({
 
         let max = -1;
         let index = -1;
-        this?.points?.forEach((point, i) => {
-          const y = point?.y ?? -1;
-          let color: string | undefined = point?.color?.toString();
+        this.points?.forEach((point, i) => {
+          const y = point.y ?? -1;
+          let color: string | undefined = point.color?.toString();
           if (color === undefined) color = "red";
           const circle = `<span class="circle" style="color: ${color};">●</span>`;
           if (y > max) {
@@ -123,7 +124,7 @@ const ChartBase: React.FC<ChartBaseProps> = ({
         return names;
       },
     },
-    series: seriesData ?? [],
+    series: seriesData,
 
     legend: {
       layout: "horizontal",

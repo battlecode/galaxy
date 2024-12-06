@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useEpisodeInfo, useNextTournament } from "../api/episode/useEpisode";
 import SectionCard from "../components/SectionCard";

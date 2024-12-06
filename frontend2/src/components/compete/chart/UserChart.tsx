@@ -62,12 +62,10 @@ const UserChart: React.FC<UserChartProps> = ({ userId, lockedEpisode }) => {
     <div className="flex flex-1 flex-col gap-8">
       {SHOW_SELECT && (
         <SelectMenu
-          options={
-            episodeListFiltered.map((ep) => ({
-              value: ep.name_short,
-              label: ep.name_long,
-            })) ?? []
-          }
+          options={episodeListFiltered.map((ep) => ({
+            value: ep.name_short,
+            label: ep.name_long,
+          }))}
           label={"Select Episode"}
           value={selectedEpisode}
           onChange={setSelectedEpisode}

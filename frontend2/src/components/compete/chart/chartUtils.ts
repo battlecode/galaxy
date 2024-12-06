@@ -6,12 +6,11 @@ type UTCMilliTimestamp = number;
 export type ChartData = [UTCMilliTimestamp, number];
 export type PlotLine = [string, UTCMilliTimestamp];
 
-export const formatNumber = (value: number, decimals = 0): string => {
-  return Number(value).toLocaleString(undefined, {
+export const formatNumber = (value: number, decimals = 0): string =>
+  Number(value).toLocaleString(undefined, {
     minimumFractionDigits: decimals > 0 ? decimals : 0,
     maximumFractionDigits: decimals > 0 ? decimals : 0,
   });
-}
 
 export const formatRatingHistory = (
   ratingHistory: HistoricalRating[],
@@ -29,9 +28,8 @@ export const formatRatingHistory = (
   }, ratingRecord);
 };
 
-export const formatTournamentList = (tournaments: Tournament[]): PlotLine[] => {
-  return tournaments.map((t) => [t.name_long, t.display_date.getTime()]);
-};
+export const formatTournamentList = (tournaments: Tournament[]): PlotLine[] =>
+  tournaments.map((t) => [t.name_long, t.display_date.getTime()]);
 
 export const highchartsOptionsBase: Highcharts.Options = {
   chart: {

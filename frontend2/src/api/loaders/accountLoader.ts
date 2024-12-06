@@ -7,7 +7,7 @@ import type { LoaderFunction } from "react-router-dom";
 export const accountLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
-    const episodeId = params.episodeId;
+    const { episodeId } = params;
 
     if (episodeId === undefined) return null;
 
