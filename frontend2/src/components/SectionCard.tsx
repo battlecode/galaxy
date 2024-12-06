@@ -25,11 +25,6 @@ const SectionCard: React.FC<SectionCardProps> = ({
           </div>
         </div>
       )}
-      {/* <div className="absolute inset-0 h-full w-1 rounded-l bg-cyan-600" /> */}
-      {loading ? <LoadingContent /> : children}
-    </div>
-    <div className={`relative overflow-auto rounded-b bg-white p-6 shadow-md`}>
-      <div className="absolute inset-0 h-full w-1 rounded-l rounded-t-none bg-cyan-600" />
       {loading ? <LoadingContent /> : children}
     </div>
   </div>
