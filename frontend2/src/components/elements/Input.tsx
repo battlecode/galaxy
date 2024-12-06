@@ -1,4 +1,5 @@
-import React, { forwardRef, type ReactElement } from "react";
+import type React from "react";
+import { forwardRef, type ReactElement } from "react";
 import FormError from "./FormError";
 import FormLabel from "./FormLabel";
 

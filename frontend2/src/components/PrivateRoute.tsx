@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import type React from "react";
+import { useEffect } from "react";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import { Outlet, useNavigate } from "react-router-dom";
 import Spinner from "./Spinner";

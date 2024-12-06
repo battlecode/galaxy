@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { login } from "../api/auth/authApi";

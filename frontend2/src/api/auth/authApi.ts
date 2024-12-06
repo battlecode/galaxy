@@ -1,7 +1,7 @@
 import { TokenApi } from "../_autogen";
 import Cookies from "js-cookie";
 import { buildKey, DEFAULT_API_CONFIGURATION } from "../helpers";
-import { type QueryClient } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import { userQueryKeys } from "../user/userKeys";
 import { loginTokenVerifyFactory } from "api/user/userFactories";
 
