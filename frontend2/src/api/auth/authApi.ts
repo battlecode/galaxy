@@ -28,15 +28,15 @@ export const login = async (
   Cookies.set("access", res.access);
   Cookies.set("refresh", res.refresh);
 
-  queryClient.setQueryData<boolean>(
-    buildKey(loginTokenVerifyFactory.queryKey, { queryClient }),
-    true,
-  );
-
   await queryClient.refetchQueries({
     // OK to call KEY.key() here as we are refetching all user-me queries.
     queryKey: userQueryKeys.meBase.key(),
   });
+
+  queryClient.setQueryData<boolean>(
+    buildKey(loginTokenVerifyFactory.queryKey, { queryClient }),
+    true,
+  );
 };
 
 /**
@@ -48,15 +48,15 @@ export const logout = async (queryClient: QueryClient): Promise<void> => {
   Cookies.remove("access");
   Cookies.remove("refresh");
 
-  queryClient.setQueryData<boolean>(
-    buildKey(loginTokenVerifyFactory.queryKey, { queryClient }),
-    false,
-  );
-
   await queryClient.refetchQueries({
     // OK to call KEY.key() here as we are refetching all user-me queries.
     queryKey: userQueryKeys.meBase.key(),
   });
+
+  queryClient.setQueryData(
+    buildKey(loginTokenVerifyFactory.queryKey, { queryClient }),
+    false,
+  );
 };
 
 export const loginTokenVerify = async (): Promise<boolean> => {

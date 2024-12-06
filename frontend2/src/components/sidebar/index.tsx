@@ -1,136 +1,140 @@
-/* eslint-disable --
- * TODO: this file will be corrected in https://github.com/battlecode/galaxy/pull/853
- */
-
 import type React from "react";
 import SidebarSection from "./SidebarSection";
-import SidebarItem from "./SidebarItem";
-import { useEpisodeId } from "../../contexts/EpisodeContext";
 import type { IconName } from "../elements/Icon";
-import { useCurrentUser } from "../../contexts/CurrentUserContext";
-import { useUserTeam } from "../../api/team/useTeam";
+import type { Episode, TeamPrivate } from "api/_autogen";
+import type { UseQueryResult } from "@tanstack/react-query";
+import { type AuthState, AuthStateEnum } from "contexts/CurrentUserContext";
 
 interface SidebarProps {
   collapsed?: boolean;
 }
 
-export const SIDEBAR_ITEM_DATA: Array<{
+enum UserAuthLevel {
+  LOGGED_OUT,
+  LOGGED_IN_NO_TEAM,
+  LOGGED_IN_HAS_TEAM,
+}
+
+export interface SidebarItemData {
   iconName: IconName;
   text: string;
   linkTo: string;
-}> = [
+  requireGameReleased: boolean;
+  userAuthLevel: UserAuthLevel;
+}
+
+const GENERAL_ITEMS: SidebarItemData[] = [
   {
     iconName: "home",
     text: "Home",
     linkTo: "home",
+    requireGameReleased: false,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
   {
     iconName: "map",
     text: "Quick Start",
     linkTo: "quick_start",
+    requireGameReleased: false,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
   {
     iconName: "clipboard_document",
     text: "Resources",
     linkTo: "resources",
+    requireGameReleased: false,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
+];
+const COMPETE_ITEMS: SidebarItemData[] = [
   {
     iconName: "trophy",
     text: "Tournaments",
     linkTo: "tournaments",
+    requireGameReleased: true,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
   {
     iconName: "chart_bar",
     text: "Rankings",
     linkTo: "rankings",
+    requireGameReleased: true,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
   {
     iconName: "clock",
     text: "Queue",
     linkTo: "queue",
+    requireGameReleased: true,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
+];
+const TEAM_MANAGEMENT_ITEMS: SidebarItemData[] = [
   {
     iconName: "user_group",
     text: "My Team",
     linkTo: "my_team",
+    requireGameReleased: false,
+    userAuthLevel: UserAuthLevel.LOGGED_IN_NO_TEAM,
   },
   {
     iconName: "arrow_up_tray",
     text: "Submissions",
     linkTo: "submissions",
+    requireGameReleased: true,
+    userAuthLevel: UserAuthLevel.LOGGED_IN_HAS_TEAM,
   },
   {
     iconName: "play_circle",
     text: "Scrimmaging",
     linkTo: "scrimmaging",
+    requireGameReleased: true,
+    userAuthLevel: UserAuthLevel.LOGGED_IN_HAS_TEAM,
   },
 ];
 
-/**
- *
- * @param startIndex The first sidebar item to include. 0-indexed, inclusive.
- * @param endIndex The last sidebar item to include (inclusive stop index)
- * @param episodeId The episodeId to link to (e.g. "bc23")
- * @returns
- */
-export const generateSidebarItems = (
-  startIndex: number,
-  endIndex: number,
-  episodeId: string,
-): JSX.Element[] => {
-  const result: JSX.Element[] = [];
-  for (let i = startIndex; i <= endIndex; i++) {
-    const itemData = SIDEBAR_ITEM_DATA[i];
-    result.push(
-      <SidebarItem
-        key={i}
-        {...itemData}
-        linkTo={`/${episodeId}/${itemData.linkTo}`}
-      />,
-    );
-  }
-  return result;
+export const ALL_SIDEBAR_ITEMS: SidebarItemData[] = [
+  ...GENERAL_ITEMS,
+  ...COMPETE_ITEMS,
+  ...TEAM_MANAGEMENT_ITEMS,
+];
+
+export const renderableItems = (
+  items: SidebarItemData[],
+  episode: UseQueryResult<Episode>,
+  authState: AuthState,
+  userTeam: UseQueryResult<TeamPrivate>,
+): SidebarItemData[] => {
+  const gameReleased =
+    episode.isSuccess && episode.data.game_release.getTime() < Date.now();
+
+  const loggedIn = authState === AuthStateEnum.AUTHENTICATED;
+
+  const userHasTeam = userTeam.isSuccess;
+
+  return items.filter((itemData) => {
+    // Ensure that we are allowed to render this item
+    if (itemData.requireGameReleased && !gameReleased) return false;
+    if (itemData.userAuthLevel > UserAuthLevel.LOGGED_OUT && !loggedIn)
+      return false;
+    if (
+      itemData.userAuthLevel > UserAuthLevel.LOGGED_IN_NO_TEAM &&
+      !userHasTeam
+    )
+      return false;
+
+    return true;
+  });
 };
 
 // IMPORTANT: When changing this file, also remember to change the mobile menu that appears on small screens.
-const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
-  collapsed = collapsed ?? false;
-  const { episodeId } = useEpisodeId();
-  const { user } = useCurrentUser();
-
-  const teamData = useUserTeam({ episodeId });
-
-  let teamManage;
-
-  // construct teamManage if needed
-  if (user !== undefined) {
-    if (teamData.isSuccess) {
-      teamManage = (
-        <SidebarSection title="team management">
-          {generateSidebarItems(6, 8, episodeId)}
-        </SidebarSection>
-      );
-    } else {
-      teamManage = (
-        <SidebarSection title="team management">
-          {generateSidebarItems(6, 6, episodeId)}
-        </SidebarSection>
-      );
-    }
-  }
-
-  // generate sidebar
-  return collapsed ? null : (
+const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) =>
+  collapsed ? null : (
     <nav className="fixed top-16 z-10 hidden h-full w-52 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">
-      <SidebarSection title="">
-        {generateSidebarItems(0, 2, episodeId)}
-      </SidebarSection>
-      <SidebarSection title="compete">
-        {generateSidebarItems(3, 5, episodeId)}
-      </SidebarSection>
-      {teamManage}
+      <SidebarSection title="" items={GENERAL_ITEMS} />
+      <SidebarSection title="compete" items={COMPETE_ITEMS} />
+      <SidebarSection title="team management" items={TEAM_MANAGEMENT_ITEMS} />
     </nav>
   );
-};
 
 export default Sidebar;
