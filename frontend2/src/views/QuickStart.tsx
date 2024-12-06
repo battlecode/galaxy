@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { quickStartText } from "../content/ManageContent";
 import { QuickStartPage } from "../content/ContentStruct";
 import { useEpisodeId } from "../contexts/EpisodeContext";

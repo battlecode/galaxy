@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { commonIssuesText } from "../content/ManageContent";
 
 import { useEpisodeId } from "../contexts/EpisodeContext";

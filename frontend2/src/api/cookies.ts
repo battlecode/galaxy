@@ -16,8 +16,5 @@ export const setApiTokens = ({
   Cookies.set("refresh", refresh);
 };
 
-export const doApiTokensExist = (): boolean => {
-  return (
-    Cookies.get("access") !== undefined && Cookies.get("refresh") !== undefined
-  );
-};
+export const doApiTokensExist = (): boolean =>
+  Cookies.get("access") !== undefined && Cookies.get("refresh") !== undefined;

@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import type React from "react";
+import { useMemo, useState } from "react";
 import SectionCard from "../SectionCard";
 import DescriptiveCheckbox, {
   getCheckboxState,
@@ -31,18 +32,18 @@ const EligibilitySettings: React.FC = () => {
     number[] | undefined
   >();
 
-  const editMode = useMemo(() => {
-    // Desired eligibility is different from the current (present, non-loading) team data
-    return (
+  const editMode = useMemo(
+    () =>
+      // Desired eligibility is different from the current (present, non-loading) team data
       !teamData.isLoading &&
       teamData.isSuccess &&
       isPresent(desiredEligibility) &&
       !isEqual(
         desiredEligibility.sort((a, b) => a - b),
         teamData.data.profile?.eligible_for?.sort((a, b) => a - b),
-      )
-    );
-  }, [desiredEligibility, teamData]);
+      ),
+    [desiredEligibility, teamData],
+  );
 
   if (episodeData.isLoading) {
     return <Loading />;
@@ -62,33 +63,29 @@ const EligibilitySettings: React.FC = () => {
           </p>
         </div>
         <div className="flex flex-1 flex-col gap-2">
-          {episodeData.data.eligibility_criteria.map((crit) => {
-            return (
-              <DescriptiveCheckbox
-                key={crit.id}
-                status={getCheckboxState(
-                  teamData.isLoading || updateTeam.isPending,
-                  editMode,
-                  Boolean(desiredEligibility?.includes(crit.id)),
-                  Boolean(
-                    teamData.data.profile?.eligible_for?.includes(crit.id),
-                  ),
-                )}
-                onChange={(checked) => {
-                  const prev = isPresent(desiredEligibility)
-                    ? desiredEligibility
-                    : teamData.data.profile?.eligible_for;
-                  setDesiredEligibility(
-                    checked
-                      ? [...(prev ?? []), crit.id]
-                      : prev?.filter((item) => item !== crit.id) ?? [],
-                  );
-                }}
-                title={`${crit.title} ${crit.icon}`}
-                description={crit.description}
-              />
-            );
-          })}
+          {episodeData.data.eligibility_criteria.map((crit) => (
+            <DescriptiveCheckbox
+              key={crit.id}
+              status={getCheckboxState(
+                teamData.isLoading || updateTeam.isPending,
+                editMode,
+                Boolean(desiredEligibility?.includes(crit.id)),
+                Boolean(teamData.data.profile?.eligible_for?.includes(crit.id)),
+              )}
+              onChange={(checked) => {
+                const prev = isPresent(desiredEligibility)
+                  ? desiredEligibility
+                  : teamData.data.profile?.eligible_for;
+                setDesiredEligibility(
+                  checked
+                    ? [...(prev ?? []), crit.id]
+                    : prev?.filter((item) => item !== crit.id) ?? [],
+                );
+              }}
+              title={`${crit.title} ${crit.icon}`}
+              description={crit.description}
+            />
+          ))}
           {editMode && (
             <Button
               variant="dark"

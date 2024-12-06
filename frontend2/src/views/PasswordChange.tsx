@@ -3,7 +3,8 @@ import Spinner from "components/Spinner";
 import Button from "components/elements/Button";
 import Input from "components/elements/Input";
 import { useEpisodeId } from "contexts/EpisodeContext";
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useSearchParams } from "react-router-dom";
 import { FIELD_REQUIRED_ERROR_MSG } from "utils/constants";
@@ -28,11 +29,12 @@ const PasswordChange: React.FC = () => {
   const { episodeId } = useEpisodeId();
 
   const [searchParams, _] = useSearchParams();
-  const queryParams: QueryParams = useMemo(() => {
-    return {
+  const queryParams: QueryParams = useMemo(
+    () => ({
       token: searchParams.get("token") ?? "",
-    };
-  }, [searchParams]);
+    }),
+    [searchParams],
+  );
 
   const resetTokenValid = usePasswordResetTokenValid({
     resetTokenRequest: { token: queryParams.token },
@@ -45,16 +47,17 @@ const PasswordChange: React.FC = () => {
         <div className="mb-6 text-5xl sm:text-6xl">BATTLECODE</div>
       </span>
       <form
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onSubmit={handleSubmit((data) => {
-          resetPassword.mutate({
-            passwordTokenRequest: {
-              password: data.password,
-              token: queryParams.token,
-            },
-          });
-          reset();
-        })}
+        onSubmit={(e) => {
+          void handleSubmit((data) => {
+            resetPassword.mutate({
+              passwordTokenRequest: {
+                password: data.password,
+                token: queryParams.token,
+              },
+            });
+            reset();
+          })(e);
+        }}
         className="flex w-11/12 flex-col gap-5 rounded-lg bg-gray-100 p-6 shadow-md sm:w-[350px]"
       >
         {(resetTokenValid.isLoading || resetTokenValid.isError) && (
@@ -122,9 +125,7 @@ const PasswordChange: React.FC = () => {
           <hr />
           <div className="mt-3 flex flex-row justify-between text-sm text-cyan-600">
             <Link to="/login">Login</Link>
-            <Link to={episodeId !== undefined ? `/${episodeId}/home` : "/"}>
-              Back to home
-            </Link>
+            <Link to={`/${episodeId}/home`}>Back to home</Link>
           </div>
         </div>
       </form>

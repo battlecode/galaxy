@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { type UserPrivate } from "../api/_autogen";
+import type { UserPrivate } from "../api/_autogen";
 
 export enum AuthStateEnum {
   LOADING = "loading",

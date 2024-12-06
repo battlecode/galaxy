@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_autogen";
 import Spinner from "components/Spinner";
 import { isNil } from "lodash";
@@ -42,7 +43,7 @@ const WinLossTie: React.FC<WinLossTieProps> = ({
     }
   }, [scrimRecord.isLoading]);
 
-  const dataOrLoading = (count?: number): JSX.Element => {
+  const dataOrLoading = (count?: number): React.JSX.Element => {
     if (scrimRecord.isLoading) {
       return <Spinner size="sm" />;
     } else if (isNil(count)) {

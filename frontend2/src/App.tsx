@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import {
   QueryCache,
   QueryClient,
@@ -53,13 +53,15 @@ import { homeIfLoggedIn } from "api/loaders/homeIfLoggedIn";
 import { episodeLoader } from "api/loaders/episodeLoader";
 import UserProfile from "views/UserProfile";
 import { userProfileLoader } from "api/loaders/userProfileLoader";
+import { HttpStatusCode } from "api/apiTypes";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => {
       if (error instanceof ResponseError) {
         // If we just have a client error, don't show a toast
-        if (error.response.status < 500) return;
+        if (error.response.status < HttpStatusCode.INTERNAL_SERVER_ERROR)
+          return;
       }
       // Otherwise, show the user a failure message
       toast.error(`Something went wrong: ${error.message}`);
@@ -73,19 +75,17 @@ queryClient.setQueryDefaults(["episode"], {
 queryClient.setQueryDefaults(["team"], { retry: false });
 queryClient.setQueryDefaults(["user"], { retry: false });
 
-const App: React.FC = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Toaster position="top-center" reverseOrder={false} />
-      <CurrentUserProvider>
-        <EpisodeProvider>
-          <RouterProvider router={router} />
-        </EpisodeProvider>
-      </CurrentUserProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
-  );
-};
+const App: React.FC = () => (
+  <QueryClientProvider client={queryClient}>
+    <Toaster position="top-center" reverseOrder={false} />
+    <CurrentUserProvider>
+      <EpisodeProvider>
+        <RouterProvider router={router} />
+      </EpisodeProvider>
+    </CurrentUserProvider>
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>
+);
 
 const router = createBrowserRouter([
   // Pages that should render without a sidebar/navbar

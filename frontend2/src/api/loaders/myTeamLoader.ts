@@ -8,7 +8,7 @@ import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_aut
 export const myTeamLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
-    const episodeId = params.episodeId;
+    const { episodeId } = params;
 
     if (episodeId === undefined) return null;
 

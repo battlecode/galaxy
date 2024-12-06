@@ -1,6 +1,6 @@
 import type { QueryClient } from "@tanstack/react-query";
 import { loginCheck } from "api/auth/authApi";
-import { type LoaderFunction } from "react-router-dom";
+import type { LoaderFunction } from "react-router-dom";
 import { DEFAULT_EPISODE } from "utils/constants";
 
 export const homeIfLoggedIn =

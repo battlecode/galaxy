@@ -1,4 +1,5 @@
-import React, { Fragment } from "react";
+import type React from "react";
+import { Fragment } from "react";
 import Table from "components/Table";
 import {
   useCancelScrimmage,

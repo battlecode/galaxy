@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { useRouteError } from "react-router-dom";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 

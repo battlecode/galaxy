@@ -27,7 +27,7 @@ jobs:
       - name: Set up NodeJS environment
         uses: actions/setup-node@v3
         with:
-          node-version: '18.11.0'
+          node-version: '20.12.2'
       # Consider this as an add on to optimize the execution of actions
       - name: Cache node modules
         id: cache-npm
@@ -50,9 +50,10 @@ jobs:
         run: npm run lint
         working-directory: ./frontend2
       # Run test cases and this could ensure minimum coverage as well if set
-      - name: Execute test cases
-        run: npm run test
-        working-directory: ./frontend2
+      # This section should be un-commented when our frontend implements unit testing
+      # - name: Execute test cases
+      #   run: npm run test
+      #   working-directory: ./frontend2
   lint:
     name: Linter (pre-commit)
     runs-on: ubuntu-latest

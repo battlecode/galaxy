@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 interface TableBottomProps {
   totalCount: number;
@@ -28,30 +28,35 @@ const TableBottom: React.FC<TableBottomProps> = ({
   function getPageNumbers(): Array<string | number> {
     // The maximum number of pages to show in the pagination bar.
     const MAX_PAGES = 15;
+    // The number of pages to show on either side of the "..."
+    const END_PAGES = 3;
+    // The start/end buttons when we have lots of pages
+    const START_BUTTONS = [1, "..."];
+    const END_BUTTONS = ["...", pageCount];
+    // The number of pages to show around the
+
     if (pageCount > MAX_PAGES) {
       // Determines where the ellipses should go based on the current page.
       if (currentPage <= MAX_PAGES - 2) {
         // TS hack: gets the array not to throw a type error.
         const pages: Array<string | number> = ["", 0]
           .concat(Array.from({ length: MAX_PAGES - 2 }, (_, idx) => idx + 1))
-          .concat(["...", pageCount]);
+          .concat(END_BUTTONS);
         return pages.slice(2);
-      } else if (currentPage >= pageCount - MAX_PAGES + 3) {
-        return [1, "..."].concat(
+      } else if (currentPage >= pageCount - MAX_PAGES + END_PAGES) {
+        return START_BUTTONS.concat(
           Array.from(
-            { length: MAX_PAGES - 2 },
-            (_, idx) => pageCount - MAX_PAGES + idx + 3,
+            { length: MAX_PAGES - START_BUTTONS.length },
+            (_, idx) => pageCount - MAX_PAGES + idx + END_PAGES,
           ),
         );
       } else {
-        return [1, "..."]
-          .concat(
-            Array.from(
-              { length: MAX_PAGES - 4 },
-              (_, idx) => idx + currentPage - 5,
-            ),
-          )
-          .concat(["...", pageCount]);
+        return START_BUTTONS.concat(
+          Array.from(
+            { length: MAX_PAGES - START_BUTTONS.length - END_BUTTONS.length },
+            (_, idx) => idx + currentPage - (END_PAGES + START_BUTTONS.length),
+          ),
+        ).concat(END_BUTTONS);
       }
     } else if (pageCount < 1) {
       // If we have no data, return this non-clickable placeholder.

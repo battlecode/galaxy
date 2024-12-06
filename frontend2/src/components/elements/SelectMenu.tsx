@@ -1,4 +1,5 @@
-import React, { Fragment, useMemo } from "react";
+import type React from "react";
+import { Fragment, useMemo } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import Icon from "./Icon";
 import FormError from "./FormError";
@@ -31,7 +32,7 @@ function SelectMenu<T extends React.Key | null | undefined>({
   className = "",
   errorMessage,
   onChange,
-}: SelectMenuProps<T>): JSX.Element {
+}: SelectMenuProps<T>): React.JSX.Element {
   const valueToLabel = useMemo(
     () => new Map(options.map((option) => [option.value, option.label])),
     [options],

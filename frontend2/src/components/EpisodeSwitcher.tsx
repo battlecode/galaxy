@@ -1,4 +1,5 @@
-import React, { Fragment, useMemo } from "react";
+import type React from "react";
+import { Fragment, useMemo } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 import Icon from "./elements/Icon";
 import { useEpisodeId } from "../contexts/EpisodeContext";
@@ -17,7 +18,7 @@ const EpisodeSwitcher: React.FC = () => {
   const idToName = useMemo(
     () =>
       new Map(
-        (episodeList?.data?.results ?? []).map((ep) => [
+        (episodeList.data?.results ?? []).map((ep) => [
           ep.name_short,
           ep.name_long,
         ]),
@@ -69,7 +70,7 @@ const EpisodeSwitcher: React.FC = () => {
               bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
               sm:max-h-60 sm:text-sm"
             >
-              {episodeList?.data?.results?.map((ep) => (
+              {episodeList.data?.results?.map((ep) => (
                 <Listbox.Option
                   className="flex cursor-default flex-row justify-between py-1.5 pl-4 pr-2 ui-active:bg-cyan-100"
                   key={ep.name_short}

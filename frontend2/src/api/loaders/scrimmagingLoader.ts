@@ -14,7 +14,7 @@ import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_aut
 export const scrimmagingLoader =
   (queryClient: QueryClient): LoaderFunction =>
   async ({ params }) => {
-    const episodeId = params.episodeId;
+    const { episodeId } = params;
 
     if (episodeId === undefined) return null;
 

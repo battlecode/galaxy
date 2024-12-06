@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import type React from "react";
+import { useMemo, useState } from "react";
 import SectionCard from "../SectionCard";
 import DescriptiveCheckbox, {
   getCheckboxState,
@@ -26,17 +27,17 @@ const ScrimmageSettings: React.FC = () => {
   const [ranked, setRanked] = useState<boolean | undefined>();
   const [unranked, setUnranked] = useState<boolean | undefined>();
 
-  const editMode = useMemo(() => {
-    // Either ranked or unranked is different from the current (present, non-loading) team data
-    return (
+  const editMode = useMemo(
+    () =>
+      // Either ranked or unranked is different from the current (present, non-loading) team data
       !teamData.isLoading &&
       teamData.isSuccess &&
       ((isPresent(ranked) &&
         ranked !== teamData.data.profile?.auto_accept_ranked) ||
         (isPresent(unranked) &&
-          unranked !== teamData.data.profile?.auto_accept_unranked))
-    );
-  }, [ranked, unranked, teamData]);
+          unranked !== teamData.data.profile?.auto_accept_unranked)),
+    [ranked, unranked, teamData],
+  );
 
   if (!teamData.isSuccess) {
     return null;
@@ -62,7 +63,7 @@ const ScrimmageSettings: React.FC = () => {
             onChange={(checked) => {
               if (!isPresent(unranked))
                 setUnranked(
-                  teamData.data?.profile?.auto_accept_unranked ?? false,
+                  teamData.data.profile?.auto_accept_unranked ?? false,
                 );
               setRanked(checked);
             }}

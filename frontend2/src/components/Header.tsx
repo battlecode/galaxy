@@ -1,4 +1,5 @@
-import React, { Fragment } from "react";
+import type React from "react";
+import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { Link, NavLink } from "react-router-dom";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";

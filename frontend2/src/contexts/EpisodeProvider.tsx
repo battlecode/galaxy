@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from "react";
+import type React from "react";
+import { useState, useMemo } from "react";
 import { EpisodeIdContext } from "./EpisodeContext";
 import { DEFAULT_EPISODE } from "../utils/constants";
 

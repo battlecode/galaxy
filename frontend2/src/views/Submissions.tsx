@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import SectionCard from "../components/SectionCard";
 import SubHistoryTable from "../components/tables/submissions/SubHistoryTable";
@@ -35,11 +36,12 @@ const Submissions: React.FC = () => {
   const queryClient = useQueryClient();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryParams: QueryParams = useMemo(() => {
-    return {
+  const queryParams: QueryParams = useMemo(
+    () => ({
       scrimsPage: parsePageParam("scrimsPage", searchParams),
-    };
-  }, [searchParams]);
+    }),
+    [searchParams],
+  );
 
   const { data: episode } = useEpisodeInfo({ id: episodeId });
 
@@ -155,8 +157,9 @@ const Submissions: React.FC = () => {
               </p>
             </span>
             <form
-              // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={(e) => {
+                void handleSubmit(onSubmit)(e);
+              }}
               className="mt-4 flex flex-col gap-4"
             >
               <div>

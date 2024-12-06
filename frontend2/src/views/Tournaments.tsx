@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useSearchParams } from "react-router-dom";
 import { tournamentsText } from "../content/ManageContent";
@@ -18,11 +19,12 @@ const Tournaments: React.FC = () => {
   const queryClient = useQueryClient();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const queryParams: QueryParams = useMemo(() => {
-    return {
+  const queryParams: QueryParams = useMemo(
+    () => ({
       schedulePage: parsePageParam("schedulePage", searchParams),
-    };
-  }, [searchParams]);
+    }),
+    [searchParams],
+  );
 
   const { data: schedule, isLoading: scheduleLoading } = useTournamentList(
     {

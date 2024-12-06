@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 interface SpinnerProps {
   size?: "sm" | "md" | "xs" | "lg" | "xl";

@@ -9,7 +9,7 @@ import { safeEnsureQueryData } from "../helpers";
 export const submissionsLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
-    const episodeId = params.episodeId;
+    const { episodeId } = params;
     const page = !isNaN(parseInt(params.page ?? ""))
       ? parseInt(params.page ?? "")
       : 1;

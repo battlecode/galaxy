@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import type { Key } from "react";
 import Markdown from "./elements/Markdown";
 import SectionCard from "./SectionCard";

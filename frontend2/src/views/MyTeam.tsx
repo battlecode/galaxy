@@ -1,4 +1,5 @@
-import React, { type EventHandler, useMemo, useState } from "react";
+import type React from "react";
+import { type EventHandler, useMemo, useState } from "react";
 import { PageTitle } from "components/elements/BattlecodeStyle";
 import SectionCard from "components/SectionCard";
 import Input from "components/elements/Input";
@@ -83,8 +84,8 @@ const MyTeam: React.FC = () => {
     setIsLeaveModalOpen(false);
   };
 
-  const membersList = useMemo(() => {
-    return (
+  const membersList = useMemo(
+    () => (
       <div className="flex flex-col gap-8">
         {!teamData.isSuccess ? (
           <Loading />
@@ -99,8 +100,9 @@ const MyTeam: React.FC = () => {
           label="Leave team"
         />
       </div>
-    );
-  }, [teamData]);
+    ),
+    [teamData],
+  );
 
   if (teamData.isLoading) {
     return <Loading />;
@@ -115,8 +117,9 @@ const MyTeam: React.FC = () => {
         <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
           <SectionCard title="Profile" className="max-w-5xl">
             <form
-              // eslint-disable-next-line @typescript-eslint/no-misused-promises
-              onSubmit={handleInfoSubmit(onInfoSubmit)}
+              onSubmit={(e) => {
+                void handleInfoSubmit(onInfoSubmit)(e);
+              }}
               className="flex flex-col md:flex-row md:gap-8"
             >
               <div className="flex flex-col items-center gap-6 p-4">
@@ -173,7 +176,7 @@ const MyTeam: React.FC = () => {
           <ScrimmageSettings />
         </div>
         {/* Display the members list, file upload, and win/loss to the right when on a big screen. */}
-        <div className="flex hidden max-w-2xl flex-1 flex-col gap-8 xl:flex">
+        <div className="hidden max-w-2xl flex-1 flex-col gap-8 xl:flex">
           <SectionCard title="Members">{membersList}</SectionCard>
           <SectionCard title="Scrimmaging Record">
             <ScrimmagingRecord
@@ -243,8 +246,9 @@ const TeamAvatar: React.FC = () => {
   return (
     <form
       className="pb-1"
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      onSubmit={handleAvatarSubmit(onAvatarSubmit)}
+      onSubmit={(e) => {
+        void handleAvatarSubmit(onAvatarSubmit)(e);
+      }}
     >
       <FormLabel label="Team Avatar" />
       <input

@@ -35,14 +35,17 @@ import {
 import { buildKey } from "../helpers";
 import { ratingHistoryFactory } from "api/compete/competeFactories";
 import { competeQueryKeys } from "api/compete/competeKeys";
+import { MILLIS_SECOND } from "utils/utilTypes";
 
 // ---------- QUERY HOOKS ---------- //
+const SEARCH_WAIT_SECONDS = 30;
+
 /**
  * For retrieving the current user's team for an episode.
  */
 export const useUserTeam = ({
   episodeId,
-}: TeamTMeRetrieveRequest): UseQueryResult<TeamPrivate, Error> =>
+}: TeamTMeRetrieveRequest): UseQueryResult<TeamPrivate> =>
   useQuery({
     queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
     queryFn: async () => await myTeamFactory.queryFn({ episodeId }),
@@ -54,7 +57,7 @@ export const useUserTeam = ({
 export const useTeam = ({
   episodeId,
   id,
-}: TeamTRetrieveRequest): UseQueryResult<TeamPublic, Error> =>
+}: TeamTRetrieveRequest): UseQueryResult<TeamPublic> =>
   useQuery({
     queryKey: buildKey(otherTeamInfoFactory.queryKey, { episodeId, id }),
     queryFn: async () => await otherTeamInfoFactory.queryFn({ episodeId, id }),
@@ -66,7 +69,7 @@ export const useTeam = ({
 export const useSearchTeams = (
   { episodeId, search, page }: TeamTListRequest,
   queryClient: QueryClient,
-): UseQueryResult<PaginatedTeamPublicList, Error> =>
+): UseQueryResult<PaginatedTeamPublicList> =>
   useQuery({
     queryKey: buildKey(searchTeamsFactory.queryKey, {
       episodeId,
@@ -79,7 +82,7 @@ export const useSearchTeams = (
         queryClient,
         true,
       ),
-    staleTime: 1000 * 30, // 30 seconds
+    staleTime: MILLIS_SECOND * SEARCH_WAIT_SECONDS,
   });
 
 // ---------- MUTATION HOOKS ---------- //
@@ -94,8 +97,7 @@ export const useCreateTeam = (
   Error,
   {
     name: string;
-  },
-  unknown
+  }
 > =>
   useMutation({
     mutationKey: teamMutationKeys.create({ episodeId }),
@@ -119,7 +121,7 @@ export const useCreateTeam = (
 export const useJoinTeam = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, TeamJoinRequest, unknown> =>
+): UseMutationResult<void, Error, TeamJoinRequest> =>
   useMutation({
     mutationKey: teamMutationKeys.join({ episodeId }),
     mutationFn: async (teamJoinRequest: TeamJoinRequest) => {
@@ -155,7 +157,7 @@ export const useLeaveTeam = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
   onSuccess?: () => void,
-): UseMutationResult<void, Error, void, unknown> =>
+): UseMutationResult<void, Error, void> =>
   useMutation({
     mutationKey: teamMutationKeys.leave({ episodeId }),
     mutationFn: async () => {
@@ -193,7 +195,7 @@ export const useLeaveTeam = (
 export const useUpdateTeam = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-): UseMutationResult<TeamPrivate, Error, PatchedTeamPrivateRequest, unknown> =>
+): UseMutationResult<TeamPrivate, Error, PatchedTeamPrivateRequest> =>
   useMutation({
     mutationKey: teamMutationKeys.update({
       episodeId,
@@ -225,7 +227,7 @@ export const useUpdateTeamAvatar = (
     episodeId: string;
   },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, Blob, unknown> =>
+): UseMutationResult<void, Error, Blob> =>
   useMutation({
     mutationKey: teamMutationKeys.avatarUpload({ episodeId }),
     // We pass in a Blob because we already have the episodeId
@@ -249,7 +251,7 @@ export const useUpdateTeamAvatar = (
 export const useUpdateTeamReport = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, TeamReportRequest, unknown> =>
+): UseMutationResult<void, Error, TeamReportRequest> =>
   useMutation({
     mutationKey: teamMutationKeys.report({ episodeId }),
     mutationFn: async (teamReportRequest: TeamReportRequest) => {

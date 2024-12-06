@@ -1,26 +1,5 @@
 import type Highcharts from "highcharts";
 
-export const dummyData = [
-  ["2023-01-07T23:40:23.724944-05:00", 213],
-  ["2023-01-07T23:40:38.190097-05:00", 393.07761467344426],
-  ["2023-01-07T23:43:24.089644-05:00", 544.4392758936382],
-  ["2023-01-08T01:17:24.776842-05:00", 695.800751650873],
-  ["2023-01-08T01:43:12.890233-05:00", 825.5286444529454],
-  ["2023-01-08T02:58:22.497562-05:00", 936.7912772869753],
-  ["2023-01-08T03:07:17.220429-05:00", 1032.2947466200887],
-  ["2023-01-08T04:23:55.062399-05:00", 1114.3493627397766],
-  ["2023-01-21T16:13:47.898738-05:00", 237],
-  ["2023-01-21T16:37:01.302090-05:00", 431.83569941362316],
-  ["2023-01-21T16:37:02.076740-05:00", 589.7367139840902],
-  ["2023-01-21T16:37:03.679759-05:00", 739.5747774074662],
-  ["2023-01-22T20:55:41.267208-05:00", 851.8840585753301],
-  ["2023-01-22T20:55:43.000873-05:00", 938.9285076344466],
-  ["2023-01-22T20:56:15.282299-05:00", 1011.8802093710394],
-  ["2024-01-27T23:25:46.234997-05:00", 0],
-  ["2024-01-27T23:35:48.751288-05:00", 0],
-  ["2024-02-01T10:06:43.283346-05:00", 0],
-]; // From Lowell
-
 // These are waypoints that are layered on top of the chart so it is easy to
 // tell when certain dates occured. The data to the right is formatted to
 // %Y-%m-%dT%H:%M:%S
@@ -29,12 +8,11 @@ export const tournaments = [
   ["Sprint 2", "2023-01-20T19:00:00-05:00"],
 ];
 
-export const formatNumber = (value: number, decimals = 0): string => {
-  return Number(value).toLocaleString(undefined, {
+export const formatNumber = (value: number, decimals = 0): string =>
+  Number(value).toLocaleString(undefined, {
     minimumFractionDigits: decimals > 0 ? decimals : 0,
     maximumFractionDigits: decimals > 0 ? decimals : 0,
   });
-};
 
 export const highchartsOptionsBase: Highcharts.Options = {
   chart: {
@@ -101,12 +79,4 @@ export const highchartsOptionsBase: Highcharts.Options = {
     split: true,
     valueDecimals: 0,
   },
-
-  series: [
-    {
-      type: "line",
-      name: "This is MY label",
-      data: dummyData,
-    },
-  ],
 };

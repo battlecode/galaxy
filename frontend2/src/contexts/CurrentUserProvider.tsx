@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { AuthStateEnum, CurrentUserContext } from "./CurrentUserContext";
 import { useCurrentUserInfo, useIsLoggedIn } from "../api/user/useUser";
 import _ from "lodash";

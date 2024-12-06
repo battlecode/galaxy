@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import type React from "react";
+import { useMemo } from "react";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { useParams } from "react-router-dom";
 import { useTeam } from "api/team/useTeam";
@@ -10,9 +11,8 @@ import Loading from "components/Loading";
 import { Status526Enum } from "api/_autogen";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 
-const isNilOrEmptyStr = (str: string | undefined | null): boolean => {
-  return isNil(str) || str === "";
-};
+const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
+  isNil(str) || str === "";
 
 // rendered at /:episodeId/team/:teamId
 const TeamProfile: React.FC = () => {
@@ -20,8 +20,8 @@ const TeamProfile: React.FC = () => {
   const { teamId } = useParams();
   const episode = useEpisodeInfo({ id: episodeId });
   const team = useTeam({ episodeId, id: teamId ?? "" });
-  const membersList = useMemo(() => {
-    return (
+  const membersList = useMemo(
+    () => (
       <div className="flex flex-col gap-8">
         {!team.isSuccess ? (
           <Loading />
@@ -29,8 +29,9 @@ const TeamProfile: React.FC = () => {
           <MemberList members={team.data.members} />
         )}
       </div>
-    );
-  }, [team]);
+    ),
+    [team],
+  );
   const eligibles = useMemo(
     () =>
       episode.data?.eligibility_criteria.filter(
@@ -95,7 +96,7 @@ const TeamProfile: React.FC = () => {
                   <div className="font-medium">Eligibility</div>
                   <div className="text-sm text-gray-800">
                     {eligibles.length !== 0 ? (
-                      eligibles?.map((criterion) => (
+                      eligibles.map((criterion) => (
                         <div key={criterion.id}>
                           {criterion.title}
                           {"  "}

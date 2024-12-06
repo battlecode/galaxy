@@ -1,4 +1,5 @@
-import React, { Fragment } from "react";
+import type React from "react";
+import { Fragment } from "react";
 import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";
 import Table from "../../Table";
@@ -54,11 +55,9 @@ const ScrimHistoryTable: React.FC<ScrimHistoryTableProps> = ({
           {
             header: "Score",
             key: "score",
-            value: (match) => {
-              return (
-                <MatchScore match={match} userTeamId={userTeamData.data?.id} />
-              );
-            },
+            value: (match) => (
+              <MatchScore match={match} userTeamId={userTeamData.data?.id} />
+            ),
           },
           {
             header: "Rating (Δ)",

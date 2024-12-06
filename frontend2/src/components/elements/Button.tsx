@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import Icon, { type IconName } from "./Icon";
 import Spinner from "../Spinner";
 

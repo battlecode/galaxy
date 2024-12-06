@@ -1,5 +1,6 @@
 import { Combobox, Transition } from "@headlessui/react";
-import React, { Fragment, useEffect, useState, useMemo } from "react";
+import type React from "react";
+import { Fragment, useEffect, useState, useMemo } from "react";
 import FormLabel from "./FormLabel";
 import Icon from "./Icon";
 import Spinner from "../Spinner";
@@ -25,7 +26,7 @@ interface AsyncSelectMenuProps<T extends React.Key | null | undefined, K> {
   useQueryResult: (
     { episodeId, search, page }: SearchParams,
     queryClient: QueryClient,
-  ) => UseQueryResult<SearchResult<K>, Error>;
+  ) => UseQueryResult<SearchResult<K>>;
   resultToOptions: (results: K[]) => Array<{ value: T; label: string }>;
   onChange: (selection: { value: T; label: string } | null) => void;
   selected: { value: T; label: string } | null;
@@ -44,7 +45,9 @@ function AsyncSelectMenu<T extends React.Key | null | undefined, K>({
   selected,
   placeholder,
   className = "",
-}: AsyncSelectMenuProps<T, K>): JSX.Element {
+}: AsyncSelectMenuProps<T, K>): React.JSX.Element {
+  const CHANGE_DEBOUNCE_MILLIS = 300;
+
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
 
@@ -65,13 +68,17 @@ function AsyncSelectMenu<T extends React.Key | null | undefined, K>({
     setSearchText(inputValue);
   };
 
-  const debouncedHandleChange = useMemo(() => debounce(handleChange, 300), []);
+  const debouncedHandleChange = useMemo(
+    () => debounce(handleChange, CHANGE_DEBOUNCE_MILLIS),
+    [],
+  );
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       debouncedHandleChange.cancel();
-    };
-  }, []);
+    },
+    [],
+  );
 
   return (
     <div className={`relative ${className}`}>
@@ -96,9 +103,9 @@ function AsyncSelectMenu<T extends React.Key | null | undefined, K>({
               debouncedHandleChange(event.target.value);
             }}
             placeholder={placeholder}
-            displayValue={(selection: { value: T; label: string } | null) => {
-              return selection !== null ? selection.label : "";
-            }}
+            displayValue={(selection: { value: T; label: string } | null) =>
+              selection !== null ? selection.label : ""
+            }
           />
           {selected !== null && (
             <button

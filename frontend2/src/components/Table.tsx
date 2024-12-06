@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import Spinner from "./Spinner";
 
 export interface Column<T> {
@@ -13,7 +13,7 @@ interface TableProps<T> {
   loading: boolean;
   keyFromValue: (data: T) => React.Key;
   onRowClick?: (data: T) => void;
-  bottomElement?: JSX.Element;
+  bottomElement?: React.JSX.Element;
 }
 
 /*

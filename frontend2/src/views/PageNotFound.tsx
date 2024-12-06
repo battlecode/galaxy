@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "components/elements/Button";
 import { useEpisodeId } from "contexts/EpisodeContext";

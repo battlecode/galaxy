@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import SelectMenu from "../components/elements/SelectMenu";
-import { type Maybe } from "../utils/utilTypes";
+import type { Maybe } from "../utils/utilTypes";
 import {
   GenderEnum,
   type CountryEnum,
@@ -40,7 +41,7 @@ const Register: React.FC = () => {
   useEffect(() => {
     // redirect to home if already logged in
     if (authState === AuthStateEnum.AUTHENTICATED) {
-      navigate(episodeId !== undefined ? `/${episodeId}/home` : "/");
+      navigate(`/${episodeId}/home`);
     }
   }, [authState]);
 
@@ -56,18 +57,20 @@ const Register: React.FC = () => {
       <div className="flex flex-1 items-end text-center font-display text-5xl tracking-wide text-white sm:text-6xl">
         BATTLECODE
       </div>
-      {/* https://github.com/orgs/react-hook-form/discussions/8622 */}
       <form
-        /* eslint-disable-next-line @typescript-eslint/no-misused-promises */
-        onSubmit={async (event) => {
-          // validate gender and country
-          await handleSubmit(onSubmit)(event);
-          if (gender === undefined) {
-            setError("profile.gender", { message: FIELD_REQUIRED_ERROR_MSG });
-          }
-          if (country === undefined) {
-            setError("profile.country", { message: FIELD_REQUIRED_ERROR_MSG });
-          }
+        onSubmit={(e) => {
+          void (async (event) => {
+            // validate gender and country
+            await handleSubmit(onSubmit)(event);
+            if (gender === undefined) {
+              setError("profile.gender", { message: FIELD_REQUIRED_ERROR_MSG });
+            }
+            if (country === undefined) {
+              setError("profile.country", {
+                message: FIELD_REQUIRED_ERROR_MSG,
+              });
+            }
+          })(e);
         }}
         className="m-6 flex w-11/12 flex-col gap-5 rounded-lg bg-gray-100 p-6 shadow-md sm:w-[550px]"
       >

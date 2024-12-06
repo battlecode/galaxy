@@ -6,7 +6,7 @@ import { safeEnsureQueryData } from "../helpers";
 export const tournamentsLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
-    const episodeId = params.episodeId;
+    const { episodeId } = params;
     if (episodeId === undefined) return null;
 
     // Tournament list

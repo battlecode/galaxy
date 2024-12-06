@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import SectionCard from "../components/SectionCard";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
@@ -41,11 +41,12 @@ const JoinTeam: React.FC = () => {
       <div className="flex flex-col gap-8 xl:flex-row">
         <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
           <form
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onSubmit={handleCreateSubmit((data) => {
-              createTeam.mutate({ name: data.teamName });
-              resetCreate();
-            })}
+            onSubmit={(e) => {
+              void handleCreateSubmit((data) => {
+                createTeam.mutate({ name: data.teamName });
+                resetCreate();
+              })(e);
+            }}
           >
             <SectionCard title="Create Team" className="max-w-5xl">
               <div className="flex flex-col gap-2">
@@ -68,14 +69,15 @@ const JoinTeam: React.FC = () => {
             </SectionCard>
           </form>
           <form
-            // eslint-disable-next-line @typescript-eslint/no-misused-promises
-            onSubmit={handleJoinSubmit((data) => {
-              joinTeam.mutate({
-                name: data.teamName,
-                join_key: data.joinKey,
-              });
-              resetJoin();
-            })}
+            onSubmit={(e) => {
+              void handleJoinSubmit((data) => {
+                joinTeam.mutate({
+                  name: data.teamName,
+                  join_key: data.joinKey,
+                });
+                resetJoin();
+              })(e);
+            }}
           >
             <SectionCard title="Join Team" className="max-w-5xl">
               <div className="flex flex-col gap-2">

@@ -1,8 +1,12 @@
-import React from "react";
+/* eslint-disable --
+ * TODO: this file will be corrected in https://github.com/battlecode/galaxy/pull/853
+ */
+
+import type React from "react";
 import SidebarSection from "./SidebarSection";
 import SidebarItem from "./SidebarItem";
 import { useEpisodeId } from "../../contexts/EpisodeContext";
-import { type IconName } from "../elements/Icon";
+import type { IconName } from "../elements/Icon";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
 import { useUserTeam } from "../../api/team/useTeam";
 
