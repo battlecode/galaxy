@@ -3,16 +3,20 @@ import { debuggingTipsText } from "../content/ManageContent";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
 import { DebuggingTipsPage } from "../content/ContentStruct";
-import NoContentLegacyEpisode from "./NoContentLegacyEpisode";
+import NoContentFound from "./NoContentFound";
+import { isNil } from "lodash";
 const DebuggingTips: React.FC = () => {
   const { episodeId } = useEpisodeId();
+
   const currentDebuggingTipsText = debuggingTipsText[episodeId];
-  const hasContent = Object.values(currentDebuggingTipsText).some(
-    (value) => value !== "",
-  );
+  const hasContent =
+    !isNil(currentDebuggingTipsText) &&
+    Object.values(currentDebuggingTipsText).some((value) => value !== "");
+
   if (!hasContent) {
-    return <NoContentLegacyEpisode />;
+    return <NoContentFound />;
   }
+
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">
