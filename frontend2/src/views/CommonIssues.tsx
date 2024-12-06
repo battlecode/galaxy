@@ -4,16 +4,20 @@ import { commonIssuesText } from "../content/ManageContent";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
 import { CommonIssuesPage } from "../content/ContentStruct";
-import NoContentLegacyEpisode from "./NoContentLegacyEpisode";
+import NoContentFound from "./NoContentFound";
+import { isNil } from "lodash";
 const CommmonIssues: React.FC = () => {
   const { episodeId } = useEpisodeId();
+
   const currentCommonIssuesText = commonIssuesText[episodeId];
-  const hasContent = Object.values(currentCommonIssuesText).some(
-    (value) => value !== "",
-  );
+  const hasContent =
+    !isNil(currentCommonIssuesText) &&
+    Object.values(currentCommonIssuesText).some((value) => value !== "");
+
   if (!hasContent) {
-    return <NoContentLegacyEpisode />;
+    return <NoContentFound />;
   }
+
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
       <div className="flex flex-1 flex-col gap-8">

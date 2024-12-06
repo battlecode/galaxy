@@ -9,7 +9,8 @@ import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import TournamentsTable from "../components/tables/TournamentsTable";
 import { useTournamentList } from "../api/episode/useEpisode";
 import { useQueryClient } from "@tanstack/react-query";
-import NoContentLegacyEpisode from "./NoContentLegacyEpisode";
+import NoContentFound from "./NoContentFound";
+import { isNil } from "lodash";
 interface QueryParams {
   schedulePage: number;
 }
@@ -33,12 +34,14 @@ const Tournaments: React.FC = () => {
     },
     queryClient,
   );
+
   const currentTournamentText = tournamentsText[episodeId];
-  const hasContent = Object.values(currentTournamentText).some(
-    (value) => value !== "",
-  );
+  const hasContent =
+    !isNil(currentTournamentText) &&
+    Object.values(currentTournamentText).some((value) => value !== "");
+
   if (!hasContent) {
-    return <NoContentLegacyEpisode />;
+    return <NoContentFound />;
   }
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
