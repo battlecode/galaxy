@@ -604,14 +604,15 @@ class MatchViewSet(
 
         team_id = parse_int(self.request.query_params.get("team_id"))
         if team_id is None and request.user.pk is not None:
-            team_id = (
-                Team.objects.filter(members__pk=request.user.pk)
-                .filter(episode_id=episode_id)
-                .first()
-                .id
+            user_team = Team.objects.filter(
+                members__pk=request.user.pk, episode_id=episode_id
             )
-            if team_id is None:
+
+            if not user_team.exists():
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+            else:
+                team_id = user_team.get().id
+
         if team_id is not None:
             queryset = queryset.filter(participants__team=team_id)
         else:
