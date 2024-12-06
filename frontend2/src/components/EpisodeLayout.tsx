@@ -16,7 +16,7 @@ const EpisodeLayout: React.FC = () => {
     }
   }, [episodeId]);
   return (
-    <div className="h-screen">
+    <div className="h-screen bg-gray-200/80">
       <Header />
       <Sidebar />
       <div className="h-full pt-16 sm:pl-52">

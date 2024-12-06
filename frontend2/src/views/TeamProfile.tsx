@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 import type React from "react";
-import { useEffect, useMemo } from "react";
-=======
-import React, { useMemo } from "react";
->>>>>>> f821dda (rebased and fixed page loading)
+import { useMemo } from "react";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { useParams } from "react-router-dom";
 import { useTeam } from "api/team/useTeam";
@@ -13,7 +9,6 @@ import { PageTitle } from "components/elements/BattlecodeStyle";
 import MemberList from "components/team/MemberList";
 import { Status526Enum } from "api/_autogen";
 import { useEpisodeInfo } from "api/episode/useEpisode";
-import toast from "react-hot-toast";
 import PageNotFound from "./PageNotFound";
 
 const isNilOrEmptyStr = (str: string | undefined | null): boolean =>

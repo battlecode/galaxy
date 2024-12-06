@@ -15,11 +15,19 @@ const SectionCard: React.FC<SectionCardProps> = ({
   className = "",
 }) => (
   <div className={className}>
-    {title !== undefined && (
-      <div className="rounded-t-md border-[4.5px] border-cyan-600 bg-cyan-400 p-2 text-xl font-semibold tracking-wide text-black">
-        {title}
-      </div>
-    )}
+    <div
+      className={`relative overflow-auto rounded-lg bg-white px-6 pb-6 pt-4 shadow-md`}
+    >
+      {title !== undefined && (
+        <div>
+          <div className=" mb-4 inline-block rounded-sm border-b-2 border-cyan-600 pb-0 text-xl font-semibold tracking-wide text-black ">
+            {title}
+          </div>
+        </div>
+      )}
+      {/* <div className="absolute inset-0 h-full w-1 rounded-l bg-cyan-600" /> */}
+      {loading ? <LoadingContent /> : children}
+    </div>
     <div className={`relative overflow-auto rounded-b bg-white p-6 shadow-md`}>
       <div className="absolute inset-0 h-full w-1 rounded-l rounded-t-none bg-cyan-600" />
       {loading ? <LoadingContent /> : children}

@@ -77,7 +77,7 @@ const TournamentPage: React.FC = () => {
   }, [tourneyData.data, episode]);
 
   return (
-    <div className="flex h-full w-full flex-col bg-white p-6">
+    <div className="flex h-full w-full flex-col p-6">
       <div className="flex flex-1 flex-col gap-8">
         <h1>Tournament {tourneyData.data?.name_long ?? tournamentId}</h1>
         <SectionCard title="About" loading={tourneyData.isLoading}>

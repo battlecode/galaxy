@@ -6,7 +6,6 @@ import { PageTitle } from "components/elements/BattlecodeStyle";
 import { useUserInfoById, useTeamsByUser } from "api/user/useUser";
 import { isNilOrEmptyStr } from "api/helpers";
 import PageNotFound from "./PageNotFound";
-import toast from "react-hot-toast";
 
 // rendered at /:episodeId/user/:userId
 const UserProfile: React.FC = () => {
