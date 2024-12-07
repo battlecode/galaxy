@@ -156,7 +156,6 @@ const router = createBrowserRouter([
           {
             path: "my_team",
             element: <MyTeam />,
-            errorElement: <ErrorBoundary />,
             loader: myTeamLoader(queryClient),
           },
           {
@@ -171,41 +170,64 @@ const router = createBrowserRouter([
         path: "",
         element: <Home />,
         loader: homeLoader(queryClient),
+        errorElement: <ErrorBoundary />,
       },
       {
         path: "home",
         element: <Home />,
         loader: homeLoader(queryClient),
+        errorElement: <ErrorBoundary />,
       },
-      { path: "resources", element: <Resources /> },
-      { path: "quick_start", element: <QuickStart /> },
+      {
+        path: "resources",
+        element: <Resources />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: "quick_start",
+        element: <QuickStart />,
+        errorElement: <ErrorBoundary />,
+      },
       {
         path: "rankings",
         element: <Rankings />,
         loader: rankingsLoader(queryClient),
+        errorElement: <ErrorBoundary />,
       },
       {
         path: "queue",
         element: <Queue />,
         loader: queueLoader(queryClient),
+        errorElement: <ErrorBoundary />,
       },
       {
         path: "tournaments",
         element: <Tournaments />,
         loader: tournamentsLoader(queryClient),
+        errorElement: <ErrorBoundary />,
       },
       {
         path: "tournament/:tournamentId",
         element: <TournamentPage />,
         loader: tournamentLoader(queryClient),
+        errorElement: <ErrorBoundary />,
       },
       {
         path: "team/:teamId",
         element: <TeamProfile />,
         loader: teamProfileLoader(queryClient),
+        errorElement: <ErrorBoundary />,
       },
-      { path: "debugging_tips", element: <DebuggingTips /> },
-      { path: "common_issues", element: <CommonIssues /> },
+      {
+        path: "debugging_tips",
+        element: <DebuggingTips />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: "common_issues",
+        element: <CommonIssues />,
+        errorElement: <ErrorBoundary />,
+      },
       {
         path: "*",
         element: <PageNotFound />,

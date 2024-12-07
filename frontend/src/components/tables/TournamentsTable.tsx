@@ -26,7 +26,7 @@ const TournamentsTable: React.FC<TournamentsTableProps> = ({
 
   return (
     <Table
-      data={data?.results ?? []}
+      data={data?.results?.filter((t) => t.is_public) ?? []}
       loading={loading}
       keyFromValue={(tour) => tour.name_short}
       onRowClick={(tour) => {
