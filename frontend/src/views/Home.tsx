@@ -83,12 +83,15 @@ const Home: React.FC = () => {
           </SectionCard> */}
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
-          <SectionCard
-            title="Next Submission Deadline"
-            loading={nextTournament.isLoading}
-          >
-            {nextTournament.isSuccess && nextTournament.data !== null ? (
+        <SectionCard title="Next Submission Deadline">
+            {nextTournament.isLoading ? (
+              <Spinner size="md" />
+            ) : nextTournament.isSuccess && nextTournament.data !== null ? (
               <CountdownDigital date={nextTournament.data.submission_freeze} />
+            ) : episode.isLoading ? (
+              <Spinner size="md" />
+            ) : episode.isSuccess && episode.data !== null ? (
+              <CountdownDigital date={episode.data.game_release} />
             ) : (
               "No upcoming submission deadlines."
             )}
