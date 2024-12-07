@@ -59,11 +59,13 @@ const Home: React.FC = () => {
             title="Rating History"
             loading={currentUser.user.isLoading}
           >
-            {currentUser.user.isSuccess && (
+            {currentUser.user.isSuccess ? (
               <UserChart
                 userId={currentUser.user.data.id}
                 lockedEpisode={episodeId}
               />
+            ) : (
+              "Sign in to view your rating history!"
             )}
           </SectionCard>
         </div>

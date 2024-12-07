@@ -64,7 +64,10 @@ const TeamProfile: React.FC = () => {
                 <div className="flex flex-col items-center p-4">
                   <img
                     className="h-24 w-24 rounded-full bg-gray-400 md:h-48 md:w-48"
-                    src={team.data.profile?.avatar_url}
+                    src={
+                      team.data.profile?.avatar_url ??
+                      "/default_profile_picture.png"
+                    }
                   />
                   <div className="mt-6 text-center text-xl font-semibold">
                     {team.data.name}

@@ -17,7 +17,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, isCurrentUser = false }) => (
     <div className="flex flex-row items-center rounded">
       <img
         className="h-8 w-8 rounded-full bg-blue-100"
-        src={user.profile?.avatar_url}
+        src={user.profile?.avatar_url ?? "/default_profile_picture.png"}
       />
 
       <div className="ml-6 font-semibold">
