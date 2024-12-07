@@ -9,7 +9,7 @@ import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 import { useUserTeam } from "api/team/useTeam";
 import { useTopRatingHistoryList } from "api/compete/useCompete";
 // import UserChart from "components/compete/chart/UserChart";
-import { useCurrentUser } from "contexts/CurrentUserContext";
+// import { useCurrentUser } from "contexts/CurrentUserContext";
 import { isPresent } from "utils/utilTypes";
 
 const Home: React.FC = () => {
