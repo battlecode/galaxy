@@ -26,6 +26,7 @@ import {
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useQueryClient } from "@tanstack/react-query";
 import type { QueryClient } from "@tanstack/query-core";
+import UserChart from "components/compete/chart/UserChart";
 
 interface FileInput {
   file: FileList;
@@ -58,9 +59,8 @@ const Account: React.FC = () => {
   return (
     <div className="p-6">
       <PageTitle>User Settings</PageTitle>
-      <div className="flex flex-col gap-8 xl:flex-row">
+      <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
         <ProfileForm episodeId={episodeId} queryClient={queryClient} />
-
         <SectionCard
           title="File Upload"
           loading={authState === AuthStateEnum.LOADING}
@@ -110,14 +110,14 @@ const Account: React.FC = () => {
                 loading={uploadResume.isPending}
                 disabled={uploadResume.isPending}
               />
-              {user?.profile?.has_resume ?? false ? (
+              {user.data?.profile?.has_resume ?? false ? (
                 <p className="text-sm">
                   Resume uploaded!{" "}
                   <button
                     className="text-cyan-600 hover:underline"
                     onClick={() => {
-                      if (user !== undefined)
-                        downloadResume.mutate({ id: user.id });
+                      if (user.isSuccess)
+                        downloadResume.mutate({ id: user.data.id });
                     }}
                   >
                     Download
@@ -130,6 +130,14 @@ const Account: React.FC = () => {
           </div>
         </SectionCard>
       </div>
+
+      <SectionCard
+        title="Rating History"
+        className="w-full flex-1"
+        loading={user.isLoading}
+      >
+        {user.isSuccess && <UserChart userId={user.data.id} />}
+      </SectionCard>
     </div>
   );
 };
@@ -152,13 +160,13 @@ const ProfileForm: React.FC<{
     formState: { errors },
   } = useForm<PatchedUserPrivateRequest>({
     defaultValues: {
-      email: user?.email,
-      first_name: user?.first_name,
-      last_name: user?.last_name,
+      email: user.data?.email,
+      first_name: user.data?.first_name,
+      last_name: user.data?.last_name,
       profile: {
-        school: user?.profile?.school,
-        kerberos: user?.profile?.kerberos,
-        biography: user?.profile?.biography,
+        school: user.data?.profile?.school,
+        kerberos: user.data?.profile?.kerberos,
+        biography: user.data?.profile?.biography,
       },
     },
   });
@@ -166,10 +174,10 @@ const ProfileForm: React.FC<{
   const watchFirstName = watch("first_name");
   const watchLastName = watch("last_name");
   const [gender, setGender] = useState<Maybe<GenderEnum>>(
-    user?.profile?.gender,
+    user.data?.profile?.gender,
   );
   const [country, setCountry] = useState<Maybe<CountryEnum>>(
-    user?.profile?.country,
+    user.data?.profile?.country,
   );
 
   const onProfileSubmit: SubmitHandler<PatchedUserPrivateRequest> = (data) => {
@@ -182,7 +190,9 @@ const ProfileForm: React.FC<{
         <div className="flex flex-col items-center gap-6 p-4">
           <img
             className="h-24 w-24 rounded-full bg-gray-400 lg:h-48 lg:w-48"
-            src={user?.profile?.avatar_url ?? "/default_profile_picture.png"}
+            src={
+              user.data?.profile?.avatar_url ?? "/default_profile_picture.png"
+            }
           />
           <div className="text-center text-xl font-semibold">
             {`${watchFirstName ?? ""} ${watchLastName ?? ""}`}
@@ -196,7 +206,7 @@ const ProfileForm: React.FC<{
           className="flex flex-1 flex-col gap-4"
         >
           <div className="grid grid-cols-2 gap-5">
-            <Input disabled label="Username" value={user?.username} />
+            <Input disabled label="Username" value={user.data?.username} />
             <Input
               required
               label="Email"

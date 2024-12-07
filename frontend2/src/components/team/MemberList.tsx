@@ -13,11 +13,11 @@ interface UserRowProps {
   isCurrentUser?: boolean;
 }
 const UserRow: React.FC<UserRowProps> = ({ user, isCurrentUser = false }) => (
-  <Link to={`user/${user.id}`}>
+  <Link to={`/user/${user.id}`}>
     <div className="flex flex-row items-center rounded">
       <img
         className="h-8 w-8 rounded-full bg-blue-100"
-        src={user.profile?.avatar_url}
+        src={user.profile?.avatar_url ?? "/default_profile_picture.png"}
       />
 
       <div className="ml-6 font-semibold">
@@ -43,13 +43,12 @@ const MemberList: React.FC<MemberListProps> = ({ members, className = "" }) => {
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
       {/* display current user first */}
-      {currentUser !== undefined &&
-        members.find((user) => user.id === currentUser.id) !== undefined && (
-          <UserRow isCurrentUser user={currentUser} />
-        )}
+      {currentUser.isSuccess &&
+        members.find((user) => user.id === currentUser.data.id) !==
+          undefined && <UserRow isCurrentUser user={currentUser.data} />}
       {members.map(
         (member) =>
-          member.id !== currentUser?.id && (
+          member.id !== currentUser.data?.id && (
             <UserRow key={member.id} user={member} />
           ),
       )}

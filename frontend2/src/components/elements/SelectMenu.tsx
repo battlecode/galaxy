@@ -4,9 +4,11 @@ import { Listbox, Transition } from "@headlessui/react";
 import Icon from "./Icon";
 import FormError from "./FormError";
 import FormLabel from "./FormLabel";
+import Spinner from "components/Spinner";
 
 interface SelectMenuProps<T extends React.Key | null | undefined> {
   options: Array<{ value: T; label: string }>;
+  loading?: boolean;
   disabled?: boolean;
   label?: string;
   required?: boolean;
@@ -27,6 +29,7 @@ function SelectMenu<T extends React.Key | null | undefined>({
   required = false,
   options,
   value,
+  loading = false,
   disabled = false,
   placeholder,
   className = "",
@@ -60,7 +63,12 @@ function SelectMenu<T extends React.Key | null | undefined>({
           >
             <span>
               {value === undefined ? placeholder : valueToLabel.get(value)}
-            </span>
+            </span>{" "}
+            {loading && (
+              <div className="my-1 flex w-full justify-center">
+                <Spinner size="xs" />
+              </div>
+            )}
             <div
               className="absolute inset-y-0 right-0 mr-2 flex transform items-center
               transition duration-300 ui-open:rotate-180 ui-not-open:rotate-0"

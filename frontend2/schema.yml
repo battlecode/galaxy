@@ -143,8 +143,40 @@ paths:
           description: This match was already finalized
   /api/compete/{episode_id}/match/historical_rating/:
     get:
-      operationId: compete_match_historical_rating_list
-      description: List the historical ratings of a team.
+      operationId: compete_match_historical_rating_retrieve
+      description: |-
+        Provides a list of historical ratings for a team in a given episode.
+        Supports filtering by team ID or defaults to the current user's team
+        if no team ID is provided.
+
+        Parameters:
+            - request (Request) - The HTTP request object.
+            - pk (int, optional) - The primary key of the object. Defaults to None.
+            - episode_id (int) - The ID of the episode to filter the ratings by.
+
+        Query Parameters:
+            - team_id (int, optional) - The team ID for which to retrieve
+            historical ratings. If not provided, defaults to the team of the
+            requesting user.
+
+        Returns:
+            Response: A JSON response containing:
+                - 200 OK: Returns a serialized representation of the team's
+                historical ratings if found.
+                - 204 No Content: If no ranked matches are found for the specified team.
+                - 400 Bad Request: If the specified team could not be found.
+
+        Raises:
+            - 400 Bad Request: If neither a valid team ID is provided nor can a team be
+            determined from the current user.
+
+        Permissions:
+            Requires `IsEpisodeMutable` permission class.
+
+        Notes:
+            - The function does not paginate results.
+            - The function returns an empty list if no valid team is found.
+            - Historical ratings are ordered by match creation date.
       parameters:
         - in: path
           name: episode_id
@@ -168,14 +200,16 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/HistoricalRating"
+                $ref: "#/components/schemas/HistoricalRating"
           description: ""
+        "400":
+          description: Could not find requested team.
   /api/compete/{episode_id}/match/historical_rating_topN/:
     get:
       operationId: compete_match_historical_rating_topN_list
-      description: List the historical top N rankings
+      description:
+        List the historical top N rankings, N should be <= 10 and defaults
+        to 10
       parameters:
         - in: query
           name: N
@@ -203,6 +237,8 @@ paths:
                 items:
                   $ref: "#/components/schemas/HistoricalRating"
           description: ""
+        "400":
+          description: "Invalid parameter: N must be less than or equal to 10"
   /api/compete/{episode_id}/match/scrimmage/:
     get:
       operationId: compete_match_scrimmage_list
@@ -1888,6 +1924,8 @@ components:
             type: integer
         min_score:
           type: integer
+          maximum: 32767
+          minimum: 0
       required:
         - episode
         - maps
@@ -3183,6 +3221,8 @@ components:
           type: string
         external_id:
           type: integer
+          maximum: 32767
+          minimum: -32768
           nullable: true
         name:
           type: string
@@ -3192,9 +3232,14 @@ components:
           items:
             type: integer
         release_status:
-          $ref: "#/components/schemas/ReleaseStatusEnum"
+          allOf:
+            - $ref: "#/components/schemas/ReleaseStatusEnum"
+          minimum: -2147483648
+          maximum: 2147483647
         display_order:
           type: integer
+          maximum: 32767
+          minimum: 0
       required:
         - display_order
         - id

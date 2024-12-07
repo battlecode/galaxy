@@ -3,43 +3,40 @@ import { useMemo, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import NoDataToDisplay from "highcharts/modules/no-data-to-display";
-import * as chart from "./chartUtil";
+import {
+  type ChartData,
+  type PlotLine,
+  highchartsOptionsBase,
+} from "./chartUtils";
 
 NoDataToDisplay(Highcharts);
 
-type UTCMilliTimestamp = number;
-
-export type ChartData = [UTCMilliTimestamp, number];
-
-// `yAxisLabel` is the name that is shown to the right of the graph.
-//
-// `values` holds a dict where the string keys are the name of the team, and
-// the value is an array of arrays where the first spot is a UTC timestampm and
-// the second is the ranking of that team. Example:
-//
-// { "Gone Sharkin" : [ [ 1673826806000.0, 1000 ], [1673826805999.0, 900], ... ], ...}
-export interface TeamChartProps {
+export interface ChartBaseProps {
   yAxisLabel: string;
   values?: Record<string, ChartData[]>;
   loading?: boolean;
   loadingMessage?: string;
+  plotLines?: PlotLine[];
+  crownTop?: boolean;
 }
 
-const TeamChart: React.FC<TeamChartProps> = ({
+const ChartBase: React.FC<ChartBaseProps> = ({
   yAxisLabel,
   values,
   loading = false,
   loadingMessage,
+  plotLines,
+  crownTop = false,
 }) => {
   // Translate values into Highcharts compatible options
   const [myChart, setChart] = useState<Highcharts.Chart>();
 
   const seriesData: Highcharts.SeriesOptionsType[] = useMemo(() => {
     if (values === undefined) return [];
-    return Object.keys(values).map((team) => ({
+    return Object.keys(values).map((key) => ({
       type: "line",
-      name: team,
-      data: values[team],
+      name: key,
+      data: values[key],
       marker: {
         enabled: false,
         symbol: "circle",
@@ -57,7 +54,7 @@ const TeamChart: React.FC<TeamChartProps> = ({
   }
 
   const options: Highcharts.Options = {
-    ...chart.highchartsOptionsBase,
+    ...highchartsOptionsBase,
     lang: {
       loading: loadingMessage ?? "Loading...",
       noData: "No data found to display.",
@@ -77,7 +74,7 @@ const TeamChart: React.FC<TeamChartProps> = ({
       },
     },
     chart: {
-      ...chart.highchartsOptionsBase.chart,
+      ...highchartsOptionsBase.chart,
       height: 400,
     },
     yAxis: {
@@ -93,7 +90,7 @@ const TeamChart: React.FC<TeamChartProps> = ({
       text: "Inspired by jmerle",
     },
     tooltip: {
-      ...chart.highchartsOptionsBase.tooltip,
+      ...highchartsOptionsBase.tooltip,
       formatter: function () {
         // Add crown emoji on the top player at the time
 
@@ -121,7 +118,8 @@ const TeamChart: React.FC<TeamChartProps> = ({
           );
         });
 
-        if (index !== -1) names[index + 1] = "👑 " + names[index + 1];
+        if (index !== -1 && crownTop)
+          names[index + 1] = "👑 " + names[index + 1];
 
         return names;
       },
@@ -129,17 +127,56 @@ const TeamChart: React.FC<TeamChartProps> = ({
     series: seriesData,
 
     legend: {
-      layout: "vertical",
-      align: "right",
-      verticalAlign: "top",
+      layout: "horizontal",
+      align: "center",
+      verticalAlign: "bottom",
+      // width: 100,
       maxHeight: 1e6,
       alignColumns: false,
+    },
+
+    xAxis: {
+      ...highchartsOptionsBase.xAxis,
+      type: "datetime",
+      title: {
+        text: "Local Date & Time",
+      },
+      crosshair: {
+        width: 1,
+      },
+      dateTimeLabelFormats: {
+        day: "%e %b",
+        hour: "%I:%M %P",
+        minute: "%I:%M:%S %P",
+      },
+      plotLines: plotLines?.map(([name, timestamp]) => ({
+        color: "#ccd6eb",
+        zIndex: 1000,
+        value: timestamp,
+        label: {
+          text: name,
+          useHTML: true,
+          x: 12,
+          y: 0,
+          rotation: 270,
+          align: "left",
+          verticalAlign: "bottom",
+          style: {
+            background: "rgba(255, 255, 255, 0.5)",
+            color: "#000000",
+            padding: "3px",
+            border: "1px solid #ccd6eb",
+            borderTop: "0",
+          },
+        },
+      })),
     },
   };
 
   return (
     <div>
       <HighchartsReact
+        classname="w-full"
         highcharts={Highcharts}
         options={options}
         callback={(chart: Highcharts.Chart) => {
@@ -150,4 +187,4 @@ const TeamChart: React.FC<TeamChartProps> = ({
   );
 };
 
-export default TeamChart;
+export default ChartBase;

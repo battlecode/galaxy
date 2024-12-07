@@ -1,6 +1,6 @@
 import type {
   CompeteMatchHistoricalRatingTopNListRequest,
-  CompeteMatchHistoricalRatingListRequest,
+  CompeteMatchHistoricalRatingRetrieveRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
   CompeteMatchScrimmagingRecordRetrieveRequest,
@@ -22,7 +22,7 @@ import {
   getAllUserTournamentSubmissions,
   getMatchesList,
   getRatingTopNList,
-  getRatingList,
+  getRatingHistory,
   getScrimmagesListByTeam,
   getScrimmagingRecord,
   getSubmissionsList,
@@ -219,12 +219,20 @@ export const ratingHistoryTopNFactory: QueryFactory<
 } as const;
 
 export const ratingHistoryFactory: QueryFactory<
-  CompeteMatchHistoricalRatingListRequest,
-  HistoricalRating[]
+  CompeteMatchHistoricalRatingRetrieveRequest,
+  HistoricalRating
 > = {
-  queryKey: competeQueryKeys.ratingHistoryTopList,
+  queryKey: competeQueryKeys.ratingHistory,
   queryFn: async ({ episodeId, teamId }) =>
-    await getRatingList({ episodeId, teamId }),
+    await getRatingHistory({ episodeId, teamId }),
+} as const;
+
+export const userRatingHistoryFactory: QueryFactory<
+  { episodeId: string },
+  HistoricalRating
+> = {
+  queryKey: competeQueryKeys.ratingHistoryMe,
+  queryFn: async ({ episodeId }) => await getRatingHistory({ episodeId }),
 } as const;
 
 export const scrimmagingRecordFactory: QueryFactory<

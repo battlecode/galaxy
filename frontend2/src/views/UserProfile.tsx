@@ -6,6 +6,7 @@ import { PageTitle } from "components/elements/BattlecodeStyle";
 import { useUserInfoById, useTeamsByUser } from "api/user/useUser";
 import { isNilOrEmptyStr } from "api/helpers";
 import PageNotFound from "./PageNotFound";
+import UserChart from "components/compete/chart/UserChart";
 
 // rendered at /:episodeId/user/:userId
 const UserProfile: React.FC = () => {
@@ -81,7 +82,9 @@ const UserProfile: React.FC = () => {
               </div>
             )}
           </SectionCard>
-          <SectionCard title="Rating History"></SectionCard>
+          <SectionCard title="Rating History">
+            <UserChart userId={id} />
+          </SectionCard>
         </div>
       </div>
     </div>

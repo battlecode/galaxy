@@ -10,6 +10,9 @@ import MemberList from "components/team/MemberList";
 import { Status526Enum } from "api/_autogen";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 import PageNotFound from "./PageNotFound";
+import TeamChart from "components/compete/chart/TeamChart";
+import { useTeamRatingHistory } from "api/compete/useCompete";
+import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 
 const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
   isNil(str) || str === "";
@@ -17,19 +20,23 @@ const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
 // rendered at /:episodeId/team/:teamId
 const TeamProfile: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const { teamId } = useParams();
+  const { teamId } = useParams(); // Always defined, else loader will redirect
 
   const episode = useEpisodeInfo({ id: episodeId });
   const team = useTeam({ episodeId, id: teamId ?? "" });
+  const teamRating = useTeamRatingHistory({
+    episodeId,
+    teamId: parseInt(teamId ?? ""),
+  });
 
-  const membersList = useMemo(() => {
-    if (!team.isSuccess) return null;
-    return (
+  const membersList = useMemo(
+    () => (
       <div className="flex flex-col gap-8">
-        <MemberList members={team.data.members} />
+        <MemberList members={team.data?.members ?? []} />
       </div>
-    );
-  }, [team]);
+    ),
+    [team],
+  );
 
   const eligibles = useMemo(
     () =>
@@ -57,7 +64,10 @@ const TeamProfile: React.FC = () => {
                 <div className="flex flex-col items-center p-4">
                   <img
                     className="h-24 w-24 rounded-full bg-gray-400 md:h-48 md:w-48"
-                    src={team.data.profile?.avatar_url}
+                    src={
+                      team.data.profile?.avatar_url ??
+                      "/default_profile_picture.png"
+                    }
                   />
                   <div className="mt-6 text-center text-xl font-semibold">
                     {team.data.name}
@@ -132,25 +142,32 @@ const TeamProfile: React.FC = () => {
               </div>
             )}
           </SectionCard>
-          <SectionCard title="Rating"></SectionCard>
-          {/* The members list that displays when on a smaller screen */}
-          <SectionCard
-            className="shrink xl:hidden"
-            title="Members"
-            loading={team.isLoading}
-          >
-            {team.isSuccess && membersList}
+          <SectionCard title="Rating History">
+            <TeamChart
+              teamRatings={teamRating.isSuccess ? [teamRating.data] : []}
+              loading={teamRating.isLoading}
+            />
           </SectionCard>
+          {/* The members list/record that displays when on a smaller screen */}
+          <div className="flex shrink flex-col gap-8 xl:hidden">
+            <SectionCard title="Members">{membersList}</SectionCard>
+            <SectionCard title="Record">
+              {team.isSuccess && (
+                <ScrimmagingRecord team={team.data} hideTeamName />
+              )}
+            </SectionCard>
+          </div>
         </div>
 
-        {/* The members list that displays to the right side when on a big screen. */}
-        <SectionCard
-          className="hidden w-1/3 shrink xl:block"
-          title="Members"
-          loading={team.isLoading}
-        >
-          {team.isSuccess && membersList}
-        </SectionCard>
+        {/* The members list/record that displays to the right side when on a big screen. */}
+        <div className="hidden w-1/3 shrink gap-8 xl:flex xl:flex-col">
+          <SectionCard title="Members">{membersList}</SectionCard>
+          <SectionCard title="Record">
+            {team.isSuccess && (
+              <ScrimmagingRecord team={team.data} hideTeamName />
+            )}
+          </SectionCard>
+        </div>
       </div>
     </div>
   );
