@@ -200,18 +200,15 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/HistoricalRating"
+                $ref: "#/components/schemas/HistoricalRating"
           description: ""
-                $ref: '#/components/schemas/HistoricalRating'
-          description: ''
-        '400':
+        "400":
           description: Could not find requested team.
   /api/compete/{episode_id}/match/historical_rating_topN/:
     get:
       operationId: compete_match_historical_rating_topN_list
-      description: List the historical top N rankings, N should be <= 10 and defaults
+      description:
+        List the historical top N rankings, N should be <= 10 and defaults
         to 10
       parameters:
         - in: query
@@ -240,10 +237,8 @@ paths:
                 items:
                   $ref: "#/components/schemas/HistoricalRating"
           description: ""
-                  $ref: '#/components/schemas/HistoricalRating'
-          description: ''
-        '400':
-          description: 'Invalid parameter: N must be less than or equal to 10'
+        "400":
+          description: "Invalid parameter: N must be less than or equal to 10"
   /api/compete/{episode_id}/match/scrimmage/:
     get:
       operationId: compete_match_scrimmage_list
@@ -3238,7 +3233,7 @@ components:
             type: integer
         release_status:
           allOf:
-          - $ref: '#/components/schemas/ReleaseStatusEnum'
+            - $ref: "#/components/schemas/ReleaseStatusEnum"
           minimum: -2147483648
           maximum: 2147483647
         display_order:

@@ -139,10 +139,11 @@ const TeamProfile: React.FC = () => {
               </div>
             )}
           </SectionCard>
-          <SectionCard title="Rating History" loading={teamRating.isLoading}>
-            {teamRating.isSuccess && <TeamChart
-              teamRatings={[teamRating.data]}
-            />}
+          <SectionCard title="Rating History">
+            <TeamChart
+              teamRatings={teamRating.isSuccess ? [teamRating.data] : []}
+              loading={teamRating.isLoading}
+            />
           </SectionCard>
           {/* The members list/record that displays when on a smaller screen */}
           <div className="flex shrink flex-col gap-8 xl:hidden">
