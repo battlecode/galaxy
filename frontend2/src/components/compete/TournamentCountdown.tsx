@@ -56,12 +56,9 @@ const TournamentCountdown: React.FC<TournamentCountdownProps> = ({
           )}
         </div>
       ) : (
-        <div>
-          <p>
-            The submission deadline for the next tournament has not been set
-            yet.
-          </p>
-        </div>
+        <p>
+          The submission deadline for the next tournament has not been set yet.
+        </p>
       )}
     </div>
   );

@@ -68,7 +68,7 @@ const TableBottom: React.FC<TableBottomProps> = ({
 
   return (
     <nav
-      className="flex items-center justify-between pt-4"
+      className="flex items-center justify-between"
       aria-label="Table navigation"
     >
       <span className="text-sm font-normal text-gray-500">

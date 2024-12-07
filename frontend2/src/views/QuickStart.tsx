@@ -18,7 +18,7 @@ const QuickStart: React.FC = () => {
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto bg-white p-6">
+    <div className="flex h-full w-full flex-col overflow-y-auto p-6">
       <div className="flex flex-1 flex-col gap-8">
         <OptionalSectionCardMarkdown
           title={QuickStartPage.OVERVIEW}

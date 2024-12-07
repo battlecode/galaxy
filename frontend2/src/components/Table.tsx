@@ -29,9 +29,9 @@ function Table<T>({
   bottomElement,
 }: TableProps<T>): React.ReactElement {
   return (
-    <div className="pl-50 w-full">
-      <table className="w-full text-left text-sm text-gray-500">
-        <thead className="border-b bg-cyan-400 text-xs uppercase text-gray-700">
+    <div className="pl-50 w-full rounded-lg shadow-md">
+      <table className="w-full border-collapse overflow-hidden rounded-t-lg text-left text-sm text-gray-500">
+        <thead className="bg-cyan-700 font-light text-white">
           <tr>
             {columns.map((col) => (
               <th key={"header" + col.key} scope="col" className="px-8 py-3">
@@ -49,15 +49,9 @@ function Table<T>({
                   ev.stopPropagation();
                   onRowClick?.(row);
                 }}
-                className={
-                  idx % 2 === 0
-                    ? `${
-                        onRowClick !== undefined ? "cursor-pointer" : ""
-                      } border-b bg-white hover:bg-cyan-200 hover:text-gray-700`
-                    : `${
-                        onRowClick !== undefined ? "cursor-pointer" : ""
-                      } border-b bg-gray-50 hover:bg-cyan-200 hover:text-gray-700`
-                }
+                className={` border-gray-400  hover:text-gray-700 ${
+                  idx % 2 === 0 ? "bg-white" : "bg-gray-100"
+                }`}
               >
                 {columns.map((col) => (
                   <th
@@ -77,7 +71,9 @@ function Table<T>({
           <Spinner size="xl" />
         </div>
       )}
-      <div className="mx-10 text-center">{bottomElement}</div>
+      <div className="rounded-b-lg bg-white px-10 py-2 text-center">
+        {bottomElement}
+      </div>
     </div>
   );
 }

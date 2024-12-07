@@ -4,7 +4,6 @@ import { useParams, useSearchParams } from "react-router-dom";
 import type { EligibilityCriterion } from "../api/_autogen";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { dateTime } from "../utils/dateTime";
-import Loading from "../components/Loading";
 import SectionCard from "../components/SectionCard";
 import Tooltip from "../components/elements/Tooltip";
 import Collapse from "../components/elements/Collapse";
@@ -78,13 +77,11 @@ const TournamentPage: React.FC = () => {
   }, [tourneyData.data, episode]);
 
   return (
-    <div className="flex h-full w-full flex-col bg-white p-6">
+    <div className="flex h-full w-full flex-col p-6">
       <div className="flex flex-1 flex-col gap-8">
         <h1>Tournament {tourneyData.data?.name_long ?? tournamentId}</h1>
-        <SectionCard title="About">
-          {!tourneyData.isSuccess ? (
-            <Loading />
-          ) : (
+        <SectionCard title="About" loading={tourneyData.isLoading}>
+          {tourneyData.isSuccess && (
             <>
               {tourneyData.data.blurb !== undefined && (
                 <p>{tourneyData.data.blurb}</p>
