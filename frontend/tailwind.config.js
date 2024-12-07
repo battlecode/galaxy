@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 import formsPlugin from "@tailwindcss/forms";
 import headlessPlugin from "@headlessui/tailwindcss";
-import tailwind from "tailwindcss/defaultConfig"
+import tailwind from "tailwindcss/defaultConfig";
 
 module.exports = {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
@@ -17,8 +17,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    formsPlugin,
-    headlessPlugin,
-  ],
+  plugins: [formsPlugin, headlessPlugin],
 };
