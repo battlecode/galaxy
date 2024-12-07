@@ -11,6 +11,7 @@ import { useUserTeam } from "api/team/useTeam";
 // import UserChart from "components/compete/chart/UserChart";
 // import { useCurrentUser } from "contexts/CurrentUserContext";
 import { isPresent } from "utils/utilTypes";
+import { isNil } from "lodash";
 
 const Home: React.FC = () => {
   // const TOP_TEAMS = 10;
@@ -70,15 +71,10 @@ const Home: React.FC = () => {
           </SectionCard> */}
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
-          <SectionCard
-            title="Next Submission Deadline"
-            loading={nextTournament.isLoading}
-          >
-            {nextTournament.isSuccess && nextTournament.data !== null ? (
-              <CountdownDigital date={nextTournament.data.submission_freeze} />
-            ) : (
-              "No upcoming submission deadlines."
-            )}
+        <SectionCard title="Next Submission Deadline" loading={nextTournament.isLoading || episode.isLoading}>
+            {!isNil(episode.data) && new Date().getTime()>episode.data.game_release.getTime() ?
+            (!isNil(nextTournament.data) ? <CountdownDigital date={nextTournament.data.submission_freeze}/> : <p></p>) : (!isNil(episode.data) ? <CountdownDigital date={episode.data.game_release}/> : <p></p>)}
+
           </SectionCard>
           <SectionCard title="Social Medias">
             <div className="flex w-full flex-row items-center gap-10">
