@@ -4,20 +4,12 @@ repos:
     hooks:
       - id: check-merge-conflict
       - id: end-of-file-fixer
-        exclude: ^frontend2/src/api/_autogen
+        exclude: ^frontend/src/api/_autogen
       - id: mixed-line-ending
         args: ["--fix=lf"]
-        exclude: ^frontend2/src/api/_autogen
+        exclude: ^frontend/src/api/_autogen
       - id: trailing-whitespace
-        exclude: ^frontend2/src/api/_autogen
-
-  # This is only used for the old frontend. The prettier check for frontend2 exists in ci.yml
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.7.1
-    hooks:
-      - id: prettier
-        types_or: [css, html, javascript, json, jsx, markdown]
-        exclude: ^(frontend/public/assets|frontend2)
+        exclude: ^frontend/src/api/_autogen
 
   - repo: https://github.com/dnephin/pre-commit-golang
     rev: v0.5.1
