@@ -26,7 +26,7 @@ import {
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useQueryClient } from "@tanstack/react-query";
 import type { QueryClient } from "@tanstack/query-core";
-import UserChart from "components/compete/chart/UserChart";
+// import UserChart from "components/compete/chart/UserChart";
 
 interface FileInput {
   file: FileList;
@@ -131,13 +131,13 @@ const Account: React.FC = () => {
         </SectionCard>
       </div>
 
-      <SectionCard
+      {/* <SectionCard
         title="Rating History"
         className="w-full flex-1"
         loading={user.isLoading}
       >
         {user.isSuccess && <UserChart userId={user.data.id} />}
-      </SectionCard>
+      </SectionCard> */}
     </div>
   );
 };

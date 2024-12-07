@@ -8,7 +8,7 @@ import TeamChart from "../components/compete/chart/TeamChart";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 import { useUserTeam } from "api/team/useTeam";
 import { useTopRatingHistoryList } from "api/compete/useCompete";
-import UserChart from "components/compete/chart/UserChart";
+// import UserChart from "components/compete/chart/UserChart";
 import { useCurrentUser } from "contexts/CurrentUserContext";
 import { isPresent } from "utils/utilTypes";
 
@@ -20,7 +20,7 @@ const Home: React.FC = () => {
   const nextTournament = useNextTournament({ episodeId });
   const topRatingHistory = useTopRatingHistoryList({ episodeId, n: TOP_TEAMS });
   const userTeam = useUserTeam({ episodeId });
-  const currentUser = useCurrentUser();
+  // const currentUser = useCurrentUser();
 
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";
@@ -55,7 +55,7 @@ const Home: React.FC = () => {
               "Join a team to scrimmage other teams!"
             )}
           </SectionCard>
-          <SectionCard
+          {/* <SectionCard
             title="Rating History"
             loading={currentUser.user.isLoading}
           >
@@ -67,7 +67,7 @@ const Home: React.FC = () => {
             ) : (
               "Sign in to view your rating history!"
             )}
-          </SectionCard>
+          </SectionCard> */}
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
           <SectionCard

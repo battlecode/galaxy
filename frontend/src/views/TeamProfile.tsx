@@ -10,8 +10,8 @@ import MemberList from "components/team/MemberList";
 import { Status526Enum } from "api/_autogen";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 import PageNotFound from "./PageNotFound";
-import TeamChart from "components/compete/chart/TeamChart";
-import { useTeamRatingHistory } from "api/compete/useCompete";
+// import TeamChart from "components/compete/chart/TeamChart";
+// import { useTeamRatingHistory } from "api/compete/useCompete";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 
 const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
@@ -24,10 +24,10 @@ const TeamProfile: React.FC = () => {
 
   const episode = useEpisodeInfo({ id: episodeId });
   const team = useTeam({ episodeId, id: teamId ?? "" });
-  const teamRating = useTeamRatingHistory({
-    episodeId,
-    teamId: parseInt(teamId ?? ""),
-  });
+  // const teamRating = useTeamRatingHistory({
+  //   episodeId,
+  //   teamId: parseInt(teamId ?? ""),
+  // });
 
   const membersList = useMemo(
     () => (
@@ -142,12 +142,12 @@ const TeamProfile: React.FC = () => {
               </div>
             )}
           </SectionCard>
-          <SectionCard title="Rating History">
+          {/* <SectionCard title="Rating History">
             <TeamChart
               teamRatings={teamRating.isSuccess ? [teamRating.data] : []}
               loading={teamRating.isLoading}
             />
-          </SectionCard>
+          </SectionCard> */}
           {/* The members list/record that displays when on a smaller screen */}
           <div className="flex shrink flex-col gap-8 xl:hidden">
             <SectionCard title="Members">{membersList}</SectionCard>
