@@ -2,7 +2,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { ResponseError } from "api/_autogen";
 import { loginCheck } from "api/auth/authApi";
 import { episodeInfoFactory } from "api/episode/episodeFactories";
-import { ratingHistoryTopNFactory } from "api/compete/competeFactories";
+// import { ratingHistoryTopNFactory } from "api/compete/competeFactories";
 import { buildKey, safeEnsureQueryData } from "api/helpers";
 import { searchTeamsFactory, myTeamFactory } from "api/team/teamFactories";
 import type { LoaderFunction } from "react-router-dom";
@@ -38,11 +38,11 @@ export const episodeLoader =
       searchTeamsFactory,
       queryClient,
     );
-    safeEnsureQueryData(
-      { episodeId: id, n: 10 },
-      ratingHistoryTopNFactory,
-      queryClient,
-    );
+    // safeEnsureQueryData(
+    //   { episodeId: id, n: 10 },
+    //   ratingHistoryTopNFactory,
+    //   queryClient,
+    // );
 
     // Prefetch the user's team
     if (loggedIn) {
