@@ -45,6 +45,13 @@ const GENERAL_ITEMS: SidebarItemData[] = [
     requireGameReleased: false,
     userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
+  {
+    iconName: "shield_check",
+    text: "Code of Conduct",
+    linkTo: "code_of_conduct",
+    requireGameReleased: false,
+    userAuthLevel: UserAuthLevel.LOGGED_OUT,
+  },
 ];
 const COMPETE_ITEMS: SidebarItemData[] = [
   {
@@ -130,7 +137,7 @@ export const renderableItems = (
 // IMPORTANT: When changing this file, also remember to change the mobile menu that appears on small screens.
 const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) =>
   collapsed ? null : (
-    <nav className="fixed top-16 z-10 hidden h-full w-52 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">
+    <nav className="fixed top-16 z-10 hidden h-full w-60 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">
       <SidebarSection title="" items={GENERAL_ITEMS} />
       <SidebarSection title="compete" items={COMPETE_ITEMS} />
       <SidebarSection title="team management" items={TEAM_MANAGEMENT_ITEMS} />
