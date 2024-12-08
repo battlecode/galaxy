@@ -1,7 +1,7 @@
 import type React from "react";
 import { useState, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import type { EligibilityCriterion } from "../api/_autogen";
+import { type EligibilityCriterion, StyleEnum } from "../api/_autogen";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { dateTime } from "../utils/dateTime";
 import SectionCard from "../components/SectionCard";
@@ -19,6 +19,11 @@ import SearchTeamsMenu from "../components/team/SearchTeamsMenu";
 interface QueryParams {
   page: number;
 }
+
+const StyleToLabel: Record<StyleEnum, string> = {
+  [StyleEnum.Se]: "Single Elimination",
+  [StyleEnum.De]: "Double Elimination",
+};
 
 const TournamentPage: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -64,12 +69,12 @@ const TournamentPage: React.FC = () => {
       return { includes: [], excludes: [], isEligible: false };
     }
     const includes =
-      tourneyData.data.eligibility_includes?.map(
-        (inc) => episode.eligibility_criteria[inc],
+      tourneyData.data.eligibility_includes?.flatMap(
+        (inc) => episode.eligibility_criteria.find((ec) => ec.id === inc) ?? [],
       ) ?? [];
     const excludes =
-      tourneyData.data.eligibility_excludes?.map(
-        (exc) => episode.eligibility_criteria[exc],
+      tourneyData.data.eligibility_excludes?.flatMap(
+        (exc) => episode.eligibility_criteria.find((ec) => ec.id === exc) ?? [],
       ) ?? [];
     const isEligible = tourneyData.data.is_eligible;
 
@@ -111,7 +116,7 @@ const TournamentPage: React.FC = () => {
 
                   <p>Not Eligible:</p>
                   {eligibility.excludes.length > 0 ? (
-                    <>
+                    <div className="flex flex-row gap-2">
                       {eligibility.excludes.map((exc) => (
                         <Tooltip
                           key={"icon " + exc.id.toString()}
@@ -120,7 +125,7 @@ const TournamentPage: React.FC = () => {
                           <span className="mr-2">{exc.icon}</span>
                         </Tooltip>
                       ))}
-                    </>
+                    </div>
                   ) : (
                     <p>N/A</p>
                   )}
@@ -138,6 +143,9 @@ const TournamentPage: React.FC = () => {
                   ) : (
                     <p>N/A</p>
                   )}
+
+                  <p>Format:</p>
+                  <p>{StyleToLabel[tourneyData.data.style]}</p>
 
                   <p>Submission Freeze:</p>
                   <p>

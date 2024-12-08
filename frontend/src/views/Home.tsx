@@ -80,8 +80,8 @@ const Home: React.FC = () => {
               "No upcoming submission deadlines."
             )}
           </SectionCard>
-          <SectionCard title="Social Medias">
-            <div className="flex w-full flex-row items-center gap-10">
+          <SectionCard title="Social Media">
+            <div className="flex w-full flex-row items-center justify-evenly pt-2">
               <SocialIcon
                 url="https://www.github.com/battlecode"
                 className={SOCIAL}

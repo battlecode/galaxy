@@ -77,6 +77,15 @@ const Header: React.FC = () => {
                         Log in
                       </Link>
                     </Menu.Item>
+                    <hr className="m-2" />
+                    <Menu.Item as="div" className="w-full pb-2 pt-1">
+                      <Link
+                        to="/register"
+                        className="rounded-full px-2.5 text-cyan-600 ring-0 hover:bg-gray-100/10"
+                      >
+                        Register
+                      </Link>
+                    </Menu.Item>
                   </>
                 )}
               </Menu.Items>
@@ -84,7 +93,12 @@ const Header: React.FC = () => {
           </Menu>
           {/* battlecode logo, episode select */}
           <div className="flex flex-1 items-center justify-center space-x-6 sm:items-stretch sm:justify-start">
-            <div className="flex flex-shrink-0 items-center">
+            <div
+              className="flex flex-shrink-0 items-center hover:cursor-pointer"
+              onClick={() => {
+                navigate(`/${episodeId}/home`);
+              }}
+            >
               <img
                 className="hidden h-8 sm:block"
                 src="/battlecode-logo-horiz-white.png"
@@ -155,7 +169,7 @@ const Header: React.FC = () => {
               </Link>
               <Link
                 to="/register"
-                className="rounded-full px-3 py-1.5 text-center text-white ring-2 ring-inset ring-gray-200 hover:bg-gray-100/10"
+                className="hidden rounded-full px-3 py-1.5 text-center text-white ring-2 ring-inset ring-gray-200 hover:bg-gray-100/10 sm:block"
               >
                 Register
               </Link>

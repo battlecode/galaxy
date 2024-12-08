@@ -19,26 +19,7 @@ export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
 
   Battlecode 2022 will have several tournaments throughout the month! We stream and commentate all tournaments online. The deadline to submit code for each non-final tournament is usually 7 pm EST the day before the tournament.
   `,
-  Prizes: `Prize amounts are approximate and will be finalized soon!
-
-  * __Final Tournament prizes:__ Prizes will range from $5000 for 1st place to $600 for 16th place.
-  * __Sprint prizes:__ Winner of each tournament will receive $250.
-  * __Newbie, High School prizes:__ Prizes will range from $700 to $200 for the top 4 teams.
-  * __[Best Devlog Series Prize](https://www.regression.gg/battlecode):__ $800 prize given by our Gold Sponsor,
-    [Regression Games](https://www.regression.gg/). First place will receive $800, and all winners will receive a chance to interview for
-    internships.
-    * We want to see what you are building during the Battlecode season! Share your Battlecode development
-      experience on your favorite social media platform over the course of the tournament. Post your
-      learnings, fun moments, hardships, and progress! You must tag Battlecode and Regression Games in
-      the post to be eligible for this prize (see [regression.gg/battlecode](https://regression.gg/battlecode) for more info, ideas, and social media handles).
-  * __Best Strategy Report Prize:__ $800 prize given by our Gold Sponsor, [Argus Labs](https://argus.gg/).
-    First place will receive $800, and all winners will receive a chance to interview for internships and a swag box.
-    * Submit a strategy report detailing the strategies you used to develop your bot! We'd love to see how you handled
-      communication, resource allocation, battling, and more. Tell us what unique strategies your team came up with!
-      A link for submitting reports will be provided later.
-  If you are an international participant, please note that [US export regulations](https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/sanctioned-destinations)
-  may restrict our ability to award prizes to students from certain countries.
-  `,
+  Prizes: `No prize information for this year, sorry!`,
   "Tournament Format": `Each match within a tournament will consist of at least 3 games, each on a different map, and the team that wins the most games will advance.
 
   Scrimmage rankings will be used to determine seeds for all tournaments. Ties will be broken by Sprint tournament rankings.

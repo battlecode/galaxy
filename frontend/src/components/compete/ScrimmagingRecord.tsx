@@ -60,7 +60,7 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
         <div className="flex flex-1 flex-row items-center justify-start gap-4">
           <img
             className="h-20 w-20 rounded-full bg-gray-400 md:h-16 md:w-16"
-            src={team.profile?.avatar_url}
+            src={team.profile?.avatar_url ?? "/default_profile_picture.png"}
           />
           <div className="text-xl font-semibold">{team.name}</div>
         </div>

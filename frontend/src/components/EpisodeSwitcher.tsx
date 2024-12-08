@@ -41,7 +41,7 @@ const EpisodeSwitcher: React.FC = () => {
         <div className="relative">
           <Listbox.Button
             className={`relative flex h-9 w-full flex-row items-center justify-center gap-3 truncate rounded-full bg-gray-900/80 py-1.5
-            pl-3.5 pr-8 text-left text-gray-100 shadow-sm focus:outline-none
+            pl-6 pr-12 text-left text-gray-100 shadow-sm focus:outline-none
             sm:text-sm sm:leading-6`}
           >
             <span className="text-sm font-semibold">

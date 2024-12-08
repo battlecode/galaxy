@@ -55,6 +55,7 @@ import UserProfile from "views/UserProfile";
 import { userProfileLoader } from "api/loaders/userProfileLoader";
 import { HttpStatusCode } from "api/apiTypes";
 import { accountLoader } from "api/loaders/accountLoader";
+import CodeOfConduct from "views/CodeOfConduct";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -186,6 +187,11 @@ const router = createBrowserRouter([
       {
         path: "quick_start",
         element: <QuickStart />,
+        errorElement: <ErrorBoundary />,
+      },
+      {
+        path: "code_of_conduct",
+        element: <CodeOfConduct />,
         errorElement: <ErrorBoundary />,
       },
       {
