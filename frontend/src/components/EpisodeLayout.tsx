@@ -19,7 +19,7 @@ const EpisodeLayout: React.FC = () => {
     <div className="h-screen bg-gray-200/80">
       <Header />
       <Sidebar />
-      <div className="h-full pt-16 sm:pl-52">
+      <div className="h-full pt-16 sm:pl-60">
         <Outlet />
       </div>
     </div>
