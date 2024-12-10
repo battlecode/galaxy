@@ -7,12 +7,13 @@ import requests
 from django.apps import apps
 from django.conf import settings
 
+from siarnaq.api.teams.models import Team
+
 if TYPE_CHECKING:
     from typing import Iterable
 
     from siarnaq.api.compete.models import Match, MatchParticipant
     from siarnaq.api.episodes.models import Tournament, TournamentRound
-    from siarnaq.api.teams.models import Team
 
 
 _headers = {
@@ -83,9 +84,7 @@ def bulk_add_teams(tournament: Tournament, teams: Iterable[Team], *, is_private:
         {
             "name": team.name,
             "seed": idx + 1,
-            "misc": json.dumps(
-                {"team_id": team.id, "submission_id": team.active_submission}
-            ),
+            "misc": json.dumps({"team_id": team.id}),
         }
         for (idx, team) in enumerate(teams)
     ]
@@ -270,6 +269,14 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
     # and map them with IDs for easy lookup
     challonge_participants = dict()
 
+    # Hold a map of all teams' latest submission for the tournament,
+    # for quick simple lookups later
+    team_submissions = dict(
+        Team.objects.with_active_submission()
+        .values_list("pk", "active_submission")
+        .all()
+    )
+
     for item in tournament_data_private["included"]:
         match item:
             case {
@@ -336,7 +343,7 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
                 ]
             )
             team_id = misc_key["team_id"]
-            submission_id = misc_key["submission_id"]
+            submission_id = team_submissions[team_id]
 
             match_participant_object = apps.get_model("compete", "MatchParticipant")(
                 team_id=team_id,
