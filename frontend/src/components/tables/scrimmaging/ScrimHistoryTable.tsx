@@ -113,7 +113,7 @@ const ScrimHistoryTable: React.FC<ScrimHistoryTableProps> = ({
                     episodeData.data.artifact_name ?? ""
                   }/${
                     episodeData.data.release_version_public ?? ""
-                  }/visualizer.html?${match.replay_url}`}
+                  }/index.html?gameSource=${match.replay_url}`}
                 >
                   Replay!
                 </NavLink>
