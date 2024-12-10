@@ -37,6 +37,10 @@ export const login = async (
     buildKey(loginTokenVerifyFactory.queryKey, { queryClient }),
     true,
   );
+
+  await queryClient.refetchQueries({
+    queryKey: ["team"],
+  });
 };
 
 /**
@@ -57,6 +61,10 @@ export const logout = async (queryClient: QueryClient): Promise<void> => {
     buildKey(loginTokenVerifyFactory.queryKey, { queryClient }),
     false,
   );
+
+  await queryClient.refetchQueries({
+    queryKey: ["team"],
+  });
 };
 
 export const loginTokenVerify = async (): Promise<boolean> => {
