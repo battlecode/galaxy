@@ -8,14 +8,14 @@ import Table from "../Table";
 import TableBottom from "../TableBottom";
 import { NavLink } from "react-router-dom";
 import EligibilityIcon from "../EligibilityIcon";
-import { isPresent } from "../../utils/utilTypes";
 import { useEpisodeId } from "../../contexts/EpisodeContext";
+import { useEpisodeInfo } from "api/episode/useEpisode";
+import { getEligibilities } from "api/helpers";
 
 interface RankingsTableProps {
   data: Maybe<PaginatedTeamPublicList>;
   loading: boolean;
   page: number;
-  eligibilityMap: Map<number, EligibilityCriterion>;
   handlePage: (page: number) => void;
 }
 
@@ -30,10 +30,10 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
   data,
   loading,
   page,
-  eligibilityMap,
   handlePage,
 }) => {
   const { episodeId } = useEpisodeId();
+  const episode = useEpisodeInfo({ id: episodeId });
 
   const MAX_NAME_LENGTH = 13;
 
@@ -96,10 +96,10 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
           header: "Eligibility",
           key: "eligibility",
           value: (team) => {
-            const icons: EligibilityCriterion[] =
-              team.profile?.eligible_for
-                ?.map((el) => eligibilityMap.get(el))
-                .filter(isPresent) ?? [];
+            const icons: EligibilityCriterion[] = getEligibilities(
+              episode.data?.eligibility_criteria ?? [],
+              team.profile?.eligible_for ?? [],
+            );
             return (
               <div className="flex flex-row items-center gap-2">
                 {icons.map((el) => (

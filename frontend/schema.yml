@@ -2244,6 +2244,9 @@ components:
         artifact_name:
           type: string
           maxLength: 32
+        release_version_client:
+          type: string
+          maxLength: 32
         release_version_public:
           type: string
           maxLength: 32

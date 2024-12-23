@@ -15,6 +15,7 @@ import { useEpisodeInfo, useTournamentInfo } from "../api/episode/useEpisode";
 import { useTournamentMatchList } from "../api/compete/useCompete";
 import { useQueryClient } from "@tanstack/react-query";
 import SearchTeamsMenu from "../components/team/SearchTeamsMenu";
+import { getEligibilities } from "api/helpers";
 
 interface QueryParams {
   page: number;
@@ -68,14 +69,25 @@ const TournamentPage: React.FC = () => {
     if (episode === undefined || tourneyData.data === undefined) {
       return { includes: [], excludes: [], isEligible: false };
     }
-    const includes =
-      tourneyData.data.eligibility_includes?.flatMap(
-        (inc) => episode.eligibility_criteria.find((ec) => ec.id === inc) ?? [],
-      ) ?? [];
-    const excludes =
-      tourneyData.data.eligibility_excludes?.flatMap(
-        (exc) => episode.eligibility_criteria.find((ec) => ec.id === exc) ?? [],
-      ) ?? [];
+    // const includes =
+    //   tourneyData.data.eligibility_includes?.flatMap(
+    //     (inc) => episode.eligibility_criteria.find((ec) => ec.id === inc) ?? [],
+    //   ) ?? [];
+    // const excludes =
+    //   tourneyData.data.eligibility_excludes?.flatMap(
+    //     (exc) => episode.eligibility_criteria.find((ec) => ec.id === exc) ?? [],
+    //   ) ?? [];
+
+    const includes = getEligibilities(
+      episode.eligibility_criteria,
+      tourneyData.data.eligibility_includes ?? [],
+    );
+
+    const excludes = getEligibilities(
+      episode.eligibility_criteria,
+      tourneyData.data.eligibility_excludes ?? [],
+    );
+
     const isEligible = tourneyData.data.is_eligible;
 
     return { includes, excludes, isEligible };

@@ -1,5 +1,9 @@
 import Cookies from "js-cookie";
-import { Configuration, type ResponseError } from "./_autogen";
+import {
+  Configuration,
+  type EligibilityCriterion,
+  type ResponseError,
+} from "./_autogen";
 import type {
   PaginatedQueryFactory,
   PaginatedRequestMinimal,
@@ -117,3 +121,9 @@ export const safeEnsureQueryData = <T, K>(
 
 export const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
   isNil(str) || str === "";
+
+export const getEligibilities = (
+  criteria: EligibilityCriterion[],
+  eligibilityIds: number[],
+): EligibilityCriterion[] =>
+  eligibilityIds.flatMap((id) => criteria.find((ec) => ec.id === id) ?? []);

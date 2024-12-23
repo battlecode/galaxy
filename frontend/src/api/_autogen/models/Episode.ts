@@ -79,6 +79,12 @@ export interface Episode {
      * @type {string}
      * @memberof Episode
      */
+    release_version_client?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Episode
+     */
     release_version_public?: string;
     /**
      * 
@@ -132,6 +138,7 @@ export function EpisodeFromJSONTyped(json: any, ignoreDiscriminator: boolean): E
         'language': LanguageEnumFromJSON(json['language']),
         'scaffold': !exists(json, 'scaffold') ? undefined : json['scaffold'],
         'artifact_name': !exists(json, 'artifact_name') ? undefined : json['artifact_name'],
+        'release_version_client': !exists(json, 'release_version_client') ? undefined : json['release_version_client'],
         'release_version_public': !exists(json, 'release_version_public') ? undefined : json['release_version_public'],
         'release_version_saturn': !exists(json, 'release_version_saturn') ? undefined : json['release_version_saturn'],
         'eligibility_criteria': ((json['eligibility_criteria'] as Array<any>).map(EligibilityCriterionFromJSON)),
@@ -155,6 +162,7 @@ export function EpisodeToJSON(value?: Episode | null): any {
         'language': LanguageEnumToJSON(value.language),
         'scaffold': value.scaffold,
         'artifact_name': value.artifact_name,
+        'release_version_client': value.release_version_client,
         'release_version_public': value.release_version_public,
         'release_version_saturn': value.release_version_saturn,
         'eligibility_criteria': ((value.eligibility_criteria as Array<any>).map(EligibilityCriterionToJSON)),
