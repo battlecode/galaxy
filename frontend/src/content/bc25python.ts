@@ -19,9 +19,9 @@ To participate in Battlecode, you need an account and a team. Each team can cons
 export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
   Lectures: `
 
-  Battlecode 2025 Python will be holding lectures, where a dev will be going over possible strategy, coding up an example player, answering questions, etc. Lectures are streamed on Twitch. More details coming soon!
+Battlecode 2025 Python will be holding lectures, where a dev will be going over possible strategy, coding up an example player, answering questions, etc. Lectures are streamed on Twitch. More details coming soon!
 
-  All lectures are streamed live on [our Twitch account](https://twitch.tv/mitbattlecode), and are later uploaded to [our YouTube channel](https://youtube.com/@MITBattlecode).
+All lectures are streamed live on [our YouTube channel](https://youtube.com/@MITBattlecode), and are later uploaded as videos.
   `,
 };
 
