@@ -50,6 +50,7 @@ class EpisodeAdmin(admin.ModelAdmin):
                 "fields": (
                     "scaffold",
                     "artifact_name",
+                    "release_version_client",
                     "release_version_public",
                     "release_version_saturn",
                 ),
