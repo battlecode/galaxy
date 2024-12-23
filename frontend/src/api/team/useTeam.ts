@@ -17,7 +17,7 @@ import type {
   TeamTMeRetrieveRequest,
   TeamTRetrieveRequest,
 } from "../_autogen";
-import { teamMutationKeys } from "./teamKeys";
+import { teamMutationKeys, teamQueryKeys } from "./teamKeys";
 import {
   createTeam,
   joinTeam,
@@ -208,6 +208,10 @@ export const useUpdateTeam = (
         buildKey(myTeamFactory.queryKey, { episodeId }),
         data,
       );
+
+      void queryClient.refetchQueries({
+        queryKey: teamQueryKeys.teamBase.key({ episodeId }),
+      });
     },
   });
 

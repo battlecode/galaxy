@@ -13,6 +13,7 @@ import PageNotFound from "./PageNotFound";
 // import TeamChart from "components/compete/chart/TeamChart";
 // import { useTeamRatingHistory } from "api/compete/useCompete";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
+import { getEligibilities } from "api/helpers";
 
 const isNilOrEmptyStr = (str: string | undefined | null): boolean =>
   isNil(str) || str === "";
@@ -40,12 +41,10 @@ const TeamProfile: React.FC = () => {
 
   const eligibles = useMemo(
     () =>
-      episode.data?.eligibility_criteria.filter(
-        (criterion) =>
-          team.data?.profile?.eligible_for?.find(
-            (id) => id === criterion.id,
-          ) !== undefined,
-      ) ?? [],
+      getEligibilities(
+        episode.data?.eligibility_criteria ?? [],
+        team.data?.profile?.eligible_for ?? [],
+      ),
     [episode, team],
   );
 

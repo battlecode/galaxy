@@ -37,6 +37,7 @@ class EpisodeSerializer(serializers.ModelSerializer):
             "language",
             "scaffold",
             "artifact_name",
+            "release_version_client",
             "release_version_public",
             "release_version_saturn",
             "eligibility_criteria",

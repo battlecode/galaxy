@@ -1,14 +1,12 @@
 import type React from "react";
 import { useMemo, useState } from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import type { EligibilityCriterion } from "../api/_autogen";
 import { useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
 import { PageTitle } from "../components/elements/BattlecodeStyle";
 import RankingsTable from "../components/tables/RankingsTable";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
-import { useEpisodeInfo } from "../api/episode/useEpisode";
 import { useSearchTeams } from "../api/team/useTeam";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -32,7 +30,6 @@ const Rankings: React.FC = () => {
     [searchParams],
   );
 
-  const episodeData = useEpisodeInfo({ id: episodeId });
   const rankingsData = useSearchTeams(
     {
       episodeId,
@@ -41,18 +38,6 @@ const Rankings: React.FC = () => {
     },
     queryClient,
   );
-
-  /**
-   * This enables us to look up eligibility criteria by index in the table component.
-   */
-  const eligibilityMap: Map<number, EligibilityCriterion> = useMemo(() => {
-    if (!episodeData.isSuccess) {
-      return new Map<number, EligibilityCriterion>();
-    }
-    return new Map(
-      episodeData.data.eligibility_criteria.map((crit, idx) => [idx, crit]),
-    );
-  }, [episodeData]);
 
   function handlePage(page: number): void {
     if (!rankingsData.isLoading) {
@@ -104,7 +89,6 @@ const Rankings: React.FC = () => {
         data={rankingsData.data}
         loading={rankingsData.isLoading}
         page={queryParams.page}
-        eligibilityMap={eligibilityMap}
         handlePage={handlePage}
       />
     </div>
