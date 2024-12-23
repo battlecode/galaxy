@@ -11,6 +11,8 @@ import { useUserTeam } from "api/team/useTeam";
 // import UserChart from "components/compete/chart/UserChart";
 // import { useCurrentUser } from "contexts/CurrentUserContext";
 import { isPresent } from "utils/utilTypes";
+import { dateTime } from "utils/dateTime";
+import Markdown from "components/elements/Markdown";
 
 const Home: React.FC = () => {
   // const TOP_TEAMS = 10;
@@ -25,6 +27,21 @@ const Home: React.FC = () => {
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";
 
+  // This is a temporary message until we have a working countdown :)
+  let WELCOME =
+    episode.isSuccess && isPresent(episode.data.blurb)
+      ? episode.data.blurb
+      : `Welcome!`;
+
+  if (episode.isSuccess && episode.data.game_release.getTime() > Date.now()) {
+    WELCOME += "\n\n";
+    WELCOME += `The competition will be launched on **${
+      dateTime(episode.data.game_release).localFullString
+    }**.`;
+    WELCOME += "\n\n";
+    WELCOME += `In the meantime, [create or join a team](/${episodeId}/my_team) and check out the [quick start](/${episodeId}/quick_start) page.`;
+  }
+
   return (
     <div className="p-6">
       <div className="flex flex-col gap-6 xl:flex-row">
@@ -37,11 +54,7 @@ const Home: React.FC = () => {
             }
             loading={episode.isLoading}
           >
-            <span>
-              {episode.isSuccess && isPresent(episode.data.blurb)
-                ? episode.data.blurb
-                : `Welcome!`}
-            </span>
+            <Markdown text={WELCOME} />
           </SectionCard>
 
           <SectionCard title="Scrimmaging Record" loading={userTeam.isLoading}>
@@ -82,19 +95,23 @@ const Home: React.FC = () => {
           </SectionCard>
           <SectionCard title="Social Media">
             <div className="flex w-full flex-row items-center justify-evenly pt-2">
+              <SocialIcon url="https://discord.gg/N86mxkH" className={SOCIAL} />
               <SocialIcon
-                url="https://www.github.com/battlecode"
+                url="https://www.youtube.com/@MITBattlecode"
                 className={SOCIAL}
               />
               <SocialIcon
-                url="https://www.youtube.com/@MITBattlecode"
+                url="https://x.com/mitbattlecode"
                 className={SOCIAL}
               />
               <SocialIcon
                 url="https://www.instagram.com/mitbattlecode"
                 className={SOCIAL}
               />
-              <SocialIcon url="https://discord.gg/N86mxkH" className={SOCIAL} />
+              <SocialIcon
+                url="https://www.github.com/battlecode"
+                className={SOCIAL}
+              />
             </div>
           </SectionCard>
           {/* <SectionCard title="Top Teams">

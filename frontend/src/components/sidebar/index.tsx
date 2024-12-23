@@ -65,7 +65,7 @@ const COMPETE_ITEMS: SidebarItemData[] = [
     iconName: "chart_bar",
     text: "Rankings",
     linkTo: "rankings",
-    requireGameReleased: true,
+    requireGameReleased: false,
     userAuthLevel: UserAuthLevel.LOGGED_OUT,
   },
   {

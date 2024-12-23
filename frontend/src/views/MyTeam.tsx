@@ -175,13 +175,6 @@ const MyTeam: React.FC = () => {
               hideAllScrimmages={true}
             />
           </SectionCard>
-          <SectionCard className="shrink xl:hidden" title="Scrimmaging Record">
-            <ScrimmagingRecord
-              team={teamData.data}
-              hideTeamName={true}
-              hideAllScrimmages={true}
-            />
-          </SectionCard>
         </div>
         {/* Display the members list, file upload, and win/loss to the right when on a big screen. */}
         <div className="hidden max-w-2xl gap-8 xl:flex xl:flex-1 xl:flex-col">
