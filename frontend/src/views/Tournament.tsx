@@ -69,14 +69,6 @@ const TournamentPage: React.FC = () => {
     if (episode === undefined || tourneyData.data === undefined) {
       return { includes: [], excludes: [], isEligible: false };
     }
-    // const includes =
-    //   tourneyData.data.eligibility_includes?.flatMap(
-    //     (inc) => episode.eligibility_criteria.find((ec) => ec.id === inc) ?? [],
-    //   ) ?? [];
-    // const excludes =
-    //   tourneyData.data.eligibility_excludes?.flatMap(
-    //     (exc) => episode.eligibility_criteria.find((ec) => ec.id === exc) ?? [],
-    //   ) ?? [];
 
     const includes = getEligibilities(
       episode.eligibility_criteria,
