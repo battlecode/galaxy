@@ -23,7 +23,7 @@ const Header: React.FC = () => {
 
   const renderedItems = useMemo(
     () => renderableItems(ALL_SIDEBAR_ITEMS, episodeData, authState, teamData),
-    [episodeData, teamData],
+    [episodeData, teamData, authState],
   );
 
   return (
@@ -92,7 +92,7 @@ const Header: React.FC = () => {
             </Transition>
           </Menu>
           {/* battlecode logo, episode select */}
-          <div className="flex flex-1 items-center justify-center space-x-6 sm:items-stretch sm:justify-start">
+          <div className="flex flex-1 items-center justify-center space-x-4 sm:items-stretch sm:justify-start">
             <div
               className="flex flex-shrink-0 items-center hover:cursor-pointer"
               onClick={() => {
@@ -100,12 +100,12 @@ const Header: React.FC = () => {
               }}
             >
               <img
-                className="hidden h-8 sm:block"
+                className="hidden h-8 cursor-pointer sm:block"
                 src="/battlecode-logo-horiz-white.png"
                 alt="Battlecode Logo"
               />
               <img
-                className="h-10 sm:hidden"
+                className="h-10 cursor-pointer sm:hidden"
                 src="/battlecode-logo-vert-white.png"
                 alt="Battlecode Logo"
               />
@@ -119,7 +119,7 @@ const Header: React.FC = () => {
                 <Menu.Button className="rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                   <span className="sr-only">Open user menu</span>
                   <img
-                    className="h-8 w-8 rounded-full bg-white"
+                    className="h-10 w-10 rounded-full bg-white"
                     src={
                       user.data?.profile?.avatar_url ??
                       "/default_profile_picture.png"

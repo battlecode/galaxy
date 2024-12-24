@@ -6,7 +6,7 @@ const ENVIRONMENT = `
 Maintaining a safe and inclusive environment for competitors is a top priority for Battlecode.
 Battlecode strictly follows [MIT's Policies](https://policies-procedures.mit.edu/) on responsible and ethical conduct.
 
-If someone makes you or anyone else feel unsafe or unwelcome, please report it to Teh Devs as soon as possible at [mailto:battlecode@mit.edu](battlecode@mit.edu).
+If someone makes you or anyone else feel unsafe or unwelcome, please report it to Teh Devs as soon as possible at [battlecode@mit.edu](mailto:battlecode@mit.edu).
 
 Harassment and other code of conduct violations reduce the value of the competition for everyone. People like you make our community a better place, and we want you to be happy here.
 `;
