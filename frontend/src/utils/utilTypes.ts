@@ -31,3 +31,4 @@ export const MILLIS_SECOND = 1000;
 export const SECONDS_MINUTE = 60;
 export const MINUTES_HOUR = 60;
 export const HOURS_DAY = 24;
+export const DAYS_YEAR = 365;
