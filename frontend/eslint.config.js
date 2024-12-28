@@ -81,7 +81,7 @@ export default [
       ],
       "@typescript-eslint/no-magic-numbers": [
         "error",
-        { ignore: [0, 1, -1, 2] },
+        { ignore: [0, 1, -1, 2, 100] },
       ],
       "@typescript-eslint/prefer-literal-enum-member": "off",
       "@typescript-eslint/prefer-destructuring": [

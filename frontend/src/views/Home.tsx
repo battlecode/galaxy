@@ -1,8 +1,7 @@
 import type React from "react";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import { useEpisodeInfo, useNextTournament } from "../api/episode/useEpisode";
+import { useEpisodeInfo } from "../api/episode/useEpisode";
 import SectionCard from "../components/SectionCard";
-import CountdownDigital from "../components/CountdownDigital";
 import { SocialIcon } from "react-social-icons";
 // import TeamChart from "../components/compete/chart/TeamChart";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
@@ -13,14 +12,13 @@ import { useUserTeam } from "api/team/useTeam";
 import { isPresent } from "utils/utilTypes";
 import { dateTime } from "utils/dateTime";
 import Markdown from "components/elements/Markdown";
-import { isNil } from "lodash";
+import HomeCountdown from "components/HomeCountdown";
 
 const Home: React.FC = () => {
   // const TOP_TEAMS = 10;
 
   const { episodeId } = useEpisodeId();
   const episode = useEpisodeInfo({ id: episodeId });
-  const nextTournament = useNextTournament({ episodeId });
   // const topRatingHistory = useTopRatingHistoryList({ episodeId, n: TOP_TEAMS });
   const userTeam = useUserTeam({ episodeId });
   // const currentUser = useCurrentUser();
@@ -35,12 +33,12 @@ const Home: React.FC = () => {
       : `Welcome!`;
 
   if (episode.isSuccess && episode.data.game_release.getTime() > Date.now()) {
-    WELCOME += "\n\n";
-    WELCOME += `The competition will be launched on **${
+    WELCOME += `
+\n\n
+The competition will be launched on **${
       dateTime(episode.data.game_release).localFullString
-    }**.`;
-    WELCOME += "\n\n";
-    WELCOME += `In the meantime, [create or join a team](/${episodeId}/my_team) and check out the [quick start](/${episodeId}/quick_start) page.`;
+    }**.\n\n
+In the meantime, [create or join a team](/${episodeId}/my_team) and check out the [quick start](/${episodeId}/quick_start) page.`;
   }
 
   return (
@@ -84,11 +82,8 @@ const Home: React.FC = () => {
           </SectionCard> */}
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
-        <SectionCard title="Next Submission Deadline" loading={nextTournament.isLoading || episode.isLoading}>
-            {!isNil(episode.data) && new Date().getTime()>episode.data.game_release.getTime() ?
-            (!isNil(nextTournament.data) ? <CountdownDigital date={nextTournament.data.submission_freeze}/> : <p></p>) : (!isNil(episode.data) ? <CountdownDigital date={episode.data.game_release}/> : <p></p>)}
+          <HomeCountdown />
 
-          </SectionCard>
           <SectionCard title="Social Media">
             <div className="flex w-full flex-row items-center justify-evenly pt-2">
               <SocialIcon url="https://discord.gg/N86mxkH" className={SOCIAL} />
