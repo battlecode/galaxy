@@ -1,4 +1,4 @@
-FROM golang:1.20.1-buster AS go
+FROM golang:1.23.4-bookworm AS go
 
 ENV BUILD_HOME /build
 WORKDIR $BUILD_HOME
@@ -10,7 +10,7 @@ COPY . .
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /saturn -ldflags="-s -w" ./cmd/saturn/main.go
 
 
-FROM openjdk:21-jdk-slim-buster
+FROM openjdk:21-jdk-slim-bookworm
 
 # Install JDK8. The base image provides JDK21, but we still need JDK8 to
 # run matches with java8
