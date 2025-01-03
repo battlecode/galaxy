@@ -53,18 +53,13 @@ func (s *Python3Scaffold) Prepare() *Step {
 				return fmt.Errorf("Refresh: %v", err)
 			}
 
-			log.Ctx(ctx).Debug().Msg("Flushing build directory.")
-			if err := os.RemoveAll(filepath.Join(s.root, "build")); err != nil {
-				return fmt.Errorf("os.RemoveAll: %v", err)
-			}
-
 			log.Ctx(ctx).Debug().Msg("Updating distribution.")
 			out, err := s.Scaffold.RunCommand(
 				ctx,
                 []string{},
-				"./gradlew",
+                s.pyVersion,
 				"update",
-				fmt.Sprintf("-PonSaturn=%t", true),
+				fmt.Sprintf("--on-saturn=%t", true),
 			)
 			log.Ctx(ctx).Debug().Msg(out)
 			if err != nil {
@@ -178,7 +173,8 @@ func (s *Python3Scaffold) RunMatch() *Step {
 				fmt.Sprintf("--p1=%s", arg.Details.(ExecuteRequest).A.Package),
 				fmt.Sprintf("--p2=%s", arg.Details.(ExecuteRequest).B.Package),
 				fmt.Sprintf("--maps=%s", strings.Join(arg.Details.(ExecuteRequest).Maps, ",")),
-				fmt.Sprintf("--out-file-name=%s", filepath.Join("data", "replay.bin")),
+				fmt.Sprintf("--out-file-dir=%s", "data"),
+				fmt.Sprintf("--out-file-name=%s", "replay.bin"),
 				fmt.Sprintf("--debug=%t", false),
 				fmt.Sprintf("--show-indicators=%t", false),
 			)
