@@ -12,7 +12,8 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /saturn -ldflags="-s -w" .
 
 FROM openjdk:21-jdk-slim-buster
 
-# Install JDK8
+# Install JDK8. The base image provides JDK21, but we still need JDK8 to
+# run matches with java8
 RUN apt-get update; apt-get install -y openjdk-8-jdk
 
 # Install python
