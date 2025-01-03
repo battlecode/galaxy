@@ -10,7 +10,16 @@ COPY . .
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /saturn -ldflags="-s -w" ./cmd/saturn/main.go
 
 
-FROM openjdk:8-slim-buster
+FROM openjdk:21-jdk-slim-buster
+
+# Install JDK8
+RUN apt-get update; apt-get install -y openjdk-8-jdk
+
+# Install python
+RUN apt-get install -y software-properties-common && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt install -y python3.12
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME

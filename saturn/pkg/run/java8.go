@@ -18,12 +18,14 @@ var java8WinnerRegex = regexp.MustCompile(`(?m)^\[server\]\s*.*\(([AB])\) wins \
 type Java8Scaffold struct {
 	Scaffold
 	matchOutputs map[*StepArguments]string
+    javaEnv []string
 }
 
-func NewJava8Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string) (*Java8Scaffold, error) {
+func NewJava8Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, javaPath string) (*Java8Scaffold, error) {
 	s := new(Java8Scaffold)
 	s.root = root
 	s.repo = repo
+    s.javaEnv = []string{fmt.Sprintf("JAVA_HOME=%s", javaPath)}
 	s.compile = Recipe{
 		&StateVersion,
 		s.Prepare(),
@@ -60,6 +62,7 @@ func (s *Java8Scaffold) Prepare() *Step {
 			log.Ctx(ctx).Debug().Msg("Updating distribution.")
 			out, err := s.Scaffold.RunCommand(
 				ctx,
+                s.javaEnv,
 				"./gradlew",
 				"update",
 				fmt.Sprintf("-PonSaturn=%t", true),
@@ -138,6 +141,7 @@ func (s *Java8Scaffold) VerifySubmission() *Step {
 			}
 			out, err := s.Scaffold.RunCommand(
 				ctx,
+                s.javaEnv,
 				"./gradlew",
 				"verify",
 				fmt.Sprintf("-Pteam=%s", pkg),
@@ -172,6 +176,7 @@ func (s *Java8Scaffold) RunMatch() *Step {
 		Callable: func(ctx context.Context, arg *StepArguments) error {
 			out, err := s.Scaffold.RunCommand(
 				ctx,
+                s.javaEnv,
 				"./gradlew",
 				"run",
 				fmt.Sprintf("-PonSaturn=%t", true),
