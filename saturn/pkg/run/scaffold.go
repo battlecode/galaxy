@@ -116,20 +116,24 @@ type Scaffold struct {
 func NewScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string) (*Scaffold, error) {
 	switch episode.Language {
 	case saturn.Java8:
+        // Kept for compatibility running old episodes
 		s, err := NewJava8Scaffold(ctx, episode, repo, root, "/usr/lib/jvm/java-8-openjdk-amd64")
 		if err != nil {
 			return nil, fmt.Errorf("NewJava8Scaffold: %v", err)
 		}
 		return &s.Scaffold, nil
 	case saturn.Java21:
-        // Java21 uses the same scaffold for now
-		s, err := NewJava8Scaffold(ctx, episode, repo, root, "/usr/local/openjdk-21")
+        // Java21 uses the same scaffold for now. Modern java21 scaffolds store
+        // java in the 'java' subdirectory of the scaffold
+        javaRoot := filepath.Join(root, "java")
+		s, err := NewJava8Scaffold(ctx, episode, repo, javaRoot, "/usr/local/openjdk-21")
 		if err != nil {
 			return nil, fmt.Errorf("NewJava21Scaffold: %v", err)
 		}
 		return &s.Scaffold, nil
 	case saturn.Python3:
-		s, err := NewPython3Scaffold(ctx, episode, repo, root)
+        pyRoot := filepath.Join(root, "python")
+		s, err := NewPython3Scaffold(ctx, episode, repo, pyRoot, "python3.12")
 		if err != nil {
 			return nil, fmt.Errorf("NewPython3Scaffold: %v", err)
 		}
