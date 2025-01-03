@@ -22,6 +22,7 @@ class Language(models.TextChoices):
     """
 
     JAVA_8 = "java8"
+    JAVA_21 = "java21"
     PYTHON_3 = "py3"
 
 
