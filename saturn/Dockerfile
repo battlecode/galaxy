@@ -1,4 +1,4 @@
-FROM golang:1.18-buster AS go
+FROM golang:1.20.1-buster AS go
 
 ENV BUILD_HOME /build
 WORKDIR $BUILD_HOME
