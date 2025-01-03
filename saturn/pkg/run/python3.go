@@ -16,7 +16,7 @@ import (
 type Python3Scaffold struct {
 	Scaffold
 	matchOutputs map[*StepArguments]string
-    pyVersion string
+	pyVersion    string
 }
 
 var pyWinnerRegex = regexp.MustCompile(`(?m)^\[server\]\s*.*\(([AB])\) wins \(round [0-9]+\)$`)
@@ -25,7 +25,7 @@ func NewPython3Scaffold(ctx context.Context, episode saturn.Episode, repo *git.R
 	s := new(Python3Scaffold)
 	s.root = root
 	s.repo = repo
-    s.pyVersion = pyVersion
+	s.pyVersion = pyVersion
 	s.compile = Recipe{
 		&StateVersion,
 		s.Prepare(),
@@ -56,8 +56,8 @@ func (s *Python3Scaffold) Prepare() *Step {
 			log.Ctx(ctx).Debug().Msg("Updating distribution.")
 			out, err := s.Scaffold.RunCommand(
 				ctx,
-                []string{},
-                s.pyVersion,
+				[]string{},
+				s.pyVersion,
 				"update",
 				fmt.Sprintf("--on-saturn=%t", true),
 			)
@@ -81,7 +81,7 @@ func (s *Python3Scaffold) DownloadSource() *Step {
 }
 
 func (s *Python3Scaffold) DownloadBinaries() *Step {
-    // Actually just downloading the source
+	// Actually just downloading the source
 	return &Step{
 		Name: "Download binary",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
@@ -126,8 +126,8 @@ func (s *Python3Scaffold) VerifySubmission() *Step {
 			}
 			out, err := s.Scaffold.RunCommand(
 				ctx,
-                []string{},
-                s.pyVersion,
+				[]string{},
+				s.pyVersion,
 				"run.py",
 				"verify",
 				fmt.Sprintf("--p1=%s", pkg),
@@ -162,8 +162,8 @@ func (s *Python3Scaffold) RunMatch() *Step {
 		Callable: func(ctx context.Context, arg *StepArguments) error {
 			out, err := s.Scaffold.RunCommand(
 				ctx,
-                []string{},
-                s.pyVersion,
+				[]string{},
+				s.pyVersion,
 				"run",
 				fmt.Sprintf("--on-saturn=%t", true),
 				fmt.Sprintf("--p1-team=%s", arg.Details.(ExecuteRequest).A.TeamName),

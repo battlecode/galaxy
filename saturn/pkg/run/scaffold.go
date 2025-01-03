@@ -116,23 +116,22 @@ type Scaffold struct {
 func NewScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string) (*Scaffold, error) {
 	switch episode.Language {
 	case saturn.Java8:
-        // Kept for compatibility running old episodes
-		s, err := NewJava8Scaffold(ctx, episode, repo, root, "/usr/lib/jvm/java-8-openjdk-amd64")
+		// Kept for compatibility running old episodes
+		s, err := NewJavaScaffold(ctx, episode, repo, root, "/usr/lib/jvm/java-8-openjdk-amd64")
 		if err != nil {
-			return nil, fmt.Errorf("NewJava8Scaffold: %v", err)
+			return nil, fmt.Errorf("NewJavaScaffold (Java8): %v", err)
 		}
 		return &s.Scaffold, nil
 	case saturn.Java21:
-        // Java21 uses the same scaffold for now. Modern java21 scaffolds store
-        // java in the 'java' subdirectory of the scaffold
-        javaRoot := filepath.Join(root, "java")
-		s, err := NewJava8Scaffold(ctx, episode, repo, javaRoot, "/usr/local/openjdk-21")
+		// Modern java21 scaffolds store java in the 'java' subdirectory of the scaffold
+		javaRoot := filepath.Join(root, "java")
+		s, err := NewJavaScaffold(ctx, episode, repo, javaRoot, "/usr/local/openjdk-21")
 		if err != nil {
-			return nil, fmt.Errorf("NewJava21Scaffold: %v", err)
+			return nil, fmt.Errorf("NewJavaScaffold (Java21): %v", err)
 		}
 		return &s.Scaffold, nil
 	case saturn.Python3:
-        pyRoot := filepath.Join(root, "python")
+		pyRoot := filepath.Join(root, "python")
 		s, err := NewPython3Scaffold(ctx, episode, repo, pyRoot, "python3.12")
 		if err != nil {
 			return nil, fmt.Errorf("NewPython3Scaffold: %v", err)
@@ -149,8 +148,8 @@ func (s *Scaffold) RunCommand(ctx context.Context, extra_env []string, name stri
 	cmd := exec.CommandContext(ctx, name, arg...)
 	cmd.Dir = s.root
 	cmd.Stdout, cmd.Stderr = procOutput, procOutput
-    cmd.Env = os.Environ()
-    cmd.Env = append(cmd.Env, extra_env...)
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, extra_env...)
 	err := cmd.Run()
 	return procOutput.String(), err
 }
