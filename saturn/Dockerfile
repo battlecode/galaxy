@@ -14,10 +14,12 @@ FROM openjdk:21-jdk-slim-bookworm
 
 # Install JDK8. The base image provides JDK21, but we still need JDK8 to
 # run matches with java8
-RUN apt-get update; apt-get install -y openjdk-8-jdk
+#RUN apt-get update && \
+#     apt-get install -y openjdk-8-jdk
 
 # Install python
-RUN apt-get install -y software-properties-common && \
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
     apt install -y python3.12
