@@ -1,3 +1,4 @@
+# Build go app
 FROM golang:1.23.4-bookworm AS go
 
 ENV BUILD_HOME /build
@@ -9,20 +10,22 @@ RUN go mod download
 COPY . .
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /saturn -ldflags="-s -w" ./cmd/saturn/main.go
 
+# Link intermediate container for python
+FROM python:3.12-slim-bookworm as python
 
 FROM openjdk:21-jdk-slim-bookworm
 
+# Setup
+RUN echo "deb http://deb.debian.org/debian unstable main" >> /etc/apt/sources.list && \
+    apt-get update
+
 # Install JDK8. The base image provides JDK21, but we still need JDK8 to
 # run matches with java8
-#RUN apt-get update && \
-#     apt-get install -y openjdk-8-jdk
+RUN apt-get install -y -t unstable openjdk-8-jdk
 
-# Install python
-RUN apt-get update && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt install -y python3.12
+# Copy python from intermediate container
+COPY --from=python /usr/local/bin/python3.12 /usr/local/bin/python3.12
+COPY --from=python /usr/local/lib/libpython3.* /usr/local/lib
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
