@@ -16,6 +16,7 @@ type Language string
 
 const (
 	Java8   Language = "java8"
+	Java21  Language = "java21"
 	Python3 Language = "py3"
 )
 
