@@ -25,7 +25,7 @@ RUN apt-get install -y -t unstable openjdk-8-jdk
 
 # Copy python from intermediate container
 COPY --from=python /usr/local/bin/python3.12 /usr/local/bin/python3.12
-COPY --from=python /usr/local/lib/libpython3.* /usr/local/lib
+COPY --from=python /usr/local/lib/libpython3.* /usr/local/lib/
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
