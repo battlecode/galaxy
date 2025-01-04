@@ -31,6 +31,9 @@ COPY --from=python /usr/local/include/python3.12 /usr/local/include/python3.12
 COPY --from=python /usr/local/bin/pip* /usr/local/bin/
 ENV PYTHONPATH=/usr/local/lib/python3.12:/usr/local/lib/python3.12/site-packages
 
+# Install google cloud package for use in the scaffold
+RUN python3.12 -m pip install google-cloud-storage
+
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 
