@@ -23,9 +23,13 @@ RUN echo "deb http://deb.debian.org/debian unstable main" >> /etc/apt/sources.li
 # run matches with java8
 RUN apt-get install -y -t unstable openjdk-8-jdk
 
-# Copy python from intermediate container
+# Copy Python executable, libraries, standard library, site-packages, include files, binary files, and Python path
 COPY --from=python /usr/local/bin/python3.12 /usr/local/bin/python3.12
 COPY --from=python /usr/local/lib/libpython3.* /usr/local/lib/
+COPY --from=python /usr/local/lib/python3.12 /usr/local/lib/python3.12
+COPY --from=python /usr/local/include/python3.12 /usr/local/include/python3.12
+COPY --from=python /usr/local/bin/pip* /usr/local/bin/
+ENV PYTHONPATH=/usr/local/lib/python3.12:/usr/local/lib/python3.12/site-packages
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
