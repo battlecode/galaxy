@@ -4,13 +4,13 @@ import type {
   PaginatedTeamPublicList,
 } from "../../api/_autogen";
 import type { Maybe } from "../../utils/utilTypes";
-import Table from "../Table";
-import TableBottom from "../TableBottom";
 import { NavLink } from "react-router-dom";
 import EligibilityIcon from "../EligibilityIcon";
 import { useEpisodeId } from "../../contexts/EpisodeContext";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 import { getEligibilities } from "api/helpers";
+import Table from "components/Table";
+import TableBottom from "components/TableBottom";
 
 interface RankingsTableProps {
   data: Maybe<PaginatedTeamPublicList>;
@@ -77,7 +77,7 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
             team.members.map((member, idx) => (
               <>
                 <NavLink
-                  key={idx}
+                  key={member.id}
                   to={`/user/${member.id}`}
                   className="hover:underline"
                 >

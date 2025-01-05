@@ -1,4 +1,6 @@
 import type React from "react";
+import Icon from "./elements/Icon";
+import { useEffect, useRef } from "react";
 
 interface TableBottomProps {
   totalCount: number;
@@ -7,33 +9,41 @@ interface TableBottomProps {
   onPage: (page: number) => void;
 }
 
+type Breakpoint = "sm" | "md";
+
 const TableBottom: React.FC<TableBottomProps> = ({
   totalCount,
   pageSize,
   currentPage,
   onPage,
 }) => {
+  const displayCount = useRef(totalCount);
+
   const first = (currentPage - 1) * pageSize + 1;
-  const last = Math.min(currentPage * pageSize, totalCount);
-  const pageCount = Math.ceil(totalCount / pageSize);
+  const last = Math.min(currentPage * pageSize, displayCount.current);
+  const pageCount = Math.ceil(displayCount.current / pageSize);
 
   const backDisabled = currentPage <= 1;
   const forwardDisabled = currentPage >= pageCount;
+
+  const pagesToShow: Record<Breakpoint, { max: number; end: number }> = {
+    sm: { max: 5, end: 1 },
+    md: { max: 13, end: 3 },
+  };
 
   /**
    *
    * @returns an array of page numbers, each of which will be rendered as a button.
    * The strings in the array, such as the ellipses will be rendered as disabled buttons.
    */
-  function getPageNumbers(): Array<string | number> {
+  function getPageNumbers(sizeBreakpoint: Breakpoint): Array<string | number> {
     // The maximum number of pages to show in the pagination bar.
-    const MAX_PAGES = 15;
+    const MAX_PAGES = pagesToShow[sizeBreakpoint].max;
     // The number of pages to show on either side of the "..."
-    const END_PAGES = 3;
+    const END_PAGES = pagesToShow[sizeBreakpoint].end;
     // The start/end buttons when we have lots of pages
     const START_BUTTONS = [1, "..."];
     const END_BUTTONS = ["...", pageCount];
-    // The number of pages to show around the
 
     if (pageCount > MAX_PAGES) {
       // Determines where the ellipses should go based on the current page.
@@ -54,7 +64,12 @@ const TableBottom: React.FC<TableBottomProps> = ({
         return START_BUTTONS.concat(
           Array.from(
             { length: MAX_PAGES - START_BUTTONS.length - END_BUTTONS.length },
-            (_, idx) => idx + currentPage - (END_PAGES + START_BUTTONS.length),
+            (_, idx) =>
+              Math.round(
+                idx +
+                  currentPage -
+                  (MAX_PAGES - START_BUTTONS.length - END_BUTTONS.length) / 2,
+              ),
           ),
         ).concat(END_BUTTONS);
       }
@@ -66,33 +81,70 @@ const TableBottom: React.FC<TableBottomProps> = ({
     }
   }
 
+  useEffect(() => {
+    if (totalCount !== displayCount.current && totalCount !== 0) {
+      displayCount.current = totalCount;
+    }
+  }, [totalCount]);
+
   return (
     <nav
-      className="flex items-center justify-between"
+      className="flex h-full w-full flex-row items-center justify-between gap-2 px-3 py-2 md:px-10"
       aria-label="Table navigation"
     >
-      <span className="text-sm font-normal text-gray-500">
+      {/* Pagination progress that displays on wider screens */}
+      <span className="hidden h-full items-center gap-1 text-sm font-normal text-gray-500 md:flex md:flex-row">
         Showing{" "}
         <span className="font-semibold text-gray-900">
           {first}-{last}
         </span>{" "}
-        of <span className="font-semibold text-gray-900">{totalCount}</span>
+        of{" "}
+        <span className="font-semibold text-gray-900">
+          {displayCount.current}
+        </span>
       </span>
-      <div className="inline-flex h-8 -space-x-px text-sm">
+
+      {/* Pagination progress that displays on smaller screens */}
+      <span className="flex h-full flex-col items-center gap-1 text-sm font-normal text-gray-500 md:hidden">
+        <span className="font-semibold text-gray-900">
+          {first}-{last}
+        </span>{" "}
+        /{" "}
+        <span className="font-semibold text-gray-900">
+          {displayCount.current}
+        </span>
+      </span>
+
+      {/* Pagination buttons */}
+      <div className="flex h-8 flex-row text-sm">
         <DirectionPageButton
           forward={false}
           disabled={backDisabled}
           currentPage={currentPage}
           onPage={onPage}
         />
-        {getPageNumbers().map((page, idx) => (
-          <PageButton
-            key={idx}
-            page={page}
-            currentPage={currentPage}
-            onPage={onPage}
-          />
-        ))}
+        {/* Page numbers that display on wider screens */}
+        <div className="hidden md:flex">
+          {getPageNumbers("md").map((page, idx) => (
+            <PageButton
+              key={idx}
+              page={page}
+              currentPage={currentPage}
+              onPage={onPage}
+            />
+          ))}
+        </div>
+        {/* Page numbers that display on smaller screens */}
+        <div className="flex md:hidden">
+          {getPageNumbers("sm").map((page, idx) => (
+            <PageButton
+              key={idx}
+              page={page}
+              currentPage={currentPage}
+              onPage={onPage}
+            />
+          ))}
+        </div>
         <DirectionPageButton
           forward={true}
           disabled={forwardDisabled}
@@ -110,11 +162,11 @@ const DirectionPageButton: React.FC<{
   currentPage: number;
   onPage: (page: number) => void;
 }> = ({ forward, disabled, currentPage, onPage }) => {
-  const className = `flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 ${
-    forward ? "rounded-r-md " : "rounded-l-md "
-  }${
-    disabled ? "cursor-not-allowed " : ""
-  }hover:bg-gray-100 hover:text-gray-700`;
+  const className = `flex items-center justify-center px-2 h-8 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 ${
+    forward ? "rounded-r-md border-l-0" : "rounded-l-md"
+  } ${
+    disabled ? "cursor-not-allowed" : ""
+  } hover:bg-gray-100 hover:text-gray-700`;
 
   return (
     <button
@@ -128,7 +180,7 @@ const DirectionPageButton: React.FC<{
       className={className}
       disabled={disabled}
     >
-      {forward ? "Next" : "Previous"}
+      <Icon size="sm" name={forward ? "chevron_right" : "chevron_left"} />
     </button>
   );
 };
@@ -138,22 +190,27 @@ const PageButton: React.FC<{
   onPage: (page: number) => void;
   currentPage: number;
 }> = ({ page, onPage, currentPage }) => {
-  const className =
+  const clickable = typeof page === "number";
+
+  const baseClassName =
+    "flex items-center justify-center px-3 h-8 border border-l-0 border-gray-300 hover:bg-blue-100 hover:text-blue-700";
+  const pageClassName =
     page === currentPage
-      ? "flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700"
-      : "flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700";
+      ? "text-blue-600 bg-blue-50"
+      : "leading-tight text-gray-500 bg-white";
+  const clickableClassName = clickable ? "cursor-pointer" : "cursor-auto";
 
   return (
     <button
       type="button"
       onClick={(ev) => {
         ev.stopPropagation();
-        if (typeof page === "number") {
+        if (clickable) {
           onPage(page);
         }
       }}
       aria-current="page"
-      className={className}
+      className={`${baseClassName} ${pageClassName} ${clickableClassName}`}
     >
       {page}
     </button>

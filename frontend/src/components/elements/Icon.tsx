@@ -19,6 +19,8 @@ import {
   ShieldCheckIcon as ShieldCheckIcon24,
   QuestionMarkCircleIcon as QuestionMarkCircleIcon24,
   LightBulbIcon as LightBulbIcon24,
+  ChevronLeftIcon as ChevronLeftIcon24,
+  ChevronRightIcon as ChevronRightIcon24,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -41,6 +43,8 @@ import {
   ShieldCheckIcon as ShieldCheckIcon20,
   QuestionMarkCircleIcon as QuestionMarkCircleIcon20,
   LightBulbIcon as LightBulbIcon20,
+  ChevronLeftIcon as ChevronLeftIcon20,
+  ChevronRightIcon as ChevronRightIcon20,
 } from "@heroicons/react/20/solid";
 
 const icons24 = {
@@ -63,6 +67,8 @@ const icons24 = {
   shield_check: ShieldCheckIcon24,
   question_mark_circle: QuestionMarkCircleIcon24,
   light_bulb: LightBulbIcon24,
+  chevron_left: ChevronLeftIcon24,
+  chevron_right: ChevronRightIcon24,
 };
 
 const icons20 = {
@@ -85,6 +91,8 @@ const icons20 = {
   shield_check: ShieldCheckIcon20,
   question_mark_circle: QuestionMarkCircleIcon20,
   light_bulb: LightBulbIcon20,
+  chevron_left: ChevronLeftIcon20,
+  chevron_right: ChevronRightIcon20,
 };
 
 export type IconName = keyof typeof icons24;

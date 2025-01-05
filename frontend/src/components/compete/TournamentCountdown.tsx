@@ -12,7 +12,7 @@ const TournamentCountdown: React.FC<TournamentCountdownProps> = ({
   tournament,
 }) => {
   const dateHasPassed = useCallback(
-    (date: Date) => date.getTime() > new Date().getTime(),
+    (date: Date) => date.getTime() < Date.now(),
     [],
   );
 

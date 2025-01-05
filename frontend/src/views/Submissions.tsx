@@ -21,6 +21,7 @@ import { useSearchParams } from "react-router-dom";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import { useUserTeam } from "api/team/useTeam";
 import { Status526Enum, LanguageEnum } from "api/_autogen";
+import { PageTitle } from "components/elements/BattlecodeStyle";
 
 interface SubmissionFormInput {
   file: FileList;
@@ -76,9 +77,7 @@ const Submissions: React.FC = () => {
 
   return (
     <div className="flex h-full w-full flex-col overflow-auto p-6">
-      <h1 className="mb-5 text-3xl font-bold leading-7 text-gray-900">
-        Submissions
-      </h1>
+      <PageTitle>Submissions</PageTitle>
 
       <SectionCard
         title="Next Submission Deadline"
@@ -273,41 +272,39 @@ const CodeSubmission: React.FC = () => {
               required
               {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
             />
-          </div>
-          <div className="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-end">
-            <Input
-              className="w-full lg:w-1/3"
-              label="Package Name (i.e. examplefuncsplayer)"
-              required
-              errorMessage={errors.packageName?.message}
-              {...register("packageName", {
-                required: FIELD_REQUIRED_ERROR_MSG,
-              })}
-            />
-            <Input
-              className="w-full lg:w-2/3"
-              label="Description (for your reference)"
-              required
-              errorMessage={errors.description?.message}
-              {...register("description", {
-                required: FIELD_REQUIRED_ERROR_MSG,
-              })}
-            />
-          </div>
-          <Button
-            className={`max-w-sm ${
-              uploadSub.isPending || !isDirty
-                ? "disabled cursor-not-allowed"
-                : ""
-            }`}
-            variant="dark"
-            label="Submit"
-            type="submit"
-            loading={uploadSub.isPending}
-            disabled={uploadSub.isPending || !isDirty}
+        </div>
+        <div className="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-end">
+          <Input
+            className="w-full lg:w-1/3"
+            label="Package Name (i.e. examplefuncsplayer)"
+            required
+            errorMessage={errors.packageName?.message}
+            {...register("packageName", {
+              required: FIELD_REQUIRED_ERROR_MSG,
+            })}
           />
-        </form>
-      </div>
+          <Input
+            className="w-full lg:w-2/3"
+            label="Description (for your reference)"
+            required
+            errorMessage={errors.description?.message}
+            {...register("description", {
+              required: FIELD_REQUIRED_ERROR_MSG,
+            })}
+          />
+        </div>
+        <Button
+          className={`max-w-sm ${
+            uploadSub.isPending || !isDirty ? "disabled cursor-not-allowed" : ""
+          }`}
+          variant="dark"
+          label="Submit"
+          type="submit"
+          loading={uploadSub.isPending}
+          disabled={uploadSub.isPending || !isDirty}
+        />
+      </form>
+    </div>
     );
   }
 };
