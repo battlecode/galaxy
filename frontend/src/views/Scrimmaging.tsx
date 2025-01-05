@@ -77,7 +77,7 @@ const Scrimmaging: React.FC = () => {
 
   const TABLIST_STYLE = "flex space-x-1 rounded-xl bg-cyan-600 p-1";
 
-  const tabList = (vertical: boolean): JSX.Element => (
+  const tabList = (vertical: boolean): React.JSX.Element => (
     <Tab.List className={`${vertical ? "flex-col" : ""} ${TABLIST_STYLE}`}>
       <Tab className={tabClassName}>Inbox</Tab>
       <Tab className={tabClassName}>Outbox</Tab>
