@@ -19,6 +19,36 @@ This is the Battlecode 2025 Python contest website, which will be your main hub 
 To participate in Battlecode, you need an account and a team. Each team can consist of 1 to 4 people. Anyone can upload a bot and participate in scrimmage matches, but only teams of MIT students can participate in tournaments.
 
 [Create an account](/register) on this website, and then go to the [team section](/bc25python/team) to either create or join a team.`,
+
+"Installation and Setup": `
+
+Check [common issues](/bc25python/common_issues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
+
+### Step 1: Install Python
+
+You'll need Python 3.12. Other versions will not work. [Download it here](https://www.python.org/downloads/). Once you have installed Python, make sure this Python installation is the one you are using when you run Battlecode (you can check the version with python --version).
+
+### Step 2: Download Battlecode
+
+Next, you should download the [Battlecode 2025 scaffold](https://github.com/battlecode/battlecode25-scaffold). To get up and running quickly, you can click "Clone or download" and then "Download ZIP," and move on to the next step.
+
+We recommend, however, that you instead use Git to organize your code. If you haven't used Git before, read [this guide](https://docs.github.com/en/get-started/using-git/about-git) (or wait for our lecture covering it). On the [scaffold page](https://github.com/battlecode/battlecode25-scaffold), click "Use this template." Importantly, on the next page, make your new repo private (you don't want other teams to view your code!). You can then clone your newly created repo and invite your team members to collaborate on it.
+
+### Step 3: Local Setup
+You can work on Battlecode using any text editor or Python IDE. It's easiest to run Battlecode Python from the terminal.
+
+First, go to the python folder in the scaffold. The run.py script lets you do all the tasks you might need to do for Battlecode, like installing new engine / client versions, running your bot, and zipping your bot to submit. To install the engine and client, run \`python ./run.py update\`.
+
+There should now be a folder called \`client\` in your scaffold folder; if you go in there, and double click the \`Battlecode Client\` application, you should be able to run and watch matches. (Please don't move that application, it will be sad.) If you notice any severe issues with the default client, you can try setting the \`compatibility_client\` property to true in properties.json and updating the client.
+
+### Developing Your Bot
+Place each version of your robot in a new subfolder in the \`src\` folder. Make sure every version has a \`bot.py\`.
+Check [debugging tips](/bc25python/debugging_tips) if you experience problems while developing, or ask on the Discord.
+
+### RUNNING BATTLECODE FROM THE CLIENT
+Open the client as described in Step 3. Navigate to the runner tab, select which bots and maps to run, and hit Run Game! Finally, click the play/pause button to view the replay.
+You can run games directly from the terminal with the gradle task \`./run.py run --maps [map] --p1 [player 1 name] --p2 [player 2 name]\`. If you don't include the map or team flags, Battlecode will default to an example player and example map.
+`,
 };
 
 export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
@@ -26,7 +56,7 @@ export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
 
 [Specifications for Battlecode 2025 Python!](https://releases.battlecode.org/specs/battlecode25/3.0.5/specs.md.html)
 
-[Documentation for Battlecode 2025 Python!](https://releases.battlecode.org/javadoc/battlecode25/3.0.5/index.html)
+The API for Battlecode Python is the same as Java. You can read the documentation [here](https://releases.battlecode.org/javadoc/battlecode25/3.0.5/index.html)
 
 `,
   "Coding Resources": `
@@ -57,11 +87,11 @@ All lectures are streamed live on and later uploaded to [our YouTube page](https
 };
 
 export const DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> = {
-  Debugging: `Debugging instructions coming soon!`,
+  Debugging: `With the current configuration of Battlecode Python, it is not possible for debugging programs to access your code. The easiest way to debug is using either print statements or the set_indicator_string, set_indicator_line, and set_indicator_dot functions.`,
 };
 
 export const COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
-  "Installation Issues": `Installation issue fixes coming soon!`,
+  "Installation Issues": `Installation issue fixes coming soon! If you run into any issues, please let us know in the Discord!`,
 };
 
 export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
