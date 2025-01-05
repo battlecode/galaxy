@@ -10,6 +10,7 @@ import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";
 import Table from "../../Table";
 import TableBottom from "../../TableBottom";
+import Button from "components/elements/Button";
 
 const SubmissionStatusDisplays: Record<StatusBccEnum, string> = {
   [StatusBccEnum.New]: "Created",
@@ -106,15 +107,13 @@ const SubHistoryTable: React.FC<SubHistoryTableProps> = ({
           header: "",
           key: "download",
           value: (sub) => (
-            <button
-              className="text-cyan-600 hover:underline"
+            <Button
+              variant="dark"
               onClick={() => {
                 downloadSubmission.mutate({ episodeId, id: sub.id.toString() });
               }}
-            >
-              {" "}
-              Download
-            </button>
+              label="Download"
+            />
           ),
         },
       ]}

@@ -1,6 +1,5 @@
 import type React from "react";
 import { Fragment } from "react";
-import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";
 import Table from "../../Table";
 import TableBottom from "../../TableBottom";
@@ -10,9 +9,9 @@ import RatingDelta from "../../compete/MatchRatingDelta";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { useUserTeam } from "api/team/useTeam";
-import { isNil } from "lodash";
 import { useUserScrimmageList } from "api/compete/useCompete";
 import { useQueryClient } from "@tanstack/react-query";
+import MatchReplayButton from "components/MatchReplayButton";
 
 interface ScrimHistoryTableProps {
   scrimsPage: number;
@@ -103,21 +102,9 @@ const ScrimHistoryTable: React.FC<ScrimHistoryTableProps> = ({
           {
             header: "Replay",
             key: "replay",
-            value: (match) =>
-              !episodeData.isSuccess || isNil(match.replay_url) ? (
-                <></>
-              ) : (
-                <NavLink
-                  className="text-cyan-600 hover:underline"
-                  to={`https://releases.battlecode.org/client/${
-                    episodeData.data.artifact_name ?? ""
-                  }/${
-                    episodeData.data.release_version_public ?? ""
-                  }/index.html?gameSource=${match.replay_url}`}
-                >
-                  Replay!
-                </NavLink>
-              ),
+            value: (match) => (
+              <MatchReplayButton episode={episodeData} match={match} />
+            ),
           },
           {
             header: "Created",

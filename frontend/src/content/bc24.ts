@@ -14,7 +14,7 @@ This is the Battlecode 2024 contest website, which will be your main hub for all
 To participate in Battlecode, you need an account and a team. Each team can consist of 1 to 4 people.
 
 [Create an account](/register) on this website, and then go to the [team section](/bc24/team) to either create or join a team.`,
-  Installation: `
+  "Installation and Setup": `
 
   Check [common issues](/bc24/common_issues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
 

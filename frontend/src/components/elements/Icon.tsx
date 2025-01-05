@@ -17,6 +17,8 @@ import {
   EyeIcon as EyeIcon24,
   EyeSlashIcon as EyeSlashIcon24,
   ShieldCheckIcon as ShieldCheckIcon24,
+  QuestionMarkCircleIcon as QuestionMarkCircleIcon24,
+  LightBulbIcon as LightBulbIcon24,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -37,6 +39,8 @@ import {
   EyeIcon as EyeIcon20,
   EyeSlashIcon as EyeSlashIcon20,
   ShieldCheckIcon as ShieldCheckIcon20,
+  QuestionMarkCircleIcon as QuestionMarkCircleIcon20,
+  LightBulbIcon as LightBulbIcon20,
 } from "@heroicons/react/20/solid";
 
 const icons24 = {
@@ -57,6 +61,8 @@ const icons24 = {
   eye: EyeIcon24,
   eye_slash: EyeSlashIcon24,
   shield_check: ShieldCheckIcon24,
+  question_mark_circle: QuestionMarkCircleIcon24,
+  light_bulb: LightBulbIcon24,
 };
 
 const icons20 = {
@@ -77,6 +83,8 @@ const icons20 = {
   eye: EyeIcon20,
   eye_slash: EyeSlashIcon20,
   shield_check: ShieldCheckIcon20,
+  question_mark_circle: QuestionMarkCircleIcon20,
+  light_bulb: LightBulbIcon20,
 };
 
 export type IconName = keyof typeof icons24;

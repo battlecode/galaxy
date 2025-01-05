@@ -9,9 +9,9 @@ import { dateTime } from "utils/dateTime";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 import { useUserTeam } from "api/team/useTeam";
-import { isNil } from "lodash";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTournamentMatchList } from "api/compete/useCompete";
+import MatchReplayButton from "components/MatchReplayButton";
 
 interface TournamentMatchesTableProps {
   tourneyPage: number;
@@ -94,21 +94,9 @@ const TournamentMatchesTable: React.FC<TournamentMatchesTableProps> = ({
           {
             header: "Replay",
             key: "replay",
-            value: (match) =>
-              !episodeData.isSuccess || isNil(match.replay_url) ? (
-                <></>
-              ) : (
-                <NavLink
-                  className="text-cyan-600 hover:underline"
-                  to={`https://releases.battlecode.org/client/${
-                    episodeData.data.artifact_name ?? ""
-                  }/${
-                    episodeData.data.release_version_public ?? ""
-                  }/index.html?gameSource=${match.replay_url}`}
-                >
-                  Replay!
-                </NavLink>
-              ),
+            value: (match) => (
+              <MatchReplayButton episode={episodeData} match={match} />
+            ),
           },
           {
             header: "Created",
