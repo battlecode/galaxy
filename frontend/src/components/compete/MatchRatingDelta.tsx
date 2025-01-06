@@ -30,7 +30,7 @@ const MatchRatingDelta: React.FC<RatingDeltaProps> = ({
      * We need this check for ranked matches against staff teams
      */
     participant.old_rating !== null ? Math.round(participant.old_rating) : 0;
-  const ratingDelta = Math.abs(newRating - oldRating);
+  const ratingDelta = newRating - oldRating;
 
   const includeName = includeTeamName === undefined || includeTeamName;
   return (

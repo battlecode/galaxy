@@ -25,7 +25,7 @@ const TeamWithRating: React.FC<TeamWithRatingProps> = ({
       const deltaClass =
         ratingDelta > 0
           ? "text-xs font-semibold slashed-zero text-green-700"
-          : rating < ratingDelta
+          : ratingDelta < 0
           ? "text-xs font-semibold slashed-zero text-red-700"
           : "text-xs font-semibold slashed-zero text-gray-700";
       return (
@@ -33,7 +33,7 @@ const TeamWithRating: React.FC<TeamWithRatingProps> = ({
           {" "}
           {includeTeamName && <span>{"("}</span>}
           {`${
-            ratingDelta > 0 ? " +" : ratingDelta < 0 ? " -" : " ±"
+            ratingDelta > 0 ? " +" : ratingDelta < 0 ? " " : " ±"
           }${ratingDelta.toFixed(0)}`}
           {includeTeamName && <span>{")"}</span>}
         </span>
