@@ -1,24 +1,20 @@
 import type React from "react";
-import { NavLink } from "react-router-dom";
 import { dateTime } from "../../utils/dateTime";
-import {
-  StatusBccEnum,
-  type PaginatedMatchList,
-  type Episode,
-} from "../../api/_autogen";
+import type { PaginatedMatchList, Episode } from "../../api/_autogen";
 import type { Maybe } from "../../utils/utilTypes";
 import Table from "../Table";
 import TableBottom from "../TableBottom";
 import MatchScore from "../compete/MatchScore";
 import MatchStatus from "../compete/MatchStatus";
 import RatingDelta from "../compete/MatchRatingDelta";
-import { isNil } from "lodash";
+import MatchReplayButton from "components/MatchReplayButton";
+import type { UseQueryResult } from "@tanstack/react-query";
 
 interface TournamentResultsTableProps {
   data: Maybe<PaginatedMatchList>;
   loading: boolean;
   page: number;
-  episode: Maybe<Episode>;
+  episode: UseQueryResult<Episode>;
   handlePage: (page: number) => void;
 }
 
@@ -84,23 +80,7 @@ const TournamentResultsTable: React.FC<TournamentResultsTableProps> = ({
       {
         header: "Replay",
         key: "replay",
-        value: (match) =>
-          isNil(episode) ||
-          match.status !== StatusBccEnum.Ok ||
-          isNil(match.replay_url) ? (
-            <></>
-          ) : (
-            <NavLink
-              className="text-cyan-600 hover:underline"
-              to={`https://releases.battlecode.org/client/${
-                episode.artifact_name ?? ""
-              }/${episode.release_version_public ?? ""}/visualizer.html?${
-                match.replay_url
-              }`}
-            >
-              Replay!
-            </NavLink>
-          ),
+        value: (match) => <MatchReplayButton episode={episode} match={match} />,
       },
       {
         header: "Created",

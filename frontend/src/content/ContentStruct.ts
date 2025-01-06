@@ -1,7 +1,7 @@
 export enum QuickStartPage {
   OVERVIEW = "Overview",
   ACCOUNT_AND_TEAM_CREATION = "Account and Team Creation",
-  INSTALLATION = "Installation",
+  INSTALLATION_AND_SETUP = "Installation and Setup",
   RESOURCES = "Resources",
   JOIN_THE_COMMUNITY = "Join the Community!",
 }

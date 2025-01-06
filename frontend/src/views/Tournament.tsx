@@ -44,7 +44,7 @@ const TournamentPage: React.FC = () => {
     label: string;
   } | null>(null);
 
-  const { data: episode } = useEpisodeInfo({
+  const episode = useEpisodeInfo({
     id: episodeId,
   });
   const tourneyData = useTournamentInfo({
@@ -66,17 +66,17 @@ const TournamentPage: React.FC = () => {
     excludes: EligibilityCriterion[];
     isEligible: boolean;
   } = useMemo(() => {
-    if (episode === undefined || tourneyData.data === undefined) {
+    if (!episode.isSuccess || !tourneyData.isSuccess) {
       return { includes: [], excludes: [], isEligible: false };
     }
 
     const includes = getEligibilities(
-      episode.eligibility_criteria,
+      episode.data.eligibility_criteria,
       tourneyData.data.eligibility_includes ?? [],
     );
 
     const excludes = getEligibilities(
-      episode.eligibility_criteria,
+      episode.data.eligibility_criteria,
       tourneyData.data.eligibility_excludes ?? [],
     );
 

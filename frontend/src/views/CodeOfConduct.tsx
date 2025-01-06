@@ -1,4 +1,3 @@
-import { PageTitle } from "components/elements/BattlecodeStyle";
 import Markdown from "components/elements/Markdown";
 import SectionCard from "components/SectionCard";
 
@@ -32,9 +31,8 @@ Particularly, sharing bot code between teams falls under this clause, and is thu
 `;
 
 const CodeOfConduct: React.FC = () => (
-  <div className="flex h-full w-full flex-col overflow-y-auto  p-6">
+  <div className="flex h-full w-full flex-col overflow-y-auto p-6">
     <div className="flex flex-1 flex-col gap-8">
-      <PageTitle>Code of Conduct</PageTitle>
       <SectionCard title="Environment">
         <Markdown text={ENVIRONMENT} />
       </SectionCard>

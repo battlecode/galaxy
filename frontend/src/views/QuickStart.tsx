@@ -31,7 +31,7 @@ const QuickStart: React.FC = () => {
         />
 
         <OptionalSectionCardMarkdown
-          title={QuickStartPage.INSTALLATION}
+          title={QuickStartPage.INSTALLATION_AND_SETUP}
           textRecord={currentQuickStartText}
         />
 
