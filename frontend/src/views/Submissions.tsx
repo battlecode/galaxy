@@ -19,13 +19,8 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
-<<<<<<< Updated upstream
 import { useUserTeam } from "api/team/useTeam";
-import { Status526Enum } from "api/_autogen";
-=======
-import { PageTitle } from "components/elements/BattlecodeStyle";
-import { LanguageEnum } from "api/_autogen";
->>>>>>> Stashed changes
+import { Status526Enum, LanguageEnum } from "api/_autogen";
 
 interface SubmissionFormInput {
   file: FileList;
@@ -171,7 +166,7 @@ const CodeSubmission: React.FC = () => {
   if (episode.data.language === LanguageEnum.Py3) {
     return (
       <div>
-        <p>Submit your PYTHON code using the button below.</p>
+        <p>Submit your python code using the button below.</p>
         <p>
           Create a{" "}
           <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
@@ -181,15 +176,13 @@ const CodeSubmission: React.FC = () => {
           should be a zip file containing a single folder (which is your package
           name), which should contain{" "}
           <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
-            RobotPlayer.java
+            bot.py
           </span>{" "}
           and any other code you have written, for example:
         </p>
         <span className="w-full">
           <p className="rounded-md border border-gray-400 bg-gray-100 px-4 py-3 font-mono">
-            {
-              "submission.zip --> examplefuncsplayer --> RobotPlayer.java, FooBar.java"
-            }
+            {"submission.zip --> examplefuncsplayer --> bot.py, utils.py"}
           </p>
         </span>
         <form
@@ -239,49 +232,13 @@ const CodeSubmission: React.FC = () => {
             loading={uploadSub.isPending}
             disabled={uploadSub.isPending || !isDirty}
           />
-<<<<<<< Updated upstream
-        </div>
-        <div className="flex w-full flex-row items-end gap-10">
-          <Input
-            className="w-1/3"
-            label="Package Name (i.e. where is RobotPlayer?)"
-            required
-            errorMessage={errors.packageName?.message}
-            {...register("packageName", {
-              required: FIELD_REQUIRED_ERROR_MSG,
-            })}
-          />
-          <Input
-            className="w-2/3"
-            label="Description (for your reference)"
-            required
-            errorMessage={errors.description?.message}
-            {...register("description", {
-              required: FIELD_REQUIRED_ERROR_MSG,
-            })}
-          />
-        </div>
-        <Button
-          className={`max-w-sm ${
-            uploadSub.isPending || !isDirty ? "disabled cursor-not-allowed" : ""
-          }`}
-          variant="dark"
-          label="Submit"
-          type="submit"
-          loading={uploadSub.isPending}
-          disabled={uploadSub.isPending || !isDirty}
-        />
-      </form>
-    </div>
-  );
-=======
         </form>
       </div>
     );
   } else {
     return (
       <div>
-        <p>Submit your code using the button below.</p>
+        <p>Submit your java code using the button below.</p>
         <p>
           Create a{" "}
           <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
@@ -353,7 +310,6 @@ const CodeSubmission: React.FC = () => {
       </div>
     );
   }
->>>>>>> Stashed changes
 };
 
 export default Submissions;
