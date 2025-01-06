@@ -1,17 +1,13 @@
 import type React from "react";
-import { Fragment, useMemo } from "react";
+import { Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
 import Icon from "./elements/Icon";
 import { useEpisodeId } from "../contexts/EpisodeContext";
-import { ALL_SIDEBAR_ITEMS, renderableItems } from "./sidebar";
 import EpisodeSwitcher from "./EpisodeSwitcher";
 import { logout } from "../api/auth/authApi";
 import { useQueryClient } from "@tanstack/react-query";
-import { useUserTeam } from "api/team/useTeam";
-import { useEpisodeInfo } from "api/episode/useEpisode";
-
 interface HeaderProps {
   toggleSidebar: () => void;
 }
@@ -22,24 +18,17 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const teamData = useUserTeam({ episodeId });
-  const episodeData = useEpisodeInfo({ id: episodeId });
-
-  const renderedItems = useMemo(
-    () => renderableItems(ALL_SIDEBAR_ITEMS, episodeData, authState, teamData),
-    [episodeData, teamData, authState],
-  );
-
   return (
     <nav className="fixed top-0 z-30 h-16 w-full bg-gray-700">
       <div className="w-full px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
-          {/* mobile menu */}
-          <button
-          className="z-20"
-          onClick={toggleSidebar}
-          >
-            <Icon name="bars_3" className="text-gray-300 hover:text-white" size="lg" />
+          {/* sidebar button */}
+          <button className="z-20" onClick={toggleSidebar}>
+            <Icon
+              name="bars_3"
+              className="text-gray-300 hover:text-white"
+              size="lg"
+            />
           </button>
           {/* <Menu>
             <div className="absolute inset-y-0 left-3 flex items-center sm:hidden">

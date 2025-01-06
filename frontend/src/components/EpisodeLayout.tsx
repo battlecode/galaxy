@@ -19,9 +19,10 @@ const EpisodeLayout: React.FC = () => {
 
   // Detect screen size and set default collapsed value
   const isLargeScreen = window.matchMedia("(min-width: 640px)").matches;
-  const defaultCollapsed = Cookies.get("sidebar-collapsed") === undefined
-    ? !isLargeScreen
-    : Cookies.get("sidebar-collapsed") === "true";
+  const defaultCollapsed =
+    Cookies.get("sidebar-collapsed") === undefined
+      ? !isLargeScreen
+      : Cookies.get("sidebar-collapsed") === "true";
 
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
 
