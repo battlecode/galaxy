@@ -13,17 +13,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var java8WinnerRegex = regexp.MustCompile(`(?m)^\[server\]\s*.*\(([AB])\) wins \(round [0-9]+\)$`)
+var javaWinnerRegex = regexp.MustCompile(`(?m)^\[server\]\s*.*\(([AB])\) wins \(round [0-9]+\)$`)
 
-type Java8Scaffold struct {
+type JavaScaffold struct {
 	Scaffold
 	matchOutputs map[*StepArguments]string
+	javaEnv      []string
 }
 
-func NewJava8Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string) (*Java8Scaffold, error) {
-	s := new(Java8Scaffold)
+func NewJavaScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, javaPath string) (*JavaScaffold, error) {
+	s := new(JavaScaffold)
 	s.root = root
 	s.repo = repo
+	s.javaEnv = []string{fmt.Sprintf("JAVA_HOME=%s", javaPath)}
 	s.compile = Recipe{
 		&StateVersion,
 		s.Prepare(),
@@ -44,7 +46,7 @@ func NewJava8Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Rep
 	return s, nil
 }
 
-func (s *Java8Scaffold) Prepare() *Step {
+func (s *JavaScaffold) Prepare() *Step {
 	return &Step{
 		Name: "Prepare scaffold",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
@@ -60,6 +62,7 @@ func (s *Java8Scaffold) Prepare() *Step {
 			log.Ctx(ctx).Debug().Msg("Updating distribution.")
 			out, err := s.Scaffold.RunCommand(
 				ctx,
+				s.javaEnv,
 				"./gradlew",
 				"update",
 				fmt.Sprintf("-PonSaturn=%t", true),
@@ -73,7 +76,7 @@ func (s *Java8Scaffold) Prepare() *Step {
 	}
 }
 
-func (s *Java8Scaffold) DownloadSource() *Step {
+func (s *JavaScaffold) DownloadSource() *Step {
 	return &Step{
 		Name: "Download source code",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
@@ -83,7 +86,7 @@ func (s *Java8Scaffold) DownloadSource() *Step {
 	}
 }
 
-func (s *Java8Scaffold) DownloadBinaries() *Step {
+func (s *JavaScaffold) DownloadBinaries() *Step {
 	return &Step{
 		Name: "Download binary",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
@@ -102,7 +105,7 @@ func (s *Java8Scaffold) DownloadBinaries() *Step {
 	}
 }
 
-func (s *Java8Scaffold) UploadBinary() *Step {
+func (s *JavaScaffold) UploadBinary() *Step {
 	return &Step{
 		Name: "Upload binary",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
@@ -112,7 +115,7 @@ func (s *Java8Scaffold) UploadBinary() *Step {
 	}
 }
 
-func (s *Java8Scaffold) UploadReplay() *Step {
+func (s *JavaScaffold) UploadReplay() *Step {
 	return &Step{
 		Name: "Upload replay",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
@@ -125,7 +128,7 @@ func (s *Java8Scaffold) UploadReplay() *Step {
 	}
 }
 
-func (s *Java8Scaffold) VerifySubmission() *Step {
+func (s *JavaScaffold) VerifySubmission() *Step {
 	return &Step{
 		Name: "Build source code",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
@@ -138,6 +141,7 @@ func (s *Java8Scaffold) VerifySubmission() *Step {
 			}
 			out, err := s.Scaffold.RunCommand(
 				ctx,
+				s.javaEnv,
 				"./gradlew",
 				"verify",
 				fmt.Sprintf("-Pteam=%s", pkg),
@@ -154,7 +158,7 @@ func (s *Java8Scaffold) VerifySubmission() *Step {
 	}
 }
 
-func (s *Java8Scaffold) CompileSucceeded() *Step {
+func (s *JavaScaffold) CompileSucceeded() *Step {
 	return &Step{
 		Name: "Compile succeeded",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
@@ -166,12 +170,13 @@ func (s *Java8Scaffold) CompileSucceeded() *Step {
 	}
 }
 
-func (s *Java8Scaffold) RunMatch() *Step {
+func (s *JavaScaffold) RunMatch() *Step {
 	return &Step{
 		Name: "Run match",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
 			out, err := s.Scaffold.RunCommand(
 				ctx,
+				s.javaEnv,
 				"./gradlew",
 				"run",
 				fmt.Sprintf("-PonSaturn=%t", true),
@@ -197,7 +202,7 @@ func (s *Java8Scaffold) RunMatch() *Step {
 	}
 }
 
-func (s *Java8Scaffold) DetermineScores() *Step {
+func (s *JavaScaffold) DetermineScores() *Step {
 	return &Step{
 		Name: "Determine scores",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
@@ -208,7 +213,7 @@ func (s *Java8Scaffold) DetermineScores() *Step {
 			defer delete(s.matchOutputs, arg)
 
 			scores := []int{0, 0}
-			for _, match := range java8WinnerRegex.FindAllSubmatch([]byte(out), -1) {
+			for _, match := range javaWinnerRegex.FindAllSubmatch([]byte(out), -1) {
 				if len(match) != 2 || len(match[1]) != 1 {
 					return fmt.Errorf("could not determine winner: logs are unreadable")
 				}
