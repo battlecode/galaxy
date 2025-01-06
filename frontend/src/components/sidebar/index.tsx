@@ -11,7 +11,6 @@ interface SidebarProps {
 }
 
 enum UserAuthLevel {
-  ONLY_LOGGED_OUT,
   LOGGED_OUT,
   LOGGED_IN_NO_TEAM,
   LOGGED_IN_HAS_TEAM,
@@ -123,28 +122,10 @@ const TEAM_MANAGEMENT_ITEMS: SidebarItemData[] = [
   },
 ];
 
-const MOBILE_USER_ITEMS: SidebarItemData[] = [
-  {
-    iconName: "user_circle",
-    text: "Login",
-    linkTo: "login",
-    requireGameReleased: false,
-    userAuthLevel: UserAuthLevel.ONLY_LOGGED_OUT,
-  },
-  {
-    iconName: "user_plus",
-    text: "Register",
-    linkTo: "register",
-    requireGameReleased: false,
-    userAuthLevel: UserAuthLevel.ONLY_LOGGED_OUT,
-  },
-];
-
 export const ALL_SIDEBAR_ITEMS: SidebarItemData[] = [
   ...GENERAL_ITEMS,
   ...COMPETE_ITEMS,
   ...TEAM_MANAGEMENT_ITEMS,
-  ...MOBILE_USER_ITEMS,
 ];
 
 export const renderableItems = (
@@ -171,8 +152,6 @@ export const renderableItems = (
       itemData.userAuthLevel > UserAuthLevel.LOGGED_IN_NO_TEAM &&
       !userHasTeam
     )
-      return false;
-    if (itemData.userAuthLevel === UserAuthLevel.ONLY_LOGGED_OUT && loggedIn)
       return false;
 
     return true;
@@ -202,12 +181,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
             title="team management"
             items={TEAM_MANAGEMENT_ITEMS}
           />
-          <div className="sm:hidden">
-            <SidebarSection
-              title="login management"
-              items={MOBILE_USER_ITEMS}
-            />
-          </div>
         </motion.nav>
       )}
     </AnimatePresence>
