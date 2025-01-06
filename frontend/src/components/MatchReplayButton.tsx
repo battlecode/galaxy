@@ -29,7 +29,7 @@ const MatchReplayButton: React.FC<MatchReplayButtonProps> = ({
           `https://releases.battlecode.org/client/${
             episode.data?.artifact_name ?? ""
           }/${
-            episode.data?.release_version_public ?? ""
+            episode.data?.release_version_client ?? ""
           }/index.html?gameSource=${match?.replay_url}`,
           "_blank",
         );

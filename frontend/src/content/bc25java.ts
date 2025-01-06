@@ -85,9 +85,9 @@ You can run games directly from the terminal with the gradle task \`./gradlew ru
 export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
   "Game Specifications": `
 
-[Specifications for Battlecode 2025 Java!](https://releases.battlecode.org/specs/battlecode25/3.0.5/specs.md.html)
+[Specifications for Battlecode 2025 Java!](https://releases.battlecode.org/specs/battlecode25/1.0.0/specs.pdf)
 
-[Javadocs for Battlecode 2025 Java!](https://releases.battlecode.org/javadoc/battlecode25/3.0.5/index.html)
+[Javadocs for Battlecode 2025 Java!](https://releases.battlecode.org/javadoc/battlecode25/1.0.0/index.html)
 
 `,
   "Coding Resources": `
