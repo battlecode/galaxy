@@ -20,13 +20,13 @@ To participate in Battlecode, you need an account and a team. Each team can cons
 
 [Create an account](/register) on this website, and then go to the [team section](/bc25python/team) to either create or join a team.`,
 
-"Installation and Setup": `
+  "Installation and Setup": `
 
 Check [common issues](/bc25python/common_issues/) if you experience problems with the instructions below, and if that doesn't help, ask on the Discord.
 
 ### Step 1: Install Python
 
-You'll need Python 3.12. Other versions will not work. [Download it here](https://www.python.org/downloads/). Once you have installed Python, make sure this Python installation is the one you are using when you run Battlecode (you can check the version with python --version).
+You'll need Python 3.12. Other versions will not work. [Download it here](https://www.python.org/downloads/release/python-3128/). Once you have installed Python, make sure this Python installation is the one you are using when you run Battlecode (you can check the version with python --version).
 
 ### Step 2: Download Battlecode
 
@@ -39,7 +39,7 @@ You can work on Battlecode using any text editor or Python IDE. It's easiest to 
 
 First, go to the python folder in the scaffold. The run.py script lets you do all the tasks you might need to do for Battlecode, like installing new engine / client versions, running your bot, and zipping your bot to submit. To install the engine and client, run \`python ./run.py update\`.
 
-There should now be a folder called \`client\` in your scaffold folder; if you go in there, and double click the \`Battlecode Client\` application, you should be able to run and watch matches. (Please don't move that application, it will be sad.) If you notice any severe issues with the default client, you can try setting the \`compatibility_client\` property to true in properties.json and updating the client.
+There should now be a folder called \`client\` in your scaffold folder; if you go in there, and double click the \`Battlecode Client\` application, you should be able to run and watch matches. (Please don't move that application, it will be sad). If you notice any severe issues with the default client, you can try setting the \`compatibility_client\` property to true in \`properties.json\` and updating the client.
 
 ### Developing Your Bot
 Place each version of your robot in a new subfolder in the \`src\` folder. Make sure every version has a \`bot.py\`.
@@ -56,12 +56,12 @@ export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
 
 [Specifications for Battlecode 2025 Python!](https://releases.battlecode.org/specs/battlecode25/3.0.5/specs.md.html)
 
-The API for Battlecode Python is the same as Java. You can read the documentation [here](https://releases.battlecode.org/javadoc/battlecode25/3.0.5/index.html)
+The API for Battlecode Python is the same as Java. You can read the documentation [here](https://releases.battlecode.org/javadoc/battlecode25/3.0.5/index.html).
 
 `,
   "Coding Resources": `
 
-If you're just starting out, check out the [quick start](/bc25python/quickstart) page!
+If you're just starting out, check out the [quick start](/bc25python/quick_start) page!
 
 For more helpful resources while coding, see:
 
@@ -87,7 +87,7 @@ All lectures are streamed live on and later uploaded to [our YouTube page](https
 };
 
 export const DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> = {
-  Debugging: `With the current configuration of Battlecode Python, it is not possible for debugging programs to access your code. The easiest way to debug is using either print statements or the set_indicator_string, set_indicator_line, and set_indicator_dot functions.`,
+  Debugging: `With the current configuration of Battlecode Python, it is not possible for debugging programs to access your code. The easiest way to debug is using either \`print\` statements or the \`set_indicator_string\`, \`set_indicator_line\`, and \`set_indicator_dot\` functions.`,
 };
 
 export const COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
