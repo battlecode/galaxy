@@ -58,7 +58,7 @@ func (s *Python3Scaffold) Prepare() *Step {
 				ctx,
 				[]string{},
 				s.pyVersion,
-                "run.py",
+				"run.py",
 				"update",
 				fmt.Sprintf("--on-saturn=%t", true),
 			)
@@ -165,7 +165,7 @@ func (s *Python3Scaffold) RunMatch() *Step {
 				ctx,
 				[]string{},
 				s.pyVersion,
-                "run.py",
+				"run.py",
 				"run",
 				fmt.Sprintf("--on-saturn=%t", true),
 				fmt.Sprintf("--p1-team=%s", arg.Details.(ExecuteRequest).A.TeamName),
