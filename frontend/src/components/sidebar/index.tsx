@@ -6,10 +6,11 @@ import { type Episode, type TeamPrivate, Status526Enum } from "api/_autogen";
 import { type AuthState, AuthStateEnum } from "contexts/CurrentUserContext";
 
 interface SidebarProps {
-  collapsed?: boolean;
+  collapsed: boolean;
 }
 
 enum UserAuthLevel {
+  ONLY_LOGGED_OUT,
   LOGGED_OUT,
   LOGGED_IN_NO_TEAM,
   LOGGED_IN_HAS_TEAM,
@@ -121,10 +122,28 @@ const TEAM_MANAGEMENT_ITEMS: SidebarItemData[] = [
   },
 ];
 
+const MOBILE_USER_ITEMS: SidebarItemData[] = [
+  {
+    iconName: "play_circle",
+    text: "Login",
+    linkTo: "login",
+    requireGameReleased: false,
+    userAuthLevel: UserAuthLevel.ONLY_LOGGED_OUT,
+  },
+  {
+    iconName: "play_circle",
+    text: "Register",
+    linkTo: "register",
+    requireGameReleased: false,
+    userAuthLevel: UserAuthLevel.ONLY_LOGGED_OUT,
+  }
+];
+
 export const ALL_SIDEBAR_ITEMS: SidebarItemData[] = [
   ...GENERAL_ITEMS,
   ...COMPETE_ITEMS,
   ...TEAM_MANAGEMENT_ITEMS,
+  ...MOBILE_USER_ITEMS
 ];
 
 export const renderableItems = (
@@ -152,19 +171,29 @@ export const renderableItems = (
       !userHasTeam
     )
       return false;
+    if (itemData.userAuthLevel === UserAuthLevel.ONLY_LOGGED_OUT && loggedIn)
+      return false;
 
     return true;
   });
 };
 
 // IMPORTANT: When changing this file, also remember to change the mobile menu that appears on small screens.
-const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) =>
-  collapsed ? null : (
-    <nav className="fixed top-16 z-10 hidden h-full w-60 flex-col gap-8 overflow-y-auto bg-gray-50 pb-24 pt-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">
-      <SidebarSection title="" items={GENERAL_ITEMS} />
-      <SidebarSection title="compete" items={COMPETE_ITEMS} />
-      <SidebarSection title="team management" items={TEAM_MANAGEMENT_ITEMS} />
-    </nav>
-  );
-
+const Sidebar: React.FC<SidebarProps> = ({ collapsed }) =>
+    <>
+      {collapsed ? null : (
+        <nav
+          className={`fixed top-16 z-10 h-full w-60 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] flex
+          } `}
+        >
+          <SidebarSection title="" items={GENERAL_ITEMS} />
+          <SidebarSection title="compete" items={COMPETE_ITEMS} />
+          <SidebarSection title="team management" items={TEAM_MANAGEMENT_ITEMS} />
+          <div className="sm:hidden">
+            <SidebarSection title="login management" items={MOBILE_USER_ITEMS} />
+          </div>
+        </nav>
+      )}
+    </>
+;
 export default Sidebar;

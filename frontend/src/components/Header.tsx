@@ -12,7 +12,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useUserTeam } from "api/team/useTeam";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  toggleSidebar: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const { authState, user } = useCurrentUser();
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
@@ -31,8 +35,14 @@ const Header: React.FC = () => {
       <div className="w-full px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           {/* mobile menu */}
-          <Menu>
-            <div className="absolute inset-y-0 left-0 flex items-center sm:hidden md:left-3">
+          <button
+          className="z-20"
+          onClick={toggleSidebar}
+          >
+            <Icon name="bars_3" className="text-gray-300 hover:text-white" size="lg" />
+          </button>
+          {/* <Menu>
+            <div className="absolute inset-y-0 left-3 flex items-center sm:hidden">
               <Menu.Button className="rounded-md px-1 py-1.5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                 <span className="sr-only">Open main menu</span>
                 <Icon
@@ -90,7 +100,7 @@ const Header: React.FC = () => {
                 )}
               </Menu.Items>
             </Transition>
-          </Menu>
+          </Menu> */}
           {/* battlecode logo, episode select */}
           <div className="flex flex-1 items-center justify-center space-x-4 sm:items-stretch sm:justify-start">
             <div
