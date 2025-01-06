@@ -2,7 +2,6 @@ import type React from "react";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 import ResponsiveIframe from "components/ResponsiveIframe";
 import { useEpisodeId } from "contexts/EpisodeContext";
-import Collapse from "components/elements/Collapse";
 import { useUserScrimmageList } from "api/compete/useCompete";
 import { useQueryClient } from "@tanstack/react-query";
 import SelectMenu from "components/elements/SelectMenu";
@@ -28,6 +27,7 @@ const Client: React.FC = () => {
     queryClient,
   );
 
+  // TODO: forward and backward compatible client URLs (and a /latest endpoint)
   const url = `https://releases.battlecode.org/client/${
     episode.data?.artifact_name ?? ""
   }/${episode.data?.release_version_public ?? ""}/index.html${
@@ -38,7 +38,7 @@ const Client: React.FC = () => {
     match: Match,
   ): {
     value: number;
-    label: JSX.Element;
+    label: React.JSX.Element;
   } => {
     const opponent = match.participants?.find(
       (p) => p.team !== userTeam.data?.id,
