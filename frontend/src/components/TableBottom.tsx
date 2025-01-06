@@ -1,6 +1,6 @@
 import type React from "react";
 import Icon from "./elements/Icon";
-import { useEffect, useRef } from "react";
+import { useMemo, useRef } from "react";
 
 interface TableBottomProps {
   totalCount: number;
@@ -17,11 +17,23 @@ const TableBottom: React.FC<TableBottomProps> = ({
   currentPage,
   onPage,
 }) => {
-  const displayCount = useRef(totalCount);
+  const prevCount = useRef(totalCount);
+
+  const stabilizedDisplayCount: number = useMemo(() => {
+    // While we are reloading the query, we want to display the previous count.
+    if (totalCount < prevCount.current) {
+      return prevCount.current;
+    } else if (totalCount > prevCount.current) {
+      prevCount.current = totalCount; // Update the previous count.
+      return totalCount;
+    } else {
+      return totalCount;
+    }
+  }, [totalCount]);
 
   const first = (currentPage - 1) * pageSize + 1;
-  const last = Math.min(currentPage * pageSize, displayCount.current);
-  const pageCount = Math.ceil(displayCount.current / pageSize);
+  const last = Math.min(currentPage * pageSize, stabilizedDisplayCount);
+  const pageCount = Math.ceil(stabilizedDisplayCount / pageSize);
 
   const backDisabled = currentPage <= 1;
   const forwardDisabled = currentPage >= pageCount;
@@ -81,12 +93,6 @@ const TableBottom: React.FC<TableBottomProps> = ({
     }
   }
 
-  useEffect(() => {
-    if (totalCount !== displayCount.current && totalCount !== 0) {
-      displayCount.current = totalCount;
-    }
-  }, [totalCount]);
-
   return (
     <nav
       className="flex h-full w-full flex-row items-center justify-between gap-2 px-3 py-2 md:px-10"
@@ -100,7 +106,7 @@ const TableBottom: React.FC<TableBottomProps> = ({
         </span>{" "}
         of{" "}
         <span className="font-semibold text-gray-900">
-          {displayCount.current}
+          {stabilizedDisplayCount}
         </span>
       </span>
 
@@ -111,7 +117,7 @@ const TableBottom: React.FC<TableBottomProps> = ({
         </span>{" "}
         /{" "}
         <span className="font-semibold text-gray-900">
-          {displayCount.current}
+          {stabilizedDisplayCount}
         </span>
       </span>
 

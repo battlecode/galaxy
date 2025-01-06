@@ -34,7 +34,7 @@ const TeamWithRating: React.FC<TeamWithRatingProps> = ({
           {" "}
           {includeTeamName && <span>{"("}</span>}
           {`${
-            ratingDelta > 0 ? " +" : ratingDelta < 0 ? " " : " ±"
+            ratingDelta > 0 ? "+" : ratingDelta < 0 ? "" : "±"
           }${ratingDelta.toFixed(0)}`}
           {includeTeamName && <span>{")"}</span>}
         </span>
