@@ -1,8 +1,8 @@
 import type React from "react";
 import SidebarSection from "./SidebarSection";
 import type { IconName } from "../elements/Icon";
-import type { Episode, TeamPrivate } from "api/_autogen";
 import type { UseQueryResult } from "@tanstack/react-query";
+import { type Episode, type TeamPrivate, Status526Enum } from "api/_autogen";
 import { type AuthState, AuthStateEnum } from "contexts/CurrentUserContext";
 
 interface SidebarProps {
@@ -132,10 +132,12 @@ export const renderableItems = (
   const loggedIn = authState === AuthStateEnum.AUTHENTICATED;
 
   const userHasTeam = userTeam.isSuccess;
+  const staffTeam = userTeam.data?.status === Status526Enum.S;
 
   return items.filter((itemData) => {
     // Ensure that we are allowed to render this item
-    if (itemData.requireGameReleased && !gameReleased) return false;
+    if (!staffTeam && itemData.requireGameReleased && !gameReleased)
+      return false;
     if (itemData.userAuthLevel > UserAuthLevel.LOGGED_OUT && !loggedIn)
       return false;
     if (
