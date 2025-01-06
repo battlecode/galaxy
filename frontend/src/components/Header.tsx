@@ -30,66 +30,6 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
               size="lg"
             />
           </button>
-          {/* <Menu>
-            <div className="absolute inset-y-0 left-3 flex items-center sm:hidden">
-              <Menu.Button className="rounded-md px-1 py-1.5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
-                <span className="sr-only">Open main menu</span>
-                <Icon
-                  name="bars_3"
-                  className="text-gray-300 hover:text-white"
-                  size="lg"
-                />
-              </Menu.Button>
-            </div>
-            <Transition
-              as={Fragment}
-              leave="transition ease-in duration-100"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <Menu.Items className="absolute left-1 top-12 z-10 mt-2 w-64 gap-2 rounded-md bg-white p-2 font-light shadow-lg sm:hidden">
-                {renderedItems.map(({ iconName, text, linkTo }, index) => (
-                  <Menu.Item key={index}>
-                    <NavLink
-                      className={({ isActive }) =>
-                        "flex items-center gap-3 rounded-lg py-2 pl-1.5 pr-8 text-base " +
-                        (isActive
-                          ? "cursor-default text-cyan-600"
-                          : "text-gray-800 ui-active:bg-gray-500 ui-active:text-gray-100")
-                      }
-                      to={`/${episodeId}/${linkTo}`}
-                    >
-                      <Icon name={iconName} size="md" />
-                      {text}
-                    </NavLink>
-                  </Menu.Item>
-                ))}
-
-                {authState === AuthStateEnum.NOT_AUTHENTICATED && (
-                  <>
-                    <hr className="m-2" />
-                    <Menu.Item as="div" className="w-full pb-2 pt-1">
-                      <Link
-                        to="/login"
-                        className="rounded-full px-2.5 text-cyan-600 ring-0 hover:bg-gray-100/10"
-                      >
-                        Log in
-                      </Link>
-                    </Menu.Item>
-                    <hr className="m-2" />
-                    <Menu.Item as="div" className="w-full pb-2 pt-1">
-                      <Link
-                        to="/register"
-                        className="rounded-full px-2.5 text-cyan-600 ring-0 hover:bg-gray-100/10"
-                      >
-                        Register
-                      </Link>
-                    </Menu.Item>
-                  </>
-                )}
-              </Menu.Items>
-            </Transition>
-          </Menu> */}
           {/* battlecode logo, episode select */}
           <div className="flex flex-1 items-center justify-center space-x-4 sm:items-stretch sm:justify-start">
             <div

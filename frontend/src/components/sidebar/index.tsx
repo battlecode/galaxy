@@ -125,14 +125,14 @@ const TEAM_MANAGEMENT_ITEMS: SidebarItemData[] = [
 
 const MOBILE_USER_ITEMS: SidebarItemData[] = [
   {
-    iconName: "play_circle",
+    iconName: "user_circle",
     text: "Login",
     linkTo: "login",
     requireGameReleased: false,
     userAuthLevel: UserAuthLevel.ONLY_LOGGED_OUT,
   },
   {
-    iconName: "play_circle",
+    iconName: "user_plus",
     text: "Register",
     linkTo: "register",
     requireGameReleased: false,
@@ -194,7 +194,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
           animate="open"
           exit="closed"
           variants={sidebarVariants}
-          className="fixed top-16 z-10 flex h-full w-60 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)]"
+          className="fixed top-16 z-10 flex h-[calc(100%-4rem)] w-60 flex-col gap-8 overflow-y-auto rounded-br-xl rounded-tr-xl bg-gray-50 py-4 shadow-lg"
         >
           <SidebarSection title="" items={GENERAL_ITEMS} />
           <SidebarSection title="compete" items={COMPETE_ITEMS} />
