@@ -1,4 +1,5 @@
 import type React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import SidebarSection from "./SidebarSection";
 import type { IconName } from "../elements/Icon";
 import type { UseQueryResult } from "@tanstack/react-query";
@@ -179,21 +180,38 @@ export const renderableItems = (
 };
 
 // IMPORTANT: When changing this file, also remember to change the mobile menu that appears on small screens.
-const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => (
-  <>
-    {collapsed ? null : (
-      <nav
-        className={`} fixed top-16 z-10 flex h-full w-60 flex-col gap-8 bg-gray-50 py-4
-          drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] `}
-      >
-        <SidebarSection title="" items={GENERAL_ITEMS} />
-        <SidebarSection title="compete" items={COMPETE_ITEMS} />
-        <SidebarSection title="team management" items={TEAM_MANAGEMENT_ITEMS} />
-        <div className="sm:hidden">
-          <SidebarSection title="login management" items={MOBILE_USER_ITEMS} />
-        </div>
-      </nav>
-    )}
-  </>
-);
+const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
+  const sidebarVariants = {
+    open: { x: 0, transition: { duration: 0.5, ease: "easeInOut" } },
+    closed: { x: "-100%", transition: { duration: 0.5, ease: "easeInOut" } },
+  };
+
+  return (
+    <AnimatePresence>
+      {!collapsed && (
+        <motion.nav
+          initial="closed"
+          animate="open"
+          exit="closed"
+          variants={sidebarVariants}
+          className="fixed top-16 z-10 flex h-full w-60 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)]"
+        >
+          <SidebarSection title="" items={GENERAL_ITEMS} />
+          <SidebarSection title="compete" items={COMPETE_ITEMS} />
+          <SidebarSection
+            title="team management"
+            items={TEAM_MANAGEMENT_ITEMS}
+          />
+          <div className="sm:hidden">
+            <SidebarSection
+              title="login management"
+              items={MOBILE_USER_ITEMS}
+            />
+          </div>
+        </motion.nav>
+      )}
+    </AnimatePresence>
+  );
+};
+
 export default Sidebar;

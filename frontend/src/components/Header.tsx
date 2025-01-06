@@ -23,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       <div className="w-full px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           {/* sidebar button */}
-          <button className="z-20" onClick={toggleSidebar}>
+          <button className="z-20 mr-4 p-2" onClick={toggleSidebar}>
             <Icon
               name="bars_3"
               className="text-gray-300 hover:text-white"

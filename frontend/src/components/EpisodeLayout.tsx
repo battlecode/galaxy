@@ -1,4 +1,5 @@
 import type React from "react";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import Header from "./Header";
 import Sidebar from "./sidebar";
@@ -31,14 +32,21 @@ const EpisodeLayout: React.FC = () => {
     setCollapsed(newCollapsedState);
     Cookies.set("sidebar-collapsed", newCollapsedState.toString());
   };
-
+  const SIDEBAR_WIDTH = 240;
   return (
     <div className="h-screen bg-gray-200/80">
       <Header toggleSidebar={toggleSidebar} />
       <Sidebar collapsed={collapsed} />
-      <div className="h-full pt-16 sm:pl-60">
+      <motion.div
+        className="h-full pt-16"
+        initial={false}
+        animate={{
+          paddingLeft: collapsed ? 0 : SIDEBAR_WIDTH, // Assuming sidebar width is 240px
+        }}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
+      >
         <Outlet />
-      </div>
+      </motion.div>
     </div>
   );
 };
