@@ -5,7 +5,7 @@ import {
   tournamentSubsListFactory,
 } from "../compete/competeFactories";
 import { buildKey, safeEnsureQueryData } from "../helpers";
-import type { Episode, TeamPrivate } from "api/_autogen";
+import { type Episode, Status526Enum, type TeamPrivate } from "api/_autogen";
 import { episodeInfoFactory } from "api/episode/episodeFactories";
 import { myTeamFactory } from "api/team/teamFactories";
 import toast from "react-hot-toast";
@@ -26,22 +26,27 @@ export const submissionsLoader =
       queryFn: async () => await episodeInfoFactory.queryFn({ id: episodeId }),
     });
 
-    if ((await episodeData).game_release.getTime() > Date.now()) {
-      toast.error(
-        `Submissions page not released yet for ${
-          (await episodeData).name_long
-        }.`,
-      );
-      return redirect(`/${episodeId}/home`);
-    }
-
+    let teamData: TeamPrivate | null = null;
     try {
-      await queryClient.ensureQueryData<TeamPrivate>({
+      teamData = await queryClient.ensureQueryData<TeamPrivate>({
         queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
         queryFn: async () => await myTeamFactory.queryFn({ episodeId }),
       });
     } catch {
       toast.error(`Please join a team to view Submissions.`);
+      return redirect(`/${episodeId}/home`);
+    }
+
+    const isStaffTeam = teamData.status === Status526Enum.S;
+    if (
+      !isStaffTeam &&
+      (await episodeData).game_release.getTime() > Date.now()
+    ) {
+      toast.error(
+        `Submissions page not released yet for ${
+          (await episodeData).name_long
+        }.`,
+      );
       return redirect(`/${episodeId}/home`);
     }
 

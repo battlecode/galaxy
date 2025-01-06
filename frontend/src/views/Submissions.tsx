@@ -19,6 +19,8 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
+import { useUserTeam } from "api/team/useTeam";
+import { Status526Enum, LanguageEnum } from "api/_autogen";
 
 interface SubmissionFormInput {
   file: FileList;
@@ -119,6 +121,7 @@ const Submissions: React.FC = () => {
 
 const CodeSubmission: React.FC = () => {
   const { episodeId } = useEpisodeId();
+  const teamData = useUserTeam({ episodeId });
   const queryClient = useQueryClient();
 
   const episode = useEpisodeInfo({ id: episodeId });
@@ -150,7 +153,8 @@ const CodeSubmission: React.FC = () => {
 
   if (!episode.isSuccess) return null;
 
-  if (episode.data.frozen)
+  const isStaffTeam = teamData.data?.status === Status526Enum.S;
+  if (!isStaffTeam && episode.data.frozen)
     return (
       <p>
         Submissions are currently frozen! This is most likely due to a
@@ -159,77 +163,153 @@ const CodeSubmission: React.FC = () => {
       </p>
     );
 
-  return (
-    <div>
-      <p>Submit your code using the button below.</p>
-      <p>
-        Create a{" "}
-        <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
-          zip
-        </span>{" "}
-        file of your robot player, and submit it below. The submission format
-        should be a zip file containing a single folder (which is your package
-        name), which should contain{" "}
-        <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
-          RobotPlayer.java
-        </span>{" "}
-        and any other code you have written, for example:
-      </p>
-      <span className="w-full">
-        <p className="rounded-md border border-gray-400 bg-gray-100 px-4 py-3 font-mono">
-          {
-            "submission.zip --> examplefuncsplayer --> RobotPlayer.java, FooBar.java"
-          }
+  if (episode.data.language === LanguageEnum.Py3) {
+    return (
+      <div>
+        <p>Submit your python code using the button below.</p>
+        <p>
+          Create a{" "}
+          <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
+            zip
+          </span>{" "}
+          file of your robot player, and submit it below. The submission format
+          should be a zip file containing a single folder (which is your package
+          name), which should contain{" "}
+          <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
+            bot.py
+          </span>{" "}
+          and any other code you have written, for example:
         </p>
-      </span>
-      <form
-        onSubmit={(e) => {
-          void handleSubmit(onSubmit)(e);
-        }}
-        className="mt-4 flex flex-col gap-4"
-      >
-        <div>
-          <FormLabel required label="Choose Submission File" />
-          <input
-            type="file"
-            accept=".zip"
-            required
-            {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
+        <span className="w-full">
+          <p className="rounded-md border border-gray-400 bg-gray-100 px-4 py-3 font-mono">
+            {"submission.zip --> examplefuncsplayer --> bot.py, utils.py"}
+          </p>
+        </span>
+        <form
+          onSubmit={(e) => {
+            void handleSubmit(onSubmit)(e);
+          }}
+          className="mt-4 flex flex-col gap-4"
+        >
+          <div>
+            <FormLabel required label="Choose Submission File" />
+            <input
+              type="file"
+              accept=".zip"
+              required
+              {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
+            />
+          </div>
+          <div className="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-end">
+            <Input
+              className="w-full lg:w-1/3"
+              label="Package Name (i.e. examplefuncsplayer)"
+              required
+              errorMessage={errors.packageName?.message}
+              {...register("packageName", {
+                required: FIELD_REQUIRED_ERROR_MSG,
+              })}
+            />
+            <Input
+              className="w-full lg:w-2/3"
+              label="Description (for your reference)"
+              required
+              errorMessage={errors.description?.message}
+              {...register("description", {
+                required: FIELD_REQUIRED_ERROR_MSG,
+              })}
+            />
+          </div>
+          <Button
+            className={`max-w-sm ${
+              uploadSub.isPending || !isDirty
+                ? "disabled cursor-not-allowed"
+                : ""
+            }`}
+            variant="dark"
+            label="Submit"
+            type="submit"
+            loading={uploadSub.isPending}
+            disabled={uploadSub.isPending || !isDirty}
           />
-        </div>
-        <div className="flex w-full flex-row items-end gap-10">
-          <Input
-            className="w-1/3"
-            label="Package Name (i.e. where is RobotPlayer?)"
-            required
-            errorMessage={errors.packageName?.message}
-            {...register("packageName", {
-              required: FIELD_REQUIRED_ERROR_MSG,
-            })}
+        </form>
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <p>Submit your java code using the button below.</p>
+        <p>
+          Create a{" "}
+          <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
+            zip
+          </span>{" "}
+          file of your robot player, and submit it below. The submission format
+          should be a zip file containing a single folder (which is your package
+          name), which should contain{" "}
+          <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
+            RobotPlayer.java
+          </span>{" "}
+          and any other code you have written, for example:
+        </p>
+        <span className="w-full">
+          <p className="rounded-md border border-gray-400 bg-gray-100 px-4 py-3 font-mono">
+            {
+              "submission.zip --> examplefuncsplayer --> RobotPlayer.java, FooBar.java"
+            }
+          </p>
+        </span>
+        <form
+          onSubmit={(e) => {
+            void handleSubmit(onSubmit)(e);
+          }}
+          className="mt-4 flex flex-col gap-4"
+        >
+          <div>
+            <FormLabel required label="Choose Submission File" />
+            <input
+              type="file"
+              accept=".zip"
+              required
+              {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
+            />
+          </div>
+          <div className="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-end">
+            <Input
+              className="w-full lg:w-1/3"
+              label="Package Name (i.e. examplefuncsplayer)"
+              required
+              errorMessage={errors.packageName?.message}
+              {...register("packageName", {
+                required: FIELD_REQUIRED_ERROR_MSG,
+              })}
+            />
+            <Input
+              className="w-full lg:w-2/3"
+              label="Description (for your reference)"
+              required
+              errorMessage={errors.description?.message}
+              {...register("description", {
+                required: FIELD_REQUIRED_ERROR_MSG,
+              })}
+            />
+          </div>
+          <Button
+            className={`max-w-sm ${
+              uploadSub.isPending || !isDirty
+                ? "disabled cursor-not-allowed"
+                : ""
+            }`}
+            variant="dark"
+            label="Submit"
+            type="submit"
+            loading={uploadSub.isPending}
+            disabled={uploadSub.isPending || !isDirty}
           />
-          <Input
-            className="w-2/3"
-            label="Description (for your reference)"
-            required
-            errorMessage={errors.description?.message}
-            {...register("description", {
-              required: FIELD_REQUIRED_ERROR_MSG,
-            })}
-          />
-        </div>
-        <Button
-          className={`max-w-sm ${
-            uploadSub.isPending || !isDirty ? "disabled cursor-not-allowed" : ""
-          }`}
-          variant="dark"
-          label="Submit"
-          type="submit"
-          loading={uploadSub.isPending}
-          disabled={uploadSub.isPending || !isDirty}
-        />
-      </form>
-    </div>
-  );
+        </form>
+      </div>
+    );
+  }
 };
 
 export default Submissions;

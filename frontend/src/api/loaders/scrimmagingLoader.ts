@@ -11,6 +11,7 @@ import { buildKey, safeEnsureQueryData } from "../helpers";
 import { myTeamFactory, searchTeamsFactory } from "../team/teamFactories";
 import {
   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum,
+  Status526Enum,
   type Episode,
   type TeamPrivate,
 } from "api/_autogen";
@@ -30,17 +31,9 @@ export const scrimmagingLoader =
       queryFn: async () => await episodeInfoFactory.queryFn({ id: episodeId }),
     });
 
-    if ((await episodeData).game_release.getTime() > Date.now()) {
-      toast.error(
-        `Scrimmaging page not released yet for ${
-          (await episodeData).name_long
-        }.`,
-      );
-      return redirect(`/${episodeId}/home`);
-    }
-
+    let teamData: TeamPrivate | null = null;
     try {
-      await queryClient.ensureQueryData<TeamPrivate>({
+      teamData = await queryClient.ensureQueryData<TeamPrivate>({
         queryKey: buildKey(myTeamFactory.queryKey, { episodeId }),
         queryFn: async () => await myTeamFactory.queryFn({ episodeId }),
       });
@@ -49,6 +42,18 @@ export const scrimmagingLoader =
       return redirect(`/${episodeId}/home`);
     }
 
+    const isStaffTeam = teamData.status === Status526Enum.S;
+    if (
+      !isStaffTeam &&
+      (await episodeData).game_release.getTime() > Date.now()
+    ) {
+      toast.error(
+        `Scrimmaging page not released yet for ${
+          (await episodeData).name_long
+        }.`,
+      );
+      return redirect(`/${episodeId}/home`);
+    }
     // Outbox
     safeEnsureQueryData({ episodeId }, scrimmageInboxListFactory, queryClient);
 
