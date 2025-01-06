@@ -56,6 +56,7 @@ import { userProfileLoader } from "api/loaders/userProfileLoader";
 import { HttpStatusCode } from "api/apiTypes";
 import { accountLoader } from "api/loaders/accountLoader";
 import CodeOfConduct from "views/CodeOfConduct";
+import Client from "views/Client";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -163,6 +164,10 @@ const router = createBrowserRouter([
             path: "scrimmaging",
             element: <Scrimmaging />,
             loader: scrimmagingLoader(queryClient),
+          },
+          {
+            path: "client",
+            element: <Client />,
           },
         ],
       },

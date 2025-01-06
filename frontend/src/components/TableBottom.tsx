@@ -162,6 +162,90 @@ const TableBottom: React.FC<TableBottomProps> = ({
   );
 };
 
+// TODO: after mobile PR merged, use the new component here :)
+export const PageButtonsList: React.FC<{
+  totalCount: number;
+  currentPage: number;
+  pageSize: number;
+  onPage: (page: number) => void;
+}> = ({ totalCount, currentPage, pageSize, onPage }) => {
+  const pageCount = Math.ceil(totalCount / pageSize);
+
+  const backDisabled = currentPage <= 1;
+  const forwardDisabled = currentPage >= pageCount;
+
+  /**
+   *
+   * @returns an array of page numbers, each of which will be rendered as a button.
+   * The strings in the array, such as the ellipses will be rendered as disabled buttons.
+   */
+  function getPageNumbers(): Array<string | number> {
+    // The maximum number of pages to show in the pagination bar.
+    const MAX_PAGES = 15;
+    // The number of pages to show on either side of the "..."
+    const END_PAGES = 3;
+    // The start/end buttons when we have lots of pages
+    const START_BUTTONS = [1, "..."];
+    const END_BUTTONS = ["...", pageCount];
+    // The number of pages to show around the
+
+    if (pageCount > MAX_PAGES) {
+      // Determines where the ellipses should go based on the current page.
+      if (currentPage <= MAX_PAGES - 2) {
+        // TS hack: gets the array not to throw a type error.
+        const pages: Array<string | number> = ["", 0]
+          .concat(Array.from({ length: MAX_PAGES - 2 }, (_, idx) => idx + 1))
+          .concat(END_BUTTONS);
+        return pages.slice(2);
+      } else if (currentPage >= pageCount - MAX_PAGES + END_PAGES) {
+        return START_BUTTONS.concat(
+          Array.from(
+            { length: MAX_PAGES - START_BUTTONS.length },
+            (_, idx) => pageCount - MAX_PAGES + idx + END_PAGES,
+          ),
+        );
+      } else {
+        return START_BUTTONS.concat(
+          Array.from(
+            { length: MAX_PAGES - START_BUTTONS.length - END_BUTTONS.length },
+            (_, idx) => idx + currentPage - (END_PAGES + START_BUTTONS.length),
+          ),
+        ).concat(END_BUTTONS);
+      }
+    } else if (pageCount < 1) {
+      // If we have no data, return this non-clickable placeholder.
+      return ["1"];
+    } else {
+      return Array.from({ length: pageCount }, (_, idx) => idx + 1);
+    }
+  }
+
+  return (
+    <div className="inline-flex h-8 -space-x-px text-sm">
+      <DirectionPageButton
+        forward={false}
+        disabled={backDisabled}
+        currentPage={currentPage}
+        onPage={onPage}
+      />
+      {getPageNumbers().map((page, idx) => (
+        <PageButton
+          key={idx}
+          page={page}
+          currentPage={currentPage}
+          onPage={onPage}
+        />
+      ))}
+      <DirectionPageButton
+        forward={true}
+        disabled={forwardDisabled}
+        currentPage={currentPage}
+        onPage={onPage}
+      />
+    </div>
+  );
+};
+
 const DirectionPageButton: React.FC<{
   forward: boolean;
   disabled: boolean;
