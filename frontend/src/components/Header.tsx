@@ -32,7 +32,7 @@ const Header: React.FC = () => {
         <div className="relative flex h-16 items-center justify-between">
           {/* mobile menu */}
           <Menu>
-            <div className="absolute inset-y-0 left-3 flex items-center sm:hidden">
+            <div className="absolute inset-y-0 left-0 flex items-center sm:hidden md:left-3">
               <Menu.Button className="rounded-md px-1 py-1.5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                 <span className="sr-only">Open main menu</span>
                 <Icon
@@ -115,7 +115,7 @@ const Header: React.FC = () => {
           {/* profile menu (if the user is logged in) */}
           {authState === AuthStateEnum.AUTHENTICATED && (
             <Menu>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:pr-0">
+              <div className="absolute inset-y-0 right-0 flex items-center pr-0 md:pr-2">
                 <Menu.Button className="rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                   <span className="sr-only">Open user menu</span>
                   <img

@@ -71,7 +71,7 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
       <h1 className="text-2xl font-bold leading-7 text-gray-900">
         Find a team to scrimmage!
       </h1>
-      <div className="justify-left mb-5 flex h-10 w-4/5 flex-row items-center">
+      <div className="mb-4 flex flex-row gap-4">
         <Input
           disabled={teamsData.isLoading}
           placeholder="Search for a team..."
@@ -89,7 +89,6 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
             }
           }}
         />
-        <div className="w-10" />
         <Button
           disabled={teamsData.isLoading}
           label="Search!"

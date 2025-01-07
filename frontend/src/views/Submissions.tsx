@@ -21,6 +21,7 @@ import { useSearchParams } from "react-router-dom";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import { useUserTeam } from "api/team/useTeam";
 import { Status526Enum, LanguageEnum } from "api/_autogen";
+import { PageTitle } from "components/elements/BattlecodeStyle";
 
 interface SubmissionFormInput {
   file: FileList;
@@ -76,9 +77,7 @@ const Submissions: React.FC = () => {
 
   return (
     <div className="flex h-full w-full flex-col overflow-auto p-6">
-      <h1 className="mb-5 text-3xl font-bold leading-7 text-gray-900">
-        Submissions
-      </h1>
+      <PageTitle>Submissions</PageTitle>
 
       <SectionCard
         title="Next Submission Deadline"

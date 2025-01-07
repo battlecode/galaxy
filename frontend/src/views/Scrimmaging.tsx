@@ -12,6 +12,7 @@ import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { useUserTeam } from "api/team/useTeam";
 import Spinner from "components/Spinner";
+import { PageTitle } from "components/elements/BattlecodeStyle";
 
 interface QueryParams {
   inboxPage: number;
@@ -74,98 +75,111 @@ const Scrimmaging: React.FC = () => {
     }));
   }
 
+  const TABLIST_STYLE = "flex space-x-1 rounded-xl bg-cyan-600 p-1";
+
+  const tabList = (vertical: boolean): React.JSX.Element => (
+    <Tab.List className={`${vertical ? "flex-col" : ""} ${TABLIST_STYLE}`}>
+      <Tab className={tabClassName}>Inbox</Tab>
+      <Tab className={tabClassName}>Outbox</Tab>
+      <Tab className={tabClassName}>Find Teams</Tab>
+      <Tab className={tabClassName}>Scrim History</Tab>
+      <Tab className={tabClassName}>Record</Tab>
+      <Tab className={tabClassName}>Tournament Matches</Tab>
+    </Tab.List>
+  );
+
+  const tabPanels = (
+    <Tab.Panels className="mt-2">
+      <Tab.Panel
+        className={classNames(
+          "rounded-xl bg-white p-3",
+          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
+        )}
+      >
+        <InboxTable inboxPage={queryParams.inboxPage} handlePage={handlePage} />
+      </Tab.Panel>
+      <Tab.Panel
+        className={classNames(
+          "rounded-xl bg-white p-3",
+          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
+        )}
+      >
+        <OutboxTable
+          outboxPage={queryParams.outboxPage}
+          handlePage={handlePage}
+        />
+      </Tab.Panel>
+      <Tab.Panel
+        className={classNames(
+          "rounded-xl bg-white p-3",
+          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
+        )}
+      >
+        <TeamsTable
+          search={queryParams.search}
+          teamsPage={queryParams.teamsPage}
+          handleSearch={handleSearch}
+          handlePage={handlePage}
+        />
+      </Tab.Panel>
+      <Tab.Panel
+        className={classNames(
+          "rounded-xl bg-white p-3",
+          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
+        )}
+      >
+        <ScrimHistoryTable
+          scrimsPage={queryParams.scrimsPage}
+          handlePage={handlePage}
+        />
+      </Tab.Panel>
+      <Tab.Panel
+        className={classNames(
+          "rounded-xl bg-white p-10",
+          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
+        )}
+      >
+        <h1 className="mb-4 text-2xl font-bold leading-7 text-gray-900">
+          Scrimmaging Record
+        </h1>
+        {!userTeam.isSuccess ? (
+          <div className="flex flex-row items-center justify-center text-xl">
+            <Spinner size="lg" />
+          </div>
+        ) : (
+          <ScrimmagingRecord team={userTeam.data} />
+        )}
+      </Tab.Panel>
+      <Tab.Panel
+        className={classNames(
+          "rounded-xl bg-white p-3",
+          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
+        )}
+      >
+        <TournamentMatchesTable
+          tourneyPage={queryParams.tourneyPage}
+          handlePage={handlePage}
+        />
+      </Tab.Panel>
+    </Tab.Panels>
+  );
+
   return (
     <div className="flex h-full w-full flex-col overflow-auto p-6">
-      <h1 className="mb-2 text-3xl font-bold leading-7 text-gray-900">
-        Scrimmaging
-      </h1>
+      <PageTitle>Scrimmaging</PageTitle>
 
-      <Tab.Group>
-        <Tab.List className="flex space-x-1 rounded-xl bg-cyan-600 p-1">
-          <Tab className={tabClassName}>Inbox</Tab>
-          <Tab className={tabClassName}>Outbox</Tab>
-          <Tab className={tabClassName}>Find Teams</Tab>
-          <Tab className={tabClassName}>Scrim History</Tab>
-          <Tab className={tabClassName}>Record</Tab>
-          <Tab className={tabClassName}>Tournament Matches</Tab>
-        </Tab.List>
-        <Tab.Panels className="mt-2">
-          <Tab.Panel
-            className={classNames(
-              "rounded-xl bg-white p-3",
-              "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-            )}
-          >
-            <InboxTable
-              inboxPage={queryParams.inboxPage}
-              handlePage={handlePage}
-            />
-          </Tab.Panel>
-          <Tab.Panel
-            className={classNames(
-              "rounded-xl bg-white p-3",
-              "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-            )}
-          >
-            <OutboxTable
-              outboxPage={queryParams.outboxPage}
-              handlePage={handlePage}
-            />
-          </Tab.Panel>
-          <Tab.Panel
-            className={classNames(
-              "rounded-xl bg-white p-3",
-              "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-            )}
-          >
-            <TeamsTable
-              search={queryParams.search}
-              teamsPage={queryParams.teamsPage}
-              handleSearch={handleSearch}
-              handlePage={handlePage}
-            />
-          </Tab.Panel>
-          <Tab.Panel
-            className={classNames(
-              "rounded-xl bg-white p-3",
-              "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-            )}
-          >
-            <ScrimHistoryTable
-              scrimsPage={queryParams.scrimsPage}
-              handlePage={handlePage}
-            />
-          </Tab.Panel>
-          <Tab.Panel
-            className={classNames(
-              "rounded-xl bg-white p-10",
-              "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-            )}
-          >
-            <h1 className="mb-4 text-2xl font-bold leading-7 text-gray-900">
-              Scrimmaging Record
-            </h1>
-            {!userTeam.isSuccess ? (
-              <div className="flex flex-row items-center justify-center text-xl">
-                Loading... <Spinner size="lg" />
-              </div>
-            ) : (
-              <ScrimmagingRecord team={userTeam.data} />
-            )}
-          </Tab.Panel>
-          <Tab.Panel
-            className={classNames(
-              "rounded-xl bg-white p-3",
-              "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-            )}
-          >
-            <TournamentMatchesTable
-              tourneyPage={queryParams.tourneyPage}
-              handlePage={handlePage}
-            />
-          </Tab.Panel>
-        </Tab.Panels>
-      </Tab.Group>
+      <div className="flex w-full flex-1 flex-col md:hidden">
+        <Tab.Group vertical>
+          {tabList(true)}
+          {tabPanels}
+        </Tab.Group>
+      </div>
+      <div className="hidden md:flex md:flex-col">
+        <Tab.Group>
+          {tabList(false)}
+          {tabPanels}
+        </Tab.Group>
+      </div>
     </div>
   );
 };
