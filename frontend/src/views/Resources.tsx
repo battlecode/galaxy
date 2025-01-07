@@ -5,9 +5,14 @@ import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdo
 import { ResourcesPage } from "../content/ContentStruct";
 import NoContentFound from "./NoContentFound";
 import { isNil } from "lodash";
+import SectionCard from "components/SectionCard";
+import { NavLink } from "react-router-dom";
+import { useEpisodeInfo } from "api/episode/useEpisode";
 
 const Resources: React.FC = () => {
   const { episodeId } = useEpisodeId();
+
+  const episode = useEpisodeInfo({ id: episodeId });
 
   const currentResourcesText = resourcesText[episodeId];
   const hasContent =
@@ -21,10 +26,22 @@ const Resources: React.FC = () => {
   return (
     <div className="flex h-full w-full flex-col overflow-y-auto p-6">
       <div className="flex flex-1 flex-col gap-8">
-        <OptionalSectionCardMarkdown
-          title={ResourcesPage.GAME_SPECIFICATION}
-          textRecord={currentResourcesText}
-        />
+        <SectionCard title="Game Specifications" loading={episode.isLoading}>
+          <div className="flex flex-col gap-4">
+            <NavLink
+              to={`https://releases.battlecode.org/specs/${episode.data?.artifact_name}/${episode.data?.release_version_public}/specs.pdf`}
+              className="text-cyan-600 hover:underline"
+            >
+              {`Specifications for ${episode.data?.name_long}!`}
+            </NavLink>
+            <NavLink
+              to={`https://releases.battlecode.org/javadoc/${episode.data?.artifact_name}/${episode.data?.release_version_public}/index.html`}
+              className="text-cyan-600 hover:underline"
+            >
+              {`API Specifications for ${episode.data?.name_long}!`}
+            </NavLink>
+          </div>
+        </SectionCard>
 
         <OptionalSectionCardMarkdown
           title={ResourcesPage.LECTURES}
