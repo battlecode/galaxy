@@ -28,12 +28,13 @@ const TeamWithRating: React.FC<TeamWithRatingProps> = ({
           : ratingDelta < 0
           ? "text-xs font-semibold slashed-zero text-red-700"
           : "text-xs font-semibold slashed-zero text-gray-700";
+
       return (
         <span className={deltaClass}>
           {" "}
           {includeTeamName && <span>{"("}</span>}
           {`${
-            ratingDelta > 0 ? " +" : ratingDelta < 0 ? " " : " ±"
+            ratingDelta > 0 ? "+" : ratingDelta < 0 ? "" : "±"
           }${ratingDelta.toFixed(0)}`}
           {includeTeamName && <span>{")"}</span>}
         </span>
@@ -42,9 +43,8 @@ const TeamWithRating: React.FC<TeamWithRatingProps> = ({
       return (
         <span>
           {" "}
-          {includeTeamName && <span>{"("}</span>}
-          {rating.toFixed(0)}
-          {includeTeamName && <span>{")"}</span>}
+          {includeTeamName && <span>{`(${rating.toFixed(0)})`}</span>}
+          {!includeTeamName && <span>{rating.toFixed(0)}</span>}
         </span>
       );
     }

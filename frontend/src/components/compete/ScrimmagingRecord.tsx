@@ -70,7 +70,7 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
           Error fetching scrimmaging record.
         </div>
       ) : (
-        <div className="flex w-full flex-row items-center justify-center gap-3 md:flex-col">
+        <div className="flex w-full flex-col items-center justify-center gap-3">
           {!hideAllScrimmages && (
             <WinLossTie
               scrimmageType={

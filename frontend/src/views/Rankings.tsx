@@ -56,10 +56,10 @@ const Rankings: React.FC = () => {
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-auto p-6">
-      <div className="items-left flex w-4/5 flex-col">
+    <div className="flex flex-col p-6">
+      <div className="items-left flex flex-1 flex-col">
         <PageTitle>Rankings</PageTitle>
-        <div className="mb-4 flex w-3/5 flex-row">
+        <div className="mb-4 flex flex-row gap-4">
           <Input
             disabled={rankingsData.isLoading}
             placeholder="Search for a team..."
@@ -72,8 +72,9 @@ const Rankings: React.FC = () => {
                 handleSearch();
               }
             }}
+            className="w-80 sm:w-52 md:w-80 lg:w-96"
           />
-          <div className="w-4" />
+
           <Button
             disabled={rankingsData.isLoading}
             label="Search!"
@@ -85,12 +86,14 @@ const Rankings: React.FC = () => {
         </div>
       </div>
 
-      <RankingsTable
-        data={rankingsData.data}
-        loading={rankingsData.isLoading}
-        page={queryParams.page}
-        handlePage={handlePage}
-      />
+      <div className="flex min-h-0 flex-1">
+        <RankingsTable
+          data={rankingsData.data}
+          loading={rankingsData.isLoading}
+          page={queryParams.page}
+          handlePage={handlePage}
+        />
+      </div>
     </div>
   );
 };

@@ -80,16 +80,15 @@ const Queue: React.FC = () => {
           }}
         />
       </div>
-      <div className="mb-4 w-96 gap-5">
-        <SearchTeamsMenu
-          onChange={(team) => {
-            setSelectedTeam(team);
-            handlePage(1);
-          }}
-          selected={selectedTeam}
-          placeholder="Search for a team..."
-        />
-      </div>
+      <SearchTeamsMenu
+        onChange={(team) => {
+          setSelectedTeam(team);
+          handlePage(1);
+        }}
+        selected={selectedTeam}
+        placeholder="Search for a team..."
+        className="mb-4 max-w-96 sm:w-full md:w-96 lg:w-96"
+      />
       <QueueTable
         data={activeData.data}
         loading={activeData.isLoading}
