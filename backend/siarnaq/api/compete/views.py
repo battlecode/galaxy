@@ -615,12 +615,12 @@ class MatchViewSet(
                 type=int,
                 description="A team to filter for. Defaults to your own team.",
             ),
-            OpenApiParameter(
-                name="scrimmage_type",
-                enum=["ranked", "unranked", "all"],
-                default="all",
-                description="Which type of scrimmages to filter for. Defaults to all.",
-            ),
+            # OpenApiParameter(
+            #     name="scrimmage_type",
+            #     enum=["ranked", "unranked", "all"],
+            #     default="all",
+            #     description="Which type of scrimmages to filter for.Defaults to all.",
+            # ),
         ],
         responses={
             status.HTTP_200_OK: ScrimmageRecordSerializer(),
@@ -638,12 +638,12 @@ class MatchViewSet(
         """List the scrimmaging win-loss-tie record of a team."""
         queryset = self.get_queryset().filter(tournament_round__isnull=True)
 
-        scrimmage_type = self.request.query_params.get("scrimmage_type")
-        if scrimmage_type is not None:
-            if scrimmage_type == "ranked":
-                queryset = queryset.filter(is_ranked=True)
-            elif scrimmage_type == "unranked":
-                queryset = queryset.filter(is_ranked=False)
+        # scrimmage_type = self.request.query_params.get("scrimmage_type")
+        # if scrimmage_type is not None:
+        #     if scrimmage_type == "ranked":
+        #         queryset = queryset.filter(is_ranked=True)
+        #     elif scrimmage_type == "unranked":
+        #         queryset = queryset.filter(is_ranked=False)
 
         team_id = parse_int(self.request.query_params.get("team_id"))
         if team_id is None and request.user.pk is not None:
@@ -673,22 +673,41 @@ class MatchViewSet(
                 return record
             if this_team.score is None or other_team.score is None:
                 return record
-            if this_team.score > other_team.score:
-                record["wins"] += 1
-            elif this_team.score < other_team.score:
-                record["losses"] += 1
-            else:
-                record["ties"] += 1
+
+            # Common logic for updating results for Ranked, Unranked, and All
+            result = (
+                "ties"
+                if this_team.score == other_team.score
+                else ("wins" if this_team.score > other_team.score else "losses")
+            )
+            # Update "Ranked" or "Unranked" based on match type
+            category = "Ranked" if match.is_ranked else "Unranked"
+
+            record[category][result] += 1
+            # Always update "All"
+            record["All"][result] += 1
+            # if this_team.score > other_team.score:
+            #     record["wins"] += 1
+            # elif this_team.score < other_team.score:
+            #     record["losses"] += 1
+            # else:
+            #     record["ties"] += 1
             return record
 
         win_loss_tie = reduce(
             match_handler,
             queryset.all(),
+            # {
+            #     "team_id": team_id,
+            #     "wins": 0,
+            #     "losses": 0,
+            #     "ties": 0,
+            # },
             {
                 "team_id": team_id,
-                "wins": 0,
-                "losses": 0,
-                "ties": 0,
+                "Ranked": {"wins": 0, "losses": 0, "ties": 0},
+                "Unranked": {"wins": 0, "losses": 0, "ties": 0},
+                "All": {"wins": 0, "losses": 0, "ties": 0},
             },
         )
         results = ScrimmageRecordSerializer(win_loss_tie).data

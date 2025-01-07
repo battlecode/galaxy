@@ -102,7 +102,6 @@ export interface CompeteMatchScrimmageListRequest {
 
 export interface CompeteMatchScrimmagingRecordRetrieveRequest {
     episodeId: string;
-    scrimmageType?: CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum;
     teamId?: number;
 }
 
@@ -535,10 +534,6 @@ export class CompeteApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
-
-        if (requestParameters.scrimmageType !== undefined) {
-            queryParameters['scrimmage_type'] = requestParameters.scrimmageType;
-        }
 
         if (requestParameters.teamId !== undefined) {
             queryParameters['team_id'] = requestParameters.teamId;
@@ -1161,14 +1156,4 @@ export class CompeteApi extends runtime.BaseAPI {
         return await response.value();
     }
 
-}
-
-/**
-  * @export
-  * @enum {string}
-  */
-export enum CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum {
-    All = 'all',
-    Ranked = 'ranked',
-    Unranked = 'unranked'
 }

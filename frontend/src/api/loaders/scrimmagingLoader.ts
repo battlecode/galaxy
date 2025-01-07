@@ -10,7 +10,7 @@ import {
 import { buildKey, safeEnsureQueryData } from "../helpers";
 import { myTeamFactory, searchTeamsFactory } from "../team/teamFactories";
 import {
-  CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum,
+  // CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum,
   Status526Enum,
   type Episode,
   type TeamPrivate,
@@ -77,32 +77,32 @@ export const scrimmagingLoader =
       {
         episodeId,
         teamId: myTeamInfo.id,
-        scrimmageType:
-          CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
+        // scrimmageType:
+        //   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
       },
       scrimmagingRecordFactory,
       queryClient,
     );
-    safeEnsureQueryData(
-      {
-        episodeId,
-        teamId: myTeamInfo.id,
-        scrimmageType:
-          CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked,
-      },
-      scrimmagingRecordFactory,
-      queryClient,
-    );
-    safeEnsureQueryData(
-      {
-        episodeId,
-        teamId: myTeamInfo.id,
-        scrimmageType:
-          CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked,
-      },
-      scrimmagingRecordFactory,
-      queryClient,
-    );
+    // safeEnsureQueryData(
+    //   {
+    //     episodeId,
+    //     teamId: myTeamInfo.id,
+    //     // scrimmageType:
+    //     //   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked,
+    //   },
+    //   scrimmagingRecordFactory,
+    //   queryClient,
+    // );
+    // safeEnsureQueryData(
+    //   {
+    //     episodeId,
+    //     teamId: myTeamInfo.id,
+    //     // scrimmageType:
+    //     //   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked,
+    //   },
+    //   scrimmagingRecordFactory,
+    //   queryClient,
+    // );
 
     // Tournament match list
     safeEnsureQueryData(

@@ -9,7 +9,7 @@ import {
   userRatingHistoryFactory,
   scrimmagingRecordFactory,
 } from "api/compete/competeFactories";
-import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_autogen";
+// import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_autogen";
 
 export const homeLoader =
   (queryClient: QueryClient): LoaderFunction =>
@@ -30,8 +30,8 @@ export const homeLoader =
     safeEnsureQueryData(
       {
         episodeId,
-        scrimmageType:
-          CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
+        // scrimmageType:
+        //   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
       },
       scrimmagingRecordFactory,
       queryClient,

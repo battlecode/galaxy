@@ -1,10 +1,11 @@
 import type React from "react";
-import { useMemo } from "react";
-import {
-  CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum,
-  type ScrimmageRecord,
-  type TeamPublic,
-} from "api/_autogen";
+// import { useMemo } from "react";
+import type { ScrimmageRecord, TeamPublic } from "api/_autogen";
+// import {
+//   // CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum,
+//   type ScrimmageRecord,
+//   type TeamPublic,
+// } from "api/_autogen";
 import WinLossTie from "./WinLossTie";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { useQueryClient } from "@tanstack/react-query";
@@ -32,23 +33,34 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
 
-  const scrimTypeToCheck = useMemo(() => {
-    if (!isNil(hideAllScrimmages) && !hideAllScrimmages) {
-      return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All;
-    } else if (!isNil(hideRanked) && !hideRanked) {
-      return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked;
-    } else if (!isNil(hideUnranked) && !hideUnranked) {
-      return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked;
-    } else {
-      return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All;
-    }
-  }, [hideAllScrimmages, hideRanked, hideUnranked]);
+  // const scrimTypeToCheck = useMemo(() => {
+  //   if (!isNil(hideAllScrimmages) && !hideAllScrimmages) {
+  //     return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All;
+  //   } else if (!isNil(hideRanked) && !hideRanked) {
+  //     return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked;
+  //   } else if (!isNil(hideUnranked) && !hideUnranked) {
+  //     return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked;
+  //   } else {
+  //     return CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All;
+  //   }
+  // }, [hideAllScrimmages, hideRanked, hideUnranked]);
+  // const scrimTypeToCheck = useMemo(() => {
+  //   if (!isNil(hideAllScrimmages) && !hideAllScrimmages) {
+  //     return "all";
+  //   } else if (!isNil(hideRanked) && !hideRanked) {
+  //     return "ranked";
+  //   } else if (!isNil(hideUnranked) && !hideUnranked) {
+  //     return "unranked";
+  //   } else {
+  //     return "all";
+  //   }
+  // }, [hideAllScrimmages, hideRanked, hideUnranked]);
 
   const recordWatcher = queryClient.getQueryState<ScrimmageRecord>(
     buildKey(scrimmagingRecordFactory.queryKey, {
       episodeId,
       teamId: team.id,
-      scrimmageType: scrimTypeToCheck,
+      // scrimmageType: scrimTypeToCheck,
     }),
   );
 
@@ -73,25 +85,28 @@ const ScrimmagingRecord: React.FC<ScrimmagingRecordProps> = ({
         <div className="flex w-full flex-col items-center justify-center gap-3">
           {!hideAllScrimmages && (
             <WinLossTie
-              scrimmageType={
-                CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All
-              }
+              // scrimmageType={
+              //   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All
+              // }
+              scrimmageType="All"
               teamId={team.id}
             />
           )}
           {!hideUnranked && (
             <WinLossTie
-              scrimmageType={
-                CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked
-              }
+              // scrimmageType={
+              //   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked
+              // }
+              scrimmageType="Ranked"
               teamId={team.id}
             />
           )}
           {!hideRanked && (
             <WinLossTie
-              scrimmageType={
-                CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked
-              }
+              // scrimmageType={
+              //   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked
+              // }
+              scrimmageType="Unranked"
               teamId={team.id}
             />
           )}

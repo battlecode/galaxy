@@ -19,6 +19,7 @@
  */
 export enum LanguageEnum {
     Java8 = 'java8',
+    Java21 = 'java21',
     Py3 = 'py3'
 }
 

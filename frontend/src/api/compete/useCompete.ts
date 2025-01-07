@@ -256,19 +256,19 @@ export const useUserRatingHistory = ({
 export const useScrimmagingRecord = ({
   episodeId,
   teamId,
-  scrimmageType,
-}: CompeteMatchScrimmagingRecordRetrieveRequest): UseQueryResult<ScrimmageRecord> =>
+} // scrimmageType,
+: CompeteMatchScrimmagingRecordRetrieveRequest): UseQueryResult<ScrimmageRecord> =>
   useQuery({
     queryKey: buildKey(scrimmagingRecordFactory.queryKey, {
       episodeId,
       teamId,
-      scrimmageType,
+      // scrimmageType,
     }),
     queryFn: async () =>
       await scrimmagingRecordFactory.queryFn({
         episodeId,
         teamId,
-        scrimmageType,
+        // scrimmageType,
       }),
     staleTime: MILLIS_SECOND * SECONDS_MINUTE * STATISTICS_WAIT_MINUTES,
   });

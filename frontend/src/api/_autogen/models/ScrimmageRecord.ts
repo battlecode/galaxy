@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ScrimmageRecordSerializerHelper } from './ScrimmageRecordSerializerHelper';
+import {
+    ScrimmageRecordSerializerHelperFromJSON,
+    ScrimmageRecordSerializerHelperFromJSONTyped,
+    ScrimmageRecordSerializerHelperToJSON,
+} from './ScrimmageRecordSerializerHelper';
+
 /**
  * 
  * @export
@@ -27,22 +34,22 @@ export interface ScrimmageRecord {
     team_id: number;
     /**
      * 
-     * @type {number}
+     * @type {ScrimmageRecordSerializerHelper}
      * @memberof ScrimmageRecord
      */
-    wins: number;
+    Ranked: ScrimmageRecordSerializerHelper;
     /**
      * 
-     * @type {number}
+     * @type {ScrimmageRecordSerializerHelper}
      * @memberof ScrimmageRecord
      */
-    losses: number;
+    Unranked: ScrimmageRecordSerializerHelper;
     /**
      * 
-     * @type {number}
+     * @type {ScrimmageRecordSerializerHelper}
      * @memberof ScrimmageRecord
      */
-    ties: number;
+    All: ScrimmageRecordSerializerHelper;
 }
 
 /**
@@ -51,9 +58,9 @@ export interface ScrimmageRecord {
 export function instanceOfScrimmageRecord(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "team_id" in value;
-    isInstance = isInstance && "wins" in value;
-    isInstance = isInstance && "losses" in value;
-    isInstance = isInstance && "ties" in value;
+    isInstance = isInstance && "Ranked" in value;
+    isInstance = isInstance && "Unranked" in value;
+    isInstance = isInstance && "All" in value;
 
     return isInstance;
 }
@@ -69,9 +76,9 @@ export function ScrimmageRecordFromJSONTyped(json: any, ignoreDiscriminator: boo
     return {
         
         'team_id': json['team_id'],
-        'wins': json['wins'],
-        'losses': json['losses'],
-        'ties': json['ties'],
+        'Ranked': ScrimmageRecordSerializerHelperFromJSON(json['Ranked']),
+        'Unranked': ScrimmageRecordSerializerHelperFromJSON(json['Unranked']),
+        'All': ScrimmageRecordSerializerHelperFromJSON(json['All']),
     };
 }
 
@@ -85,9 +92,9 @@ export function ScrimmageRecordToJSON(value?: ScrimmageRecord | null): any {
     return {
         
         'team_id': value.team_id,
-        'wins': value.wins,
-        'losses': value.losses,
-        'ties': value.ties,
+        'Ranked': ScrimmageRecordSerializerHelperToJSON(value.Ranked),
+        'Unranked': ScrimmageRecordSerializerHelperToJSON(value.Unranked),
+        'All': ScrimmageRecordSerializerHelperToJSON(value.All),
     };
 }
 

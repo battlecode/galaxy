@@ -284,16 +284,6 @@ paths:
             pattern: ^[^\/.]+$
           required: true
         - in: query
-          name: scrimmage_type
-          schema:
-            type: string
-            enum:
-              - all
-              - ranked
-              - unranked
-            default: all
-          description: Which type of scrimmages to filter for. Defaults to all.
-        - in: query
           name: team_id
           schema:
             type: integer
@@ -2308,6 +2298,7 @@ components:
     LanguageEnum:
       enum:
         - java8
+        - java21
         - py3
       type: string
     Match:
@@ -2674,6 +2665,20 @@ components:
       properties:
         team_id:
           type: integer
+        Ranked:
+          $ref: "#/components/schemas/ScrimmageRecordSerializerHelper"
+        Unranked:
+          $ref: "#/components/schemas/ScrimmageRecordSerializerHelper"
+        All:
+          $ref: "#/components/schemas/ScrimmageRecordSerializerHelper"
+      required:
+        - All
+        - Ranked
+        - Unranked
+        - team_id
+    ScrimmageRecordSerializerHelper:
+      type: object
+      properties:
         wins:
           type: integer
         losses:
@@ -2682,7 +2687,6 @@ components:
           type: integer
       required:
         - losses
-        - team_id
         - ties
         - wins
     ScrimmageRequest:
