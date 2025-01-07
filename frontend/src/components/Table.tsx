@@ -29,15 +29,15 @@ function Table<T>({
   bottomElement,
 }: TableProps<T>): React.ReactElement {
   return (
-    <div className="pl-50 w-full overflow-auto rounded-lg shadow-md">
+    <div className="pl-50 w-full rounded-lg shadow-md">
       {/* MOBILE PAGINATION */}
-      <div className="rounded-t-lg border-b-2 border-cyan-700 bg-gray-50 md:hidden">
+      <div className="w-full rounded-t-lg border-b-2 border-cyan-700 bg-gray-50 md:hidden">
         {bottomElement}
       </div>
 
       {/* MOBILE TABLE */}
       <div className="flex w-full flex-col md:hidden">
-        <table className="w-full border-collapse overflow-hidden rounded-b-lg border-b-0 text-left text-sm text-gray-500">
+        <table className="w-full border-collapse rounded-b-lg border-b-0 text-left text-sm text-gray-500">
           {!loading &&
             data.map((row, rowIdx) => (
               <tbody
@@ -52,6 +52,7 @@ function Table<T>({
               >
                 {columns.map((col, colIdx) => (
                   <tr
+                    className="grid w-full grid-cols-2"
                     key={
                       "mobile" + "row" + col.key + keyFromValue(row).toString()
                     }
@@ -59,7 +60,7 @@ function Table<T>({
                     <th
                       key={"mobile" + "header" + col.key}
                       scope="col"
-                      className={`bg-cyan-700 py-3 pl-4 pr-3 font-bold text-white ${
+                      className={`max-w-32 text-ellipsis bg-cyan-700 py-3 pl-4 pr-0 font-bold text-white ${
                         colIdx === columns.length - 1 &&
                         rowIdx < data.length - 1
                           ? "border-b border-white"
@@ -76,7 +77,7 @@ function Table<T>({
                         keyFromValue(row).toString()
                       }
                       scope="row"
-                      className="text-ellipsis whitespace-normal px-8 py-3 font-medium text-gray-900"
+                      className="min-w-0 place-items-center overflow-hidden text-ellipsis text-wrap py-3 pr-2 font-medium text-gray-900"
                     >
                       {col.value(row)}
                     </td>
@@ -132,7 +133,9 @@ function Table<T>({
           <Spinner size="xl" />
         </div>
       )}
-      <div className="hidden rounded-b-lg bg-white md:flex">
+
+      {/* WIDESCREEN PAGINATION */}
+      <div className="hidden w-full rounded-b-lg bg-white md:flex">
         {bottomElement}
       </div>
     </div>

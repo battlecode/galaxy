@@ -19,21 +19,12 @@ interface TeamsTableProps {
   handleSearch: (search: string) => void;
 }
 
-function trimString(str: string, maxLength: number): string {
-  if (str.length > maxLength) {
-    return str.slice(0, maxLength - 1) + "...";
-  }
-  return str;
-}
-
 const TeamsTable: React.FC<TeamsTableProps> = ({
   search,
   teamsPage,
   handlePage,
   handleSearch,
 }) => {
-  const MAX_NAME_LENGTH = 13;
-
   const { episodeId } = useEpisodeId();
   const episodeInfo = useEpisodeInfo({ id: episodeId });
   const queryClient = useQueryClient();
@@ -128,7 +119,7 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
                 to={`/${episodeId}/team/${team.id}`}
                 className="hover:underline"
               >
-                {trimString(team.name, MAX_NAME_LENGTH)}
+                {team.name}
               </NavLink>
             ),
           },
@@ -137,16 +128,14 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
             key: "members",
             value: (team) =>
               team.members.map((member, idx) => (
-                <>
-                  <NavLink
-                    key={idx}
-                    to={`/user/${member.id}`}
-                    className="hover:underline"
-                  >
-                    {trimString(member.username, MAX_NAME_LENGTH)}
-                  </NavLink>
-                  {idx !== team.members.length - 1 ? ", " : ""}
-                </>
+                <NavLink
+                  key={member.id}
+                  to={`/user/${member.id}`}
+                  className="hover:underline"
+                >
+                  {member.username +
+                    (idx !== team.members.length - 1 ? ", " : "")}
+                </NavLink>
               )),
           },
           {
