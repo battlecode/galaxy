@@ -106,6 +106,7 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
         keyFromValue={(team) => team.id.toString()}
         bottomElement={
           <TableBottom
+            querySuccess={teamsData.isSuccess}
             totalCount={teamsData.data?.count ?? 0}
             pageSize={10}
             currentPage={teamsPage}

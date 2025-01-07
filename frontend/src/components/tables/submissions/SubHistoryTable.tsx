@@ -1,16 +1,16 @@
 import type React from "react";
-import {
-  type PaginatedSubmissionList,
-  StatusBccEnum,
-} from "../../../api/_autogen";
+import { StatusBccEnum } from "../../../api/_autogen";
 import { useEpisodeId } from "contexts/EpisodeContext";
-import { useDownloadSubmission } from "../../../api/compete/useCompete";
-import type { Maybe } from "../../../utils/utilTypes";
+import {
+  useDownloadSubmission,
+  useSubmissionsList,
+} from "../../../api/compete/useCompete";
 import { NavLink } from "react-router-dom";
 import { dateTime } from "../../../utils/dateTime";
 import Table from "../../Table";
 import TableBottom from "../../TableBottom";
 import Button from "components/elements/Button";
+import { useQueryClient } from "@tanstack/react-query";
 
 const SubmissionStatusDisplays: Record<StatusBccEnum, string> = {
   [StatusBccEnum.New]: "Created",
@@ -23,34 +23,35 @@ const SubmissionStatusDisplays: Record<StatusBccEnum, string> = {
 };
 
 interface SubHistoryTableProps {
-  data: Maybe<PaginatedSubmissionList>;
-  loading: boolean;
   page: number;
   handlePage: (page: number) => void;
 }
 
 const SubHistoryTable: React.FC<SubHistoryTableProps> = ({
-  data,
-  loading,
   page,
   handlePage,
 }) => {
   const { episodeId } = useEpisodeId();
+  const queryClient = useQueryClient();
+
+  const submissions = useSubmissionsList({ episodeId, page }, queryClient);
+
   const downloadSubmission = useDownloadSubmission({ episodeId });
 
   return (
     <Table
-      data={data?.results ?? []}
-      loading={loading}
-      keyFromValue={(match) => match.id.toString()}
+      data={submissions.data?.results ?? []}
+      loading={submissions.isLoading}
+      keyFromValue={(sub) => sub.id.toString()}
       bottomElement={
         <TableBottom
+          querySuccess={submissions.isSuccess}
           currentPage={page}
           pageSize={10}
           onPage={(page) => {
             handlePage(page);
           }}
-          totalCount={data?.count ?? 0}
+          totalCount={submissions.data?.count ?? 0}
         />
       }
       columns={[

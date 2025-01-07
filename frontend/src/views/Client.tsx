@@ -8,7 +8,7 @@ import SelectMenu from "components/elements/SelectMenu";
 import { StatusBccEnum, type Match } from "api/_autogen";
 import MatchScore from "components/compete/MatchScore";
 import { dateTime } from "utils/dateTime";
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useUserTeam } from "api/team/useTeam";
 import { PageButtonsList } from "components/TableBottom";
 import { getClientUrl } from "api/helpers";
@@ -60,6 +60,18 @@ const Client: React.FC = () => {
     };
   };
 
+  const prevCount = useRef(0);
+
+  const stabilizedDisplayCount: number = useMemo(() => {
+    // While we are reloading the query, we want to display the previous count.
+    if (!matches.isSuccess) {
+      return prevCount.current;
+    } else {
+      prevCount.current = matches.data.count ?? 0; // Update the previous count
+      return matches.data.count ?? 0;
+    }
+  }, [matches]);
+
   return (
     <div className="flex h-full w-full flex-col gap-2 p-6">
       <div className="flex w-full flex-1 flex-col items-center gap-4 md:flex-row md:gap-2">
@@ -80,7 +92,7 @@ const Client: React.FC = () => {
           }}
         />
         <PageButtonsList
-          totalCount={matches.data?.count ?? 0}
+          recordCount={stabilizedDisplayCount}
           pageSize={10}
           currentPage={selectedPage}
           onPage={(page) => {

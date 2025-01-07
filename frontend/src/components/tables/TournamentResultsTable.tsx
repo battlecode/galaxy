@@ -31,6 +31,7 @@ const TournamentResultsTable: React.FC<TournamentResultsTableProps> = ({
     keyFromValue={(match) => match.id.toString()}
     bottomElement={
       <TableBottom
+        querySuccess={!loading}
         totalCount={data?.count ?? 0}
         pageSize={10}
         currentPage={page}
