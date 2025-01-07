@@ -4,9 +4,8 @@ from typing import Optional
 import google.cloud.storage as storage
 import structlog
 from django.conf import settings
-from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import NotSupportedError, transaction
-from django.db.models import Exists, F, OuterRef, Q, Subquery
+from django.db.models import Exists, OuterRef, Q, Subquery
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
@@ -39,7 +38,7 @@ from siarnaq.api.compete.serializers import (
 )
 from siarnaq.api.episodes.models import ReleaseStatus, Tournament
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable, IsEpisodeMutable
-from siarnaq.api.teams.models import Rating, Team, TeamStatus
+from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.gcloud import titan
 
@@ -388,115 +387,150 @@ class MatchViewSet(
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
-    def get_rated_matches(self, episode_id, team_id=None):
-        """
-        Retrieve matches with valid ratings for a specific episode.
+    def get_historical_rating(self, episode_id, team):
 
-        This helper function returns a QuerySet of matches that are ranked and have
-        valid ratings for participants in a given episode. The matches are filtered
-        to exclude those with participants from teams with an 'INVISIBLE' status.
-        Additionally, matches that are part of a tournament round are excluded.
-
-        Parameters:
-        - episode_id (int): The identifier of the episode to filter matches by.
-        - team_id (int, optional): If provided, further filters the matches to
-        include only those where the specified team participated.
-
-        Returns:
-        - QuerySet: A Django QuerySet containing matches that meet the specified
-        criteria, ordered by creation date in descending order.
-        """
-        has_invisible = self.get_queryset().filter(
-            participants__team__status=TeamStatus.INVISIBLE
-        )
-        matches = (
-            self.get_queryset()
-            .filter(episode=episode_id)
-            .filter(tournament_round__isnull=True)
-            .exclude(pk__in=Subquery(has_invisible.values("pk")))
-            .filter(is_ranked=True)
-            .filter(participants__rating__isnull=False)
-            .order_by("-created")
-        )
-        if team_id is not None:
-            matches = matches.filter(participants__team=team_id)
-
-        return matches
-
-    def get_top_historical_rating_ranking(self, episode_id, limit=None):
-        """
-        Retrieve historical ratings for teams in a specific episode, sorted by
-        highest rating.
-
-        This function returns historical ratings for teams participating in a
-        given episode. The results are ordered by the maximum current rating,
-        in descending order.
-
-        Parameters:
-        - episode_id (int): The identifier of the episode to filter teams by.
-        - limit (int, optional): The maximum number of team ratings to return.
-
-        Returns:
-        - List[Dict]: A list of dictionaries containing team information and
-                      their historical ratings, sorted by highest rating in
-                      descending order. The number of items is capped by
-                      the 'limit' parameter if provided.
-        """
-        # return []
-
-        matches = self.get_rated_matches(episode_id)
-        match_participants = MatchParticipant.objects.filter(match__in=matches)
-
-        # Subquery to get the last rating value
-        last_rating_subquery = (
-            match_participants.filter(team_id=OuterRef("team_id"))
-            .values("rating__value")
-            .order_by("-match__created")[:1]
-        )
-
-        # Aggregate rating history per each team
-        rating_history = (
-            match_participants.values("team_id")
-            .annotate(
-                timestamps_list=ArrayAgg(
-                    F("match__created"), ordering="match__created"
-                ),
-                ratings_pk_list=ArrayAgg(F("rating__pk"), ordering="match__created"),
-                last_rating_value=Subquery(last_rating_subquery),
+        logger.debug(f"Matchparticipant count: {MatchParticipant.objects.count()}")
+        team_ratings = (
+            MatchParticipant.objects.filter(
+                team_id=team.pk,
+                match__episode=episode_id,
+                match__tournament_round__isnull=True,
+                match__is_ranked=True,
+                rating__isnull=False,
             )
-            .order_by("-last_rating_value")[:limit]
+            .exclude(match__participants__team__status=TeamStatus.INVISIBLE)
+            .select_related("match", "rating")
+            .order_by("match__created")
         )
 
-        # Fetch all teams and ratings in bulk
-        team_ids = [team_data["team_id"] for team_data in rating_history]
-        rating_pks = {
-            pk for team_data in rating_history for pk in team_data["ratings_pk_list"]
-        }
-
-        teams = Team.objects.in_bulk(team_ids)
-        ratings = Rating.objects.in_bulk(rating_pks)
-
-        # Parse query results into required format
-        grouped = [
+        logger.debug(f"Team ratings count: {team_ratings.count()}")
+        # Prepare rating history
+        rating_history = [
             {
-                "team_id": team_data["team_id"],
-                "team_rating": {
-                    "team": teams[team_data["team_id"]],
-                    "rating_history": [
-                        {
-                            "timestamp": timestamp,
-                            "rating": ratings[rating_pk],
-                        }
-                        for rating_pk, timestamp in zip(
-                            team_data["ratings_pk_list"], team_data["timestamps_list"]
-                        )
-                    ],
-                },
+                "timestamp": match_data.match.created,
+                "rating": match_data.rating,
             }
-            for team_data in rating_history
+            for match_data in team_ratings
         ]
 
-        return grouped
+        historical_rating = {
+            "team_id": team.pk,
+            "team_rating": {
+                "team": team,
+                "rating_history": rating_history,
+            },
+        }
+
+        return historical_rating
+
+    # def get_rated_matches(self, episode_id, team_id=None):
+    #     """
+    #     Retrieve matches with valid ratings for a specific episode.
+
+    #     This helper function returns a QuerySet of matches that are ranked and have
+    #     valid ratings for participants in a given episode. The matches are filtered
+    #     to exclude those with participants from teams with an 'INVISIBLE' status.
+    #     Additionally, matches that are part of a tournament round are excluded.
+
+    #     Parameters:
+    #     - episode_id (int): The identifier of the episode to filter matches by.
+    #     - team_id (int, optional): If provided, further filters the matches to
+    #     include only those where the specified team participated.
+
+    #     Returns:
+    #     - QuerySet: A Django QuerySet containing matches that meet the specified
+    #     criteria, ordered by creation date in descending order.
+    #     """
+    #     has_invisible = self.get_queryset().filter(
+    #         participants__team__status=TeamStatus.INVISIBLE
+    #     )
+    #     matches = (
+    #         self.get_queryset()
+    #         .filter(episode=episode_id)
+    #         .filter(tournament_round__isnull=True)
+    #         .exclude(pk__in=Subquery(has_invisible.values("pk")))
+    #         .filter(is_ranked=True)
+    #         .filter(participants__rating__isnull=False)
+    #         .order_by("-created")
+    #     )
+    #     if team_id is not None:
+    #         matches = matches.filter(participants__team=team_id)
+
+    #     return matches
+
+    # def get_top_historical_rating_ranking(self, episode_id, limit=None):
+    #     """
+    #     Retrieve historical ratings for teams in a specific episode, sorted by
+    #     highest rating.
+
+    #     This function returns historical ratings for teams participating in a
+    #     given episode. The results are ordered by the maximum current rating,
+    #     in descending order.
+
+    #     Parameters:
+    #     - episode_id (int): The identifier of the episode to filter teams by.
+    #     - limit (int, optional): The maximum number of team ratings to return.
+
+    #     Returns:
+    #     - List[Dict]: A list of dictionaries containing team information and
+    #                   their historical ratings, sorted by highest rating in
+    #                   descending order. The number of items is capped by
+    #                   the 'limit' parameter if provided.
+    #     """
+    #     # return []
+
+    #     matches = self.get_rated_matches(episode_id)
+    #     match_participants = MatchParticipant.objects.filter(match__in=matches)
+
+    #     # Subquery to get the last rating value
+    #     last_rating_subquery = (
+    #         match_participants.filter(team_id=OuterRef("team_id"))
+    #         .values("rating__value")
+    #         .order_by("-match__created")[:1]
+    #     )
+
+    #     # Aggregate rating history per each team
+    #     rating_history = (
+    #         match_participants.values("team_id")
+    #         .annotate(
+    #             timestamps_list=ArrayAgg(
+    #                 F("match__created"), ordering="match__created"
+    #             ),
+    #             ratings_pk_list=ArrayAgg(F("rating__pk"), ordering="match__created"),
+    #             last_rating_value=Subquery(last_rating_subquery),
+    #         )
+    #         .order_by("-last_rating_value")[:limit]
+    #     )
+
+    #     # Fetch all teams and ratings in bulk
+    #     team_ids = [team_data["team_id"] for team_data in rating_history]
+    #     rating_pks = {
+    #         pk for team_data in rating_history for pk in team_data["ratings_pk_list"]
+    #     }
+
+    #     teams = Team.objects.in_bulk(team_ids)
+    #     ratings = Rating.objects.in_bulk(rating_pks)
+
+    #     # Parse query results into required format
+    #     grouped = [
+    #         {
+    #             "team_id": team_data["team_id"],
+    #             "team_rating": {
+    #                 "team": teams[team_data["team_id"]],
+    #                 "rating_history": [
+    #                     {
+    #                         "timestamp": timestamp,
+    #                         "rating": ratings[rating_pk],
+    #                     }
+    #                     for rating_pk, timestamp in zip(
+    #                         team_data["ratings_pk_list"], team_data["timestamps_list"]
+    #                     )
+    #                 ],
+    #             },
+    #         }
+    #         for team_data in rating_history
+    #     ]
+    #     return grouped
 
     @extend_schema(
         parameters=[
@@ -663,7 +697,6 @@ class MatchViewSet(
             - The function returns an empty list if no valid team is found.
             - Historical ratings are ordered by match creation date.
         """
-        # return Response(status=status.HTTP_204_NO_CONTENT)
         team_id = self.request.query_params.get("team_id")
 
         if team_id is not None:
@@ -681,84 +714,7 @@ class MatchViewSet(
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         team = team_query.get()
-        #
-        # def get_queryset(self):
-        #     queryset = (
-        #         Match.objects.filter(episode=self.kwargs["episode_id"])
-        #         .select_related("tournament_round__tournament")
-        #         .prefetch_related(
-        #             "participants__previous_participation__rating",
-        #             "participants__rating",
-        #             "participants__team__profile__rating",
-        #             "participants__team__members",
-        #             "maps",
-        #         )
-        #         .order_by("-pk")
-        #     )
-        #     return queryset
-        # def get_rated_matches(self, episode_id, team_id=None):
-        #     has_invisible = self.get_queryset().filter(
-        #         participants__team__status=TeamStatus.INVISIBLE
-        #     )
-        #     matches = (
-        #         self.get_queryset()
-        #         .filter(episode=episode_id)
-        #         .filter(tournament_round__isnull=True)
-        #         .exclude(pk__in=Subquery(has_invisible.values("pk")))
-        #         .filter(is_ranked=True)
-        #         .filter(participants__rating__isnull=False)
-        #         .order_by("-created")
-        #     )
-        #     if team_id is not None:
-        #         matches = matches.filter(participants__team=team_id)
-
-        #     return matches
-
-        # TODO: add this has invisible again and optimize it
-
-        # has_invisible = self.get_queryset().filter(
-        #         participants__team__status=TeamStatus.INVISIBLE
-        #     )
-
-        logger.debug(f"Matchparticipant count: {MatchParticipant.objects.count()}")
-
-        team_ratings = (
-            MatchParticipant.objects.filter(
-                Q(team_id=team.pk)
-                & Q(match__episode=episode_id)
-                & Q(match__tournament_round__isnull=True)
-                & Q(match__is_ranked=True)
-                & Q(rating__isnull=False)
-            )
-            .select_related("match", "rating")
-            .order_by("match__created")
-        )
-
-        logger.debug(
-            f"Team ratings count: {team_ratings.count()}"
-        )  # rated_matches = self.get_rated_matches(episode_id, team.pk)
-
-        # team_ratings = MatchParticipant.objects.filter(
-        #     match__in=rated_matches, team__pk=team.pk
-        # ).order_by("match__created")
-
-        # Prepare rating history
-        rating_history = [
-            {
-                "timestamp": match_data.match.created,
-                "rating": match_data.rating,
-            }
-            for match_data in team_ratings
-        ]
-
-        historical_rating = {
-            "team_id": team.pk,
-            "team_rating": {
-                "team": team,
-                "rating_history": rating_history,
-            },
-        }
-
+        historical_rating = self.get_historical_rating(episode_id, team)
         results = HistoricalRatingSerializer(historical_rating, many=False).data
         return Response(results, status=status.HTTP_200_OK)
 
@@ -808,7 +764,20 @@ class MatchViewSet(
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        grouped = self.get_top_historical_rating_ranking(episode_id=episode_id, limit=N)
+        # get top limit teams
+        top_teams = Team.objects.filter(episode=episode_id).order_by(
+            "-profile__rating"
+        )[:N]
+
+        grouped = [
+            {
+                "team_id": team.pk,
+                "team_rating": self.get_historical_rating(episode_id, team)[
+                    "team_rating"
+                ],
+            }
+            for team in top_teams
+        ]
         results = HistoricalRatingSerializer(grouped, many=True).data
         return Response(results, status=status.HTTP_200_OK)
 
