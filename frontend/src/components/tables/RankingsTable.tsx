@@ -19,13 +19,6 @@ interface RankingsTableProps {
   handlePage: (page: number) => void;
 }
 
-function trimString(str: string, maxLength: number): string {
-  if (str.length > maxLength) {
-    return str.slice(0, maxLength - 1) + "...";
-  }
-  return str;
-}
-
 const RankingsTable: React.FC<RankingsTableProps> = ({
   data,
   loading,
@@ -34,8 +27,6 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
 }) => {
   const { episodeId } = useEpisodeId();
   const episode = useEpisodeInfo({ id: episodeId });
-
-  const MAX_NAME_LENGTH = 20;
 
   return (
     <Table
@@ -75,16 +66,14 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
           key: "members",
           value: (team) =>
             team.members.map((member, idx) => (
-              <>
-                <NavLink
-                  key={member.id}
-                  to={`/user/${member.id}`}
-                  className="hover:underline"
-                >
-                  {trimString(member.username, MAX_NAME_LENGTH)}
-                </NavLink>
-                {idx !== team.members.length - 1 ? ", " : ""}
-              </>
+              <NavLink
+                key={member.id}
+                to={`/user/${member.id}`}
+                className="hover:underline"
+              >
+                {member.username +
+                  (idx !== team.members.length - 1 ? ", " : "")}
+              </NavLink>
             )),
         },
         {

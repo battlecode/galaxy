@@ -45,7 +45,7 @@ const TournamentsTable: React.FC<TournamentsTableProps> = ({
           header: "Tournament",
           key: "name_long",
           value: (tour) => (
-            <span className="hover:underline">{tour.name_long}</span>
+            <span className="text-wrap hover:underline">{tour.name_long}</span>
           ),
         },
         {
@@ -66,7 +66,9 @@ const TournamentsTable: React.FC<TournamentsTableProps> = ({
         {
           header: "About",
           key: "blurb",
-          value: (tour) => <div className="max-w-80">{tour.blurb}</div>,
+          value: (tour) => (
+            <div className="max-w-80 text-wrap">{tour.blurb}</div>
+          ),
         },
       ]}
     />
