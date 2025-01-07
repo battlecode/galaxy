@@ -59,7 +59,7 @@ function Table<T>({
                     <th
                       key={"mobile" + "header" + col.key}
                       scope="col"
-                      className={`bg-cyan-700 px-8 py-3 font-bold text-white ${
+                      className={`bg-cyan-700 py-3 pl-4 pr-3 font-bold text-white ${
                         colIdx === columns.length - 1 &&
                         rowIdx < data.length - 1
                           ? "border-b border-white"

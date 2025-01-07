@@ -35,7 +35,7 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
   const { episodeId } = useEpisodeId();
   const episode = useEpisodeInfo({ id: episodeId });
 
-  const MAX_NAME_LENGTH = 13;
+  const MAX_NAME_LENGTH = 20;
 
   return (
     <Table
