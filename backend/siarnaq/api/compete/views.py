@@ -606,6 +606,165 @@ class MatchViewSet(
     @extend_schema(
         parameters=[
             OpenApiParameter(
+                name="team_id",
+                type=int,
+                description="Optional teamID to filter for. Defaults to your own team.",
+                required=False,
+            ),
+        ],
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="No ranked matches found."
+            ),
+            status.HTTP_200_OK: HistoricalRatingSerializer(many=False),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                description="Could not find requested team."
+            ),
+        },
+    )
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=(IsEpisodeMutable,),
+        pagination_class=None,
+    )
+    def fast_historical_rating(self, request, pk=None, *, episode_id):
+        """
+        Provides a list of historical ratings for a team in a given episode.
+        Supports filtering by team ID or defaults to the current user's team
+        if no team ID is provided.
+
+        Parameters:
+            - request (Request) - The HTTP request object.
+            - pk (int, optional) - The primary key of the object. Defaults to None.
+            - episode_id (int) - The ID of the episode to filter the ratings by.
+
+        Query Parameters:
+            - team_id (int, optional) - The team ID for which to retrieve
+            historical ratings. If not provided, defaults to the team of the
+            requesting user.
+
+        Returns:
+            Response: A JSON response containing:
+                - 200 OK: Returns a serialized representation of the team's
+                historical ratings if found.
+                - 204 No Content: If no ranked matches are found for the specified team.
+                - 400 Bad Request: If the specified team could not be found.
+
+        Raises:
+            - 400 Bad Request: If neither a valid team ID is provided nor can a team be
+            determined from the current user.
+
+        Permissions:
+            Requires `IsEpisodeMutable` permission class.
+
+        Notes:
+            - The function does not paginate results.
+            - The function returns an empty list if no valid team is found.
+            - Historical ratings are ordered by match creation date.
+        """
+        # return Response(status=status.HTTP_204_NO_CONTENT)
+        team_id = self.request.query_params.get("team_id")
+
+        if team_id is not None:
+            team_query = Team.objects.filter(
+                episode_id=episode_id, pk=parse_int(team_id)
+            )
+        elif request.user.pk is not None:
+            team_query = Team.objects.filter(
+                members__pk=request.user.pk, episode_id=episode_id
+            )
+        else:
+            return Response([])
+
+        if not team_query.exists():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        team = team_query.get()
+        #
+        # def get_queryset(self):
+        #     queryset = (
+        #         Match.objects.filter(episode=self.kwargs["episode_id"])
+        #         .select_related("tournament_round__tournament")
+        #         .prefetch_related(
+        #             "participants__previous_participation__rating",
+        #             "participants__rating",
+        #             "participants__team__profile__rating",
+        #             "participants__team__members",
+        #             "maps",
+        #         )
+        #         .order_by("-pk")
+        #     )
+        #     return queryset
+        # def get_rated_matches(self, episode_id, team_id=None):
+        #     has_invisible = self.get_queryset().filter(
+        #         participants__team__status=TeamStatus.INVISIBLE
+        #     )
+        #     matches = (
+        #         self.get_queryset()
+        #         .filter(episode=episode_id)
+        #         .filter(tournament_round__isnull=True)
+        #         .exclude(pk__in=Subquery(has_invisible.values("pk")))
+        #         .filter(is_ranked=True)
+        #         .filter(participants__rating__isnull=False)
+        #         .order_by("-created")
+        #     )
+        #     if team_id is not None:
+        #         matches = matches.filter(participants__team=team_id)
+
+        #     return matches
+
+        # TODO: add this has invisible again and optimize it
+
+        # has_invisible = self.get_queryset().filter(
+        #         participants__team__status=TeamStatus.INVISIBLE
+        #     )
+
+        logger.debug(f"Matchparticipant count: {MatchParticipant.objects.count()}")
+
+        team_ratings = (
+            MatchParticipant.objects.filter(
+                Q(team_id=team.pk)
+                & Q(match__episode=episode_id)
+                & Q(match__tournament_round__isnull=True)
+                & Q(match__is_ranked=True)
+                & Q(rating__isnull=False)
+            )
+            .select_related("match", "rating")
+            .order_by("match__created")
+        )
+
+        logger.debug(
+            f"Team ratings count: {team_ratings.count()}"
+        )  # rated_matches = self.get_rated_matches(episode_id, team.pk)
+
+        # team_ratings = MatchParticipant.objects.filter(
+        #     match__in=rated_matches, team__pk=team.pk
+        # ).order_by("match__created")
+
+        # Prepare rating history
+        rating_history = [
+            {
+                "timestamp": match_data.match.created,
+                "rating": match_data.rating,
+            }
+            for match_data in team_ratings
+        ]
+
+        historical_rating = {
+            "team_id": team.pk,
+            "team_rating": {
+                "team": team,
+                "rating_history": rating_history,
+            },
+        }
+
+        results = HistoricalRatingSerializer(historical_rating, many=False).data
+        return Response(results, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
                 name="N",
                 type=int,
                 description="number of top teams to get ratings for, defaults to 10",
