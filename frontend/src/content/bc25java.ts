@@ -28,9 +28,9 @@ Check [common issues](/bc25java/common_issues/) if you experience problems with 
 
 ### Step 1: Install Java
 
-You'll need a Java Development Kit (JDK) version 21. Other versions will not work, and note that this is different from the previous episodes' use of Java 8. [Download it here](https://www.oracle.com/java/technologies/downloads/#java21). You may need to create an Oracle account.
+You'll need a Java Development Kit (JDK) version 21. Other versions will not work, and note that this is different from the previous episodes' use of Java 8. [Download it here](https://www.oracle.com/java/technologies/downloads/#java21). You may need to create an Oracle account, or you can use another JDK distribution.
 
-- Alternatively, you can install a JDK yourself using your favorite package manager. Make sure it's an Oracle JDK — we don't support anything else — and is compatible with Java 21.
+- Alternatively, you can install a JDK yourself using your favorite package manager. Make sure it is compatible with Java 21.
 
 If you're unsure how to install the JDK, you can find instructions for all operating systems [here](https://docs.oracle.com/en/java/javase/21/install/overview-jdk-installation.html) (pay attention to \`PATH\` and \`CLASSPATH\`).
 
@@ -331,7 +331,7 @@ If your error is not listed above, ask on [the Discord](https://discord.gg/N86mx
 Always follow each of the below Gradle commands with \`./gradlew build\`.
 
 - Are you on the latest version of Battlecode? try \`./gradlew update\`
-- Did you download the Oracle JDK 21 listed in [the installation instructions](/bc25/quickstart)?
+- Did you download the JDK 21 listed in [the installation instructions](/bc25/quickstart)?
 - Did you set your \`JAVA_HOME\` correctly?
 - \`./gradlew clean\` (always good to try)
 - \`./gradlew cleanEclipse\` (if Eclipse)
