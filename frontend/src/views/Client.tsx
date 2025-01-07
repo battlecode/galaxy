@@ -11,7 +11,7 @@ import { dateTime } from "utils/dateTime";
 import { useState } from "react";
 import { useUserTeam } from "api/team/useTeam";
 import { PageButtonsList } from "components/TableBottom";
-import { isPresent } from "utils/utilTypes";
+import { getClientUrl } from "api/helpers";
 
 const Client: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -27,12 +27,12 @@ const Client: React.FC = () => {
     queryClient,
   );
 
-  // TODO: forward and backward compatible client URLs (and a /latest endpoint)
-  const url = `https://releases.battlecode.org/client/${
-    episode.data?.artifact_name ?? ""
-  }/${episode.data?.release_version_public ?? ""}/index.html${
-    isPresent(selectedMatch) ? `?gameSource=${selectedMatch.replay_url}` : ""
-  }`;
+  const clientUrl = getClientUrl(
+    episode.data?.name_short,
+    episode.data?.artifact_name,
+    episode.data?.release_version_client,
+    selectedMatch?.replay_url,
+  );
 
   const matchToOption = (
     match: Match,
@@ -89,7 +89,7 @@ const Client: React.FC = () => {
         />
       </div>
 
-      <ResponsiveIframe url={url} />
+      <ResponsiveIframe url={clientUrl ?? ""} />
     </div>
   );
 };
