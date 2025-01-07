@@ -18,7 +18,7 @@ This is the Battlecode 2025 Python contest website, which will be your main hub 
   "Account and Team Creation": `
 To participate in Battlecode, you need an account and a team. Each team can consist of 1 to 4 people. Anyone can upload a bot and participate in scrimmage matches, but only teams of MIT students can participate in tournaments.
 
-[Create an account](/register) on this website, and then go to the [team section](/bc25python/team) to either create or join a team.`,
+[Create an account](/register) on this website, and then go to the [team section](/bc25python/my_team) to either create or join a team.`,
 
   "Installation and Setup": `
 
@@ -26,7 +26,7 @@ Check [common issues](/bc25python/common_issues/) if you experience problems wit
 
 ### Step 1: Install Python
 
-You'll need Python 3.12. Other versions will not work. [Download it here](https://www.python.org/downloads/release/python-3128/). Once you have installed Python, make sure this Python installation is the one you are using when you run Battlecode (you can check the version with python --version).
+You'll need Python 3.12. Other versions will not work. [Download it here](https://www.python.org/downloads/release/python-3128/). Once you have installed Python, make sure this Python installation is the one you are using when you run Battlecode (you can check the version with \`python --version\`).
 
 ### Step 2: Download Battlecode
 
@@ -52,13 +52,6 @@ You can run games directly from the terminal with the gradle task \`./run.py run
 };
 
 export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
-  "Game Specifications": `
-
-[Specifications for Battlecode 2025 Python!](https://releases.battlecode.org/specs/battlecode25/1.0.0/specs.pdf)
-
-The API for Battlecode Python is the same as Java. You can read the documentation [here](https://releases.battlecode.org/javadoc/battlecode25/1.0.0/index.html).
-
-`,
   "Coding Resources": `
 
 If you're just starting out, check out the [quick start](/bc25python/quick_start) page!
