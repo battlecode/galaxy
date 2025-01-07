@@ -42,6 +42,7 @@ const ScrimHistoryTable: React.FC<ScrimHistoryTableProps> = ({
         keyFromValue={(match) => match.id.toString()}
         bottomElement={
           <TableBottom
+            querySuccess={scrimsData.isSuccess}
             totalCount={scrimsData.data?.count ?? 0}
             pageSize={10}
             currentPage={scrimsPage}

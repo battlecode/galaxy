@@ -42,6 +42,7 @@ const InboxTable: React.FC<InboxTableProps> = ({ inboxPage, handlePage }) => {
         keyFromValue={(req) => req.id.toString()}
         bottomElement={
           <TableBottom
+            querySuccess={inboxData.isSuccess}
             totalCount={inboxData.data?.count ?? 0}
             pageSize={10}
             currentPage={inboxPage}

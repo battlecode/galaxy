@@ -21,6 +21,7 @@ import {
   LightBulbIcon as LightBulbIcon24,
   ChevronLeftIcon as ChevronLeftIcon24,
   ChevronRightIcon as ChevronRightIcon24,
+  ComputerDesktopIcon as ComputerDesktopIcon24,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -45,6 +46,7 @@ import {
   LightBulbIcon as LightBulbIcon20,
   ChevronLeftIcon as ChevronLeftIcon20,
   ChevronRightIcon as ChevronRightIcon20,
+  ComputerDesktopIcon as ComputerDesktopIcon20,
 } from "@heroicons/react/20/solid";
 
 const icons24 = {
@@ -69,6 +71,7 @@ const icons24 = {
   light_bulb: LightBulbIcon24,
   chevron_left: ChevronLeftIcon24,
   chevron_right: ChevronRightIcon24,
+  computer_desktop: ComputerDesktopIcon24,
 };
 
 const icons20 = {
@@ -93,6 +96,7 @@ const icons20 = {
   light_bulb: LightBulbIcon20,
   chevron_left: ChevronLeftIcon20,
   chevron_right: ChevronRightIcon20,
+  computer_desktop: ComputerDesktopIcon20,
 };
 
 export type IconName = keyof typeof icons24;

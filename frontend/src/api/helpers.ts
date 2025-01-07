@@ -127,3 +127,30 @@ export const getEligibilities = (
   eligibilityIds: number[],
 ): EligibilityCriterion[] =>
   eligibilityIds.flatMap((id) => criteria.find((ec) => ec.id === id) ?? []);
+
+export const getClientUrl = (
+  episodeId?: string,
+  artifactName?: string,
+  clientVersion?: string,
+  gameSource: string | null | undefined = "",
+): string | undefined => {
+  if (
+    !isPresent(episodeId) ||
+    !isPresent(artifactName) ||
+    !isPresent(clientVersion)
+  ) {
+    return undefined;
+  }
+
+  switch (episodeId) {
+    case "bc22":
+    case "bc23":
+      return `https://releases.battlecode.org/client/${artifactName}/${clientVersion}/visualizer.html${
+        !isNilOrEmptyStr(gameSource) ? `?${gameSource}` : ""
+      }`;
+    default:
+      return `https://releases.battlecode.org/client/${artifactName}/${clientVersion}/index.html${
+        !isNilOrEmptyStr(gameSource) ? `?gameSource=${gameSource}` : ""
+      }`;
+  }
+};

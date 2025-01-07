@@ -46,6 +46,7 @@ const TournamentMatchesTable: React.FC<TournamentMatchesTableProps> = ({
         keyFromValue={(match) => match.id.toString()}
         bottomElement={
           <TableBottom
+            querySuccess={matchesData.isSuccess}
             totalCount={matchesData.data?.count ?? 0}
             pageSize={10}
             currentPage={tourneyPage}

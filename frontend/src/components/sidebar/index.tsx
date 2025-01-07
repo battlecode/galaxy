@@ -112,6 +112,13 @@ const TEAM_MANAGEMENT_ITEMS: SidebarItemData[] = [
     requireGameReleased: true,
     userAuthLevel: UserAuthLevel.LOGGED_IN_HAS_TEAM,
   },
+  {
+    iconName: "computer_desktop",
+    text: "Client",
+    linkTo: "client",
+    requireGameReleased: true,
+    userAuthLevel: UserAuthLevel.LOGGED_IN_HAS_TEAM,
+  },
 ];
 
 export const ALL_SIDEBAR_ITEMS: SidebarItemData[] = [

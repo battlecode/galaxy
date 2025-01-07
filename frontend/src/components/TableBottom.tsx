@@ -1,8 +1,9 @@
 import type React from "react";
 import Icon from "./elements/Icon";
-import { useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 interface TableBottomProps {
+  querySuccess: boolean;
   totalCount: number;
   pageSize: number;
   currentPage: number;
@@ -11,7 +12,13 @@ interface TableBottomProps {
 
 type Breakpoint = "sm" | "md";
 
+const BREAKPOINTS: Record<Breakpoint, { max: number; end: number }> = {
+  sm: { max: 5, end: 1 },
+  md: { max: 13, end: 3 },
+};
+
 const TableBottom: React.FC<TableBottomProps> = ({
+  querySuccess,
   totalCount,
   pageSize,
   currentPage,
@@ -21,77 +28,16 @@ const TableBottom: React.FC<TableBottomProps> = ({
 
   const stabilizedDisplayCount: number = useMemo(() => {
     // While we are reloading the query, we want to display the previous count.
-    if (totalCount < prevCount.current) {
+    if (!querySuccess) {
       return prevCount.current;
-    } else if (totalCount > prevCount.current) {
-      prevCount.current = totalCount; // Update the previous count.
-      return totalCount;
     } else {
+      prevCount.current = totalCount; // Update the previous count
       return totalCount;
     }
-  }, [totalCount]);
+  }, [totalCount, querySuccess]);
 
   const first = (currentPage - 1) * pageSize + 1;
   const last = Math.min(currentPage * pageSize, stabilizedDisplayCount);
-  const pageCount = Math.ceil(stabilizedDisplayCount / pageSize);
-
-  const backDisabled = currentPage <= 1;
-  const forwardDisabled = currentPage >= pageCount;
-
-  const pagesToShow: Record<Breakpoint, { max: number; end: number }> = {
-    sm: { max: 5, end: 1 },
-    md: { max: 13, end: 3 },
-  };
-
-  /**
-   *
-   * @returns an array of page numbers, each of which will be rendered as a button.
-   * The strings in the array, such as the ellipses will be rendered as disabled buttons.
-   */
-  function getPageNumbers(sizeBreakpoint: Breakpoint): Array<string | number> {
-    // The maximum number of pages to show in the pagination bar.
-    const MAX_PAGES = pagesToShow[sizeBreakpoint].max;
-    // The number of pages to show on either side of the "..."
-    const END_PAGES = pagesToShow[sizeBreakpoint].end;
-    // The start/end buttons when we have lots of pages
-    const START_BUTTONS = [1, "..."];
-    const END_BUTTONS = ["...", pageCount];
-
-    if (pageCount > MAX_PAGES) {
-      // Determines where the ellipses should go based on the current page.
-      if (currentPage <= MAX_PAGES - 2) {
-        // TS hack: gets the array not to throw a type error.
-        const pages: Array<string | number> = ["", 0]
-          .concat(Array.from({ length: MAX_PAGES - 2 }, (_, idx) => idx + 1))
-          .concat(END_BUTTONS);
-        return pages.slice(2);
-      } else if (currentPage >= pageCount - MAX_PAGES + END_PAGES) {
-        return START_BUTTONS.concat(
-          Array.from(
-            { length: MAX_PAGES - START_BUTTONS.length },
-            (_, idx) => pageCount - MAX_PAGES + idx + END_PAGES,
-          ),
-        );
-      } else {
-        return START_BUTTONS.concat(
-          Array.from(
-            { length: MAX_PAGES - START_BUTTONS.length - END_BUTTONS.length },
-            (_, idx) =>
-              Math.round(
-                idx +
-                  currentPage -
-                  (MAX_PAGES - START_BUTTONS.length - END_BUTTONS.length) / 2,
-              ),
-          ),
-        ).concat(END_BUTTONS);
-      }
-    } else if (pageCount < 1) {
-      // If we have no data, return this non-clickable placeholder.
-      return ["1"];
-    } else {
-      return Array.from({ length: pageCount }, (_, idx) => idx + 1);
-    }
-  }
 
   return (
     <nav
@@ -121,44 +67,120 @@ const TableBottom: React.FC<TableBottomProps> = ({
         </span>
       </span>
 
-      {/* Pagination buttons */}
-      <div className="flex h-8 flex-row text-sm">
-        <DirectionPageButton
-          forward={false}
-          disabled={backDisabled}
-          currentPage={currentPage}
-          onPage={onPage}
-        />
-        {/* Page numbers that display on wider screens */}
-        <div className="hidden md:flex">
-          {getPageNumbers("md").map((page, idx) => (
-            <PageButton
-              key={idx}
-              page={page}
-              currentPage={currentPage}
-              onPage={onPage}
-            />
-          ))}
-        </div>
-        {/* Page numbers that display on smaller screens */}
-        <div className="flex md:hidden">
-          {getPageNumbers("sm").map((page, idx) => (
-            <PageButton
-              key={idx}
-              page={page}
-              currentPage={currentPage}
-              onPage={onPage}
-            />
-          ))}
-        </div>
-        <DirectionPageButton
-          forward={true}
-          disabled={forwardDisabled}
-          currentPage={currentPage}
-          onPage={onPage}
-        />
-      </div>
+      <PageButtonsList
+        recordCount={stabilizedDisplayCount}
+        pageSize={pageSize}
+        currentPage={currentPage}
+        onPage={onPage}
+      />
     </nav>
+  );
+};
+
+export const PageButtonsList: React.FC<{
+  recordCount: number;
+  pageSize: number;
+  currentPage: number;
+  onPage: (page: number) => void;
+}> = ({ recordCount, pageSize, currentPage, onPage }) => {
+  const pageCount = Math.max(1, Math.ceil(recordCount / pageSize));
+
+  const backDisabled = currentPage <= 1;
+  const forwardDisabled = currentPage >= pageCount;
+
+  /**
+   *
+   * @returns an array of page numbers, each of which will be rendered as a button.
+   * The strings in the array, such as the ellipses will be rendered as disabled buttons.
+   */
+  const getPageNumbers = useCallback(
+    (sizeBreakpoint: Breakpoint): Array<string | number> => {
+      // The maximum number of pages to show in the pagination bar.
+      const MAX_PAGES = BREAKPOINTS[sizeBreakpoint].max;
+      // The number of pages to show on either side of the "..."
+      const END_PAGES = BREAKPOINTS[sizeBreakpoint].end;
+      // The start/end buttons when we have lots of pages
+      const START_BUTTONS = [1, "..."];
+      const END_BUTTONS = ["...", pageCount];
+
+      if (pageCount > MAX_PAGES) {
+        // Determines where the ellipses should go based on the current page.
+        if (currentPage <= MAX_PAGES - 2) {
+          // TS hack: gets the array not to throw a type error.
+          const pages: Array<string | number> = ["", 0]
+            .concat(Array.from({ length: MAX_PAGES - 2 }, (_, idx) => idx + 1))
+            .concat(END_BUTTONS);
+          return pages.slice(2);
+        } else if (currentPage >= pageCount - MAX_PAGES + END_PAGES) {
+          return START_BUTTONS.concat(
+            Array.from(
+              { length: MAX_PAGES - START_BUTTONS.length },
+              (_, idx) => pageCount - MAX_PAGES + idx + END_PAGES,
+            ),
+          );
+        } else {
+          return START_BUTTONS.concat(
+            Array.from(
+              { length: MAX_PAGES - START_BUTTONS.length - END_BUTTONS.length },
+              (_, idx) =>
+                Math.round(
+                  idx +
+                    currentPage -
+                    (MAX_PAGES - START_BUTTONS.length - END_BUTTONS.length) / 2,
+                ),
+            ),
+          ).concat(END_BUTTONS);
+        }
+      } else if (pageCount < 1) {
+        // If we have no data, return this non-clickable placeholder.
+        return ["1"];
+      } else {
+        return Array.from({ length: pageCount }, (_, idx) => idx + 1);
+      }
+    },
+    [currentPage, pageCount],
+  );
+
+  return (
+    <div
+      className="flex h-8 flex-row text-sm"
+      key={pageCount.toString() + currentPage.toString()}
+    >
+      <DirectionPageButton
+        forward={false}
+        disabled={backDisabled}
+        currentPage={currentPage}
+        onPage={onPage}
+      />
+      {/* Page numbers that display on wider screens */}
+      <div className="hidden md:flex">
+        {getPageNumbers("md").map((page, idx) => (
+          <PageButton
+            key={page.toString() + idx.toString()}
+            page={page}
+            currentPage={currentPage}
+            onPage={onPage}
+          />
+        ))}
+      </div>
+      {/* Page numbers that display on smaller screens */}
+      <div className="flex md:hidden">
+        {getPageNumbers("sm").map((page, idx) => (
+          <PageButton
+            key={page.toString() + idx.toString()}
+            page={page}
+            currentPage={currentPage}
+            onPage={onPage}
+          />
+        ))}
+      </div>
+      <DirectionPageButton
+        forward={true}
+        disabled={forwardDisabled}
+        currentPage={currentPage}
+        onPage={onPage}
+      />
+    </div>
   );
 };
 

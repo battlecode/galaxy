@@ -43,6 +43,7 @@ const OutboxTable: React.FC<OutboxTableProps> = ({
         keyFromValue={(req) => req.id.toString()}
         bottomElement={
           <TableBottom
+            querySuccess={outboxData.isSuccess}
             totalCount={outboxData.data?.count ?? 0}
             pageSize={10}
             currentPage={outboxPage}
