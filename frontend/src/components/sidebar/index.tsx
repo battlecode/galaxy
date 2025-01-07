@@ -153,7 +153,7 @@ export const renderableItems = (
 // IMPORTANT: When changing this file, also remember to change the mobile menu that appears on small screens.
 const Sidebar: React.FC<SidebarProps> = ({ collapsed = false }) =>
   collapsed ? null : (
-    <nav className="fixed top-16 z-10 hidden h-full w-60 flex-col gap-8 bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">
+    <nav className="fixed top-16 z-10 hidden h-full w-60 flex-col gap-8 overflow-y-auto bg-gray-50 pb-24 pt-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] sm:flex">
       <SidebarSection title="" items={GENERAL_ITEMS} />
       <SidebarSection title="compete" items={COMPETE_ITEMS} />
       <SidebarSection title="team management" items={TEAM_MANAGEMENT_ITEMS} />

@@ -17,7 +17,7 @@ This is the Battlecode 2025 Java contest website, which will be your main hub fo
   "Account and Team Creation": `
 To participate in Battlecode, you need an account and a team. Each team can consist of 1 to 4 people.
 
-[Create an account](/register) on this website, and then go to the [team section](/bc25java/team) to either create or join a team.
+[Create an account](/register) on this website, and then go to the [team section](/bc25java/my_team) to either create or join a team.
 
 If you need to rename your team for any reason, please reach out to Teh Devs on [Discord](https://discord.gg/N86mxkH) or at [battlecode@mit.edu](mailto:battlecode@mit.edu).
 `,
@@ -83,13 +83,6 @@ You can run games directly from the terminal with the gradle task \`./gradlew ru
 };
 
 export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
-  "Game Specifications": `
-
-[Specifications for Battlecode 2025 Java!](https://releases.battlecode.org/specs/battlecode25/1.0.0/specs.pdf)
-
-[Javadocs for Battlecode 2025 Java!](https://releases.battlecode.org/javadoc/battlecode25/1.0.0/index.html)
-
-`,
   "Coding Resources": `
 
 If you're just starting out, check out the [quick start](/bc25java/quickstart) page!
