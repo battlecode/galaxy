@@ -12,7 +12,6 @@ import TournamentCountdown from "../components/compete/TournamentCountdown";
 import FormLabel from "../components/elements/FormLabel";
 import { useEpisodeInfo, useNextTournament } from "../api/episode/useEpisode";
 import {
-  useSubmissionsList,
   useTournamentSubmissions,
   useUploadSubmission,
 } from "../api/compete/useCompete";
@@ -30,30 +29,22 @@ interface SubmissionFormInput {
 }
 
 interface QueryParams {
-  scrimsPage: number;
+  subsPage: number;
 }
 
 const Submissions: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const queryClient = useQueryClient();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams: QueryParams = useMemo(
     () => ({
-      scrimsPage: parsePageParam("scrimsPage", searchParams),
+      subsPage: parsePageParam("subsPage", searchParams),
     }),
     [searchParams],
   );
 
   const episode = useEpisodeInfo({ id: episodeId });
 
-  const submissions = useSubmissionsList(
-    {
-      episodeId,
-      page: queryParams.scrimsPage,
-    },
-    queryClient,
-  );
   const tourneySubs = useTournamentSubmissions({
     episodeId,
   });
@@ -99,11 +90,9 @@ const Submissions: React.FC = () => {
 
       <SectionCard title="Submission History" className="mb-8">
         <SubHistoryTable
-          data={submissions.data}
-          loading={submissions.isLoading}
-          page={queryParams.scrimsPage}
+          page={queryParams.subsPage}
           handlePage={(page) => {
-            handlePage(page, "scrimsPage");
+            handlePage(page, "subsPage");
           }}
         />
       </SectionCard>

@@ -5,9 +5,10 @@ import Icon from "./Icon";
 import FormError from "./FormError";
 import FormLabel from "./FormLabel";
 import Spinner from "components/Spinner";
+import { isPresent } from "utils/utilTypes";
 
 interface SelectMenuProps<T extends React.Key | null | undefined> {
-  options: Array<{ value: T; label: string }>;
+  options: Array<{ value: T; label: string | React.JSX.Element }>;
   loading?: boolean;
   disabled?: boolean;
   label?: string;
@@ -49,7 +50,7 @@ function SelectMenu<T extends React.Key | null | undefined>({
 
   return (
     <div className={`relative ${invalid ? "mb-2" : ""} ${className}`}>
-      <Listbox value={value} onChange={onChange} disabled={disabled}>
+      <Listbox value={value} onChange={onChange} disabled={disabled || loading}>
         <div className="relative">
           {label !== undefined && (
             <Listbox.Label>
@@ -57,15 +58,17 @@ function SelectMenu<T extends React.Key | null | undefined>({
             </Listbox.Label>
           )}
           <Listbox.Button
-            className={`relative h-9 w-full truncate rounded-md bg-white py-1.5 pl-3 pr-10
+            className={`relative h-9 w-full truncate rounded-md bg-white pl-3 pr-10
             text-left shadow-sm ring-1 ring-inset focus:outline-none focus:ring-1
             sm:text-sm sm:leading-6 ${stateStyle}`}
           >
-            <span>
-              {value === undefined ? placeholder : valueToLabel.get(value)}
-            </span>{" "}
+            {!isPresent(value) ? placeholder : valueToLabel.get(value)}
             {loading && (
-              <div className="my-1 flex w-full justify-center">
+              <div
+                className={`absolute inset-y-0 right-0 mr-${
+                  isPresent(value) ? "16" : "8"
+                } flex transform items-center`}
+              >
                 <Spinner size="xs" />
               </div>
             )}
@@ -89,14 +92,17 @@ function SelectMenu<T extends React.Key | null | undefined>({
             >
               {options.map((option) => (
                 <Listbox.Option
-                  className="flex cursor-default flex-row justify-between py-1.5 pl-4 pr-2 ui-active:bg-cyan-100"
+                  className="flex cursor-default flex-row justify-between py-1.5 pl-4 pr-2
+                ui-selected:bg-cyan-100 ui-active:bg-cyan-100"
                   key={option.value}
                   value={option.value}
                 >
                   <div className="overflow-x-auto pr-2">{option.label}</div>
-                  <span className=" hidden items-center text-cyan-900 ui-selected:flex">
-                    <Icon name="check" size="sm" />
-                  </span>
+                  {value === option.value && (
+                    <span className="items-center text-cyan-900">
+                      <Icon name="check" size="sm" />
+                    </span>
+                  )}
                 </Listbox.Option>
               ))}
             </Listbox.Options>
