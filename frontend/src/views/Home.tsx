@@ -3,25 +3,25 @@ import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useEpisodeInfo } from "../api/episode/useEpisode";
 import SectionCard from "../components/SectionCard";
 import { SocialIcon } from "react-social-icons";
-// import TeamChart from "../components/compete/chart/TeamChart";
+import TeamChart from "../components/compete/chart/TeamChart";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 import { useUserTeam } from "api/team/useTeam";
-// import { useTopRatingHistoryList } from "api/compete/useCompete";
-// import UserChart from "components/compete/chart/UserChart";
-// import { useCurrentUser } from "contexts/CurrentUserContext";
+import { useTopRatingHistoryList } from "api/compete/useCompete";
+import UserChart from "components/compete/chart/UserChart";
+import { useCurrentUser } from "contexts/CurrentUserContext";
 import { isPresent } from "utils/utilTypes";
 import { dateTime } from "utils/dateTime";
 import Markdown from "components/elements/Markdown";
 import HomeCountdown from "components/HomeCountdown";
 
 const Home: React.FC = () => {
-  // const TOP_TEAMS = 10;
+  const TOP_TEAMS = 10;
 
   const { episodeId } = useEpisodeId();
   const episode = useEpisodeInfo({ id: episodeId });
-  // const topRatingHistory = useTopRatingHistoryList({ episodeId, n: TOP_TEAMS });
+  const topRatingHistory = useTopRatingHistoryList({ episodeId, n: TOP_TEAMS });
   const userTeam = useUserTeam({ episodeId });
-  // const currentUser = useCurrentUser();
+  const currentUser = useCurrentUser();
 
   const SOCIAL =
     "hover:drop-shadow-lg hover:opacity-80 transition-opacity duration-300 ease-in-out";
@@ -67,7 +67,7 @@ In the meantime, [create or join a team](/${episodeId}/my_team) and check out th
               "Join a team to scrimmage other teams!"
             )}
           </SectionCard>
-          {/* <SectionCard
+          <SectionCard
             title="Rating History"
             loading={currentUser.user.isLoading}
           >
@@ -79,7 +79,7 @@ In the meantime, [create or join a team](/${episodeId}/my_team) and check out th
             ) : (
               "Sign in to view your rating history!"
             )}
-          </SectionCard> */}
+          </SectionCard>
         </div>
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
           <HomeCountdown />
@@ -105,13 +105,13 @@ In the meantime, [create or join a team](/${episodeId}/my_team) and check out th
               />
             </div>
           </SectionCard>
-          {/* <SectionCard title="Top Teams">
+          <SectionCard title="Top Teams">
             <TeamChart
               teamRatings={topRatingHistory.data ?? []}
               loading={topRatingHistory.isLoading}
               crownTop
             />
-          </SectionCard> */}
+          </SectionCard>
         </div>
       </div>
     </div>

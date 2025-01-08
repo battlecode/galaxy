@@ -388,6 +388,10 @@ class MatchViewSet(
         return self.get_paginated_response(serializer.data)
 
     def get_historical_rating(self, episode_id, teams):
+        """
+        helper function to return historical ratings for all given teams
+        in the given episode
+        """
         teams_ids = [team.pk for team in teams]
         logger.debug(f"Matchparticipant count: {MatchParticipant.objects.count()}")
         # get all teams data in one query
@@ -564,7 +568,7 @@ class MatchViewSet(
         permission_classes=(IsEpisodeMutable,),
         pagination_class=None,
     )
-    def historical_rating(self, request, pk=None, *, episode_id):
+    def slow_historical_rating(self, request, pk=None, *, episode_id):
         """
         Provides a list of historical ratings for a team in a given episode.
         Supports filtering by team ID or defaults to the current user's team
@@ -669,7 +673,7 @@ class MatchViewSet(
         permission_classes=(IsEpisodeMutable,),
         pagination_class=None,
     )
-    def fast_historical_rating(self, request, pk=None, *, episode_id):
+    def historical_rating(self, request, pk=None, *, episode_id):
         """
         Provides a list of historical ratings for a team in a given episode.
         Supports filtering by team ID or defaults to the current user's team

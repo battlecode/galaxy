@@ -22,8 +22,8 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import { FIELD_REQUIRED_ERROR_MSG } from "utils/constants";
 import FormLabel from "components/elements/FormLabel";
 import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
-// import TeamChart from "components/compete/chart/TeamChart";
-// import { useUserRatingHistory } from "api/compete/useCompete";
+import TeamChart from "components/compete/chart/TeamChart";
+import { useUserRatingHistory } from "api/compete/useCompete";
 
 interface InfoFormInput {
   quote: string;
@@ -48,7 +48,7 @@ const MyTeam: React.FC = () => {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState<boolean>(false);
 
   const teamData = useUserTeam({ episodeId });
-  // const teamRatingHistory = useUserRatingHistory({ episodeId });
+  const teamRatingHistory = useUserRatingHistory({ episodeId });
 
   const updateTeam = useUpdateTeam(
     {
@@ -189,14 +189,14 @@ const MyTeam: React.FC = () => {
               hideAllScrimmages={true}
             />
           </SectionCard>
-          {/* <SectionCard title="Rating History">
+          <SectionCard title="Rating History">
             <TeamChart
               teamRatings={
                 teamRatingHistory.isSuccess ? [teamRatingHistory.data] : []
               }
               loading={teamRatingHistory.isLoading}
             />
-          </SectionCard> */}
+          </SectionCard>
         </div>
       </div>
       {/* The confirmation modal that pops up when a user clicks "Leave Team" */}
