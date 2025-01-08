@@ -173,7 +173,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
           animate="open"
           exit="closed"
           variants={sidebarVariants}
-          className="fixed top-16 z-10 flex h-[calc(100%-4rem)] w-60 flex-col gap-8 overflow-y-auto rounded-br-xl rounded-tr-xl bg-gray-50 py-4 shadow-lg"
+          className="fixed top-16 z-10 flex h-full w-60 flex-col gap-8 overflow-y-auto rounded-br-xl rounded-tr-xl bg-gray-50 py-4 drop-shadow-[2px_0_2px_rgba(0,0,0,0.25)] "
         >
           <SidebarSection title="" items={GENERAL_ITEMS} />
           <SidebarSection title="compete" items={COMPETE_ITEMS} />
