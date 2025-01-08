@@ -407,6 +407,7 @@ class MatchViewSet(
             .select_related("match", "rating")
             .order_by("match__created")
         )
+        logger.debug(f"match_participants queyr plan: {match_participants.query}")
 
         logger.debug(f"match_participants count: {match_participants.count()}")
         # Prepare rating history
@@ -777,8 +778,9 @@ class MatchViewSet(
 
         # get top limit teams
         top_teams = Team.objects.filter(episode=episode_id).order_by(
-            "-profile__rating"
+            "-profile__rating__value"
         )[:N]
+        logger.debug(f"top 10 teams: {top_teams.query}")
 
         grouped = self.get_historical_rating(episode_id, top_teams)
 
