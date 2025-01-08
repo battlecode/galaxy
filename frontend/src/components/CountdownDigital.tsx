@@ -1,14 +1,11 @@
-import { useQueryClient } from "@tanstack/react-query";
-import React, { useEffect, useMemo, useState } from "react";
-import { useEpisodeId } from "../contexts/EpisodeContext";
-import { buildKey } from "../api/helpers";
-import { nextTournamentFactory } from "../api/episode/episodeFactories";
-import {
-  HOURS_DAY,
-  MILLIS_SECOND,
-  MINUTES_HOUR,
-  SECONDS_MINUTE,
-} from "utils/utilTypes";
+import type React from "react";
+import { useEffect, useMemo, useState } from "react";
+
+const thousand = 1000;
+const sixty = 60;
+const hoursInDay = 24;
+const fullPercentage = 100;
+const countDownRefreshRate = 30;
 
 interface ProgressCircleProps {
   sqSize: number;
@@ -24,7 +21,7 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
   const radius = (sqSize - strokeWidth) / 2;
   const viewBox = `0 0 ${sqSize} ${sqSize}`;
   const dashArray = radius * Math.PI * 2;
-  const dashOffset = dashArray - (dashArray * percentage) / 100;
+  const dashOffset = dashArray - (dashArray * percentage) / fullPercentage;
 
   return (
     <svg width={sqSize} height={sqSize} viewBox={viewBox}>
@@ -33,7 +30,7 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
             cx={sqSize / 2}
             cy={sqSize / 2}
             r={radius}
-            strokeWidth={`${strokeWidth*0.5}px`} />
+            strokeWidth={`${strokeWidth / 2}px`} />
             <circle
               className="fill-none stroke-cyan-600 transition-all delay-200 ease-in"
               cx={sqSize / 2}
@@ -60,17 +57,17 @@ const computeTimeDiff = (fromDate: Date, toDate: Date): DateParams => {
   const timeDiff = toDate.getTime() - fromDate.getTime();
 
   const days = Math.floor(
-    (timeDiff) / (1000 * 60 * 60 * 24),
+    (timeDiff) / (thousand * sixty * sixty * hoursInDay),
   );
   const hours = Math.floor(
-    ((timeDiff) % (1000 * 60 * 60 * 24)) /
-      (1000 * 60 * 60),
+    ((timeDiff) % (thousand * sixty * sixty * hoursInDay)) /
+      (thousand * sixty * sixty),
   );
   const minutes = Math.floor(
-    ((timeDiff) % (1000 * 60 * 60)) / (1000 * 60),
+    ((timeDiff) % (thousand * sixty * sixty)) / (thousand * sixty),
   );
 
-  return { days: days, hours: hours, minutes: minutes };
+  return { days, hours, minutes };
 };
 
 interface CountdownDigitalProps {
@@ -82,13 +79,12 @@ const CountdownDigital: React.FC<CountdownDigitalProps> = ({
   date,
 }) => {
   const currentTime = new Date();
-  const dateHasPassed = date.getTime() < currentTime.getTime();
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setCount((prevCount) => prevCount + 1);
-    }, 1000 * 30);
+    }, thousand * countDownRefreshRate);
     return () => {
       clearInterval(intervalId);
     };
@@ -96,9 +92,9 @@ const CountdownDigital: React.FC<CountdownDigitalProps> = ({
 
   const countdownInfo = useMemo(() => computeTimeDiff(currentTime, date), [count]);
   const progressCircleSize = 140;
-  const percentageDays = ((60-countdownInfo.days)/60)*100;
-  const percentageHours = ((24-countdownInfo.hours)/24)*100;
-  const percentageMins = ((60-countdownInfo.minutes)/60)*100;
+  const percentageDays = ((sixty-countdownInfo.days)/sixty)*fullPercentage;
+  const percentageHours = ((hoursInDay-countdownInfo.hours)/hoursInDay)*fullPercentage;
+  const percentageMins = ((sixty-countdownInfo.minutes)/sixty)*fullPercentage;
   const countTxtSize = "3xl";
   const labelTxtSize = "l";
 
