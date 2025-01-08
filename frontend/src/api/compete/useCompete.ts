@@ -255,9 +255,8 @@ export const useUserRatingHistory = ({
  */
 export const useScrimmagingRecord = ({
   episodeId,
-  teamId,
-} // scrimmageType,
-: CompeteMatchScrimmagingRecordRetrieveRequest): UseQueryResult<ScrimmageRecord> =>
+  teamId, // scrimmageType,
+}: CompeteMatchScrimmagingRecordRetrieveRequest): UseQueryResult<ScrimmageRecord> =>
   useQuery({
     queryKey: buildKey(scrimmagingRecordFactory.queryKey, {
       episodeId,

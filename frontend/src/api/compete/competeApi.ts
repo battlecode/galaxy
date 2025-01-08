@@ -248,9 +248,8 @@ export const getRatingHistory = async ({
  */
 export const getScrimmagingRecord = async ({
   episodeId,
-  teamId,
-} // scrimmageType,
-: CompeteMatchScrimmagingRecordRetrieveRequest): Promise<ScrimmageRecord> =>
+  teamId, // scrimmageType,
+}: CompeteMatchScrimmagingRecordRetrieveRequest): Promise<ScrimmageRecord> =>
   await API.competeMatchScrimmagingRecordRetrieve({
     episodeId,
     teamId,
