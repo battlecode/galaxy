@@ -79,6 +79,8 @@ Check [debugging tips](/bc25java/debugging_tips) if you experience problems whil
 ### RUNNING BATTLECODE FROM THE CLIENT
 Open the client as described in Step 3. Navigate to the runner tab, select which bots and maps to run, and hit Run Game! Finally, click the play/pause button to view the replay.
 You can run games directly from the terminal with the gradle task \`./gradlew run -Pmaps=[map] -PteamA=[Team A] -PteamB=[Team B]\`. If you don't include the map or team flags, Battlecode will default to whatever is listed in \`gradle.properties\`. Running the same gradle task from your IDE will also work.
+
+Note that you can also use the web client located at [https://play.battlecode.org/bc25java/client](/bc25java/client) if you are having issues running the client locally.
 `,
 };
 
@@ -305,13 +307,12 @@ Known errors, with solutions:
 
 If your error is not listed above, ask on [the Discord](https://discord.gg/N86mxkH).
 `,
-  //   "Client Issues": `
+  "Client Issues": `
 
-  // If you're experiencing memory problems with the client, please try:
+If you're experiencing memory problems with the client, please try:
 
-  // - Making .bc25 files with the engine directly and uploading them to the client's match queue, rather than using the client's runner. With this method, once the web version of the visualizer is live, you can just use the web version at [https://play.battlecode.org/clients/bc25/index.html](https://play.battlecode.org/clients/bc25/index.html) rather than the desktop application.
-  // `,
-  // TODO: what was the web client???
+ - Making .bc25 files with the engine directly and uploading them to the client's match queue, rather than using the client's runner. The web client can be found at [https://play.battlecode.org/bc25java/client](https://play.battlecode.org/bc25java/client) and can be used in place of the desktop application.
+  `,
   "Other Issues": `
 - *After an update, IntelliJ doesn't recognize new API functions (e.g. \`rc.getMapWidth\`).* You need to refresh dependencies. Right-click on the project name (most likely \`battlecode25-scaffold\`) in the Gradle Tool Window (the right-hand sidebar), and click \`Refresh Gradle Dependencies\`. It is good to do this after every update.
 - You can enable auto-updates in IntelliJ by navigating to \`settings > build, execution, deployment > Gradle\` and checking \`Automatically import this project on changes in build script files\`, or the button that says something similar if you have an older version.
@@ -341,7 +342,9 @@ export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
 Battlecode 2025 Java will have several tournaments throughout the month! We stream and commentate all tournaments online.
 
 The deadline to submit code for each non-final tournament is usually 7 pm EST *the day before* the tournament.
-    `,
+
+Please note that **all times on this page are in your current time zone**. Refer to the submission freeze countdown timer for the time remaining before the next submission freeze.
+`,
   Prizes: `
 Prize amounts are approximate and will be finalized soon!
 

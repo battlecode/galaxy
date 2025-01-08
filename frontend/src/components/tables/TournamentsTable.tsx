@@ -52,7 +52,7 @@ const TournamentsTable: React.FC<TournamentsTableProps> = ({
         {
           header: "Date",
           key: "display_date",
-          value: (tour) => dateTime(tour.display_date).shortDateStr,
+          value: (tour) => dateTime(tour.display_date).zeroOffsetShortStr,
         },
         {
           header: "Eligible?",

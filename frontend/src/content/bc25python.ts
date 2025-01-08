@@ -48,6 +48,8 @@ Check [debugging tips](/bc25python/debugging_tips) if you experience problems wh
 ### RUNNING BATTLECODE FROM THE CLIENT
 Open the client as described in Step 3. Navigate to the runner tab, select which bots and maps to run, and hit Run Game! Finally, click the play/pause button to view the replay.
 You can run games directly from the terminal with the gradle task \`./run.py run --maps [map] --p1 [player 1 name] --p2 [player 2 name]\`. If you don't include the map or team flags, Battlecode will default to an example player and example map.
+
+Note that you can also use the web client located at [https://play.battlecode.org/bc25python/client](/bc25python/client) if you are having issues running the client locally.
 `,
 };
 
@@ -85,6 +87,12 @@ export const DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> = {
 
 export const COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
   "Installation Issues": `Installation issue fixes coming soon! If you run into any issues, please let us know in the Discord!`,
+  "Client Issues": `
+
+If you're experiencing memory problems with the client, please try:
+
+  - Making .bc25 files with the engine directly and uploading them to the client's match queue, rather than using the client's runner. The web client can be found at [https://play.battlecode.org/bc25python/client](/bc25python/client) and can be used in place of the desktop application.
+    `,
 };
 
 export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
@@ -93,6 +101,7 @@ export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
 
   The deadline to submit code for each non-final tournament is usually 7 pm EST *the day before* the tournament.
 
+  Please note that **all times on this page are in your current time zone**. Refer to the submission freeze countdown timer for the time remaining before the next submission freeze.
   `,
   Prizes: `
   Battlecode 2025 Python will have several tournaments throughout the month! We stream and commentate all tournaments online.
