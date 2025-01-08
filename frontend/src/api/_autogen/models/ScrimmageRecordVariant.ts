@@ -16,33 +16,33 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface ScrimmageRecordSerializerHelper
+ * @interface ScrimmageRecordVariant
  */
-export interface ScrimmageRecordSerializerHelper {
+export interface ScrimmageRecordVariant {
     /**
      * 
      * @type {number}
-     * @memberof ScrimmageRecordSerializerHelper
+     * @memberof ScrimmageRecordVariant
      */
     wins: number;
     /**
      * 
      * @type {number}
-     * @memberof ScrimmageRecordSerializerHelper
+     * @memberof ScrimmageRecordVariant
      */
     losses: number;
     /**
      * 
      * @type {number}
-     * @memberof ScrimmageRecordSerializerHelper
+     * @memberof ScrimmageRecordVariant
      */
     ties: number;
 }
 
 /**
- * Check if a given object implements the ScrimmageRecordSerializerHelper interface.
+ * Check if a given object implements the ScrimmageRecordVariant interface.
  */
-export function instanceOfScrimmageRecordSerializerHelper(value: object): boolean {
+export function instanceOfScrimmageRecordVariant(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "wins" in value;
     isInstance = isInstance && "losses" in value;
@@ -51,11 +51,11 @@ export function instanceOfScrimmageRecordSerializerHelper(value: object): boolea
     return isInstance;
 }
 
-export function ScrimmageRecordSerializerHelperFromJSON(json: any): ScrimmageRecordSerializerHelper {
-    return ScrimmageRecordSerializerHelperFromJSONTyped(json, false);
+export function ScrimmageRecordVariantFromJSON(json: any): ScrimmageRecordVariant {
+    return ScrimmageRecordVariantFromJSONTyped(json, false);
 }
 
-export function ScrimmageRecordSerializerHelperFromJSONTyped(json: any, ignoreDiscriminator: boolean): ScrimmageRecordSerializerHelper {
+export function ScrimmageRecordVariantFromJSONTyped(json: any, ignoreDiscriminator: boolean): ScrimmageRecordVariant {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -67,7 +67,7 @@ export function ScrimmageRecordSerializerHelperFromJSONTyped(json: any, ignoreDi
     };
 }
 
-export function ScrimmageRecordSerializerHelperToJSON(value?: ScrimmageRecordSerializerHelper | null): any {
+export function ScrimmageRecordVariantToJSON(value?: ScrimmageRecordVariant | null): any {
     if (value === undefined) {
         return undefined;
     }

@@ -482,15 +482,15 @@ class HistoricalRatingSerializer(serializers.Serializer):
 
 
 class ScrimmageRecordSerializer(serializers.Serializer):
-    class ScrimmageRecordSerializerHelper(serializers.Serializer):
+    class ScrimmageRecordVariantSerializer(serializers.Serializer):
         wins = serializers.IntegerField()
         losses = serializers.IntegerField()
         ties = serializers.IntegerField()
 
     team_id = serializers.IntegerField()
-    Ranked = ScrimmageRecordSerializerHelper()
-    Unranked = ScrimmageRecordSerializerHelper()
-    All = ScrimmageRecordSerializerHelper()
+    Ranked = ScrimmageRecordVariantSerializer()
+    Unranked = ScrimmageRecordVariantSerializer()
+    All = ScrimmageRecordVariantSerializer()
 
 
 class EmptySerializer(serializers.Serializer):

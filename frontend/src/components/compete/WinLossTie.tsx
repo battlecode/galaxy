@@ -1,27 +1,17 @@
 import type React from "react";
 import { useMemo } from "react";
-// import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_autogen";
+import type { ScrimmageTypeEnum } from "api/apiTypes";
 import Spinner from "components/Spinner";
 import { isNil } from "lodash";
 import { useScrimmagingRecord } from "api/compete/useCompete";
 import { useEpisodeId } from "contexts/EpisodeContext";
 
-// interface WinLossTieProps {
-//   scrimmageType: CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum;
-//   teamId: number;
-//   className?: string;
-// }
 interface WinLossTieProps {
-  scrimmageType: "All" | "Ranked" | "Unranked"; // Adjust to match the new schema
+  scrimmageType: ScrimmageTypeEnum;
   teamId: number;
   className?: string;
 }
-// const scrimmageTypeToName = {
-//   [CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All]:
-//     "All Scrimmages",
-//   [CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked]: "Unranked",
-//   [CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked]: "Ranked",
-// } as const;
+
 const scrimmageTypeToName = {
   All: "All Scrimmages",
   Unranked: "Unranked",
@@ -37,7 +27,6 @@ const WinLossTie: React.FC<WinLossTieProps> = ({
   const scrimRecord = useScrimmagingRecord({
     episodeId,
     teamId,
-    // scrimmageType,
   });
 
   const HEADER =

@@ -9,12 +9,7 @@ import {
 } from "../compete/competeFactories";
 import { buildKey, safeEnsureQueryData } from "../helpers";
 import { myTeamFactory, searchTeamsFactory } from "../team/teamFactories";
-import {
-  // CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum,
-  Status526Enum,
-  type Episode,
-  type TeamPrivate,
-} from "api/_autogen";
+import { Status526Enum, type Episode, type TeamPrivate } from "api/_autogen";
 import { episodeInfoFactory } from "api/episode/episodeFactories";
 import toast from "react-hot-toast";
 
@@ -77,32 +72,10 @@ export const scrimmagingLoader =
       {
         episodeId,
         teamId: myTeamInfo.id,
-        // scrimmageType:
-        //   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All,
       },
       scrimmagingRecordFactory,
       queryClient,
     );
-    // safeEnsureQueryData(
-    //   {
-    //     episodeId,
-    //     teamId: myTeamInfo.id,
-    //     // scrimmageType:
-    //     //   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked,
-    //   },
-    //   scrimmagingRecordFactory,
-    //   queryClient,
-    // );
-    // safeEnsureQueryData(
-    //   {
-    //     episodeId,
-    //     teamId: myTeamInfo.id,
-    //     // scrimmageType:
-    //     //   CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked,
-    //   },
-    //   scrimmagingRecordFactory,
-    //   queryClient,
-    // );
 
     // Tournament match list
     safeEnsureQueryData(

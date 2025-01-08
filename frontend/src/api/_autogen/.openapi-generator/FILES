@@ -40,7 +40,7 @@ models/ResetToken.ts
 models/ResetTokenRequest.ts
 models/SaturnInvocationRequest.ts
 models/ScrimmageRecord.ts
-models/ScrimmageRecordSerializerHelper.ts
+models/ScrimmageRecordVariant.ts
 models/ScrimmageRequest.ts
 models/ScrimmageRequestRequest.ts
 models/ScrimmageStatusEnum.ts

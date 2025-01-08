@@ -244,14 +244,12 @@ export const getRatingHistory = async ({
  * Defaults to all scrimmage types.
  * @param episodeId The episode ID to retrieve record data for.
  * @param teamId The team ID to retrieve record data for.
- * @param scrimmageType The type of scrimmage to retrieve record data for.
  */
 export const getScrimmagingRecord = async ({
   episodeId,
-  teamId, // scrimmageType,
+  teamId,
 }: CompeteMatchScrimmagingRecordRetrieveRequest): Promise<ScrimmageRecord> =>
   await API.competeMatchScrimmagingRecordRetrieve({
     episodeId,
     teamId,
-    // scrimmageType,
   });

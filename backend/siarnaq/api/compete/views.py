@@ -626,12 +626,6 @@ class MatchViewSet(
                 type=int,
                 description="A team to filter for. Defaults to your own team.",
             ),
-            # OpenApiParameter(
-            #     name="scrimmage_type",
-            #     enum=["ranked", "unranked", "all"],
-            #     default="all",
-            #     description="Which type of scrimmages to filter for.Defaults to all.",
-            # ),
         ],
         responses={
             status.HTTP_200_OK: ScrimmageRecordSerializer(),

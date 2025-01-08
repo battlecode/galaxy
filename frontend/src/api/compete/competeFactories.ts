@@ -235,14 +235,6 @@ export const userRatingHistoryFactory: QueryFactory<
   queryFn: async ({ episodeId }) => await getRatingHistory({ episodeId }),
 } as const;
 
-// export const scrimmagingRecordFactory: QueryFactory<
-//   CompeteMatchScrimmagingRecordRetrieveRequest,
-//   ScrimmageRecord
-// > = {
-//   queryKey: competeQueryKeys.scrimmagingRecord,
-//   queryFn: async ({ episodeId, teamId, scrimmageType }) =>
-//     await getScrimmagingRecord({ episodeId, teamId, scrimmageType }),
-// } as const;
 export const scrimmagingRecordFactory: QueryFactory<
   CompeteMatchScrimmagingRecordRetrieveRequest,
   ScrimmageRecord

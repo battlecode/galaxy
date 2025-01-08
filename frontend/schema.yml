@@ -278,17 +278,18 @@ paths:
       description: |-
         Retrieve the scrimmaging win-loss-tie record for a team.
 
-        Returns a JSON object containing the team's record in ranked, unranked, and overall matches.
+        Returns a JSON object containing the team's record in ranked,
+        unranked, and overall matches.
         The record is broken down into wins, losses, and ties for each category.
 
         Query Parameters:
-        - team_id (optional): ID of the team to retrieve the record for. If not provided,
-                              uses the authenticated user's team.
+        - team_id (optional): ID of the team to retrieve the record for.
+                              If not provided, uses the authenticated user's team.
 
         Returns:
         - 200 OK: Successfully retrieved the team's scrimmaging record.
-        - 400 Bad Request: If no team_id is provided and the user is not associated with a team,
-                           or if the provided team_id is invalid.
+        - 400 Bad Request: If no team_id is provided and the user is not associated
+                              with a team, or if the provided team_id is invalid.
       parameters:
         - in: path
           name: episode_id
@@ -2679,17 +2680,17 @@ components:
         team_id:
           type: integer
         Ranked:
-          $ref: "#/components/schemas/ScrimmageRecordSerializerHelper"
+          $ref: "#/components/schemas/ScrimmageRecordVariant"
         Unranked:
-          $ref: "#/components/schemas/ScrimmageRecordSerializerHelper"
+          $ref: "#/components/schemas/ScrimmageRecordVariant"
         All:
-          $ref: "#/components/schemas/ScrimmageRecordSerializerHelper"
+          $ref: "#/components/schemas/ScrimmageRecordVariant"
       required:
         - All
         - Ranked
         - Unranked
         - team_id
-    ScrimmageRecordSerializerHelper:
+    ScrimmageRecordVariant:
       type: object
       properties:
         wins:

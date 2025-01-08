@@ -13,12 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { ScrimmageRecordSerializerHelper } from './ScrimmageRecordSerializerHelper';
+import type { ScrimmageRecordVariant } from './ScrimmageRecordVariant';
 import {
-    ScrimmageRecordSerializerHelperFromJSON,
-    ScrimmageRecordSerializerHelperFromJSONTyped,
-    ScrimmageRecordSerializerHelperToJSON,
-} from './ScrimmageRecordSerializerHelper';
+    ScrimmageRecordVariantFromJSON,
+    ScrimmageRecordVariantFromJSONTyped,
+    ScrimmageRecordVariantToJSON,
+} from './ScrimmageRecordVariant';
 
 /**
  * 
@@ -34,22 +34,22 @@ export interface ScrimmageRecord {
     team_id: number;
     /**
      * 
-     * @type {ScrimmageRecordSerializerHelper}
+     * @type {ScrimmageRecordVariant}
      * @memberof ScrimmageRecord
      */
-    Ranked: ScrimmageRecordSerializerHelper;
+    Ranked: ScrimmageRecordVariant;
     /**
      * 
-     * @type {ScrimmageRecordSerializerHelper}
+     * @type {ScrimmageRecordVariant}
      * @memberof ScrimmageRecord
      */
-    Unranked: ScrimmageRecordSerializerHelper;
+    Unranked: ScrimmageRecordVariant;
     /**
      * 
-     * @type {ScrimmageRecordSerializerHelper}
+     * @type {ScrimmageRecordVariant}
      * @memberof ScrimmageRecord
      */
-    All: ScrimmageRecordSerializerHelper;
+    All: ScrimmageRecordVariant;
 }
 
 /**
@@ -76,9 +76,9 @@ export function ScrimmageRecordFromJSONTyped(json: any, ignoreDiscriminator: boo
     return {
         
         'team_id': json['team_id'],
-        'Ranked': ScrimmageRecordSerializerHelperFromJSON(json['Ranked']),
-        'Unranked': ScrimmageRecordSerializerHelperFromJSON(json['Unranked']),
-        'All': ScrimmageRecordSerializerHelperFromJSON(json['All']),
+        'Ranked': ScrimmageRecordVariantFromJSON(json['Ranked']),
+        'Unranked': ScrimmageRecordVariantFromJSON(json['Unranked']),
+        'All': ScrimmageRecordVariantFromJSON(json['All']),
     };
 }
 
@@ -92,9 +92,9 @@ export function ScrimmageRecordToJSON(value?: ScrimmageRecord | null): any {
     return {
         
         'team_id': value.team_id,
-        'Ranked': ScrimmageRecordSerializerHelperToJSON(value.Ranked),
-        'Unranked': ScrimmageRecordSerializerHelperToJSON(value.Unranked),
-        'All': ScrimmageRecordSerializerHelperToJSON(value.All),
+        'Ranked': ScrimmageRecordVariantToJSON(value.Ranked),
+        'Unranked': ScrimmageRecordVariantToJSON(value.Unranked),
+        'All': ScrimmageRecordVariantToJSON(value.All),
     };
 }
 

@@ -66,6 +66,12 @@ export enum GenderEnum {
 
 export type Gender = `${GenderEnum}`;
 
+export enum ScrimmageTypeEnum {
+  ALL = "All",
+  RANKED = "Ranked",
+  UNRANKED = "Unranked",
+}
+
 export const COUNTRIES: Record<CountryEnum, string> = {
   US: "United States of America",
   CA: "Canada",
