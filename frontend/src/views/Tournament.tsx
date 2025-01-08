@@ -99,7 +99,7 @@ const TournamentPage: React.FC = () => {
                 <div className="grid max-w-4xl grid-cols-2 gap-2">
                   <p>Tournament Date:</p>
                   <p>
-                    {dateTime(tourneyData.data.display_date).localFullString}
+                    {dateTime(tourneyData.data.display_date).zeroOffsetShortStr}
                   </p>
 
                   <p>Eligible?:</p>

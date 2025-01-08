@@ -53,7 +53,7 @@ const Client: React.FC = () => {
           )}
           <span className="text-gray-800">{opponent?.teamname ?? "???"}</span>
           <span className="italic text-gray-600">
-            {dateTime(match.created).shortDateStr}
+            {dateTime(match.created).localShortStr}
           </span>
         </div>
       ),
