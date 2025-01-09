@@ -104,8 +104,7 @@ export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
   Please note that **all times on this page are in your current time zone**. Refer to the submission freeze countdown timer for the time remaining before the next submission freeze.
   `,
   Prizes: `
-  Battlecode 2025 Python will have several tournaments throughout the month! We stream and commentate all tournaments online.
-  Due to its experimental nature, we have not finalized the tournament schedule or prizes. Please check back later for more information.
+- **Sprint Prizes:** Winner of each tournament will receive $250.
   `,
   /*
   "Tournament Format": `

@@ -3,6 +3,8 @@ import { useCallback } from "react";
 import type { Tournament } from "../../api/_autogen";
 import { dateTime } from "../../utils/dateTime";
 import { NavLink } from "react-router-dom";
+import { useEpisodeId } from "contexts/EpisodeContext";
+import CountdownDisplay from "components/CountdownDisplay";
 
 interface TournamentCountdownProps {
   tournament?: Tournament;
@@ -11,6 +13,8 @@ interface TournamentCountdownProps {
 const TournamentCountdown: React.FC<TournamentCountdownProps> = ({
   tournament,
 }) => {
+  const { episodeId } = useEpisodeId();
+
   const dateHasPassed = useCallback(
     (date: Date) => date.getTime() < Date.now(),
     [],
@@ -19,8 +23,8 @@ const TournamentCountdown: React.FC<TournamentCountdownProps> = ({
   return (
     <div>
       {tournament !== undefined ? (
-        <div>
-          <p>
+        <div className="flex flex-col gap-4">
+          <span>
             The submission deadline for the <b>{tournament.name_long}</b>{" "}
             {dateHasPassed(tournament.submission_freeze) ? "was" : "is"} at{" "}
             {dateTime(tournament.submission_freeze).estDateStr} Eastern Time,
@@ -29,36 +33,52 @@ const TournamentCountdown: React.FC<TournamentCountdownProps> = ({
               {dateTime(tournament.submission_freeze).localFullString} in your
               local time.
             </b>
-          </p>
-          <p>
+          </span>
+          <span>
             Make sure you have{" "}
-            <NavLink className="hover:underline" to="tournaments">
+            <NavLink
+              className="text-cyan-600 hover:underline"
+              to={`/${episodeId}/tournaments`}
+            >
               checked your tournament eligibility
             </NavLink>{" "}
             prior to the deadline! You can indicate your eligibility on your{" "}
-            <NavLink className="hover:underline" to="team">
+            <NavLink
+              className="text-cyan-600 hover:underline"
+              to={`/${episodeId}/my_team`}
+            >
               team profile page
             </NavLink>
             .
-          </p>
+          </span>
           {tournament.require_resume && (
-            <p>
+            <span>
               Also make sure to have all members upload a resume, at your{" "}
-              <NavLink className="hover:underline" to="/account">
+              <NavLink
+                className="text-cyan-600 hover:underline"
+                to={`/account`}
+              >
                 personal profile page
               </NavLink>
               . See the eligibility rules given in the{" "}
-              <NavLink className="hover:underline" to="team">
+              <NavLink
+                className="text-cyan-600 hover:underline"
+                to={`/${episodeId}/tournament/${tournament.name_short}`}
+              >
                 tournament page
               </NavLink>{" "}
               for more info.
-            </p>
+            </span>
           )}
+
+          <div className="flex w-full items-center justify-center">
+            <CountdownDisplay date={tournament.submission_freeze} />
+          </div>
         </div>
       ) : (
-        <p>
+        <span>
           The submission deadline for the next tournament has not been set yet.
-        </p>
+        </span>
       )}
     </div>
   );

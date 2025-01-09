@@ -346,11 +346,19 @@ The deadline to submit code for each non-final tournament is usually 7 pm EST *t
 Please note that **all times on this page are in your current time zone**. Refer to the submission freeze countdown timer for the time remaining before the next submission freeze.
 `,
   Prizes: `
-Prize amounts are approximate and will be finalized soon!
+- **Final Tournament Prizes:** Prizes will range from $5000 for 1st place to $500 for 16th place.
+- **Sprint Prizes:** Winner of each tournament will receive $250.
+- **High School Prizes:** Prizes will range from $600 to $200 for the top 3 teams.
+- **MIT Novice Prizes:** Prizes will range from $500 to $200 for the top 3 teams.\n\n
 
-- **Final Tournament prizes:** Prizes will range from $5000 for 1st place to $500 for 16th place.
-- **Sprint prizes:** Winner of each tournament will receive $250.
-- **Novice, High School prizes:** Prizes will range from $600 to $200 for the top 3 teams.
+- **Most Innovative Breakthrough Prize:** $1000 prize given by our Platinum Sponsor, [Adobe](https://www.adobe.com/). More details to come!
+- **Most Adaptive Strategy Prize:** $800 prize given by our Gold Sponsor, [Amplitude](https://www.amplitude.com/). More details to come!\n\n
+
+- **Winning Team Prize:** For the first time ever, there is a new Battlecode prize in addition to $$$ and Eternal Glory.
+Amplitude is offering all the members of this year's winning team Amplitude internships. That is right, winning Battlecode now guarantees you a career as well!
+*Offer details and fine print: Software engineering internship for summer of 2025 at Amplitude offices in San Francisco. You must be able to work in the US and relocate to San Francisco.
+If you aren't able to work in the US or can't relocate to San Francisco, we'll try to work with you but we can't guarantee a role.
+Most interns receive full time offers to join the Amplitude team at the end of the internship. More on Amplitude here: [https://amplitude.com/careers](https://amplitude.com/careers).*
 
 If you are an international participant, please note that [US export regulations](https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/sanctioned-destinations) may restrict our ability to award prizes to students from certain countries.
     `,
