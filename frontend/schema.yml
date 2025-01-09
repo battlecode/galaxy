@@ -2239,6 +2239,9 @@ components:
         game_release:
           type: string
           format: date-time
+        game_archive:
+          type: string
+          format: date-time
         language:
           $ref: "#/components/schemas/LanguageEnum"
         scaffold:
@@ -2267,6 +2270,7 @@ components:
       required:
         - eligibility_criteria
         - frozen
+        - game_archive
         - game_release
         - language
         - name_long

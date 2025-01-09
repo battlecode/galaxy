@@ -1,6 +1,10 @@
 import type React from "react";
 import { useMemo, useState } from "react";
-import { useEpisodeList, useTournamentList } from "api/episode/useEpisode";
+import {
+  useEpisodeInfo,
+  useEpisodeList,
+  useTournamentList,
+} from "api/episode/useEpisode";
 import SelectMenu from "../../elements/SelectMenu";
 import ChartBase from "./ChartBase";
 import { useTeamRatingHistory } from "api/compete/useCompete";
@@ -102,6 +106,9 @@ const ChartSection: React.FC<ChartSectionProps> = ({ episodeId, teamId }) => {
     return formatTournamentList(tournamentList.data.results ?? []);
   }, [tournamentList]);
 
+  const episode = useEpisodeInfo({ id: episodeId });
+  const xAxisEndDate = episode.data?.game_archive;
+
   return (
     <ChartBase
       yAxisLabel="Rating"
@@ -110,6 +117,7 @@ const ChartSection: React.FC<ChartSectionProps> = ({ episodeId, teamId }) => {
       loadingMessage="Loading rating data..."
       plotLines={tournamentData}
       crownTop={false}
+      xAxisEndDate={xAxisEndDate}
     />
   );
 };

@@ -18,6 +18,7 @@ export interface ChartBaseProps {
   loadingMessage?: string;
   plotLines?: PlotLine[];
   crownTop?: boolean;
+  xAxisEndDate?: Date;
 }
 
 const ChartBase: React.FC<ChartBaseProps> = ({
@@ -27,6 +28,7 @@ const ChartBase: React.FC<ChartBaseProps> = ({
   loadingMessage,
   plotLines,
   crownTop = false,
+  xAxisEndDate = new Date(),
 }) => {
   // Translate values into Highcharts compatible options
   const [myChart, setChart] = useState<Highcharts.Chart>();
@@ -170,6 +172,7 @@ const ChartBase: React.FC<ChartBaseProps> = ({
           },
         },
       })),
+      max: Math.min(xAxisEndDate.getTime(), Date.now()),
     },
   };
 
