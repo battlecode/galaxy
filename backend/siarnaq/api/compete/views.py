@@ -1,11 +1,22 @@
-from functools import reduce
 from typing import Optional
 
 import google.cloud.storage as storage
 import structlog
 from django.conf import settings
 from django.db import NotSupportedError, transaction
-from django.db.models import Exists, OuterRef, Q, Subquery
+from django.db.models import (
+    Case,
+    Exists,
+    F,
+    IntegerField,
+    OuterRef,
+    Q,
+    Subquery,
+    Sum,
+    Value,
+    When,
+)
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import mixins, status, viewsets
@@ -615,12 +626,6 @@ class MatchViewSet(
                 type=int,
                 description="A team to filter for. Defaults to your own team.",
             ),
-            OpenApiParameter(
-                name="scrimmage_type",
-                enum=["ranked", "unranked", "all"],
-                default="all",
-                description="Which type of scrimmages to filter for. Defaults to all.",
-            ),
         ],
         responses={
             status.HTTP_200_OK: ScrimmageRecordSerializer(),
@@ -635,64 +640,164 @@ class MatchViewSet(
         permission_classes=(IsEpisodeMutable,),
     )
     def scrimmaging_record(self, request, pk=None, *, episode_id):
-        """List the scrimmaging win-loss-tie record of a team."""
-        queryset = self.get_queryset().filter(tournament_round__isnull=True)
+        """
+        Retrieve the scrimmaging win-loss-tie record for a team.
 
-        scrimmage_type = self.request.query_params.get("scrimmage_type")
-        if scrimmage_type is not None:
-            if scrimmage_type == "ranked":
-                queryset = queryset.filter(is_ranked=True)
-            elif scrimmage_type == "unranked":
-                queryset = queryset.filter(is_ranked=False)
+        Returns a JSON object containing the team's record in ranked,
+        unranked, and overall matches.
+        The record is broken down into wins, losses, and ties for each category.
 
-        team_id = parse_int(self.request.query_params.get("team_id"))
+        Query Parameters:
+        - team_id (optional): ID of the team to retrieve the record for.
+                              If not provided, uses the authenticated user's team.
+
+        Returns:
+        - 200 OK: Successfully retrieved the team's scrimmaging record.
+        - 400 Bad Request: If no team_id is provided and the user is not associated
+                              with a team, or if the provided team_id is invalid.
+        """
+        team_id = parse_int(request.query_params.get("team_id"))
         if team_id is None and request.user.pk is not None:
             user_team = Team.objects.filter(
                 members__pk=request.user.pk, episode_id=episode_id
-            )
+            ).first()
 
-            if not user_team.exists():
+            if not user_team:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-            else:
-                team_id = user_team.get().id
-
-        if team_id is not None:
-            queryset = queryset.filter(participants__team=team_id)
-        else:
+            team_id = user_team.id
+        elif team_id is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        has_invisible = self.get_queryset().filter(
-            participants__team__status=TeamStatus.INVISIBLE
+
+        queryset = (
+            self.get_queryset()
+            .filter(tournament_round__isnull=True, participants__team_id=team_id)
+            .exclude(participants__team__status=TeamStatus.INVISIBLE)
         )
-        queryset = queryset.exclude(pk__in=Subquery(has_invisible.values("pk")))
 
-        def match_handler(record, match):
-            """Mutate the win-loss-tie record based on the match outcome."""
-            this_team = match.participants.filter(team=team_id).first()
-            other_team = match.participants.exclude(team=team_id).first()
-            if this_team is None or other_team is None:
-                return record
-            if this_team.score is None or other_team.score is None:
-                return record
-            if this_team.score > other_team.score:
-                record["wins"] += 1
-            elif this_team.score < other_team.score:
-                record["losses"] += 1
-            else:
-                record["ties"] += 1
-            return record
+        # Annotate the queryset to perform logic on the database side
+        results = queryset.annotate(
+            this_team_score=Sum(
+                Case(
+                    When(participants__team_id=team_id, then="participants__score"),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            ),
+            other_team_score=Sum(
+                Case(
+                    When(~Q(participants__team_id=team_id), then="participants__score"),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            ),
+        ).aggregate(
+            ranked_wins=Coalesce(
+                Sum(
+                    Case(
+                        When(
+                            Q(this_team_score__gt=F("other_team_score"))
+                            & Q(is_ranked=True),
+                            then=1,
+                        ),
+                        default=0,
+                        output_field=IntegerField(),
+                    )
+                ),
+                0,
+            ),
+            ranked_losses=Coalesce(
+                Sum(
+                    Case(
+                        When(
+                            Q(this_team_score__lt=F("other_team_score"))
+                            & Q(is_ranked=True),
+                            then=1,
+                        ),
+                        default=0,
+                        output_field=IntegerField(),
+                    )
+                ),
+                0,
+            ),
+            ranked_ties=Coalesce(
+                Sum(
+                    Case(
+                        When(
+                            Q(this_team_score=F("other_team_score"))
+                            & Q(is_ranked=True),
+                            then=1,
+                        ),
+                        default=0,
+                        output_field=IntegerField(),
+                    )
+                ),
+                0,
+            ),
+            unranked_wins=Coalesce(
+                Sum(
+                    Case(
+                        When(
+                            Q(this_team_score__gt=F("other_team_score"))
+                            & Q(is_ranked=False),
+                            then=1,
+                        ),
+                        default=0,
+                        output_field=IntegerField(),
+                    )
+                ),
+                0,
+            ),
+            unranked_losses=Coalesce(
+                Sum(
+                    Case(
+                        When(
+                            Q(this_team_score__lt=F("other_team_score"))
+                            & Q(is_ranked=False),
+                            then=1,
+                        ),
+                        default=0,
+                        output_field=IntegerField(),
+                    )
+                ),
+                0,
+            ),
+            unranked_ties=Coalesce(
+                Sum(
+                    Case(
+                        When(
+                            Q(this_team_score=F("other_team_score"))
+                            & Q(is_ranked=False),
+                            then=1,
+                        ),
+                        default=0,
+                        output_field=IntegerField(),
+                    )
+                ),
+                0,
+            ),
+        )
 
-        win_loss_tie = reduce(
-            match_handler,
-            queryset.all(),
-            {
-                "team_id": team_id,
-                "wins": 0,
-                "losses": 0,
-                "ties": 0,
+        win_loss_tie = {
+            "team_id": team_id,
+            "Ranked": {
+                "wins": results["ranked_wins"],
+                "losses": results["ranked_losses"],
+                "ties": results["ranked_ties"],
             },
-        )
-        results = ScrimmageRecordSerializer(win_loss_tie).data
-        return Response(results, status=status.HTTP_200_OK)
+            "Unranked": {
+                "wins": results["unranked_wins"],
+                "losses": results["unranked_losses"],
+                "ties": results["unranked_ties"],
+            },
+            "All": {
+                "wins": results["ranked_wins"] + results["unranked_wins"],
+                "losses": results["ranked_losses"] + results["unranked_losses"],
+                "ties": results["ranked_ties"] + results["unranked_ties"],
+            },
+        }
+
+        serialized_results = ScrimmageRecordSerializer(win_loss_tie).data
+        return Response(serialized_results, status=status.HTTP_200_OK)
 
     @extend_schema(
         responses={

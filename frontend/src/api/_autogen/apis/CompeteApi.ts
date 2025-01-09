@@ -102,7 +102,6 @@ export interface CompeteMatchScrimmageListRequest {
 
 export interface CompeteMatchScrimmagingRecordRetrieveRequest {
     episodeId: string;
-    scrimmageType?: CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum;
     teamId?: number;
 }
 
@@ -527,7 +526,7 @@ export class CompeteApi extends runtime.BaseAPI {
     }
 
     /**
-     * List the scrimmaging win-loss-tie record of a team.
+     * Retrieve the scrimmaging win-loss-tie record for a team.  Returns a JSON object containing the team\'s record in ranked, unranked, and overall matches. The record is broken down into wins, losses, and ties for each category.  Query Parameters: - team_id (optional): ID of the team to retrieve the record for.                       If not provided, uses the authenticated user\'s team.  Returns: - 200 OK: Successfully retrieved the team\'s scrimmaging record. - 400 Bad Request: If no team_id is provided and the user is not associated                       with a team, or if the provided team_id is invalid.
      */
     async competeMatchScrimmagingRecordRetrieveRaw(requestParameters: CompeteMatchScrimmagingRecordRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ScrimmageRecord>> {
         if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
@@ -535,10 +534,6 @@ export class CompeteApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
-
-        if (requestParameters.scrimmageType !== undefined) {
-            queryParameters['scrimmage_type'] = requestParameters.scrimmageType;
-        }
 
         if (requestParameters.teamId !== undefined) {
             queryParameters['team_id'] = requestParameters.teamId;
@@ -565,7 +560,7 @@ export class CompeteApi extends runtime.BaseAPI {
     }
 
     /**
-     * List the scrimmaging win-loss-tie record of a team.
+     * Retrieve the scrimmaging win-loss-tie record for a team.  Returns a JSON object containing the team\'s record in ranked, unranked, and overall matches. The record is broken down into wins, losses, and ties for each category.  Query Parameters: - team_id (optional): ID of the team to retrieve the record for.                       If not provided, uses the authenticated user\'s team.  Returns: - 200 OK: Successfully retrieved the team\'s scrimmaging record. - 400 Bad Request: If no team_id is provided and the user is not associated                       with a team, or if the provided team_id is invalid.
      */
     async competeMatchScrimmagingRecordRetrieve(requestParameters: CompeteMatchScrimmagingRecordRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ScrimmageRecord> {
         const response = await this.competeMatchScrimmagingRecordRetrieveRaw(requestParameters, initOverrides);
@@ -1161,14 +1156,4 @@ export class CompeteApi extends runtime.BaseAPI {
         return await response.value();
     }
 
-}
-
-/**
-  * @export
-  * @enum {string}
-  */
-export enum CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum {
-    All = 'all',
-    Ranked = 'ranked',
-    Unranked = 'unranked'
 }

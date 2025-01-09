@@ -3,7 +3,6 @@ import type { LoaderFunction } from "react-router-dom";
 import { myTeamFactory } from "../team/teamFactories";
 import { safeEnsureQueryData } from "../helpers";
 import { scrimmagingRecordFactory } from "api/compete/competeFactories";
-import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_autogen";
 
 export const myTeamLoader =
   (queryClient: QueryClient): LoaderFunction =>
@@ -19,17 +18,6 @@ export const myTeamLoader =
     safeEnsureQueryData(
       {
         episodeId,
-        scrimmageType:
-          CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked,
-      },
-      scrimmagingRecordFactory,
-      queryClient,
-    );
-    safeEnsureQueryData(
-      {
-        episodeId,
-        scrimmageType:
-          CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked,
       },
       scrimmagingRecordFactory,
       queryClient,

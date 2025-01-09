@@ -240,6 +240,6 @@ export const scrimmagingRecordFactory: QueryFactory<
   ScrimmageRecord
 > = {
   queryKey: competeQueryKeys.scrimmagingRecord,
-  queryFn: async ({ episodeId, teamId, scrimmageType }) =>
-    await getScrimmagingRecord({ episodeId, teamId, scrimmageType }),
+  queryFn: async ({ episodeId, teamId }) =>
+    await getScrimmagingRecord({ episodeId, teamId }),
 } as const;

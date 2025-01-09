@@ -1,22 +1,21 @@
 import type React from "react";
 import { useMemo } from "react";
-import { CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum } from "api/_autogen";
+import type { ScrimmageTypeEnum } from "api/apiTypes";
 import Spinner from "components/Spinner";
 import { isNil } from "lodash";
 import { useScrimmagingRecord } from "api/compete/useCompete";
 import { useEpisodeId } from "contexts/EpisodeContext";
 
 interface WinLossTieProps {
-  scrimmageType: CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum;
+  scrimmageType: ScrimmageTypeEnum;
   teamId: number;
   className?: string;
 }
 
 const scrimmageTypeToName = {
-  [CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.All]:
-    "All Scrimmages",
-  [CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Unranked]: "Unranked",
-  [CompeteMatchScrimmagingRecordRetrieveScrimmageTypeEnum.Ranked]: "Ranked",
+  All: "All Scrimmages",
+  Unranked: "Unranked",
+  Ranked: "Ranked",
 } as const;
 
 const WinLossTie: React.FC<WinLossTieProps> = ({
@@ -28,7 +27,6 @@ const WinLossTie: React.FC<WinLossTieProps> = ({
   const scrimRecord = useScrimmagingRecord({
     episodeId,
     teamId,
-    scrimmageType,
   });
 
   const HEADER =
@@ -70,13 +68,13 @@ const WinLossTie: React.FC<WinLossTieProps> = ({
         Ties
       </span>
       <div className={`rounded-bl-lg bg-green-200 ${dataClassName}`}>
-        {dataOrLoading(scrimRecord.data?.wins)}
+        {dataOrLoading(scrimRecord.data?.[scrimmageType].wins)}
       </div>
       <div className={`bg-red-200 ${dataClassName}`}>
-        {dataOrLoading(scrimRecord.data?.losses)}
+        {dataOrLoading(scrimRecord.data?.[scrimmageType].losses)}
       </div>
       <div className={`rounded-br-lg bg-gray-200 ${dataClassName}`}>
-        {dataOrLoading(scrimRecord.data?.ties)}
+        {dataOrLoading(scrimRecord.data?.[scrimmageType].ties)}
       </div>
     </div>
   );
