@@ -34,6 +34,7 @@ class EpisodeSerializer(serializers.ModelSerializer):
             "name_long",
             "blurb",
             "game_release",
+            "game_archive",
             "language",
             "scaffold",
             "artifact_name",
