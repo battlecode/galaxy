@@ -39,7 +39,7 @@ const TeamChart: React.FC<TeamChartProps> = ({
   }, [tournamentList]);
 
   const episode = useEpisodeInfo({ id: episodeId });
-  const xAxisEndTime = episode.data?.game_archive;
+  const xAxisEndDate = episode.data?.game_archive;
 
   return (
     <ChartBase
@@ -49,7 +49,7 @@ const TeamChart: React.FC<TeamChartProps> = ({
       loadingMessage="Loading rating data..."
       plotLines={tournamentData}
       crownTop={crownTop}
-      xAxisEndTime={xAxisEndTime}
+      xAxisEndDate={xAxisEndDate}
     />
   );
 };
