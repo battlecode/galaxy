@@ -12,7 +12,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useUserTeam } from "api/team/useTeam";
 import { useEpisodeInfo } from "api/episode/useEpisode";
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  toggleSidebar: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const { authState, user } = useCurrentUser();
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
@@ -30,9 +34,21 @@ const Header: React.FC = () => {
     <nav className="fixed top-0 z-30 h-16 w-full bg-gray-700">
       <div className="w-full px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
+          {/* desktop sidebar button */}
+          <button
+            className="z-20 mr-4 hidden p-2 sm:block"
+            onClick={toggleSidebar}
+          >
+            <span className="sr-only">Toggle Sidebar</span>
+            <Icon
+              name="bars_3"
+              className="text-gray-300 hover:text-white"
+              size="lg"
+            />
+          </button>
           {/* mobile menu */}
           <Menu>
-            <div className="absolute inset-y-0 left-0 flex items-center sm:hidden md:left-3">
+            <div className="absolute inset-y-0 left-3 flex items-center sm:hidden">
               <Menu.Button className="rounded-md px-1 py-1.5 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                 <span className="sr-only">Open main menu</span>
                 <Icon
