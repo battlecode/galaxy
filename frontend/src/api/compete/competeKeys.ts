@@ -159,14 +159,11 @@ export const competeQueryKeys: CompeteKeys = {
     key: ({
       episodeId,
       teamId,
-      scrimmageType,
     }: CompeteMatchScrimmagingRecordRetrieveRequest) =>
       [
         ...competeQueryKeys.scrimBase.key({ episodeId }),
         "record",
         teamId ?? "me",
-        "scrimmageType",
-        scrimmageType,
       ] as const,
   },
 };
