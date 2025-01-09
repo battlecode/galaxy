@@ -52,7 +52,7 @@ const EpisodeLayout: React.FC = () => {
     Cookies.set("sidebar-collapsed", newCollapsedState.toString());
   };
   return (
-    <div className="h-screen bg-gray-200/80">
+    <div className="h-full min-h-screen bg-gray-200/80">
       <Header toggleSidebar={toggleSidebar} />
       <Sidebar collapsed={collapsed} />
       <motion.div

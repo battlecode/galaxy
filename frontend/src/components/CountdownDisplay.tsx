@@ -106,7 +106,7 @@ const CountdownDisplay: React.FC<CountdownDisplayProps> = ({ date }) => {
     ((MINUTES_HOUR - countdownInfo.minutes) / MINUTES_HOUR) * 100;
 
   return (
-    <div className="grid auto-cols-min auto-rows-min grid-cols-3 place-items-center gap-5">
+    <div className="grid auto-cols-min auto-rows-min grid-cols-3 place-items-center gap-5 md:max-w-[600px]">
       <ProgressCircle
         progressPercentage={percentageDays}
         labelText={`${countdownInfo.days} Days`}
