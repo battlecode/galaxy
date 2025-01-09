@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useTournamentList } from "api/episode/useEpisode";
+import { useEpisodeInfo, useTournamentList } from "api/episode/useEpisode";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import type React from "react";
 import { useMemo } from "react";
@@ -38,6 +38,9 @@ const TeamChart: React.FC<TeamChartProps> = ({
     return formatTournamentList(tournamentList.data.results ?? []);
   }, [tournamentList]);
 
+  const episode = useEpisodeInfo({ id: episodeId });
+  const xAxisEndTime = episode.data?.game_archive;
+
   return (
     <ChartBase
       yAxisLabel="Rating"
@@ -46,6 +49,7 @@ const TeamChart: React.FC<TeamChartProps> = ({
       loadingMessage="Loading rating data..."
       plotLines={tournamentData}
       crownTop={crownTop}
+      xAxisEndTime={xAxisEndTime}
     />
   );
 };

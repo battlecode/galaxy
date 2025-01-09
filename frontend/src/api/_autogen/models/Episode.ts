@@ -58,6 +58,12 @@ export interface Episode {
     game_release: Date;
     /**
      * 
+     * @type {Date}
+     * @memberof Episode
+     */
+    game_archive: Date;
+    /**
+     * 
      * @type {LanguageEnum}
      * @memberof Episode
      */
@@ -114,6 +120,7 @@ export function instanceOfEpisode(value: object): boolean {
     isInstance = isInstance && "name_short" in value;
     isInstance = isInstance && "name_long" in value;
     isInstance = isInstance && "game_release" in value;
+    isInstance = isInstance && "game_archive" in value;
     isInstance = isInstance && "language" in value;
     isInstance = isInstance && "eligibility_criteria" in value;
     isInstance = isInstance && "frozen" in value;
@@ -135,6 +142,7 @@ export function EpisodeFromJSONTyped(json: any, ignoreDiscriminator: boolean): E
         'name_long': json['name_long'],
         'blurb': !exists(json, 'blurb') ? undefined : json['blurb'],
         'game_release': (new Date(json['game_release'])),
+        'game_archive': (new Date(json['game_archive'])),
         'language': LanguageEnumFromJSON(json['language']),
         'scaffold': !exists(json, 'scaffold') ? undefined : json['scaffold'],
         'artifact_name': !exists(json, 'artifact_name') ? undefined : json['artifact_name'],
@@ -159,6 +167,7 @@ export function EpisodeToJSON(value?: Episode | null): any {
         'name_long': value.name_long,
         'blurb': value.blurb,
         'game_release': (value.game_release.toISOString()),
+        'game_archive': (value.game_archive.toISOString()),
         'language': LanguageEnumToJSON(value.language),
         'scaffold': value.scaffold,
         'artifact_name': value.artifact_name,
