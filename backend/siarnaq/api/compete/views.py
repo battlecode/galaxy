@@ -13,7 +13,6 @@ from django.db.models import (
     Q,
     Subquery,
     Sum,
-    Value,
     When,
 )
 from django.db.models.functions import Coalesce
@@ -674,23 +673,26 @@ class MatchViewSet(
             .exclude(participants__team__status=TeamStatus.INVISIBLE)
         )
 
-        # Annotate the queryset to perform logic on the database side
-        results = queryset.annotate(
-            this_team_score=Sum(
-                Case(
-                    When(participants__team_id=team_id, then="participants__score"),
-                    default=Value(0),
-                    output_field=IntegerField(),
-                )
-            ),
-            other_team_score=Sum(
-                Case(
-                    When(~Q(participants__team_id=team_id), then="participants__score"),
-                    default=Value(0),
-                    output_field=IntegerField(),
-                )
-            ),
-        ).aggregate(
+        this_team_subquery = Subquery(
+            MatchParticipant.objects.filter(match_id=OuterRef("pk"), team_id=team_id)
+            .values("match_id")
+            .annotate(total_score=Sum("score"))
+            .values("total_score")[:1]
+        )
+
+        other_team_subquery = Subquery(
+            MatchParticipant.objects.filter(match_id=OuterRef("pk"))
+            .exclude(team_id=team_id)
+            .values("match_id")
+            .annotate(total_score=Sum("score"))
+            .values("total_score")[:1]
+        )
+
+        annotated_queryset = queryset.annotate(
+            this_team_score=this_team_subquery, other_team_score=other_team_subquery
+        )
+
+        results = annotated_queryset.aggregate(
             ranked_wins=Coalesce(
                 Sum(
                     Case(
