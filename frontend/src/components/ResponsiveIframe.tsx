@@ -4,9 +4,13 @@ import { isPresent } from "utils/utilTypes";
 
 interface ResponsiveIframeProps {
   url: string;
+  className?: string;
 }
 
-const ResponsiveIframe: React.FC<ResponsiveIframeProps> = ({ url }) => {
+const ResponsiveIframe: React.FC<ResponsiveIframeProps> = ({
+  url,
+  className = "",
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({
     width: "100%",
@@ -27,10 +31,13 @@ const ResponsiveIframe: React.FC<ResponsiveIframeProps> = ({ url }) => {
     return () => {
       window.removeEventListener("resize", updateDimensions);
     };
-  }, []);
+  }, [
+    containerRef.current?.getBoundingClientRect().width,
+    containerRef.current?.getBoundingClientRect().height,
+  ]);
 
   return (
-    <div ref={containerRef} className="h-full w-full">
+    <div ref={containerRef} className={`h-full w-full ${className}`}>
       <iframe
         src={url}
         style={{

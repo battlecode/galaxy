@@ -65,6 +65,11 @@ const InboxTable: React.FC<InboxTableProps> = ({ inboxPage, handlePage }) => {
             ),
           },
           {
+            header: "Type",
+            key: "type",
+            value: (req) => (req.is_ranked ? "Ranked" : "Unranked"),
+          },
+          {
             header: "Player Order",
             key: "player_order",
             value: (req) => stringifyPlayerOrder(req.player_order),

@@ -73,8 +73,8 @@ const Client: React.FC = () => {
   }, [matches]);
 
   return (
-    <div className="flex h-full w-full flex-col gap-2 p-6">
-      <div className="flex w-full flex-1 flex-col items-center gap-4 md:flex-row md:gap-2">
+    <div className="flex h-full min-h-screen w-full flex-col gap-2 p-6">
+      <div className="flex max-h-min w-full flex-1 flex-col items-center gap-4 md:flex-row md:gap-2">
         <SelectMenu
           loading={matches.isLoading || userTeam.isLoading}
           className="w-full md:max-w-96"
@@ -101,7 +101,7 @@ const Client: React.FC = () => {
         />
       </div>
 
-      <ResponsiveIframe url={clientUrl ?? ""} />
+      <ResponsiveIframe url={clientUrl ?? ""} className="flex flex-1" />
     </div>
   );
 };
