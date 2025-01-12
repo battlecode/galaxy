@@ -87,7 +87,7 @@ Note that you can also use the web client located at [https://play.battlecode.or
 export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
   "Coding Resources": `
 
-If you're just starting out, check out the [quick start](/bc25java/quickstart) page!
+If you're just starting out, check out the [quick start](/bc25java/quick_start) page!
 
 For more helpful resources while coding, see:
 
