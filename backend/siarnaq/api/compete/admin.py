@@ -2,6 +2,7 @@ import structlog
 from django.contrib import admin
 
 from siarnaq.api.compete.models import (
+    AdminSettings,
     Match,
     MatchParticipant,
     ScrimmageRequest,
@@ -10,6 +11,11 @@ from siarnaq.api.compete.models import (
 from siarnaq.api.episodes.models import Map
 
 logger = structlog.get_logger(__name__)
+
+
+@admin.register(AdminSettings)
+class AdminSettingsAdmin(admin.ModelAdmin):
+    list_display = ("is_allowed_ranked_scrimmages",)
 
 
 @admin.action(description="Add pending tasks to the Saturn queue")

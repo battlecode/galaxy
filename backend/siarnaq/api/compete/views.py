@@ -26,6 +26,7 @@ from rest_framework.response import Response
 
 from siarnaq.api.compete.filters import IsSubmissionCreatorFilterBackend
 from siarnaq.api.compete.models import (
+    AdminSettings,
     Match,
     MatchParticipant,
     SaturnStatus,
@@ -66,6 +67,12 @@ class TooManyScrimmages(APIException):
     status_code = status.HTTP_409_CONFLICT
     default_detail = "You have too many running scrimmages or requests with this team."
     default_code = "too_many_scrimmages"
+
+
+class RankedMatchesDisabed(APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = "Ranked matches are currently disabled."
+    default_code = "ranked_matches_disabled"
 
 
 class EpisodeTeamUserContextMixin:
@@ -929,6 +936,11 @@ class ScrimmageRequestViewSet(
         serializer.is_valid(raise_exception=True)
 
         if serializer.validated_data["is_ranked"]:
+            # Get the global settings (assuming only one instance exists)
+            admin_settings = AdminSettings.objects.first()
+            if admin_settings and (not admin_settings.is_allowed_ranked_scrimmages):
+                raise RankedMatchesDisabed
+
             active_statuses = {
                 SaturnStatus.CREATED,
                 SaturnStatus.QUEUED,
@@ -1037,6 +1049,10 @@ class ScrimmageRequestViewSet(
     def accept(self, request, pk=None, *, episode_id):
         """Accept a scrimmage request."""
         self.get_object()  # Asserts permission
+        if ScrimmageRequest.objects.filter(pk=pk).first().is_ranked:
+            admin_settings = AdminSettings.objects.first()
+            if admin_settings and (not admin_settings.is_allowed_ranked_scrimmages):
+                raise RankedMatchesDisabed
         self.get_queryset().filter(pk=pk).accept()
         return Response(None, status.HTTP_204_NO_CONTENT)
 
