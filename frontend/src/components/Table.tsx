@@ -1,5 +1,6 @@
 import type React from "react";
 import Spinner from "./Spinner";
+import { uniqueId } from "lodash";
 
 export interface Column<T> {
   header: React.ReactNode;
@@ -11,7 +12,7 @@ interface TableProps<T> {
   data: T[];
   columns: Array<Column<T>>;
   loading: boolean;
-  keyFromValue: (data: T) => React.Key;
+  keyFromValue: (data: T) => string;
   onRowClick?: (data: T) => void;
   bottomElement?: React.JSX.Element;
 }
@@ -28,6 +29,8 @@ function Table<T>({
   onRowClick,
   bottomElement,
 }: TableProps<T>): React.ReactElement {
+  const getKey = (data: T): string => uniqueId(keyFromValue(data));
+
   return (
     <div className="pl-50 w-full rounded-lg shadow-md">
       {/* MOBILE PAGINATION */}
@@ -41,7 +44,7 @@ function Table<T>({
           {!loading &&
             data.map((row, rowIdx) => (
               <tbody
-                key={"mobile" + "rowbody" + keyFromValue(row).toString()}
+                key={"mobile" + "rowbody" + getKey(row)}
                 onClick={(ev) => {
                   ev.stopPropagation();
                   onRowClick?.(row);
@@ -53,9 +56,7 @@ function Table<T>({
                 {columns.map((col, colIdx) => (
                   <tr
                     className="grid w-full grid-cols-2"
-                    key={
-                      "mobile" + "row" + col.key + keyFromValue(row).toString()
-                    }
+                    key={"mobile" + "row" + col.key + getKey(row)}
                   >
                     <th
                       key={"mobile" + "header" + col.key}
@@ -70,12 +71,7 @@ function Table<T>({
                       {col.header}
                     </th>
                     <td
-                      key={
-                        "mobile" +
-                        "cell" +
-                        col.key +
-                        keyFromValue(row).toString()
-                      }
+                      key={"mobile" + "cell" + col.key + getKey(row)}
                       scope="row"
                       className="min-w-0 place-items-center overflow-hidden text-ellipsis text-wrap py-3 pr-2 font-medium text-gray-900"
                     >
@@ -104,7 +100,7 @@ function Table<T>({
             {!loading &&
               data.map((row, idx) => (
                 <tr
-                  key={"row" + keyFromValue(row).toString()}
+                  key={"row" + getKey(row)}
                   onClick={(ev) => {
                     ev.stopPropagation();
                     onRowClick?.(row);
@@ -115,7 +111,7 @@ function Table<T>({
                 >
                   {columns.map((col) => (
                     <td
-                      key={"cell" + col.key + keyFromValue(row).toString()}
+                      key={"cell" + col.key + getKey(row)}
                       scope="row"
                       className="text-ellipsis whitespace-normal px-8 py-3 font-medium text-gray-900"
                     >

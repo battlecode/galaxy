@@ -1283,12 +1283,24 @@ paths:
 
         When creating a team, add the logged in user as the sole member.
       parameters:
+        - in: query
+          name: eligible_for
+          schema:
+            type: array
+            items:
+              type: integer
+          description: Filter teams by a set of eligibility criteria ID
         - in: path
           name: episode_id
           schema:
             type: string
             pattern: ^[^\/.]+$
           required: true
+        - in: query
+          name: has_active_submission
+          schema:
+            type: boolean
+          description: Filter teams by active submission status
         - name: ordering
           required: false
           in: query
@@ -1325,12 +1337,24 @@ paths:
 
         When creating a team, add the logged in user as the sole member.
       parameters:
+        - in: query
+          name: eligible_for
+          schema:
+            type: array
+            items:
+              type: integer
+          description: Filter teams by a set of eligibility criteria ID
         - in: path
           name: episode_id
           schema:
             type: string
             pattern: ^[^\/.]+$
           required: true
+        - in: query
+          name: has_active_submission
+          schema:
+            type: boolean
+          description: Filter teams by active submission status
       tags:
         - team
       requestBody:
@@ -1362,12 +1386,24 @@ paths:
 
         When creating a team, add the logged in user as the sole member.
       parameters:
+        - in: query
+          name: eligible_for
+          schema:
+            type: array
+            items:
+              type: integer
+          description: Filter teams by a set of eligibility criteria ID
         - in: path
           name: episode_id
           schema:
             type: string
             pattern: ^[^\/.]+$
           required: true
+        - in: query
+          name: has_active_submission
+          schema:
+            type: boolean
+          description: Filter teams by active submission status
         - in: path
           name: id
           schema:
@@ -1389,12 +1425,24 @@ paths:
       operationId: team_t_avatar_create
       description: Update uploaded avatar.
       parameters:
+        - in: query
+          name: eligible_for
+          schema:
+            type: array
+            items:
+              type: integer
+          description: Filter teams by a set of eligibility criteria ID
         - in: path
           name: episode_id
           schema:
             type: string
             pattern: ^[^\/.]+$
           required: true
+        - in: query
+          name: has_active_submission
+          schema:
+            type: boolean
+          description: Filter teams by active submission status
       tags:
         - team
       requestBody:
@@ -1419,12 +1467,24 @@ paths:
 
         When creating a team, add the logged in user as the sole member.
       parameters:
+        - in: query
+          name: eligible_for
+          schema:
+            type: array
+            items:
+              type: integer
+          description: Filter teams by a set of eligibility criteria ID
         - in: path
           name: episode_id
           schema:
             type: string
             pattern: ^[^\/.]+$
           required: true
+        - in: query
+          name: has_active_submission
+          schema:
+            type: boolean
+          description: Filter teams by active submission status
       tags:
         - team
       requestBody:
@@ -1449,12 +1509,24 @@ paths:
       operationId: team_t_leave_create
       description: Leave a team.
       parameters:
+        - in: query
+          name: eligible_for
+          schema:
+            type: array
+            items:
+              type: integer
+          description: Filter teams by a set of eligibility criteria ID
         - in: path
           name: episode_id
           schema:
             type: string
             pattern: ^[^\/.]+$
           required: true
+        - in: query
+          name: has_active_submission
+          schema:
+            type: boolean
+          description: Filter teams by active submission status
       tags:
         - team
       security:
@@ -1467,12 +1539,24 @@ paths:
       operationId: team_t_me_retrieve
       description: Retrieve or update information about the current team.
       parameters:
+        - in: query
+          name: eligible_for
+          schema:
+            type: array
+            items:
+              type: integer
+          description: Filter teams by a set of eligibility criteria ID
         - in: path
           name: episode_id
           schema:
             type: string
             pattern: ^[^\/.]+$
           required: true
+        - in: query
+          name: has_active_submission
+          schema:
+            type: boolean
+          description: Filter teams by active submission status
       tags:
         - team
       security:
@@ -1488,12 +1572,24 @@ paths:
       operationId: team_t_me_update
       description: Retrieve or update information about the current team.
       parameters:
+        - in: query
+          name: eligible_for
+          schema:
+            type: array
+            items:
+              type: integer
+          description: Filter teams by a set of eligibility criteria ID
         - in: path
           name: episode_id
           schema:
             type: string
             pattern: ^[^\/.]+$
           required: true
+        - in: query
+          name: has_active_submission
+          schema:
+            type: boolean
+          description: Filter teams by active submission status
       tags:
         - team
       requestBody:
@@ -1520,12 +1616,24 @@ paths:
       operationId: team_t_me_partial_update
       description: Retrieve or update information about the current team.
       parameters:
+        - in: query
+          name: eligible_for
+          schema:
+            type: array
+            items:
+              type: integer
+          description: Filter teams by a set of eligibility criteria ID
         - in: path
           name: episode_id
           schema:
             type: string
             pattern: ^[^\/.]+$
           required: true
+        - in: query
+          name: has_active_submission
+          schema:
+            type: boolean
+          description: Filter teams by active submission status
       tags:
         - team
       requestBody:

@@ -86,25 +86,35 @@ export interface TeamRequirementRetrieveRequest {
 
 export interface TeamTAvatarCreateRequest {
     episodeId: string;
+    eligibleFor?: Array<number>;
+    hasActiveSubmission?: boolean;
     avatar?: Blob;
 }
 
 export interface TeamTCreateRequest {
     episodeId: string;
     teamCreateRequest: TeamCreateRequest;
+    eligibleFor?: Array<number>;
+    hasActiveSubmission?: boolean;
 }
 
 export interface TeamTJoinCreateRequest {
     episodeId: string;
     teamJoinRequest: TeamJoinRequest;
+    eligibleFor?: Array<number>;
+    hasActiveSubmission?: boolean;
 }
 
 export interface TeamTLeaveCreateRequest {
     episodeId: string;
+    eligibleFor?: Array<number>;
+    hasActiveSubmission?: boolean;
 }
 
 export interface TeamTListRequest {
     episodeId: string;
+    eligibleFor?: Array<number>;
+    hasActiveSubmission?: boolean;
     ordering?: string;
     page?: number;
     search?: string;
@@ -112,21 +122,29 @@ export interface TeamTListRequest {
 
 export interface TeamTMePartialUpdateRequest {
     episodeId: string;
+    eligibleFor?: Array<number>;
+    hasActiveSubmission?: boolean;
     patchedTeamPrivateRequest?: PatchedTeamPrivateRequest;
 }
 
 export interface TeamTMeRetrieveRequest {
     episodeId: string;
+    eligibleFor?: Array<number>;
+    hasActiveSubmission?: boolean;
 }
 
 export interface TeamTMeUpdateRequest {
     episodeId: string;
+    eligibleFor?: Array<number>;
+    hasActiveSubmission?: boolean;
     teamPrivateRequest?: TeamPrivateRequest;
 }
 
 export interface TeamTRetrieveRequest {
     episodeId: string;
     id: string;
+    eligibleFor?: Array<number>;
+    hasActiveSubmission?: boolean;
 }
 
 /**
@@ -393,6 +411,14 @@ export class TeamApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters.eligibleFor) {
+            queryParameters['eligible_for'] = requestParameters.eligibleFor;
+        }
+
+        if (requestParameters.hasActiveSubmission !== undefined) {
+            queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -455,6 +481,14 @@ export class TeamApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters.eligibleFor) {
+            queryParameters['eligible_for'] = requestParameters.eligibleFor;
+        }
+
+        if (requestParameters.hasActiveSubmission !== undefined) {
+            queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
@@ -500,6 +534,14 @@ export class TeamApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters.eligibleFor) {
+            queryParameters['eligible_for'] = requestParameters.eligibleFor;
+        }
+
+        if (requestParameters.hasActiveSubmission !== undefined) {
+            queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
@@ -540,6 +582,14 @@ export class TeamApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters.eligibleFor) {
+            queryParameters['eligible_for'] = requestParameters.eligibleFor;
+        }
+
+        if (requestParameters.hasActiveSubmission !== undefined) {
+            queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -576,6 +626,14 @@ export class TeamApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters.eligibleFor) {
+            queryParameters['eligible_for'] = requestParameters.eligibleFor;
+        }
+
+        if (requestParameters.hasActiveSubmission !== undefined) {
+            queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
 
         if (requestParameters.ordering !== undefined) {
             queryParameters['ordering'] = requestParameters.ordering;
@@ -627,6 +685,14 @@ export class TeamApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters.eligibleFor) {
+            queryParameters['eligible_for'] = requestParameters.eligibleFor;
+        }
+
+        if (requestParameters.hasActiveSubmission !== undefined) {
+            queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
@@ -668,6 +734,14 @@ export class TeamApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters.eligibleFor) {
+            queryParameters['eligible_for'] = requestParameters.eligibleFor;
+        }
+
+        if (requestParameters.hasActiveSubmission !== undefined) {
+            queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -705,6 +779,14 @@ export class TeamApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters.eligibleFor) {
+            queryParameters['eligible_for'] = requestParameters.eligibleFor;
+        }
+
+        if (requestParameters.hasActiveSubmission !== undefined) {
+            queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
@@ -750,6 +832,14 @@ export class TeamApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters.eligibleFor) {
+            queryParameters['eligible_for'] = requestParameters.eligibleFor;
+        }
+
+        if (requestParameters.hasActiveSubmission !== undefined) {
+            queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

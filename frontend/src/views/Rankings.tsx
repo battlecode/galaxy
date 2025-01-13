@@ -9,11 +9,19 @@ import RankingsTable from "../components/tables/RankingsTable";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import { useSearchTeams } from "../api/team/useTeam";
 import { useQueryClient } from "@tanstack/react-query";
+import SelectMultipleMenu from "components/elements/SelectMultipleMenu";
+import { useEpisodeInfo } from "api/episode/useEpisode";
+import EligibilityIcon from "components/EligibilityIcon";
 
 interface QueryParams {
   page: number;
   search: string;
+  eligibleFor: string[];
 }
+
+const eligibleEqual = (eligible1: number[], eligible2: number[]): boolean =>
+  eligible1.length === eligible2.length &&
+  eligible1.every((el1) => eligible2.includes(el1));
 
 const Rankings: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -26,15 +34,25 @@ const Rankings: React.FC = () => {
     () => ({
       page: parsePageParam("page", searchParams),
       search: searchParams.get("search") ?? "",
+      eligibleFor: searchParams.getAll("eligibleFor"),
     }),
     [searchParams],
   );
 
+  const [eligibleFor, setEligibleFor] = useState<number[]>(
+    queryParams.eligibleFor.map((el) => parseInt(el)),
+  );
+
+  const episode = useEpisodeInfo({ id: episodeId });
   const rankingsData = useSearchTeams(
     {
       episodeId,
       page: queryParams.page,
       search: queryParams.search,
+      eligibleFor:
+        queryParams.eligibleFor.length > 0
+          ? queryParams.eligibleFor.map((el) => parseInt(el))
+          : undefined,
     },
     queryClient,
   );
@@ -46,10 +64,18 @@ const Rankings: React.FC = () => {
   }
 
   function handleSearch(): void {
-    if (!rankingsData.isLoading && searchText !== queryParams.search) {
+    if (
+      !rankingsData.isLoading &&
+      (searchText !== queryParams.search ||
+        !eligibleEqual(
+          queryParams.eligibleFor.map((el) => parseInt(el)),
+          eligibleFor,
+        ))
+    ) {
       setSearchParams((prev) => ({
         ...getParamEntries(prev),
         search: searchText,
+        eligibleFor: eligibleFor.map((el) => el.toFixed(0)),
         page: "1",
       }));
     }
@@ -59,7 +85,7 @@ const Rankings: React.FC = () => {
     <div className="flex flex-col p-6">
       <div className="items-left flex flex-1 flex-col">
         <PageTitle>Rankings</PageTitle>
-        <div className="mb-4 flex flex-row gap-4">
+        <div className="mb-4 flex flex-col gap-4 md:flex-row">
           <Input
             disabled={rankingsData.isLoading}
             placeholder="Search for a team..."
@@ -75,7 +101,33 @@ const Rankings: React.FC = () => {
             className="w-80 sm:w-52 md:w-80 lg:w-96"
           />
 
+          <SelectMultipleMenu<number>
+            className="min-w-60 max-w-96"
+            disabled={episode.isLoading || rankingsData.isLoading}
+            options={
+              episode.data?.eligibility_criteria.map((el) => ({
+                value: el.id,
+                label: (
+                  <div
+                    key={el.id}
+                    className="justify-left flex w-full flex-1 flex-row items-center gap-4 overflow-hidden"
+                  >
+                    <div className="text-gray-800">{el.title}</div>
+                    <EligibilityIcon criterion={el} />
+                  </div>
+                ),
+              })) ?? []
+            }
+            placeholder="Eligibility to include..."
+            value={eligibleFor}
+            onChange={setEligibleFor}
+          />
+
           <Button
+            loading={
+              rankingsData.isLoading &&
+              (searchText !== "" || eligibleFor.length > 0)
+            }
             disabled={rankingsData.isLoading}
             label="Search!"
             variant="dark"
@@ -89,6 +141,7 @@ const Rankings: React.FC = () => {
       <div className="flex min-h-0 flex-1">
         <RankingsTable
           data={rankingsData.data}
+          eligibleFor={queryParams.eligibleFor}
           loading={rankingsData.isLoading}
           page={queryParams.page}
           handlePage={handlePage}

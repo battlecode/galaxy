@@ -14,6 +14,7 @@ import TableBottom from "components/TableBottom";
 
 interface RankingsTableProps {
   data: Maybe<PaginatedTeamPublicList>;
+  eligibleFor: string[];
   loading: boolean;
   page: number;
   handlePage: (page: number) => void;
@@ -21,6 +22,7 @@ interface RankingsTableProps {
 
 const RankingsTable: React.FC<RankingsTableProps> = ({
   data,
+  eligibleFor,
   loading,
   page,
   handlePage,
@@ -32,7 +34,9 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
     <Table
       data={data?.results ?? []}
       loading={loading}
-      keyFromValue={(team) => team.id.toString()}
+      keyFromValue={(team) =>
+        team.id.toString() + eligibleFor.reduce((prev, curr) => prev + curr, "")
+      }
       bottomElement={
         <TableBottom
           querySuccess={!loading}
