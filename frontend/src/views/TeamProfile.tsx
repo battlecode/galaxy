@@ -96,18 +96,8 @@ const TeamProfile: React.FC = () => {
                     )}
                   </div>
                   <div>
-                    <div className="font-medium">Biography</div>
-                    <div className="text-sm text-gray-800">
-                      {isNilOrEmptyStr(team.data.profile?.biography) ? (
-                        <span className="italic text-gray-500">
-                          This team does not have a biography
-                        </span>
-                      ) : (
-                        team.data.profile?.biography
-                      )}
-                    </div>
                     <div>
-                      <div className="font-medium">Team biography</div>
+                      <div className="font-medium">Biography</div>
                       <div className="text-sm text-gray-800">
                         {isNilOrEmptyStr(team.data.profile?.biography) ? (
                           <span className="italic text-gray-500">
