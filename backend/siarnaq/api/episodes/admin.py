@@ -65,7 +65,11 @@ class EpisodeAdmin(admin.ModelAdmin):
         (
             "Match management",
             {
-                "fields": ("submission_frozen", "autoscrim_schedule"),
+                "fields": (
+                    "submission_frozen",
+                    "is_allowed_ranked_scrimmage",
+                    "autoscrim_schedule",
+                ),
             },
         ),
     )
