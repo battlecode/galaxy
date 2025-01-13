@@ -24,6 +24,17 @@ from siarnaq.gcloud import tasks
 logger = structlog.get_logger(__name__)
 
 
+class AdminSettings(models.Model):
+    is_allowed_ranked_scrimmages = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = "Admin Setting"
+        verbose_name_plural = "Admin Settings"
+
+    def __str__(self):
+        return "Admin Settings"
+
+
 class SaturnStatus(models.TextChoices):
     """
     An immutable type enumerating the possible statuses of an invocation on Saturn.
