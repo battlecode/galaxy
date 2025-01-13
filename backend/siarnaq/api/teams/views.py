@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -14,7 +14,11 @@ from rest_framework.response import Response
 
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
-from siarnaq.api.teams.filters import TeamActiveSubmissionFilter, TeamOrderingFilter
+from siarnaq.api.teams.filters import (
+    TeamActiveSubmissionFilter,
+    TeamEligibilityFilter,
+    TeamOrderingFilter,
+)
 from siarnaq.api.teams.models import ClassRequirement, Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.api.teams.serializers import (
@@ -34,6 +38,21 @@ from siarnaq.gcloud import titan
 logger = structlog.get_logger(__name__)
 
 
+@extend_schema(
+    parameters=[
+        OpenApiParameter(
+            name="has_active_submission",
+            type=bool,
+            description="Filter teams by active submission status",
+        ),
+        OpenApiParameter(
+            name="eligible_for",
+            type=int,
+            many=True,
+            description="Filter teams by a set of eligibility criteria ID",
+        ),
+    ]
+)
 class TeamViewSet(
     viewsets.GenericViewSet,
     mixins.CreateModelMixin,
@@ -50,6 +69,7 @@ class TeamViewSet(
         filters.SearchFilter,
         TeamOrderingFilter,
         TeamActiveSubmissionFilter,
+        TeamEligibilityFilter,
     ]
     ordering = "pk"
     ordering_fields = ["pk", "name"] + TeamOrderingFilter.ordering_fields

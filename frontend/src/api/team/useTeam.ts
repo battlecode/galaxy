@@ -67,18 +67,26 @@ export const useTeam = ({
  * For searching the teams in an episode, ordered by ranking.
  */
 export const useSearchTeams = (
-  { episodeId, search, page }: TeamTListRequest,
+  {
+    episodeId,
+    search,
+    hasActiveSubmission,
+    eligibleFor,
+    page,
+  }: TeamTListRequest,
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedTeamPublicList> =>
   useQuery({
     queryKey: buildKey(searchTeamsFactory.queryKey, {
       episodeId,
       search,
+      hasActiveSubmission,
+      eligibleFor,
       page,
     }),
     queryFn: async () =>
       await searchTeamsFactory.queryFn(
-        { episodeId, search, page },
+        { episodeId, search, hasActiveSubmission, eligibleFor, page },
         queryClient,
         true,
       ),

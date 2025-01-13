@@ -24,6 +24,7 @@ import {
   ComputerDesktopIcon as ComputerDesktopIcon24,
   UserCircleIcon as UserCircleIcon24,
   UserPlusIcon as UserPlusIcon24,
+  FunnelIcon as FilterIcon24,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -51,6 +52,7 @@ import {
   ComputerDesktopIcon as ComputerDesktopIcon20,
   UserCircleIcon as UserCircleIcon20,
   UserPlusIcon as UserPlusIcon20,
+  FunnelIcon as FilterIcon20,
 } from "@heroicons/react/20/solid";
 
 const icons24 = {
@@ -78,6 +80,7 @@ const icons24 = {
   computer_desktop: ComputerDesktopIcon24,
   user_circle: UserCircleIcon24,
   user_plus: UserPlusIcon24,
+  filter: FilterIcon24,
 };
 
 const icons20 = {
@@ -105,6 +108,7 @@ const icons20 = {
   computer_desktop: ComputerDesktopIcon20,
   user_circle: UserCircleIcon20,
   user_plus: UserPlusIcon20,
+  filter: FilterIcon20,
 };
 
 export type IconName = keyof typeof icons24;

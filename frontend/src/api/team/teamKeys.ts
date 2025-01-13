@@ -35,11 +35,19 @@ export const teamQueryKeys: TeamKeys = {
   },
 
   search: {
-    key: ({ episodeId, search = "", page = 1 }: TeamTListRequest) =>
+    key: ({
+      episodeId,
+      search = "",
+      hasActiveSubmission = false,
+      eligibleFor = [],
+      page = 1,
+    }: TeamTListRequest) =>
       [
         ...teamQueryKeys.teamBase.key({ episodeId }),
         "search",
         search,
+        hasActiveSubmission,
+        eligibleFor,
         page,
       ] as const,
     // ["team", "search", { episodeId, search, page }] as const,

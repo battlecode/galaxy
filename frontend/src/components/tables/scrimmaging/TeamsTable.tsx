@@ -1,5 +1,5 @@
 import type React from "react";
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Table from "components/Table";
 import TableBottom from "components/TableBottom";
@@ -30,32 +30,13 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
   const queryClient = useQueryClient();
   const userTeam = useUserTeam({ episodeId });
   const teamsData = useSearchTeams(
-    { episodeId, search, page: teamsPage },
+    { episodeId, search, hasActiveSubmission: true, page: teamsPage },
     queryClient,
   );
   const maps = useEpisodeMaps({ episodeId });
 
   const [searchText, setSearchText] = useState<string>(search);
   const [teamToRequest, setTeamToRequest] = useState<TeamPublic | null>(null);
-
-  const canRequestScrimmage: (team: TeamPublic) => boolean = useCallback(
-    (team) => {
-      // TODO: Hack -> has_active_submission should be a boolean! Some sort of bug in API generation.
-      const hasActiveSubmission =
-        typeof team.has_active_submission === "boolean"
-          ? team.has_active_submission
-          : team.has_active_submission === "true";
-      return (
-        userTeam.isSuccess &&
-        episodeInfo.isSuccess &&
-        !episodeInfo.data.frozen &&
-        userTeam.data.id !== team.id &&
-        hasActiveSubmission &&
-        team.members.length > 0
-      );
-    },
-    [userTeam],
-  );
 
   return (
     <Fragment>
@@ -172,7 +153,7 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
                   label="Request"
                   variant="dark"
                   loading={maps.isLoading && teamToRequest?.id === team.id}
-                  disabled={!canRequestScrimmage(team)}
+                  disabled={!episodeInfo.isSuccess || episodeInfo.data.frozen}
                   onClick={() => {
                     setTeamToRequest(team);
                   }}

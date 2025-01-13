@@ -33,12 +33,18 @@ const Scrimmaging: React.FC = () => {
 
   const tabClassName = ({ selected }: { selected: boolean }): string =>
     classNames(
-      "w-full rounded-lg py-2.5 text-sm font-medium leading-5",
+      "w-full rounded-lg p-2.5 text-sm font-medium leading-5",
       "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
       selected
         ? "bg-white text-cyan-700 shadow"
         : "text-cyan-100 hover:bg-white/[0.12] hover:text-white",
     );
+
+  const panelClassName = classNames(
+    "grid grid-cols-1 gap-2 min-w-0",
+    "rounded-xl bg-white p-3",
+    "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
+  );
 
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams: QueryParams = useMemo(
@@ -90,31 +96,16 @@ const Scrimmaging: React.FC = () => {
 
   const tabPanels = (
     <Tab.Panels className="mt-2">
-      <Tab.Panel
-        className={classNames(
-          "rounded-xl bg-white p-3",
-          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-        )}
-      >
+      <Tab.Panel className={panelClassName}>
         <InboxTable inboxPage={queryParams.inboxPage} handlePage={handlePage} />
       </Tab.Panel>
-      <Tab.Panel
-        className={classNames(
-          "rounded-xl bg-white p-3",
-          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-        )}
-      >
+      <Tab.Panel className={panelClassName}>
         <OutboxTable
           outboxPage={queryParams.outboxPage}
           handlePage={handlePage}
         />
       </Tab.Panel>
-      <Tab.Panel
-        className={classNames(
-          "rounded-xl bg-white p-3",
-          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-        )}
-      >
+      <Tab.Panel className={panelClassName}>
         <TeamsTable
           search={queryParams.search}
           teamsPage={queryParams.teamsPage}
@@ -122,23 +113,13 @@ const Scrimmaging: React.FC = () => {
           handlePage={handlePage}
         />
       </Tab.Panel>
-      <Tab.Panel
-        className={classNames(
-          "rounded-xl bg-white p-3",
-          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-        )}
-      >
+      <Tab.Panel className={panelClassName}>
         <ScrimHistoryTable
           scrimsPage={queryParams.scrimsPage}
           handlePage={handlePage}
         />
       </Tab.Panel>
-      <Tab.Panel
-        className={classNames(
-          "rounded-xl bg-white p-10",
-          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-        )}
-      >
+      <Tab.Panel className={panelClassName}>
         <h1 className="mb-4 text-2xl font-bold leading-7 text-gray-900">
           Scrimmaging Record
         </h1>
@@ -150,12 +131,7 @@ const Scrimmaging: React.FC = () => {
           <ScrimmagingRecord team={userTeam.data} />
         )}
       </Tab.Panel>
-      <Tab.Panel
-        className={classNames(
-          "rounded-xl bg-white p-3",
-          "ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2",
-        )}
-      >
+      <Tab.Panel className={panelClassName}>
         <TournamentMatchesTable
           tourneyPage={queryParams.tourneyPage}
           handlePage={handlePage}

@@ -7,7 +7,7 @@ import Icon from "./Icon";
 import FormError from "./FormError";
 
 interface SelectMultipleMenuProps<T extends React.Key | null | undefined> {
-  options: Array<{ value: T; label: string }>;
+  options: Array<{ value: T; label: string | React.JSX.Element }>;
   disabled?: boolean;
   label?: string;
   required?: boolean;
@@ -69,7 +69,7 @@ function SelectMultipleMenu<T extends React.Key | null | undefined>({
                 : value.map((v) => (
                     <Pill
                       key={v}
-                      text={valueToLabel.get(v) ?? ""}
+                      label={valueToLabel.get(v) ?? ""}
                       deletable
                       onDelete={() => {
                         removeOption(v);
@@ -101,7 +101,9 @@ function SelectMultipleMenu<T extends React.Key | null | undefined>({
                   key={option.value}
                   value={option.value}
                 >
-                  <div className="overflow-x-auto pr-2">{option.label}</div>
+                  <div className="w-full overflow-x-auto pr-2">
+                    {option.label}
+                  </div>
                   <span className="hidden items-center text-cyan-900 ui-selected:flex">
                     <Icon name="check" size="sm" />
                   </span>

@@ -31,3 +31,12 @@ class TeamActiveSubmissionFilter(filters.BaseFilterBackend):
         if "has_active_submission" not in request.query_params:
             return queryset
         return queryset.filter(submissions__accepted=True).distinct()
+
+
+class TeamEligibilityFilter(filters.BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        if "eligible_for" not in request.query_params:
+            return queryset
+        return queryset.filter(
+            profile__eligible_for__in=request.query_params.getlist("eligible_for")
+        )

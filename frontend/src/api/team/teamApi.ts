@@ -134,17 +134,24 @@ export const updateTeamPartial = async ({
  * Search team, ordering the result by ranking.
  * @param episodeId The current episode's ID.
  * @param search The search query.
+ * @param hasActiveSubmission Whether the team has an active submission.
+ * @param eligibleFor A list of criteria, of which the team must be
+ * eligible for at least one.
  * @param page The page number.
  */
 export const searchTeams = async ({
   episodeId,
   search,
+  hasActiveSubmission,
+  eligibleFor,
   page,
 }: TeamTListRequest): Promise<PaginatedTeamPublicList> =>
   await API.teamTList({
     episodeId,
     ordering: "-rating,name",
     search,
+    hasActiveSubmission,
+    eligibleFor,
     page,
   });
 

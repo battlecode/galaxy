@@ -81,7 +81,7 @@ const OutboxTable: React.FC<OutboxTableProps> = ({
             value: (req) => (
               <div className="flex min-h-max w-full flex-row flex-wrap gap-2">
                 {req.maps.map((mapItem) => (
-                  <Pill key={mapItem} text={mapItem} deletable={false} />
+                  <Pill key={mapItem} label={mapItem} deletable={false} />
                 ))}
               </div>
             ),
