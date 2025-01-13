@@ -13,6 +13,7 @@ import { useEpisodeId } from "contexts/EpisodeContext";
 import { useUserTeam } from "api/team/useTeam";
 import Spinner from "components/Spinner";
 import { PageTitle } from "components/elements/BattlecodeStyle";
+import { classNames } from "api/helpers";
 
 interface QueryParams {
   inboxPage: number;
@@ -26,10 +27,6 @@ interface QueryParams {
 const Scrimmaging: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const userTeam = useUserTeam({ episodeId });
-
-  function classNames(...classes: string[]): string {
-    return classes.filter(Boolean).join(" ");
-  }
 
   const tabClassName = ({ selected }: { selected: boolean }): string =>
     classNames(

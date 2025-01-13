@@ -11,6 +11,13 @@ import {
   type EpisodeTournamentListRequest,
   type EpisodeTournamentRetrieveRequest,
   type EpisodeEListRequest,
+  type EpisodeTournamentRoundListRequest,
+  type EpisodeTournamentInitializeCreateRequest,
+  type PaginatedTournamentRoundList,
+  type EpisodeTournamentRoundEnqueueCreateRequest,
+  type EpisodeTournamentRoundReleaseCreateRequest,
+  type EpisodeTournamentRoundRetrieveRequest,
+  type TournamentRound,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION } from "../helpers";
 
@@ -77,3 +84,71 @@ export const getTournamentInfo = async ({
     episodeId,
     id,
   });
+
+/**
+ * Get the information of a specific tournament round during the given episode.
+ * @param episodeId The current episode's ID.
+ * @param tournament The tournament's ID.
+ * @param id The round's ID.
+ */
+export const getTournamentRoundInfo = async ({
+  episodeId,
+  tournament,
+  id,
+}: EpisodeTournamentRoundRetrieveRequest): Promise<TournamentRound> =>
+  await API.episodeTournamentRoundRetrieve({
+    episodeId,
+    tournament,
+    id,
+  });
+
+/**
+ * Get the rounds of a specific tournament during the given episode.
+ * @param episodeId The current episode's ID.
+ * @param tournament The tournament's ID.
+ */
+export const getTournamentRoundList = async ({
+  episodeId,
+  tournament,
+}: EpisodeTournamentRoundListRequest): Promise<PaginatedTournamentRoundList> =>
+  await API.episodeTournamentRoundList({ episodeId, tournament });
+
+/**
+ * Initialize the requested tournament id the given episode.
+ * @param episodeId The current episode's ID.
+ * @param id The tournament's ID.
+ */
+export const initializeTournament = async ({
+  episodeId,
+  id,
+}: EpisodeTournamentInitializeCreateRequest): Promise<void> => {
+  await API.episodeTournamentInitializeCreate({ episodeId, id });
+};
+
+/**
+ * Create and enqueue matches for the given tournament round.
+ */
+export const createAndEnqueueMatches = async ({
+  episodeId,
+  tournament,
+  id,
+  maps,
+}: EpisodeTournamentRoundEnqueueCreateRequest): Promise<void> => {
+  await API.episodeTournamentRoundEnqueueCreate({
+    episodeId,
+    tournament,
+    id,
+    maps,
+  });
+};
+
+/**
+ * Asynchronously release the given tournament round to the bracket service.
+ */
+export const releaseTournamentRound = async ({
+  episodeId,
+  tournament,
+  id,
+}: EpisodeTournamentRoundReleaseCreateRequest): Promise<void> => {
+  await API.episodeTournamentRoundReleaseCreate({ episodeId, tournament, id });
+};

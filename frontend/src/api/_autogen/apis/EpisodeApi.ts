@@ -65,6 +65,11 @@ export interface EpisodeMapRetrieveRequest {
     id: string;
 }
 
+export interface EpisodeTournamentInitializeCreateRequest {
+    episodeId: string;
+    id: string;
+}
+
 export interface EpisodeTournamentListRequest {
     episodeId: string;
     page?: number;
@@ -79,10 +84,26 @@ export interface EpisodeTournamentRetrieveRequest {
     id: string;
 }
 
+export interface EpisodeTournamentRoundEnqueueCreateRequest {
+    episodeId: string;
+    id: string;
+    maps: Array<number>;
+    tournament: string;
+    episodeId2?: string;
+    id2?: string;
+    tournament2?: string;
+}
+
 export interface EpisodeTournamentRoundListRequest {
     episodeId: string;
     tournament: string;
     page?: number;
+}
+
+export interface EpisodeTournamentRoundReleaseCreateRequest {
+    episodeId: string;
+    id: string;
+    tournament: string;
 }
 
 export interface EpisodeTournamentRoundRetrieveRequest {
@@ -297,6 +318,47 @@ export class EpisodeApi extends runtime.BaseAPI {
     }
 
     /**
+     * Seed the tournament with eligible teams in order of decreasing rating, populate the brackets in the bracket service, and create TournamentRounds.
+     */
+    async episodeTournamentInitializeCreateRaw(requestParameters: EpisodeTournamentInitializeCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
+            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling episodeTournamentInitializeCreate.');
+        }
+
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling episodeTournamentInitializeCreate.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/episode/{episode_id}/tournament/{id}/initialize/`.replace(`{${"episode_id"}}`, encodeURIComponent(String(requestParameters.episodeId))).replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Seed the tournament with eligible teams in order of decreasing rating, populate the brackets in the bracket service, and create TournamentRounds.
+     */
+    async episodeTournamentInitializeCreate(requestParameters: EpisodeTournamentInitializeCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.episodeTournamentInitializeCreateRaw(requestParameters, initOverrides);
+    }
+
+    /**
      * A viewset for retrieving Tournaments.
      */
     async episodeTournamentListRaw(requestParameters: EpisodeTournamentListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedTournamentList>> {
@@ -419,6 +481,71 @@ export class EpisodeApi extends runtime.BaseAPI {
     }
 
     /**
+     * Enqueue the given round of the tournament. Fails if this round is already in progress.
+     */
+    async episodeTournamentRoundEnqueueCreateRaw(requestParameters: EpisodeTournamentRoundEnqueueCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
+            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling episodeTournamentRoundEnqueueCreate.');
+        }
+
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling episodeTournamentRoundEnqueueCreate.');
+        }
+
+        if (requestParameters.maps === null || requestParameters.maps === undefined) {
+            throw new runtime.RequiredError('maps','Required parameter requestParameters.maps was null or undefined when calling episodeTournamentRoundEnqueueCreate.');
+        }
+
+        if (requestParameters.tournament === null || requestParameters.tournament === undefined) {
+            throw new runtime.RequiredError('tournament','Required parameter requestParameters.tournament was null or undefined when calling episodeTournamentRoundEnqueueCreate.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.episodeId2 !== undefined) {
+            queryParameters['episode_id'] = requestParameters.episodeId2;
+        }
+
+        if (requestParameters.id2 !== undefined) {
+            queryParameters['id'] = requestParameters.id2;
+        }
+
+        if (requestParameters.maps) {
+            queryParameters['maps'] = requestParameters.maps;
+        }
+
+        if (requestParameters.tournament2 !== undefined) {
+            queryParameters['tournament'] = requestParameters.tournament2;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/episode/{episode_id}/tournament/{tournament}/round/{id}/enqueue/`.replace(`{${"episode_id"}}`, encodeURIComponent(String(requestParameters.episodeId))).replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"tournament"}}`, encodeURIComponent(String(requestParameters.tournament))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Enqueue the given round of the tournament. Fails if this round is already in progress.
+     */
+    async episodeTournamentRoundEnqueueCreate(requestParameters: EpisodeTournamentRoundEnqueueCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.episodeTournamentRoundEnqueueCreateRaw(requestParameters, initOverrides);
+    }
+
+    /**
      * A viewset for retrieving tournament rounds.
      */
     async episodeTournamentRoundListRaw(requestParameters: EpisodeTournamentRoundListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<PaginatedTournamentRoundList>> {
@@ -462,6 +589,51 @@ export class EpisodeApi extends runtime.BaseAPI {
     async episodeTournamentRoundList(requestParameters: EpisodeTournamentRoundListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<PaginatedTournamentRoundList> {
         const response = await this.episodeTournamentRoundListRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Release the results of this round to the public bracket service.
+     */
+    async episodeTournamentRoundReleaseCreateRaw(requestParameters: EpisodeTournamentRoundReleaseCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
+            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling episodeTournamentRoundReleaseCreate.');
+        }
+
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling episodeTournamentRoundReleaseCreate.');
+        }
+
+        if (requestParameters.tournament === null || requestParameters.tournament === undefined) {
+            throw new runtime.RequiredError('tournament','Required parameter requestParameters.tournament was null or undefined when calling episodeTournamentRoundReleaseCreate.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/episode/{episode_id}/tournament/{tournament}/round/{id}/release/`.replace(`{${"episode_id"}}`, encodeURIComponent(String(requestParameters.episodeId))).replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"tournament"}}`, encodeURIComponent(String(requestParameters.tournament))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Release the results of this round to the public bracket service.
+     */
+    async episodeTournamentRoundReleaseCreate(requestParameters: EpisodeTournamentRoundReleaseCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.episodeTournamentRoundReleaseCreateRaw(requestParameters, initOverrides);
     }
 
     /**

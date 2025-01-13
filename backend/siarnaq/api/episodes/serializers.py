@@ -109,3 +109,7 @@ class TournamentRoundSerializer(serializers.ModelSerializer):
         if instance.release_status != ReleaseStatus.RESULTS:
             data["maps"] = None
         return data
+
+
+class EmptySerializer(serializers.Serializer):
+    pass

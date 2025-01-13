@@ -1,12 +1,14 @@
 import type React from "react";
 import { useNavigate } from "react-router-dom";
 import { useEpisodeId } from "../../contexts/EpisodeContext";
-import type { PaginatedTournamentList } from "../../api/_autogen";
+import type { PaginatedTournamentList, Tournament } from "../../api/_autogen";
 import type { Maybe } from "../../utils/utilTypes";
-import Table from "../Table";
+import Table, { type Column } from "../Table";
 import TableBottom from "../TableBottom";
 import { dateTime } from "../../utils/dateTime";
 import Icon from "../elements/Icon";
+import { useCurrentUser } from "contexts/CurrentUserContext";
+import Button from "components/elements/Button";
 
 interface TournamentsTableProps {
   data: Maybe<PaginatedTournamentList>;
@@ -23,6 +25,23 @@ const TournamentsTable: React.FC<TournamentsTableProps> = ({
 }) => {
   const { episodeId } = useEpisodeId();
   const navigate = useNavigate();
+
+  const { user } = useCurrentUser();
+
+  const adminColumn: Column<Tournament> = {
+    header: "Admin",
+    key: "admin",
+    value: (tour) => (
+      <Button
+        variant="dark"
+        label="Go!"
+        onClick={(ev) => {
+          ev.stopPropagation();
+          navigate(`/${episodeId}/tournament/${tour.name_short}/admin`);
+        }}
+      />
+    ),
+  };
 
   return (
     <Table
@@ -64,6 +83,7 @@ const TournamentsTable: React.FC<TournamentsTableProps> = ({
               <Icon name={"x_mark"} className="text-red-700" size="md" />
             ),
         },
+        ...(user.isSuccess && user.data.is_staff ? [adminColumn] : []),
         {
           header: "About",
           key: "blurb",

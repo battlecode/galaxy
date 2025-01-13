@@ -6,11 +6,15 @@ import type {
   EpisodeTournamentListRequest,
   EpisodeTournamentNextRetrieveRequest,
   EpisodeTournamentRetrieveRequest,
+  EpisodeTournamentRoundListRequest,
+  EpisodeTournamentRoundRetrieveRequest,
   GameMap,
   PaginatedEpisodeList,
   PaginatedTournamentList,
+  PaginatedTournamentRoundList,
   ResponseError,
   Tournament,
+  TournamentRound,
 } from "../_autogen";
 import {
   HttpStatusCode,
@@ -25,6 +29,8 @@ import {
   getNextTournament,
   getTournamentInfo,
   getTournamentList,
+  getTournamentRoundInfo,
+  getTournamentRoundList,
 } from "./episodeApi";
 import { episodeQueryKeys } from "./episodeKeys";
 
@@ -118,3 +124,36 @@ export const tournamentInfoFactory: QueryFactory<
   queryFn: async ({ episodeId, id }) =>
     await getTournamentInfo({ episodeId, id }),
 } as const;
+
+export const tournamentRoundInfoFactory: QueryFactory<
+  EpisodeTournamentRoundRetrieveRequest,
+  TournamentRound
+> = {
+  queryKey: episodeQueryKeys.tournamentRoundInfo,
+  queryFn: async ({ episodeId, tournament, id }) =>
+    await getTournamentRoundInfo({ episodeId, tournament, id }),
+} as const;
+
+export const tournamentRoundListFactory: PaginatedQueryFactory<
+  EpisodeTournamentRoundListRequest,
+  PaginatedTournamentRoundList
+> = {
+  queryKey: episodeQueryKeys.tournamentRoundList,
+  queryFn: async (request, queryClient, prefetchNext) => {
+    const result = await getTournamentRoundList(request);
+    // Prefetch the next page if we want to prefetch
+    if (prefetchNext) {
+      await prefetchNextPage(
+        request,
+        result,
+        {
+          queryKey: episodeQueryKeys.tournamentRoundList,
+          queryFn: tournamentRoundListFactory.queryFn,
+        },
+        queryClient,
+      );
+    }
+
+    return result;
+  },
+};

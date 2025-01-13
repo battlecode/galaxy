@@ -2,9 +2,14 @@ import type {
   EpisodeEListRequest,
   EpisodeERetrieveRequest,
   EpisodeMapListRequest,
+  EpisodeTournamentInitializeCreateRequest,
   EpisodeTournamentListRequest,
   EpisodeTournamentNextRetrieveRequest,
   EpisodeTournamentRetrieveRequest,
+  EpisodeTournamentRoundEnqueueCreateRequest,
+  EpisodeTournamentRoundListRequest,
+  EpisodeTournamentRoundReleaseCreateRequest,
+  EpisodeTournamentRoundRetrieveRequest,
 } from "../_autogen";
 import type { QueryKeyBuilder } from "../apiTypes";
 
@@ -15,7 +20,10 @@ interface EpisodeKeys {
   maps: QueryKeyBuilder<EpisodeMapListRequest>;
   tournamentList: QueryKeyBuilder<EpisodeTournamentListRequest>;
   nextTournament: QueryKeyBuilder<EpisodeTournamentNextRetrieveRequest>;
+  tournamentBase: QueryKeyBuilder<{ episodeId: string; id: string }>;
   tournamentInfo: QueryKeyBuilder<EpisodeTournamentRetrieveRequest>;
+  tournamentRoundInfo: QueryKeyBuilder<EpisodeTournamentRoundRetrieveRequest>;
+  tournamentRoundList: QueryKeyBuilder<EpisodeTournamentRoundListRequest>;
 }
 
 // ---------- QUERY KEYS ---------- //
@@ -56,12 +64,88 @@ export const episodeQueryKeys: EpisodeKeys = {
       ] as const,
   },
 
-  tournamentInfo: {
-    key: ({ episodeId, id }: EpisodeTournamentRetrieveRequest) =>
+  tournamentBase: {
+    key: ({ episodeId, id }: { episodeId: string; id: string }) =>
       [
         ...episodeQueryKeys.byId.key({ id: episodeId }),
-        "tournamentInfo",
+        "tournament",
         id,
       ] as const,
   },
+
+  tournamentInfo: {
+    key: ({ episodeId, id }: EpisodeTournamentRetrieveRequest) =>
+      [
+        ...episodeQueryKeys.tournamentBase.key({ episodeId, id }),
+        "info",
+        id,
+      ] as const,
+  },
+
+  tournamentRoundInfo: {
+    key: ({
+      episodeId,
+      tournament,
+      id,
+    }: EpisodeTournamentRoundRetrieveRequest) =>
+      [
+        ...episodeQueryKeys.tournamentBase.key({ episodeId, id: tournament }),
+        "round",
+        id,
+      ] as const,
+  },
+
+  tournamentRoundList: {
+    key: ({
+      episodeId,
+      tournament,
+      page = 1,
+    }: EpisodeTournamentRoundListRequest) =>
+      [
+        ...episodeQueryKeys.tournamentBase.key({ episodeId, id: tournament }),
+        "round",
+        "list",
+        page,
+      ] as const,
+  },
+};
+
+// ---------- MUTATION KEYS ---------- //
+export const episodeMutationKeys = {
+  initializeTournament: ({
+    episodeId,
+    id,
+  }: EpisodeTournamentInitializeCreateRequest) =>
+    ["episode", episodeId, "tournament", id, "initialize"] as const,
+
+  // We don't include the maps because they aren't relevant to the key
+  createEnqueueTournamentRound: ({
+    episodeId,
+    tournament,
+    id,
+  }: EpisodeTournamentRoundEnqueueCreateRequest) =>
+    [
+      "episode",
+      episodeId,
+      "tournament",
+      tournament,
+      "round",
+      id,
+      "createEnqueue",
+    ] as const,
+
+  releaseTournamentRound: ({
+    episodeId,
+    tournament,
+    id,
+  }: EpisodeTournamentRoundReleaseCreateRequest) =>
+    [
+      "episode",
+      episodeId,
+      "tournament",
+      tournament,
+      "round",
+      id,
+      "release",
+    ] as const,
 };
