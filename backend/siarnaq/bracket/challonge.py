@@ -27,8 +27,7 @@ _headers = {
     "User-Agent": "",
 }
 
-AUTH_TYPE = "v1"
-URL_BASE = "https://api.challonge.com/v2/"
+URL_BASE = "https://api.challonge.com/v2.1/"
 
 
 def create_tournament(tournament: Tournament, *, is_private: bool):
@@ -100,7 +99,7 @@ def bulk_add_teams(tournament: Tournament, teams: Iterable[Team], *, is_private:
 
     payload = {
         "data": {
-            "type": "Participant",
+            "type": "Participants",
             "attributes": {
                 "participants": participants_for_challonge,
             },
@@ -150,7 +149,7 @@ def get_tournament_data(tournament: Tournament, *, is_private: bool):
         # in case of bracket reset
         matches = [item for item in data["included"] if item["type"] == "match"]
         match_last = max(
-            matches, key=lambda match: match["attributes"]["suggestedPlayOrder"]
+            matches, key=lambda match: match["attributes"]["suggested_play_order"]
         )
         # Give it its own round
         match_last["attributes"]["round"] += 1
@@ -168,7 +167,7 @@ def _get_round_indexes(tournament: Tournament, *, is_private: bool):
     round_indexes = list()
 
     matches = [item for item in tournament_data["included"] if item["type"] == "match"]
-    matches.sort(key=lambda i: i["attributes"]["suggestedPlayOrder"])
+    matches.sort(key=lambda i: i["attributes"]["suggested_play_order"])
 
     for match in matches:
         round_index = match["attributes"]["round"]
@@ -334,15 +333,12 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
         )
         match_objects.append(match_object)
 
-        # Note that Challonge 1-indexes its player indexes
-        # while our internal data model (in Siarnaq) 0-indexes.
-        for (siarnaq_player_index, challonge_player_index) in enumerate(
-            ["player1", "player2"]
-        ):
+        challonge_points = challonge_match["attributes"]["points_by_participant"]
+        for (player_index, challonge_points_participant) in enumerate(challonge_points):
             # This looks ugly but it's how to parse through the Challonge-related data.
-            challonge_participant_id_private = challonge_match["relationships"][
-                challonge_player_index
-            ]["data"]["id"]
+            challonge_participant_id_private = str(
+                challonge_points_participant["participant_id"]
+            )
             challonge_participant_id_public = challonge_team_ids_private_to_public[
                 challonge_participant_id_private
             ]
@@ -358,7 +354,7 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
                 team_id=team_id,
                 submission_id=submission_id,
                 match=match_object,
-                player_index=siarnaq_player_index,
+                player_index=player_index,
                 external_id_private=challonge_participant_id_private,
                 external_id_public=challonge_participant_id_public,
             )
@@ -405,7 +401,7 @@ def update_match(match: Match, *, is_private: bool):
             if is_private
             else participant.external_id_public,
             "score_set": str(participant.score),
-            "advancing": True if participant.score == high_score else False,
+            "advancing": participant.score == high_score,
         }
         for participant in participants
     ]
