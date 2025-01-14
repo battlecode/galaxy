@@ -18,8 +18,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
-import { useUserTeam } from "api/team/useTeam";
-import { Status526Enum, LanguageEnum } from "api/_autogen";
+import { LanguageEnum } from "api/_autogen";
 import { PageTitle } from "components/elements/BattlecodeStyle";
 import { useCurrentUserInfo } from "api/user/useUser";
 
