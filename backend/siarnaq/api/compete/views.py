@@ -273,6 +273,15 @@ class MatchViewSet(
             )
             .order_by("-pk")
         )
+
+        # Check if the user is not staff
+        if not self.request.user.is_staff:
+            # Exclude matches where tournament round is not null and not released
+            queryset = queryset.exclude(
+                Q(tournament_round__isnull=False)
+                & Q(tournament_round__release_status=ReleaseStatus.HIDDEN)
+            )
+
         return queryset
 
     def get_serializer_context(self):
