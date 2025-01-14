@@ -1,5 +1,8 @@
+import structlog
 from django.db.models import Count
 from rest_framework import filters
+
+logger = structlog.get_logger(__name__)
 
 
 class TeamOrderingFilter(filters.OrderingFilter):
@@ -42,8 +45,15 @@ class TeamEligibilityFilter(filters.BaseFilterBackend):
         eligible_for_list = request.query_params.getlist("eligible_for")
 
         # Filter teams that have all the specified eligible_for values
-        return (
+        # tricky query, this results in a join becasue eligible_for is a many to many
+        filtered_teams = (
             queryset.filter(profile__eligible_for__in=eligible_for_list)
             .annotate(eligible_count=Count("profile__eligible_for"))
             .filter(eligible_count=len(eligible_for_list))
         )
+        logger.info(
+            "TeamEligibilityFilter",
+            message="TeamEligibilityFilter Query Plan:",
+            queryPlan=str(filtered_teams.query),
+        )
+        return filtered_teams
