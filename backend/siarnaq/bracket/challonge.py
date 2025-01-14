@@ -68,8 +68,7 @@ def create_tournament(tournament: Tournament, *, is_private: bool):
     }
 
     r = requests.post(url, headers=_headers, json=payload)
-    # log tournament posted all tournament info and reply text
-    logger.info("create tournament, request post, r=", r)
+    logger.info("create tournament, request post, r=", message=r.text)
     r.raise_for_status()
 
 
@@ -109,8 +108,7 @@ def bulk_add_teams(tournament: Tournament, teams: Iterable[Team], *, is_private:
     }
 
     r = requests.post(url, headers=_headers, json=payload)
-    logger.info("bulk add teams, request post, r=", r)
-
+    logger.info("bulk add teams, request post, r=", message=r.text)
     r.raise_for_status()
 
 
@@ -126,7 +124,8 @@ def start_tournament(tournament: Tournament, *, is_private: bool):
     payload = {"data": {"type": "TournamentState", "attributes": {"state": "start"}}}
 
     r = requests.put(url, headers=_headers, json=payload)
-    logger.info("start_tournament, request post, r=", r)
+    logger.info("start tournament, request post, r=", message=r.text)
+
     r.raise_for_status()
 
 
