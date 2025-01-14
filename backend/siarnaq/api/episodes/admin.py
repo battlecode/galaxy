@@ -16,6 +16,14 @@ from siarnaq.api.user.models import User
 logger = structlog.get_logger(__name__)
 
 
+@admin.action(description="Trigger a round of autoscrimmages")
+def autoscrim(modeladmin, request, queryset):
+    logger.info("autoscrim", message="Forcibly enqueueing autoscrims.")
+    # For now, autoscrims are always best of 3.
+    for episode in queryset:
+        episode.autoscrim(best_of=3)
+
+
 @admin.action(description="Export all submitted resumes")
 def export_resumes(modeladmin, request, queryset):
     return HttpResponseRedirect(User.objects.export_resumes(episodes=queryset))
@@ -30,7 +38,7 @@ class MapInline(admin.TabularInline):
 
 @admin.register(Episode)
 class EpisodeAdmin(admin.ModelAdmin):
-    actions = [export_resumes]
+    actions = [autoscrim, export_resumes]
     fieldsets = (
         (
             "General",

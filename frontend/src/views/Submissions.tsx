@@ -18,9 +18,9 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
-import { useUserTeam } from "api/team/useTeam";
-import { Status526Enum, LanguageEnum } from "api/_autogen";
+import { LanguageEnum } from "api/_autogen";
 import { PageTitle } from "components/elements/BattlecodeStyle";
+import { useCurrentUserInfo } from "api/user/useUser";
 
 interface SubmissionFormInput {
   file: FileList;
@@ -109,9 +109,9 @@ const Submissions: React.FC = () => {
 
 const CodeSubmission: React.FC = () => {
   const { episodeId } = useEpisodeId();
-  const teamData = useUserTeam({ episodeId });
   const queryClient = useQueryClient();
 
+  const userData = useCurrentUserInfo();
   const episode = useEpisodeInfo({ id: episodeId });
 
   const uploadSub = useUploadSubmission(
@@ -141,8 +141,8 @@ const CodeSubmission: React.FC = () => {
 
   if (!episode.isSuccess) return null;
 
-  const isStaffTeam = teamData.data?.status === Status526Enum.S;
-  if (!isStaffTeam && episode.data.frozen)
+  const userIsStaff = userData.isSuccess && userData.data.is_staff;
+  if (!userIsStaff && episode.data.frozen)
     return (
       <p>
         Submissions are currently frozen! This is most likely due to a
