@@ -26,7 +26,6 @@ from rest_framework.response import Response
 
 from siarnaq.api.compete.filters import IsSubmissionCreatorFilterBackend
 from siarnaq.api.compete.models import (
-    AdminSettings,
     Match,
     MatchParticipant,
     SaturnStatus,
@@ -47,7 +46,7 @@ from siarnaq.api.compete.serializers import (
     SubmissionSerializer,
     TournamentSubmissionSerializer,
 )
-from siarnaq.api.episodes.models import ReleaseStatus, Tournament
+from siarnaq.api.episodes.models import Episode, ReleaseStatus, Tournament
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable, IsEpisodeMutable
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
@@ -937,8 +936,8 @@ class ScrimmageRequestViewSet(
 
         if serializer.validated_data["is_ranked"]:
             # Get the global settings (assuming only one instance exists)
-            admin_settings = AdminSettings.objects.first()
-            if admin_settings and (not admin_settings.is_allowed_ranked_scrimmages):
+            episode = Episode.objects.get(pk=self.kwargs["episode_id"])
+            if episode and (not episode.is_allowed_ranked_scrimmage):
                 raise RankedMatchesDisabed
 
             active_statuses = {
@@ -1050,8 +1049,8 @@ class ScrimmageRequestViewSet(
         """Accept a scrimmage request."""
         self.get_object()  # Asserts permission
         if ScrimmageRequest.objects.filter(pk=pk).first().is_ranked:
-            admin_settings = AdminSettings.objects.first()
-            if admin_settings and (not admin_settings.is_allowed_ranked_scrimmages):
+            episode = Episode.objects.get(pk=self.kwargs["episode_id"])
+            if episode and (not episode.is_allowed_ranked_scrimmage):
                 raise RankedMatchesDisabed
         self.get_queryset().filter(pk=pk).accept()
         return Response(None, status.HTTP_204_NO_CONTENT)

@@ -108,6 +108,9 @@ class Episode(models.Model):
     )
     """The eligibility criteria active in this episode."""
 
+    is_allowed_ranked_scrimmage = models.BooleanField(default=True)
+    """Whether ranked scrimmages are allowed in this episode."""
+
     objects = EpisodeQuerySet.as_manager()
 
     def __str__(self):
