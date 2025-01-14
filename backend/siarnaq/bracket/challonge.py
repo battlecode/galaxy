@@ -4,8 +4,11 @@ import json
 from typing import TYPE_CHECKING
 
 import requests
+import structlog
 from django.apps import apps
 from django.conf import settings
+
+logger = structlog.get_logger(__name__)
 
 if TYPE_CHECKING:
     from typing import Iterable
@@ -30,6 +33,7 @@ URL_BASE = "https://api.challonge.com/v2.1/"
 def create_tournament(tournament: Tournament, *, is_private: bool):
     from siarnaq.api.episodes.models import TournamentStyle
 
+    logger.info("create_tournament", message="Creating Challonge tournament.")
     # Challonge does not allow hyphens in IDs, so substitute just in case
     tournament.external_id_public = tournament.external_id_public.replace("-", "_")
     tournament.external_id_private = tournament.external_id_private.replace("-", "_")
@@ -63,6 +67,7 @@ def create_tournament(tournament: Tournament, *, is_private: bool):
     }
 
     r = requests.post(url, headers=_headers, json=payload)
+    logger.info("create tournament, request post, r=", message=r.text)
     r.raise_for_status()
 
 
@@ -71,6 +76,8 @@ def bulk_add_teams(tournament: Tournament, teams: Iterable[Team], *, is_private:
     Adds teams in bulk to a bracket.
     Expects `teams` to have active_submission included.
     """
+    logger.info("bulk_add_teams", message="Adding teams to Challonge tournament.")
+
     tournament_challonge_id = (
         tournament.external_id_private if is_private else tournament.external_id_public
     )
@@ -100,10 +107,13 @@ def bulk_add_teams(tournament: Tournament, teams: Iterable[Team], *, is_private:
     }
 
     r = requests.post(url, headers=_headers, json=payload)
+    logger.info("bulk add teams, request post, r=", message=r.text)
     r.raise_for_status()
 
 
 def start_tournament(tournament: Tournament, *, is_private: bool):
+    logger.info("start_tournament", message="Starting Challonge tournament.")
+
     tournament_challonge_id = (
         tournament.external_id_private if is_private else tournament.external_id_public
     )
@@ -113,6 +123,8 @@ def start_tournament(tournament: Tournament, *, is_private: bool):
     payload = {"data": {"type": "TournamentState", "attributes": {"state": "start"}}}
 
     r = requests.put(url, headers=_headers, json=payload)
+    logger.info("start tournament, request post, r=", message=r.text)
+
     r.raise_for_status()
 
 
