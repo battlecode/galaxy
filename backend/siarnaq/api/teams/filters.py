@@ -1,3 +1,4 @@
+from django.db.models import Count
 from rest_framework import filters
 
 
@@ -37,6 +38,12 @@ class TeamEligibilityFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         if "eligible_for" not in request.query_params:
             return queryset
-        return queryset.filter(
-            profile__eligible_for__in=request.query_params.getlist("eligible_for")
+
+        eligible_for_list = request.query_params.getlist("eligible_for")
+
+        # Filter teams that have all the specified eligible_for values
+        return (
+            queryset.filter(profile__eligible_for__in=eligible_for_list)
+            .annotate(eligible_count=Count("profile__eligible_for"))
+            .filter(eligible_count=len(eligible_for_list))
         )

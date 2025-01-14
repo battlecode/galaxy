@@ -138,15 +138,13 @@ const Rankings: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1">
-        <RankingsTable
-          data={rankingsData.data}
-          eligibleFor={queryParams.eligibleFor}
-          loading={rankingsData.isLoading}
-          page={queryParams.page}
-          handlePage={handlePage}
-        />
-      </div>
+      <RankingsTable
+        data={rankingsData.data}
+        eligibleFor={queryParams.eligibleFor}
+        loading={rankingsData.isLoading}
+        page={queryParams.page}
+        handlePage={handlePage}
+      />
     </div>
   );
 };
