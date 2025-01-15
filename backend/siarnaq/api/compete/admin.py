@@ -1,5 +1,7 @@
 import structlog
 from django.contrib import admin
+from django.db.models import Exists, OuterRef
+from django.utils.translation import gettext_lazy as _
 
 from siarnaq.api.compete.models import (
     AdminSettings,
@@ -34,6 +36,15 @@ def force_requeue(modeladmin, request, queryset):
 def cancel(modeladmin, request, queryset):
     logger.info("task_cancel", message="Cancelling tasks on Saturn.")
     queryset.cancel()
+
+
+@admin.action(description="Recalculate ratings")
+def recalc_rating(modeladmin, request, queryset):
+    logger.info(
+        "match_recalc_rating",
+        message=f"Recalculate ratings for {len(queryset)} matches. ",
+    )
+    queryset.request_racalc_ratings()
 
 
 @admin.register(Submission)
@@ -107,9 +118,40 @@ class MatchParticipantInline(admin.TabularInline):
         )
 
 
+class RatingNullFilter(admin.SimpleListFilter):
+    title = _("Rating is null")
+    parameter_name = "rating_is_null"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", _("Yes")),
+            ("no", _("No")),
+        )
+
+    def queryset(self, request, queryset):
+        # did this Exists trick to prevent getting duplicates from the join
+        if self.value() == "yes":
+            return queryset.annotate(
+                rating_is_null=Exists(
+                    MatchParticipant.objects.filter(
+                        match=OuterRef("pk"), rating__isnull=True
+                    )
+                )
+            ).filter(rating_is_null=True)
+        if self.value() == "no":
+            return queryset.annotate(
+                rating_is_null=Exists(
+                    MatchParticipant.objects.filter(
+                        match=OuterRef("pk"), rating__isnull=True
+                    )
+                )
+            ).filter(rating_is_null=False)
+        return queryset
+
+
 @admin.register(Match)
 class MatchAdmin(admin.ModelAdmin):
-    actions = [enqueue, force_requeue, cancel]
+    actions = [enqueue, force_requeue, cancel, recalc_rating]
     fieldsets = (
         (
             "General",
@@ -147,8 +189,9 @@ class MatchAdmin(admin.ModelAdmin):
         "tournament_round",
         "status",
         "created",
+        "is_ranked",
     )
-    list_filter = ("episode", "status")
+    list_filter = ("episode", "status", "is_ranked", RatingNullFilter)
     ordering = ("-pk",)
     raw_id_fields = ("tournament_round",)
     readonly_fields = (
