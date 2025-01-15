@@ -379,8 +379,11 @@ export const useRequestScrimmage = (
         } catch (e: unknown) {
           const error = e as ResponseError;
           // Parse the response text as JSON, detail propety contains the error message
-          const errorJson = (await error.response.json()) as { detail?: string };
-          const errorDetail = errorJson.detail ?? "An unexpected error occurred.";
+          const errorJson = (await error.response.json()) as {
+            detail?: string;
+          };
+          const errorDetail =
+            errorJson.detail ?? "An unexpected error occurred.";
           throw new Error(errorDetail);
         }
       };
@@ -412,7 +415,6 @@ export const useAcceptScrimmage = (
       id,
     }: CompeteRequestAcceptCreateRequest) => {
       const toastFn = async (): Promise<void> => {
-
         try {
           await acceptScrimmage({ episodeId, id });
           // Invalidate the inbox query
@@ -435,11 +437,14 @@ export const useAcceptScrimmage = (
               ),
           });
         } catch (e: unknown) {
-            const error = e as ResponseError;
-            // Parse the response text as JSON, detail propety contains the error message
-            const errorJson = (await error.response.json()) as { detail?: string };
-            const errorDetail = errorJson.detail ?? "An unexpected error occurred.";
-            throw new Error(errorDetail);
+          const error = e as ResponseError;
+          // Parse the response text as JSON, detail propety contains the error message
+          const errorJson = (await error.response.json()) as {
+            detail?: string;
+          };
+          const errorDetail =
+            errorJson.detail ?? "An unexpected error occurred.";
+          throw new Error(errorDetail);
         }
       };
 
