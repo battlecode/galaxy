@@ -350,12 +350,11 @@ export const useRequestScrimmage = (
       scrimmageRequestRequest,
     }: CompeteRequestCreateRequest) => {
       const toastFn = async (): Promise<ScrimmageRequest> => {
-        const result = await requestScrimmage({
-          episodeId,
-          scrimmageRequestRequest,
-        });
-
         try {
+          const result = await requestScrimmage({
+            episodeId,
+            scrimmageRequestRequest,
+          });
           // Invalidate the outbox query
           await queryClient.invalidateQueries({
             queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
@@ -375,17 +374,21 @@ export const useRequestScrimmage = (
                 true,
               ),
           });
-        } catch (e) {
-          toast.error((e as ResponseError).message);
-        }
 
-        return result;
+          return result;
+        } catch (e: unknown) {
+          const error = e as ResponseError;
+          // Parse the response text as JSON, detail propety contains the error message
+          const errorJson = (await error.response.json()) as { detail?: string };
+          const errorDetail = errorJson.detail ?? "An unexpected error occurred.";
+          throw new Error(errorDetail);
+        }
       };
 
       return await toast.promise(toastFn(), {
         loading: "Requesting scrimmage...",
         success: "Scrimmage requested!",
-        error: "Error requesting scrimmage. Is the requested team eligible?",
+        error: (error: Error) => error.message, // Return the error message thrown in toastFn
       });
     },
     onSuccess,
@@ -409,9 +412,9 @@ export const useAcceptScrimmage = (
       id,
     }: CompeteRequestAcceptCreateRequest) => {
       const toastFn = async (): Promise<void> => {
-        await acceptScrimmage({ episodeId, id });
 
         try {
+          await acceptScrimmage({ episodeId, id });
           // Invalidate the inbox query
           await queryClient.invalidateQueries({
             queryKey: buildKey(scrimmageInboxListFactory.queryKey, {
@@ -431,15 +434,19 @@ export const useAcceptScrimmage = (
                 true,
               ),
           });
-        } catch (e) {
-          toast.error((e as ResponseError).message);
+        } catch (e: unknown) {
+            const error = e as ResponseError;
+            // Parse the response text as JSON, detail propety contains the error message
+            const errorJson = (await error.response.json()) as { detail?: string };
+            const errorDetail = errorJson.detail ?? "An unexpected error occurred.";
+            throw new Error(errorDetail);
         }
       };
 
       await toast.promise(toastFn(), {
         loading: "Accepting scrimmage...",
         success: "Scrimmage accepted!",
-        error: "Error accepting scrimmage.",
+        error: (error: Error) => error.message, // Return the error message thrown in toastFn
       });
     },
   });
