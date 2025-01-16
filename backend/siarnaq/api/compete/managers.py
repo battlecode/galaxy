@@ -82,6 +82,13 @@ class SaturnInvokableQuerySet(models.QuerySet):
                 )
         self.model.objects.bulk_update(invocations, ["status", "logs", "num_failures"])
 
+    def request_racalc_ratings(self):
+        """Request ratings to be recalculated for all items in this queryset."""
+        # Make a list of the current query self ordered by match created date
+        sorted_matches = self.order_by("created")
+        for match in sorted_matches:
+            match.request_rating_update()
+
 
 class SubmissionQuerySet(SaturnInvokableQuerySet):
     @property
