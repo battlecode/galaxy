@@ -972,6 +972,50 @@ paths:
             type: string
             pattern: ^[^\/.]+$
           required: true
+        - in: query
+          name: episode_id
+          schema:
+            type: string
+          description: An episode to filter for.
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: id
+          schema:
+            type: string
+          description: A tournament round to filter for.
+        - in: path
+          name: tournament
+          schema:
+            type: string
+            pattern: ^[^\/.]+$
+          required: true
+        - in: query
+          name: tournament
+          schema:
+            type: string
+          description: A tournament to filter for.
+      tags:
+        - episode
+      security:
+        - jwtAuth: []
+      responses:
+        "204":
+          description: Tournament round has been released to public bracket service
+  /api/episode/{episode_id}/tournament/{tournament}/round/{id}/requeue/:
+    post:
+      operationId: episode_tournament_round_requeue_create
+      description: Re-queue every unsuccessful match in this round on Saturn.
+      parameters:
+        - in: path
+          name: episode_id
+          schema:
+            type: string
+            pattern: ^[^\/.]+$
+          required: true
         - in: path
           name: id
           schema:
@@ -989,7 +1033,9 @@ paths:
         - jwtAuth: []
       responses:
         "204":
-          description: Tournament round has been released to public bracket service
+          description: Tournament round has been requeued
+        "400":
+          description: No failed matches to requeue
   /api/episode/{episode_id}/tournament/next/:
     get:
       operationId: episode_tournament_next_retrieve
@@ -3485,6 +3531,8 @@ components:
           type: integer
           maximum: 32767
           minimum: 0
+        in_progress:
+          type: boolean
       required:
         - display_order
         - id

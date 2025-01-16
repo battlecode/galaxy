@@ -139,7 +139,7 @@ class TournamentRoundViewSet(viewsets.ReadOnlyModelViewSet):
                 tournament=self.kwargs["tournament"],
             )
             .prefetch_related("maps")
-            .order_by("external_id")
+            .order_by("display_order")
         )
         if not self.request.user.is_staff:
             queryset = queryset.filter(tournament__is_public=True)
@@ -217,11 +217,56 @@ class TournamentRoundViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
     @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="episode_id",
+                type=str,
+                description="An episode to filter for.",
+            ),
+            OpenApiParameter(
+                name="tournament",
+                type=str,
+                description="A tournament to filter for.",
+            ),
+            OpenApiParameter(
+                name="id",
+                type=str,
+                description="A tournament round to filter for.",
+            ),
+        ],
         responses={
             status.HTTP_204_NO_CONTENT: OpenApiResponse(
                 description=(
                     "Tournament round has been released to public bracket service"
                 )
+            ),
+        },
+    )
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(IsAdminUser,),
+        serializer_class=EmptySerializer,
+        throttle_classes=(),
+    )
+    def release(self, request, pk=None, *, episode_id, tournament):
+        """
+        Release the results of this round to the public bracket service.
+        """
+        instance = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        instance.request_publish_to_bracket(is_public=True)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="Tournament round has been requeued"
+            ),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                description="No failed matches to requeue"
             ),
         }
     )
@@ -232,12 +277,25 @@ class TournamentRoundViewSet(viewsets.ReadOnlyModelViewSet):
         serializer_class=EmptySerializer,
         throttle_classes=(),
     )
-    def release(self, request, pk=None, *, episode_id):
+    def requeue(self, request, pk=None, *, episode_id, tournament):
         """
-        Release the results of this round to the public bracket service.
+        Re-queue every unsuccessful match in this round on Saturn.
         """
+        from siarnaq.api.compete.models import Match, SaturnStatus
+
         instance = self.get_object()
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        instance.request_publish_to_bracket(is_public=True)
+
+        # Get all failed matches for this round
+        failed = Match.objects.filter(
+            tournament_round=instance.id, status=SaturnStatus.ERRORED
+        )
+
+        if not failed.exists():
+            return Response(None, status=status.HTTP_400_BAD_REQUEST)
+
+        # TODO: should we logger.info the round requeue here?
+        failed.enqueue_all()
+
         return Response(None, status=status.HTTP_204_NO_CONTENT)

@@ -18,6 +18,7 @@ import {
   type EpisodeTournamentRoundReleaseCreateRequest,
   type EpisodeTournamentRoundRetrieveRequest,
   type TournamentRound,
+  type EpisodeTournamentRoundRequeueCreateRequest,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION } from "../helpers";
 
@@ -106,12 +107,14 @@ export const getTournamentRoundInfo = async ({
  * Get the rounds of a specific tournament during the given episode.
  * @param episodeId The current episode's ID.
  * @param tournament The tournament's ID.
+ * @param page The desired page to retrieve.
  */
 export const getTournamentRoundList = async ({
   episodeId,
   tournament,
+  page,
 }: EpisodeTournamentRoundListRequest): Promise<PaginatedTournamentRoundList> =>
-  await API.episodeTournamentRoundList({ episodeId, tournament });
+  await API.episodeTournamentRoundList({ episodeId, tournament, page });
 
 /**
  * Initialize the requested tournament id the given episode.
@@ -151,4 +154,15 @@ export const releaseTournamentRound = async ({
   id,
 }: EpisodeTournamentRoundReleaseCreateRequest): Promise<void> => {
   await API.episodeTournamentRoundReleaseCreate({ episodeId, tournament, id });
+};
+
+/**
+ * Asynchronously requeue the given tournament round's failed matches on Saturn.
+ */
+export const requeueTournamentRound = async ({
+  episodeId,
+  tournament,
+  id,
+}: EpisodeTournamentRoundRequeueCreateRequest): Promise<void> => {
+  await API.episodeTournamentRoundRequeueCreate({ episodeId, tournament, id });
 };

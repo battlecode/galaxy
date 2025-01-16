@@ -104,6 +104,15 @@ export interface EpisodeTournamentRoundReleaseCreateRequest {
     episodeId: string;
     id: string;
     tournament: string;
+    episodeId2?: string;
+    id2?: string;
+    tournament2?: string;
+}
+
+export interface EpisodeTournamentRoundRequeueCreateRequest {
+    episodeId: string;
+    id: string;
+    tournament: string;
 }
 
 export interface EpisodeTournamentRoundRetrieveRequest {
@@ -609,6 +618,18 @@ export class EpisodeApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
+        if (requestParameters.episodeId2 !== undefined) {
+            queryParameters['episode_id'] = requestParameters.episodeId2;
+        }
+
+        if (requestParameters.id2 !== undefined) {
+            queryParameters['id'] = requestParameters.id2;
+        }
+
+        if (requestParameters.tournament2 !== undefined) {
+            queryParameters['tournament'] = requestParameters.tournament2;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -634,6 +655,51 @@ export class EpisodeApi extends runtime.BaseAPI {
      */
     async episodeTournamentRoundReleaseCreate(requestParameters: EpisodeTournamentRoundReleaseCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.episodeTournamentRoundReleaseCreateRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     * Re-queue every unsuccessful match in this round on Saturn.
+     */
+    async episodeTournamentRoundRequeueCreateRaw(requestParameters: EpisodeTournamentRoundRequeueCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.episodeId === null || requestParameters.episodeId === undefined) {
+            throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling episodeTournamentRoundRequeueCreate.');
+        }
+
+        if (requestParameters.id === null || requestParameters.id === undefined) {
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling episodeTournamentRoundRequeueCreate.');
+        }
+
+        if (requestParameters.tournament === null || requestParameters.tournament === undefined) {
+            throw new runtime.RequiredError('tournament','Required parameter requestParameters.tournament was null or undefined when calling episodeTournamentRoundRequeueCreate.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/episode/{episode_id}/tournament/{tournament}/round/{id}/requeue/`.replace(`{${"episode_id"}}`, encodeURIComponent(String(requestParameters.episodeId))).replace(`{${"id"}}`, encodeURIComponent(String(requestParameters.id))).replace(`{${"tournament"}}`, encodeURIComponent(String(requestParameters.tournament))),
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Re-queue every unsuccessful match in this round on Saturn.
+     */
+    async episodeTournamentRoundRequeueCreate(requestParameters: EpisodeTournamentRoundRequeueCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.episodeTournamentRoundRequeueCreateRaw(requestParameters, initOverrides);
     }
 
     /**

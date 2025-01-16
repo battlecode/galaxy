@@ -28,6 +28,7 @@ import {
   ShareIcon as ShareIcon24,
   LockClosedIcon as LockClosedIcon24,
   ExclamationTriangleIcon as ExclamationTriangleIcon24,
+  ArrowPathIcon as ArrowPathIcon24,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -59,6 +60,7 @@ import {
   ShareIcon as ShareIcon20,
   LockClosedIcon as LockClosedIcon20,
   ExclamationTriangleIcon as ExclamationTriangleIcon20,
+  ArrowPathIcon as ArrowPathIcon20,
 } from "@heroicons/react/20/solid";
 
 const icons24 = {
@@ -90,6 +92,7 @@ const icons24 = {
   share: ShareIcon24,
   lock_closed: LockClosedIcon24,
   exclamation_triangle: ExclamationTriangleIcon24,
+  arrow_path: ArrowPathIcon24,
 };
 
 const icons20 = {
@@ -121,6 +124,7 @@ const icons20 = {
   share: ShareIcon20,
   lock_closed: LockClosedIcon20,
   exclamation_triangle: ExclamationTriangleIcon20,
+  arrow_path: ArrowPathIcon20,
 };
 
 export type IconName = keyof typeof icons24;

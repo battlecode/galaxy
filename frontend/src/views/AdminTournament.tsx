@@ -1,10 +1,12 @@
 import { Tab } from "@headlessui/react";
-import { type QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import {
+  type PaginatedMatchList,
   ReleaseStatusEnum,
   StatusBccEnum,
   type TournamentRound,
 } from "api/_autogen";
+import { tournamentMatchListFactory } from "api/compete/competeFactories";
 import { useTournamentMatchList } from "api/compete/useCompete";
 import {
   useCreateAndEnqueueMatches,
@@ -12,12 +14,12 @@ import {
   useEpisodeMaps,
   useInitializeTournament,
   useReleaseTournamentRound,
+  useRequeueTournamentRound,
   useTournamentInfo,
   useTournamentRoundInfo,
   useTournamentRoundList,
 } from "api/episode/useEpisode";
 import { buildKey, classNames } from "api/helpers";
-import { myUserInfoFactory } from "api/user/userFactories";
 import { PageTitle } from "components/elements/BattlecodeStyle";
 import Button from "components/elements/Button";
 import Icon from "components/elements/Icon";
@@ -26,38 +28,41 @@ import Tooltip from "components/elements/Tooltip";
 import Modal from "components/Modal";
 import SectionCard from "components/SectionCard";
 import Spinner from "components/Spinner";
+import { PageButtonsList } from "components/TableBottom";
 import TournamentResultsTable from "components/tables/TournamentResultsTable";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import type React from "react";
 import { useCallback, useMemo, useState } from "react";
-import { type LoaderFunction, redirect, useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
+import { parsePageParam } from "utils/searchParamHelpers";
 import { isPresent } from "utils/utilTypes";
 
-export const adminTournamentLoader =
-  (queryClient: QueryClient): LoaderFunction =>
-  async ({ params }) => {
-    const { episodeId, tournamentId } = params;
-    if (episodeId === undefined) return null;
-    if (tournamentId === undefined) return redirect(`/${episodeId}/home`);
-
-    // Ensure the user is a staff member
-    const user = queryClient.ensureQueryData({
-      queryKey: buildKey(myUserInfoFactory.queryKey, {}),
-      queryFn: myUserInfoFactory.queryFn,
-    });
-
-    if (!(await user).is_staff)
-      return redirect(`/${episodeId}/tournament/${tournamentId}`);
-
-    return null;
-  };
+interface QueryParams {
+  roundPage: number;
+}
 
 const AdminTournament: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const { tournamentId } = useParams();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const queryParams: QueryParams = useMemo(
+    () => ({
+      roundPage: parsePageParam("roundPage", searchParams),
+    }),
+    [searchParams],
+  );
+
+  function handlePage(page: number): void {
+    if (!tournamentRounds.isLoading) {
+      setSearchParams({ ...queryParams, roundPage: page.toString() });
+    }
+  }
+
   const queryClient = useQueryClient();
 
+  const episode = useEpisodeInfo({ id: episodeId });
   const tournament = useTournamentInfo({
     episodeId,
     id: tournamentId ?? "",
@@ -66,6 +71,7 @@ const AdminTournament: React.FC = () => {
     {
       episodeId,
       tournament: tournamentId ?? "",
+      page: queryParams.roundPage,
     },
     queryClient,
   );
@@ -97,35 +103,97 @@ const AdminTournament: React.FC = () => {
     [tournamentRounds],
   );
 
-  const activeRound = useMemo(() => {
-    if (LOADING || !SUCCESS) return undefined;
-
-    // First round which is still fully hidden
-    return sortedRounds.find(
-      (round) =>
-        !isPresent(round.release_status) ||
-        round.release_status < ReleaseStatusEnum.NUMBER_1,
-    );
-  }, [LOADING, SUCCESS, tournamentRounds]);
-
-  const canReset = useCallback(
+  /**
+   * Round is active if:
+   *  - it is not released
+   *  - it has been sent to Saturn and the next round has not been sent
+   *  - it is the earliest round that has not been sent to Saturn and
+   *    the round before it has been completed
+   */
+  const isActive = useCallback(
     (round: TournamentRound) => {
-      if (!isPresent(activeRound)) return false;
-
-      if (round.id === activeRound.id) return true;
-
-      // Can reset if is round before active
       if (
-        round.display_order === activeRound.display_order - 1 &&
-        isPresent(activeRound.release_status) &&
-        activeRound.release_status > ReleaseStatusEnum.NUMBER_0
-      ) {
-        return true;
-      }
+        LOADING ||
+        !SUCCESS ||
+        (round.release_status ?? ReleaseStatusEnum.NUMBER_0) ===
+          ReleaseStatusEnum.NUMBER_2
+      )
+        return false;
 
-      return false;
+      /**
+       * Whether the round has been started, i.e. sent to Saturn.
+       */
+      const hasStarted = (round: TournamentRound): boolean =>
+        round.in_progress ?? false;
+
+      const roundIndex = sortedRounds.findIndex((r) => r.id === round.id);
+      if (roundIndex === -1) return false;
+
+      const isEarliestUnsentRound =
+        sortedRounds.findIndex((sr) => !hasStarted(sr)) === roundIndex;
+
+      const prevRound: TournamentRound | undefined =
+        sortedRounds[roundIndex - 1];
+      const nextRound: TournamentRound | undefined =
+        sortedRounds[roundIndex + 1];
+
+      // Has been sent to Saturn and next round has not been sent
+      if (
+        hasStarted(round) &&
+        (!isPresent(nextRound) || !hasStarted(nextRound))
+      )
+        return true;
+      // Earliest round that has not been sent to Saturn and round before it has been completed
+      else if (
+        isEarliestUnsentRound &&
+        (!isPresent(prevRound) || hasStarted(prevRound))
+      )
+        return true;
+      else return false;
     },
-    [activeRound],
+    [LOADING, SUCCESS, sortedRounds],
+  );
+
+  /**
+   * Can attempt a requeue if:
+   * - the round is active
+   * - the round has been sent to Saturn
+   * - the round has no matches in progress
+   * - the round is not released
+   *
+   * Note that requeue may fail if there are no failed matches for this round.
+   */
+  const canRequeue = useCallback(
+    (round: TournamentRound) => {
+      if (LOADING || !SUCCESS) return false;
+      else if (
+        !isActive(round) ||
+        !(round.in_progress ?? false) ||
+        round.release_status === ReleaseStatusEnum.NUMBER_2
+      )
+        return false;
+
+      const matches = queryClient.getQueryData<PaginatedMatchList>(
+        buildKey(tournamentMatchListFactory.queryKey, {
+          episodeId,
+          tournamentId,
+          roundId: round.id,
+        }),
+      );
+
+      if (!isPresent(matches)) return false;
+
+      // TODO: should we waterfall every page of matches?
+      return (
+        matches.results?.find(
+          (match) =>
+            match.status === StatusBccEnum.Run ||
+            match.status === StatusBccEnum.Try ||
+            match.status === StatusBccEnum.Que,
+        ) === undefined
+      );
+    },
+    [isActive, LOADING, SUCCESS, episodeId, tournamentId],
   );
 
   return (
@@ -149,7 +217,41 @@ const AdminTournament: React.FC = () => {
         />
       </Tooltip>
 
+      <SectionCard
+        title="Information"
+        loading={tournament.isLoading || episode.isLoading}
+      >
+        {tournament.isSuccess && episode.isSuccess && (
+          <div className="grid max-w-96 grid-cols-2 items-center justify-start text-gray-700">
+            <span className="font-semibold">Challonge:</span>
+            <Button
+              label="Go!"
+              fullWidth={false}
+              onClick={() => {
+                window.open(
+                  `https://www.challonge.com/${tournament.data.name_short}`,
+                  "_blank",
+                );
+              }}
+            />
+
+            {/* TODO: is there any way to link to tournament viewer? */}
+          </div>
+        )}
+      </SectionCard>
+
       <SectionCard title="Manage Rounds" loading={tournamentRounds.isLoading}>
+        <div className="mb-4 flex w-full flex-row justify-center">
+          <PageButtonsList
+            recordCount={tournamentRounds.data?.count ?? 0}
+            pageSize={10}
+            currentPage={queryParams.roundPage}
+            onPage={(newPage) => {
+              handlePage(newPage);
+            }}
+          />
+        </div>
+
         {tournamentRounds.isSuccess && (
           <Tab.Group>
             <Tab.List className={TABLIST_STYLE}>
@@ -158,27 +260,21 @@ const AdminTournament: React.FC = () => {
                   key={round.id}
                   tournamentId={round.tournament}
                   roundId={round.id}
-                  activeRound={round.id === activeRound?.id}
-                  canReset={canReset(round)}
+                  activeRound={isActive(round)}
                 />
               ))}
             </Tab.List>
             {sortedRounds.map((round) => (
               <RoundPanel
                 key={round.id}
-                tournamentId={round.tournament}
-                roundId={round.id}
-                activeRound={round.id === activeRound?.id}
-                canReset={canReset(round)}
+                round={round}
+                activeRound={isActive(round)}
+                canRequeue={canRequeue}
               />
             ))}
           </Tab.Group>
         )}
       </SectionCard>
-
-      {/* TODO: link to client tournament display thingy? and/or iframe it */}
-      {/* TODO: link to challonge! */}
-      {/* TODO: Tournament rounds accessible via tabs? */}
 
       <Modal
         isOpen={initializeModalOpen}
@@ -226,14 +322,12 @@ interface RoundTabProps {
   tournamentId: string;
   roundId: number;
   activeRound: boolean;
-  canReset: boolean;
 }
 
 const RoundTab: React.FC<RoundTabProps> = ({
   tournamentId,
   roundId,
   activeRound,
-  canReset,
 }) => {
   const { episodeId } = useEpisodeId();
 
@@ -255,8 +349,6 @@ const RoundTab: React.FC<RoundTabProps> = ({
       classes.push("text-cyan-100 hover:bg-white/[0.12] hover:text-white");
     }
 
-    // TODO differential tab styling based on isActive and canReset
-
     return classNames(...classes);
   }, []);
 
@@ -264,9 +356,10 @@ const RoundTab: React.FC<RoundTabProps> = ({
     <Tab className={tabClassName}>
       <div className="flex w-full flex-col items-center justify-center gap-2">
         {round.data?.name ?? <Spinner size="sm" />}
-        {round.isSuccess && !canReset && <Icon size="sm" name="lock_closed" />}
-        {round.isSuccess && activeRound && (
+        {round.isSuccess && activeRound ? (
           <Icon size="sm" name="exclamation_triangle" />
+        ) : (
+          <Icon size="sm" name="lock_closed" />
         )}
       </div>
     </Tab>
@@ -274,32 +367,32 @@ const RoundTab: React.FC<RoundTabProps> = ({
 };
 
 interface RoundPanelProps {
-  tournamentId: string;
-  roundId: number;
+  round: TournamentRound;
   activeRound: boolean;
-  canReset: boolean;
+  canRequeue: (round: TournamentRound) => boolean;
 }
 
+const RELEASE_STATUS_LABELS: Record<ReleaseStatusEnum, string> = {
+  [ReleaseStatusEnum.NUMBER_0]: "Fully Hidden",
+  [ReleaseStatusEnum.NUMBER_1]: "Participants Only",
+  [ReleaseStatusEnum.NUMBER_2]: "Fully Released",
+};
+
 const RoundPanel: React.FC<RoundPanelProps> = ({
-  tournamentId,
-  roundId,
+  round,
   activeRound,
-  canReset,
+  canRequeue,
 }) => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
 
-  const [selectedMaps, setSelectedMaps] = useState<number[]>([]);
+  const [selectedMaps, setSelectedMaps] = useState<number[]>(round.maps ?? []);
   const [matchesPage, setMatchesPage] = useState(1);
+  const [releaseModalOpen, setReleaseModalOpen] = useState(false);
 
   const episode = useEpisodeInfo({ id: episodeId });
-  const round = useTournamentRoundInfo({
-    episodeId,
-    tournament: tournamentId,
-    id: roundId.toString(),
-  });
   const matches = useTournamentMatchList(
-    { episodeId, roundId, tournamentId },
+    { episodeId, roundId: round.id, tournamentId: round.tournament },
     queryClient,
   );
   const maps = useEpisodeMaps({ episodeId });
@@ -307,98 +400,145 @@ const RoundPanel: React.FC<RoundPanelProps> = ({
   const createAndEnqueue = useCreateAndEnqueueMatches(
     {
       episodeId,
-      tournament: tournamentId,
-      id: roundId.toString(),
+      tournament: round.tournament,
+      id: round.id.toString(),
       maps: selectedMaps,
     },
     queryClient,
   );
+  const requeue = useRequeueTournamentRound({
+    episodeId,
+    tournament: round.tournament,
+    id: round.id.toString(),
+  });
   const release = useReleaseTournamentRound({
     episodeId,
-    tournament: tournamentId,
-    id: roundId.toString(),
+    tournament: round.tournament,
+    id: round.id.toString(),
   });
 
+  /**
+   * Can create/enqueue when:
+   *  - the round is active
+   *  - the round has no matches
+   *  - an odd number of matches are selected
+   */
   const canCreateEnqueue = useMemo(() => {
-    if (!matches.isSuccess || !round.isSuccess) return false;
+    if (!matches.isSuccess) return false;
 
     return (
       activeRound &&
-      canReset &&
-      !(
-        matches.data.results?.some(
-          (match) =>
-            match.status === StatusBccEnum.New ||
-            match.status === StatusBccEnum.Que ||
-            match.status === StatusBccEnum.Run ||
-            match.status === StatusBccEnum.Try,
-        ) ?? false
-      )
+      selectedMaps.length % 2 !== 0 &&
+      (matches.data.count ?? false) === 0
+    );
+  }, [matches, activeRound, selectedMaps]);
+
+  /**
+   * Can release when:
+   *  - the round has been sent to Saturn
+   *  - the round is not released
+   *  - all of the matches in this round are completed successfully
+   */
+  const canRelease = useMemo(() => {
+    if (!matches.isSuccess) return false;
+
+    // TODO: should we waterfall all of the matches in this round?
+    return (
+      (round.in_progress ?? false) &&
+      (round.release_status ?? ReleaseStatusEnum.NUMBER_0) <
+        ReleaseStatusEnum.NUMBER_2 &&
+      matches.data.results?.find(
+        (match) => match.status !== StatusBccEnum.Ok,
+      ) === undefined
     );
   }, [matches, round]);
 
-  // const canRelease = useMemo(() => {
-  //   // TODO: when can we release this round?
-  // }, []);
-
-  if (activeRound) {
-    console.log("round", round.data);
-  }
-
   return (
     <Tab.Panel className="flex flex-col gap-4 rounded-xl bg-white p-3 ring-white/60 ring-offset-2 ring-offset-cyan-400 focus:outline-none focus:ring-2">
-      <SelectMultipleMenu<number>
-        label="Select An Odd Number of Maps"
-        options={maps.data?.map((m) => ({ value: m.id, label: m.name })) ?? []}
-        placeholder={"Select maps for this round..."}
-        value={selectedMaps}
-        onChange={(newMaps) => {
-          setSelectedMaps(newMaps);
-        }}
-      />
+      <SectionCard title="Round Information">
+        <div className="grid min-w-32 grid-cols-2 justify-start text-gray-700">
+          <span className="font-semibold">Round:</span>
+          <span>{round.name}</span>
 
-      <span className="font-normal text-gray-700">
-        {`This round is ${activeRound ? "active" : "not active"}. It ${
-          canReset ? "can" : "cannot"
-        } be reset.`}
-      </span>
+          <span className="font-semibold">Has started?:</span>
+          <span>{round.in_progress ?? false ? "Yes" : "No"}</span>
+
+          <span className="font-semibold">Release Status:</span>
+          <span>
+            {isPresent(round.release_status)
+              ? RELEASE_STATUS_LABELS[round.release_status]
+              : "N/A"}
+          </span>
+
+          <span className="font-semibold">Maps:</span>
+          <span>
+            {round.maps
+              ?.map((m) => maps.data?.[m]?.name)
+              .filter(isPresent)
+              .join(", ") ?? "N/A"}
+          </span>
+        </div>
+      </SectionCard>
+
+      {!(round.in_progress ?? false) && (
+        <SelectMultipleMenu<number>
+          label="Select An Odd Number of Maps"
+          disabled={createAndEnqueue.isPending}
+          options={
+            maps.data?.map((m) => ({ value: m.id, label: m.name })) ?? []
+          }
+          placeholder={"Select maps for this round..."}
+          value={selectedMaps}
+          onChange={(newMaps) => {
+            setSelectedMaps(newMaps);
+          }}
+        />
+      )}
 
       <SectionCard title="Matches">
         <div className="mb-4 flex flex-row gap-4">
-          <Tooltip text="If matches already exist, this will restart the round.">
+          <Button
+            disabled={!canCreateEnqueue || createAndEnqueue.isPending}
+            loading={createAndEnqueue.isPending}
+            iconName="play_circle"
+            variant="dark"
+            label="Create Matches"
+            onClick={() => {
+              createAndEnqueue.mutate({
+                episodeId,
+                tournament: round.tournament,
+                id: round.id.toString(),
+                maps: selectedMaps,
+              });
+            }}
+          />
+          <Tooltip text="Requeues all matches.">
             <Button
-              // TODO: disable logic isn't correct yet
-              disabled={!canCreateEnqueue}
-              loading={createAndEnqueue.isPending}
-              iconName="play_circle"
-              variant="dark"
-              label="Create Matches"
+              disabled={!canRequeue(round) || requeue.isPending}
+              loading={requeue.isPending}
+              iconName="arrow_path"
+              variant="danger-outline"
+              label="Requeue"
               onClick={() => {
-                createAndEnqueue.mutate({
+                requeue.mutate({
                   episodeId,
-                  tournament: tournamentId,
-                  id: roundId.toString(),
-                  maps: selectedMaps,
+                  tournament: round.tournament,
+                  id: round.id.toString(),
                 });
               }}
             />
           </Tooltip>
           <Tooltip text="Releases the round to the bracket service.">
             <Button
-              // TODO: disable logic isn't correct yet
-              disabled={
-                !round.isSuccess ||
-                round.data.release_status !== ReleaseStatusEnum.NUMBER_2 // TODO what do release statuses mean??
-              }
+              disabled={release.isPending || !canRelease}
               loading={release.isPending}
               iconName="share"
-              variant="dark"
               label="Release Round"
               onClick={() => {
                 release.mutate({
                   episodeId,
-                  tournament: tournamentId,
-                  id: roundId.toString(),
+                  tournament: round.tournament,
+                  id: round.id.toString(),
                 });
               }}
             />
@@ -415,6 +555,44 @@ const RoundPanel: React.FC<RoundPanelProps> = ({
           }}
         />
       </SectionCard>
+
+      <Modal
+        isOpen={releaseModalOpen}
+        closeModal={() => {
+          setReleaseModalOpen(false);
+        }}
+        title={`Release ${round.name}?`}
+      >
+        <div className="mt-4 flex flex-col gap-4">
+          <span className="font-semibold text-gray-700">
+            Are you sure you want to release this tournament round? Releasing
+            the round will make it visible on the public bracket to competitors.
+          </span>
+          <div className="mt-2 flex flex-row gap-4">
+            <Button
+              label="Confirm"
+              variant="dark"
+              fullWidth
+              loading={release.isPending}
+              onClick={() => {
+                release.mutate({
+                  episodeId,
+                  tournament: round.tournament,
+                  id: round.id.toString(),
+                });
+                setReleaseModalOpen(false);
+              }}
+            />
+            <Button
+              fullWidth
+              label="Cancel"
+              onClick={() => {
+                setReleaseModalOpen(false);
+              }}
+            />
+          </div>
+        </div>
+      </Modal>
     </Tab.Panel>
   );
 };

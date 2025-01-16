@@ -17,6 +17,7 @@ import type {
   EpisodeTournamentRoundEnqueueCreateRequest,
   EpisodeTournamentRoundListRequest,
   EpisodeTournamentRoundReleaseCreateRequest,
+  EpisodeTournamentRoundRequeueCreateRequest,
   EpisodeTournamentRoundRetrieveRequest,
   GameMap,
   PaginatedEpisodeList,
@@ -43,8 +44,10 @@ import {
   createAndEnqueueMatches,
   initializeTournament,
   releaseTournamentRound,
+  requeueTournamentRound,
 } from "./episodeApi";
 import toast from "react-hot-toast";
+import { competeQueryKeys } from "api/compete/competeKeys";
 
 // ---------- QUERY HOOKS ---------- //
 const EPISODE_WAIT_TIME = 5;
@@ -148,17 +151,18 @@ export const useTournamentRoundInfo = ({
  * For retrieving a list of the rounds in a specific tournament occurring during the given episode.
  */
 export const useTournamentRoundList = (
-  { episodeId, tournament }: EpisodeTournamentRoundListRequest,
+  { episodeId, tournament, page = 1 }: EpisodeTournamentRoundListRequest,
   queryClient: QueryClient,
 ): UseQueryResult<PaginatedTournamentRoundList> =>
   useQuery({
     queryKey: buildKey(tournamentRoundListFactory.queryKey, {
       episodeId,
       tournament,
+      page,
     }),
     queryFn: async () =>
       await tournamentRoundListFactory.queryFn(
-        { episodeId, tournament },
+        { episodeId, tournament, page },
         queryClient,
         true,
       ),
@@ -183,36 +187,16 @@ export const useInitializeTournament = (
 
         // Refetch all info for this tournament
         try {
-          // Invalidate all queries for this tournament TODO verify this works!
-          const invalidateInfo = queryClient.invalidateQueries({
+          void queryClient.refetchQueries({
             queryKey: buildKey(episodeQueryKeys.tournamentBase, {
               episodeId,
               id,
             }),
           });
-          const prefetchInfo = queryClient.prefetchQuery({
-            queryKey: buildKey(tournamentInfoFactory.queryKey, {
-              episodeId,
-              id,
-            }),
-            queryFn: async () =>
-              await tournamentInfoFactory.queryFn({ episodeId, id }),
-          });
-          const prefetchRounds = queryClient.prefetchQuery({
-            queryKey: buildKey(tournamentRoundListFactory.queryKey, {
-              episodeId,
-              tournament: id,
-              page: 1,
-            }),
-            queryFn: async () =>
-              await tournamentRoundListFactory.queryFn(
-                { episodeId, tournament: id, page: 1 },
-                queryClient,
-                true,
-              ),
-          });
 
-          await Promise.all([invalidateInfo, prefetchInfo, prefetchRounds]);
+          void queryClient.refetchQueries({
+            queryKey: buildKey(competeQueryKeys.matchBase, { episodeId }),
+          });
         } catch (e) {
           toast.error((e as ResponseError).message);
         }
@@ -221,7 +205,7 @@ export const useInitializeTournament = (
       await toast.promise(toastFn(), {
         loading: "Initializing tournament...",
         success: "Tournament initialized!",
-        error: "Error initializing tournament.",
+        error: (e) => `Error initializing tournament: ${(e as Error).message}`,
       });
     },
   });
@@ -249,29 +233,21 @@ export const useCreateAndEnqueueMatches = (
       const toastFn = async (): Promise<void> => {
         await createAndEnqueueMatches({ episodeId, tournament, id, maps });
 
-        // Refetch this tournament's rounds
+        // Refetch this tournament round and its matches
         try {
-          const invalidateRounds = queryClient.invalidateQueries({
-            queryKey: buildKey(episodeQueryKeys.tournamentBase, {
-              episodeId,
-              id: tournament,
-            }),
-          });
-          const prefetchRounds = queryClient.prefetchQuery({
-            queryKey: buildKey(tournamentRoundListFactory.queryKey, {
+          const roundInfo = queryClient.refetchQueries({
+            queryKey: buildKey(episodeQueryKeys.tournamentRoundInfo, {
               episodeId,
               tournament,
-              page: 1,
+              id,
             }),
-            queryFn: async () =>
-              await tournamentRoundListFactory.queryFn(
-                { episodeId, tournament, page: 1 },
-                queryClient,
-                true,
-              ),
           });
 
-          await Promise.all([invalidateRounds, prefetchRounds]);
+          const tourneyMatches = queryClient.refetchQueries({
+            queryKey: buildKey(competeQueryKeys.matchBase, { episodeId }),
+          });
+
+          await Promise.all([roundInfo, tourneyMatches]);
         } catch (e) {
           toast.error((e as ResponseError).message);
         }
@@ -316,6 +292,40 @@ export const useReleaseTournamentRound = ({
         loading: "Initiating round release...",
         success: "Round release initiated!",
         error: "Error releasing tournament round.",
+      });
+    },
+  });
+
+export const useRequeueTournamentRound = ({
+  episodeId,
+  tournament,
+  id,
+}: EpisodeTournamentRoundRequeueCreateRequest): UseMutationResult<
+  void,
+  Error,
+  EpisodeTournamentRoundRequeueCreateRequest
+> =>
+  useMutation({
+    mutationKey: episodeMutationKeys.requeueTournamentRound({
+      episodeId,
+      tournament,
+      id,
+    }),
+    mutationFn: async ({
+      episodeId,
+      tournament,
+      id,
+    }: EpisodeTournamentRoundRequeueCreateRequest) => {
+      const toastFn = async (): Promise<void> => {
+        await requeueTournamentRound({ episodeId, tournament, id });
+
+        // TODO: refetch the round and its matches :)
+      };
+
+      await toast.promise(toastFn(), {
+        loading: "Initiating round requeue...",
+        success: "Failed matches requeued!",
+        error: "Error requeueing tournament round.",
       });
     },
   });

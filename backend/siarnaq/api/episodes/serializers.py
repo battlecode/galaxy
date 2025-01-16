@@ -101,6 +101,7 @@ class TournamentRoundSerializer(serializers.ModelSerializer):
             "maps",
             "release_status",
             "display_order",
+            "in_progress",
         ]
 
     def to_representation(self, instance):

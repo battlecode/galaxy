@@ -9,6 +9,7 @@ import type {
   EpisodeTournamentRoundEnqueueCreateRequest,
   EpisodeTournamentRoundListRequest,
   EpisodeTournamentRoundReleaseCreateRequest,
+  EpisodeTournamentRoundRequeueCreateRequest,
   EpisodeTournamentRoundRetrieveRequest,
 } from "../_autogen";
 import type { QueryKeyBuilder } from "../apiTypes";
@@ -147,5 +148,20 @@ export const episodeMutationKeys = {
       "round",
       id,
       "release",
+    ] as const,
+
+  requeueTournamentRound: ({
+    episodeId,
+    tournament,
+    id,
+  }: EpisodeTournamentRoundRequeueCreateRequest) =>
+    [
+      "episode",
+      episodeId,
+      "tournament",
+      tournament,
+      "round",
+      id,
+      "requeue",
     ] as const,
 };
