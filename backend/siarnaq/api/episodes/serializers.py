@@ -101,6 +101,7 @@ class TournamentRoundSerializer(serializers.ModelSerializer):
             "maps",
             "release_status",
             "display_order",
+            "in_progress",
         ]
 
     def to_representation(self, instance):
@@ -109,3 +110,7 @@ class TournamentRoundSerializer(serializers.ModelSerializer):
         if instance.release_status != ReleaseStatus.RESULTS:
             data["maps"] = None
         return data
+
+
+class EmptySerializer(serializers.Serializer):
+    pass

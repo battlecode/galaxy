@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from drf_spectacular.utils import OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAdminUser
@@ -10,6 +10,7 @@ from siarnaq.api.episodes.models import Episode, Map, Tournament, TournamentRoun
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.episodes.serializers import (
     AutoscrimSerializer,
+    EmptySerializer,
     EpisodeSerializer,
     MapSerializer,
     TournamentRoundSerializer,
@@ -97,6 +98,31 @@ class TournamentViewSet(viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(next_tournament)
         return Response(serializer.data)
 
+    @extend_schema(
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="Tournament has been initialized"
+            ),
+        }
+    )
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(IsAdminUser,),
+        serializer_class=EmptySerializer,
+        throttle_classes=(),
+    )
+    def initialize(self, request, pk=None, *, episode_id):
+        """
+        Seed the tournament with eligible teams in order of decreasing rating,
+        populate the brackets in the bracket service, and create TournamentRounds.
+        """
+        instance = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        instance.initialize()
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
 
 class TournamentRoundViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -113,8 +139,163 @@ class TournamentRoundViewSet(viewsets.ReadOnlyModelViewSet):
                 tournament=self.kwargs["tournament"],
             )
             .prefetch_related("maps")
-            .order_by("external_id")
+            .order_by("display_order")
         )
         if not self.request.user.is_staff:
             queryset = queryset.filter(tournament__is_public=True)
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="episode_id",
+                type=str,
+                description="An episode to filter for.",
+            ),
+            OpenApiParameter(
+                name="tournament",
+                type=str,
+                description="A tournament to filter for.",
+            ),
+            OpenApiParameter(
+                name="id",
+                type=str,
+                description="A tournament round to filter for.",
+            ),
+            OpenApiParameter(
+                name="maps",
+                type=int,
+                many=True,
+                required=True,
+                description="List of map IDs to use in this round.",
+            ),
+        ],
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="Tournament round has been enqueued"
+            ),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                description="Tournament round could not be enqueued"
+            ),
+            status.HTTP_409_CONFLICT: OpenApiResponse(
+                description="Tournament round is already in progress"
+            ),
+        },
+    )
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(IsAdminUser,),
+        serializer_class=EmptySerializer,
+    )
+    def enqueue(self, request, pk=None, *, episode_id, tournament):
+        """
+        Enqueue the given round of the tournament.
+        Fails if this round is already in progress.
+        """
+        instance = self.get_object()
+
+        # Set the tournament round's maps to the provided list
+        old_maps = instance.maps.all()
+        map_ids = self.request.query_params.getlist("maps")
+        maps = Map.objects.filter(episode_id=episode_id, id__in=map_ids)
+
+        # We require an odd number of maps to prevent ties
+        if len(maps) % 2 == 0:
+            return Response(None, status=status.HTTP_400_BAD_REQUEST)
+
+        instance.maps.set(maps)
+
+        # Attempt to enqueue the round
+        try:
+            instance.enqueue()
+        except RuntimeError as e:
+            # Revert the maps if enqueueing failed
+            instance.maps.set(old_maps)
+            return Response(str(e), status=status.HTTP_409_CONFLICT)
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="episode_id",
+                type=str,
+                description="An episode to filter for.",
+            ),
+            OpenApiParameter(
+                name="tournament",
+                type=str,
+                description="A tournament to filter for.",
+            ),
+            OpenApiParameter(
+                name="id",
+                type=str,
+                description="A tournament round to filter for.",
+            ),
+        ],
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description=(
+                    "Tournament round has been released to public bracket service"
+                )
+            ),
+        },
+    )
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(IsAdminUser,),
+        serializer_class=EmptySerializer,
+        throttle_classes=(),
+    )
+    def release(self, request, pk=None, *, episode_id, tournament):
+        """
+        Release the results of this round to the public bracket service.
+        """
+        instance = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        instance.request_publish_to_bracket(is_public=True)
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(
+        responses={
+            status.HTTP_204_NO_CONTENT: OpenApiResponse(
+                description="Tournament round has been requeued"
+            ),
+            status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                description="No failed matches to requeue"
+            ),
+        }
+    )
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=(IsAdminUser,),
+        serializer_class=EmptySerializer,
+        throttle_classes=(),
+    )
+    def requeue(self, request, pk=None, *, episode_id, tournament):
+        """
+        Re-queue every unsuccessful match in this round on Saturn.
+        """
+        from siarnaq.api.compete.models import Match, SaturnStatus
+
+        instance = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Get all failed matches for this round
+        failed = Match.objects.filter(
+            tournament_round=instance.id, status=SaturnStatus.ERRORED
+        )
+
+        if not failed.exists():
+            return Response(None, status=status.HTTP_400_BAD_REQUEST)
+
+        # TODO: should we logger.info the round requeue here?
+        failed.enqueue_all()
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)

@@ -101,12 +101,13 @@ function SelectMultipleMenu<T extends React.Key | null | undefined>({
                   key={option.value}
                   value={option.value}
                 >
-                  <div className="w-full overflow-x-auto pr-2">
-                    {option.label}
-                  </div>
-                  <span className="hidden items-center text-cyan-900 ui-selected:flex">
-                    <Icon name="check" size="sm" />
-                  </span>
+                  <div className="overflow-x-auto pr-2">{option.label}</div>
+                  {value !== undefined &&
+                    value.some((opt) => opt === option.value) && (
+                      <span className="hidden items-center text-cyan-900 ui-selected:flex">
+                        <Icon name="check" size="sm" />
+                      </span>
+                    )}
                 </Listbox.Option>
               ))}
             </Listbox.Options>

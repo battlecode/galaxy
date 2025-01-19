@@ -68,6 +68,12 @@ export interface TournamentRound {
      * @memberof TournamentRound
      */
     display_order: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof TournamentRound
+     */
+    in_progress?: boolean;
 }
 
 /**
@@ -100,6 +106,7 @@ export function TournamentRoundFromJSONTyped(json: any, ignoreDiscriminator: boo
         'maps': !exists(json, 'maps') ? undefined : json['maps'],
         'release_status': !exists(json, 'release_status') ? undefined : ReleaseStatusEnumFromJSON(json['release_status']),
         'display_order': json['display_order'],
+        'in_progress': !exists(json, 'in_progress') ? undefined : json['in_progress'],
     };
 }
 
@@ -118,6 +125,7 @@ export function TournamentRoundToJSON(value?: TournamentRound | null): any {
         'maps': value.maps,
         'release_status': ReleaseStatusEnumToJSON(value.release_status),
         'display_order': value.display_order,
+        'in_progress': value.in_progress,
     };
 }
 

@@ -57,6 +57,8 @@ import { HttpStatusCode } from "api/apiTypes";
 import { accountLoader } from "api/loaders/accountLoader";
 import CodeOfConduct from "views/CodeOfConduct";
 import Client from "views/Client";
+import AdminTournament from "views/AdminTournament";
+import { adminTournamentLoader } from "api/loaders/adminTournamentLoader";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -222,6 +224,12 @@ const router = createBrowserRouter([
         element: <TournamentPage />,
         loader: tournamentLoader(queryClient),
         errorElement: <ErrorBoundary />,
+      },
+      {
+        path: "tournament/:tournamentId/admin",
+        element: <AdminTournament />,
+        errorElement: <ErrorBoundary />,
+        loader: adminTournamentLoader(queryClient),
       },
       {
         path: "team/:teamId",

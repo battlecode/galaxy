@@ -811,6 +811,31 @@ paths:
               schema:
                 $ref: "#/components/schemas/Tournament"
           description: ""
+  /api/episode/{episode_id}/tournament/{id}/initialize/:
+    post:
+      operationId: episode_tournament_initialize_create
+      description: |-
+        Seed the tournament with eligible teams in order of decreasing rating,
+        populate the brackets in the bracket service, and create TournamentRounds.
+      parameters:
+        - in: path
+          name: episode_id
+          schema:
+            type: string
+            pattern: ^[^\/.]+$
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      tags:
+        - episode
+      security:
+        - jwtAuth: []
+      responses:
+        "204":
+          description: Tournament has been initialized
   /api/episode/{episode_id}/tournament/{tournament}/round/:
     get:
       operationId: episode_tournament_round_list
@@ -878,6 +903,139 @@ paths:
               schema:
                 $ref: "#/components/schemas/TournamentRound"
           description: ""
+  /api/episode/{episode_id}/tournament/{tournament}/round/{id}/enqueue/:
+    post:
+      operationId: episode_tournament_round_enqueue_create
+      description: |-
+        Enqueue the given round of the tournament.
+        Fails if this round is already in progress.
+      parameters:
+        - in: path
+          name: episode_id
+          schema:
+            type: string
+            pattern: ^[^\/.]+$
+          required: true
+        - in: query
+          name: episode_id
+          schema:
+            type: string
+          description: An episode to filter for.
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: id
+          schema:
+            type: string
+          description: A tournament round to filter for.
+        - in: query
+          name: maps
+          schema:
+            type: array
+            items:
+              type: integer
+          description: List of map IDs to use in this round.
+          required: true
+        - in: path
+          name: tournament
+          schema:
+            type: string
+            pattern: ^[^\/.]+$
+          required: true
+        - in: query
+          name: tournament
+          schema:
+            type: string
+          description: A tournament to filter for.
+      tags:
+        - episode
+      security:
+        - jwtAuth: []
+      responses:
+        "204":
+          description: Tournament round has been enqueued
+        "400":
+          description: Tournament round could not be enqueued
+        "409":
+          description: Tournament round is already in progress
+  /api/episode/{episode_id}/tournament/{tournament}/round/{id}/release/:
+    post:
+      operationId: episode_tournament_round_release_create
+      description: Release the results of this round to the public bracket service.
+      parameters:
+        - in: path
+          name: episode_id
+          schema:
+            type: string
+            pattern: ^[^\/.]+$
+          required: true
+        - in: query
+          name: episode_id
+          schema:
+            type: string
+          description: An episode to filter for.
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: id
+          schema:
+            type: string
+          description: A tournament round to filter for.
+        - in: path
+          name: tournament
+          schema:
+            type: string
+            pattern: ^[^\/.]+$
+          required: true
+        - in: query
+          name: tournament
+          schema:
+            type: string
+          description: A tournament to filter for.
+      tags:
+        - episode
+      security:
+        - jwtAuth: []
+      responses:
+        "204":
+          description: Tournament round has been released to public bracket service
+  /api/episode/{episode_id}/tournament/{tournament}/round/{id}/requeue/:
+    post:
+      operationId: episode_tournament_round_requeue_create
+      description: Re-queue every unsuccessful match in this round on Saturn.
+      parameters:
+        - in: path
+          name: episode_id
+          schema:
+            type: string
+            pattern: ^[^\/.]+$
+          required: true
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: tournament
+          schema:
+            type: string
+            pattern: ^[^\/.]+$
+          required: true
+      tags:
+        - episode
+      security:
+        - jwtAuth: []
+      responses:
+        "204":
+          description: Tournament round has been requeued
+        "400":
+          description: No failed matches to requeue
   /api/episode/{episode_id}/tournament/next/:
     get:
       operationId: episode_tournament_next_retrieve
@@ -3373,6 +3531,8 @@ components:
           type: integer
           maximum: 32767
           minimum: 0
+        in_progress:
+          type: boolean
       required:
         - display_order
         - id
