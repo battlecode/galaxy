@@ -406,6 +406,7 @@ class MatchSerializerTestCase(TestCase):
                     "maps": None,
                     "release_status": self.r_hidden.release_status,
                     "display_order": self.r_hidden.display_order,
+                    "in_progress": self.r_hidden.in_progress,
                 },
                 "participants": [
                     {
@@ -556,6 +557,7 @@ class MatchSerializerTestCase(TestCase):
                     "maps": [self.map.pk],
                     "release_status": self.r_results.release_status,
                     "display_order": self.r_results.display_order,
+                    "in_progress": self.r_results.in_progress,
                 },
                 "participants": [
                     {
@@ -635,6 +637,7 @@ class MatchSerializerTestCase(TestCase):
                     "maps": None,
                     "release_status": self.r_participants.release_status,
                     "display_order": self.r_participants.display_order,
+                    "in_progress": self.r_participants.in_progress,
                 },
                 "participants": [
                     {
@@ -714,6 +717,7 @@ class MatchSerializerTestCase(TestCase):
                     "maps": None,
                     "release_status": self.r_hidden.release_status,
                     "display_order": self.r_hidden.display_order,
+                    "in_progress": self.r_hidden.in_progress,
                 },
                 "participants": None,
                 "maps": None,
