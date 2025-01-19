@@ -277,9 +277,16 @@ class MatchViewSet(
         # Check if the user is not staff
         if not self.request.user.is_staff:
             # Exclude matches where tournament round is not null and not released
-            queryset = queryset.exclude(
-                Q(tournament_round__isnull=False)
-                & Q(tournament_round__release_status=ReleaseStatus.HIDDEN)
+            queryset = (
+                queryset.exclude(
+                    Q(tournament_round__isnull=False)
+                    & Q(tournament_round__release_status=ReleaseStatus.HIDDEN)
+                )
+                .exclude(
+                    Q(tournament_round__isnull=False)
+                    & Q(tournament_round__tournament__is_public=False)
+                )
+                .exclude(Q(participants__team__status=TeamStatus.INVISIBLE))
             )
 
         return queryset
@@ -459,41 +466,6 @@ class MatchViewSet(
         ]
 
         return historical_rating
-
-    def get_rated_matches(self, episode_id, team_id=None):
-        """
-        Retrieve matches with valid ratings for a specific episode.
-
-        This helper function returns a QuerySet of matches that are ranked and have
-        valid ratings for participants in a given episode. The matches are filtered
-        to exclude those with participants from teams with an 'INVISIBLE' status.
-        Additionally, matches that are part of a tournament round are excluded.
-
-        Parameters:
-        - episode_id (int): The identifier of the episode to filter matches by.
-        - team_id (int, optional): If provided, further filters the matches to
-        include only those where the specified team participated.
-
-        Returns:
-        - QuerySet: A Django QuerySet containing matches that meet the specified
-        criteria, ordered by creation date in descending order.
-        """
-        has_invisible = self.get_queryset().filter(
-            participants__team__status=TeamStatus.INVISIBLE
-        )
-        matches = (
-            self.get_queryset()
-            .filter(episode=episode_id)
-            .filter(tournament_round__isnull=True)
-            .exclude(pk__in=Subquery(has_invisible.values("pk")))
-            .filter(is_ranked=True)
-            .filter(participants__rating__isnull=False)
-            .order_by("-created")
-        )
-        if team_id is not None:
-            matches = matches.filter(participants__team=team_id)
-
-        return matches
 
     @extend_schema(
         parameters=[
