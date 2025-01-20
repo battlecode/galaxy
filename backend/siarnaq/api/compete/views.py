@@ -273,6 +273,22 @@ class MatchViewSet(
             )
             .order_by("-pk")
         )
+
+        # Check if the user is not staff
+        if not self.request.user.is_staff:
+            # Exclude matches where tournament round is not null and not released
+            queryset = (
+                queryset.exclude(
+                    Q(tournament_round__isnull=False)
+                    & Q(tournament_round__release_status=ReleaseStatus.HIDDEN)
+                )
+                .exclude(
+                    Q(tournament_round__isnull=False)
+                    & Q(tournament_round__tournament__is_public=False)
+                )
+                .exclude(Q(participants__team__status=TeamStatus.INVISIBLE))
+            )
+
         return queryset
 
     def get_serializer_context(self):
@@ -325,7 +341,11 @@ class MatchViewSet(
         Passing the external_id_private of a tournament allows match lookup for the
         tournament, even if it's private. Client uses the external_id_private parameter
         """
-        queryset = self.get_queryset()
+        queryset = (
+            Match.objects.filter(episode=self.kwargs["episode_id"]).select_related(
+                "tournament_round__tournament"
+            )
+        ).order_by("-pk")
 
         external_id_private = self.request.query_params.get("external_id_private")
         tournaments = None
@@ -345,7 +365,7 @@ class MatchViewSet(
                 tournaments = tournaments.filter(pk=tournament_id)
                 if not tournaments.exists():
                     return Response(None, status=status.HTTP_404_NOT_FOUND)
-        queryset = self.get_queryset().filter(
+        queryset = queryset.filter(
             tournament_round__tournament__in=Subquery(tournaments.values("pk"))
         )
 
@@ -450,41 +470,6 @@ class MatchViewSet(
         ]
 
         return historical_rating
-
-    def get_rated_matches(self, episode_id, team_id=None):
-        """
-        Retrieve matches with valid ratings for a specific episode.
-
-        This helper function returns a QuerySet of matches that are ranked and have
-        valid ratings for participants in a given episode. The matches are filtered
-        to exclude those with participants from teams with an 'INVISIBLE' status.
-        Additionally, matches that are part of a tournament round are excluded.
-
-        Parameters:
-        - episode_id (int): The identifier of the episode to filter matches by.
-        - team_id (int, optional): If provided, further filters the matches to
-        include only those where the specified team participated.
-
-        Returns:
-        - QuerySet: A Django QuerySet containing matches that meet the specified
-        criteria, ordered by creation date in descending order.
-        """
-        has_invisible = self.get_queryset().filter(
-            participants__team__status=TeamStatus.INVISIBLE
-        )
-        matches = (
-            self.get_queryset()
-            .filter(episode=episode_id)
-            .filter(tournament_round__isnull=True)
-            .exclude(pk__in=Subquery(has_invisible.values("pk")))
-            .filter(is_ranked=True)
-            .filter(participants__rating__isnull=False)
-            .order_by("-created")
-        )
-        if team_id is not None:
-            matches = matches.filter(participants__team=team_id)
-
-        return matches
 
     @extend_schema(
         parameters=[

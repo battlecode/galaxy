@@ -669,65 +669,6 @@ class MatchSerializerTestCase(TestCase):
             },
         )
 
-    def test_not_admin_has_self_no_staff_team_tournament_hidden(self):
-        serializer = MatchSerializer(
-            context={
-                "episode_id": self.e1.pk,
-                "team_id": self.teams[0],
-                "user_id": self.users[0].pk,
-                "user_is_staff": False,
-                "team_is_staff": False,
-            }
-        )
-        match = Match.objects.create(
-            episode=self.e1,
-            tournament_round=self.r_hidden,
-            alternate_order=True,
-            is_ranked=False,
-        )
-        red = MatchParticipant.objects.create(  # noqa: F841
-            team=self.teams[0],
-            submission=self.submissions[0],
-            match=match,
-            player_index=0,
-            score=0,
-            rating=Rating.objects.create(),
-        )
-        blue = MatchParticipant.objects.create(  # noqa: F841
-            team=self.teams[1],
-            submission=self.submissions[1],
-            match=match,
-            player_index=1,
-            score=1,
-            rating=Rating.objects.create(),
-        )
-        match.maps.add(self.map)
-        data = serializer.to_representation(match)
-        self.assertEqual(
-            data,
-            {
-                "id": match.pk,
-                "status": str(match.status),
-                "episode": match.episode.pk,
-                "tournament_round": {
-                    "id": self.r_hidden.pk,
-                    "tournament": self.r_hidden.tournament.pk,
-                    "external_id": self.r_hidden.external_id,
-                    "name": self.r_hidden.name,
-                    "maps": None,
-                    "release_status": self.r_hidden.release_status,
-                    "display_order": self.r_hidden.display_order,
-                    "in_progress": self.r_hidden.in_progress,
-                },
-                "participants": None,
-                "maps": None,
-                "alternate_order": match.alternate_order,
-                "created": match.created.isoformat().replace("+00:00", "Z"),
-                "is_ranked": match.is_ranked,
-                "replay_url": None,
-            },
-        )
-
     def test_not_admin_has_self_no_staff_team_tournament_none(self):
         serializer = MatchSerializer(
             context={
@@ -863,58 +804,6 @@ class MatchSerializerTestCase(TestCase):
                     },
                 ],
                 "maps": [self.map.name],
-                "alternate_order": match.alternate_order,
-                "created": match.created.isoformat().replace("+00:00", "Z"),
-                "is_ranked": match.is_ranked,
-                "replay_url": None,
-            },
-        )
-
-    def test_not_admin_no_self_has_invisible_team(self):
-        self.teams[-1].status = TeamStatus.INVISIBLE
-        self.teams[-1].save()
-        serializer = MatchSerializer(
-            context={
-                "episode_id": self.e1.pk,
-                "team_id": self.teams[0],
-                "user_id": self.users[0].pk,
-                "user_is_staff": False,
-                "team_is_staff": False,
-            }
-        )
-        match = Match.objects.create(
-            episode=self.e1,
-            tournament_round=None,
-            alternate_order=True,
-            is_ranked=False,
-        )
-        red = MatchParticipant.objects.create(  # noqa: F841
-            team=self.teams[1],
-            submission=self.submissions[1],
-            match=match,
-            player_index=0,
-            score=1,
-            rating=Rating.objects.create(),
-        )
-        blue = MatchParticipant.objects.create(  # noqa: F841
-            team=self.teams[-1],
-            submission=self.submissions[-1],
-            match=match,
-            player_index=1,
-            score=1,
-            rating=Rating.objects.create(),
-        )
-        match.maps.add(self.map)
-        data = serializer.to_representation(match)
-        self.assertEqual(
-            data,
-            {
-                "id": match.pk,
-                "status": str(match.status),
-                "episode": match.episode.pk,
-                "tournament_round": None,
-                "participants": None,
-                "maps": None,
                 "alternate_order": match.alternate_order,
                 "created": match.created.isoformat().replace("+00:00", "Z"),
                 "is_ranked": match.is_ranked,
@@ -1241,6 +1130,34 @@ class MatchViewSetTestCase(APITestCase):
             player_index=1,
             score=1,
             rating=Rating.objects.create(),
+        )
+        match.maps.add(self.map)
+        response = self.client.get(
+            reverse("match-scrimmage", kwargs={"episode_id": "e1"})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()["results"]), 1)
+
+    def test_not_admin_has_self_no_staff_team_tournament_hidden(self):
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=self.r_public_hidden,
+            alternate_order=True,
+            is_ranked=False,
+        )
+        match.maps.add(self.map)
+        response = self.client.get(
+            reverse("match-scrimmage", kwargs={"episode_id": "e1"})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.json()["results"]), 0)
+
+    def test_not_admin_no_self_has_invisible_team(self):
+        match = Match.objects.create(
+            episode=self.e1,
+            tournament_round=None,
+            alternate_order=True,
+            is_ranked=False,
         )
         match.maps.add(self.map)
         response = self.client.get(
