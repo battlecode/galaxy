@@ -341,7 +341,11 @@ class MatchViewSet(
         Passing the external_id_private of a tournament allows match lookup for the
         tournament, even if it's private. Client uses the external_id_private parameter
         """
-        queryset = self.get_queryset()
+        queryset = (
+            Match.objects.filter(episode=self.kwargs["episode_id"]).select_related(
+                "tournament_round__tournament"
+            )
+        ).order_by("-pk")
 
         external_id_private = self.request.query_params.get("external_id_private")
         tournaments = None
@@ -361,7 +365,7 @@ class MatchViewSet(
                 tournaments = tournaments.filter(pk=tournament_id)
                 if not tournaments.exists():
                     return Response(None, status=status.HTTP_404_NOT_FOUND)
-        queryset = self.get_queryset().filter(
+        queryset = queryset.filter(
             tournament_round__tournament__in=Subquery(tournaments.values("pk"))
         )
 
