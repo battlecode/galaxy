@@ -351,8 +351,9 @@ Please note that **all times on this page are in your current time zone**. Refer
 - **High School Prizes:** Prizes will range from $600 to $200 for the top 3 teams.
 - **MIT Novice Prizes:** Prizes will range from $500 to $200 for the top 3 teams.\n\n
 
-- **Most Innovative Breakthrough Prize:** $1000 prize given by our Platinum Sponsor, [Adobe](https://www.adobe.com/). More details to come!
-- **Most Adaptive Strategy Prize:** $800 prize given by our Gold Sponsor, [Amplitude](https://www.amplitude.com/). More details to come!\n\n
+- **Most Innovative Breakthrough Prize:** $1000 prize given by our Platinum Sponsor, [Adobe](https://www.adobe.com/).
+- **Most Adaptive Strategy Prize:** $750 prize given by our Gold Sponsor, [Amplitude](https://www.amplitude.com/).
+- **Best Pathfinding Prize:** $750 prize given by our Gold Sponsor, [Jump Trading](https://www.jumptrading.com/). \n\n
 
 - **Winning Team Prize:** For the first time ever, there is a new Battlecode prize in addition to $$$ and Eternal Glory.
 Amplitude is offering all the members of this year's winning team Amplitude internships. That is right, winning Battlecode now guarantees you a career as well!
