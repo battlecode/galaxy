@@ -5,6 +5,8 @@ import google.cloud.storage as storage
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models, transaction
+from django.db.models import Q
+from django.utils import timezone
 
 import siarnaq.api.refs as refs
 from siarnaq.api.teams.managers import TeamQuerySet
@@ -167,6 +169,26 @@ class Team(models.Model):
 
     def get_non_staff_count(self):
         return self.members.filter(is_staff=False).count()
+
+    def can_scrimmage(self):
+        """Check whether this team is currently rate-limited from scrimmaging."""
+        from siarnaq.api.compete.models import Match, SaturnStatus
+        from siarnaq.api.episodes.models import Episode
+
+        past_hour = timezone.now() - timezone.timedelta(hours=1)
+        # Get this team's non-failed scrimmages created in the past hour
+        match_count = (
+            Match.objects.filter(
+                episode=self.episode,
+                tournament_round=None,
+                created__gte=past_hour,
+                participants__team=self.id,
+            )
+            .filter(~Q(status=SaturnStatus.ERRORED) & ~Q(status=SaturnStatus.CANCELLED))
+            .count()
+        )
+
+        return match_count < Episode.objects.get(pk=self.episode).scrimmage_hourly_limit
 
 
 class TeamProfile(models.Model):
