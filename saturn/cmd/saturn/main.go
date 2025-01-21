@@ -27,7 +27,7 @@ var (
 	monitorPort                 *uint   = flag.Uint("port", 8005, "the port for monitoring shutdowns")
 	scaffoldRoot                *string = flag.String("scaffold", "/scaffolds", "the root directory for saving scaffolds")
 	parallelism                 *uint   = flag.Uint("parallel", 1, "the number of scaffolds to run in parallel")
-	onSaturn                    *bool   = flag.Bool("saturn", true, "run on saturn")
+	onSaturn                    *bool   = flag.Bool("onsaturn", true, "run on saturn")
 )
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), unix.SIGINT, unix.SIGTERM)
 	defer stop()
 
-	secret, err := saturn.ReadSecret(ctx, *gcpProjectID, *gcpSecretName)
+	secret, err := saturn.ReadSecret(ctx, *gcpProjectID, *gcpSecretName, *onSaturn)
 	if err != nil {
 		log.Ctx(ctx).Fatal().Err(err).Msg("Could not read secrets.")
 	}
