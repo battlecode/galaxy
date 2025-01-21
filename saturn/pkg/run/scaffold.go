@@ -70,7 +70,7 @@ func (m *ScaffoldMultiplexer) Compile(
 	if err := mapstructure.Decode(payload.Details, &req); err != nil {
 		return fmt.Errorf("mapstructure.Decode: %v", err)
 	}
-	storage, err := NewGCSClient(ctx)
+	storage, err := NewGCSClient(ctx, m.onSaturn)
 	if err != nil {
 		return fmt.Errorf("NewGCSClient: %v", err)
 	}
@@ -93,7 +93,7 @@ func (m *ScaffoldMultiplexer) Execute(
 	if err := mapstructure.Decode(payload.Details, &req); err != nil {
 		return fmt.Errorf("mapstructure.Decode: %v", err)
 	}
-	storage, err := NewGCSClient(ctx)
+	storage, err := NewGCSClient(ctx, m.onSaturn)
 	if err != nil {
 		return fmt.Errorf("NewGCSClient: %v", err)
 	}
