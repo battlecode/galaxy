@@ -66,7 +66,7 @@ func main() {
 		app, err := saturn.New(
 			ctx,
 			saturn.WithGcpPubsubSubcriber(*gcpProjectID, *gcpPubsubSubscriptionID),
-			saturn.WithGcpTokenedReporter(*gcpTokenedReporterAudience, *gcpTokenedReporterUserAgent),
+			saturn.WithGcpTokenedReporter(*gcpTokenedReporterAudience, *gcpTokenedReporterUserAgent, *onSaturn),
 			saturn.WithRunner("compile", multiplexer.Compile),
 			saturn.WithRunner("execute", multiplexer.Execute),
 		)
