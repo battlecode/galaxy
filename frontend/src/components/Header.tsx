@@ -162,7 +162,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
                   <Menu.Item>
                     <button
                       onClick={() => {
-                        void logout(queryClient);
+                        logout(queryClient);
                         navigate(`/${episodeId}/home`);
                       }}
                       className="flex w-full items-center rounded-lg px-4 py-2 sm:text-sm"

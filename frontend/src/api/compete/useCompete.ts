@@ -356,23 +356,17 @@ export const useRequestScrimmage = (
             scrimmageRequestRequest,
           });
           // Invalidate the outbox query
-          await queryClient.invalidateQueries({
-            queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
+          await queryClient.resetQueries({
+            queryKey: buildKey(competeQueryKeys.subBase, {
               episodeId,
             }),
           });
           // Prefetch the first page of the outbox list
-          await queryClient.prefetchQuery({
+          await queryClient.refetchQueries({
             queryKey: buildKey(scrimmageOutboxListFactory.queryKey, {
               episodeId,
               page: 1,
             }),
-            queryFn: async () =>
-              await scrimmageOutboxListFactory.queryFn(
-                { episodeId, page: 1 },
-                queryClient,
-                true,
-              ),
           });
 
           return result;
