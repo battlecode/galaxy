@@ -104,7 +104,7 @@ export const TOURNAMENTS: Partial<Record<TourneyPageKey, string>> = {
   Please note that **all times on this page are in your current time zone**. Refer to the submission freeze countdown timer for the time remaining before the next submission freeze.
   `,
   Prizes: `
-- **Sprint Prizes:** Winner of each tournament will receive $250.
+- **Final Tournament Prizes:** 1st place winner will receive $600, and 2nd place winner will receive $400.
   `,
   /*
   "Tournament Format": `
