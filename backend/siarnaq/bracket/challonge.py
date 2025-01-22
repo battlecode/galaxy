@@ -60,7 +60,9 @@ def create_tournament(tournament: Tournament, *, is_private: bool):
                 "private": is_private,
                 "url": challonge_id,
                 "game_name": "Battlecode",
-                "match_options": {"accept_attachments": True},
+                "match_options": {
+                    "accept_attachments": True
+                },  # need to add attachments(replay url) manually
             },
         }
     }
