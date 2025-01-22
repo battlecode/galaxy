@@ -11,6 +11,9 @@ from django.utils import timezone
 import siarnaq.api.refs as refs
 from siarnaq.api.teams.managers import TeamQuerySet
 
+# from drf_spectacular.utils import extend_schema_field
+# from drf_spectacular.types import OpenApiTypes
+
 
 class Rating(models.Model):
     """
@@ -85,6 +88,22 @@ class TeamStatus(models.TextChoices):
     A team with staff privileges that is invisible to regular users.
     Invisible teams are useful for testing purposes.
     """
+
+
+class ScrimmageRequestAcceptReject(models.TextChoices):
+    """
+    An immutable type enumerating the possible varieties of scrimmage
+    request auto accept/reject settings.
+    """
+
+    AUTO_ACCEPT = "A"
+    """Automatically accept all scrimmage requests."""
+
+    AUTO_REJECT = "R"
+    """Automatically reject all scrimmage requests."""
+
+    MANUAL = "M"
+    """Manually accept or reject scrimmage requests."""
 
 
 def make_team_join_key():
@@ -226,11 +245,19 @@ class TeamProfile(models.Model):
     rating = models.OneToOneField(Rating, on_delete=models.PROTECT)
     """The current rating of the team."""
 
-    auto_accept_ranked = models.BooleanField(default=False)
-    """Whether the team automatically accepts ranked match requests."""
+    auto_accept_reject_ranked = models.CharField(
+        max_length=1,
+        choices=ScrimmageRequestAcceptReject.choices,
+        default=ScrimmageRequestAcceptReject.MANUAL,
+    )
+    """Whether the team automatically accepts or rejects ranked match requests."""
 
-    auto_accept_unranked = models.BooleanField(default=True)
-    """Whether the team automatically accepts unranked match requests."""
+    auto_accept_reject_unranked = models.CharField(
+        max_length=1,
+        choices=ScrimmageRequestAcceptReject.choices,
+        default=ScrimmageRequestAcceptReject.MANUAL,
+    )
+    """Whether the team automatically accepts or rejects unranked match requests."""
 
     eligible_for = models.ManyToManyField(
         refs.ELIGIBILITY_CRITERION_MODEL, related_name="teams", blank=True

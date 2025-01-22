@@ -29,8 +29,8 @@ class TeamProfilePublicSerializer(serializers.ModelSerializer):
             "has_avatar",
             "avatar_url",
             "rating",
-            "auto_accept_ranked",
-            "auto_accept_unranked",
+            "auto_accept_reject_ranked",
+            "auto_accept_reject_unranked",
             "eligible_for",
         ]
         read_only_fields = ["rating", "has_avatar", "avatar_url"]
@@ -79,8 +79,8 @@ class TeamProfilePrivateSerializer(TeamProfilePublicSerializer):
             "has_report",
             "avatar_url",
             "rating",
-            "auto_accept_ranked",
-            "auto_accept_unranked",
+            "auto_accept_reject_ranked",
+            "auto_accept_reject_unranked",
             "eligible_for",
         ]
         read_only_fields = ["rating", "has_avatar", "avatar_url", "has_report"]

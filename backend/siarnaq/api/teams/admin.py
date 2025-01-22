@@ -9,8 +9,8 @@ class TeamProfileInline(admin.StackedInline):
     fields = (
         "quote",
         "biography",
-        "auto_accept_ranked",
-        "auto_accept_unranked",
+        "auto_accept_reject_ranked",
+        "auto_accept_reject_unranked",
         "rating",
         "has_avatar",
         "eligible_for",

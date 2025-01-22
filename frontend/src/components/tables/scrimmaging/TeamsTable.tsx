@@ -11,6 +11,7 @@ import Button from "components/elements/Button";
 import type { TeamPublic } from "api/_autogen";
 import RequestScrimModal from "./RequestScrimModal";
 import { useEpisodeInfo, useEpisodeMaps } from "api/episode/useEpisode";
+import ScrimmageAcceptRejectLabel from "components/ScrimmageAcceptRejectLabel";
 
 interface TeamsTableProps {
   search: string;
@@ -126,22 +127,22 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
             value: (team) => team.profile?.quote ?? "",
           },
           {
-            header: "Auto-Accept Ranked",
-            key: "auto_accept_ranked",
-            value: (team) =>
-              team.profile?.auto_accept_ranked !== undefined &&
-              team.profile.auto_accept_ranked
-                ? "Yes"
-                : "No",
+            header: "Ranked",
+            key: "ranked_scrimmages",
+            value: (team) => (
+              <ScrimmageAcceptRejectLabel
+                acceptRejectStatus={team.profile?.auto_accept_reject_ranked}
+              />
+            ),
           },
           {
-            header: "Auto-Accept Unranked",
-            key: "auto_accept_unranked",
-            value: (team) =>
-              team.profile?.auto_accept_unranked !== undefined &&
-              team.profile.auto_accept_unranked
-                ? "Yes"
-                : "No",
+            header: "Unranked",
+            key: "unranked_scrimmages",
+            value: (team) => (
+              <ScrimmageAcceptRejectLabel
+                acceptRejectStatus={team.profile?.auto_accept_reject_unranked}
+              />
+            ),
           },
           {
             header: "",

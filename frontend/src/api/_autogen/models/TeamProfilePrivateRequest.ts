@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { ScrimmageRequestAcceptRejectEnum } from './ScrimmageRequestAcceptRejectEnum';
+import {
+    ScrimmageRequestAcceptRejectEnumFromJSON,
+    ScrimmageRequestAcceptRejectEnumFromJSONTyped,
+    ScrimmageRequestAcceptRejectEnumToJSON,
+} from './ScrimmageRequestAcceptRejectEnum';
+
 /**
  * 
  * @export
@@ -33,16 +40,16 @@ export interface TeamProfilePrivateRequest {
     biography?: string;
     /**
      * 
-     * @type {boolean}
+     * @type {ScrimmageRequestAcceptRejectEnum}
      * @memberof TeamProfilePrivateRequest
      */
-    auto_accept_ranked?: boolean;
+    auto_accept_reject_ranked?: ScrimmageRequestAcceptRejectEnum;
     /**
      * 
-     * @type {boolean}
+     * @type {ScrimmageRequestAcceptRejectEnum}
      * @memberof TeamProfilePrivateRequest
      */
-    auto_accept_unranked?: boolean;
+    auto_accept_reject_unranked?: ScrimmageRequestAcceptRejectEnum;
     /**
      * 
      * @type {Array<number>}
@@ -72,8 +79,8 @@ export function TeamProfilePrivateRequestFromJSONTyped(json: any, ignoreDiscrimi
         
         'quote': !exists(json, 'quote') ? undefined : json['quote'],
         'biography': !exists(json, 'biography') ? undefined : json['biography'],
-        'auto_accept_ranked': !exists(json, 'auto_accept_ranked') ? undefined : json['auto_accept_ranked'],
-        'auto_accept_unranked': !exists(json, 'auto_accept_unranked') ? undefined : json['auto_accept_unranked'],
+        'auto_accept_reject_ranked': !exists(json, 'auto_accept_reject_ranked') ? undefined : ScrimmageRequestAcceptRejectEnumFromJSON(json['auto_accept_reject_ranked']),
+        'auto_accept_reject_unranked': !exists(json, 'auto_accept_reject_unranked') ? undefined : ScrimmageRequestAcceptRejectEnumFromJSON(json['auto_accept_reject_unranked']),
         'eligible_for': !exists(json, 'eligible_for') ? undefined : json['eligible_for'],
     };
 }
@@ -89,8 +96,8 @@ export function TeamProfilePrivateRequestToJSON(value?: TeamProfilePrivateReques
         
         'quote': value.quote,
         'biography': value.biography,
-        'auto_accept_ranked': value.auto_accept_ranked,
-        'auto_accept_unranked': value.auto_accept_unranked,
+        'auto_accept_reject_ranked': ScrimmageRequestAcceptRejectEnumToJSON(value.auto_accept_reject_ranked),
+        'auto_accept_reject_unranked': ScrimmageRequestAcceptRejectEnumToJSON(value.auto_accept_reject_unranked),
         'eligible_for': value.eligible_for,
     };
 }

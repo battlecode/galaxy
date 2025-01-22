@@ -2,6 +2,7 @@ import type React from "react";
 import Icon from "./Icon";
 import { Switch } from "@headlessui/react";
 import Spinner from "../Spinner";
+import { isPresent } from "utils/utilTypes";
 
 export const enum CheckboxState {
   CHECKED,
@@ -12,15 +13,17 @@ export const enum CheckboxState {
 export const getCheckboxState = (
   loading: boolean,
   editMode: boolean,
-  manualCheck: boolean,
-  dataCheck: boolean,
+  manualCheck: boolean | undefined,
+  dataCheck: boolean | undefined,
 ): CheckboxState => {
   if (loading) {
     return CheckboxState.LOADING;
-  } else if (editMode) {
+  } else if (editMode && isPresent(manualCheck)) {
     return manualCheck ? CheckboxState.CHECKED : CheckboxState.UNCHECKED;
   } else {
-    return dataCheck ? CheckboxState.CHECKED : CheckboxState.UNCHECKED;
+    return isPresent(dataCheck) && dataCheck
+      ? CheckboxState.CHECKED
+      : CheckboxState.UNCHECKED;
   }
 };
 

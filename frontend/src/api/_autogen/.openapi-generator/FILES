@@ -42,6 +42,7 @@ models/SaturnInvocationRequest.ts
 models/ScrimmageRecord.ts
 models/ScrimmageRecordVariant.ts
 models/ScrimmageRequest.ts
+models/ScrimmageRequestAcceptRejectEnum.ts
 models/ScrimmageRequestRequest.ts
 models/ScrimmageStatusEnum.ts
 models/Status526Enum.ts

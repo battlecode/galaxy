@@ -93,6 +93,7 @@ export default [
       ],
       "@typescript-eslint/non-nullable-type-assertion-style": "off",
       "@typescript-eslint/no-non-null-assertion": "error",
+      "react/prop-types": "off",
     },
   },
   {

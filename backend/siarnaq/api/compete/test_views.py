@@ -28,7 +28,12 @@ from siarnaq.api.episodes.models import (
     TournamentRound,
     TournamentStyle,
 )
-from siarnaq.api.teams.models import Rating, Team, TeamStatus
+from siarnaq.api.teams.models import (
+    Rating,
+    ScrimmageRequestAcceptReject,
+    Team,
+    TeamStatus,
+)
 from siarnaq.api.user.models import User
 
 
@@ -1205,8 +1210,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
                 episode=self.e1 if i < 2 else self.e2,
                 name=f"team{i}",
                 profile=dict(
-                    auto_accept_ranked=False,
-                    auto_accept_unranked=False,
+                    auto_accept_reject_ranked=ScrimmageRequestAcceptReject.MANUAL,
+                    auto_accept_reject_unranked=ScrimmageRequestAcceptReject.MANUAL,
                 ),
             )
             t.members.add(u)
@@ -1233,7 +1238,9 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     )
     def test_create_autoaccept(self, enqueue):
         self.client.force_authenticate(self.users[0])
-        self.teams[1].profile.auto_accept_ranked = True
+        self.teams[
+            1
+        ].profile.auto_accept_reject_ranked = ScrimmageRequestAcceptReject.AUTO_ACCEPT
         self.teams[1].profile.save()
         response = self.client.post(
             reverse("request-list", kwargs={"episode_id": "e1"}),
