@@ -3032,6 +3032,12 @@ components:
         - requested_to_name
         - requested_to_rating
         - status
+    ScrimmageRequestAcceptRejectEnum:
+      enum:
+        - A
+        - R
+        - M
+      type: string
     ScrimmageRequestRequest:
       type: object
       properties:
@@ -3281,10 +3287,10 @@ components:
           type: number
           format: double
           readOnly: true
-        auto_accept_ranked:
-          type: boolean
-        auto_accept_unranked:
-          type: boolean
+        auto_accept_reject_ranked:
+          $ref: "#/components/schemas/ScrimmageRequestAcceptRejectEnum"
+        auto_accept_reject_unranked:
+          $ref: "#/components/schemas/ScrimmageRequestAcceptRejectEnum"
         eligible_for:
           type: array
           items:
@@ -3304,10 +3310,10 @@ components:
         biography:
           type: string
           maxLength: 1024
-        auto_accept_ranked:
-          type: boolean
-        auto_accept_unranked:
-          type: boolean
+        auto_accept_reject_ranked:
+          $ref: "#/components/schemas/ScrimmageRequestAcceptRejectEnum"
+        auto_accept_reject_unranked:
+          $ref: "#/components/schemas/ScrimmageRequestAcceptRejectEnum"
         eligible_for:
           type: array
           items:
@@ -3332,10 +3338,10 @@ components:
           type: number
           format: double
           readOnly: true
-        auto_accept_ranked:
-          type: boolean
-        auto_accept_unranked:
-          type: boolean
+        auto_accept_reject_ranked:
+          $ref: "#/components/schemas/ScrimmageRequestAcceptRejectEnum"
+        auto_accept_reject_unranked:
+          $ref: "#/components/schemas/ScrimmageRequestAcceptRejectEnum"
         eligible_for:
           type: array
           items:

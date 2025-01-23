@@ -77,6 +77,8 @@ class EpisodeAdmin(admin.ModelAdmin):
                     "submission_frozen",
                     "is_allowed_ranked_scrimmage",
                     "autoscrim_schedule",
+                    "ranked_scrimmage_hourly_limit",
+                    "unranked_scrimmage_hourly_limit",
                 ),
             },
         ),

@@ -11,6 +11,7 @@ import { useEpisodeInfo } from "api/episode/useEpisode";
 import { getEligibilities } from "api/helpers";
 import Table from "components/Table";
 import TableBottom from "components/TableBottom";
+import ScrimmageAcceptRejectLabel from "components/ScrimmageAcceptRejectLabel";
 
 interface RankingsTableProps {
   data: Maybe<PaginatedTeamPublicList>;
@@ -104,22 +105,22 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
           },
         },
         {
-          header: "Auto-Accept Ranked",
-          key: "auto_accept_ranked",
-          value: (team) =>
-            team.profile?.auto_accept_ranked !== undefined &&
-            team.profile.auto_accept_ranked
-              ? "Yes"
-              : "No",
+          header: "Ranked Scrimmages",
+          key: "ranked_scrimmages",
+          value: (team) => (
+            <ScrimmageAcceptRejectLabel
+              acceptRejectStatus={team.profile?.auto_accept_reject_ranked}
+            />
+          ),
         },
         {
-          header: "Auto-Accept Unranked",
-          key: "auto_accept_unranked",
-          value: (team) =>
-            team.profile?.auto_accept_unranked !== undefined &&
-            team.profile.auto_accept_unranked
-              ? "Yes"
-              : "No",
+          header: "Unranked Scrimmages",
+          key: "unranked_scrimmages",
+          value: (team) => (
+            <ScrimmageAcceptRejectLabel
+              acceptRejectStatus={team.profile?.auto_accept_reject_unranked}
+            />
+          ),
         },
       ]}
     />

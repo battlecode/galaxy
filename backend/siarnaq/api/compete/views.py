@@ -74,6 +74,12 @@ class RankedMatchesDisabed(APIException):
     default_code = "ranked_matches_disabled"
 
 
+class ScrimmageRateLimited(APIException):
+    status_code = status.HTTP_429_TOO_MANY_REQUESTS
+    default_detail = "You have requested too many scrimmages in the past hour."
+    default_code = "scrimmages_rate_limited"
+
+
 class EpisodeTeamUserContextMixin:
     """Add the current episode, team and user to the serializer context."""
 
@@ -965,6 +971,11 @@ class ScrimmageRequestViewSet(
                 >= settings.MAX_SCRIMMAGES_AGAINST_TEAM
             ):
                 raise TooManyScrimmages
+
+        # Check if we should reject based on rate-limiting
+        requestor = Team.objects.get(pk=serializer.validated_data["requested_by_id"])
+        if not requestor.can_scrimmage(serializer.validated_data["is_ranked"]):
+            raise ScrimmageRateLimited
 
         serializer.save()
         # Generate the Location header, as supplied by CreateModelMixin

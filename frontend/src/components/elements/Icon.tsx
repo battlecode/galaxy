@@ -29,6 +29,7 @@ import {
   LockClosedIcon as LockClosedIcon24,
   ExclamationTriangleIcon as ExclamationTriangleIcon24,
   ArrowPathIcon as ArrowPathIcon24,
+  MagnifyingGlassIcon as MagnifyingGlassIcon24,
 } from "@heroicons/react/24/outline";
 
 import {
@@ -61,6 +62,7 @@ import {
   LockClosedIcon as LockClosedIcon20,
   ExclamationTriangleIcon as ExclamationTriangleIcon20,
   ArrowPathIcon as ArrowPathIcon20,
+  MagnifyingGlassIcon as MagnifyingGlassIcon20,
 } from "@heroicons/react/20/solid";
 
 const icons24 = {
@@ -93,6 +95,7 @@ const icons24 = {
   lock_closed: LockClosedIcon24,
   exclamation_triangle: ExclamationTriangleIcon24,
   arrow_path: ArrowPathIcon24,
+  magnifying_glass: MagnifyingGlassIcon24,
 };
 
 const icons20 = {
@@ -125,6 +128,7 @@ const icons20 = {
   lock_closed: LockClosedIcon20,
   exclamation_triangle: ExclamationTriangleIcon20,
   arrow_path: ArrowPathIcon20,
+  magnifying_glass: MagnifyingGlassIcon20,
 };
 
 export type IconName = keyof typeof icons24;

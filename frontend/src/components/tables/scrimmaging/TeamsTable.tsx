@@ -1,5 +1,5 @@
 import type React from "react";
-import { Fragment, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Table from "components/Table";
 import TableBottom from "components/TableBottom";
@@ -8,9 +8,13 @@ import { useEpisodeId } from "contexts/EpisodeContext";
 import { useSearchTeams, useUserTeam } from "api/team/useTeam";
 import Input from "components/elements/Input";
 import Button from "components/elements/Button";
-import type { TeamPublic } from "api/_autogen";
+import {
+  ScrimmageRequestAcceptRejectEnum,
+  type TeamPublic,
+} from "api/_autogen";
 import RequestScrimModal from "./RequestScrimModal";
 import { useEpisodeInfo, useEpisodeMaps } from "api/episode/useEpisode";
+import ScrimmageAcceptRejectLabel from "components/ScrimmageAcceptRejectLabel";
 
 interface TeamsTableProps {
   search: string;
@@ -37,6 +41,20 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
 
   const [searchText, setSearchText] = useState<string>(search);
   const [teamToRequest, setTeamToRequest] = useState<TeamPublic | null>(null);
+
+  const canRequestTeam = useCallback(
+    (team: TeamPublic) => {
+      if (!episodeInfo.isSuccess || episodeInfo.data.frozen) return false;
+
+      return (
+        team.profile?.auto_accept_reject_ranked !==
+          ScrimmageRequestAcceptRejectEnum.R ||
+        team.profile.auto_accept_reject_unranked !==
+          ScrimmageRequestAcceptRejectEnum.R
+      );
+    },
+    [episodeInfo],
+  );
 
   return (
     <Fragment>
@@ -126,22 +144,22 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
             value: (team) => team.profile?.quote ?? "",
           },
           {
-            header: "Auto-Accept Ranked",
-            key: "auto_accept_ranked",
-            value: (team) =>
-              team.profile?.auto_accept_ranked !== undefined &&
-              team.profile.auto_accept_ranked
-                ? "Yes"
-                : "No",
+            header: "Ranked",
+            key: "ranked_scrimmages",
+            value: (team) => (
+              <ScrimmageAcceptRejectLabel
+                acceptRejectStatus={team.profile?.auto_accept_reject_ranked}
+              />
+            ),
           },
           {
-            header: "Auto-Accept Unranked",
-            key: "auto_accept_unranked",
-            value: (team) =>
-              team.profile?.auto_accept_unranked !== undefined &&
-              team.profile.auto_accept_unranked
-                ? "Yes"
-                : "No",
+            header: "Unranked",
+            key: "unranked_scrimmages",
+            value: (team) => (
+              <ScrimmageAcceptRejectLabel
+                acceptRejectStatus={team.profile?.auto_accept_reject_unranked}
+              />
+            ),
           },
           {
             header: "",
@@ -153,7 +171,7 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
                   label="Request"
                   variant="dark"
                   loading={maps.isLoading && teamToRequest?.id === team.id}
-                  disabled={!episodeInfo.isSuccess || episodeInfo.data.frozen}
+                  disabled={!canRequestTeam(team)}
                   onClick={() => {
                     setTeamToRequest(team);
                   }}

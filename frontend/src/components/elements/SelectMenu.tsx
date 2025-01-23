@@ -63,20 +63,15 @@ function SelectMenu<T extends React.Key | null | undefined>({
             sm:text-sm sm:leading-6 ${stateStyle}`}
           >
             {!isPresent(value) ? placeholder : valueToLabel.get(value)}
-            {loading && (
-              <div
-                className={`absolute inset-y-0 right-0 mr-${
-                  isPresent(value) ? "16" : "8"
-                } flex transform items-center`}
-              >
-                <Spinner size="xs" />
-              </div>
-            )}
             <div
               className="absolute inset-y-0 right-0 mr-2 flex transform items-center
               transition duration-300 ui-open:rotate-180 ui-not-open:rotate-0"
             >
-              <Icon name="chevron_down" size="sm" />
+              {loading ? (
+                <Spinner size="xs" />
+              ) : (
+                <Icon name="chevron_down" size="sm" />
+              )}
             </div>
           </Listbox.Button>
           <Transition

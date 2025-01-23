@@ -524,4 +524,9 @@ SPECTACULAR_SETTINGS = {
     "AUTHENTICATION_WHITELIST": [
         "rest_framework_simplejwt.authentication.JWTAuthentication"
     ],
+    "ENUM_NAME_OVERRIDES": {
+        "ScrimmageRequestAcceptRejectEnum": (
+            "siarnaq.api.teams.models.ScrimmageRequestAcceptReject"
+        ),
+    },
 }

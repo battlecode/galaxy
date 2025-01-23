@@ -35,6 +35,7 @@ export * from './SaturnInvocationRequest';
 export * from './ScrimmageRecord';
 export * from './ScrimmageRecordVariant';
 export * from './ScrimmageRequest';
+export * from './ScrimmageRequestAcceptRejectEnum';
 export * from './ScrimmageRequestRequest';
 export * from './ScrimmageStatusEnum';
 export * from './Status526Enum';

@@ -99,37 +99,6 @@ export const updateTeamPartial = async ({
     patchedTeamPrivateRequest,
   });
 
-// -- TEAM STATS --//
-
-// TODO: implement rankings history
-// /**
-//  * Get the Mu history of the given team.
-//  * @param teamId The team's ID.
-//  */
-// export const getTeamMuHistoryByTeam = async (teamId: number) => {
-//   return await $.get(`${baseUrl}/api/${LEAGUE}/team/${teamId}/history/`);
-// };
-
-/**
- * getTeamMuHistoryByTeam
- */
-
-/**
- * getTeamWinStatsByTeam
- */
-
-/**
- * getUserTeamWinStats
- */
-
-/**
- * getTeamInfoByTeam
- */
-
-/**
- * getTeamRankingByTeam
- */
-
 /**
  * Search team, ordering the result by ranking.
  * @param episodeId The current episode's ID.

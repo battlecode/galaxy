@@ -5,6 +5,7 @@ import google.cloud.storage as storage
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models, transaction
+from django.utils import timezone
 
 import siarnaq.api.refs as refs
 from siarnaq.api.teams.managers import TeamQuerySet
@@ -83,6 +84,22 @@ class TeamStatus(models.TextChoices):
     A team with staff privileges that is invisible to regular users.
     Invisible teams are useful for testing purposes.
     """
+
+
+class ScrimmageRequestAcceptReject(models.TextChoices):
+    """
+    An immutable type enumerating the possible varieties of scrimmage
+    request auto accept/reject settings.
+    """
+
+    AUTO_ACCEPT = "A"
+    """Automatically accept all scrimmage requests."""
+
+    AUTO_REJECT = "R"
+    """Automatically reject all scrimmage requests."""
+
+    MANUAL = "M"
+    """Manually accept or reject scrimmage requests."""
 
 
 def make_team_join_key():
@@ -168,6 +185,36 @@ class Team(models.Model):
     def get_non_staff_count(self):
         return self.members.filter(is_staff=False).count()
 
+    def can_scrimmage(self, is_ranked):
+        """
+        Check whether this team is currently rate-limited from
+        creating a given type of scrimmage request.
+        is_ranked determines which type of scrimmage is being checked.
+        """
+        from siarnaq.api.compete.models import MatchParticipant
+        from siarnaq.api.episodes.models import Episode
+
+        past_hour = timezone.now() - timezone.timedelta(hours=1)
+
+        # Get this team's scrimmages created in the past hour
+        match_count = MatchParticipant.objects.filter(
+            team_id=self.id,
+            match__episode=self.episode,
+            match__tournament_round__isnull=True,
+            match__is_ranked=is_ranked,
+            match__created__gte=past_hour,
+        ).count()
+
+        # Get the maximum number of created matches allowed in the past hour
+        episode = Episode.objects.get(pk=self.episode_id)
+        max_matches = (
+            episode.ranked_scrimmage_hourly_limit
+            if is_ranked
+            else episode.unranked_scrimmage_hourly_limit
+        )
+
+        return match_count < max_matches
+
 
 class TeamProfile(models.Model):
     """
@@ -204,11 +251,19 @@ class TeamProfile(models.Model):
     rating = models.OneToOneField(Rating, on_delete=models.PROTECT)
     """The current rating of the team."""
 
-    auto_accept_ranked = models.BooleanField(default=False)
-    """Whether the team automatically accepts ranked match requests."""
+    auto_accept_reject_ranked = models.CharField(
+        max_length=1,
+        choices=ScrimmageRequestAcceptReject.choices,
+        default=ScrimmageRequestAcceptReject.MANUAL,
+    )
+    """Whether the team automatically accepts or rejects ranked match requests."""
 
-    auto_accept_unranked = models.BooleanField(default=True)
-    """Whether the team automatically accepts unranked match requests."""
+    auto_accept_reject_unranked = models.CharField(
+        max_length=1,
+        choices=ScrimmageRequestAcceptReject.choices,
+        default=ScrimmageRequestAcceptReject.MANUAL,
+    )
+    """Whether the team automatically accepts or rejects unranked match requests."""
 
     eligible_for = models.ManyToManyField(
         refs.ELIGIBILITY_CRITERION_MODEL, related_name="teams", blank=True

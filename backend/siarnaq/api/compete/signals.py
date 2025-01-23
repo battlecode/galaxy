@@ -31,16 +31,40 @@ def update_match_ratings(instance, **kwargs):
 
 
 @receiver(post_save, sender=ScrimmageRequest)
-def auto_accept_scrimmage(instance, created, **kwargs):
-    """Automatically accept a scrimmage request if the team prefers to do so."""
+def auto_accept_reject_scrimmage(instance, created, **kwargs):
+    """
+    Automatically accept or reject a scrimmage request if the team prefers to do so.
+    """
+    from siarnaq.api.teams.models import ScrimmageRequestAcceptReject
+
     if not created:
         return
-    if (instance.is_ranked and instance.requested_to.profile.auto_accept_ranked) or (
-        not instance.is_ranked and instance.requested_to.profile.auto_accept_unranked
+
+    if (
+        instance.is_ranked
+        and instance.requested_to.profile.auto_accept_reject_ranked
+        == ScrimmageRequestAcceptReject.AUTO_ACCEPT
+    ) or (
+        not instance.is_ranked
+        and instance.requested_to.profile.auto_accept_reject_unranked
+        == ScrimmageRequestAcceptReject.AUTO_ACCEPT
     ):
         # Must wait for transaction to complete, so that maps are inserted.
         transaction.on_commit(
             lambda: ScrimmageRequest.objects.filter(pk=instance.pk).accept()
+        )
+    elif (
+        instance.is_ranked
+        and instance.requested_to.profile.auto_accept_reject_ranked
+        == ScrimmageRequestAcceptReject.AUTO_REJECT
+    ) or (
+        not instance.is_ranked
+        and instance.requested_to.profile.auto_accept_reject_unranked
+        == ScrimmageRequestAcceptReject.AUTO_REJECT
+    ):
+        # Must wait for transaction to complete, so that we safely reject
+        transaction.on_commit(
+            lambda: ScrimmageRequest.objects.filter(pk=instance.pk).reject()
         )
 
 
