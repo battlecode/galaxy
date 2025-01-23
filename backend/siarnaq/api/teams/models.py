@@ -5,7 +5,6 @@ import google.cloud.storage as storage
 from django.conf import settings
 from django.core.validators import RegexValidator
 from django.db import models, transaction
-from django.db.models import Q
 from django.utils import timezone
 
 import siarnaq.api.refs as refs
@@ -192,23 +191,19 @@ class Team(models.Model):
         creating a given type of scrimmage request.
         is_ranked determines which type of scrimmage is being checked.
         """
-        from siarnaq.api.compete.models import Match, SaturnStatus
+        from siarnaq.api.compete.models import MatchParticipant
         from siarnaq.api.episodes.models import Episode
 
         past_hour = timezone.now() - timezone.timedelta(hours=1)
 
-        # Get this team's non-failed scrimmages created in the past hour
-        match_count = (
-            Match.objects.filter(
-                episode=self.episode,
-                tournament_round=None,
-                created__gte=past_hour,
-                participants__team=self.id,
-                is_ranked=is_ranked,
-            )
-            .filter(~Q(status=SaturnStatus.ERRORED) & ~Q(status=SaturnStatus.CANCELLED))
-            .count()
-        )
+        # Get this team's scrimmages created in the past hour
+        match_count = MatchParticipant.objects.filter(
+            team_id=self.id,
+            match__episode=self.episode,
+            match__tournament_round__isnull=True,
+            match__is_ranked=is_ranked,
+            match__created__gte=past_hour,
+        ).count()
 
         # Get the maximum number of created matches allowed in the past hour
         episode = Episode.objects.get(pk=self.episode_id)
