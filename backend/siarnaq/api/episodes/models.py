@@ -111,8 +111,13 @@ class Episode(models.Model):
     is_allowed_ranked_scrimmage = models.BooleanField(default=True)
     """Whether ranked scrimmages are allowed in this episode."""
 
-    scrimmage_hourly_limit = models.PositiveSmallIntegerField(default=10)
-    """The maximum number of scrimmage requests a team can create in an hour."""
+    ranked_scrimmage_hourly_limit = models.PositiveSmallIntegerField(default=10)
+    """The maximum number of ranked scrimmage requests a team can create in an hour."""
+
+    unranked_scrimmage_hourly_limit = models.PositiveSmallIntegerField(default=10)
+    """
+    The maximum number of unranked scrimmage requests a team can create in an hour.
+    """
 
     objects = EpisodeQuerySet.as_manager()
 

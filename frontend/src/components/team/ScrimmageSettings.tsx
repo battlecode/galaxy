@@ -22,42 +22,6 @@ const ScrimmageSettings: React.FC = () => {
     queryClient,
   );
 
-  // True/False only when dirtied, undefined otherwise
-  // const [acceptRanked, setAcceptRanked] = useState<boolean | undefined>();
-  // const [acceptUnranked, setAcceptUnranked] = useState<boolean | undefined>();
-  // const [rejectRanked, setRejectRanked] = useState<boolean | undefined>();
-  // const [rejectUnranked, setRejectUnranked] = useState<boolean | undefined>();
-
-  // const editMode = useMemo(() => {
-  //   if (!teamData.isSuccess || teamData.isLoading) return false;
-
-  //   // Some of accept/reject ranked/unranked is different from the data
-  //   return (
-  //     (isPresent(acceptRanked) &&
-  //       acceptRanked !== teamData.data.profile?.auto_accept_ranked) ||
-  //     (isPresent(acceptUnranked) &&
-  //       acceptUnranked !== teamData.data.profile?.auto_accept_unranked) ||
-  //     (isPresent(rejectRanked) &&
-  //       rejectRanked !== teamData.data.profile?.auto_reject_ranked) ||
-  //     (isPresent(rejectUnranked) &&
-  //       rejectUnranked !== teamData.data.profile?.auto_reject_unranked)
-  //   );
-  // }, [acceptRanked, acceptUnranked, rejectRanked, rejectUnranked, teamData]);
-
-  // const wrapCheckboxState = useCallback(
-  //   (
-  //     manualCheck: boolean | undefined,
-  //     dataCheck: boolean | undefined,
-  //   ): CheckboxState =>
-  //     getCheckboxState(
-  //       teamData.isLoading || updateTeam.isPending,
-  //       editMode,
-  //       manualCheck,
-  //       dataCheck,
-  //     ),
-  //   [teamData, updateTeam, editMode],
-  // );
-
   const [acceptRejectRanked, setAcceptRejectRanked] = useState<
     ScrimmageRequestAcceptRejectEnum | undefined
   >();
@@ -80,16 +44,20 @@ const ScrimmageSettings: React.FC = () => {
   }, [teamData, acceptRejectRanked, acceptRejectUnranked]);
 
   return (
-    <SectionCard title="Scrimmaging" loading={teamData.isLoading}>
+    <SectionCard
+      title="Scrimmaging"
+      loading={teamData.isLoading}
+      allowOverflow={true}
+    >
       {teamData.isSuccess && (
-        <div className="flex flex-col gap-3 2xl:flex-row">
-          <div className="text-green-600 2xl:w-60">
+        <div className="flex flex-col gap-3">
+          <div className="text-green-600">
             <p className="text-gray-700">
               Choose how you want to handle incoming scrimmage requests from
               other players.
             </p>
           </div>
-          <div className="flex flex-1 flex-col gap-2">
+          <div className="flex w-full flex-1 flex-col gap-4">
             <ScrimmageAcceptRejectSelect
               label="Ranked Scrimmages"
               loading={teamData.isLoading || updateTeam.isPending}
@@ -131,76 +99,6 @@ const ScrimmageSettings: React.FC = () => {
               />
             )}
           </div>
-          {/* <div className="flex flex-1 flex-col gap-2">
-            <DescriptiveCheckbox
-              status={wrapCheckboxState(
-                acceptRanked,
-                teamData.data.profile?.auto_accept_ranked,
-              )}
-              onChange={(checked) => {
-                setAcceptRanked(checked);
-              }}
-              title="Auto-accept ranked scrimmages"
-              description="When enabled, your team will automatically accept
-                  ranked scrimmage requests. Ranked scrimmages affect your ELO rating."
-            />
-            <DescriptiveCheckbox
-              status={wrapCheckboxState(
-                acceptUnranked,
-                teamData.data.profile?.auto_accept_unranked,
-              )}
-              onChange={(checked) => {
-                setAcceptUnranked(checked);
-              }}
-              title="Auto-accept unranked scrimmages"
-              description="When enabled, your team will automatically accept
-                  unranked scrimmage requests. Unranked scrimmages do not affect your ELO rating."
-            />
-            <DescriptiveCheckbox
-              status={wrapCheckboxState(
-                rejectRanked,
-                teamData.data.profile?.auto_reject_ranked,
-              )}
-              onChange={(checked) => {
-                setRejectRanked(checked);
-              }}
-              title="Auto-reject ranked scrimmages"
-              description="When enabled, your team will automatically reject
-                  ranked scrimmage requests."
-            />
-            <DescriptiveCheckbox
-              status={wrapCheckboxState(
-                rejectUnranked,
-                teamData.data.profile?.auto_reject_unranked,
-              )}
-              onChange={(checked) => {
-                setRejectUnranked(checked);
-              }}
-              title="Auto-reject unranked scrimmages"
-              description="When enabled, your team will automatically reject
-                  unranked scrimmage requests."
-            />
-            {editMode && (
-              <Button
-                variant="dark"
-                label="Save"
-                fullWidth
-                // VERY IMPORTANT - Prevents race conditions with other team updates!
-                disabled={updateTeam.isPending}
-                loading={updateTeam.isPending}
-                onClick={() => {
-                  updateTeam.mutate({
-                    profile: {
-                      auto_accept_ranked: acceptRanked,
-                      auto_accept_unranked: acceptUnranked,
-                      auto_reject_ranked: rejectRanked,
-                      auto_reject_unranked: rejectUnranked,
-                    },
-                  });
-                }}
-              />
-            )}
-          </div> */}
         </div>
       )}
     </SectionCard>
@@ -234,6 +132,7 @@ const ScrimmageAcceptRejectSelect: React.FC<
     loading={loading}
     value={acceptRejectStatus}
     onChange={onChange}
+    className="w-48"
   />
 );
 

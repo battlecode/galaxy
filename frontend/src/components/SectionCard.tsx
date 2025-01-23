@@ -6,6 +6,7 @@ interface SectionCardProps {
   children?: React.ReactNode;
   title?: string;
   className?: string;
+  allowOverflow?: boolean;
 }
 
 const SectionCard: React.FC<SectionCardProps> = ({
@@ -13,10 +14,13 @@ const SectionCard: React.FC<SectionCardProps> = ({
   title,
   loading = false,
   className = "",
+  allowOverflow = false,
 }) => (
   <div className={className}>
     <div
-      className={`relative overflow-auto rounded-lg bg-white px-6 pb-6 pt-4 shadow-md`}
+      className={`relative ${
+        allowOverflow ? "" : "overflow-auto"
+      } rounded-lg bg-white px-6 pb-6 pt-4 shadow-md`}
     >
       {title !== undefined && (
         <div>

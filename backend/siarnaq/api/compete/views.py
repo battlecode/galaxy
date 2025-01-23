@@ -974,7 +974,7 @@ class ScrimmageRequestViewSet(
 
         # Check if we should reject based on rate-limiting
         requestor = Team.objects.get(pk=serializer.validated_data["requested_by_id"])
-        if not requestor.can_scrimmage():
+        if not requestor.can_scrimmage(serializer.validated_data["is_ranked"]):
             raise ScrimmageRateLimited
 
         serializer.save()
