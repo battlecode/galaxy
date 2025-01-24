@@ -272,6 +272,23 @@ class MatchSerializer(serializers.ModelSerializer):
             # Staff can see everything
             pass
         elif (
+            (
+                instance.tournament_round is not None
+                and instance.tournament_round.release_status <= ReleaseStatus.HIDDEN
+            )
+            or (
+                instance.tournament_round is not None
+                and not instance.tournament_round.tournament.is_public
+            )
+            or instance.participants.filter(team__status=TeamStatus.INVISIBLE).exists()
+        ):
+            # TODO: Not sure why removing this doesn't work(shows hidden matches)
+            #  but need to ship the PR
+
+            # Fully redact matches from private tournaments, unreleased tournament
+            # rounds, and those with invisible teams.
+            data["participants"] = data["replay_url"] = data["maps"] = None
+        elif (
             instance.tournament_round is not None
             and instance.tournament_round.release_status <= ReleaseStatus.PARTICIPANTS
         ):

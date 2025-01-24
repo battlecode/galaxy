@@ -350,8 +350,11 @@ class MatchViewSet(
         tournament, even if it's private. Client uses the external_id_private parameter
         """
         # Get the matches for the episode, excluding those that should not be shown
-        queryset = self.get_queryset(prefetch_related=False)
-
+        queryset = (
+            Match.objects.filter(episode=self.kwargs["episode_id"])
+            .select_related("tournament_round__tournament")
+            .order_by("-pk")
+        )
         external_id_private = self.request.query_params.get("external_id_private")
         tournaments = None
         if external_id_private is not None:
@@ -383,6 +386,11 @@ class MatchViewSet(
         team_id = parse_int(self.request.query_params.get("team_id"))
         if team_id is not None:
             queryset = queryset.filter(participants__team=team_id)
+            if not request.user.is_staff:
+                # Regular users do not know about unreleased tournament matches
+                queryset = queryset.exclude(
+                    tournament_round__release_status__lt=ReleaseStatus.PARTICIPANTS
+                )
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)

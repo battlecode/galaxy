@@ -106,9 +106,8 @@ class TournamentRoundSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        user = self.context["request"].user
         # If user is staff, do not redact anything
-        if user.is_staff:
+        if self.context["user_is_staff"]:
             return data
         # Redact maps if not yet fully released
         if instance.release_status != ReleaseStatus.RESULTS:
