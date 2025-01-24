@@ -414,6 +414,34 @@ class TournamentRound(models.Model):
                 match_participant_objects
             )
 
+        # IMPORTANT: bulk create does not respect the map ordering so we reset it here
+        tournament_round_maps = self.maps.all()
+        map_order = {map.id: index for index, map in enumerate(tournament_round_maps)}
+
+        # Prepare bulk update data
+        through_model = matches[0].maps.through
+        bulk_updates = []
+
+        with transaction.atomic():
+            for match in matches:
+                match_maps = match.maps.all()
+                for map in match_maps:
+                    if map.id in map_order:
+                        bulk_updates.append(
+                            through_model(
+                                match_id=match.id,
+                                map_id=map.id,
+                                sort_value=map_order[map.id],
+                            )
+                        )
+
+            # Delete existing relationships
+            through_model.objects.filter(match__in=matches).delete()
+
+            # Bulk create new relationships with correct order
+            through_model.objects.bulk_create(bulk_updates)
+
+        # Enqueue the matches
         Match.objects.filter(pk__in=[match.pk for match in matches]).enqueue()
 
         self.in_progress = True

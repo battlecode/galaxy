@@ -266,23 +266,25 @@ class MatchViewSet(
     serializer_class = MatchSerializer
     permission_classes = (IsEpisodeMutable | IsAdminUser,)
 
-    def get_queryset(self):
+    def get_queryset(self, prefetch_related=True):
         queryset = (
             Match.objects.filter(episode=self.kwargs["episode_id"])
             .select_related("tournament_round__tournament")
-            .prefetch_related(
+            .order_by("-pk")
+        )
+
+        # Only prefetch rating and team data if needed
+        if prefetch_related:
+            queryset = queryset.prefetch_related(
                 "participants__previous_participation__rating",
                 "participants__rating",
                 "participants__team__profile__rating",
                 "participants__team__members",
                 "maps",
             )
-            .order_by("-pk")
-        )
 
-        # Check if the user is not staff
+        # Exclude matches where tournament round is not null and not released
         if not self.request.user.is_staff:
-            # Exclude matches where tournament round is not null and not released
             queryset = (
                 queryset.exclude(
                     Q(tournament_round__isnull=False)
@@ -347,11 +349,8 @@ class MatchViewSet(
         Passing the external_id_private of a tournament allows match lookup for the
         tournament, even if it's private. Client uses the external_id_private parameter
         """
-        queryset = (
-            Match.objects.filter(episode=self.kwargs["episode_id"]).select_related(
-                "tournament_round__tournament"
-            )
-        ).order_by("-pk")
+        # Get the matches for the episode, excluding those that should not be shown
+        queryset = self.get_queryset(prefetch_related=False)
 
         external_id_private = self.request.query_params.get("external_id_private")
         tournaments = None
@@ -384,11 +383,6 @@ class MatchViewSet(
         team_id = parse_int(self.request.query_params.get("team_id"))
         if team_id is not None:
             queryset = queryset.filter(participants__team=team_id)
-            if not request.user.is_staff:
-                # Regular users do not know about unreleased tournament matches
-                queryset = queryset.exclude(
-                    tournament_round__release_status__lt=ReleaseStatus.PARTICIPANTS
-                )
 
         page = self.paginate_queryset(queryset)
         serializer = self.get_serializer(page, many=True)

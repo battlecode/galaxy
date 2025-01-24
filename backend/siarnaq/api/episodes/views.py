@@ -3,6 +3,7 @@ from django.utils import timezone
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 
@@ -16,6 +17,18 @@ from siarnaq.api.episodes.serializers import (
     TournamentRoundSerializer,
     TournamentSerializer,
 )
+
+
+class NoMatchesToRequeue(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = "No failed matches to requeue"
+    default_code = "no_failed_matches"
+
+
+class RoundInProgress(APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = "Round is already in progress"
+    default_code = "round_in_progress"
 
 
 class EpisodeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -197,8 +210,10 @@ class TournamentRoundViewSet(viewsets.ReadOnlyModelViewSet):
 
         # Set the tournament round's maps to the provided list
         old_maps = instance.maps.all()
+
         map_ids = self.request.query_params.getlist("maps")
-        maps = Map.objects.filter(episode_id=episode_id, id__in=map_ids)
+        map_objs = Map.objects.filter(episode_id=episode_id, id__in=map_ids)
+        maps = sorted(list(map_objs), key=lambda m: map_ids.index(str(m.id)))
 
         # We require an odd number of maps to prevent ties
         if len(maps) % 2 == 0:
@@ -209,10 +224,10 @@ class TournamentRoundViewSet(viewsets.ReadOnlyModelViewSet):
         # Attempt to enqueue the round
         try:
             instance.enqueue()
-        except RuntimeError as e:
+        except RuntimeError:
             # Revert the maps if enqueueing failed
             instance.maps.set(old_maps)
-            return Response(str(e), status=status.HTTP_409_CONFLICT)
+            raise RoundInProgress()
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
@@ -293,7 +308,7 @@ class TournamentRoundViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
         if not failed.exists():
-            return Response(None, status=status.HTTP_400_BAD_REQUEST)
+            raise NoMatchesToRequeue()
 
         # TODO: should we logger.info the round requeue here?
         failed.enqueue_all()

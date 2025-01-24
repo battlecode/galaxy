@@ -187,12 +187,20 @@ class TournamentAdmin(admin.ModelAdmin):
         "display_date",
         "submission_freeze",
         "is_public",
+        "private_challonge_link",
     )
     list_filter = ("episode",)
     list_select_related = ("episode",)
     ordering = ("-episode__game_release", "-submission_freeze")
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
+
+    def private_challonge_link(self, obj):
+        """Generate a link to the private Challonge bracket."""
+        link = f"https://challonge.com/{obj.external_id_private}"
+        return format_html(
+            '<a href="{}" target="_blank">Private Challonge Link</a>', link
+        )
 
 
 class MatchInline(admin.TabularInline):
