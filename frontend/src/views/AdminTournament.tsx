@@ -223,7 +223,7 @@ const AdminTournament: React.FC = () => {
       >
         {tournament.isSuccess && episode.isSuccess && (
           <div className="grid max-w-96 grid-cols-2 items-center justify-start text-gray-700">
-            <span className="font-semibold">Challonge:</span>
+            <span className="font-semibold">Public Challonge:</span>
             <Button
               label="Go!"
               fullWidth={false}
@@ -406,16 +406,22 @@ const RoundPanel: React.FC<RoundPanelProps> = ({
     },
     queryClient,
   );
-  const requeue = useRequeueTournamentRound({
-    episodeId,
-    tournament: round.tournament,
-    id: round.id.toString(),
-  });
-  const release = useReleaseTournamentRound({
-    episodeId,
-    tournament: round.tournament,
-    id: round.id.toString(),
-  });
+  const requeue = useRequeueTournamentRound(
+    {
+      episodeId,
+      tournament: round.tournament,
+      id: round.id.toString(),
+    },
+    queryClient,
+  );
+  const release = useReleaseTournamentRound(
+    {
+      episodeId,
+      tournament: round.tournament,
+      id: round.id.toString(),
+    },
+    queryClient,
+  );
 
   /**
    * Can create/enqueue when:
@@ -473,7 +479,7 @@ const RoundPanel: React.FC<RoundPanelProps> = ({
           <span className="font-semibold">Maps:</span>
           <span>
             {round.maps
-              ?.map((m) => maps.data?.[m]?.name)
+              ?.map((m) => maps.data?.find((map) => map.id === m)?.name)
               .filter(isPresent)
               .join(", ") ?? "N/A"}
           </span>

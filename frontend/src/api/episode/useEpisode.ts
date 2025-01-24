@@ -231,10 +231,10 @@ export const useCreateAndEnqueueMatches = (
       maps,
     }: EpisodeTournamentRoundEnqueueCreateRequest) => {
       const toastFn = async (): Promise<void> => {
-        await createAndEnqueueMatches({ episodeId, tournament, id, maps });
-
-        // Refetch this tournament round and its matches
         try {
+          await createAndEnqueueMatches({ episodeId, tournament, id, maps });
+
+          // Refetch this tournament round and its matches
           const roundInfo = queryClient.refetchQueries({
             queryKey: buildKey(episodeQueryKeys.tournamentRoundInfo, {
               episodeId,
@@ -248,15 +248,22 @@ export const useCreateAndEnqueueMatches = (
           });
 
           await Promise.all([roundInfo, tourneyMatches]);
-        } catch (e) {
-          toast.error((e as ResponseError).message);
+        } catch (e: unknown) {
+          const error = e as ResponseError;
+          // Parse the response text as JSON, detail propety contains the error message
+          const errorJson = (await error.response.json()) as {
+            detail?: string;
+          };
+          const errorDetail =
+            errorJson.detail ?? "An unexpected error occurred.";
+          throw new Error(errorDetail);
         }
       };
 
       await toast.promise(toastFn(), {
         loading: "Creating and enqueuing matches...",
         success: "Matches created and enqueued!",
-        error: "Error creating and enqueuing matches.",
+        error: (error: Error) => error.message, // Return the error message thrown in toastFn
       });
     },
   });
@@ -264,15 +271,10 @@ export const useCreateAndEnqueueMatches = (
 /**
  * For releasing the given tournament round to the bracket service.
  */
-export const useReleaseTournamentRound = ({
-  episodeId,
-  tournament,
-  id,
-}: EpisodeTournamentRoundReleaseCreateRequest): UseMutationResult<
-  void,
-  Error,
-  EpisodeTournamentRoundReleaseCreateRequest
-> =>
+export const useReleaseTournamentRound = (
+  { episodeId, tournament, id }: EpisodeTournamentRoundReleaseCreateRequest,
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, EpisodeTournamentRoundReleaseCreateRequest> =>
   useMutation({
     mutationKey: episodeMutationKeys.releaseTournamentRound({
       episodeId,
@@ -285,26 +287,40 @@ export const useReleaseTournamentRound = ({
       id,
     }: EpisodeTournamentRoundReleaseCreateRequest) => {
       const toastFn = async (): Promise<void> => {
-        await releaseTournamentRound({ episodeId, tournament, id });
+        try {
+          await releaseTournamentRound({ episodeId, tournament, id });
+
+          await queryClient.refetchQueries({
+            queryKey: buildKey(episodeQueryKeys.tournamentRoundInfo, {
+              episodeId,
+              tournament,
+              id,
+            }),
+          });
+        } catch (e: unknown) {
+          const error = e as ResponseError;
+          // Parse the response text as JSON, detail propety contains the error message
+          const errorJson = (await error.response.json()) as {
+            detail?: string;
+          };
+          const errorDetail =
+            errorJson.detail ?? "An unexpected error occurred.";
+          throw new Error(errorDetail);
+        }
       };
 
       await toast.promise(toastFn(), {
         loading: "Initiating round release...",
         success: "Round release initiated!",
-        error: "Error releasing tournament round.",
+        error: (error: Error) => error.message, // Return the error message thrown in toastFn
       });
     },
   });
 
-export const useRequeueTournamentRound = ({
-  episodeId,
-  tournament,
-  id,
-}: EpisodeTournamentRoundRequeueCreateRequest): UseMutationResult<
-  void,
-  Error,
-  EpisodeTournamentRoundRequeueCreateRequest
-> =>
+export const useRequeueTournamentRound = (
+  { episodeId, tournament, id }: EpisodeTournamentRoundRequeueCreateRequest,
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, EpisodeTournamentRoundRequeueCreateRequest> =>
   useMutation({
     mutationKey: episodeMutationKeys.requeueTournamentRound({
       episodeId,
@@ -317,15 +333,39 @@ export const useRequeueTournamentRound = ({
       id,
     }: EpisodeTournamentRoundRequeueCreateRequest) => {
       const toastFn = async (): Promise<void> => {
-        await requeueTournamentRound({ episodeId, tournament, id });
+        try {
+          await requeueTournamentRound({ episodeId, tournament, id });
 
-        // TODO: refetch the round and its matches :)
+          // Refetch this tournament round and its matches
+          const roundInfo = queryClient.refetchQueries({
+            queryKey: buildKey(episodeQueryKeys.tournamentRoundInfo, {
+              episodeId,
+              tournament,
+              id,
+            }),
+          });
+
+          const tourneyMatches = queryClient.refetchQueries({
+            queryKey: buildKey(competeQueryKeys.matchBase, { episodeId }),
+          });
+
+          await Promise.all([roundInfo, tourneyMatches]);
+        } catch (e: unknown) {
+          const error = e as ResponseError;
+          // Parse the response text as JSON, detail propety contains the error message
+          const errorJson = (await error.response.json()) as {
+            detail?: string;
+          };
+          const errorDetail =
+            errorJson.detail ?? "An unexpected error occurred.";
+          throw new Error(errorDetail);
+        }
       };
 
       await toast.promise(toastFn(), {
         loading: "Initiating round requeue...",
         success: "Failed matches requeued!",
-        error: "Error requeueing tournament round.",
+        error: (error: Error) => error.message, // Return the error message thrown in toastFn
       });
     },
   });

@@ -266,23 +266,25 @@ class MatchViewSet(
     serializer_class = MatchSerializer
     permission_classes = (IsEpisodeMutable | IsAdminUser,)
 
-    def get_queryset(self):
+    def get_queryset(self, prefetch_related=True):
         queryset = (
             Match.objects.filter(episode=self.kwargs["episode_id"])
             .select_related("tournament_round__tournament")
-            .prefetch_related(
+            .order_by("-pk")
+        )
+
+        # Only prefetch rating and team data if needed
+        if prefetch_related:
+            queryset = queryset.prefetch_related(
                 "participants__previous_participation__rating",
                 "participants__rating",
                 "participants__team__profile__rating",
                 "participants__team__members",
                 "maps",
             )
-            .order_by("-pk")
-        )
 
-        # Check if the user is not staff
+        # Exclude matches where tournament round is not null and not released
         if not self.request.user.is_staff:
-            # Exclude matches where tournament round is not null and not released
             queryset = (
                 queryset.exclude(
                     Q(tournament_round__isnull=False)
@@ -347,12 +349,12 @@ class MatchViewSet(
         Passing the external_id_private of a tournament allows match lookup for the
         tournament, even if it's private. Client uses the external_id_private parameter
         """
+        # Get the matches for the episode, excluding those that should not be shown
         queryset = (
-            Match.objects.filter(episode=self.kwargs["episode_id"]).select_related(
-                "tournament_round__tournament"
-            )
-        ).order_by("-pk")
-
+            Match.objects.filter(episode=self.kwargs["episode_id"])
+            .select_related("tournament_round__tournament")
+            .order_by("-pk")
+        )
         external_id_private = self.request.query_params.get("external_id_private")
         tournaments = None
         if external_id_private is not None:

@@ -408,7 +408,7 @@ class MatchSerializerTestCase(TestCase):
                     "tournament": self.r_hidden.tournament.pk,
                     "external_id": self.r_hidden.external_id,
                     "name": self.r_hidden.name,
-                    "maps": None,
+                    "maps": [self.map.pk],
                     "release_status": self.r_hidden.release_status,
                     "display_order": self.r_hidden.display_order,
                     "in_progress": self.r_hidden.in_progress,

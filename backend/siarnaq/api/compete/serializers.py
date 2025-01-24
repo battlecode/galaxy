@@ -282,6 +282,9 @@ class MatchSerializer(serializers.ModelSerializer):
             )
             or instance.participants.filter(team__status=TeamStatus.INVISIBLE).exists()
         ):
+            # TODO: Not sure why removing this doesn't work(shows hidden matches)
+            #  but need to ship the PR
+
             # Fully redact matches from private tournaments, unreleased tournament
             # rounds, and those with invisible teams.
             data["participants"] = data["replay_url"] = data["maps"] = None
