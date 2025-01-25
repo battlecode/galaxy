@@ -21,7 +21,7 @@ type Python3Scaffold struct {
 
 var pyWinnerRegex = regexp.MustCompile(`(?m)^\[server\]\s*.*\(([AB])\) wins \(round [0-9]+\)$`)
 
-func NewPython3Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, pyVersion string) (*Python3Scaffold, error) {
+func NewPython3Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, pyVersion string, onSaturn bool) (*Python3Scaffold, error) {
 	s := new(Python3Scaffold)
 	s.root = root
 	s.repo = repo
@@ -42,6 +42,7 @@ func NewPython3Scaffold(ctx context.Context, episode saturn.Episode, repo *git.R
 		s.DetermineScores(),
 	}
 	s.matchOutputs = make(map[*StepArguments]string)
+	s.onSaturn = onSaturn
 	return s, nil
 }
 
@@ -60,7 +61,7 @@ func (s *Python3Scaffold) Prepare() *Step {
 				s.pyVersion,
 				"run.py",
 				"update",
-				fmt.Sprintf("--on-saturn=%t", true),
+				fmt.Sprintf("--on-saturn=%t", s.onSaturn),
 			)
 			log.Ctx(ctx).Debug().Msg(out)
 			if err != nil {
@@ -132,7 +133,7 @@ func (s *Python3Scaffold) VerifySubmission() *Step {
 				"run.py",
 				"verify",
 				fmt.Sprintf("--p1=%s", pkg),
-				fmt.Sprintf("--on-saturn=%t", true),
+				fmt.Sprintf("--on-saturn=%t", s.onSaturn),
 			)
 			log.Ctx(ctx).Debug().Msg(out)
 			if err != nil {
@@ -167,7 +168,7 @@ func (s *Python3Scaffold) RunMatch() *Step {
 				s.pyVersion,
 				"run.py",
 				"run",
-				fmt.Sprintf("--on-saturn=%t", true),
+				fmt.Sprintf("--on-saturn=%t", s.onSaturn),
 				fmt.Sprintf("--p1-team=%s", arg.Details.(ExecuteRequest).A.TeamName),
 				fmt.Sprintf("--p2-team=%s", arg.Details.(ExecuteRequest).B.TeamName),
 				fmt.Sprintf("--p1-dir=%s", filepath.Join("data", "A")),
