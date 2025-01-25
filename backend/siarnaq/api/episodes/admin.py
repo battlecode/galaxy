@@ -21,7 +21,7 @@ def autoscrim(modeladmin, request, queryset):
     logger.info("autoscrim", message="Forcibly enqueueing autoscrims.")
     # For now, autoscrims are always best of 3.
     for episode in queryset:
-        episode.autoscrim(best_of=3)
+        episode.autoscrim(best_of=3, override_freeze=True)
 
 
 @admin.action(description="Export all submitted resumes")

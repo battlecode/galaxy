@@ -136,7 +136,7 @@ class Episode(models.Model):
             is_public=True,
         ).exists()
 
-    def autoscrim(self, best_of):
+    def autoscrim(self, best_of, override_freeze=False):
         """
         Trigger a round of automatically-generated ranked scrimmages for all teams in
         this episode with an accepted submission, unless the episode is archived or
@@ -149,7 +149,7 @@ class Episode(models.Model):
             number of maps available for the episode.
         """
         log = logger.bind(episode=self.pk)
-        if self.frozen():
+        if self.frozen() and not override_freeze:
             log.warn("autoscrim_frozen", message="Refusing to autoscrim: frozen.")
             return
         if timezone.now() > self.game_archive:
