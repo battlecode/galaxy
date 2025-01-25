@@ -386,7 +386,7 @@ class MatchViewSet(
         team_id = parse_int(self.request.query_params.get("team_id"))
         if team_id is not None:
             queryset = queryset.filter(participants__team=team_id)
-        if (not request.user.is_staff) and (external_id_private is not None):
+        if (not request.user.is_staff) and (external_id_private is None):
             # Regular users do not know about unreleased tournament matches
             queryset = queryset.exclude(
                 tournament_round__release_status__lt=ReleaseStatus.PARTICIPANTS
