@@ -25,4 +25,4 @@ RUN go build -o pubsubclient pubsubclient.go
 EXPOSE 8514
 
 # Run the entry point script
-ENTRYPOINT ["rlwrap", "/usr/local/bin/startpubsub.sh"]
+ENTRYPOINT ["rlwrap", "bash", "/usr/local/bin/startpubsub.sh"]

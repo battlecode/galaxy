@@ -102,8 +102,8 @@ Simulating Saturn’s distributed system locally can be challenging. To facilita
 
 #### 1. Prepare Secret File
 
-- Access Google Secret Manager.
-
+- Access our Google Cloud's Project Secret Manager.
+- Copy the Git token from our production-saturn secret
 - Create a `secret.json` file in the `development` directory containing the required Git token.
 
 
@@ -115,7 +115,6 @@ Navigate to the `development` directory and run:
 ```bash
 
 cd  development
-
 docker  build  -t  pubsub-emulator  .
 
 ```
@@ -137,9 +136,7 @@ In the `development` directory, execute:
 ```bash
 
 docker  run  -it  --rm  --network  host  \
-
 -v $(pwd):/development  \
-
 pubsub-emulator
 
 ```
@@ -161,13 +158,9 @@ Run Saturn Container:
 ```bash
 
 docker  run  --network  host  \
-
 -e  PUBSUB_EMULATOR_HOST=localhost:8514  \
-
 -v $(pwd)/development:/development  \
-
 saturn  -subscription=test  -project=mitbattlecode  -onsaturn=false  \
-
 -secret="/development/secret.json"
 
 ```
