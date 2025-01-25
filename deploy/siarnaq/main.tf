@@ -1,5 +1,5 @@
 locals {
-  pubsub_topics = toset(["compile", "execute"])
+  pubsub_topics = toset(["compile", "execute", "titan"])
 }
 
 resource "google_service_account" "this" {
