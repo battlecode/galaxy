@@ -69,7 +69,6 @@ resource "google_compute_firewall" "websocket" {
     ports    = ["80", "443", "8080", "8001"]  # Adjust ports as needed for your websocket server
   }
 
-  # Ideally restrict to cpw.battlecode.org's IP address(es)
   source_ranges = ["0.0.0.0/0"]
   target_tags   = ["${var.name}-websocket"]
 }
@@ -130,7 +129,6 @@ resource "google_compute_instance" "this" {
   ]
 }
 
-# ./websocket-vm/main.tf
 resource "tls_private_key" "ssh" {
   algorithm = "RSA"
   rsa_bits  = 4096
