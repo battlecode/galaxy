@@ -107,17 +107,6 @@ resource "google_compute_firewall" "websocket" {
   target_tags   = ["${var.name}-websocket"]
 }
 
-module "container" {
-  source  = "terraform-google-modules/container-vm/google"
-  version = "~> 2.0"
-
-  container = {
-    image = var.image
-    args  = [
-    ]
-  }
-}
-
 resource "google_compute_instance" "this" {
   name         = var.name
   machine_type = var.machine_type
@@ -127,7 +116,7 @@ resource "google_compute_instance" "this" {
 
   boot_disk {
     initialize_params {
-      image = module.container.source_image
+      image = var.image
       size  = var.disk_size
     }
   }
@@ -152,7 +141,6 @@ resource "google_compute_instance" "this" {
   }
 
   metadata = {
-    gce-container-declaration = module.container.metadata_value
     google-logging-enabled    = true
     google-monitoring-enabled = true
     ssh-keys = "ubuntu:${tls_private_key.ssh.public_key_openssh}"

@@ -150,7 +150,7 @@ module "cpw" {
   subnetwork_ip_cidr  = "10.0.4.0/24"
   secret_id           = "cpw-ssh-key"
   machine_type        = "n2-standard-4" #4 vCPUs, 16GB RAM
-  image               = "ubuntu-os-cloud/ubuntu-2204-lts"
+  image               = "projects/debian-cloud/global/images/family/debian-11"
   disk_size           = 50
 }
 
