@@ -64,7 +64,7 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v3.1.0
       - name: Cache conda
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3
         with:
           path: ~/conda_pkgs_dir
           key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
@@ -87,7 +87,7 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v3.1.0
       - name: Cache conda
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v3
         with:
           path: ~/conda_pkgs_dir
           key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}

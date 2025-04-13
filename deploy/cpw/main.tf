@@ -32,7 +32,6 @@ resource "google_project_iam_member" "log" {
   member  = "serviceAccount:${google_service_account.this.email}"
 
   depends_on = [google_service_account.this]
-
 }
 
 resource "google_project_iam_member" "monitoring" {
@@ -41,7 +40,6 @@ resource "google_project_iam_member" "monitoring" {
   member  = "serviceAccount:${google_service_account.this.email}"
 
   depends_on = [google_service_account.this]
-
 }
 
 resource "google_secret_manager_secret_iam_member" "this" {
@@ -93,7 +91,6 @@ resource "google_compute_firewall" "ssh" {
   target_tags   = ["${var.name}-ssh"]
 
   depends_on = [google_compute_network.cpw]
-
 }
 
 # Allow websocket connections from cpw.battlecode.org
@@ -103,7 +100,7 @@ resource "google_compute_firewall" "websocket" {
 
   allow {
     protocol = "tcp"
-    ports    = ["80", "443", "8080"]  # Adjust ports as needed for your websocket server
+    ports    = ["80", "443", "8080", "8001"]  # Adjust ports as needed for your websocket server
   }
 
   source_ranges = ["0.0.0.0/0"]
@@ -168,5 +165,4 @@ resource "google_compute_instance" "this" {
     tls_private_key.ssh,
     google_secret_manager_secret_version.ssh_private_key
   ]
-
 }
