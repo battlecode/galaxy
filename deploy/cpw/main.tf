@@ -66,7 +66,7 @@ resource "google_compute_firewall" "websocket" {
 
   allow {
     protocol = "tcp"
-    ports    = ["80", "443", "8080"]  # Adjust ports as needed for your websocket server
+    ports    = ["80", "443", "8080", "8001"]  # Adjust ports as needed for your websocket server
   }
 
   # Ideally restrict to cpw.battlecode.org's IP address(es)
