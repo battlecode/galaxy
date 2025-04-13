@@ -140,7 +140,7 @@ module "staging_network" {
 
 module "cpw" {
   source      = "./cpw"
-  name        = "cpwc"
+  name        = "cpw"
   gcp_project = var.gcp_project
   gcp_region  = var.gcp_region
   gcp_zone    = var.gcp_zone
