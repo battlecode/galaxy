@@ -138,6 +138,22 @@ module "staging_network" {
   additional_buckets = {}
 }
 
+module "cpw" {
+  source      = "./cpw"
+  name        = "cpwc"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {environment="production", component="cpw"})
+
+  # network_vpc_id      = module.production_network.vpc_id
+  subnetwork_ip_cidr  = "10.0.4.0/24"
+  secret_id           = "cpw-ssh-key"
+  machine_type        = "n2-standard-4" #4 vCPUs, 16GB RAM
+  image               = "ubuntu-os-cloud/ubuntu-2204-lts"
+  disk_size           = 50
+}
+
 data "google_dns_managed_zone" "this" {
   name = "battlecode-dns-zone"
 }
@@ -163,6 +179,7 @@ locals {
         subdomain = "www.",
         rrdatas   = ["battlecode.org."],
       },
+      module.cpw.dns_records
     ]
   )
 }
