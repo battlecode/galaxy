@@ -58,8 +58,6 @@ resource "google_compute_network" "cpw" {
   name                    = "${var.name}-vpc"
   auto_create_subnetworks = false
   routing_mode            = "REGIONAL"
-
-  depends_on = [google_compute_network.cpw]
 }
 
 # Create a subnet within the isolated VPC
