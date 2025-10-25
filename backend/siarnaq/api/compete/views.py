@@ -69,7 +69,7 @@ class TooManyScrimmages(APIException):
 
 
 class RankedMatchesDisabed(APIException):
-    status_code = status.HTTP_409_CONFLICT
+    status_code = status.HTTP_429_TOO_MANY_MESSAGES
     default_detail = "Ranked matches are currently disabled."
     default_code = "ranked_matches_disabled"
 
@@ -923,6 +923,8 @@ class ScrimmageRequestViewSet(
                 return super().get_permissions()
 
     def create(self, request, *, episode_id):
+        # if is ranked: reject forbidden
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

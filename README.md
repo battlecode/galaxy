@@ -1,4 +1,4 @@
-# Galaxy
+# Galaxy (THE BEST REPO)
 
 ![CI](https://github.com/battlecode/galaxy/actions/workflows/ci.yml/badge.svg)
 
