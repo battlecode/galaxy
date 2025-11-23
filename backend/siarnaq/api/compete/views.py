@@ -934,7 +934,6 @@ class ScrimmageRequestViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # if serializer.validated_data["is_ranked"]:
         # Get the global settings (assuming only one instance exists)
         episode = Episode.objects.get(pk=self.kwargs["episode_id"])
         is_ranked = serializer.validated_data["is_ranked"]
@@ -967,7 +966,7 @@ class ScrimmageRequestViewSet(
         # max matches that can be requested by participant in current mode
         max_matches = (
             episode.ranked_scrimmage_hourly_limit
-            if serializer.validated_data["is_ranked"]
+            if is_ranked
             else episode.unranked_scrimmage_hourly_limit
         )
 
