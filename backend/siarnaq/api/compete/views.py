@@ -80,6 +80,14 @@ class ScrimmageRateLimited(APIException):
     default_code = "scrimmages_rate_limited"
 
 
+class ScrimmageLowerRank(APIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = (
+        "You cannot request a ranked scrimmage against a team ranked lower than you."
+    )
+    default_code = "scrimmage_lower_rank"
+
+
 class EpisodeTeamUserContextMixin:
     """Add the current episode, team and user to the serializer context."""
 
@@ -926,24 +934,53 @@ class ScrimmageRequestViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        if serializer.validated_data["is_ranked"]:
-            # Get the global settings (assuming only one instance exists)
-            episode = Episode.objects.get(pk=self.kwargs["episode_id"])
-            if episode and (not episode.is_allowed_ranked_scrimmage):
-                raise RankedMatchesDisabed
+        # Get the global settings (assuming only one instance exists)
+        episode = Episode.objects.get(pk=self.kwargs["episode_id"])
+        is_ranked = serializer.validated_data["is_ranked"]
+        if episode and (not episode.is_allowed_ranked_scrimmage) and is_ranked:
+            raise RankedMatchesDisabed
 
-            active_statuses = {
-                SaturnStatus.CREATED,
-                SaturnStatus.QUEUED,
-                SaturnStatus.RUNNING,
-                SaturnStatus.RETRY,
-            }
-            existing_requests = ScrimmageRequest.objects.filter(
-                requested_by=serializer.validated_data["requested_by_id"],
+        past_hour = timezone.now() - timezone.timedelta(hours=1)
+
+        active_statuses = {
+            SaturnStatus.CREATED,
+            SaturnStatus.QUEUED,
+            SaturnStatus.RUNNING,
+            SaturnStatus.RETRY,
+        }
+        # requests initiated by requestor in past hour
+        existing_requests_from_requestor = ScrimmageRequest.objects.filter(
+            requested_by=serializer.validated_data["requested_by_id"],
+            is_ranked=is_ranked,
+            created__gte=past_hour,
+        )
+
+        # matches involving requestor in past hour
+        match_count = MatchParticipant.objects.filter(
+            team_id=serializer.validated_data["requested_by_id"],
+            match__episode=episode,
+            match__tournament_round__isnull=True,
+            match__is_ranked=is_ranked,
+            match__created__gte=past_hour,
+        ).count()
+        # max matches that can be requested by participant in current mode
+        max_matches = (
+            episode.ranked_scrimmage_hourly_limit
+            if is_ranked
+            else episode.unranked_scrimmage_hourly_limit
+        )
+
+        # check number of matches requested + run in past hour (rate limiting)
+        # note this checks both unranked and ranked caps
+        if existing_requests_from_requestor.count() + match_count >= max_matches:
+            raise ScrimmageRateLimited
+        # check if too many ranked scrimmages requested between two teams
+        if is_ranked:
+            # existing request between two teams
+            existing_requests = existing_requests_from_requestor.filter(
                 requested_to=serializer.validated_data["requested_to"],
-                is_ranked=True,
-                status=ScrimmageRequestStatus.PENDING,
             ).count()
+            # existing active matches between the two participants
             existing_matches = (
                 Match.objects.annotate(
                     has_requester=Exists(
@@ -963,20 +1000,27 @@ class ScrimmageRequestViewSet(
                     has_requester=True,
                     has_requestee=True,
                     status__in=active_statuses,
-                    is_ranked=True,
+                    is_ranked=is_ranked,
                 )
                 .count()
             )
+
             if (
                 existing_requests + existing_matches
                 >= settings.MAX_SCRIMMAGES_AGAINST_TEAM
             ):
                 raise TooManyScrimmages
 
-        # Check if we should reject based on rate-limiting
-        requestor = Team.objects.get(pk=serializer.validated_data["requested_by_id"])
-        if not requestor.can_scrimmage(serializer.validated_data["is_ranked"]):
-            raise ScrimmageRateLimited
+        # stop teams from scrimmaging lower ranked teams
+        if is_ranked:
+            # fetch ranks of the two teams
+            team1 = Team.objects.select_related("profile__rating").get(
+                pk=serializer.validated_data["requested_by_id"]
+            )
+            team2 = serializer.validated_data["requested_to"]
+            # compare ratings
+            if team1.profile.rating.value > team2.profile.rating.value:
+                raise ScrimmageLowerRank
 
         serializer.save()
         # Generate the Location header, as supplied by CreateModelMixin
