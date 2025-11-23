@@ -59,3 +59,19 @@ repos:
         require_serial: true
         types_or: [python, pyi]
         exclude: ^backend/.*/migrations
+
+      - id: tsc-frontend
+        name: tsc-frontend
+        entry: bash -c 'cd frontend && npx tsc --noEmit'
+        language: system
+        files: ^frontend/src/
+        types: [ts, tsx]
+        pass_filenames: false
+
+      - id: eslint-frontend
+        name: eslint-frontend
+        entry: bash -c 'cd frontend && npx eslint'
+        language: system
+        files: ^frontend/src/.*\.(ts|tsx)$
+        types: [ts, tsx]
+        pass_filenames: true

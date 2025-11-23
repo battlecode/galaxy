@@ -24,6 +24,16 @@ jobs:
     steps:
       - name: Checkout to the repository
         uses: actions/checkout@v3
+      - name: Cache conda
+        uses: actions/cache@v3
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
+      - name: Setup miniconda
+        uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          environment-file: environment-dev.yml
+          use-only-tar-bz2: true
       - name: Set up NodeJS environment
         uses: actions/setup-node@v3
         with:
@@ -48,6 +58,14 @@ jobs:
       - name: Check linting and formatting
         # Custom script for checking the linting and formatting being in place
         run: npm run lint
+        working-directory: ./frontend
+      - name: Check TypeScript types
+        run: npx tsc --noEmit
+        working-directory: ./frontend
+      - name: Verify generated types are up-to-date
+        run: |
+          ./generate_types.sh
+          git diff --exit-code src/api/_autogen/ || (echo "ERROR: Generated TypeScript types are out of date. Please run ./generate_types.sh and commit the changes." && exit 1)
         working-directory: ./frontend
       # Run test cases and this could ensure minimum coverage as well if set
       # This section should be un-commented when our frontend implements unit testing
