@@ -54,15 +54,22 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - name: Install package dependencies
-        run: npm install
+        run: npm ci
         working-directory: ./frontend
       - name: Check linting and formatting
         # Custom script for checking the linting and formatting being in place
         run: npm run lint
         working-directory: ./frontend
+      - name: Check TypeScript types
+        run: npx tsc --noEmit
+        working-directory: ./frontend
       - name: Verify generated types are up-to-date
         run: |
+          # Verify conda environment is activated
+          conda info --envs
+          # Run the type generation script
           ./generate_types.sh
+          # Check if any files were modified
           git diff --exit-code src/api/_autogen/ || (echo "ERROR: Generated TypeScript types are out of date. Please run ./generate_types.sh and commit the changes." && exit 1)
         working-directory: ./frontend
   lint:
