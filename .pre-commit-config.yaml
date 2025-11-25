@@ -62,14 +62,14 @@ repos:
 
       - id: tsc-frontend
         name: tsc-frontend
-        entry: bash -c 'cd frontend && npx tsc --noEmit'
+        entry: bash -c 'cd frontend && npx --no-install tsc --noEmit'
         language: system
         files: ^frontend/src/.*\.(ts|tsx)$
         pass_filenames: false
 
       - id: eslint-frontend
         name: eslint-frontend
-        entry: bash -c 'cd frontend && npx eslint'
+        entry: bash -c 'cd frontend && npx --no-install eslint'
         language: system
         files: ^frontend/src/.*\.(ts|tsx)$
         pass_filenames: true

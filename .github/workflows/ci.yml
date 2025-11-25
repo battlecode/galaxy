@@ -34,6 +34,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           environment-file: environment-dev.yml
+          activate-environment: galaxy
           use-only-tar-bz2: true
       - name: Set up NodeJS environment
         uses: actions/setup-node@v3
@@ -65,8 +66,7 @@ jobs:
         working-directory: ./frontend
       - name: Verify generated types are up-to-date
         run: |
-          # Activate conda environment and run the type generation script
-          conda activate galaxy
+          # Run the type generation script (conda environment 'galaxy' is already activated)
           ./generate_types.sh
           # Check if any files were modified
           git diff --exit-code src/api/_autogen/ || (echo "ERROR: Generated TypeScript types are out of date. Please run ./generate_types.sh and commit the changes." && exit 1)
@@ -89,6 +89,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           environment-file: environment-dev.yml
+          activate-environment: galaxy
           use-only-tar-bz2: true
       - name: Set up NodeJS environment
         uses: actions/setup-node@v3
@@ -119,6 +120,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           environment-file: environment-dev.yml
+          activate-environment: galaxy
           use-only-tar-bz2: true
       - name: Initialize migrations
         run: ./manage.py makemigrations
