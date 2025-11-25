@@ -21,7 +21,7 @@ dependencies:
   - mypy=0.942
   - nodejs=20
   - openjdk=11
-  - openssl=3.0.5
+  - openssl>=3.0.15
   - pillow=9.0.1
   - pip=22.3
   - pre_commit=2.20.0
