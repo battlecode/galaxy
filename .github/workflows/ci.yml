@@ -65,9 +65,8 @@ jobs:
         working-directory: ./frontend
       - name: Verify generated types are up-to-date
         run: |
-          # Verify conda environment is activated
-          conda info --envs
-          # Run the type generation script
+          # Activate conda environment and run the type generation script
+          conda activate galaxy
           ./generate_types.sh
           # Check if any files were modified
           git diff --exit-code src/api/_autogen/ || (echo "ERROR: Generated TypeScript types are out of date. Please run ./generate_types.sh and commit the changes." && exit 1)
@@ -91,6 +90,13 @@ jobs:
         with:
           environment-file: environment-dev.yml
           use-only-tar-bz2: true
+      - name: Set up NodeJS environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.12.2'
+      - name: Install frontend dependencies for pre-commit
+        run: npm ci
+        working-directory: ./frontend
       - name: Run linter
         run: |
           pre-commit install
