@@ -21,7 +21,7 @@ type JavaScaffold struct {
 	javaEnv      []string
 }
 
-func NewJavaScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, javaPath string) (*JavaScaffold, error) {
+func NewJavaScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, javaPath string, onSaturn bool) (*JavaScaffold, error) {
 	s := new(JavaScaffold)
 	s.root = root
 	s.repo = repo
@@ -43,6 +43,7 @@ func NewJavaScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repo
 		s.DetermineScores(),
 	}
 	s.matchOutputs = make(map[*StepArguments]string)
+	s.onSaturn = onSaturn
 	return s, nil
 }
 
@@ -65,7 +66,7 @@ func (s *JavaScaffold) Prepare() *Step {
 				s.javaEnv,
 				"./gradlew",
 				"update",
-				fmt.Sprintf("-PonSaturn=%t", true),
+				fmt.Sprintf("-PonSaturn=%t", s.onSaturn),
 			)
 			log.Ctx(ctx).Debug().Msg(out)
 			if err != nil {
@@ -145,7 +146,7 @@ func (s *JavaScaffold) VerifySubmission() *Step {
 				"./gradlew",
 				"verify",
 				fmt.Sprintf("-Pteam=%s", pkg),
-				fmt.Sprintf("-PonSaturn=%t", true),
+				fmt.Sprintf("-PonSaturn=%t", s.onSaturn),
 			)
 			log.Ctx(ctx).Debug().Msg(out)
 			if err != nil {
@@ -179,7 +180,7 @@ func (s *JavaScaffold) RunMatch() *Step {
 				s.javaEnv,
 				"./gradlew",
 				"run",
-				fmt.Sprintf("-PonSaturn=%t", true),
+				fmt.Sprintf("-PonSaturn=%t", s.onSaturn),
 				fmt.Sprintf("-PteamA=%s", arg.Details.(ExecuteRequest).A.TeamName),
 				fmt.Sprintf("-PteamB=%s", arg.Details.(ExecuteRequest).B.TeamName),
 				fmt.Sprintf("-PclassLocationA=%s", filepath.Join("data", "A")),

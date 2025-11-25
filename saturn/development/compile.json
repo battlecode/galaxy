@@ -1,0 +1,23 @@
+{
+    "episode": {
+        "name": "bc25python",
+        "language": "py3",
+        "scaffold": "https://github.com/battlecode/battlecode25-scaffold"
+    },
+    "metadata": {
+        "report-url": "/development/test/report.txt",
+        "task-type": "compile"
+    },
+    "details": {
+        "source": {
+            "bucket": "local",
+            "name": "/development/test/python.zip"
+        },
+        "binary": {
+            "bucket": "local",
+            "name": "/development/test/binary.zip"
+        },
+        "team-name": "test",
+        "package": "examplefuncsplayer"
+    }
+}
