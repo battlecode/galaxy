@@ -8,6 +8,7 @@ on:
       - opened
       - synchronize
       - reopened
+  workflow_dispatch:
 
 defaults:
   run:
@@ -17,8 +18,8 @@ env:
   CACHE_NUMBER: 1
 
 jobs:
-  unit-test-frontend:
-    name: Frontend linting / unit tests
+  frontend-readiness:
+    name: Frontend linting / readiness checks
     # Defines the type of runner the job runs on
     runs-on: ubuntu-latest
     steps:
@@ -59,19 +60,11 @@ jobs:
         # Custom script for checking the linting and formatting being in place
         run: npm run lint
         working-directory: ./frontend
-      - name: Check TypeScript types
-        run: npx tsc --noEmit
-        working-directory: ./frontend
       - name: Verify generated types are up-to-date
         run: |
           ./generate_types.sh
           git diff --exit-code src/api/_autogen/ || (echo "ERROR: Generated TypeScript types are out of date. Please run ./generate_types.sh and commit the changes." && exit 1)
         working-directory: ./frontend
-      # Run test cases and this could ensure minimum coverage as well if set
-      # This section should be un-commented when our frontend implements unit testing
-      # - name: Execute test cases
-      #   run: npm run test
-      #   working-directory: ./frontend
   lint:
     name: Linter (pre-commit)
     runs-on: ubuntu-latest
