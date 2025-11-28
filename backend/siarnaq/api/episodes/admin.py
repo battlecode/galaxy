@@ -110,9 +110,9 @@ class MapAdmin(admin.ModelAdmin):
 
 @admin.register(EligibilityCriterion)
 class EligibilityCriterionAdmin(admin.ModelAdmin):
-    fields = ("title", "description", "icon")
-    list_display = ("title", "icon")
-    ordering = ("title",)
+    fields = ("title", "description", "icon", "is_private")
+    list_display = ("title", "icon", "is_private")
+    ordering = ("is_private", "title")
     search_fields = ("title",)
     search_help_text = "Search for a title."
 
