@@ -3,10 +3,13 @@ import unittest
 from unittest.mock import patch
 
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
+from rest_framework import status
+from rest_framework.test import APITestCase
 
 from siarnaq.api.compete.models import Match, MatchParticipant, Submission
-from siarnaq.api.episodes.models import Episode, Language, Map
+from siarnaq.api.episodes.models import EligibilityCriterion, Episode, Language, Map
 from siarnaq.api.teams.managers import generate_4regular_graph
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.user.models import User
@@ -235,3 +238,60 @@ class AutoscrimmageTestCase(TestCase):
             Team.objects.autoscrim(episode=e1, best_of=3)
         m.refresh_from_db()
         self.assertFalse(m.matches.exists())
+
+
+class EligibilityTestCase(APITestCase):
+    """Test suite for team eligibility logic in Team API."""
+
+    def setUp(self):
+        self.episode = Episode.objects.create(
+            name_short="ep",
+            registration=timezone.now(),
+            game_release=timezone.now(),
+            game_archive=timezone.now(),
+            language=Language.JAVA_8,
+        )
+
+        self.team = Team.objects.create(episode=self.episode, name="t1")
+        self.user = User.objects.create_user(username="u1", email="u1@example.com")
+        self.team.members.add(self.user)
+
+    # Partitions for: me (patch)
+    # eligible_for: contains private criteria, doesn't contain private criteria
+    # eligible_for: criteria all in team's assigned episode, or not
+    def test_patch_criterion_private(self):
+        criterion1 = EligibilityCriterion.objects.create(
+            title="crit1", description="desc1", icon="i1", is_private=False
+        )
+        criterion2 = EligibilityCriterion.objects.create(
+            title="crit2", description="desc2", icon="i2", is_private=True
+        )
+
+        self.episode.eligibility_criteria.add(criterion1)
+        self.episode.eligibility_criteria.add(criterion2)
+        self.client.force_authenticate(self.user)
+        response = self.client.patch(
+            reverse("team-me", kwargs={"episode_id": "ep"}),
+            {"profile": {"eligible_for": [criterion1.pk]}},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.patch(
+            reverse("team-me", kwargs={"episode_id": "ep"}),
+            {"profile": {"eligible_for": [criterion1.pk, criterion2.pk]}},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_patch_criterion_wrong_episode(self):
+        criterion = EligibilityCriterion.objects.create(
+            title="crit", description="desc", icon="i", is_private=False
+        )
+        self.client.force_authenticate(self.user)
+        response = self.client.patch(
+            reverse("team-me", kwargs={"episode_id": "ep"}),
+            {"profile": {"eligible_for": [criterion.pk]}},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

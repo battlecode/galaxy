@@ -40,6 +40,9 @@ class EligibilityCriterion(models.Model):
     icon = models.CharField(max_length=8)
     """An icon to display for teams that satisfy this criterion."""
 
+    is_private = models.BooleanField(default=True)
+    """Whether this criterion can only be assigned by an admin."""
+
     def __str__(self):
         return self.title
 
