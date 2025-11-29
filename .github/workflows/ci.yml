@@ -8,6 +8,7 @@ on:
       - opened
       - synchronize
       - reopened
+  workflow_dispatch:
 
 defaults:
   run:
@@ -17,13 +18,26 @@ env:
   CACHE_NUMBER: 1
 
 jobs:
-  unit-test-frontend:
-    name: Frontend linting / unit tests
+  frontend-readiness:
+    name: Frontend linting / readiness checks
     # Defines the type of runner the job runs on
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout to the repository
         uses: actions/checkout@v3
+      - name: Cache conda
+        uses: actions/cache@v3
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('environment-dev.yml') }}
+      - name: Setup miniconda
+        uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          environment-file: environment-dev.yml
+          activate-environment: galaxy
+          use-only-tar-bz2: true
       - name: Set up NodeJS environment
         uses: actions/setup-node@v3
         with:
@@ -43,23 +57,27 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       - name: Install package dependencies
-        run: npm install
+        run: npm ci
         working-directory: ./frontend
       - name: Check linting and formatting
         # Custom script for checking the linting and formatting being in place
         run: npm run lint
         working-directory: ./frontend
-      # Run test cases and this could ensure minimum coverage as well if set
-      # This section should be un-commented when our frontend implements unit testing
-      # - name: Execute test cases
-      #   run: npm run test
-      #   working-directory: ./frontend
+      - name: Check TypeScript types
+        run: npx tsc --noEmit
+        working-directory: ./frontend
+      - name: Verify generated types are up-to-date
+        run: |
+          # Run the type generation script (conda environment 'galaxy' is already activated)
+          ./generate_types.sh
+          # Check if any files were modified
+          git diff --exit-code src/api/_autogen/ || (echo "ERROR: Generated TypeScript types are out of date. Please run ./generate_types.sh and commit the changes." && exit 1)
+        working-directory: ./frontend
   lint:
     name: Linter (pre-commit)
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
     steps:
       - name: Checkout branch
         uses: actions/checkout@v3.1.0
@@ -72,7 +90,28 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           environment-file: environment-dev.yml
+          activate-environment: galaxy
           use-only-tar-bz2: true
+      - name: Set up NodeJS environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.12.2'
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Install frontend dependencies for pre-commit
+        run: npm ci
+        working-directory: ./frontend
       - name: Run linter
         run: |
           pre-commit install
@@ -82,7 +121,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
     steps:
       - name: Checkout branch
         uses: actions/checkout@v3.1.0
@@ -95,6 +133,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           environment-file: environment-dev.yml
+          activate-environment: galaxy
           use-only-tar-bz2: true
       - name: Initialize migrations
         run: ./manage.py makemigrations
