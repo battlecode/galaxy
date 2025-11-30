@@ -1,6 +1,6 @@
 import type React from "react";
 import { type EventHandler, useMemo, useState } from "react";
-import { PageTitle } from "components/elements/BattlecodeStyle";
+import { PageTitle, PageContainer } from "components/elements/BattlecodeStyle";
 import SectionCard from "components/SectionCard";
 import Input from "components/elements/Input";
 import TextArea from "components/elements/TextArea";
@@ -108,7 +108,7 @@ const MyTeam: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
+    <PageContainer>
       <PageTitle>Team Settings</PageTitle>
       <div className="flex flex-col gap-8 xl:flex-row">
         <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
@@ -232,10 +232,9 @@ const MyTeam: React.FC = () => {
           </div>
         </div>
       </Modal>
-    </div>
+    </PageContainer>
   );
 };
-
 const TeamAvatar: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();

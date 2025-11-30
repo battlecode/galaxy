@@ -12,7 +12,7 @@ import ScrimmagingRecord from "components/compete/ScrimmagingRecord";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { useUserTeam } from "api/team/useTeam";
 import Spinner from "components/Spinner";
-import { PageTitle } from "components/elements/BattlecodeStyle";
+import { PageTitle, PageContainer } from "components/elements/BattlecodeStyle";
 import { classNames } from "api/helpers";
 
 interface QueryParams {
@@ -138,7 +138,7 @@ const Scrimmaging: React.FC = () => {
   );
 
   return (
-    <div className="flex h-full w-full flex-col overflow-auto p-6">
+    <PageContainer>
       <PageTitle>Scrimmaging</PageTitle>
 
       <div className="flex w-full flex-1 flex-col md:hidden">
@@ -153,7 +153,7 @@ const Scrimmaging: React.FC = () => {
           {tabPanels}
         </Tab.Group>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 
