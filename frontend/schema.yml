@@ -1974,7 +1974,7 @@ paths:
   /api/user/u/:
     post:
       operationId: user_u_create
-      description: A viewset for retrieving and updating all user info.
+      description: Create a new user (registration) and send verification email.
       tags:
         - user
       requestBody:
@@ -2133,6 +2133,19 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserPrivate"
           description: ""
+  /api/user/u/resend_verification_email/:
+    post:
+      operationId: user_u_resend_verification_email_create
+      description: Resend verification email to authenticated user.
+      tags:
+        - user
+      security:
+        - jwtAuth: []
+      responses:
+        "204":
+          description: No response body
+        "400":
+          description: No response body
   /api/user/u/resume/:
     get:
       operationId: user_u_resume_retrieve
@@ -2194,8 +2207,6 @@ components:
             type: integer
         min_score:
           type: integer
-          maximum: 32767
-          minimum: 0
       required:
         - episode
         - maps
@@ -3518,8 +3529,6 @@ components:
           type: string
         external_id:
           type: integer
-          maximum: 32767
-          minimum: -32768
           nullable: true
         name:
           type: string
@@ -3529,14 +3538,9 @@ components:
           items:
             type: integer
         release_status:
-          allOf:
-            - $ref: "#/components/schemas/ReleaseStatusEnum"
-          minimum: -2147483648
-          maximum: 2147483647
+          $ref: "#/components/schemas/ReleaseStatusEnum"
         display_order:
           type: integer
-          maximum: 32767
-          minimum: 0
         in_progress:
           type: boolean
       required:
@@ -3724,8 +3728,12 @@ components:
           readOnly: true
           title: Staff status
           description: Designates whether the user can log into this admin site.
+        email_verified:
+          type: boolean
+          readOnly: true
       required:
         - email
+        - email_verified
         - first_name
         - id
         - is_staff

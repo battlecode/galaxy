@@ -29,6 +29,7 @@ import {
   updateCurrentUser,
   downloadResume,
   userAvatarUpload,
+  resendVerificationEmail,
 } from "./userApi";
 import { toast } from "react-hot-toast";
 import { login } from "../auth/authApi";
@@ -141,7 +142,7 @@ export const useCreateUser = (
       };
       await toast.promise(toastFn(), {
         loading: "Creating new user...",
-        success: "Created new user!",
+        success: "Created new user! Check your email to verify your account.",
         error: (err) => {
           if (err instanceof Error) {
             return err.message;
@@ -283,6 +284,27 @@ export const useDownloadResume = ({
         loading: "Downloading resume...",
         success: "Downloaded resume!",
         error: "Error downloading resume.",
+      });
+    },
+  });
+
+/**
+ * For resending verification email to the currently logged in user.
+ */
+export const useResendVerificationEmail = ({
+  episodeId,
+}: {
+  episodeId: string;
+}): UseMutationResult<void, Error, undefined> =>
+  useMutation({
+    mutationKey: userMutationKeys.resendVerification({ episodeId }),
+    mutationFn: async () => {
+      await toast.promise(resendVerificationEmail(), {
+        loading: "Resending verification email...",
+        success:
+          "Sent verification email!\nWait a few minutes for it to arrive.",
+        error:
+          "Error sending verification email.\n Try again.\nContact battlecode@mit.edu if you encounter any issues.",
       });
     },
   });

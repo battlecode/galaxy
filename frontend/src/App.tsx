@@ -64,6 +64,7 @@ const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => {
       if (error instanceof ResponseError) {
+        // TODO: add special handling for 403 email verification erros
         // If we just have a client error, don't show a toast
         if (error.response.status < HttpStatusCode.INTERNAL_SERVER_ERROR)
           return;

@@ -260,7 +260,7 @@ export class UserApi extends runtime.BaseAPI {
     }
 
     /**
-     * A viewset for retrieving and updating all user info.
+     * Create a new user (registration) and send verification email.
      */
     async userUCreateRaw(requestParameters: UserUCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserCreate>> {
         if (requestParameters.userCreateRequest === null || requestParameters.userCreateRequest === undefined) {
@@ -293,7 +293,7 @@ export class UserApi extends runtime.BaseAPI {
     }
 
     /**
-     * A viewset for retrieving and updating all user info.
+     * Create a new user (registration) and send verification email.
      */
     async userUCreate(requestParameters: UserUCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserCreate> {
         const response = await this.userUCreateRaw(requestParameters, initOverrides);
@@ -410,6 +410,39 @@ export class UserApi extends runtime.BaseAPI {
     async userUMeUpdate(requestParameters: UserUMeUpdateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserPrivate> {
         const response = await this.userUMeUpdateRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Resend verification email to authenticated user.
+     */
+    async userUResendVerificationEmailCreateRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/user/u/resend_verification_email/`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Resend verification email to authenticated user.
+     */
+    async userUResendVerificationEmailCreate(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.userUResendVerificationEmailCreateRaw(initOverrides);
     }
 
     /**
