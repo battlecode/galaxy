@@ -481,7 +481,7 @@ class MatchSerializerTestCase(TestCase):
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
-        self.assertEqual(
+        self.assertDictEqual(
             json.loads(json.dumps(data)),
             {
                 "id": match.pk,
@@ -712,7 +712,7 @@ class MatchSerializerTestCase(TestCase):
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
-        self.assertEqual(
+        self.assertDictEqual(
             json.loads(json.dumps(data)),
             {
                 "id": match.pk,
@@ -783,7 +783,7 @@ class MatchSerializerTestCase(TestCase):
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
-        self.assertEqual(
+        self.assertDictEqual(
             json.loads(json.dumps(data)),
             {
                 "id": match.pk,
@@ -854,7 +854,7 @@ class MatchSerializerTestCase(TestCase):
         )
         match.maps.add(self.map)
         data = serializer.to_representation(match)
-        self.assertEqual(
+        self.assertDictEqual(
             json.loads(json.dumps(data)),
             {
                 "id": match.pk,
@@ -1242,9 +1242,9 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     )
     def test_create_autoaccept(self, enqueue):
         self.client.force_authenticate(self.users[0])
-        self.teams[
-            1
-        ].profile.auto_accept_reject_ranked = ScrimmageRequestAcceptReject.AUTO_ACCEPT
+        self.teams[1].profile.auto_accept_reject_ranked = (
+            ScrimmageRequestAcceptReject.AUTO_ACCEPT
+        )
         self.teams[1].profile.save()
         response = self.client.post(
             reverse("request-list", kwargs={"episode_id": "e1"}),
