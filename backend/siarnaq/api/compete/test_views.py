@@ -1,4 +1,5 @@
 import io
+import json
 import random
 from datetime import timedelta
 from unittest.mock import mock_open, patch
@@ -481,7 +482,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertEqual(
-            dict(data),
+            json.loads(json.dumps(data)),
             {
                 "id": match.pk,
                 "status": str(match.status),
@@ -712,7 +713,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertEqual(
-            dict(data),
+            json.loads(json.dumps(data)),
             {
                 "id": match.pk,
                 "status": str(match.status),
@@ -783,7 +784,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertEqual(
-            dict(data),
+            json.loads(json.dumps(data)),
             {
                 "id": match.pk,
                 "status": str(match.status),
@@ -854,7 +855,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertEqual(
-            dict(data),
+            json.loads(json.dumps(data)),
             {
                 "id": match.pk,
                 "status": str(match.status),
