@@ -55,6 +55,9 @@ module "production" {
   saturn_secrets        = var.saturn_secrets_production
   storage_releases_name = module.releases.storage_bucket_name
 
+  siarnaq_trigger_tag_pattern  = "^siarnaq-backend-.*"
+  frontend_trigger_tag_pattern = "^siarnaq-frontend-.*"
+
   depends_on = [null_resource.apis]
 }
 
@@ -87,6 +90,9 @@ module "staging" {
   max_execute_instances = 1
   saturn_secrets        = var.saturn_secrets_staging
   storage_releases_name = module.releases.storage_bucket_name
+
+  siarnaq_trigger_tag_pattern  = "^staging-siarnaq-.*"
+  frontend_trigger_tag_pattern = "^staging-frontend-.*"
 
   depends_on = [null_resource.apis]
 }
