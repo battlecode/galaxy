@@ -52,11 +52,15 @@ class SubmissionViewSetTestCase(APITestCase):
         self.user = User.objects.create_user(
             username="user1", email="user1@example.com"
         )
+        self.user.email_verified = True
+        self.user.save()
         self.team = Team.objects.create(episode=self.e1, name="team1")
         self.team.members.add(self.user)
         other_user = User.objects.create_user(
             username="user2", email="user2@example.com"
         )
+        other_user.email_verified = True
+        other_user.save()
         other_team = Team.objects.create(episode=self.e1, name="team2")
         other_team.members.add(other_user)
         self.admin = User.objects.get(username="admin")
@@ -158,9 +162,10 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertFalse(Submission.objects.exists())
 
     def test_create_no_team(self):
-        self.client.force_authenticate(
-            User.objects.create_user(username="user3", email="user3@example.com")
-        )
+        user3 = User.objects.create_user(username="user3", email="user3@example.com")
+        user3.email_verified = True
+        user3.save()
+        self.client.force_authenticate(user3)
         with io.BytesIO(b"abcdefg") as f:
             response = self.client.post(
                 reverse("submission-list", kwargs={"episode_id": "e1"}),
@@ -342,6 +347,8 @@ class MatchSerializerTestCase(TestCase):
             u = User.objects.create_user(
                 username=f"user{i}", email=f"user{i}@example.com"
             )
+            u.email_verified = True
+            u.save()
             t = Team.objects.create(episode=self.e1, name=f"team{i}")
             t.members.add(u)
             self.submissions.append(
@@ -356,6 +363,8 @@ class MatchSerializerTestCase(TestCase):
         self.staff = User.objects.create_user(
             username="staff", email="staff@example.com", is_staff=True
         )
+        self.staff.email_verified = True
+        self.staff.save()
 
     # Partitions:
     # user: admin, not admin
@@ -980,6 +989,8 @@ class MatchViewSetTestCase(APITestCase):
             u = User.objects.create_user(
                 username=f"user{i}", email=f"user{i}@example.com"
             )
+            u.email_verified = True
+            u.save()
             t = Team.objects.create(episode=self.e1, name=f"team{i}")
             t.members.add(u)
             self.submissions.append(
@@ -1209,6 +1220,8 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             u = User.objects.create_user(
                 username=f"user{i}", email=f"user{i}@example.com"
             )
+            u.email_verified = True
+            u.save()
             t = Team.objects.create(
                 episode=self.e1 if i < 2 else self.e2,
                 name=f"team{i}",
@@ -1599,9 +1612,12 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
         "siarnaq.api.compete.managers.SaturnInvokableQuerySet.enqueue", autospec=True
     )
     def test_regression_issue_516(self, enqueue):
-        self.teams[0].members.add(
-            User.objects.create_user(username="another", email="another@example.com")
+        another_user = User.objects.create_user(
+            username="another", email="another@example.com"
         )
+        another_user.email_verified = True
+        another_user.save()
+        self.teams[0].members.add(another_user)
         self.client.force_authenticate(self.users[1])
         r = ScrimmageRequest.objects.create(
             episode=self.e1,
