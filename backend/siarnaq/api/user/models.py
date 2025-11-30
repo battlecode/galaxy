@@ -22,6 +22,7 @@ class User(AbstractUser):
     first_name = models.CharField(_("first name"), max_length=30, blank=False)
     last_name = models.CharField(_("last name"), max_length=30, blank=False)
     email = models.EmailField(_("email address"), blank=False, unique=True)
+    email_verified = models.BooleanField(default=False)
 
     objects = UserManager()
 

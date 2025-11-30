@@ -65,8 +65,9 @@ class UserPrivateSerializer(UserPublicSerializer):
             "first_name",
             "last_name",
             "is_staff",
+            "email_verified",
         ]
-        read_only_fields = ["id", "username", "is_staff"]
+        read_only_fields = ["id", "username", "is_staff", "email_verified"]
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
