@@ -33,6 +33,7 @@ from siarnaq.api.teams.serializers import (
     UserPassedSerializer,
 )
 from siarnaq.api.user.models import User
+from siarnaq.api.user.permissions import IsEmailVerified
 from siarnaq.gcloud import titan
 
 logger = structlog.get_logger(__name__)
@@ -99,6 +100,7 @@ class TeamViewSet(
             case "create":
                 return (
                     IsAuthenticated(),
+                    IsEmailVerified(),
                     IsEpisodeAvailable(),
                     (~IsOnTeam)(),
                 )
@@ -110,7 +112,7 @@ class TeamViewSet(
     @action(
         detail=False,
         methods=["get", "put", "patch"],
-        permission_classes=(IsAuthenticated, IsEpisodeAvailable),
+        permission_classes=(IsAuthenticated, IsEmailVerified, IsEpisodeAvailable),
         serializer_class=TeamPrivateSerializer,
     )
     def me(self, request, *, episode_id):
@@ -136,7 +138,7 @@ class TeamViewSet(
         detail=False,
         methods=["post"],
         serializer_class=TeamLeaveSerializer,
-        permission_classes=(IsAuthenticated, IsEpisodeAvailable),
+        permission_classes=(IsAuthenticated, IsEmailVerified, IsEpisodeAvailable),
     )
     def leave(self, request, *, episode_id):
         """Leave a team."""
@@ -151,7 +153,12 @@ class TeamViewSet(
         detail=False,
         methods=["post"],
         serializer_class=TeamJoinSerializer,
-        permission_classes=(IsAuthenticated, IsEpisodeAvailable, ~IsOnTeam),
+        permission_classes=(
+            IsAuthenticated,
+            IsEmailVerified,
+            IsEpisodeAvailable,
+            ~IsOnTeam,
+        ),
     )
     def join(self, request, pk=None, *, episode_id):
         serializer = self.get_serializer(data=request.data)
@@ -194,7 +201,7 @@ class TeamViewSet(
         detail=False,
         methods=["post"],
         serializer_class=TeamAvatarSerializer,
-        permission_classes=(IsAuthenticated, IsEpisodeAvailable),
+        permission_classes=(IsAuthenticated, IsEmailVerified, IsEpisodeAvailable),
     )
     def avatar(self, request, pk=None, *, episode_id):
         """Update uploaded avatar."""
@@ -227,7 +234,7 @@ class ClassRequirementViewSet(viewsets.ReadOnlyModelViewSet):
     @action(
         detail=True,
         methods=["get"],
-        permission_classes=(IsAuthenticated,),
+        permission_classes=(IsAuthenticated, IsEmailVerified),
         serializer_class=UserPassedSerializer,
     )
     def check(self, request, pk=None, episode_id=None):
@@ -253,7 +260,7 @@ class ClassRequirementViewSet(viewsets.ReadOnlyModelViewSet):
         detail=False,
         methods=["get", "put"],
         serializer_class=TeamReportSerializer,
-        permission_classes=(IsAuthenticated, IsEpisodeAvailable),
+        permission_classes=(IsAuthenticated, IsEmailVerified, IsEpisodeAvailable),
     )
     def report(self, request, pk=None, *, episode_id):
         """Retrieve or update team strategy report"""

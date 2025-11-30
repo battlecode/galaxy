@@ -101,6 +101,7 @@ class Base(Configuration):
         "rest_framework_simplejwt",
         "drf_spectacular",
         "django_rest_passwordreset",
+        "django_email_verification",
         "anymail",
         "import_export",
         "sortedm2m",
@@ -248,6 +249,17 @@ class Base(Configuration):
     EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
     EMAIL_HOST_USER = "no-reply@battlecode.org"
 
+    # Email Verification Configuration (base settings)
+    EMAIL_FROM_ADDRESS = "no-reply@battlecode.org"
+    EMAIL_MULTI_USER = False
+    EMAIL_MAIL_SUBJECT = "MIT Battlecode: Verify Your Email"
+    EMAIL_MAIL_HTML = "email_verification.html"
+    EMAIL_MAIL_PLAIN = "email_verification.html"
+    EMAIL_MAIL_TOKEN_LIFE = 60 * 60 * 24  # 24 hours in seconds
+    EMAIL_MAIL_PAGE_TEMPLATE = "email_verified_result.html"
+    EMAIL_MAIL_CALLBACK = "siarnaq.api.user.signals.email_verified_callback"
+    # EMAIL_PAGE_DOMAIN is set per-environment based on FRONTEND_ORIGIN
+
 
 class Local(Base):
     ALLOWED_HOSTS = [
@@ -281,6 +293,7 @@ class Local(Base):
 
     EMAIL_ENABLED = False
     FRONTEND_ORIGIN = "http://localhost:3000"
+    EMAIL_PAGE_DOMAIN = FRONTEND_ORIGIN
 
     LOGGING: dict[str, Any] = {
         **_LOGGING_COMMON,
@@ -345,8 +358,9 @@ class Staging(Base):
     DEBUG = False
     CORS_ALLOW_ALL_ORIGINS = True
 
-    EMAIL_ENABLED = False
+    EMAIL_ENABLED = True
     FRONTEND_ORIGIN = "https://play.staging.battlecode.org"
+    EMAIL_PAGE_DOMAIN = FRONTEND_ORIGIN
 
     LOGGING: dict[str, Any] = {
         **_LOGGING_COMMON,
@@ -440,6 +454,7 @@ class Production(Base):
 
     EMAIL_ENABLED = True
     FRONTEND_ORIGIN = "https://play.battlecode.org"
+    EMAIL_PAGE_DOMAIN = FRONTEND_ORIGIN
 
     LOGGING: dict[str, Any] = {
         **_LOGGING_COMMON,

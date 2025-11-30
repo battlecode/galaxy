@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation</title>
+</head>
+<body>
+{% if success %}
+{{ user.username }}, your account is confirmed!
+{% else %}
+Error, invalid token!
+{% endif %}
+</body>
+</html>

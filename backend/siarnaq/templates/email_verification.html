@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Verify Your Email</title>
+</head>
+<body>
+    <h1>Welcome to MIT Battlecode, {{ user.username }}!</h1>
+
+    <p>Thank you for registering. Please verify your email address to activate your account.</p>
+
+    <p>
+        <a href="{{ link }}" style="background-color: #4CAF50; color: white; padding: 14px 20px; text-decoration: none; display: inline-block;">
+            Verify Email Address
+        </a>
+    </p>
+
+    <p>Or copy and paste this link into your browser:</p>
+    <p>{{ link }}</p>
+
+    <p>This link will expire on {{ expiry|date:"F d, Y" }} at {{ expiry|time:"g:i A" }}.</p>
+
+    <p>If you didn't create an account, you can safely ignore this email.</p>
+
+    <p>
+        Best ,<br>
+        -Teh Devs
+    </p>
+</body>
+</html>
