@@ -12,4 +12,5 @@ urlpatterns = [
         "password_reset/",
         include("django_rest_passwordreset.urls", namespace="password_reset"),
     ),
+    path("verify_email/", include("django_email_verification.urls")),
 ]

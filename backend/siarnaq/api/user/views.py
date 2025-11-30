@@ -5,6 +5,7 @@ import structlog
 from django.conf import settings
 from django.db import transaction
 from django.http import Http404
+from django_email_verification import send_email
 from drf_spectacular.utils import extend_schema
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
@@ -51,6 +52,41 @@ class UserViewSet(
             case _:
                 return super().get_serializer_class()
 
+    def create(self, request, *args, **kwargs):
+        """Create a new user (registration) and send verification email."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.save()
+        user.is_active = True
+        user.email_verified = False
+        user.save()
+
+        logger.info("user_created", user_id=user.id, username=user.username)
+        send_email(user)
+        logger.info("verification_email_sent", user_id=user.id, email=user.email)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
+
+    def _handle_email_change(self, user, old_email):
+        """
+        Check if the user's email has changed. If so, reset verification status,
+        send a new verification email, and log.
+        """
+        if user.email != old_email:
+            user.email_verified = False
+            user.save(update_fields=["email_verified"])
+            send_email(user)
+            logger.info(
+                "email_changed",
+                user_id=user.id,
+                old_email=old_email,
+                new_email=user.email,
+            )
+
     @action(
         detail=False,
         methods=["get", "put", "patch"],
@@ -65,14 +101,18 @@ class UserViewSet(
                 serializer = self.get_serializer(user)
                 return Response(serializer.data)
             case "put":
+                old_email = user.email
                 serializer = self.get_serializer(user, data=request.data)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
+                self._handle_email_change(user, old_email)
                 return Response(serializer.data)
             case "patch":
+                old_email = user.email
                 serializer = self.get_serializer(user, data=request.data, partial=True)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
+                self._handle_email_change(user, old_email)
                 return Response(serializer.data)
 
     @extend_schema(
@@ -184,5 +224,37 @@ class UserViewSet(
             profile.avatar_uuid = uuid.uuid4()
             profile.save(update_fields=["has_avatar", "avatar_uuid"])
             titan.upload_image(avatar, profile.get_avatar_path())
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(
+        request=None,
+        responses={
+            status.HTTP_204_NO_CONTENT: None,
+            status.HTTP_400_BAD_REQUEST: None,
+        },
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        permission_classes=(IsAuthenticated,),
+    )
+    def resend_verification_email(self, request):
+        """Resend verification email to authenticated user."""
+        user = self.get_queryset().get(pk=request.user.pk)
+
+        if user.email_verified:
+            logger.info(
+                "resend_verification_attempted_already_verified",
+                user_id=user.id,
+                email=user.email,
+            )
+            return Response(
+                None,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        send_email(user)
+        logger.info("verification_email_resent", user_id=user.id, email=user.email)
 
         return Response(None, status=status.HTTP_204_NO_CONTENT)

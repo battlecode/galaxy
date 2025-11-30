@@ -45,3 +45,9 @@ def send_password_reset_token_email(
         recipient_list=[user_email],
         fail_silently=False,
     )
+
+
+def email_verified_callback(user):
+    """Called automatically by django_email_verification after user verifies email."""
+    user.email_verified = True
+    user.save(update_fields=["email_verified"])
