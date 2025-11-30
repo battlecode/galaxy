@@ -481,7 +481,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertEqual(
-            data,
+            dict(data),
             {
                 "id": match.pk,
                 "status": str(match.status),
@@ -712,7 +712,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertEqual(
-            data,
+            dict(data),
             {
                 "id": match.pk,
                 "status": str(match.status),
@@ -783,7 +783,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertEqual(
-            data,
+            dict(data),
             {
                 "id": match.pk,
                 "status": str(match.status),
@@ -854,7 +854,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertEqual(
-            data,
+            dict(data),
             {
                 "id": match.pk,
                 "status": str(match.status),
