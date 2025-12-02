@@ -32,3 +32,8 @@ variable "storage_names" {
   description = "Name of Google Cloud Storage buckets to be scanned"
   type        = list(string)
 }
+
+variable "pubsub_topic_scan_name" {
+  description = "Name of the Pub/Sub topic for scan requests"
+  type        = string
+}

@@ -9,18 +9,36 @@ Titan is our antivirus module that performs asynchronous malware scanning on-dem
 
 ## How to request a scan
 
-Titan is configured (by Terraform) to respond to scan requests for the `public` and
-`secure` storage buckets. To request a scan, tag the object with the following metadata
-after uploading it:
+To request a scan from Siarnaq, use the `titan.request_scan()` function with a blob:
 
-```
-Titan-Status: Unverified
+```python
+from siarnaq.gcloud import titan
+
+# After uploading a file to GCS
+titan.request_scan(blob)
 ```
 
-Titan will detect this and scan the file. Once the file is scanned, the status will be
-replaced with either of `Verified` or `Malicious`.
+This function:
+1. Sets the blob's metadata to `Titan-Status: Unverified`
+2. Publishes a scan request message to the Pub/Sub topic
+
+Once the file is scanned, Titan updates the metadata status to either `Verified` or
+`Malicious`. The status can be checked using `titan.get_object()`.
 
 ## System architecture
 
-Titan receives file metadata update events via Google EventArc. These events are pushed
-to the server and the file is scanned.
+Titan receives scan requests via Google Cloud Pub/Sub:
+
+1. **Siarnaq** publishes scan request messages to the `{environment}-siarnaq-scan` topic
+2. **Pub/Sub** pushes these messages to Titan's Cloud Run service via OIDC-authenticated HTTP POST
+3. **Titan** processes the message, retrieves the file from GCS, scans it with ClamAV, and updates the file's metadata
+
+The message payload is a simple JSON object:
+```json
+{
+  "bucket": "bucket-name",
+  "name": "path/to/file"
+}
+```
+
+Titan runs on Cloud Run and scales automatically based on incoming Pub/Sub push requests.

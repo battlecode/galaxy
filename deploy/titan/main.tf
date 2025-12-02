@@ -4,12 +4,6 @@ resource "google_service_account" "this" {
   description  = "Service account for perform Titan actions"
 }
 
-resource "google_project_iam_member" "eventarc" {
-  project = var.gcp_project
-  role    = "roles/eventarc.eventReceiver"
-  member  = "serviceAccount:${google_service_account.this.email}"
-}
-
 resource "google_storage_bucket_iam_member" "this" {
   for_each = toset(var.storage_names)
 
@@ -18,42 +12,28 @@ resource "google_storage_bucket_iam_member" "this" {
   member = "serviceAccount:${google_service_account.this.email}"
 }
 
-data "google_storage_project_service_account" "gcs_account" {
-}
+resource "google_pubsub_subscription" "scan" {
+  name  = "${var.name}-scan"
+  topic = var.pubsub_topic_scan_name
+  labels = var.labels
 
-resource "google_project_iam_member" "storage_pubsub" {
-  project = var.gcp_project
-  role    = "roles/pubsub.publisher"
-  member  = "serviceAccount:${data.google_storage_project_service_account.gcs_account.email_address}"
-}
+  push_config {
+    push_endpoint = google_cloud_run_service.this.status[0].url
 
-resource "google_eventarc_trigger" "this" {
-  for_each = toset(var.storage_names)
-
-  name            = "${var.name}-${each.value}"
-  location        = var.gcp_region
-  service_account = google_service_account.this.email
-  labels          = var.labels
-
-  matching_criteria {
-    attribute = "type"
-    value     = "google.cloud.storage.object.v1.metadataUpdated"
-  }
-
-  matching_criteria {
-    attribute = "bucket"
-    value     = each.value
-  }
-
-  destination {
-    cloud_run_service {
-      service = google_cloud_run_service.this.name
-      region = var.gcp_region
+    oidc_token {
+      service_account_email = google_service_account.this.email
     }
   }
 
+  ack_deadline_seconds       = 600
+  message_retention_duration = "604800s"  # 7 days
+
+  retry_policy {
+    minimum_backoff = "10s"
+    maximum_backoff = "600s"
+  }
+
   depends_on = [
-    google_project_iam_member.eventarc,
     google_cloud_run_service_iam_member.this,
   ]
 }

@@ -13,3 +13,7 @@ output "topic_compile_name" {
 output "topic_execute_name" {
   value = google_pubsub_topic.this["execute"].name
 }
+
+output "pubsub_topic_scan_name" {
+  value = google_pubsub_topic.this["scan"].name
+}

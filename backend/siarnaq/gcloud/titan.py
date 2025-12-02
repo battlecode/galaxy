@@ -1,5 +1,6 @@
 import datetime
 import io
+import json
 
 import google.cloud.storage as storage
 import structlog
@@ -7,16 +8,60 @@ from django.conf import settings
 from google.auth import impersonated_credentials
 from PIL import Image
 
+from siarnaq.gcloud import saturn
+
 logger = structlog.get_logger(__name__)
 
 
 def request_scan(blob: storage.Blob) -> None:
     """Request that Titan scan a blob for malware."""
-    # Titan responds to google.cloud.storage.object.v1.metadataUpdated events via
-    # Eventarc, so it suffices to set the Titan metadata field.
     logger.info("titan_request", message="Requesting scan on file.", file=blob.name)
+
+    # Set metadata to Unverified before publishing to Pub/Sub
     blob.metadata = {"Titan-Status": "Unverified"}
     blob.patch()
+
+    # Publish scan request to Pub/Sub topic
+    if not settings.GCLOUD_ENABLE_ACTIONS:
+        logger.warn("titan_disabled", message="Titan scan queue is disabled.")
+        return
+
+    publish_client = saturn.get_publish_client()
+    topic = publish_client.topic_path(
+        settings.GCLOUD_PROJECT, settings.GCLOUD_TOPIC_SCAN
+    )
+
+    payload = {
+        "bucket": blob.bucket.name,
+        "name": blob.name,
+    }
+
+    try:
+        future = publish_client.publish(
+            topic=topic,
+            data=json.dumps(payload).encode(),
+            ordering_key=settings.GCLOUD_ORDER_SCAN,
+        )
+        message_id = future.result()
+        logger.info(
+            "titan_enqueued",
+            message="Scan request has been queued.",
+            message_id=message_id,
+            bucket=blob.bucket.name,
+            file=blob.name,
+        )
+    except Exception:
+        logger.error(
+            "titan_publish_error",
+            message="Scan request could not be queued.",
+            exc_info=True,
+            bucket=blob.bucket.name,
+            file=blob.name,
+        )
+        publish_client.resume_publish(
+            topic=topic,
+            ordering_key=settings.GCLOUD_ORDER_SCAN,
+        )
 
 
 def get_object(
