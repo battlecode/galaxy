@@ -38,12 +38,17 @@ from siarnaq.api.teams.models import (
 from siarnaq.api.user.models import User
 
 
-def ordered_dict_to_dict(data) -> dict:
+def ordered_dict_to_dict(data):
     """
     Recursively convert OrderedDict to dict for test comparisons.
+    Applies the conversion to ordered dicts, dicts, and lists.
     """
     if isinstance(data, OrderedDict):
         return {key: ordered_dict_to_dict(value) for key, value in data.items()}
+    elif isinstance(data, dict):
+        return {key: ordered_dict_to_dict(value) for key, value in data.items()}
+    elif isinstance(data, list):
+        return [ordered_dict_to_dict(item) for item in data]
     else:
         return data
 
