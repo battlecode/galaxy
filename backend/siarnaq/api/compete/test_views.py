@@ -2,6 +2,7 @@ import io
 import random
 from collections import OrderedDict
 from datetime import timedelta
+from typing import Any
 from unittest.mock import mock_open, patch
 
 from django.test import TestCase, override_settings
@@ -38,7 +39,7 @@ from siarnaq.api.teams.models import (
 from siarnaq.api.user.models import User
 
 
-def ordered_dict_to_dict(data):
+def ordered_dict_to_dict(data: Any) -> Any:
     """
     Recursively convert OrderedDict to dict for test comparisons.
     Applies the conversion to ordered dicts, dicts, and lists.
