@@ -45,9 +45,14 @@ func (m *mockStorageClient) GetFile(ctx context.Context, payload *ScanPayload) (
 
 type mockScanner struct {
 	scanResults map[string][]string
+	nextResult  []string
 }
 
 func (m *mockScanner) Scan(ctx context.Context, file File) ([]string, error) {
+	// If nextResult is set, return it
+	if m.nextResult != nil {
+		return m.nextResult, nil
+	}
 	// Return empty slice (no threats) for testing
 	return []string{}, nil
 }
@@ -326,6 +331,7 @@ func TestHandleFile(t *testing.T) {
 			// Create mock scanner that returns configured signatures
 			scanner := &mockScanner{
 				scanResults: make(map[string][]string),
+				nextResult:  tt.scanSignatures,
 			}
 
 			// Create Titan instance

@@ -120,6 +120,36 @@ func (t *Titan) HandleHTTP(ctx context.Context, w http.ResponseWriter, r *http.R
 	return t.HandleFile(ctx, file)
 }
 
+// HandleDirectHTTP processes a direct HTTP request (for local development).
+func (t *Titan) HandleDirectHTTP(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodPost {
+		log.Ctx(ctx).Warn().Str("method", r.Method).Msg("Unexpected HTTP method.")
+		return fmt.Errorf("unexpected method: %s", r.Method)
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Ctx(ctx).Warn().Err(err).Msg("Failed to read request body.")
+		return fmt.Errorf("io.ReadAll: %v", err)
+	}
+
+	var payload ScanPayload
+	if err := json.Unmarshal(body, &payload); err != nil {
+		log.Ctx(ctx).Warn().Err(err).Msg("Failed to parse scan payload.")
+		return fmt.Errorf("json.Unmarshal: %v", err)
+	}
+
+	ctx = payload.WithLogger(ctx)
+	log.Ctx(ctx).Info().Msg("Received direct scan request (local dev mode).")
+
+	file, err := t.storage.GetFile(ctx, &payload)
+	if err != nil {
+		log.Ctx(ctx).Warn().Err(err).Msg("Failed to retrieve file.")
+		return fmt.Errorf("storage.GetFile: %v", err)
+	}
+	return t.HandleFile(ctx, file)
+}
+
 // HandleFile scans a file, and updates its status to reflect the scanning outcome.
 func (t *Titan) HandleFile(ctx context.Context, file File) error {
 	log.Ctx(ctx).Debug().Msg("Received request to process file.")
