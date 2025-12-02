@@ -1,6 +1,6 @@
 import io
-import json
 import random
+from collections import OrderedDict
 from datetime import timedelta
 from unittest.mock import mock_open, patch
 
@@ -36,6 +36,16 @@ from siarnaq.api.teams.models import (
     TeamStatus,
 )
 from siarnaq.api.user.models import User
+
+
+def ordered_dict_to_dict(data) -> dict:
+    """
+    Recursively convert OrderedDict to dict for test comparisons.
+    """
+    if isinstance(data, OrderedDict):
+        return {key: ordered_dict_to_dict(value) for key, value in data.items()}
+    else:
+        return data
 
 
 class SubmissionViewSetTestCase(APITestCase):
@@ -482,7 +492,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertDictEqual(
-            json.loads(json.dumps(data)),
+            ordered_dict_to_dict(data),
             {
                 "id": match.pk,
                 "status": str(match.status),
@@ -713,7 +723,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertDictEqual(
-            json.loads(json.dumps(data)),
+            ordered_dict_to_dict(data),
             {
                 "id": match.pk,
                 "status": str(match.status),
@@ -784,7 +794,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertDictEqual(
-            json.loads(json.dumps(data)),
+            ordered_dict_to_dict(data),
             {
                 "id": match.pk,
                 "status": str(match.status),
@@ -855,7 +865,7 @@ class MatchSerializerTestCase(TestCase):
         match.maps.add(self.map)
         data = serializer.to_representation(match)
         self.assertDictEqual(
-            json.loads(json.dumps(data)),
+            ordered_dict_to_dict(data),
             {
                 "id": match.pk,
                 "status": str(match.status),
@@ -1242,9 +1252,9 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     )
     def test_create_autoaccept(self, enqueue):
         self.client.force_authenticate(self.users[0])
-        self.teams[1].profile.auto_accept_reject_ranked = (
-            ScrimmageRequestAcceptReject.AUTO_ACCEPT
-        )
+        self.teams[
+            1
+        ].profile.auto_accept_reject_ranked = ScrimmageRequestAcceptReject.AUTO_ACCEPT
         self.teams[1].profile.save()
         response = self.client.post(
             reverse("request-list", kwargs={"episode_id": "e1"}),
