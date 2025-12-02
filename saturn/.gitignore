@@ -19,3 +19,6 @@
 
 # Go workspace file
 go.work
+
+# Secret file for local dev
+*secret.*

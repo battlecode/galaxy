@@ -1,0 +1,49 @@
+{
+    "episode": {
+        "name": "bc25java",
+        "language": "java21",
+        "scaffold": "https://github.com/battlecode/battlecode25-scaffold"
+    },
+    "metadata": {
+        "report-url": "/development/test/report.txt",
+        "task-type": "execute"
+    },
+    "details": {
+        "maps": [
+                "fix",
+                "galaxy",
+                "gridworld",
+                "quack",
+                "sierpinski"
+        ],
+        "replay": {
+            "bucket": "local",
+            "name": "/development/test/replay.bc25java"
+        },
+        "alternate-order": true,
+        "a": {
+            "source": {
+                "bucket": "local",
+                "name": "/development/test/source1.zip"
+            },
+            "binary": {
+                "bucket": "local",
+                "name": "/development/test/binary1.zip"
+            },
+            "team-name": "test1",
+            "package": "examplefuncsplayer"
+        },
+        "b": {
+            "source": {
+                "bucket": "local",
+                "name": "/development/test/source2.zip"
+                },
+            "binary": {
+                "bucket": "local",
+                "name": "/development/test/binary2.zip"
+            },
+            "team-name": "test2",
+            "package": "examplefuncsplayer"
+        }
+    }
+}
