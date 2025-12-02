@@ -19,7 +19,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import { LanguageEnum } from "api/_autogen";
-import { PageTitle } from "components/elements/BattlecodeStyle";
+import { PageTitle, PageContainer } from "components/elements/BattlecodeStyle";
 import { useCurrentUserInfo } from "api/user/useUser";
 
 interface SubmissionFormInput {
@@ -67,7 +67,7 @@ const Submissions: React.FC = () => {
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-auto p-6">
+    <PageContainer>
       <PageTitle>Submissions</PageTitle>
 
       <SectionCard
@@ -103,7 +103,7 @@ const Submissions: React.FC = () => {
           loading={tourneySubs.isLoading}
         />
       </SectionCard>
-    </div>
+    </PageContainer>
   );
 };
 

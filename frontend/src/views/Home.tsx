@@ -9,6 +9,7 @@ import { useUserTeam } from "api/team/useTeam";
 import { useTopRatingHistoryList } from "api/compete/useCompete";
 import UserChart from "components/compete/chart/UserChart";
 import { useCurrentUser } from "contexts/CurrentUserContext";
+import { PageContainer } from "components/elements/BattlecodeStyle";
 import { isPresent } from "utils/utilTypes";
 import { dateTime } from "utils/dateTime";
 import Markdown from "components/elements/Markdown";
@@ -42,7 +43,7 @@ In the meantime, [create or join a team](/${episodeId}/my_team) and check out th
   }
 
   return (
-    <div className="p-6">
+    <PageContainer>
       <div className="flex flex-col gap-6 xl:flex-row">
         <div className="flex w-full flex-col gap-6 xl:w-1/2">
           <SectionCard
@@ -114,7 +115,7 @@ In the meantime, [create or join a team](/${episodeId}/my_team) and check out th
           </SectionCard>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

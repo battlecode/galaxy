@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { useTeam } from "api/team/useTeam";
 import { isNil } from "lodash";
 import SectionCard from "components/SectionCard";
-import { PageTitle } from "components/elements/BattlecodeStyle";
+import { PageTitle, PageContainer } from "components/elements/BattlecodeStyle";
 import MemberList from "components/team/MemberList";
 import { Status526Enum } from "api/_autogen";
 import { useEpisodeInfo } from "api/episode/useEpisode";
@@ -53,7 +53,7 @@ const TeamProfile: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
+    <PageContainer>
       <PageTitle>Team Profile</PageTitle>
       <div className="flex flex-col gap-8 xl:flex-row">
         <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
@@ -158,7 +158,7 @@ const TeamProfile: React.FC = () => {
           </SectionCard>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

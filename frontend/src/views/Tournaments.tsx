@@ -6,6 +6,7 @@ import { tournamentsText } from "../content/ManageContent";
 import { TourneyPage } from "../content/ContentStruct";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
+import { PageContainer } from "components/elements/BattlecodeStyle";
 import TournamentsTable from "../components/tables/TournamentsTable";
 import { useTournamentList } from "../api/episode/useEpisode";
 import { useQueryClient } from "@tanstack/react-query";
@@ -44,7 +45,7 @@ const Tournaments: React.FC = () => {
     return <NoContentFound />;
   }
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto p-6">
+    <PageContainer>
       <div className="flex flex-1 flex-col gap-8">
         <OptionalSectionCardMarkdown
           title={TourneyPage.SCHEDULE}
@@ -78,7 +79,7 @@ const Tournaments: React.FC = () => {
           textRecord={currentTournamentText}
         />
       </div>
-    </div>
+    </PageContainer>
   );
 };
 
