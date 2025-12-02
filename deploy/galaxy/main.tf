@@ -84,7 +84,7 @@ resource "google_cloudbuild_trigger" "frontend" {
     name  = "galaxy"
 
     push {
-      tag = "^siarnaq-frontend-.*"
+      tag = var.frontend_trigger_tag_pattern
     }
   }
 
@@ -156,6 +156,8 @@ module "siarnaq" {
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name
   storage_ephemeral_name = google_storage_bucket.ephemeral.name
+
+  trigger_tag_pattern = var.siarnaq_trigger_tag_pattern
 }
 
 module "titan" {
