@@ -7,6 +7,32 @@ scan these files for malware.
 
 Titan is our antivirus module that performs asynchronous malware scanning on-demand.
 
+## Development
+
+### Running Tests
+
+To run the unit tests locally:
+
+```bash
+cd titan
+go test -v ./pkg/...
+```
+
+To run tests with coverage:
+
+```bash
+go test -v -coverprofile=coverage.out ./pkg/...
+go tool cover -html=coverage.out  # View coverage in browser
+```
+
+To run tests with race detection:
+
+```bash
+go test -v -race ./pkg/...
+```
+
+The tests are automatically run as part of CI on every pull request.
+
 ## How to request a scan
 
 To request a scan from Siarnaq, use the `titan.request_scan()` function with a blob:
