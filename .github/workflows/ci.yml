@@ -194,13 +194,22 @@ jobs:
           # Update virus definitions (or use cached ones)
           sudo systemctl stop clamav-freshclam || true
           sudo freshclam || echo "Using cached virus definitions"
+          # Configure clamd to allow TCP connections (easier for tests)
+          echo "TCPSocket 3310" | sudo tee -a /etc/clamav/clamd.conf
+          echo "TCPAddr 127.0.0.1" | sudo tee -a /etc/clamav/clamd.conf
+          # Add current user to clamav group for socket access
+          sudo usermod -a -G clamav $USER
           # Start clamd socket and daemon
           sudo systemctl start clamav-daemon.socket
           sudo systemctl start clamav-daemon.service
           # Wait for clamd to be ready (check socket exists and responds)
           for i in {1..60}; do
-            if [ -S /var/run/clamav/clamd.ctl ] && echo "PING" | nc -U /var/run/clamav/clamd.ctl 2>/dev/null | grep -q "PONG"; then
+            if [ -S /var/run/clamav/clamd.ctl ] && sudo -u clamav bash -c "echo PING | nc -U /var/run/clamav/clamd.ctl 2>/dev/null" | grep -q "PONG"; then
               echo "clamd is ready!"
+              # Also verify it's accessible via TCP
+              if echo "PING" | nc 127.0.0.1 3310 2>/dev/null | grep -q "PONG"; then
+                echo "clamd TCP connection verified"
+              fi
               exit 0
             fi
             echo "Waiting for clamd... ($i/60)"
@@ -221,6 +230,7 @@ jobs:
         working-directory: ./titan
         env:
           REQUIRE_CLAMD: "true"
+          CLAMD_TCP: "true"
       - name: Report unit test coverage
         run: |
           echo "=== Unit Test Coverage ==="
