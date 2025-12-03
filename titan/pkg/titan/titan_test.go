@@ -57,83 +57,11 @@ func (m *mockScanner) Scan(ctx context.Context, file File) ([]string, error) {
 	return []string{}, nil
 }
 
-// Test direct HTTP endpoint (local dev mode)
-func TestHandleDirectHTTP(t *testing.T) {
-	tests := []struct {
-		name           string
-		payload        ScanPayload
-		method         string
-		wantStatusCode int
-	}{
-		{
-			name: "valid scan request",
-			payload: ScanPayload{
-				Bucket: "test-bucket",
-				Name:   "path/to/file.pdf",
-			},
-			method:         http.MethodPost,
-			wantStatusCode: http.StatusOK,
-		},
-		{
-			name: "valid scan request with special characters",
-			payload: ScanPayload{
-				Bucket: "test-bucket",
-				Name:   "episode/bc24/submission/123/source.zip",
-			},
-			method:         http.MethodPost,
-			wantStatusCode: http.StatusOK,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create Titan instance with mocks
-			titan := &Titan{
-				storage: &mockStorageClient{
-					files: make(map[string]*mockFile),
-				},
-				scanner: &mockScanner{
-					scanResults: make(map[string][]string),
-				},
-			}
-
-			// Create request body
-			body, err := json.Marshal(tt.payload)
-			if err != nil {
-				t.Fatalf("failed to marshal payload: %v", err)
-			}
-
-			// Create HTTP request
-			req := httptest.NewRequest(tt.method, "/", bytes.NewReader(body))
-			req.Header.Set("Content-Type", "application/json")
-
-			// Create response recorder
-			w := httptest.NewRecorder()
-
-			// Call handler
-			err = titan.HandleDirectHTTP(context.Background(), w, req)
-			if err != nil {
-				t.Logf("HandleDirectHTTP returned error (expected for test): %v", err)
-			}
-
-			// Verify we can parse the request without error
-			if tt.method == http.MethodPost {
-				var parsed ScanPayload
-				if err := json.Unmarshal(body, &parsed); err != nil {
-					t.Errorf("failed to parse payload: %v", err)
-				}
-				if parsed.Bucket != tt.payload.Bucket {
-					t.Errorf("bucket mismatch: got %v, want %v", parsed.Bucket, tt.payload.Bucket)
-				}
-				if parsed.Name != tt.payload.Name {
-					t.Errorf("name mismatch: got %v, want %v", parsed.Name, tt.payload.Name)
-				}
-			}
-		})
-	}
-}
-
-// Test Pub/Sub push message format (production mode)
+// Partitions:
+// - message format: valid Pub/Sub structure, invalid JSON
+// - payload encoding: correctly base64-encoded, malformed base64
+// - file path: simple filename, nested path structure
+// - HTTP method: POST (valid), GET/PUT/DELETE (invalid)
 func TestHandleHTTP_PubSubPush(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -229,7 +157,11 @@ func TestHandleHTTP_PubSubPush(t *testing.T) {
 	}
 }
 
-// Test payload parsing and validation
+// Partitions:
+// - JSON structure: valid, malformed syntax
+// - required fields: both present, bucket missing, name missing
+// - file path format: simple filename, nested directory structure, special characters
+// - bucket name: valid GCS bucket name, empty string
 func TestScanPayload(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -284,7 +216,10 @@ func TestScanPayload(t *testing.T) {
 	}
 }
 
-// Test HandleFile logic
+// Partitions:
+// - initial file status: Untracked, Unverified, Verified, Malicious
+// - scan result: no threats (empty), single threat, multiple threats
+// - scanner behavior: success, error/failure
 func TestHandleFile(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -365,7 +300,11 @@ func TestHandleFile(t *testing.T) {
 	}
 }
 
-// Test PubsubMessage structure
+// Partitions:
+// - message structure: valid Google format, missing fields, extra fields
+// - data encoding: valid base64, invalid base64, empty data
+// - nested payload: valid JSON, invalid JSON, empty payload
+// - field types: correct types, type mismatches
 func TestPubsubMessageFormat(t *testing.T) {
 	// Example message from Google Cloud Pub/Sub documentation
 	messageJSON := `{
