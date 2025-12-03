@@ -152,12 +152,32 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0  # Fetch all history for comparing changes
+      - name: Check for Titan changes
+        id: check_changes
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            # For PRs, check if titan/ directory has changes
+            if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q '^titan/'; then
+              echo "changed=true" >> $GITHUB_OUTPUT
+              echo "Titan package has changes"
+            else
+              echo "changed=false" >> $GITHUB_OUTPUT
+              echo "No changes in Titan package, skipping tests"
+            fi
+          else
+            # For pushes to main or manual triggers, always run
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
       - name: Set up Go
+        if: steps.check_changes.outputs.changed == 'true'
         uses: actions/setup-go@v4
         with:
           go-version: '1.18'
           cache-dependency-path: titan/go.sum
       - name: Cache ClamAV database
+        if: steps.check_changes.outputs.changed == 'true'
         uses: actions/cache@v3
         with:
           path: |
@@ -167,22 +187,40 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-clamav-
       - name: Install ClamAV
+        if: steps.check_changes.outputs.changed == 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clamav clamav-daemon
+          sudo apt-get install -y clamav clamav-daemon netcat-openbsd
           # Update virus definitions (or use cached ones)
           sudo systemctl stop clamav-freshclam || true
           sudo freshclam || echo "Using cached virus definitions"
-          # Start clamd
-          sudo systemctl start clamav-daemon
-          # Wait for clamd to be ready
-          timeout 30 bash -c 'until echo "PING" | nc -U /var/run/clamav/clamd.ctl 2>/dev/null; do sleep 1; done' || echo "clamd ready check timed out"
+          # Start clamd socket and daemon
+          sudo systemctl start clamav-daemon.socket
+          sudo systemctl start clamav-daemon.service
+          # Wait for clamd to be ready (check socket exists and responds)
+          for i in {1..60}; do
+            if [ -S /var/run/clamav/clamd.ctl ] && echo "PING" | nc -U /var/run/clamav/clamd.ctl 2>/dev/null | grep -q "PONG"; then
+              echo "clamd is ready!"
+              exit 0
+            fi
+            echo "Waiting for clamd... ($i/60)"
+            sleep 2
+          done
+          # If we got here, clamd didn't start in time - fail the build
+          echo "ERROR: clamd failed to start within 120 seconds"
+          sudo systemctl status clamav-daemon.service
+          sudo journalctl -u clamav-daemon.service -n 50
+          exit 1
       - name: Run unit tests
+        if: steps.check_changes.outputs.changed == 'true'
         run: go test -v -race -short -coverprofile=coverage-unit.out ./pkg/...
         working-directory: ./titan
       - name: Run integration tests
+        if: steps.check_changes.outputs.changed == 'true'
         run: go test -v -race -coverprofile=coverage-integration.out ./pkg/...
         working-directory: ./titan
+        env:
+          REQUIRE_CLAMD: "true"
       - name: Report unit test coverage
         run: |
           echo "=== Unit Test Coverage ==="

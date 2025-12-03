@@ -39,20 +39,28 @@ func (f *testFile) SetStatus(ctx context.Context, status FileStatus) error {
 func setupClamD(t *testing.T) func() {
 	t.Helper()
 
+	requireClamd := os.Getenv("REQUIRE_CLAMD") == "true"
+
 	// Check if clamd is already running
 	if isClamdRunning() {
 		t.Log("Using existing clamd instance")
 		return func() {} // No cleanup needed
 	}
 
+	t.Log("clamd not found running, attempting to start...")
+
 	// Try to start clamd
 	cmd := exec.Command("clamd")
 	if err := cmd.Start(); err != nil {
-		t.Skipf("Cannot start clamd (install clamav-daemon): %v", err)
+		if requireClamd {
+			t.Fatalf("Cannot start clamd (required in CI): %v", err)
+		} else {
+			t.Skipf("Cannot start clamd (install clamav-daemon): %v", err)
+		}
 	}
 
-	// Wait for clamd to be ready (up to 10 seconds)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// Wait for clamd to be ready (up to 30 seconds for CI environments)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	ready := make(chan bool)
@@ -65,7 +73,7 @@ func setupClamD(t *testing.T) func() {
 			select {
 			case <-ctx.Done():
 				return
-			case <-time.After(100 * time.Millisecond):
+			case <-time.After(500 * time.Millisecond):
 				// Continue waiting
 			}
 		}
@@ -75,8 +83,14 @@ func setupClamD(t *testing.T) func() {
 	case <-ready:
 		t.Log("clamd started successfully")
 	case <-ctx.Done():
-		cmd.Process.Kill()
-		t.Skip("clamd did not start in time")
+		if cmd.Process != nil {
+			cmd.Process.Kill()
+		}
+		if requireClamd {
+			t.Fatal("clamd did not start in time (required in CI)")
+		} else {
+			t.Skip("clamd did not start in time")
+		}
 	}
 
 	return func() {
