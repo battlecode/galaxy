@@ -1,7 +1,9 @@
 import io
 import random
+import re
 from collections import OrderedDict
-from datetime import timedelta
+from datetime import datetime, timedelta
+from datetime import timezone as dt_timezone
 from typing import Any
 from unittest.mock import mock_open, patch
 
@@ -41,8 +43,10 @@ from siarnaq.api.user.models import User
 
 def ordered_dict_to_dict(data: Any) -> Any:
     """
-    Recursively convert OrderedDict to dict for test comparisons.
-    Applies the conversion to ordered dicts, dicts, and lists.
+    Recursively clean data for test comparisons.
+    This function:
+    - Converts OrderedDict to dict recursively
+    - Normalizes ISO 8601 datetime strings to UTC (Z suffix)
     """
     if isinstance(data, OrderedDict):
         return {key: ordered_dict_to_dict(value) for key, value in data.items()}
@@ -50,6 +54,22 @@ def ordered_dict_to_dict(data: Any) -> Any:
         return {key: ordered_dict_to_dict(value) for key, value in data.items()}
     elif isinstance(data, list):
         return [ordered_dict_to_dict(item) for item in data]
+    elif isinstance(data, str):
+        # Check if it's an ISO 8601 datetime string and normalize to UTC
+        iso_pattern = (
+            r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?([+-]\d{2}:\d{2}|Z)$"
+        )
+        if re.match(iso_pattern, data):
+            try:
+                # Parse the datetime and convert to UTC with Z suffix
+                dt = datetime.fromisoformat(data.replace("Z", "+00:00"))
+                # Convert to UTC and format with Z suffix
+                utc_dt = dt.astimezone(dt_timezone.utc)
+                return utc_dt.isoformat().replace("+00:00", "Z")
+            except (ValueError, AttributeError):
+                # If parsing fails, return as-is
+                return data
+        return data
     else:
         return data
 
