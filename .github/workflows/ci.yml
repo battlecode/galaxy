@@ -197,28 +197,31 @@ jobs:
           # Configure clamd to allow TCP connections (easier for tests)
           echo "TCPSocket 3310" | sudo tee -a /etc/clamav/clamd.conf
           echo "TCPAddr 127.0.0.1" | sudo tee -a /etc/clamav/clamd.conf
-          # Add current user to clamav group for socket access
-          sudo usermod -a -G clamav $USER
-          # Start clamd socket and daemon
-          sudo systemctl start clamav-daemon.socket
-          sudo systemctl start clamav-daemon.service
-          # Wait for clamd to be ready (check socket exists and responds)
+          # Restart clamd to pick up the new configuration
+          sudo systemctl restart clamav-daemon.service
+          # Wait for clamd to be ready on TCP
+          echo "Waiting for clamd to start with TCP enabled..."
           for i in {1..60}; do
-            if [ -S /var/run/clamav/clamd.ctl ] && sudo -u clamav bash -c "echo PING | nc -U /var/run/clamav/clamd.ctl 2>/dev/null" | grep -q "PONG"; then
-              echo "clamd is ready!"
-              # Also verify it's accessible via TCP
-              if echo "PING" | nc 127.0.0.1 3310 2>/dev/null | grep -q "PONG"; then
-                echo "clamd TCP connection verified"
-              fi
+            if echo "PING" | nc -w 1 127.0.0.1 3310 2>/dev/null | grep -q "PONG"; then
+              echo "✓ clamd is ready and responding on TCP port 3310"
               exit 0
             fi
-            echo "Waiting for clamd... ($i/60)"
+            if [ $((i % 5)) -eq 0 ]; then
+              echo "Still waiting for clamd... ($i/60 attempts)"
+              sudo systemctl status clamav-daemon.service --no-pager || true
+            fi
             sleep 2
           done
           # If we got here, clamd didn't start in time - fail the build
           echo "ERROR: clamd failed to start within 120 seconds"
-          sudo systemctl status clamav-daemon.service
-          sudo journalctl -u clamav-daemon.service -n 50
+          echo "=== Service Status ==="
+          sudo systemctl status clamav-daemon.service --no-pager
+          echo "=== Recent Logs ==="
+          sudo journalctl -u clamav-daemon.service -n 100 --no-pager
+          echo "=== Config File ==="
+          sudo cat /etc/clamav/clamd.conf | grep -E "TCPSocket|TCPAddr|LocalSocket"
+          echo "=== Network Ports ==="
+          sudo netstat -tulpn | grep clam || true
           exit 1
       - name: Run unit tests
         if: steps.check_changes.outputs.changed == 'true'

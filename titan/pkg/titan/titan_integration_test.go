@@ -47,19 +47,20 @@ func setupClamD(t *testing.T) func() {
 		return func() {} // No cleanup needed
 	}
 
-	t.Log("clamd not found running, attempting to start...")
-
-	// Try to start clamd
-	cmd := exec.Command("clamd")
-	if err := cmd.Start(); err != nil {
-		if requireClamd {
-			t.Fatalf("Cannot start clamd (required in CI): %v", err)
-		} else {
-			t.Skipf("Cannot start clamd (install clamav-daemon): %v", err)
-		}
+	// In CI, clamd should already be running - if not, fail immediately
+	if requireClamd {
+		t.Fatal("clamd is not running (required in CI - check CI setup step)")
 	}
 
-	// Wait for clamd to be ready (up to 30 seconds for CI environments)
+	t.Log("clamd not found running, attempting to start locally...")
+
+	// Try to start clamd locally (for local development)
+	cmd := exec.Command("clamd")
+	if err := cmd.Start(); err != nil {
+		t.Skipf("Cannot start clamd (install clamav-daemon): %v", err)
+	}
+
+	// Wait for clamd to be ready (up to 30 seconds for local environments)
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
@@ -86,11 +87,7 @@ func setupClamD(t *testing.T) func() {
 		if cmd.Process != nil {
 			cmd.Process.Kill()
 		}
-		if requireClamd {
-			t.Fatal("clamd did not start in time (required in CI)")
-		} else {
-			t.Skip("clamd did not start in time")
-		}
+		t.Skip("clamd did not start in time")
 	}
 
 	return func() {
