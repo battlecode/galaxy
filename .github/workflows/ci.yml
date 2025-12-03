@@ -176,16 +176,7 @@ jobs:
         with:
           go-version: '1.18'
           cache-dependency-path: titan/go.sum
-      - name: Cache ClamAV database
-        if: steps.check_changes.outputs.changed == 'true'
-        uses: actions/cache@v3
-        with:
-          path: |
-            /var/lib/clamav
-            ~/.clamav
-          key: ${{ runner.os }}-clamav-${{ hashFiles('.github/workflows/ci.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-clamav-
+
       - name: Install ClamAV
         if: steps.check_changes.outputs.changed == 'true'
         run: |
@@ -204,14 +195,18 @@ jobs:
           # Download just the bytecode database
           sudo wget -q -O bytecode.cvd http://database.clamav.net/bytecode.cvd || sudo curl -sL -o bytecode.cvd http://database.clamav.net/bytecode.cvd
 
-          # Create daily.cvd as a copy of bytecode (to satisfy systemd condition)
+          # Create daily.cvd and main.cvd as copies of bytecode (to satisfy systemd conditions)
           sudo cp bytecode.cvd daily.cvd
+          sudo cp bytecode.cvd main.cvd
 
           # Add custom EICAR signature for testing
           echo '58354f2150254041505b345c505a583534285e2937434329377d24454943415220:69:EICAR-Test' | sudo tee test.ndb
 
           sudo chown clamav:clamav /var/lib/clamav/*
           cd -
+
+          echo "Database files created:"
+          ls -lh /var/lib/clamav/
 
           # Configure clamd for TCP
           echo 'TCPSocket 3310' | sudo tee -a /etc/clamav/clamd.conf
