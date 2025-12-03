@@ -65,7 +65,7 @@ go tool cover -html=coverage.out  # View coverage in browser
 go test -v -race ./pkg/...
 ```
 
-The tests are automatically run as part of CI on every pull request. The CI pipeline caches the ClamAV virus definitions to speed up test execution.
+The tests are automatically run as part of CI on every pull request. The CI pipeline uses a minimal custom test database (only EICAR signature) rather than downloading the full ~8GB ClamAV database set. This keeps CI execution fast while still validating real scanning functionality.
 
 ## How to request a scan
 
