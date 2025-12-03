@@ -11,27 +11,61 @@ Titan is our antivirus module that performs asynchronous malware scanning on-dem
 
 ### Running Tests
 
-To run the unit tests locally:
+#### Unit Tests (Fast, No Dependencies)
+
+Run the fast unit tests with mocked dependencies:
+
+```bash
+cd titan
+go test -v -short ./pkg/...
+```
+
+#### Integration Tests (Requires ClamAV)
+
+The integration tests require ClamAV to be installed and running. These tests verify the actual scanning functionality with a real clamd daemon.
+
+**Install ClamAV:**
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install clamav clamav-daemon
+
+# macOS
+brew install clamav
+```
+
+**Start ClamAV daemon:**
+
+```bash
+# Ubuntu/Debian
+sudo systemctl start clamav-daemon
+
+# macOS
+# Edit /opt/homebrew/etc/clamav/clamd.conf if needed
+clamd
+```
+
+**Run integration tests:**
 
 ```bash
 cd titan
 go test -v ./pkg/...
 ```
 
-To run tests with coverage:
+**Run all tests with coverage:**
 
 ```bash
 go test -v -coverprofile=coverage.out ./pkg/...
 go tool cover -html=coverage.out  # View coverage in browser
 ```
 
-To run tests with race detection:
+**Run tests with race detection:**
 
 ```bash
 go test -v -race ./pkg/...
 ```
 
-The tests are automatically run as part of CI on every pull request.
+The tests are automatically run as part of CI on every pull request. The CI pipeline caches the ClamAV virus definitions to speed up test execution.
 
 ## How to request a scan
 
