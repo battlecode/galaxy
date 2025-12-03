@@ -334,11 +334,7 @@ func TestClamdIntegration_MultipleScans(t *testing.T) {
 
 // TestMain can be used to set up test environment
 func TestMain(m *testing.M) {
-	// Check if we're running integration tests
-	if os.Getenv("INTEGRATION_TESTS") != "" || !testing.Short() {
-		// Could add global setup here
-	}
-
+	// m.Run() must be called first to parse flags before testing.Short() can be used
 	code := m.Run()
 	os.Exit(code)
 }
