@@ -19,8 +19,8 @@ const (
 
 // StorageClient is a client to a file storage service.
 type StorageClient interface {
-	// GetFile retrieves the file specified by an event.
-	GetFile(context.Context, *EventPayload) (File, error)
+	// GetFile retrieves the file specified by a scan payload.
+	GetFile(context.Context, *ScanPayload) (File, error)
 }
 
 // File is a handle to manage a file stored in a file storage service.

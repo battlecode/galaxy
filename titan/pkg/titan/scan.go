@@ -3,6 +3,7 @@ package titan
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/baruwa-enterprise/clamd"
 )
@@ -19,8 +20,19 @@ type ClamdClient struct {
 }
 
 // NewClamdClient creates a new client to clamd.
+// It uses TCP connection if CLAMD_TCP is set, otherwise Unix socket (default).
 func NewClamdClient(ctx context.Context) (*ClamdClient, error) {
-	client, err := clamd.NewClient("", "")
+	var client *clamd.Client
+	var err error
+
+	// In CI or if CLAMD_TCP is set, use TCP connection
+	if os.Getenv("CLAMD_TCP") != "" {
+		client, err = clamd.NewClient("tcp", "127.0.0.1:3310")
+	} else {
+		// Default: use Unix socket
+		client, err = clamd.NewClient("", "")
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("clamd.NewClient: %v", err)
 	}

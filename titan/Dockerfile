@@ -10,7 +10,7 @@ COPY . .
 RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /titan -ldflags="-s -w" ./cmd/titan/main.go
 
 
-FROM clamav/clamav:0.105.1_base
+FROM clamav/clamav:1.4_base
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME

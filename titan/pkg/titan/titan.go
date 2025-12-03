@@ -2,31 +2,40 @@ package titan
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/rs/zerolog/log"
 )
 
-// EventArcTriggerType is the EventArc trigger type that this server should respond to.
-const EventArcTriggerType = "google.cloud.storage.object.v1.metadataUpdated"
+// PubsubMessage represents the structure of a Pub/Sub push message.
+type PubsubMessage struct {
+	Message struct {
+		Data        string `json:"data"`
+		MessageID   string `json:"messageId"`
+		PublishTime string `json:"publishTime"`
+	} `json:"message"`
+	Subscription string `json:"subscription"`
+}
 
-// EventPayload contains the details of the event delivered by EventArc.
-type EventPayload struct {
+// ScanPayload contains the details of a scan request published by Siarnaq.
+type ScanPayload struct {
 	Bucket string `json:"bucket"`
 	Name   string `json:"name"`
 }
 
-// WithLogger updates the logger context to include event payload details.
-func (e *EventPayload) WithLogger(ctx context.Context) context.Context {
-	log := log.Ctx(ctx).With().Str("bucket", e.Bucket).Str("name", e.Name).Logger()
+// WithLogger updates the logger context to include scan payload details.
+func (s *ScanPayload) WithLogger(ctx context.Context) context.Context {
+	log := log.Ctx(ctx).With().Str("bucket", s.Bucket).Str("name", s.Name).Logger()
 	return log.WithContext(ctx)
 }
 
-// Titan is the main application that receives EventArc events from Google Cloud
-// Storage, and sends them to clamd for scanning.
+// Titan is the main application that receives Pub/Sub push messages from Siarnaq
+// and sends files to clamd for scanning.
 type Titan struct {
 	storage StorageClient
 	scanner Scanner
@@ -49,40 +58,61 @@ func New(ctx context.Context) (*Titan, error) {
 	return &Titan{storage, scanner}, nil
 }
 
-// Start begins the HTTP server to receive EventArc events.
+// Start begins the HTTP server to receive Pub/Sub push messages.
 func (t *Titan) Start(ctx context.Context, addr string) error {
-	p, err := cloudevents.NewHTTP()
-	if err != nil {
-		return fmt.Errorf("cloudevents.NewHTTP: %v", err)
-	}
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if err := t.HandleHTTP(r.Context(), w, r); err != nil {
+			log.Ctx(r.Context()).Error().Err(err).Msg("Failed to handle request.")
+			// Always return 200 to prevent Pub/Sub from retrying (we don't want retries)
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})
 
-	h, err := cloudevents.NewHTTPReceiveHandler(ctx, p, t.Handle)
-	if err != nil {
-		return fmt.Errorf("cloudevents.NewHTTPReceiveHandler: %v", err)
-	}
-
-	err = http.ListenAndServe(addr, h)
+	err := http.ListenAndServe(addr, nil)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("http.ListenAndServe: %v", err)
 	}
 	return nil
 }
 
-// Handle responds to a single EventArc event.
-func (t *Titan) Handle(ctx context.Context, event cloudevents.Event) error {
-	if t := event.Type(); t != EventArcTriggerType {
-		log.Ctx(ctx).Warn().Str("eventType", t).Msgf("Unexpected event type: %v.", t)
-		return fmt.Errorf("unexpected event type: %v", t)
+// HandleHTTP processes an HTTP request from Pub/Sub push subscription.
+func (t *Titan) HandleHTTP(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	if r.Method != http.MethodPost {
+		log.Ctx(ctx).Warn().Str("method", r.Method).Msg("Unexpected HTTP method.")
+		return fmt.Errorf("unexpected method: %s", r.Method)
 	}
 
-	data := &EventPayload{}
-	if err := event.DataAs(data); err != nil {
-		log.Ctx(ctx).Warn().Err(err).Msg("Failed to parse event payload.")
-		return fmt.Errorf("event.DataAs: %v", err)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Ctx(ctx).Warn().Err(err).Msg("Failed to read request body.")
+		return fmt.Errorf("io.ReadAll: %v", err)
 	}
 
-	ctx = data.WithLogger(ctx)
-	file, err := t.storage.GetFile(ctx, data)
+	var pubsubMsg PubsubMessage
+	if err := json.Unmarshal(body, &pubsubMsg); err != nil {
+		log.Ctx(ctx).Warn().Err(err).Msg("Failed to parse Pub/Sub message.")
+		return fmt.Errorf("json.Unmarshal: %v", err)
+	}
+
+	// Decode base64-encoded message data
+	data, err := base64.StdEncoding.DecodeString(pubsubMsg.Message.Data)
+	if err != nil {
+		log.Ctx(ctx).Warn().Err(err).Msg("Failed to decode message data.")
+		return fmt.Errorf("base64.DecodeString: %v", err)
+	}
+
+	var payload ScanPayload
+	if err := json.Unmarshal(data, &payload); err != nil {
+		log.Ctx(ctx).Warn().Err(err).Msg("Failed to parse scan payload.")
+		return fmt.Errorf("json.Unmarshal payload: %v", err)
+	}
+
+	ctx = payload.WithLogger(ctx)
+	log.Ctx(ctx).Debug().Str("messageId", pubsubMsg.Message.MessageID).Msg("Received scan request.")
+
+	file, err := t.storage.GetFile(ctx, &payload)
 	if err != nil {
 		log.Ctx(ctx).Warn().Err(err).Msg("Failed to retrieve file.")
 		return fmt.Errorf("storage.GetFile: %v", err)
