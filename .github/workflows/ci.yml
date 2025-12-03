@@ -196,35 +196,29 @@ jobs:
           sudo systemctl stop clamav-freshclam || true
           sudo systemctl disable clamav-freshclam || true
 
-          # Create a minimal test database instead of downloading the full 8GB database
-          # This contains just the EICAR test signature for testing
+          # Download only the bytecode database (smallest one, ~200KB vs 8GB for all)
+          # This is enough to test the scanning functionality
+          echo "Downloading minimal ClamAV database (bytecode only)..."
           sudo mkdir -p /var/lib/clamav
-          echo "Creating minimal test database for CI..."
+          cd /var/lib/clamav
+          # Download just the bytecode database
+          sudo wget -q -O bytecode.cvd http://database.clamav.net/bytecode.cvd || sudo curl -sL -o bytecode.cvd http://database.clamav.net/bytecode.cvd
 
-          # Create EICAR signature file
-          echo '544d44:0:*:58354f2150254041505b345c505a583534285e2937434329377d24454943415220:Win.Test.EICAR_HDB-1' | sudo tee /var/lib/clamav/test.hdb
+          # Create daily.cvd as a copy of bytecode (to satisfy systemd condition)
+          sudo cp bytecode.cvd daily.cvd
 
-          # Create a dummy daily.cvd to satisfy systemd's ConditionPathExistsGlob
-          # This is a minimal valid ClamAV database header
-          sudo touch /var/lib/clamav/daily.cvd
+          # Add custom EICAR signature for testing
+          echo '58354f2150254041505b345c505a583534285e2937434329377d24454943415220:69:EICAR-Test' | sudo tee test.ndb
 
-          sudo chown clamav:clamav /var/lib/clamav/test.hdb /var/lib/clamav/daily.cvd
+          sudo chown clamav:clamav /var/lib/clamav/*
+          cd -
 
-          # Override systemd condition to allow starting without full database
-          sudo mkdir -p /etc/systemd/system/clamav-daemon.service.d
-          echo '[Unit]' | sudo tee /etc/systemd/system/clamav-daemon.service.d/override.conf
-          echo 'ConditionPathExistsGlob=' | sudo tee -a /etc/systemd/system/clamav-daemon.service.d/override.conf
-          sudo systemctl daemon-reload
-
-          # Configure clamd for TCP and minimal database
+          # Configure clamd for TCP
           echo 'TCPSocket 3310' | sudo tee -a /etc/clamav/clamd.conf
           echo 'TCPAddr 127.0.0.1' | sudo tee -a /etc/clamav/clamd.conf
-          echo 'DatabaseDirectory /var/lib/clamav' | sudo tee -a /etc/clamav/clamd.conf
 
           # Start clamd
-          sudo systemctl start clamav-daemon.service
-
-          # Wait for clamd to be ready on TCP (should be fast with minimal database)
+          sudo systemctl start clamav-daemon.service          # Wait for clamd to be ready on TCP (should be fast with minimal database)
           echo "Waiting for clamd to start with minimal test database..."
           for i in {1..30}; do
             if echo "PING" | nc -w 1 127.0.0.1 3310 2>/dev/null | grep -q "PONG"; then
@@ -233,7 +227,8 @@ jobs:
             fi
             if [ $((i % 5)) -eq 0 ]; then
               echo "Still waiting for clamd... ($i/30 attempts)"
-              sudo journalctl -u clamav-daemon.service --no-pager -n 2 | tail -1
+              echo "=== Recent service logs ==="
+              sudo journalctl -u clamav-daemon.service --no-pager -n 10
             fi
             sleep 2
           done
