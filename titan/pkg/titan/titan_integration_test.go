@@ -92,8 +92,8 @@ func isClamdRunning() bool {
 	if err != nil {
 		return false
 	}
-	// Try to scan an empty reader to test connectivity
-	_, err = client.client.Ping()
+	// Try to ping clamd to test connectivity
+	_, err = client.client.Ping(context.Background())
 	return err == nil
 }
 
