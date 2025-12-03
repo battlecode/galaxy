@@ -9,9 +9,11 @@ from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import filters, mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
+from siarnaq.api.episodes.models import EligibilityCriterion
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable
 from siarnaq.api.teams.exceptions import TeamMaxSizeExceeded
 from siarnaq.api.teams.filters import (
@@ -36,6 +38,12 @@ from siarnaq.api.user.models import User
 from siarnaq.gcloud import titan
 
 logger = structlog.get_logger(__name__)
+
+
+class ForbiddenEligiblity(APIException):
+    status_code = status.HTTP_403_FORBIDDEN
+    default_detail = "You are not permitted to select these eligibility criteria."
+    default_code = "forbidden_eligibility"
 
 
 @extend_schema(
@@ -126,6 +134,22 @@ class TeamViewSet(
                 serializer.save()
                 return Response(serializer.data)
             case "patch":
+                if request.data["profile"] is not None:
+                    # If user is editing their profile, verify that they've
+                    # selected valid eligibility criteria.
+                    if eligible_for := request.data["profile"]["eligible_for"]:
+                        selected_criteria = EligibilityCriterion.objects.filter(
+                            pk__in=eligible_for
+                        )
+                        episode_criteria = team.episode.eligibility_criteria.filter(
+                            pk__in=eligible_for
+                        )
+                        if any(
+                            criterion.is_private or criterion not in episode_criteria
+                            for criterion in selected_criteria
+                        ):
+                            raise ForbiddenEligiblity
+
                 serializer = self.get_serializer(team, data=request.data, partial=True)
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
