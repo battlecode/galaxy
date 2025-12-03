@@ -191,37 +191,52 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y clamav clamav-daemon netcat-openbsd
-          # Update virus definitions (or use cached ones)
+
+          # Stop the auto-update service
           sudo systemctl stop clamav-freshclam || true
-          sudo freshclam || echo "Using cached virus definitions"
-          # Configure clamd to allow TCP connections (easier for tests)
-          echo "TCPSocket 3310" | sudo tee -a /etc/clamav/clamd.conf
-          echo "TCPAddr 127.0.0.1" | sudo tee -a /etc/clamav/clamd.conf
-          # Restart clamd to pick up the new configuration
-          sudo systemctl restart clamav-daemon.service
-          # Wait for clamd to be ready on TCP
-          echo "Waiting for clamd to start with TCP enabled..."
-          for i in {1..60}; do
+          sudo systemctl disable clamav-freshclam || true
+
+          # Create a minimal test database instead of downloading the full 8GB database
+          # This contains just the EICAR test signature for testing
+          sudo mkdir -p /var/lib/clamav
+          echo "Creating minimal test database for CI..."
+
+          # Create EICAR signature file
+          echo '544d44:0:*:58354f2150254041505b345c505a583534285e2937434329377d24454943415220:Win.Test.EICAR_HDB-1' | sudo tee /var/lib/clamav/test.hdb
+          sudo chown clamav:clamav /var/lib/clamav/test.hdb
+
+          # Configure clamd for TCP and minimal database
+          echo 'TCPSocket 3310' | sudo tee -a /etc/clamav/clamd.conf
+          echo 'TCPAddr 127.0.0.1' | sudo tee -a /etc/clamav/clamd.conf
+          echo 'DatabaseDirectory /var/lib/clamav' | sudo tee -a /etc/clamav/clamd.conf
+
+          # Start clamd
+          sudo systemctl start clamav-daemon.service
+
+          # Wait for clamd to be ready on TCP (should be fast with minimal database)
+          echo "Waiting for clamd to start with minimal test database..."
+          for i in {1..30}; do
             if echo "PING" | nc -w 1 127.0.0.1 3310 2>/dev/null | grep -q "PONG"; then
               echo "✓ clamd is ready and responding on TCP port 3310"
               exit 0
             fi
             if [ $((i % 5)) -eq 0 ]; then
-              echo "Still waiting for clamd... ($i/60 attempts)"
-              sudo systemctl status clamav-daemon.service --no-pager || true
+              echo "Still waiting for clamd... ($i/30 attempts)"
+              sudo journalctl -u clamav-daemon.service --no-pager -n 2 | tail -1
             fi
             sleep 2
           done
+
           # If we got here, clamd didn't start in time - fail the build
-          echo "ERROR: clamd failed to start within 120 seconds"
+          echo "ERROR: clamd failed to start within 60 seconds"
           echo "=== Service Status ==="
           sudo systemctl status clamav-daemon.service --no-pager
           echo "=== Recent Logs ==="
           sudo journalctl -u clamav-daemon.service -n 100 --no-pager
           echo "=== Config File ==="
-          sudo cat /etc/clamav/clamd.conf | grep -E "TCPSocket|TCPAddr|LocalSocket"
-          echo "=== Network Ports ==="
-          sudo netstat -tulpn | grep clam || true
+          sudo cat /etc/clamav/clamd.conf | grep -E "TCPSocket|TCPAddr|DatabaseDirectory"
+          echo "=== Database Files ==="
+          ls -lh /var/lib/clamav/
           exit 1
       - name: Run unit tests
         if: steps.check_changes.outputs.changed == 'true'
