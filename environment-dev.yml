@@ -6,11 +6,11 @@ dependencies:
   - ca-certificates
   - click<8.1.0
   - coverage>=7.0
-  - django=4.1.2
-  - django-cors-headers=3.13.0
-  - django-stubs<1.12.0
-  - djangorestframework=3.14.0
-  - drf-spectacular=0.24.2
+  - django>=4.2,<5.0
+  - django-cors-headers>=3.13.0
+  - django-stubs>=1.12.0
+  - djangorestframework>=3.14.0
+  - drf-spectacular>=0.24.2
   - flake8=5.0.4
   - go=1.18.5
   - google-auth=2.13.0
