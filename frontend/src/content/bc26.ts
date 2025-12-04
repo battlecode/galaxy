@@ -16,11 +16,15 @@ This is the Battlecode 2026 contest website, which will be your main hub for all
 
 `,
   "Account and Team Creation": `
-Coming soon!
+To participate in Battlecode, you need an account and a team. Each team can consist of 1 to 4 people.
+
+[Create an account](/register) on this website, and then go to the [team section](/bc26/my_team) to either create or join a team.
+
+If you need to rename your team for any reason, please reach out to Teh Devs on [Discord](https://discord.gg/N86mxkH) or at [battlecode@mit.edu](mailto:battlecode@mit.edu).
+
 `,
 
   "Installation and Setup": `
-
 Coming soon!
 `,
 };
@@ -28,12 +32,21 @@ Coming soon!
 export const RESOURCES: Partial<Record<ResourcesPageKey, string>> = {
   "Coding Resources": `
 
-Coming soon!
+If you're just starting out, check out the [quick start](/bc26/quick_start) page!
+
+For more helpful resources while coding, see:
+
+- [Common Issues](/bc26/common_issues)
+- [Debugging Tips](/bc26/debugging_tips)
 
 `,
   "Third-party Tools": `
 
-Coming soon!
+The tools below were made by contestants! They haven't been tested by the devs, but might prove to be very helpful in developing your bot.
+
+If you make a new tool that could be useful to others, please post it in the [#open-source channel](https://discord.gg/N86mxkH) on the Discord. Everyone will love you!!
+
+- There is nothing here yet...
 
 `,
   Lectures: `
@@ -46,15 +59,13 @@ All lectures are streamed live on and later uploaded to [our YouTube page](https
 
 export const DEBUGGINGTIPS: Partial<Record<DebuggingTipsPageKey, string>> = {
   Debugging: `
-
 Coming soon!
   `,
 };
 
 export const COMMONISSUES: Partial<Record<CommonIssuesPageKey, string>> = {
   "Installation Issues": `
-
-    Coming soon!
+Coming soon!
 `,
 };
 
@@ -65,6 +76,8 @@ Battlecode 2026 will have several tournaments throughout the month! We stream an
 The deadline to submit code for each non-final tournament is usually 7 pm EST *the day before* the tournament.
 
 Please note that **all times on this page are in your current time zone**. Refer to the submission freeze countdown timer for the time remaining before the next submission freeze.
+
+The tournament schedule will be released before the contest begins. Please check back later!
 `,
   Prizes: `Coming soon!`,
 };
