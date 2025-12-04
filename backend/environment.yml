@@ -12,11 +12,11 @@ dependencies:
   - google-cloud-secret-manager=2.12.6
   - google-cloud-storage=2.5.0
   - gunicorn=20.1.0
-  - openssl=3.0.5
-  - pillow=9.0.1
-  - pip=22.3
+  - openssl
+  - pillow>=9.0
+  - pip>=22.3
   - psycopg2=2.9.3
-  - python=3.10
+  - python=3.12
   - pip:
     - django-anymail==8.6
     - django-configurations==2.4
