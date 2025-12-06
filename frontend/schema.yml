@@ -2168,6 +2168,45 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserResume'
           description: ''
+  /api/user/verify_email/send/:
+    post:
+      operationId: user_verify_email_send_create
+      description: |-
+        Send (or resend) an email verification token to the authenticated user's email.
+        Requires authentication.
+      tags:
+      - user
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: Email verification sent successfully, or user is already verified
+  /api/user/verify_email/validate_token/:
+    post:
+      operationId: user_verify_email_validate_token_create
+      description: Verify an email address using the provided token.
+      tags:
+      - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyTokenRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerifyTokenRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerifyTokenRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: Email verified successfully
+        '400':
+          description: Invalid or expired token
 components:
   schemas:
     AutoscrimRequest:
@@ -3726,6 +3765,7 @@ components:
           readOnly: true
       required:
       - email
+      - email_verified
       - first_name
       - id
       - is_staff
@@ -3893,6 +3933,15 @@ components:
       - ready
       - reason
       - url
+    VerifyTokenRequest:
+      type: object
+      description: Serializer for verifying an email verification token.
+      properties:
+        token:
+          type: string
+          minLength: 1
+      required:
+      - token
   securitySchemes:
     jwtAuth:
       type: http
