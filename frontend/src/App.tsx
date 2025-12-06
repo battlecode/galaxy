@@ -10,6 +10,7 @@ import Logout from "./views/Logout";
 import Register from "./views/Register";
 import PasswordForgot from "./views/PasswordForgot";
 import PasswordChange from "./views/PasswordChange";
+import EmailVerify from "./views/EmailVerify";
 import Account from "./views/Account";
 import Login from "./views/Login";
 import QuickStart from "./views/QuickStart";
@@ -117,6 +118,11 @@ const router = createBrowserRouter([
   {
     path: "/password_change",
     element: <PasswordChange />,
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: "/verify_email",
+    element: <EmailVerify />,
     errorElement: <ErrorBoundary />,
   },
   // Account page doesn't have episode id in URL

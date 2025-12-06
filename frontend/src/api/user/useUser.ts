@@ -30,6 +30,7 @@ import {
   downloadResume,
   userAvatarUpload,
   resendVerificationEmail,
+  verifyEmail,
 } from "./userApi";
 import { toast } from "react-hot-toast";
 import { login } from "../auth/authApi";
@@ -305,6 +306,26 @@ export const useResendVerificationEmail = ({
           "Sent verification email!\nWait a few minutes for it to arrive.",
         error:
           "Error sending verification email.\n Try again.\nContact battlecode@mit.edu if you encounter any issues.",
+      });
+    },
+  });
+
+/**
+ * For verifying an email with a token.
+ */
+export const useVerifyEmail = (
+  { episodeId }: { episodeId: string },
+  queryClient: QueryClient,
+): UseMutationResult<void, Error, string> =>
+  useMutation({
+    mutationKey: userMutationKeys.verifyEmail({ episodeId }),
+    mutationFn: async (token: string) => {
+      await verifyEmail(token);
+    },
+    onSuccess: async () => {
+      // Refetch user info to update email_verified status
+      await queryClient.refetchQueries({
+        queryKey: buildKey(myUserInfoFactory.queryKey, { episodeId }),
       });
     },
   });

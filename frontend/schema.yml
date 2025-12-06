@@ -1166,6 +1166,7 @@ paths:
               - br
               - bs
               - ca
+              - ckb
               - cs
               - cy
               - da
@@ -1246,6 +1247,7 @@ paths:
               - tr
               - tt
               - udm
+              - ug
               - uk
               - ur
               - uz
@@ -2133,19 +2135,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserPrivate"
           description: ""
-  /api/user/u/resend_verification_email/:
-    post:
-      operationId: user_u_resend_verification_email_create
-      description: Resend verification email to authenticated user.
-      tags:
-        - user
-      security:
-        - jwtAuth: []
-      responses:
-        "204":
-          description: No response body
-        "400":
-          description: No response body
   /api/user/u/resume/:
     get:
       operationId: user_u_resume_retrieve
@@ -2184,6 +2173,45 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserResume"
           description: ""
+  /api/user/verify_email/send/:
+    post:
+      operationId: user_verify_email_send_create
+      description: |-
+        Send (or resend) an email verification token to the authenticated user's email.
+        Requires authentication.
+      tags:
+        - user
+      security:
+        - jwtAuth: []
+      responses:
+        "200":
+          description: Email verification sent successfully, or user is already verified
+  /api/user/verify_email/validate_token/:
+    post:
+      operationId: user_verify_email_validate_token_create
+      description: Verify an email address using the provided token.
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyTokenRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/VerifyTokenRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/VerifyTokenRequest"
+        required: true
+      security:
+        - jwtAuth: []
+        - {}
+      responses:
+        "200":
+          description: Email verified successfully
+        "400":
+          description: Invalid or expired token
 components:
   schemas:
     AutoscrimRequest:
@@ -2207,6 +2235,9 @@ components:
             type: integer
         min_score:
           type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
       required:
         - episode
         - maps
@@ -3529,6 +3560,9 @@ components:
           type: string
         external_id:
           type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
           nullable: true
         name:
           type: string
@@ -3538,9 +3572,15 @@ components:
           items:
             type: integer
         release_status:
-          $ref: "#/components/schemas/ReleaseStatusEnum"
+          allOf:
+            - $ref: "#/components/schemas/ReleaseStatusEnum"
+          minimum: -9223372036854775808
+          maximum: 9223372036854775807
         display_order:
           type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
         in_progress:
           type: boolean
       required:
@@ -3903,6 +3943,15 @@ components:
         - ready
         - reason
         - url
+    VerifyTokenRequest:
+      type: object
+      description: Serializer for verifying an email verification token.
+      properties:
+        token:
+          type: string
+          minLength: 1
+      required:
+        - token
   securitySchemes:
     jwtAuth:
       type: http

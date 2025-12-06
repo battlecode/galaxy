@@ -5,6 +5,7 @@ from siarnaq.api.user import views
 
 router = DefaultRouter()
 router.register("u", views.UserViewSet, basename="user")
+router.register("verify_email", views.EmailVerificationViewSet, basename="verify_email")
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -12,5 +13,4 @@ urlpatterns = [
         "password_reset/",
         include("django_rest_passwordreset.urls", namespace="password_reset"),
     ),
-    path("verify_email/", include("django_email_verification.urls")),
 ]

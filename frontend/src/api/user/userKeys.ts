@@ -77,4 +77,7 @@ export const userMutationKeys = {
 
   resendVerification: ({ episodeId }: { episodeId: string }) =>
     ["user", "resendVerification", episodeId] as const,
+
+  verifyEmail: ({ episodeId }: { episodeId: string }) =>
+    ["user", "verifyEmail", episodeId] as const,
 };

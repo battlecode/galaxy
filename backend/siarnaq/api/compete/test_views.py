@@ -1222,7 +1222,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             )
             u.email_verified = True
             u.save()
-            t = Team.objects.create(
+            t = Team(
                 episode=self.e1 if i < 2 else self.e2,
                 name=f"team{i}",
                 profile=dict(
@@ -1230,6 +1230,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
                     auto_accept_reject_unranked=ScrimmageRequestAcceptReject.MANUAL,
                 ),
             )
+            t.save()
             t.members.add(u)
             self.submissions.append(
                 Submission.objects.create(

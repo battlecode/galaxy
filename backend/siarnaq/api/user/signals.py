@@ -3,11 +3,13 @@ import urllib.parse
 import structlog
 from django.conf import settings
 from django.core.mail import send_mail
-from django.dispatch import receiver
+from django.dispatch import Signal, receiver
 from django.template.loader import render_to_string
 from django_rest_passwordreset.signals import reset_password_token_created
 
 logger = structlog.get_logger(__name__)
+
+email_verification_token_created = Signal()
 
 
 @receiver(reset_password_token_created)
@@ -47,7 +49,36 @@ def send_password_reset_token_email(
     )
 
 
-def email_verified_callback(user):
-    """Called automatically by django_email_verification after user verifies email."""
-    user.email_verified = True
-    user.save(update_fields=["email_verified"])
+@receiver(email_verification_token_created)
+def send_email_verification_token_email(
+    sender, instance, email_verification_token, *args, **kwargs
+):
+    """
+    When an email verification token is created, send an email to the user.
+    """
+
+    if not settings.EMAIL_ENABLED:
+        logger.warn(
+            "email_verification_disabled",
+            message="Email verification emails are disabled.",
+        )
+        return
+
+    logger.info("email_verification_email", message="Sending email verification email.")
+    user_email = email_verification_token.user.email
+    uri = f"{settings.FRONTEND_ORIGIN}/verify_email/"
+    token_encoded = urllib.parse.urlencode({"token": email_verification_token.key})
+    context = {
+        "username": email_verification_token.user.username,
+        "verify_email_url": f"{uri}?{token_encoded}",
+    }
+    email_html_message = render_to_string("email_verification.html", context)
+
+    send_mail(
+        subject="MIT Battlecode: Verify Your Email",
+        message=email_html_message,
+        html_message=email_html_message,
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[user_email],
+        fail_silently=False,
+    )

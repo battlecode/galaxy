@@ -1,7 +1,11 @@
+from datetime import timedelta
+
+from django.conf import settings
+from django.utils import timezone
 from django_countries.serializer_fields import CountryField
 from rest_framework import serializers
 
-from siarnaq.api.user.models import User, UserProfile
+from siarnaq.api.user.models import EmailVerificationToken, User, UserProfile
 
 
 class UserProfilePublicSerializer(serializers.ModelSerializer):
@@ -111,3 +115,32 @@ class UserResumeSerializer(serializers.Serializer):
 
 class UserAvatarSerializer(serializers.Serializer):
     avatar = serializers.ImageField(write_only=True)
+
+
+class EmailSerializer(serializers.Serializer):
+    """Serializer for requesting an email verification token."""
+
+    email = serializers.EmailField()
+
+
+class VerifyTokenSerializer(serializers.Serializer):
+    """Serializer for verifying an email verification token."""
+
+    token = serializers.CharField()
+
+    def validate(self, attrs):
+        token = attrs.get("token")
+
+        try:
+            verification_token = EmailVerificationToken.objects.get(token=token)
+        except EmailVerificationToken.DoesNotExist:
+            raise serializers.ValidationError({"token": ["Invalid token"]})
+
+        expiry_time = settings.EMAIL_VERIFICATION_TOKEN_EXPIRY_TIME
+        expiry_date = verification_token.created_at + timedelta(hours=expiry_time)
+
+        if timezone.now() > expiry_date:
+            raise serializers.ValidationError({"token": ["Token has expired"]})
+
+        attrs["verification_token"] = verification_token
+        return attrs

@@ -29,6 +29,7 @@ import type {
   UserPrivateRequest,
   UserPublic,
   UserResume,
+  VerifyTokenRequest,
 } from '../models';
 import {
     EmailFromJSON,
@@ -59,6 +60,8 @@ import {
     UserPublicToJSON,
     UserResumeFromJSON,
     UserResumeToJSON,
+    VerifyTokenRequestFromJSON,
+    VerifyTokenRequestToJSON,
 } from '../models';
 
 export interface UserPasswordResetConfirmCreateRequest {
@@ -99,6 +102,10 @@ export interface UserURetrieveRequest {
 
 export interface UserUTeamsRetrieveRequest {
     id: number;
+}
+
+export interface UserVerifyEmailValidateTokenCreateRequest {
+    verifyTokenRequest: VerifyTokenRequest;
 }
 
 /**
@@ -413,39 +420,6 @@ export class UserApi extends runtime.BaseAPI {
     }
 
     /**
-     * Resend verification email to authenticated user.
-     */
-    async userUResendVerificationEmailCreateRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        if (this.configuration && this.configuration.accessToken) {
-            const token = this.configuration.accessToken;
-            const tokenString = await token("jwtAuth", []);
-
-            if (tokenString) {
-                headerParameters["Authorization"] = `Bearer ${tokenString}`;
-            }
-        }
-        const response = await this.request({
-            path: `/api/user/u/resend_verification_email/`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.VoidApiResponse(response);
-    }
-
-    /**
-     * Resend verification email to authenticated user.
-     */
-    async userUResendVerificationEmailCreate(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.userUResendVerificationEmailCreateRaw(initOverrides);
-    }
-
-    /**
      * Retrieve or update the uploaded resume.
      */
     async userUResumeRetrieveRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserResume>> {
@@ -608,6 +582,79 @@ export class UserApi extends runtime.BaseAPI {
     async userUTeamsRetrieve(requestParameters: UserUTeamsRetrieveRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: TeamPublic; }> {
         const response = await this.userUTeamsRetrieveRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     * Send (or resend) an email verification token to the authenticated user\'s email. Requires authentication.
+     */
+    async userVerifyEmailSendCreateRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/user/verify_email/send/`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Send (or resend) an email verification token to the authenticated user\'s email. Requires authentication.
+     */
+    async userVerifyEmailSendCreate(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.userVerifyEmailSendCreateRaw(initOverrides);
+    }
+
+    /**
+     * Verify an email address using the provided token.
+     */
+    async userVerifyEmailValidateTokenCreateRaw(requestParameters: UserVerifyEmailValidateTokenCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.verifyTokenRequest === null || requestParameters.verifyTokenRequest === undefined) {
+            throw new runtime.RequiredError('verifyTokenRequest','Required parameter requestParameters.verifyTokenRequest was null or undefined when calling userVerifyEmailValidateTokenCreate.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        if (this.configuration && this.configuration.accessToken) {
+            const token = this.configuration.accessToken;
+            const tokenString = await token("jwtAuth", []);
+
+            if (tokenString) {
+                headerParameters["Authorization"] = `Bearer ${tokenString}`;
+            }
+        }
+        const response = await this.request({
+            path: `/api/user/verify_email/validate_token/`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: VerifyTokenRequestToJSON(requestParameters.verifyTokenRequest),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     * Verify an email address using the provided token.
+     */
+    async userVerifyEmailValidateTokenCreate(requestParameters: UserVerifyEmailValidateTokenCreateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.userVerifyEmailValidateTokenCreateRaw(requestParameters, initOverrides);
     }
 
 }
