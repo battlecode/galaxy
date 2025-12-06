@@ -248,6 +248,9 @@ class Base(Configuration):
     EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
     EMAIL_HOST_USER = "no-reply@battlecode.org"
 
+    # Email Verification Configuration
+    EMAIL_VERIFICATION_TOKEN_EXPIRY_TIME = 24  # Time in hours
+
 
 class Local(Base):
     ALLOWED_HOSTS = [
@@ -345,7 +348,7 @@ class Staging(Base):
     DEBUG = False
     CORS_ALLOW_ALL_ORIGINS = True
 
-    EMAIL_ENABLED = False
+    EMAIL_ENABLED = True
     FRONTEND_ORIGIN = "https://play.staging.battlecode.org"
 
     LOGGING: dict[str, Any] = {

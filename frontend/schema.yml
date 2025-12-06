@@ -1166,6 +1166,7 @@ paths:
               - br
               - bs
               - ca
+              - ckb
               - cs
               - cy
               - da
@@ -1246,6 +1247,7 @@ paths:
               - tr
               - tt
               - udm
+              - ug
               - uk
               - ur
               - uz
@@ -1974,7 +1976,7 @@ paths:
   /api/user/u/:
     post:
       operationId: user_u_create
-      description: A viewset for retrieving and updating all user info.
+      description: Create a new user (registration) and send verification email.
       tags:
         - user
       requestBody:
@@ -2171,6 +2173,45 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserResume"
           description: ""
+  /api/user/verify_email/send/:
+    post:
+      operationId: user_verify_email_send_create
+      description: |-
+        Send (or resend) an email verification token to the authenticated user's email.
+        Requires authentication.
+      tags:
+        - user
+      security:
+        - jwtAuth: []
+      responses:
+        "200":
+          description: Email verification sent successfully, or user is already verified
+  /api/user/verify_email/validate_token/:
+    post:
+      operationId: user_verify_email_validate_token_create
+      description: Verify an email address using the provided token.
+      tags:
+        - user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyTokenRequest"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/VerifyTokenRequest"
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/VerifyTokenRequest"
+        required: true
+      security:
+        - jwtAuth: []
+        - {}
+      responses:
+        "200":
+          description: Email verified successfully
+        "400":
+          description: Invalid or expired token
 components:
   schemas:
     AutoscrimRequest:
@@ -2194,8 +2235,9 @@ components:
             type: integer
         min_score:
           type: integer
-          maximum: 32767
+          maximum: 9223372036854775807
           minimum: 0
+          format: int64
       required:
         - episode
         - maps
@@ -3518,8 +3560,9 @@ components:
           type: string
         external_id:
           type: integer
-          maximum: 32767
-          minimum: -32768
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
           nullable: true
         name:
           type: string
@@ -3531,12 +3574,13 @@ components:
         release_status:
           allOf:
             - $ref: "#/components/schemas/ReleaseStatusEnum"
-          minimum: -2147483648
-          maximum: 2147483647
+          minimum: -9223372036854775808
+          maximum: 9223372036854775807
         display_order:
           type: integer
-          maximum: 32767
+          maximum: 9223372036854775807
           minimum: 0
+          format: int64
         in_progress:
           type: boolean
       required:
@@ -3724,8 +3768,12 @@ components:
           readOnly: true
           title: Staff status
           description: Designates whether the user can log into this admin site.
+        email_verified:
+          type: boolean
+          readOnly: true
       required:
         - email
+        - email_verified
         - first_name
         - id
         - is_staff
@@ -3895,6 +3943,15 @@ components:
         - ready
         - reason
         - url
+    VerifyTokenRequest:
+      type: object
+      description: Serializer for verifying an email verification token.
+      properties:
+        token:
+          type: string
+          minLength: 1
+      required:
+        - token
   securitySchemes:
     jwtAuth:
       type: http

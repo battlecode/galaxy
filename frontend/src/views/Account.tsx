@@ -213,6 +213,13 @@ const ProfileForm: React.FC<{
               errorMessage={errors.email?.message}
               {...register("email", { required: FIELD_REQUIRED_ERROR_MSG })}
             />
+            {/* Warning about email change TODO: maybe add reset button here?*/}
+            <div className="col-span-2">
+              <p className="text-xs text-gray-500">
+                Note: Changing your email will require re-verification.
+              </p>
+            </div>
+
             <Input
               required
               label="First name"

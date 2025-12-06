@@ -1,0 +1,19 @@
+<p>Hello, {{ username|safe }}!</p>
+
+<p>
+  Thank you for registering for
+  <a href="https://www.battlecode.org/">Battlecode</a>.
+  Please verify your email address to activate your account.
+</p>
+<p>
+  Click <a href="{{verify_email_url}}">here</a> to verify your email. The
+  link will expire in 24 hours.
+</p>
+<p>Link: <a href="{{verify_email_url}}">{{verify_email_url}}</a></p>
+<p>
+  If you didn't create an account, you can safely ignore this email.
+</p>
+<p>
+  Best, <br />
+  -Teh Devs
+</p>

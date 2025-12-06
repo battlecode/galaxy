@@ -16,6 +16,9 @@ conda run -n galaxy python manage.py spectacular --file ../frontend/schema.yml -
 
 cd ../frontend
 
+echo "Formatting schema.yml with prettier.."
+npx prettier --write schema.yml
+
 # Delete the types folder before regenerating it.
 echo "Deleting the old types folder.."
 rm -rf ./src/api/_autogen

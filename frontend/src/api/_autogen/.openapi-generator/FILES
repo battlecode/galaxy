@@ -82,5 +82,6 @@ models/UserProfilePublicRequest.ts
 models/UserPublic.ts
 models/UserPublicRequest.ts
 models/UserResume.ts
+models/VerifyTokenRequest.ts
 models/index.ts
 runtime.ts

@@ -75,3 +75,4 @@ export * from './UserProfilePublicRequest';
 export * from './UserPublic';
 export * from './UserPublicRequest';
 export * from './UserResume';
+export * from './VerifyTokenRequest';

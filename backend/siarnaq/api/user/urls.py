@@ -5,6 +5,7 @@ from siarnaq.api.user import views
 
 router = DefaultRouter()
 router.register("u", views.UserViewSet, basename="user")
+router.register("verify_email", views.EmailVerificationViewSet, basename="verify_email")
 
 urlpatterns = [
     path("", include(router.urls)),
