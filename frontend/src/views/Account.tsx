@@ -22,6 +22,7 @@ import {
   useUpdateCurrentUserInfo,
   useUpdateUserAvatar,
   useResumeUpload,
+  useResendVerificationEmail,
 } from "../api/user/useUser";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useQueryClient } from "@tanstack/react-query";
@@ -151,6 +152,7 @@ const ProfileForm: React.FC<{
     { episodeId },
     queryClient,
   );
+  const resendEmailMutation = useResendVerificationEmail({ episodeId });
 
   const {
     register,
@@ -213,11 +215,28 @@ const ProfileForm: React.FC<{
               errorMessage={errors.email?.message}
               {...register("email", { required: FIELD_REQUIRED_ERROR_MSG })}
             />
-            {/* Warning about email change TODO: maybe add reset button here?*/}
+            {/* Warning about email change and resend verification button */}
             <div className="col-span-2">
               <p className="text-xs text-gray-500">
                 Note: Changing your email will require re-verification.
               </p>
+              {user.data?.email_verified === false && (
+                <div className="mt-2 flex items-center gap-2">
+                  <p className="text-xs text-yellow-700">
+                    Your email is not verified.
+                  </p>
+                  <Button
+                    label="Resend Verification Email"
+                    onClick={() => {
+                      resendEmailMutation.mutate(undefined);
+                    }}
+                    loading={resendEmailMutation.isPending}
+                    disabled={resendEmailMutation.isPending}
+                    variant="dark"
+                    className="text-xs"
+                  />
+                </div>
+              )}
             </div>
 
             <Input

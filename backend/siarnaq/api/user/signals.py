@@ -67,7 +67,7 @@ def send_email_verification_token_email(
     logger.info("email_verification_email", message="Sending email verification email.")
     user_email = email_verification_token.user.email
     uri = f"{settings.FRONTEND_ORIGIN}/verify_email/"
-    token_encoded = urllib.parse.urlencode({"token": email_verification_token.key})
+    token_encoded = urllib.parse.urlencode({"token": email_verification_token.token})
     context = {
         "username": email_verification_token.user.username,
         "verify_email_url": f"{uri}?{token_encoded}",
