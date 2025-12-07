@@ -47,7 +47,7 @@ from siarnaq.api.compete.serializers import (
     TournamentSubmissionSerializer,
 )
 from siarnaq.api.episodes.models import Episode, ReleaseStatus, Tournament
-from siarnaq.api.episodes.permissions import IsEpisodeAvailable, IsEpisodeMutable
+from siarnaq.api.episodes.permissions import IsEpisodeAvailable, IsEpisodeMutableForTeam
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
 from siarnaq.api.user.permissions import IsEmailVerified
@@ -131,7 +131,7 @@ class SubmissionViewSet(
     permission_classes = (
         IsAuthenticated,
         IsEmailVerified,
-        IsEpisodeMutable | IsAdminUser,
+        IsEpisodeMutableForTeam | IsAdminUser,
         IsOnTeam,
     )
     filter_backends = [IsSubmissionCreatorFilterBackend]
@@ -274,7 +274,7 @@ class MatchViewSet(
     """
 
     serializer_class = MatchSerializer
-    permission_classes = (IsEpisodeMutable | IsAdminUser,)
+    permission_classes = (IsEpisodeMutableForTeam | IsAdminUser,)
 
     def get_queryset(self, prefetch_related=True):
         queryset = (
@@ -351,7 +351,7 @@ class MatchViewSet(
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=(IsEpisodeMutable,),
+        permission_classes=(IsEpisodeMutableForTeam,),
     )
     def tournament(self, request, *, episode_id):
         """
@@ -418,7 +418,7 @@ class MatchViewSet(
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=(IsEpisodeMutable,),
+        permission_classes=(IsEpisodeMutableForTeam,),
     )
     def scrimmage(self, request, pk=None, *, episode_id):
         """List all scrimmages that a particular team participated in."""
@@ -510,7 +510,7 @@ class MatchViewSet(
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=(IsEpisodeMutable,),
+        permission_classes=(IsEpisodeMutableForTeam,),
         pagination_class=None,
     )
     def historical_rating(self, request, pk=None, *, episode_id):
@@ -591,7 +591,7 @@ class MatchViewSet(
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=(IsEpisodeMutable,),
+        permission_classes=(IsEpisodeMutableForTeam,),
         # needed so that the generated schema is not paginated
         pagination_class=None,
     )
@@ -644,7 +644,7 @@ class MatchViewSet(
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=(IsEpisodeMutable,),
+        permission_classes=(IsEpisodeMutableForTeam,),
     )
     def scrimmaging_record(self, request, pk=None, *, episode_id):
         """
@@ -919,7 +919,7 @@ class ScrimmageRequestViewSet(
                     IsAuthenticated(),
                     IsEmailVerified(),
                     IsOnTeam(),
-                    (IsEpisodeMutable | IsAdminUser)(),
+                    (IsEpisodeMutableForTeam | IsAdminUser)(),
                     HasTeamSubmission(),
                 ]
             case "destroy":
@@ -1101,7 +1101,7 @@ class ScrimmageRequestViewSet(
             IsAuthenticated,
             IsEmailVerified,
             IsOnTeam,
-            IsEpisodeMutable | IsAdminUser,
+            IsEpisodeMutableForTeam | IsAdminUser,
             HasTeamSubmission,
         ),
     )
