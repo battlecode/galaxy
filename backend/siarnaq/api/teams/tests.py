@@ -3,10 +3,18 @@ import unittest
 from unittest.mock import patch
 
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
+from rest_framework.test import APIClient
 
 from siarnaq.api.compete.models import Match, MatchParticipant, Submission
-from siarnaq.api.episodes.models import Episode, Language, Map
+from siarnaq.api.episodes.models import (
+    EligibilityCriterion,
+    Episode,
+    Language,
+    Map,
+    Tournament,
+)
 from siarnaq.api.teams.managers import generate_4regular_graph
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.user.models import User
@@ -235,3 +243,66 @@ class AutoscrimmageTestCase(TestCase):
             Team.objects.autoscrim(episode=e1, best_of=3)
         m.refresh_from_db()
         self.assertFalse(m.matches.exists())
+
+
+class TeamEligibilityFreezeTestCase(TestCase):
+    """Tests for blocking eligibility changes during tournament submission freeze."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username="user", email="user@example.com")
+        # Create a visible episode
+        self.episode = Episode.objects.create(
+            name_short="ep1",
+            registration=timezone.now(),
+            game_release=timezone.now(),
+            game_archive=timezone.now(),
+            language=Language.JAVA_8,
+        )
+        # Create a team and add user
+        self.team = Team.objects.create(episode=self.episode, name="team1")
+        self.team.members.add(self.user)
+
+        # Create an eligibility criterion
+        self.criterion = EligibilityCriterion.objects.create(
+            title="crit",
+            description="d",
+            icon="x",
+        )
+
+    def _me_url(self):
+        return reverse("team-me", kwargs={"episode_id": self.episode.name_short})
+
+    def test_cannot_change_eligibility_during_freeze(self):
+        # Create an active-freeze tournament
+        now = timezone.now()
+        Tournament.objects.create(
+            name_short="t1",
+            name_long="Tournament 1",
+            episode=self.episode,
+            style="SE",
+            require_resume=False,
+            is_public=True,
+            display_date=now.date(),
+            submission_freeze=now - timezone.timedelta(hours=1),
+            submission_unfreeze=now + timezone.timedelta(hours=1),
+        )
+
+        self.client.force_authenticate(self.user)
+        url = self._me_url()
+        data = {"profile": {"eligible_for": [self.criterion.pk]}}
+        resp = self.client.patch(url, data, format="json")
+        self.assertEqual(resp.status_code, 400)
+
+    def test_can_change_eligibility_outside_freeze(self):
+        # No active tournaments
+        self.client.force_authenticate(self.user)
+        url = self._me_url()
+        data = {"profile": {"eligible_for": [self.criterion.pk]}}
+        resp = self.client.patch(url, data, format="json")
+        self.assertIn(resp.status_code, (200, 201))
+        # verify eligible_for was set
+        self.team.refresh_from_db()
+        self.assertTrue(
+            self.team.profile.eligible_for.filter(pk=self.criterion.pk).exists()
+        )
