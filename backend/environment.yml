@@ -6,9 +6,10 @@ dependencies:
   - gunicorn>=20.1.0
   - openssl
   - pillow>=9.0
-  - pip>=22.3
+  - pip>=24.0
   - psycopg2=2.9.3
   - python=3.12
+  - setuptools>=65.0
   - pip:
     - django>=4.2,<5.0
     - django-anymail>=8.6
