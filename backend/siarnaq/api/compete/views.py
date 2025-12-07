@@ -458,9 +458,9 @@ class MatchViewSet(
             .select_related("match", "rating")
             .order_by("match__created")
         )
-        logger.debug(f"match_participants query plan: {match_participants.query}")
+        # logger.debug(f"match_participants query plan: {match_participants.query}")
 
-        logger.debug(f"match_participants count: {match_participants.count()}")
+        # logger.debug(f"match_participants count: {match_participants.count()}")
         # Prepare rating history
         teams_rating_history = [
             [
