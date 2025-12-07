@@ -134,7 +134,10 @@ class TeamViewSet(
                 serializer.save()
                 return Response(serializer.data)
             case "patch":
-                if request.data["profile"] is not None:
+                if (
+                    request.data["profile"] is not None
+                    and "eligible_for" in request.data["profile"]
+                ):
                     # If user is editing their profile, verify that they've
                     # selected valid eligibility criteria.
                     if eligible_for := request.data["profile"]["eligible_for"]:
