@@ -2,6 +2,7 @@ import random
 import unittest
 from unittest.mock import patch
 
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -257,6 +258,7 @@ class TeamEligibilityFreezeTestCase(TestCase):
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
+            submission_frozen=False,
             language=Language.JAVA_8,
         )
         # Create a team and add user
@@ -306,3 +308,101 @@ class TeamEligibilityFreezeTestCase(TestCase):
         self.assertTrue(
             self.team.profile.eligible_for.filter(pk=self.criterion.pk).exists()
         )
+
+
+class SubmissionFreezeBehaviorTestCase(TestCase):
+    """Tests submission create behavior under tournament submission freezes."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username="user2", email="u2@example.com")
+        self.episode = Episode.objects.create(
+            name_short="ep2",
+            registration=timezone.now(),
+            game_release=timezone.now(),
+            game_archive=timezone.now(),
+            submission_frozen=False,
+            language=Language.JAVA_8,
+        )
+        self.team = Team.objects.create(episode=self.episode, name="teamA")
+        self.team.members.add(self.user)
+        self.criterion = EligibilityCriterion.objects.create(
+            title="crit2", description="d", icon="x"
+        )
+
+    def _submission_url(self):
+        return reverse(
+            "submission-list", kwargs={"episode_id": self.episode.name_short}
+        )
+
+    def _make_file(self):
+        return SimpleUploadedFile(
+            "source.zip", b"content", content_type="application/zip"
+        )
+
+    def test_frozen_if_eligible_for_any_active_tournament(self):
+        now = timezone.now()
+        # Create two active tournaments; team eligible for tournament1
+        t1 = Tournament.objects.create(
+            name_short="tA",
+            name_long="T A",
+            episode=self.episode,
+            style="SE",
+            require_resume=False,
+            is_public=True,
+            display_date=now.date(),
+            submission_freeze=now - timezone.timedelta(hours=1),
+            submission_unfreeze=now + timezone.timedelta(hours=1),
+        )
+        Tournament.objects.create(
+            name_short="tB",
+            name_long="T B",
+            episode=self.episode,
+            style="SE",
+            require_resume=False,
+            is_public=True,
+            display_date=now.date(),
+            submission_freeze=now - timezone.timedelta(hours=1),
+            submission_unfreeze=now + timezone.timedelta(hours=1),
+        )
+        t1.eligibility_includes.add(self.criterion)
+        # make team eligible for criterion
+        self.team.profile.eligible_for.add(self.criterion)
+
+        self.client.force_authenticate(self.user)
+        url = self._submission_url()
+        data = {"source_code": self._make_file(), "package": "p", "description": "d"}
+        resp = self.client.post(url, data, format="multipart")
+        # Should be forbidden due to active freeze
+        self.assertEqual(resp.status_code, 403)
+
+    def test_not_frozen_if_no_active_tournaments(self):
+        # No tournaments
+        self.client.force_authenticate(self.user)
+        url = self._submission_url()
+        data = {"source_code": self._make_file(), "package": "p", "description": "d"}
+        resp = self.client.post(url, data, format="multipart")
+        self.assertEqual(resp.status_code, 201)
+
+    def test_not_frozen_if_not_eligible_for_active_tournaments(self):
+        now = timezone.now()
+        # Create active tournament but team not eligible
+        t = Tournament.objects.create(
+            name_short="tC",
+            name_long="T C",
+            episode=self.episode,
+            style="SE",
+            require_resume=False,
+            is_public=True,
+            display_date=now.date(),
+            submission_freeze=now - timezone.timedelta(hours=1),
+            submission_unfreeze=now + timezone.timedelta(hours=1),
+        )
+        # make the tournament require a criterion the team does not have
+        t.eligibility_includes.add(self.criterion)
+
+        self.client.force_authenticate(self.user)
+        url = self._submission_url()
+        data = {"source_code": self._make_file(), "package": "p", "description": "d"}
+        resp = self.client.post(url, data, format="multipart")
+        self.assertEqual(resp.status_code, 201)

@@ -47,6 +47,10 @@ class IsEpisodeMutableForTeam(permissions.BasePermission):
         if not team.exists():
             return False
 
+        # If the episode itself is frozen (global freeze flag or pre-release), deny.
+        if episode.frozen():
+            return False
+
         # Deny mutation if any of the user's teams are eligible for a tournament
         # that currently has an active submission freeze window.
         now = timezone.now()
