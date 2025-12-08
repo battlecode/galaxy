@@ -169,8 +169,9 @@ module "titan" {
   gcp_zone    = var.gcp_zone
   labels      = merge(var.labels, {component="titan"})
 
-  image         = var.titan_image
-  storage_names = [google_storage_bucket.public.name, google_storage_bucket.secure.name]
+  image                  = var.titan_image
+  storage_names          = [google_storage_bucket.public.name, google_storage_bucket.secure.name]
+  pubsub_topic_scan_name = module.siarnaq.pubsub_topic_scan_name
 }
 
 resource "google_secret_manager_secret" "saturn" {

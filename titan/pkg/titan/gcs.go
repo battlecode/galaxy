@@ -26,7 +26,7 @@ func NewGCSClient(ctx context.Context) (*GCSClient, error) {
 	return &GCSClient{client}, nil
 }
 
-func (c *GCSClient) GetFile(ctx context.Context, data *EventPayload) (File, error) {
+func (c *GCSClient) GetFile(ctx context.Context, data *ScanPayload) (File, error) {
 	handle := c.client.Bucket(data.Bucket).Object(data.Name)
 	attrs, err := handle.Attrs(ctx)
 	if err != nil {
