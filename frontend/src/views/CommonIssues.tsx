@@ -5,6 +5,7 @@ import { useEpisodeId } from "../contexts/EpisodeContext";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
 import { CommonIssuesPage } from "../content/ContentStruct";
 import NoContentFound from "./NoContentFound";
+import { PageContainer } from "components/elements/BattlecodeStyle";
 import { isNil } from "lodash";
 const CommmonIssues: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -19,7 +20,7 @@ const CommmonIssues: React.FC = () => {
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto p-6">
+    <PageContainer>
       <div className="flex flex-1 flex-col gap-8">
         <OptionalSectionCardMarkdown
           title={CommonIssuesPage.INSTALLATION_ISSUES}
@@ -41,7 +42,7 @@ const CommmonIssues: React.FC = () => {
           textRecord={currentCommonIssuesText}
         />
       </div>
-    </div>
+    </PageContainer>
   );
 };
 
