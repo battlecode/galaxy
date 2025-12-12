@@ -4,7 +4,10 @@ import { useEpisodeId } from "../contexts/EpisodeContext";
 import { useSearchParams } from "react-router-dom";
 import Input from "../components/elements/Input";
 import Button from "../components/elements/Button";
-import { PageTitle } from "../components/elements/BattlecodeStyle";
+import {
+  PageTitle,
+  PageContainer,
+} from "../components/elements/BattlecodeStyle";
 import RankingsTable from "../components/tables/RankingsTable";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import { useSearchTeams } from "../api/team/useTeam";
@@ -82,7 +85,7 @@ const Rankings: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col p-6">
+    <PageContainer>
       <div className="items-left flex flex-1 flex-col">
         <PageTitle>Rankings</PageTitle>
         <div className="mb-4 flex flex-col gap-4 md:flex-row">
@@ -145,7 +148,7 @@ const Rankings: React.FC = () => {
         page={queryParams.page}
         handlePage={handlePage}
       />
-    </div>
+    </PageContainer>
   );
 };
 

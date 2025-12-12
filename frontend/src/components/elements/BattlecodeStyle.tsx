@@ -11,3 +11,17 @@ export const PageTitle: React.FC<PageTitleProps> = ({
     {children}
   </h1>
 );
+
+interface PageContainerProps {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export const PageContainer: React.FC<PageContainerProps> = ({
+  children,
+  className = "",
+}: PageContainerProps) => (
+  <div className={`flex h-full w-full flex-col overflow-auto p-6 ${className}`}>
+    {children}
+  </div>
+);

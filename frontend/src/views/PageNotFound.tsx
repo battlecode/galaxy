@@ -2,12 +2,13 @@ import type React from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "components/elements/Button";
 import { useEpisodeId } from "contexts/EpisodeContext";
+import { PageContainer } from "components/elements/BattlecodeStyle";
 
 const PageNotFound: React.FC = () => {
   const navigate = useNavigate();
   const { episodeId } = useEpisodeId();
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-8 overflow-auto">
+    <PageContainer className="items-center justify-center gap-8">
       <div className="flex h-fit w-full flex-row justify-center overflow-auto">
         <img
           className="bg-grey h-64 w-64 rounded-full fill-cyan-500"
@@ -34,7 +35,7 @@ const PageNotFound: React.FC = () => {
           navigate(`/${episodeId}/home`);
         }}
       />
-    </div>
+    </PageContainer>
   );
 };
 

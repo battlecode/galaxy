@@ -20,7 +20,7 @@ import {
   useTournamentRoundList,
 } from "api/episode/useEpisode";
 import { buildKey, classNames } from "api/helpers";
-import { PageTitle } from "components/elements/BattlecodeStyle";
+import { PageContainer, PageTitle } from "components/elements/BattlecodeStyle";
 import Button from "components/elements/Button";
 import Icon from "components/elements/Icon";
 import SelectMultipleMenu from "components/elements/SelectMultipleMenu";
@@ -197,7 +197,7 @@ const AdminTournament: React.FC = () => {
   );
 
   return (
-    <div className="flex h-full w-full flex-col gap-4 p-6">
+    <PageContainer className="gap-4">
       <PageTitle>
         Admin Settings{" "}
         {tournament.isSuccess ? `for ${tournament.data.name_long}` : ""}
@@ -314,7 +314,7 @@ const AdminTournament: React.FC = () => {
           </div>
         </div>
       </Modal>
-    </div>
+    </PageContainer>
   );
 };
 
