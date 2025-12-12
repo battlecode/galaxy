@@ -74,4 +74,10 @@ export const userMutationKeys = {
 
   resumeDownload: ({ episodeId }: { episodeId: string }) =>
     ["user", "resume", episodeId, "download"] as const,
+
+  resendVerification: ({ episodeId }: { episodeId: string }) =>
+    ["user", "resendVerification", episodeId] as const,
+
+  verifyEmail: ({ episodeId }: { episodeId: string }) =>
+    ["user", "verifyEmail", episodeId] as const,
 };

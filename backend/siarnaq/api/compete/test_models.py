@@ -30,12 +30,15 @@ class MatchParticipantLinkedListTestCase(TestCase):
         )
         for name in ["team1", "team2", "team3"]:
             t = Team.objects.create(episode=self.e1, name=name)
+            u = User.objects.create_user(
+                username=name + "_user", email=f"{name}@example.com"
+            )
+            u.email_verified = True
+            u.save()
             Submission.objects.create(
                 episode=self.e1,
                 team=t,
-                user=User.objects.create_user(
-                    username=name + "_user", email=f"{name}@example.com"
-                ),
+                user=u,
                 accepted=True,
             )
 
@@ -168,12 +171,15 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
         )
         for name in ["team1", "team2", "team3"]:
             t = Team.objects.create(episode=e1, name=name)
+            u = User.objects.create_user(
+                username=name + "_user", email=f"{name}@example.com"
+            )
+            u.email_verified = True
+            u.save()
             Submission.objects.create(
                 episode=e1,
                 team=t,
-                user=User.objects.create_user(
-                    username=name + "_user", email=f"{name}@example.com"
-                ),
+                user=u,
                 accepted=True,
             )
 
@@ -493,12 +499,15 @@ class ScrimmageRequestQuerySetTestCase(TestCase):
         self.teams = []
         for name in ["team1", "team2"]:
             t = Team.objects.create(episode=e1, name=name)
+            u = User.objects.create_user(
+                username=name + "_user", email=f"{name}@example.com"
+            )
+            u.email_verified = True
+            u.save()
             Submission.objects.create(
                 episode=e1,
                 team=t,
-                user=User.objects.create_user(
-                    username=name + "_user", email=f"{name}@example.com"
-                ),
+                user=u,
                 accepted=True,
             )
             self.teams.append(t)

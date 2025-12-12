@@ -205,6 +205,106 @@ class Base(Configuration):
 
     USE_TZ = True
 
+    LANGUAGES = [
+        ("af", "Afrikaans"),
+        ("ar", "Arabic"),
+        ("ar-dz", "Algerian Arabic"),
+        ("ast", "Asturian"),
+        ("az", "Azerbaijani"),
+        ("bg", "Bulgarian"),
+        ("be", "Belarusian"),
+        ("bn", "Bengali"),
+        ("br", "Breton"),
+        ("bs", "Bosnian"),
+        ("ca", "Catalan"),
+        ("cs", "Czech"),
+        ("cy", "Welsh"),
+        ("da", "Danish"),
+        ("de", "German"),
+        ("dsb", "Lower Sorbian"),
+        ("el", "Greek"),
+        ("en", "English"),
+        ("en-au", "Australian English"),
+        ("en-gb", "British English"),
+        ("eo", "Esperanto"),
+        ("es", "Spanish"),
+        ("es-ar", "Argentinian Spanish"),
+        ("es-co", "Colombian Spanish"),
+        ("es-mx", "Mexican Spanish"),
+        ("es-ni", "Nicaraguan Spanish"),
+        ("es-ve", "Venezuelan Spanish"),
+        ("et", "Estonian"),
+        ("eu", "Basque"),
+        ("fa", "Persian"),
+        ("fi", "Finnish"),
+        ("fr", "French"),
+        ("fy", "Frisian"),
+        ("ga", "Irish"),
+        ("gd", "Scottish Gaelic"),
+        ("gl", "Galician"),
+        ("he", "Hebrew"),
+        ("hi", "Hindi"),
+        ("hr", "Croatian"),
+        ("hsb", "Upper Sorbian"),
+        ("hu", "Hungarian"),
+        ("hy", "Armenian"),
+        ("ia", "Interlingua"),
+        ("id", "Indonesian"),
+        ("ig", "Igbo"),
+        ("io", "Ido"),
+        ("is", "Icelandic"),
+        ("it", "Italian"),
+        ("ja", "Japanese"),
+        ("ka", "Georgian"),
+        ("kab", "Kabyle"),
+        ("kk", "Kazakh"),
+        ("km", "Khmer"),
+        ("kn", "Kannada"),
+        ("ko", "Korean"),
+        ("ky", "Kyrgyz"),
+        ("lb", "Luxembourgish"),
+        ("lt", "Lithuanian"),
+        ("lv", "Latvian"),
+        ("mk", "Macedonian"),
+        ("ml", "Malayalam"),
+        ("mn", "Mongolian"),
+        ("mr", "Marathi"),
+        ("ms", "Malay"),
+        ("my", "Burmese"),
+        ("nb", "Norwegian Bokmål"),
+        ("ne", "Nepali"),
+        ("nl", "Dutch"),
+        ("nn", "Norwegian Nynorsk"),
+        ("os", "Ossetic"),
+        ("pa", "Punjabi"),
+        ("pl", "Polish"),
+        ("pt", "Portuguese"),
+        ("pt-br", "Brazilian Portuguese"),
+        ("ro", "Romanian"),
+        ("ru", "Russian"),
+        ("sk", "Slovak"),
+        ("sl", "Slovenian"),
+        ("sq", "Albanian"),
+        ("sr", "Serbian"),
+        ("sr-latn", "Serbian Latin"),
+        ("sv", "Swedish"),
+        ("sw", "Swahili"),
+        ("ta", "Tamil"),
+        ("te", "Telugu"),
+        ("tg", "Tajik"),
+        ("th", "Thai"),
+        ("tk", "Turkmen"),
+        ("tr", "Turkish"),
+        ("tt", "Tatar"),
+        ("udm", "Udmurt"),
+        ("uk", "Ukrainian"),
+        ("ur", "Urdu"),
+        ("uz", "Uzbek"),
+        ("vi", "Vietnamese"),
+        ("zh-hans", "Simplified Chinese"),
+        ("zh-hant", "Traditional Chinese"),
+    ]
+
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
@@ -247,6 +347,9 @@ class Base(Configuration):
 
     EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
     EMAIL_HOST_USER = "no-reply@battlecode.org"
+
+    # Email Verification Configuration
+    EMAIL_VERIFICATION_TOKEN_EXPIRY_TIME = 24  # Time in hours
 
 
 class Local(Base):
@@ -345,7 +448,7 @@ class Staging(Base):
     DEBUG = False
     CORS_ALLOW_ALL_ORIGINS = True
 
-    EMAIL_ENABLED = False
+    EMAIL_ENABLED = True
     FRONTEND_ORIGIN = "https://play.staging.battlecode.org"
 
     LOGGING: dict[str, Any] = {

@@ -1,3 +1,5 @@
+import binascii
+import os
 import posixpath
 import uuid
 
@@ -9,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 
 from siarnaq.api.user.managers import UserManager
+from siarnaq.api.user.signals import email_verification_token_created
 
 
 class User(AbstractUser):
@@ -22,6 +25,7 @@ class User(AbstractUser):
     first_name = models.CharField(_("first name"), max_length=30, blank=False)
     last_name = models.CharField(_("last name"), max_length=30, blank=False)
     email = models.EmailField(_("email address"), blank=False, unique=True)
+    email_verified = models.BooleanField(default=False)
 
     objects = UserManager()
 
@@ -38,6 +42,26 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
         if self.profile._state.adding:
             self.profile.save()
+
+    def create_and_send_verification_token(self, sender_class, sender_instance):
+        """
+        Create a new email verification token for this user and send the verification
+        email.
+        This method handles deleting old tokens, creating a new one, and
+        triggering the email signal.
+        """
+
+        EmailVerificationToken.objects.filter(user=self).delete()
+
+        token = EmailVerificationToken.objects.create(user=self)
+
+        email_verification_token_created.send(
+            sender=sender_class,
+            instance=sender_instance,
+            email_verification_token=token,
+        )
+
+        return token
 
 
 class Gender(models.TextChoices):
@@ -117,3 +141,40 @@ class UserProfile(models.Model):
         )
         # Append UUID to public URL to prevent caching on avatar update
         return f"{public_url}?{self.avatar_uuid}"
+
+
+class EmailVerificationToken(models.Model):
+    """
+    A database model for email verification tokens.
+    """
+
+    class Meta:
+        verbose_name = _("Email Verification Token")
+        verbose_name_plural = _("Email Verification Tokens")
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="email_verification_tokens",
+        on_delete=models.CASCADE,
+    )
+    """The user associated with this email verification token."""
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    """When this token was generated."""
+
+    token = models.CharField(max_length=64, db_index=True, unique=True)
+    """The unique verification token string."""
+
+    @staticmethod
+    def generate_key():
+        """Generate a pseudo-random token using os.urandom and binascii.hexlify."""
+        return binascii.hexlify(os.urandom(32)).decode()
+
+    def save(self, *args, **kwargs):
+        """Save the token, auto-generating it if not set."""
+        if not self.token:
+            self.token = self.generate_key()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Email verification token for user {self.user}"

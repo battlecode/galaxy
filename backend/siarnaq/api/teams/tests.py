@@ -253,7 +253,9 @@ class EligibilityTestCase(APITestCase):
         )
 
         self.team = Team.objects.create(episode=self.episode, name="t1")
-        self.user = User.objects.create_user(username="u1", email="u1@example.com")
+        self.user = User.objects.create_user(
+            username="u1", email="u1@example.com", email_verified=True
+        )
         self.team.members.add(self.user)
 
     # Partitions for: me (patch)

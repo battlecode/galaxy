@@ -8,6 +8,7 @@
 
 # auto-generated types/models
 src/api/_autogen
+schema.yml
 
 /coverage
 
