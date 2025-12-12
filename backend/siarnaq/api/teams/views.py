@@ -184,7 +184,7 @@ class TeamViewSet(
             IsAuthenticated,
             IsEmailVerified,
             IsEpisodeAvailable,
-            (~IsOnTeam)(),  # type: ignore[operator]
+            ~IsOnTeam,  # type: ignore[operator]
         ),
     )
     def join(self, request, pk=None, *, episode_id):
