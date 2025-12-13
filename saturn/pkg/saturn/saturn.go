@@ -66,13 +66,13 @@ func WithGcpPubsubSubcriber(projectID, subscriptionID string) SaturnOption {
 	}
 }
 
-func WithGcpTokenedReporter(audience, userAgent string) SaturnOption {
+func WithGcpTokenedReporter(audience, userAgent string, onSaturn bool) SaturnOption {
 	return func(ctx context.Context, s *Saturn) (*Saturn, error) {
 		if s.report != nil {
 			return nil, fmt.Errorf("reporter already exists")
 		}
 		log.Ctx(ctx).Debug().Msg("Initializing outcome reporter.")
-		report, err := NewGCPTokenedReporter(ctx, audience, userAgent)
+		report, err := NewGCPTokenedReporter(ctx, audience, userAgent, onSaturn)
 		if err != nil {
 			return nil, fmt.Errorf("NewGCPTokenedReporter: %v", err)
 		}

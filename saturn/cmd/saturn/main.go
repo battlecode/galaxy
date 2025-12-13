@@ -27,6 +27,7 @@ var (
 	monitorPort                 *uint   = flag.Uint("port", 8005, "the port for monitoring shutdowns")
 	scaffoldRoot                *string = flag.String("scaffold", "/scaffolds", "the root directory for saving scaffolds")
 	parallelism                 *uint   = flag.Uint("parallel", 1, "the number of scaffolds to run in parallel")
+	onSaturn                    *bool   = flag.Bool("onsaturn", true, "run on saturn")
 )
 
 func main() {
@@ -38,7 +39,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), unix.SIGINT, unix.SIGTERM)
 	defer stop()
 
-	secret, err := saturn.ReadSecret(ctx, *gcpProjectID, *gcpSecretName)
+	secret, err := saturn.ReadSecret(ctx, *gcpProjectID, *gcpSecretName, *onSaturn)
 	if err != nil {
 		log.Ctx(ctx).Fatal().Err(err).Msg("Could not read secrets.")
 	}
@@ -57,7 +58,7 @@ func main() {
 	)
 	for i = 0; i < *parallelism; i++ {
 		root := filepath.Join(*scaffoldRoot, strconv.FormatUint(uint64(i), 10))
-		multiplexer, err := run.NewScaffoldMultiplexer(root, secret)
+		multiplexer, err := run.NewScaffoldMultiplexer(root, secret, *onSaturn)
 		if err != nil {
 			log.Ctx(ctx).Fatal().Err(err).Msg("Could not initialize scaffold multiplexer.")
 		}
@@ -65,7 +66,7 @@ func main() {
 		app, err := saturn.New(
 			ctx,
 			saturn.WithGcpPubsubSubcriber(*gcpProjectID, *gcpPubsubSubscriptionID),
-			saturn.WithGcpTokenedReporter(*gcpTokenedReporterAudience, *gcpTokenedReporterUserAgent),
+			saturn.WithGcpTokenedReporter(*gcpTokenedReporterAudience, *gcpTokenedReporterUserAgent, *onSaturn),
 			saturn.WithRunner("compile", multiplexer.Compile),
 			saturn.WithRunner("execute", multiplexer.Execute),
 		)

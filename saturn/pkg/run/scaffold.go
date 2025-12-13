@@ -22,9 +22,10 @@ type ScaffoldMultiplexer struct {
 	Root      string
 	scaffolds map[string]*Scaffold
 	gitAuth   transport.AuthMethod
+	onSaturn  bool
 }
 
-func NewScaffoldMultiplexer(root string, secret *saturn.Secret) (*ScaffoldMultiplexer, error) {
+func NewScaffoldMultiplexer(root string, secret *saturn.Secret, onSaturn bool) (*ScaffoldMultiplexer, error) {
 	gitAuth := &transportHttp.BasicAuth{
 		Username: "ignored",
 		Password: secret.GitToken,
@@ -33,6 +34,7 @@ func NewScaffoldMultiplexer(root string, secret *saturn.Secret) (*ScaffoldMultip
 		Root:      root,
 		scaffolds: make(map[string]*Scaffold),
 		gitAuth:   gitAuth,
+		onSaturn:  onSaturn,
 	}, nil
 }
 
@@ -49,7 +51,7 @@ func (m *ScaffoldMultiplexer) runTask(
 		if err != nil {
 			return fmt.Errorf("cloneGit: %v", err)
 		}
-		scaffold, err = NewScaffold(ctx, payload.Episode, repo, root)
+		scaffold, err = NewScaffold(ctx, payload.Episode, repo, root, m.onSaturn)
 		if err != nil {
 			return fmt.Errorf("NewScaffold: %v", err)
 		}
@@ -68,7 +70,7 @@ func (m *ScaffoldMultiplexer) Compile(
 	if err := mapstructure.Decode(payload.Details, &req); err != nil {
 		return fmt.Errorf("mapstructure.Decode: %v", err)
 	}
-	storage, err := NewGCSClient(ctx)
+	storage, err := NewGCSClient(ctx, m.onSaturn)
 	if err != nil {
 		return fmt.Errorf("NewGCSClient: %v", err)
 	}
@@ -91,7 +93,7 @@ func (m *ScaffoldMultiplexer) Execute(
 	if err := mapstructure.Decode(payload.Details, &req); err != nil {
 		return fmt.Errorf("mapstructure.Decode: %v", err)
 	}
-	storage, err := NewGCSClient(ctx)
+	storage, err := NewGCSClient(ctx, m.onSaturn)
 	if err != nil {
 		return fmt.Errorf("NewGCSClient: %v", err)
 	}
@@ -106,18 +108,19 @@ func (m *ScaffoldMultiplexer) Execute(
 }
 
 type Scaffold struct {
-	root    string
-	repo    *git.Repository
-	gitAuth transport.AuthMethod
-	compile Recipe
-	execute Recipe
+	root     string
+	repo     *git.Repository
+	gitAuth  transport.AuthMethod
+	compile  Recipe
+	execute  Recipe
+	onSaturn bool
 }
 
-func NewScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string) (*Scaffold, error) {
+func NewScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, onSaturn bool) (*Scaffold, error) {
 	switch episode.Language {
 	case saturn.Java8:
 		// Kept for compatibility running old episodes
-		s, err := NewJavaScaffold(ctx, episode, repo, root, "/usr/lib/jvm/java-8-openjdk-amd64")
+		s, err := NewJavaScaffold(ctx, episode, repo, root, "/usr/lib/jvm/java-8-openjdk-amd64", onSaturn)
 		if err != nil {
 			return nil, fmt.Errorf("NewJavaScaffold (Java8): %v", err)
 		}
@@ -125,14 +128,14 @@ func NewScaffold(ctx context.Context, episode saturn.Episode, repo *git.Reposito
 	case saturn.Java21:
 		// Modern java21 scaffolds store java in the 'java' subdirectory of the scaffold
 		javaRoot := filepath.Join(root, "java")
-		s, err := NewJavaScaffold(ctx, episode, repo, javaRoot, "/usr/local/openjdk-21")
+		s, err := NewJavaScaffold(ctx, episode, repo, javaRoot, "/usr/local/openjdk-21", onSaturn)
 		if err != nil {
 			return nil, fmt.Errorf("NewJavaScaffold (Java21): %v", err)
 		}
 		return &s.Scaffold, nil
 	case saturn.Python3:
 		pyRoot := filepath.Join(root, "python")
-		s, err := NewPython3Scaffold(ctx, episode, repo, pyRoot, "python3.12")
+		s, err := NewPython3Scaffold(ctx, episode, repo, pyRoot, "python3.12", onSaturn)
 		if err != nil {
 			return nil, fmt.Errorf("NewPython3Scaffold: %v", err)
 		}
