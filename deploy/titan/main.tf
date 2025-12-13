@@ -121,7 +121,7 @@ resource "google_cloudbuild_trigger" "this" {
     name  = "galaxy"
 
     push {
-      tag = "^titan-.*"
+      tag = var.trigger_tag_pattern
     }
   }
 
