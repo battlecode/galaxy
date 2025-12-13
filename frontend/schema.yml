@@ -1,7 +1,6 @@
 openapi: 3.0.3
 info:
   title: ''
-  title: ''
   version: 0.0.0
 paths:
   /api/compete/{episode_id}/match/:
@@ -21,32 +20,15 @@ paths:
         description: A page number within the paginated result set.
         schema:
           type: integer
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedMatchList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedMatchList'
           description: ''
   /api/compete/{episode_id}/match/{id}/:
@@ -65,31 +47,15 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Match'
-          description: ''
                 $ref: '#/components/schemas/Match'
           description: ''
   /api/compete/{episode_id}/match/{id}/publish_public_bracket/:
@@ -108,25 +74,11 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           description: No response body
   /api/compete/{episode_id}/match/{id}/rating_update/:
@@ -145,25 +97,11 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           description: No response body
   /api/compete/{episode_id}/match/{id}/report/:
@@ -182,43 +120,25 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - compete
       - compete
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/MatchReportRequest'
-              $ref: '#/components/schemas/MatchReportRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/MatchReportRequest'
               $ref: '#/components/schemas/MatchReportRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/MatchReportRequest'
-              $ref: '#/components/schemas/MatchReportRequest'
         required: true
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
         '204':
-        '204':
           description: Report has been received
-        '409':
         '409':
           description: This match was already finalized
   /api/compete/{episode_id}/match/historical_rating/:
@@ -269,28 +189,13 @@ paths:
         schema:
           type: integer
         description: Optional teamID to filter for. Defaults to your own team.
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: team_id
-        schema:
-          type: integer
-        description: Optional teamID to filter for. Defaults to your own team.
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
         '204':
-        '204':
           description: No ranked matches found.
-        '200':
         '200':
           content:
             application/json:
@@ -298,14 +203,10 @@ paths:
                 $ref: '#/components/schemas/HistoricalRating'
           description: ''
         '400':
-                $ref: '#/components/schemas/HistoricalRating'
-          description: ''
-        '400':
           description: Could not find requested team.
   /api/compete/{episode_id}/match/historical_rating_topN/:
     get:
       operationId: compete_match_historical_rating_topN_list
-      description: List the historical top N rankings, N should be <= 10 and defaults
       description: List the historical top N rankings, N should be <= 10 and defaults
         to 10
       parameters:
@@ -320,38 +221,19 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: query
-        name: N
-        schema:
-          type: integer
-        description: number of top teams to get ratings for, defaults to 10
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
         '204':
-        '204':
           description: No ranked matches found.
-        '200':
         '200':
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/HistoricalRating'
-          description: ''
-        '400':
-          description: 'Invalid parameter: N must be less than or equal to 10'
                   $ref: '#/components/schemas/HistoricalRating'
           description: ''
         '400':
@@ -378,37 +260,15 @@ paths:
         schema:
           type: integer
         description: A team to filter for. Defaults to your own team.
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - in: query
-        name: team_id
-        schema:
-          type: integer
-        description: A team to filter for. Defaults to your own team.
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedMatchList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedMatchList'
           description: ''
   /api/compete/{episode_id}/match/scrimmaging_record/:
@@ -441,32 +301,15 @@ paths:
         schema:
           type: integer
         description: A team to filter for. Defaults to your own team.
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: team_id
-        schema:
-          type: integer
-        description: A team to filter for. Defaults to your own team.
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScrimmageRecord'
-          description: ''
-        '400':
                 $ref: '#/components/schemas/ScrimmageRecord'
           description: ''
         '400':
@@ -511,52 +354,15 @@ paths:
         schema:
           type: string
         description: A tournament to filter for.
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: external_id_private
-        schema:
-          type: string
-        description: A private id to filter for.
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - in: query
-        name: round_id
-        schema:
-          type: integer
-        description: A tournament round to filter for.
-      - in: query
-        name: team_id
-        schema:
-          type: integer
-        description: A team to filter for.
-      - in: query
-        name: tournament_id
-        schema:
-          type: string
-        description: A tournament to filter for.
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedMatchList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedMatchList'
           description: ''
   /api/compete/{episode_id}/request/:
@@ -570,41 +376,27 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - compete
       - compete
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ScrimmageRequestRequest'
-              $ref: '#/components/schemas/ScrimmageRequestRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ScrimmageRequestRequest'
               $ref: '#/components/schemas/ScrimmageRequestRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/ScrimmageRequestRequest'
-              $ref: '#/components/schemas/ScrimmageRequestRequest'
         required: true
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '201':
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScrimmageRequest'
-          description: ''
                 $ref: '#/components/schemas/ScrimmageRequest'
           description: ''
   /api/compete/{episode_id}/request/{id}/:
@@ -623,25 +415,11 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: No response body
   /api/compete/{episode_id}/request/{id}/accept/:
@@ -660,25 +438,11 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: Scrimmage request has been accepted
   /api/compete/{episode_id}/request/{id}/reject/:
@@ -697,25 +461,11 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: Scrimmage request has been rejected
   /api/compete/{episode_id}/request/inbox/:
@@ -735,32 +485,15 @@ paths:
         description: A page number within the paginated result set.
         schema:
           type: integer
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedScrimmageRequestList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedScrimmageRequestList'
           description: ''
   /api/compete/{episode_id}/request/outbox/:
@@ -780,32 +513,15 @@ paths:
         description: A page number within the paginated result set.
         schema:
           type: integer
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedScrimmageRequestList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedScrimmageRequestList'
           description: ''
   /api/compete/{episode_id}/submission/:
@@ -825,32 +541,15 @@ paths:
         description: A page number within the paginated result set.
         schema:
           type: integer
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSubmissionList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedSubmissionList'
           description: ''
     post:
@@ -866,14 +565,7 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - compete
       - compete
       requestBody:
         content:
@@ -890,15 +582,11 @@ paths:
                   format: binary
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '201':
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Submission'
-          description: ''
                 $ref: '#/components/schemas/Submission'
           description: ''
   /api/compete/{episode_id}/submission/{id}/:
@@ -917,31 +605,15 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Submission'
-          description: ''
                 $ref: '#/components/schemas/Submission'
           description: ''
   /api/compete/{episode_id}/submission/{id}/download/:
@@ -960,31 +632,15 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SubmissionDownload'
-          description: ''
                 $ref: '#/components/schemas/SubmissionDownload'
           description: ''
   /api/compete/{episode_id}/submission/{id}/report/:
@@ -1003,43 +659,25 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - compete
       - compete
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/SubmissionReportRequest'
-              $ref: '#/components/schemas/SubmissionReportRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/SubmissionReportRequest'
               $ref: '#/components/schemas/SubmissionReportRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/SubmissionReportRequest'
-              $ref: '#/components/schemas/SubmissionReportRequest'
         required: true
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
         '204':
-        '204':
           description: Report has been received
-        '409':
         '409':
           description: This submission was already finalized
   /api/compete/{episode_id}/submission/tournament/:
@@ -1053,28 +691,17 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - compete
       - compete
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TournamentSubmission'
-          description: ''
                   $ref: '#/components/schemas/TournamentSubmission'
           description: ''
   /api/episode/{episode_id}/map/:
@@ -1088,28 +715,17 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/GameMap'
-          description: ''
                   $ref: '#/components/schemas/GameMap'
           description: ''
   /api/episode/{episode_id}/map/{id}/:
@@ -1128,31 +744,15 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GameMap'
-          description: ''
                 $ref: '#/components/schemas/GameMap'
           description: ''
   /api/episode/{episode_id}/tournament/:
@@ -1172,32 +772,15 @@ paths:
         description: A page number within the paginated result set.
         schema:
           type: integer
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedTournamentList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedTournamentList'
           description: ''
   /api/episode/{episode_id}/tournament/{id}/:
@@ -1216,31 +799,15 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tournament'
-          description: ''
                 $ref: '#/components/schemas/Tournament'
           description: ''
   /api/episode/{episode_id}/tournament/{id}/initialize/:
@@ -1261,25 +828,11 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: Tournament has been initialized
   /api/episode/{episode_id}/tournament/{tournament}/round/:
@@ -1305,38 +858,15 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - in: path
-        name: tournament
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedTournamentRoundList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedTournamentRoundList'
           description: ''
   /api/episode/{episode_id}/tournament/{tournament}/round/{id}/:
@@ -1361,37 +891,15 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-      - in: path
-        name: tournament
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TournamentRound'
-          description: ''
                 $ref: '#/components/schemas/TournamentRound'
           description: ''
   /api/episode/{episode_id}/tournament/{tournament}/round/{id}/enqueue/:
@@ -1441,60 +949,15 @@ paths:
         schema:
           type: string
         description: A tournament to filter for.
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: episode_id
-        schema:
-          type: string
-        description: An episode to filter for.
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-      - in: query
-        name: id
-        schema:
-          type: string
-        description: A tournament round to filter for.
-      - in: query
-        name: maps
-        schema:
-          type: array
-          items:
-            type: integer
-        description: List of map IDs to use in this round.
-        required: true
-      - in: path
-        name: tournament
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: tournament
-        schema:
-          type: string
-        description: A tournament to filter for.
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: Tournament round has been enqueued
         '400':
-        '400':
           description: Tournament round could not be enqueued
-        '409':
         '409':
           description: Tournament round is already in progress
   /api/episode/{episode_id}/tournament/{tournament}/round/{id}/release/:
@@ -1534,46 +997,11 @@ paths:
         schema:
           type: string
         description: A tournament to filter for.
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: episode_id
-        schema:
-          type: string
-        description: An episode to filter for.
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-      - in: query
-        name: id
-        schema:
-          type: string
-        description: A tournament round to filter for.
-      - in: path
-        name: tournament
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: tournament
-        schema:
-          type: string
-        description: A tournament to filter for.
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: Tournament round has been released to public bracket service
   /api/episode/{episode_id}/tournament/{tournament}/round/{id}/requeue/:
@@ -1598,40 +1026,18 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
-      - in: path
-        name: tournament
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
         '204':
-        '204':
           description: Tournament round has been requeued
-        '400':
         '400':
           description: No failed matches to requeue
   /api/episode/{episode_id}/tournament/next/:
     get:
       operationId: episode_tournament_next_retrieve
-      description: Retrieve the next upcoming tournament, as ordered by submission
       description: Retrieve the next upcoming tournament, as ordered by submission
         freeze time.
       parameters:
@@ -1641,26 +1047,15 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tournament'
-          description: ''
                 $ref: '#/components/schemas/Tournament'
           description: ''
   /api/episode/e/:
@@ -1674,28 +1069,16 @@ paths:
         description: A page number within the paginated result set.
         schema:
           type: integer
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
       - {}
-      - jwtAuth: []
-      - {}
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedEpisodeList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedEpisodeList'
           description: ''
   /api/episode/e/{id}/:
@@ -1708,27 +1091,16 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - episode
       - episode
       security:
       - jwtAuth: []
       - {}
-      - jwtAuth: []
-      - {}
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Episode'
-          description: ''
                 $ref: '#/components/schemas/Episode'
           description: ''
   /api/episode/e/{id}/autoscrim/:
@@ -1741,34 +1113,23 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - episode
       - episode
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/AutoscrimRequest'
-              $ref: '#/components/schemas/AutoscrimRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/AutoscrimRequest'
               $ref: '#/components/schemas/AutoscrimRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/AutoscrimRequest'
-              $ref: '#/components/schemas/AutoscrimRequest'
         required: true
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: Created successfully
   /api/specs/:
@@ -1889,125 +1250,12 @@ paths:
           - vi
           - zh-hans
           - zh-hant
-      - in: query
-        name: format
-        schema:
-          type: string
-          enum:
-          - json
-          - yaml
-      - in: query
-        name: lang
-        schema:
-          type: string
-          enum:
-          - af
-          - ar
-          - ar-dz
-          - ast
-          - az
-          - be
-          - bg
-          - bn
-          - br
-          - bs
-          - ca
-          - cs
-          - cy
-          - da
-          - de
-          - dsb
-          - el
-          - en
-          - en-au
-          - en-gb
-          - eo
-          - es
-          - es-ar
-          - es-co
-          - es-mx
-          - es-ni
-          - es-ve
-          - et
-          - eu
-          - fa
-          - fi
-          - fr
-          - fy
-          - ga
-          - gd
-          - gl
-          - he
-          - hi
-          - hr
-          - hsb
-          - hu
-          - hy
-          - ia
-          - id
-          - ig
-          - io
-          - is
-          - it
-          - ja
-          - ka
-          - kab
-          - kk
-          - km
-          - kn
-          - ko
-          - ky
-          - lb
-          - lt
-          - lv
-          - mk
-          - ml
-          - mn
-          - mr
-          - ms
-          - my
-          - nb
-          - ne
-          - nl
-          - nn
-          - os
-          - pa
-          - pl
-          - pt
-          - pt-br
-          - ro
-          - ru
-          - sk
-          - sl
-          - sq
-          - sr
-          - sr-latn
-          - sv
-          - sw
-          - ta
-          - te
-          - tg
-          - th
-          - tk
-          - tr
-          - tt
-          - udm
-          - uk
-          - ur
-          - uz
-          - vi
-          - zh-hans
-          - zh-hant
       tags:
-      - specs
       - specs
       security:
       - jwtAuth: []
       - {}
-      - jwtAuth: []
-      - {}
       responses:
-        '200':
         '200':
           content:
             application/vnd.oai.openapi:
@@ -2027,7 +1275,6 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
-          description: ''
   /api/team/{episode_id}/requirement/:
     get:
       operationId: team_requirement_list
@@ -2045,32 +1292,15 @@ paths:
         description: A page number within the paginated result set.
         schema:
           type: integer
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
       tags:
-      - team
       - team
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedClassRequirementList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedClassRequirementList'
           description: ''
   /api/team/{episode_id}/requirement/{id}/:
@@ -2089,31 +1319,15 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - team
       - team
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClassRequirement'
-          description: ''
                 $ref: '#/components/schemas/ClassRequirement'
           description: ''
   /api/team/{episode_id}/requirement/{id}/check/:
@@ -2132,31 +1346,15 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - team
       - team
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPassed'
-          description: ''
                 $ref: '#/components/schemas/UserPassed'
           description: ''
   /api/team/{episode_id}/requirement/{id}/compute/:
@@ -2175,31 +1373,15 @@ paths:
         schema:
           type: string
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - team
       - team
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPassed'
-          description: ''
                 $ref: '#/components/schemas/UserPassed'
           description: ''
   /api/team/{episode_id}/requirement/report/:
@@ -2213,20 +1395,11 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - team
       - team
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: No response body
     put:
@@ -2239,35 +1412,23 @@ paths:
           type: string
           pattern: ^[^\/.]+$
         required: true
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
       tags:
-      - team
       - team
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TeamReportRequest'
-              $ref: '#/components/schemas/TeamReportRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TeamReportRequest'
               $ref: '#/components/schemas/TeamReportRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/TeamReportRequest'
-              $ref: '#/components/schemas/TeamReportRequest'
         required: true
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: No response body
   /api/team/{episode_id}/t/:
@@ -2314,56 +1475,15 @@ paths:
         description: A search term.
         schema:
           type: string
-      - in: query
-        name: eligible_for
-        schema:
-          type: array
-          items:
-            type: integer
-        description: Filter teams by a set of eligibility criteria ID
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: has_active_submission
-        schema:
-          type: boolean
-        description: Filter teams by active submission status
-      - name: ordering
-        required: false
-        in: query
-        description: Which field to use when ordering the results.
-        schema:
-          type: string
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      - name: search
-        required: false
-        in: query
-        description: A search term.
-        schema:
-          type: string
       tags:
-      - team
       - team
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedTeamPublicList'
-          description: ''
                 $ref: '#/components/schemas/PaginatedTeamPublicList'
           description: ''
     post:
@@ -2391,53 +1511,27 @@ paths:
         schema:
           type: boolean
         description: Filter teams by active submission status
-      - in: query
-        name: eligible_for
-        schema:
-          type: array
-          items:
-            type: integer
-        description: Filter teams by a set of eligibility criteria ID
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: has_active_submission
-        schema:
-          type: boolean
-        description: Filter teams by active submission status
       tags:
-      - team
       - team
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TeamCreateRequest'
-              $ref: '#/components/schemas/TeamCreateRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TeamCreateRequest'
               $ref: '#/components/schemas/TeamCreateRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/TeamCreateRequest'
-              $ref: '#/components/schemas/TeamCreateRequest'
         required: true
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '201':
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeamCreate'
-          description: ''
                 $ref: '#/components/schemas/TeamCreate'
           description: ''
   /api/team/{episode_id}/t/{id}/:
@@ -2471,43 +1565,15 @@ paths:
         schema:
           type: string
         required: true
-      - in: query
-        name: eligible_for
-        schema:
-          type: array
-          items:
-            type: integer
-        description: Filter teams by a set of eligibility criteria ID
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: has_active_submission
-        schema:
-          type: boolean
-        description: Filter teams by active submission status
-      - in: path
-        name: id
-        schema:
-          type: string
-        required: true
       tags:
-      - team
       - team
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeamPublic'
-          description: ''
                 $ref: '#/components/schemas/TeamPublic'
           description: ''
   /api/team/{episode_id}/t/avatar/:
@@ -2533,26 +1599,7 @@ paths:
         schema:
           type: boolean
         description: Filter teams by active submission status
-      - in: query
-        name: eligible_for
-        schema:
-          type: array
-          items:
-            type: integer
-        description: Filter teams by a set of eligibility criteria ID
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: has_active_submission
-        schema:
-          type: boolean
-        description: Filter teams by active submission status
       tags:
-      - team
       - team
       requestBody:
         content:
@@ -2565,9 +1612,7 @@ paths:
                   format: binary
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: No response body
   /api/team/{episode_id}/t/join/:
@@ -2596,47 +1641,23 @@ paths:
         schema:
           type: boolean
         description: Filter teams by active submission status
-      - in: query
-        name: eligible_for
-        schema:
-          type: array
-          items:
-            type: integer
-        description: Filter teams by a set of eligibility criteria ID
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: has_active_submission
-        schema:
-          type: boolean
-        description: Filter teams by active submission status
       tags:
-      - team
       - team
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TeamJoinRequest'
-              $ref: '#/components/schemas/TeamJoinRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TeamJoinRequest'
               $ref: '#/components/schemas/TeamJoinRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/TeamJoinRequest'
-              $ref: '#/components/schemas/TeamJoinRequest'
         required: true
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: No response body
   /api/team/{episode_id}/t/leave/:
@@ -2662,32 +1683,11 @@ paths:
         schema:
           type: boolean
         description: Filter teams by active submission status
-      - in: query
-        name: eligible_for
-        schema:
-          type: array
-          items:
-            type: integer
-        description: Filter teams by a set of eligibility criteria ID
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: has_active_submission
-        schema:
-          type: boolean
-        description: Filter teams by active submission status
       tags:
-      - team
       - team
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           description: No response body
   /api/team/{episode_id}/t/me/:
@@ -2713,38 +1713,15 @@ paths:
         schema:
           type: boolean
         description: Filter teams by active submission status
-      - in: query
-        name: eligible_for
-        schema:
-          type: array
-          items:
-            type: integer
-        description: Filter teams by a set of eligibility criteria ID
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: has_active_submission
-        schema:
-          type: boolean
-        description: Filter teams by active submission status
       tags:
-      - team
       - team
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeamPrivate'
-          description: ''
                 $ref: '#/components/schemas/TeamPrivate'
           description: ''
     put:
@@ -2769,52 +1746,26 @@ paths:
         schema:
           type: boolean
         description: Filter teams by active submission status
-      - in: query
-        name: eligible_for
-        schema:
-          type: array
-          items:
-            type: integer
-        description: Filter teams by a set of eligibility criteria ID
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: has_active_submission
-        schema:
-          type: boolean
-        description: Filter teams by active submission status
       tags:
-      - team
       - team
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TeamPrivateRequest'
-              $ref: '#/components/schemas/TeamPrivateRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TeamPrivateRequest'
               $ref: '#/components/schemas/TeamPrivateRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/TeamPrivateRequest'
-              $ref: '#/components/schemas/TeamPrivateRequest'
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeamPrivate'
-          description: ''
                 $ref: '#/components/schemas/TeamPrivate'
           description: ''
     patch:
@@ -2839,52 +1790,26 @@ paths:
         schema:
           type: boolean
         description: Filter teams by active submission status
-      - in: query
-        name: eligible_for
-        schema:
-          type: array
-          items:
-            type: integer
-        description: Filter teams by a set of eligibility criteria ID
-      - in: path
-        name: episode_id
-        schema:
-          type: string
-          pattern: ^[^\/.]+$
-        required: true
-      - in: query
-        name: has_active_submission
-        schema:
-          type: boolean
-        description: Filter teams by active submission status
       tags:
-      - team
       - team
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PatchedTeamPrivateRequest'
-              $ref: '#/components/schemas/PatchedTeamPrivateRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedTeamPrivateRequest'
               $ref: '#/components/schemas/PatchedTeamPrivateRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedTeamPrivateRequest'
-              $ref: '#/components/schemas/PatchedTeamPrivateRequest'
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TeamPrivate'
-          description: ''
                 $ref: '#/components/schemas/TeamPrivate'
           description: ''
   /api/token/:
@@ -2895,30 +1820,23 @@ paths:
         token pair to prove the authentication of those credentials.
       tags:
       - token
-      - token
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TokenObtainPairRequest'
-              $ref: '#/components/schemas/TokenObtainPairRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenObtainPairRequest'
               $ref: '#/components/schemas/TokenObtainPairRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/TokenObtainPairRequest'
-              $ref: '#/components/schemas/TokenObtainPairRequest'
         required: true
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenObtainPair'
-          description: ''
                 $ref: '#/components/schemas/TokenObtainPair'
           description: ''
   /api/token/refresh/:
@@ -2929,30 +1847,23 @@ paths:
         token if the refresh token is valid.
       tags:
       - token
-      - token
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TokenRefreshRequest'
-              $ref: '#/components/schemas/TokenRefreshRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenRefreshRequest'
               $ref: '#/components/schemas/TokenRefreshRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/TokenRefreshRequest'
-              $ref: '#/components/schemas/TokenRefreshRequest'
         required: true
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenRefresh'
-          description: ''
                 $ref: '#/components/schemas/TokenRefresh'
           description: ''
   /api/token/verify/:
@@ -2963,24 +1874,19 @@ paths:
         information about a token's fitness for a particular use.
       tags:
       - token
-      - token
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TokenVerifyRequest'
-              $ref: '#/components/schemas/TokenVerifyRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/TokenVerifyRequest'
               $ref: '#/components/schemas/TokenVerifyRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/TokenVerifyRequest'
-              $ref: '#/components/schemas/TokenVerifyRequest'
         required: true
       responses:
-        '200':
         '200':
           description: No response body
   /api/user/password_reset/:
@@ -2992,64 +1898,49 @@ paths:
         Sends a signal reset_password_token_created when a reset token was created
       tags:
       - user
-      - user
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/EmailRequest'
-              $ref: '#/components/schemas/EmailRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/EmailRequest'
               $ref: '#/components/schemas/EmailRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/EmailRequest'
-              $ref: '#/components/schemas/EmailRequest'
         required: true
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Email'
-          description: ''
                 $ref: '#/components/schemas/Email'
           description: ''
   /api/user/password_reset/confirm/:
     post:
       operationId: user_password_reset_confirm_create
       description: An Api View which provides a method to reset a password based on
-      description: An Api View which provides a method to reset a password based on
         a unique token
       tags:
-      - user
       - user
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PasswordTokenRequest'
-              $ref: '#/components/schemas/PasswordTokenRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PasswordTokenRequest'
               $ref: '#/components/schemas/PasswordTokenRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PasswordTokenRequest'
-              $ref: '#/components/schemas/PasswordTokenRequest'
         required: true
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PasswordToken'
-          description: ''
                 $ref: '#/components/schemas/PasswordToken'
           description: ''
   /api/user/password_reset/validate_token/:
@@ -3058,30 +1949,23 @@ paths:
       description: An Api View which provides a method to verify that a token is valid
       tags:
       - user
-      - user
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ResetTokenRequest'
-              $ref: '#/components/schemas/ResetTokenRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/ResetTokenRequest'
               $ref: '#/components/schemas/ResetTokenRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/ResetTokenRequest'
-              $ref: '#/components/schemas/ResetTokenRequest'
         required: true
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ResetToken'
-          description: ''
                 $ref: '#/components/schemas/ResetToken'
           description: ''
   /api/user/u/:
@@ -3090,35 +1974,26 @@ paths:
       description: Create a new user (registration) and send verification email.
       tags:
       - user
-      - user
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/UserCreateRequest'
-              $ref: '#/components/schemas/UserCreateRequest'
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/UserCreateRequest'
-              $ref: '#/components/schemas/UserCreateRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/UserCreateRequest'
               $ref: '#/components/schemas/UserCreateRequest'
         required: true
       security:
       - jwtAuth: []
       - {}
-      - jwtAuth: []
-      - {}
       responses:
-        '201':
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserCreate'
-          description: ''
                 $ref: '#/components/schemas/UserCreate'
           description: ''
   /api/user/u/{id}/:
@@ -3132,28 +2007,16 @@ paths:
           type: integer
         description: A unique integer value identifying this user.
         required: true
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this user.
-        required: true
       tags:
-      - user
       - user
       security:
       - jwtAuth: []
       - {}
-      - jwtAuth: []
-      - {}
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPublic'
-          description: ''
                 $ref: '#/components/schemas/UserPublic'
           description: ''
   /api/user/u/{id}/teams/:
@@ -3167,22 +2030,12 @@ paths:
           type: integer
         description: A unique integer value identifying this user.
         required: true
-      - in: path
-        name: id
-        schema:
-          type: integer
-        description: A unique integer value identifying this user.
-        required: true
       tags:
-      - user
       - user
       security:
       - jwtAuth: []
       - {}
-      - jwtAuth: []
-      - {}
       responses:
-        '200':
         '200':
           content:
             application/json:
@@ -3191,14 +2044,11 @@ paths:
                 additionalProperties:
                   $ref: '#/components/schemas/TeamPublic'
           description: ''
-                  $ref: '#/components/schemas/TeamPublic'
-          description: ''
   /api/user/u/avatar/:
     post:
       operationId: user_u_avatar_create
       description: Update uploaded avatar.
       tags:
-      - user
       - user
       requestBody:
         content:
@@ -3211,9 +2061,7 @@ paths:
                   format: binary
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '204':
         '204':
           description: No response body
   /api/user/u/me/:
@@ -3222,18 +2070,13 @@ paths:
       description: Retrieve or update information about the logged-in user.
       tags:
       - user
-      - user
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPrivate'
-          description: ''
                 $ref: '#/components/schemas/UserPrivate'
           description: ''
     put:
@@ -3241,33 +2084,25 @@ paths:
       description: Retrieve or update information about the logged-in user.
       tags:
       - user
-      - user
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/UserPrivateRequest'
-              $ref: '#/components/schemas/UserPrivateRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/UserPrivateRequest'
               $ref: '#/components/schemas/UserPrivateRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/UserPrivateRequest'
-              $ref: '#/components/schemas/UserPrivateRequest'
         required: true
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPrivate'
-          description: ''
                 $ref: '#/components/schemas/UserPrivate'
           description: ''
     patch:
@@ -3275,32 +2110,24 @@ paths:
       description: Retrieve or update information about the logged-in user.
       tags:
       - user
-      - user
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PatchedUserPrivateRequest'
-              $ref: '#/components/schemas/PatchedUserPrivateRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedUserPrivateRequest'
               $ref: '#/components/schemas/PatchedUserPrivateRequest'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PatchedUserPrivateRequest'
-              $ref: '#/components/schemas/PatchedUserPrivateRequest'
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPrivate'
-          description: ''
                 $ref: '#/components/schemas/UserPrivate'
           description: ''
   /api/user/u/resume/:
@@ -3309,25 +2136,19 @@ paths:
       description: Retrieve or update the uploaded resume.
       tags:
       - user
-      - user
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResume'
           description: ''
-                $ref: '#/components/schemas/UserResume'
-          description: ''
     put:
       operationId: user_u_resume_update
       description: Retrieve or update the uploaded resume.
       tags:
-      - user
       - user
       requestBody:
         content:
@@ -3340,9 +2161,7 @@ paths:
                   format: binary
       security:
       - jwtAuth: []
-      - jwtAuth: []
       responses:
-        '200':
         '200':
           content:
             application/json:
@@ -3398,7 +2217,6 @@ components:
           minimum: 1
       required:
       - best_of
-      - best_of
     ClassRequirement:
       type: object
       properties:
@@ -3417,261 +2235,8 @@ components:
       - maps
       - min_score
       - reference_player
-      - episode
-      - maps
-      - min_score
-      - reference_player
     CountryEnum:
       enum:
-      - AF
-      - AX
-      - AL
-      - DZ
-      - AS
-      - AD
-      - AO
-      - AI
-      - AQ
-      - AG
-      - AR
-      - AM
-      - AW
-      - AU
-      - AT
-      - AZ
-      - BS
-      - BH
-      - BD
-      - BB
-      - BY
-      - BE
-      - BZ
-      - BJ
-      - BM
-      - BT
-      - BO
-      - BQ
-      - BA
-      - BW
-      - BV
-      - BR
-      - IO
-      - BN
-      - BG
-      - BF
-      - BI
-      - CV
-      - KH
-      - CM
-      - CA
-      - KY
-      - CF
-      - TD
-      - CL
-      - CN
-      - CX
-      - CC
-      - CO
-      - KM
-      - CG
-      - CD
-      - CK
-      - CR
-      - CI
-      - HR
-      - CU
-      - CW
-      - CY
-      - CZ
-      - DK
-      - DJ
-      - DM
-      - DO
-      - EC
-      - EG
-      - SV
-      - GQ
-      - ER
-      - EE
-      - SZ
-      - ET
-      - FK
-      - FO
-      - FJ
-      - FI
-      - FR
-      - GF
-      - PF
-      - TF
-      - GA
-      - GM
-      - GE
-      - DE
-      - GH
-      - GI
-      - GR
-      - GL
-      - GD
-      - GP
-      - GU
-      - GT
-      - GG
-      - GN
-      - GW
-      - GY
-      - HT
-      - HM
-      - VA
-      - HN
-      - HK
-      - HU
-      - IS
-      - IN
-      - ID
-      - IR
-      - IQ
-      - IE
-      - IM
-      - IL
-      - IT
-      - JM
-      - JP
-      - JE
-      - JO
-      - KZ
-      - KE
-      - KI
-      - KW
-      - KG
-      - LA
-      - LV
-      - LB
-      - LS
-      - LR
-      - LY
-      - LI
-      - LT
-      - LU
-      - MO
-      - MG
-      - MW
-      - MY
-      - MV
-      - ML
-      - MT
-      - MH
-      - MQ
-      - MR
-      - MU
-      - YT
-      - MX
-      - FM
-      - MD
-      - MC
-      - MN
-      - ME
-      - MS
-      - MA
-      - MZ
-      - MM
-      - NA
-      - NR
-      - NP
-      - NL
-      - NC
-      - NZ
-      - NI
-      - NE
-      - NG
-      - NU
-      - NF
-      - KP
-      - MK
-      - MP
-      - 'NO'
-      - OM
-      - PK
-      - PW
-      - PS
-      - PA
-      - PG
-      - PY
-      - PE
-      - PH
-      - PN
-      - PL
-      - PT
-      - PR
-      - QA
-      - RE
-      - RO
-      - RU
-      - RW
-      - BL
-      - SH
-      - KN
-      - LC
-      - MF
-      - PM
-      - VC
-      - WS
-      - SM
-      - ST
-      - SA
-      - SN
-      - RS
-      - SC
-      - SL
-      - SG
-      - SX
-      - SK
-      - SI
-      - SB
-      - SO
-      - ZA
-      - GS
-      - KR
-      - SS
-      - ES
-      - LK
-      - SD
-      - SR
-      - SJ
-      - SE
-      - CH
-      - SY
-      - TW
-      - TJ
-      - TZ
-      - TH
-      - TL
-      - TG
-      - TK
-      - TO
-      - TT
-      - TN
-      - TR
-      - TM
-      - TC
-      - TV
-      - UG
-      - UA
-      - AE
-      - GB
-      - UM
-      - US
-      - UY
-      - UZ
-      - VU
-      - VE
-      - VN
-      - VG
-      - VI
-      - WF
-      - EH
-      - YE
-      - ZM
-      - ZW
       - AF
       - AX
       - AL
@@ -3942,10 +2507,6 @@ components:
       - icon
       - id
       - title
-      - description
-      - icon
-      - id
-      - title
     Email:
       type: object
       properties:
@@ -3953,7 +2514,6 @@ components:
           type: string
           format: email
       required:
-      - email
       - email
     EmailRequest:
       type: object
@@ -3963,7 +2523,6 @@ components:
           format: email
           minLength: 1
       required:
-      - email
       - email
     Episode:
       type: object
@@ -3985,7 +2544,6 @@ components:
           format: date-time
         language:
           $ref: '#/components/schemas/LanguageEnum'
-          $ref: '#/components/schemas/LanguageEnum'
         scaffold:
           type: string
           format: uri
@@ -4006,18 +2564,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EligibilityCriterion'
-            $ref: '#/components/schemas/EligibilityCriterion'
         frozen:
           type: boolean
           readOnly: true
       required:
-      - eligibility_criteria
-      - frozen
-      - game_archive
-      - game_release
-      - language
-      - name_long
-      - name_short
       - eligibility_criteria
       - frozen
       - game_archive
@@ -4046,17 +2596,8 @@ components:
       - id
       - is_public
       - name
-      - episode
-      - id
-      - is_public
-      - name
     GenderEnum:
       enum:
-      - F
-      - M
-      - N
-      - '*'
-      - '?'
       - F
       - M
       - N
@@ -4070,15 +2611,10 @@ components:
           type: integer
         team_rating:
           $ref: '#/components/schemas/TeamRating'
-          $ref: '#/components/schemas/TeamRating'
       required:
-      - team_id
       - team_id
     LanguageEnum:
       enum:
-      - java8
-      - java21
-      - py3
       - java8
       - java21
       - py3
@@ -4092,7 +2628,6 @@ components:
         status:
           allOf:
           - $ref: '#/components/schemas/StatusBccEnum'
-          - $ref: '#/components/schemas/StatusBccEnum'
           readOnly: true
         episode:
           type: string
@@ -4100,12 +2635,10 @@ components:
         tournament_round:
           allOf:
           - $ref: '#/components/schemas/TournamentRound'
-          - $ref: '#/components/schemas/TournamentRound'
           nullable: true
         participants:
           type: array
           items:
-            $ref: '#/components/schemas/MatchParticipant'
             $ref: '#/components/schemas/MatchParticipant'
           nullable: true
         maps:
@@ -4129,15 +2662,6 @@ components:
           readOnly: true
           nullable: true
       required:
-      - alternate_order
-      - created
-      - episode
-      - id
-      - is_ranked
-      - maps
-      - participants
-      - replay_url
-      - status
       - alternate_order
       - created
       - episode
@@ -4186,14 +2710,6 @@ components:
       - submission
       - team
       - teamname
-      - match
-      - old_rating
-      - player_index
-      - rating
-      - score
-      - submission
-      - team
-      - teamname
     MatchRating:
       type: object
       properties:
@@ -4206,13 +2722,10 @@ components:
       required:
       - rating
       - timestamp
-      - rating
-      - timestamp
     MatchReportRequest:
       type: object
       properties:
         invocation:
-          $ref: '#/components/schemas/SaturnInvocationRequest'
           $ref: '#/components/schemas/SaturnInvocationRequest'
         scores:
           type: array
@@ -4220,7 +2733,6 @@ components:
             type: integer
             minimum: 0
       required:
-      - invocation
       - invocation
     PaginatedClassRequirementList:
       type: object
@@ -4242,7 +2754,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ClassRequirement'
-            $ref: '#/components/schemas/ClassRequirement'
     PaginatedEpisodeList:
       type: object
       properties:
@@ -4262,7 +2773,6 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/Episode'
             $ref: '#/components/schemas/Episode'
     PaginatedMatchList:
       type: object
@@ -4284,7 +2794,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Match'
-            $ref: '#/components/schemas/Match'
     PaginatedScrimmageRequestList:
       type: object
       properties:
@@ -4304,7 +2813,6 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/ScrimmageRequest'
             $ref: '#/components/schemas/ScrimmageRequest'
     PaginatedSubmissionList:
       type: object
@@ -4326,7 +2834,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Submission'
-            $ref: '#/components/schemas/Submission'
     PaginatedTeamPublicList:
       type: object
       properties:
@@ -4346,7 +2853,6 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/TeamPublic'
             $ref: '#/components/schemas/TeamPublic'
     PaginatedTournamentList:
       type: object
@@ -4368,7 +2874,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Tournament'
-            $ref: '#/components/schemas/Tournament'
     PaginatedTournamentRoundList:
       type: object
       properties:
@@ -4389,7 +2894,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TournamentRound'
-            $ref: '#/components/schemas/TournamentRound'
     PasswordToken:
       type: object
       properties:
@@ -4398,8 +2902,6 @@ components:
         token:
           type: string
       required:
-      - password
-      - token
       - password
       - token
     PasswordTokenRequest:
@@ -4414,19 +2916,15 @@ components:
       required:
       - password
       - token
-      - password
-      - token
     PatchedTeamPrivateRequest:
       type: object
       properties:
         profile:
           $ref: '#/components/schemas/TeamProfilePrivateRequest'
-          $ref: '#/components/schemas/TeamProfilePrivateRequest'
     PatchedUserPrivateRequest:
       type: object
       properties:
         profile:
-          $ref: '#/components/schemas/UserProfilePrivateRequest'
           $ref: '#/components/schemas/UserProfilePrivateRequest'
         email:
           type: string
@@ -4447,15 +2945,9 @@ components:
       - +
       - '-'
       - '?'
-      - +
-      - '-'
-      - '?'
       type: string
     ReleaseStatusEnum:
       enum:
-      - 0
-      - 1
-      - 2
       - 0
       - 1
       - 2
@@ -4467,7 +2959,6 @@ components:
           type: string
       required:
       - token
-      - token
     ResetTokenRequest:
       type: object
       properties:
@@ -4476,19 +2967,16 @@ components:
           minLength: 1
       required:
       - token
-      - token
     SaturnInvocationRequest:
       type: object
       properties:
         status:
-          $ref: '#/components/schemas/StatusBccEnum'
           $ref: '#/components/schemas/StatusBccEnum'
         logs:
           type: string
         interrupted:
           type: boolean
       required:
-      - status
       - status
     ScrimmageRecord:
       type: object
@@ -4497,18 +2985,11 @@ components:
           type: integer
         Ranked:
           $ref: '#/components/schemas/ScrimmageRecordVariant'
-          $ref: '#/components/schemas/ScrimmageRecordVariant'
         Unranked:
-          $ref: '#/components/schemas/ScrimmageRecordVariant'
           $ref: '#/components/schemas/ScrimmageRecordVariant'
         All:
           $ref: '#/components/schemas/ScrimmageRecordVariant'
-          $ref: '#/components/schemas/ScrimmageRecordVariant'
       required:
-      - All
-      - Ranked
-      - Unranked
-      - team_id
       - All
       - Ranked
       - Unranked
@@ -4523,9 +3004,6 @@ components:
         ties:
           type: integer
       required:
-      - losses
-      - ties
-      - wins
       - losses
       - ties
       - wins
@@ -4544,7 +3022,6 @@ components:
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/ScrimmageStatusEnum'
           - $ref: '#/components/schemas/ScrimmageStatusEnum'
           readOnly: true
         is_ranked:
@@ -4570,7 +3047,6 @@ components:
           readOnly: true
         player_order:
           $ref: '#/components/schemas/PlayerOrderEnum'
-          $ref: '#/components/schemas/PlayerOrderEnum'
         maps:
           type: array
           items:
@@ -4590,24 +3066,8 @@ components:
       - requested_to_name
       - requested_to_rating
       - status
-      - created
-      - episode
-      - id
-      - is_ranked
-      - maps
-      - player_order
-      - requested_by
-      - requested_by_name
-      - requested_by_rating
-      - requested_to
-      - requested_to_name
-      - requested_to_rating
-      - status
     ScrimmageRequestAcceptRejectEnum:
       enum:
-      - A
-      - R
-      - M
       - A
       - R
       - M
@@ -4621,7 +3081,6 @@ components:
           type: integer
         player_order:
           $ref: '#/components/schemas/PlayerOrderEnum'
-          $ref: '#/components/schemas/PlayerOrderEnum'
         map_names:
           type: array
           items:
@@ -4634,25 +3093,14 @@ components:
       - map_names
       - player_order
       - requested_to
-      - is_ranked
-      - map_names
-      - player_order
-      - requested_to
     ScrimmageStatusEnum:
       enum:
-      - P
-      - Y
-      - N
       - P
       - Y
       - N
       type: string
     Status526Enum:
       enum:
-      - R
-      - X
-      - S
-      - O
       - R
       - X
       - S
@@ -4667,18 +3115,9 @@ components:
       - OK!
       - ERR
       - CAN
-      - NEW
-      - QUE
-      - RUN
-      - TRY
-      - OK!
-      - ERR
-      - CAN
       type: string
     StyleEnum:
       enum:
-      - SE
-      - DE
       - SE
       - DE
       type: string
@@ -4690,7 +3129,6 @@ components:
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/StatusBccEnum'
           - $ref: '#/components/schemas/StatusBccEnum'
           readOnly: true
         logs:
@@ -4735,16 +3173,6 @@ components:
       - teamname
       - user
       - username
-      - accepted
-      - created
-      - episode
-      - id
-      - logs
-      - status
-      - team
-      - teamname
-      - user
-      - username
     SubmissionDownload:
       type: object
       properties:
@@ -4762,19 +3190,14 @@ components:
       - ready
       - reason
       - url
-      - ready
-      - reason
-      - url
     SubmissionReportRequest:
       type: object
       properties:
         invocation:
           $ref: '#/components/schemas/SaturnInvocationRequest'
-          $ref: '#/components/schemas/SaturnInvocationRequest'
         accepted:
           type: boolean
       required:
-      - invocation
       - invocation
     TeamCreate:
       type: object
@@ -4783,7 +3206,6 @@ components:
           type: integer
           readOnly: true
         profile:
-          $ref: '#/components/schemas/TeamProfilePrivate'
           $ref: '#/components/schemas/TeamProfilePrivate'
         episode:
           type: string
@@ -4795,7 +3217,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserPublic'
-            $ref: '#/components/schemas/UserPublic'
           readOnly: true
         join_key:
           type: string
@@ -4804,14 +3225,8 @@ components:
         status:
           allOf:
           - $ref: '#/components/schemas/Status526Enum'
-          - $ref: '#/components/schemas/Status526Enum'
           readOnly: true
       required:
-      - id
-      - join_key
-      - members
-      - name
-      - status
       - id
       - join_key
       - members
@@ -4822,7 +3237,6 @@ components:
       properties:
         profile:
           $ref: '#/components/schemas/TeamProfilePrivateRequest'
-          $ref: '#/components/schemas/TeamProfilePrivateRequest'
         episode:
           type: string
           minLength: 1
@@ -4832,7 +3246,6 @@ components:
           pattern: ^[ -~]*$
           maxLength: 32
       required:
-      - name
       - name
     TeamJoinRequest:
       type: object
@@ -4846,8 +3259,6 @@ components:
       required:
       - join_key
       - name
-      - join_key
-      - name
     TeamPrivate:
       type: object
       properties:
@@ -4855,7 +3266,6 @@ components:
           type: integer
           readOnly: true
         profile:
-          $ref: '#/components/schemas/TeamProfilePrivate'
           $ref: '#/components/schemas/TeamProfilePrivate'
         episode:
           type: string
@@ -4867,7 +3277,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserPublic'
-            $ref: '#/components/schemas/UserPublic'
           readOnly: true
         join_key:
           type: string
@@ -4876,15 +3285,8 @@ components:
         status:
           allOf:
           - $ref: '#/components/schemas/Status526Enum'
-          - $ref: '#/components/schemas/Status526Enum'
           readOnly: true
       required:
-      - episode
-      - id
-      - join_key
-      - members
-      - name
-      - status
       - episode
       - id
       - join_key
@@ -4895,7 +3297,6 @@ components:
       type: object
       properties:
         profile:
-          $ref: '#/components/schemas/TeamProfilePrivateRequest'
           $ref: '#/components/schemas/TeamProfilePrivateRequest'
     TeamProfilePrivate:
       type: object
@@ -4922,19 +3323,13 @@ components:
           readOnly: true
         auto_accept_reject_ranked:
           $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
-          $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
         auto_accept_reject_unranked:
-          $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
           $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
         eligible_for:
           type: array
           items:
             type: integer
       required:
-      - avatar_url
-      - has_avatar
-      - has_report
-      - rating
       - avatar_url
       - has_avatar
       - has_report
@@ -4951,9 +3346,7 @@ components:
           maxLength: 1024
         auto_accept_reject_ranked:
           $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
-          $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
         auto_accept_reject_unranked:
-          $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
           $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
         eligible_for:
           type: array
@@ -4981,18 +3374,13 @@ components:
           readOnly: true
         auto_accept_reject_ranked:
           $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
-          $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
         auto_accept_reject_unranked:
-          $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
           $ref: '#/components/schemas/ScrimmageRequestAcceptRejectEnum'
         eligible_for:
           type: array
           items:
             type: integer
       required:
-      - avatar_url
-      - has_avatar
-      - rating
       - avatar_url
       - has_avatar
       - rating
@@ -5003,7 +3391,6 @@ components:
           type: integer
           readOnly: true
         profile:
-          $ref: '#/components/schemas/TeamProfilePublic'
           $ref: '#/components/schemas/TeamProfilePublic'
         episode:
           type: string
@@ -5016,11 +3403,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/UserPublic'
-            $ref: '#/components/schemas/UserPublic'
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/Status526Enum'
           - $ref: '#/components/schemas/Status526Enum'
           readOnly: true
         has_active_submission:
@@ -5033,26 +3418,16 @@ components:
       - members
       - name
       - status
-      - episode
-      - has_active_submission
-      - id
-      - members
-      - name
-      - status
     TeamRating:
       type: object
       properties:
         team:
           $ref: '#/components/schemas/TeamPublic'
-          $ref: '#/components/schemas/TeamPublic'
         rating_history:
           type: array
           items:
             $ref: '#/components/schemas/MatchRating'
-            $ref: '#/components/schemas/MatchRating'
       required:
-      - rating_history
-      - team
       - rating_history
       - team
     TeamReportRequest:
@@ -5064,7 +3439,6 @@ components:
           writeOnly: true
       required:
       - report
-      - report
     TokenObtainPair:
       type: object
       properties:
@@ -5075,8 +3449,6 @@ components:
           type: string
           readOnly: true
       required:
-      - access
-      - refresh
       - access
       - refresh
     TokenObtainPairRequest:
@@ -5093,8 +3465,6 @@ components:
       required:
       - password
       - username
-      - password
-      - username
     TokenRefresh:
       type: object
       properties:
@@ -5102,7 +3472,6 @@ components:
           type: string
           readOnly: true
       required:
-      - access
       - access
     TokenRefreshRequest:
       type: object
@@ -5113,7 +3482,6 @@ components:
           minLength: 1
       required:
       - refresh
-      - refresh
     TokenVerifyRequest:
       type: object
       properties:
@@ -5122,7 +3490,6 @@ components:
           writeOnly: true
           minLength: 1
       required:
-      - token
       - token
     Tournament:
       type: object
@@ -5139,7 +3506,6 @@ components:
         episode:
           type: string
         style:
-          $ref: '#/components/schemas/StyleEnum'
           $ref: '#/components/schemas/StyleEnum'
         display_date:
           type: string
@@ -5166,16 +3532,6 @@ components:
           type: boolean
           readOnly: true
       required:
-      - display_date
-      - episode
-      - is_eligible
-      - is_public
-      - name_long
-      - name_short
-      - require_resume
-      - style
-      - submission_freeze
-      - submission_unfreeze
       - display_date
       - episode
       - is_eligible
@@ -5215,10 +3571,6 @@ components:
       - id
       - name
       - tournament
-      - display_order
-      - id
-      - name
-      - tournament
     TournamentSubmission:
       type: object
       properties:
@@ -5227,7 +3579,6 @@ components:
           readOnly: true
         status:
           allOf:
-          - $ref: '#/components/schemas/StatusBccEnum'
           - $ref: '#/components/schemas/StatusBccEnum'
           readOnly: true
         logs:
@@ -5278,19 +3629,6 @@ components:
       - tournament
       - user
       - username
-      - accepted
-      - created
-      - description
-      - episode
-      - id
-      - logs
-      - package
-      - status
-      - team
-      - teamname
-      - tournament
-      - user
-      - username
     UserCreate:
       type: object
       properties:
@@ -5299,10 +3637,8 @@ components:
           readOnly: true
         profile:
           $ref: '#/components/schemas/UserProfilePrivate'
-          $ref: '#/components/schemas/UserProfilePrivate'
         username:
           type: string
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
           pattern: ^[\w.@+-]+$
@@ -5330,22 +3666,14 @@ components:
       - is_staff
       - last_name
       - username
-      - email
-      - first_name
-      - id
-      - is_staff
-      - last_name
-      - username
     UserCreateRequest:
       type: object
       properties:
         profile:
           $ref: '#/components/schemas/UserProfilePrivateRequest'
-          $ref: '#/components/schemas/UserProfilePrivateRequest'
         username:
           type: string
           minLength: 1
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
           pattern: ^[\w.@+-]+$
@@ -5374,11 +3702,6 @@ components:
       - last_name
       - password
       - username
-      - email
-      - first_name
-      - last_name
-      - password
-      - username
     UserPassed:
       type: object
       properties:
@@ -5396,10 +3719,6 @@ components:
       - id
       - passed
       - username
-      - email
-      - id
-      - passed
-      - username
     UserPrivate:
       type: object
       properties:
@@ -5408,11 +3727,9 @@ components:
           readOnly: true
         profile:
           $ref: '#/components/schemas/UserProfilePrivate'
-          $ref: '#/components/schemas/UserProfilePrivate'
         username:
           type: string
           readOnly: true
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
         email:
@@ -5447,7 +3764,6 @@ components:
       properties:
         profile:
           $ref: '#/components/schemas/UserProfilePrivateRequest'
-          $ref: '#/components/schemas/UserProfilePrivateRequest'
         email:
           type: string
           format: email
@@ -5466,14 +3782,10 @@ components:
       - email
       - first_name
       - last_name
-      - email
-      - first_name
-      - last_name
     UserProfilePrivate:
       type: object
       properties:
         gender:
-          $ref: '#/components/schemas/GenderEnum'
           $ref: '#/components/schemas/GenderEnum'
         gender_details:
           type: string
@@ -5499,13 +3811,7 @@ components:
           readOnly: true
         country:
           $ref: '#/components/schemas/CountryEnum'
-          $ref: '#/components/schemas/CountryEnum'
       required:
-      - avatar_url
-      - country
-      - gender
-      - has_avatar
-      - has_resume
       - avatar_url
       - country
       - gender
@@ -5515,7 +3821,6 @@ components:
       type: object
       properties:
         gender:
-          $ref: '#/components/schemas/GenderEnum'
           $ref: '#/components/schemas/GenderEnum'
         gender_details:
           type: string
@@ -5532,10 +3837,7 @@ components:
           pattern: ^[-a-zA-Z0-9_]+$
         country:
           $ref: '#/components/schemas/CountryEnum'
-          $ref: '#/components/schemas/CountryEnum'
       required:
-      - country
-      - gender
       - country
       - gender
     UserProfilePublic:
@@ -5556,8 +3858,6 @@ components:
       required:
       - avatar_url
       - has_avatar
-      - avatar_url
-      - has_avatar
     UserProfilePublicRequest:
       type: object
       properties:
@@ -5575,10 +3875,8 @@ components:
           readOnly: true
         profile:
           $ref: '#/components/schemas/UserProfilePublic'
-          $ref: '#/components/schemas/UserProfilePublic'
         username:
           type: string
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
           pattern: ^[\w.@+-]+$
@@ -5592,25 +3890,19 @@ components:
       - id
       - is_staff
       - username
-      - id
-      - is_staff
-      - username
     UserPublicRequest:
       type: object
       properties:
         profile:
           $ref: '#/components/schemas/UserProfilePublicRequest'
-          $ref: '#/components/schemas/UserProfilePublicRequest'
         username:
           type: string
           minLength: 1
-          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
           description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
             only.
           pattern: ^[\w.@+-]+$
           maxLength: 150
       required:
-      - username
       - username
     UserResume:
       type: object
