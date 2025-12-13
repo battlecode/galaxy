@@ -18,7 +18,7 @@ dependencies:
   - google-cloud-secret-manager=2.12.6
   - google-cloud-storage=2.5.0
   - isort=5.10.1
-  - mypy=0.942
+  - mypy=1.8.0
   - nodejs=20
   - openjdk=11
   - openssl>=3.0.15

@@ -68,6 +68,12 @@ export interface UserPrivate {
      * @memberof UserPrivate
      */
     readonly is_staff: boolean;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UserPrivate
+     */
+    readonly email_verified: boolean;
 }
 
 /**
@@ -81,6 +87,7 @@ export function instanceOfUserPrivate(value: object): boolean {
     isInstance = isInstance && "first_name" in value;
     isInstance = isInstance && "last_name" in value;
     isInstance = isInstance && "is_staff" in value;
+    isInstance = isInstance && "email_verified" in value;
 
     return isInstance;
 }
@@ -102,6 +109,7 @@ export function UserPrivateFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'first_name': json['first_name'],
         'last_name': json['last_name'],
         'is_staff': json['is_staff'],
+        'email_verified': json['email_verified'],
     };
 }
 

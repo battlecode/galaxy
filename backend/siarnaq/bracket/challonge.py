@@ -95,7 +95,14 @@ def bulk_add_teams(tournament: Tournament, teams: Iterable[Team], *, is_private:
             "name": team.name,
             "seed": idx + 1,
             "misc": json.dumps(
-                {"team_id": team.id, "submission_id": team.active_submission}
+                {
+                    "team_id": team.id,
+                    "submission_id": (
+                        team.get_active_submission().pk
+                        if team.get_active_submission()
+                        else None
+                    ),
+                }
             ),
         }
         for (idx, team) in enumerate(teams)
@@ -338,7 +345,7 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
         match_objects.append(match_object)
 
         challonge_points = challonge_match["attributes"]["points_by_participant"]
-        for (player_index, challonge_points_participant) in enumerate(challonge_points):
+        for player_index, challonge_points_participant in enumerate(challonge_points):
             # This looks ugly but it's how to parse through the Challonge-related data.
             challonge_participant_id_private = str(
                 challonge_points_participant["participant_id"]
@@ -368,7 +375,8 @@ def get_match_and_participant_objects_for_round(round: TournamentRound):
 
 
 def update_match(match: Match, *, is_private: bool):
-    tournament: Tournament = match.tournament_round.tournament
+    assert match.tournament_round is not None
+    tournament = match.tournament_round.tournament
 
     tournament_challonge_id = (
         tournament.external_id_private if is_private else tournament.external_id_public
@@ -398,12 +406,16 @@ def update_match(match: Match, *, is_private: bool):
     # as a one-item set.)
 
     participants: list[MatchParticipant] = list(match.participants.all())
-    high_score = max(participant.score for participant in participants)
+    high_score = max(
+        (participant.score or 0 for participant in participants), default=0
+    )
     participants_for_challonge = [
         {
-            "participant_id": participant.external_id_private
-            if is_private
-            else participant.external_id_public,
+            "participant_id": (
+                participant.external_id_private
+                if is_private
+                else participant.external_id_public
+            ),
             "score_set": str(participant.score),
             "advancing": participant.score == high_score,
         }

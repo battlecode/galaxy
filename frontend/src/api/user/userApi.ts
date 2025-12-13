@@ -31,6 +31,23 @@ export const createUser = async ({
   await API.userUCreate({ userCreateRequest });
 
 /**
+ * Resend verification email to currently logged in user.
+ */
+export const resendVerificationEmail = async (): Promise<void> => {
+  await API.userVerifyEmailSendCreate();
+};
+
+/**
+ * Verify email with token.
+ * @param token The email verification token.
+ */
+export const verifyEmail = async (token: string): Promise<void> => {
+  await API.userVerifyEmailValidateTokenCreate({
+    verifyTokenRequest: { token },
+  });
+};
+
+/**
  * Verify that a password reset token is valid and not expired.
  * @param resetTokenRequest The password reset token to verify.
  */

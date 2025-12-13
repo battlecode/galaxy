@@ -5,6 +5,8 @@ import Header from "./Header";
 import Sidebar from "./sidebar";
 import { Outlet, useParams } from "react-router-dom";
 import { useEpisodeId } from "../contexts/EpisodeContext";
+import { useCurrentUser } from "../contexts/CurrentUserContext";
+import EmailVerificationBanner from "./EmailVerificationBanner";
 import Cookies from "js-cookie";
 const SIDEBAR_WIDTH = 240;
 
@@ -51,6 +53,11 @@ const EpisodeLayout: React.FC = () => {
     setCollapsed(newCollapsedState);
     Cookies.set("sidebar-collapsed", newCollapsedState.toString());
   };
+
+  const { user } = useCurrentUser();
+  const showVerificationBanner =
+    user.isSuccess && !user.data.email_verified && !user.data.is_staff;
+
   return (
     <div className="h-full min-h-screen bg-gray-200/80">
       <Header toggleSidebar={toggleSidebar} />
@@ -63,6 +70,11 @@ const EpisodeLayout: React.FC = () => {
         }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
       >
+        {showVerificationBanner && (
+          <div className="p-4">
+            <EmailVerificationBanner email={user.data.email} />
+          </div>
+        )}
         <Outlet />
       </motion.div>
     </div>

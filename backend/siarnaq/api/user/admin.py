@@ -4,7 +4,7 @@ from import_export.admin import ExportMixin
 
 from siarnaq.api.teams.models import Team
 from siarnaq.api.user.forms import UserCreationForm
-from siarnaq.api.user.models import User, UserProfile
+from siarnaq.api.user.models import EmailVerificationToken, User, UserProfile
 
 
 class UserProfileInline(admin.StackedInline):
@@ -92,4 +92,18 @@ class UserAdmin(ExportMixin, BaseUserAdmin):
         return form
 
     def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(EmailVerificationToken)
+class EmailVerificationTokenAdmin(admin.ModelAdmin):
+    """Admin interface for email verification tokens."""
+
+    list_display = ("user", "token", "created_at")
+    list_filter = ("created_at",)
+    search_fields = ("user__username", "user__email", "token")
+    readonly_fields = ("user", "token", "created_at")
+    ordering = ("-created_at",)
+
+    def has_add_permission(self, request):
         return False

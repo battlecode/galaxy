@@ -50,6 +50,7 @@ from siarnaq.api.episodes.models import Episode, ReleaseStatus, Tournament
 from siarnaq.api.episodes.permissions import IsEpisodeAvailable, IsEpisodeMutable
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.teams.permissions import IsOnTeam
+from siarnaq.api.user.permissions import IsEmailVerified
 from siarnaq.gcloud import titan
 
 logger = structlog.get_logger(__name__)
@@ -129,6 +130,7 @@ class SubmissionViewSet(
     serializer_class = SubmissionSerializer
     permission_classes = (
         IsAuthenticated,
+        IsEmailVerified,
         IsEpisodeMutable | IsAdminUser,
         IsOnTeam,
     )
@@ -915,6 +917,7 @@ class ScrimmageRequestViewSet(
             case "create":
                 return [
                     IsAuthenticated(),
+                    IsEmailVerified(),
                     IsOnTeam(),
                     (IsEpisodeMutable | IsAdminUser)(),
                     HasTeamSubmission(),
@@ -922,11 +925,17 @@ class ScrimmageRequestViewSet(
             case "destroy":
                 return [
                     IsAuthenticated(),
+                    IsEmailVerified(),
                     IsOnTeam(),
                     IsEpisodeAvailable(),
                 ]
             case "list" | "retrieve":
-                return [IsAuthenticated(), IsOnTeam(), IsEpisodeAvailable()]
+                return [
+                    IsAuthenticated(),
+                    IsEmailVerified(),
+                    IsOnTeam(),
+                    IsEpisodeAvailable(),
+                ]
             case _:
                 return super().get_permissions()
 
@@ -1037,7 +1046,12 @@ class ScrimmageRequestViewSet(
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=(IsAuthenticated, IsEpisodeAvailable, IsOnTeam),
+        permission_classes=(
+            IsAuthenticated,
+            IsEmailVerified,
+            IsEpisodeAvailable,
+            IsOnTeam,
+        ),
     )
     def inbox(self, request, *, episode_id):
         """Get all pending scrimmage requests received."""
@@ -1055,7 +1069,12 @@ class ScrimmageRequestViewSet(
     @action(
         detail=False,
         methods=["get"],
-        permission_classes=(IsAuthenticated, IsEpisodeAvailable, IsOnTeam),
+        permission_classes=(
+            IsAuthenticated,
+            IsEmailVerified,
+            IsEpisodeAvailable,
+            IsOnTeam,
+        ),
     )
     def outbox(self, request, *, episode_id):
         """Get all pending scrimmage requests sent."""
@@ -1080,6 +1099,7 @@ class ScrimmageRequestViewSet(
         methods=["post"],
         permission_classes=(
             IsAuthenticated,
+            IsEmailVerified,
             IsOnTeam,
             IsEpisodeMutable | IsAdminUser,
             HasTeamSubmission,
@@ -1107,7 +1127,12 @@ class ScrimmageRequestViewSet(
     @action(
         detail=True,
         methods=["post"],
-        permission_classes=(IsAuthenticated, IsOnTeam, IsEpisodeAvailable),
+        permission_classes=(
+            IsAuthenticated,
+            IsEmailVerified,
+            IsOnTeam,
+            IsEpisodeAvailable,
+        ),
     )
     def reject(self, request, pk=None, *, episode_id):
         """Reject a scrimmage request."""
