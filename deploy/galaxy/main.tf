@@ -171,6 +171,8 @@ module "titan" {
 
   image         = var.titan_image
   storage_names = [google_storage_bucket.public.name, google_storage_bucket.secure.name]
+
+  trigger_tag_pattern = var.titan_trigger_tag_pattern
 }
 
 resource "google_secret_manager_secret" "saturn" {
@@ -255,7 +257,7 @@ resource "google_cloudbuild_trigger" "saturn" {
     name  = "galaxy"
 
     push {
-      tag = "^saturn-.*"
+      tag = var.saturn_trigger_tag_pattern
     }
   }
 

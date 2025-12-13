@@ -32,3 +32,8 @@ variable "storage_names" {
   description = "Name of Google Cloud Storage buckets to be scanned"
   type        = list(string)
 }
+
+variable "trigger_tag_pattern" {
+  description = "Regex pattern for git tags that trigger Titan builds"
+  type        = string
+}

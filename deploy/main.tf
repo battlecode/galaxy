@@ -57,6 +57,8 @@ module "production" {
 
   siarnaq_trigger_tag_pattern  = "^siarnaq-backend-.*"
   frontend_trigger_tag_pattern = "^siarnaq-frontend-.*"
+  titan_trigger_tag_pattern    = "^titan-.*"
+  saturn_trigger_tag_pattern   = "^saturn-.*"
 
   depends_on = [null_resource.apis]
 }
@@ -91,8 +93,10 @@ module "staging" {
   saturn_secrets        = var.saturn_secrets_staging
   storage_releases_name = module.releases.storage_bucket_name
 
-  siarnaq_trigger_tag_pattern  = "^staging-siarnaq-.*"
-  frontend_trigger_tag_pattern = "^staging-frontend-.*"
+  siarnaq_trigger_tag_pattern  = "^(staging-)?siarnaq-.*"
+  frontend_trigger_tag_pattern = "^(staging-)?frontend-.*"
+  titan_trigger_tag_pattern    = "^(staging-)?titan-.*"
+  saturn_trigger_tag_pattern   = "^(staging-)?saturn-.*"
 
   depends_on = [null_resource.apis]
 }
