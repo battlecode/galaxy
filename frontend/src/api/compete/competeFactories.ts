@@ -1,6 +1,7 @@
 import type {
   CompeteMatchHistoricalRatingTopNListRequest,
   CompeteMatchHistoricalRatingRetrieveRequest,
+  CompeteMatchRetrieveRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
   CompeteMatchScrimmagingRecordRetrieveRequest,
@@ -10,16 +11,18 @@ import type {
   CompeteSubmissionListRequest,
   CompeteSubmissionTournamentListRequest,
   HistoricalRating,
+  Match,
   PaginatedMatchList,
   PaginatedScrimmageRequestList,
   PaginatedSubmissionList,
   TournamentSubmission,
-  ScrimmageRecord,
+  ScrimmageRecord, CompeteSubmissionRetrieveRequest, Submission
 } from "../_autogen";
 import type { PaginatedQueryFactory, QueryFactory } from "../apiTypes";
 import { competeQueryKeys } from "./competeKeys";
 import {
   getAllUserTournamentSubmissions,
+  getMatchInfo,
   getMatchesList,
   getRatingTopNList,
   getRatingHistory,
@@ -28,9 +31,17 @@ import {
   getSubmissionsList,
   getTournamentMatchesList,
   getUserScrimmagesInboxList,
-  getUserScrimmagesOutboxList,
+  getUserScrimmagesOutboxList, getSubmissionInfo
 } from "./competeApi";
 import { prefetchNextPage } from "../helpers";
+
+export const submissionInfoFactory: QueryFactory<
+  CompeteSubmissionRetrieveRequest,
+  Submission
+> = {
+  queryKey: competeQueryKeys.subInfo,
+  queryFn: async ({ episodeId, id }) => await getSubmissionInfo({ episodeId, id }),
+} as const;
 
 export const subsListFactory: PaginatedQueryFactory<
   CompeteSubmissionListRequest,
@@ -159,6 +170,14 @@ export const teamScrimmageListFactory: PaginatedQueryFactory<
 
     return result;
   },
+} as const;
+
+export const matchInfoFactory: QueryFactory<
+  CompeteMatchRetrieveRequest,
+  Match
+> = {
+  queryKey: competeQueryKeys.matchInfo,
+  queryFn: async ({ episodeId, id }) => await getMatchInfo({ episodeId, id }),
 } as const;
 
 export const matchListFactory: PaginatedQueryFactory<

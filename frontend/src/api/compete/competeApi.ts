@@ -1,29 +1,32 @@
 import {
-  CompeteApi,
-  type TournamentSubmission,
-  type PaginatedSubmissionList,
-  type PaginatedScrimmageRequestList,
-  type PaginatedMatchList,
-  type CompeteSubmissionCreateRequest,
-  type CompeteSubmissionDownloadRetrieveRequest,
-  type CompeteSubmissionListRequest,
-  type Submission,
-  type CompeteRequestAcceptCreateRequest,
-  type CompeteRequestRejectCreateRequest,
-  type CompeteRequestInboxListRequest,
-  type CompeteRequestOutboxListRequest,
-  type CompeteRequestCreateRequest,
-  type ScrimmageRequest,
-  type CompeteMatchScrimmageListRequest,
-  type CompeteMatchTournamentListRequest,
-  type CompeteMatchListRequest,
-  type CompeteSubmissionTournamentListRequest,
-  type CompeteRequestDestroyRequest,
-  type CompeteMatchHistoricalRatingTopNListRequest,
-  type HistoricalRating,
-  type CompeteMatchScrimmagingRecordRetrieveRequest,
-  type ScrimmageRecord,
-  type CompeteMatchHistoricalRatingRetrieveRequest,
+    CompeteApi,
+    type TournamentSubmission,
+    type PaginatedSubmissionList,
+    type PaginatedScrimmageRequestList,
+    type PaginatedMatchList,
+    type CompeteSubmissionRetrieveRequest,
+    type CompeteSubmissionCreateRequest,
+    type CompeteSubmissionDownloadRetrieveRequest,
+    type CompeteSubmissionListRequest,
+    type Submission,
+    type CompeteRequestAcceptCreateRequest,
+    type CompeteRequestRejectCreateRequest,
+    type CompeteRequestInboxListRequest,
+    type CompeteRequestOutboxListRequest,
+    type CompeteRequestCreateRequest,
+    type ScrimmageRequest,
+    type Match,
+    type CompeteMatchRetrieveRequest,
+    type CompeteMatchScrimmageListRequest,
+    type CompeteMatchTournamentListRequest,
+    type CompeteMatchListRequest,
+    type CompeteSubmissionTournamentListRequest,
+    type CompeteRequestDestroyRequest,
+    type CompeteMatchHistoricalRatingTopNListRequest,
+    type HistoricalRating,
+    type CompeteMatchScrimmagingRecordRetrieveRequest,
+    type ScrimmageRecord,
+    type CompeteMatchHistoricalRatingRetrieveRequest,
 } from "../_autogen";
 import { DEFAULT_API_CONFIGURATION, downloadFile } from "../helpers";
 
@@ -73,6 +76,11 @@ export const downloadSubmission = async ({
   await downloadFile(url, `battlecode_source_${id}.zip`);
 };
 
+export const getSubmissionInfo = async ({
+    episodeId,
+  id,
+}: CompeteSubmissionRetrieveRequest): Promise<Submission> => await API.competeSubmissionRetrieve({ episodeId, id });
+
 /**
  * Get a paginated list of all of the current user's team's submissions.
  * @param episodeId The current episode's ID.
@@ -92,6 +100,7 @@ export const getAllUserTournamentSubmissions = async ({
   episodeId,
 }: CompeteSubmissionTournamentListRequest): Promise<TournamentSubmission[]> =>
   await API.competeSubmissionTournamentList({ episodeId });
+
 
 /**
  * Accept a scrimmage invitation.
@@ -201,6 +210,15 @@ export const getTournamentMatchesList = async ({
     roundId,
     teamId,
     tournamentId,
+  });
+
+export const getMatchInfo = async ({
+  episodeId,
+  id,
+}: CompeteMatchRetrieveRequest): Promise<Match> =>
+  await API.competeMatchRetrieve({
+    episodeId,
+    id,
   });
 
 /**
