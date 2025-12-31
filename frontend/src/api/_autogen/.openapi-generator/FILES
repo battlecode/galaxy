@@ -18,6 +18,7 @@ models/GameMap.ts
 models/GenderEnum.ts
 models/HistoricalRating.ts
 models/LanguageEnum.ts
+models/LanguagesEnum.ts
 models/Match.ts
 models/MatchParticipant.ts
 models/MatchRating.ts

@@ -26,6 +26,24 @@ class Language(models.TextChoices):
     PYTHON_3 = "py3"
 
 
+class ProgrammingLanguage(models.Model):
+    """A programming language supported by episodes."""
+
+    code = models.CharField(
+        max_length=16,
+        primary_key=True,
+        choices=Language.choices,
+        help_text="The language code (e.g., 'java8', 'py3')",
+    )
+    display_name = models.CharField(max_length=64)
+
+    class Meta:
+        ordering = ["display_name"]
+
+    def __str__(self):
+        return self.display_name
+
+
 class EligibilityCriterion(models.Model):
     """
     A database model for an eligibility criterion for entering into a tournament.
@@ -88,8 +106,13 @@ class Episode(models.Model):
     autoscrim_schedule = models.CharField(max_length=64, null=True, blank=True)
     """A cron specification for the autoscrim schedule, or null if disabled."""
 
-    language = models.CharField(max_length=8, choices=Language.choices)
-    """The implementation language supported for this episode."""
+    languages = models.ManyToManyField(
+        "ProgrammingLanguage",
+        related_name="episodes",
+        blank=True,
+        help_text="The implementation languages supported for this episode.",
+    )
+    """The implementation languages supported for this episode."""
 
     scaffold = models.URLField(blank=True)
     """The URL of the git repository where the scaffold can be obtained."""
@@ -110,6 +133,14 @@ class Episode(models.Model):
         EligibilityCriterion, related_name="episodes", blank=True
     )
     """The eligibility criteria active in this episode."""
+
+    languages = models.ManyToManyField(
+        "ProgrammingLanguage",
+        related_name="episodes",
+        blank=True,
+        help_text="The implementation languages supported for this episode.",
+    )
+    """The implementation languages supported for this episode."""
 
     is_allowed_ranked_scrimmage = models.BooleanField(default=True)
     """Whether ranked scrimmages are allowed in this episode."""
@@ -139,6 +170,10 @@ class Episode(models.Model):
             is_public=True,
         ).exists()
 
+    def get_supported_languages(self):
+        """Return list of supported language codes."""
+        return list(self.languages.values_list("code", flat=True))
+
     def autoscrim(self, best_of, override_freeze=False):
         """
         Trigger a round of automatically-generated ranked scrimmages for all teams in
@@ -161,9 +196,10 @@ class Episode(models.Model):
 
     def for_saturn(self):
         """Return the representation of this object as expected by Saturn."""
+        # TODO(@nour-massri): Update Saturn service to handle multiple languages
         return {
             "name": self.name_short,
-            "language": self.language,
+            "languages": self.get_supported_languages(),
             "scaffold": self.scaffold,
         }
 

@@ -11,6 +11,7 @@ export * from './GameMap';
 export * from './GenderEnum';
 export * from './HistoricalRating';
 export * from './LanguageEnum';
+export * from './LanguagesEnum';
 export * from './Match';
 export * from './MatchParticipant';
 export * from './MatchRating';

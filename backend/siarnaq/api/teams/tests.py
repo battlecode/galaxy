@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from siarnaq.api.compete.models import Match, MatchParticipant, Submission
-from siarnaq.api.episodes.models import EligibilityCriterion, Episode, Language, Map
+from siarnaq.api.episodes.models import EligibilityCriterion, Episode, Map
 from siarnaq.api.teams.managers import generate_4regular_graph
 from siarnaq.api.teams.models import Team, TeamStatus
 from siarnaq.api.user.models import User
@@ -67,18 +67,31 @@ class AutoscrimmageTestCase(TestCase):
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
-            language=Language.JAVA_8,
         )
+        # Add default language via M2M
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
+        java8, _ = ProgrammingLanguage.objects.get_or_create(
+            code="java8", defaults={"display_name": "Java 8"}
+        )
+        e.languages.add(java8)
+
         for i in range(n_public_maps):
             Map.objects.create(episode=e, name=f"map{i}", is_public=True)
         return e
 
     def make_team(self, *, episode, name, n_submissions, **kwargs):
         """Create a team with the given quantity of accepted submissions."""
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         t = Team.objects.create(episode=episode, name=name, **kwargs)
         u = User.objects.create_user(username=name, email=f"{name}@example.com")
+        # Get the language that should already exist from make_episode
+        java8 = ProgrammingLanguage.objects.get(code="java8")
         for i in range(n_submissions):
-            Submission.objects.create(episode=episode, team=t, user=u, accepted=True)
+            Submission.objects.create(
+                episode=episode, team=t, user=u, accepted=True, language=java8
+            )
         return t
 
     # Partitions:
@@ -160,12 +173,15 @@ class AutoscrimmageTestCase(TestCase):
         self.assertFalse(MatchParticipant.objects.filter(team=t).exists())
 
     def test_team_latest_accepted_older_accepted(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         e1 = self.make_episode("e1", n_public_maps=3)
+        java8 = ProgrammingLanguage.objects.get(code="java8")
         for i in range(3):
             t = self.make_team(episode=e1, name=f"team{i}", n_submissions=1)
         s1 = t.submissions.get()
         s2 = Submission.objects.create(
-            episode=e1, team=t, user=User.objects.last(), accepted=True
+            episode=e1, team=t, user=User.objects.last(), accepted=True, language=java8
         )
         with self.patcher:
             Team.objects.autoscrim(episode=e1, best_of=3)
@@ -175,12 +191,15 @@ class AutoscrimmageTestCase(TestCase):
         self.assertEqual(s2.participations.count(), 2)
 
     def test_team_latest_not_accepted_older_accepted(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         e1 = self.make_episode("e1", n_public_maps=3)
+        java8 = ProgrammingLanguage.objects.get(code="java8")
         for i in range(3):
             t = self.make_team(episode=e1, name=f"team{i}", n_submissions=1)
         s1 = t.submissions.get()
         s2 = Submission.objects.create(
-            episode=e1, team=t, user=User.objects.last(), accepted=False
+            episode=e1, team=t, user=User.objects.last(), accepted=False, language=java8
         )
         with self.patcher:
             Team.objects.autoscrim(episode=e1, best_of=3)
@@ -190,15 +209,18 @@ class AutoscrimmageTestCase(TestCase):
         self.assertEqual(s2.participations.count(), 0)
 
     def test_team_latest_not_accepted_older_not_accepted(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         e1 = self.make_episode("e1", n_public_maps=3)
+        java8 = ProgrammingLanguage.objects.get(code="java8")
         for i in range(3):
             self.make_team(episode=e1, name=f"team{i}", n_submissions=1)
         t = self.make_team(episode=e1, name="badteam", n_submissions=0)
         s1 = Submission.objects.create(
-            episode=e1, team=t, user=User.objects.last(), accepted=False
+            episode=e1, team=t, user=User.objects.last(), accepted=False, language=java8
         )
         s2 = Submission.objects.create(
-            episode=e1, team=t, user=User.objects.last(), accepted=False
+            episode=e1, team=t, user=User.objects.last(), accepted=False, language=java8
         )
         with self.patcher:
             Team.objects.autoscrim(episode=e1, best_of=3)
@@ -244,13 +266,18 @@ class EligibilityTestCase(APITestCase):
     """Test suite for team eligibility logic in Team API."""
 
     def setUp(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         self.episode = Episode.objects.create(
             name_short="ep",
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
-            language=Language.JAVA_8,
         )
+        java8, _ = ProgrammingLanguage.objects.get_or_create(
+            code="java8", defaults={"display_name": "Java 8"}
+        )
+        self.episode.languages.add(java8)
 
         self.team = Team.objects.create(episode=self.episode, name="t1")
         self.user = User.objects.create_user(

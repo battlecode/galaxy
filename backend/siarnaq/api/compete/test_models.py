@@ -11,7 +11,7 @@ from siarnaq.api.compete.models import (
     ScrimmageRequest,
     Submission,
 )
-from siarnaq.api.episodes.models import Episode, Language, Map
+from siarnaq.api.episodes.models import Episode, Map
 from siarnaq.api.teams.models import Rating, Team
 from siarnaq.api.user.models import User
 
@@ -21,13 +21,18 @@ class MatchParticipantLinkedListTestCase(TestCase):
 
     def setUp(self):
         """Initialize the episode and teams available in the test suite."""
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         self.e1 = Episode.objects.create(
             name_short="e1",
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
-            language=Language.JAVA_8,
         )
+        java8, _ = ProgrammingLanguage.objects.get_or_create(
+            code="java8", defaults={"display_name": "Java 8"}
+        )
+        self.e1.languages.add(java8)
         for name in ["team1", "team2", "team3"]:
             t = Team.objects.create(episode=self.e1, name=name)
             u = User.objects.create_user(
@@ -40,6 +45,7 @@ class MatchParticipantLinkedListTestCase(TestCase):
                 team=t,
                 user=u,
                 accepted=True,
+                language=java8,
             )
 
     def make_match(self):
@@ -162,13 +168,18 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
 
     def setUp(self):
         """Initialize the episode and teams available in the test suite."""
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         e1 = Episode.objects.create(
             name_short="e1",
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
-            language=Language.JAVA_8,
         )
+        java8, _ = ProgrammingLanguage.objects.get_or_create(
+            code="java8", defaults={"display_name": "Java 8"}
+        )
+        e1.languages.add(java8)
         for name in ["team1", "team2", "team3"]:
             t = Team.objects.create(episode=e1, name=name)
             u = User.objects.create_user(
@@ -181,6 +192,7 @@ class MatchParticipantRatingFinalizationTestCase(TestCase):
                 team=t,
                 user=u,
                 accepted=True,
+                language=java8,
             )
 
     # Partitions for: rating. Testing finalizations occur iff prerequisites are met.
@@ -488,13 +500,18 @@ class ScrimmageRequestQuerySetTestCase(TestCase):
     """Test suite for handling sets of scrimmage requests."""
 
     def setUp(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         e1 = Episode.objects.create(
             name_short="e1",
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
-            language=Language.JAVA_8,
         )
+        java8, _ = ProgrammingLanguage.objects.get_or_create(
+            code="java8", defaults={"display_name": "Java 8"}
+        )
+        e1.languages.add(java8)
         self.m = Map.objects.create(episode=e1, name="m", is_public=True)
         self.teams = []
         for name in ["team1", "team2"]:
@@ -509,6 +526,7 @@ class ScrimmageRequestQuerySetTestCase(TestCase):
                 team=t,
                 user=u,
                 accepted=True,
+                language=java8,
             )
             self.teams.append(t)
         self.n = 100

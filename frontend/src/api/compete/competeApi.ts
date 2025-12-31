@@ -38,18 +38,21 @@ const API = new CompeteApi(DEFAULT_API_CONFIGURATION);
  * @param _package The name of the submission's package.
  * @param description The submission's description.
  * @param sourceCode The submission's source code.
+ * @param language The programming language of the submission.
  */
 export const uploadSubmission = async ({
   episodeId,
   _package,
   description,
   sourceCode,
+  language,
 }: CompeteSubmissionCreateRequest): Promise<Submission> =>
   await API.competeSubmissionCreate({
     episodeId,
     sourceCode,
     _package,
     description,
+    language,
   });
 
 /**

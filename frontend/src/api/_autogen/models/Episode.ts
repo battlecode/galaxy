@@ -19,12 +19,12 @@ import {
     EligibilityCriterionFromJSONTyped,
     EligibilityCriterionToJSON,
 } from './EligibilityCriterion';
-import type { LanguageEnum } from './LanguageEnum';
+import type { LanguagesEnum } from './LanguagesEnum';
 import {
-    LanguageEnumFromJSON,
-    LanguageEnumFromJSONTyped,
-    LanguageEnumToJSON,
-} from './LanguageEnum';
+    LanguagesEnumFromJSON,
+    LanguagesEnumFromJSONTyped,
+    LanguagesEnumToJSON,
+} from './LanguagesEnum';
 
 /**
  * 
@@ -64,10 +64,10 @@ export interface Episode {
     game_archive: Date;
     /**
      * 
-     * @type {LanguageEnum}
+     * @type {Array<LanguagesEnum>}
      * @memberof Episode
      */
-    language: LanguageEnum;
+    readonly languages: Array<LanguagesEnum>;
     /**
      * 
      * @type {string}
@@ -121,7 +121,7 @@ export function instanceOfEpisode(value: object): boolean {
     isInstance = isInstance && "name_long" in value;
     isInstance = isInstance && "game_release" in value;
     isInstance = isInstance && "game_archive" in value;
-    isInstance = isInstance && "language" in value;
+    isInstance = isInstance && "languages" in value;
     isInstance = isInstance && "eligibility_criteria" in value;
     isInstance = isInstance && "frozen" in value;
 
@@ -143,7 +143,7 @@ export function EpisodeFromJSONTyped(json: any, ignoreDiscriminator: boolean): E
         'blurb': !exists(json, 'blurb') ? undefined : json['blurb'],
         'game_release': (new Date(json['game_release'])),
         'game_archive': (new Date(json['game_archive'])),
-        'language': LanguageEnumFromJSON(json['language']),
+        'languages': ((json['languages'] as Array<any>).map(LanguagesEnumFromJSON)),
         'scaffold': !exists(json, 'scaffold') ? undefined : json['scaffold'],
         'artifact_name': !exists(json, 'artifact_name') ? undefined : json['artifact_name'],
         'release_version_client': !exists(json, 'release_version_client') ? undefined : json['release_version_client'],
@@ -168,7 +168,6 @@ export function EpisodeToJSON(value?: Episode | null): any {
         'blurb': value.blurb,
         'game_release': (value.game_release.toISOString()),
         'game_archive': (value.game_archive.toISOString()),
-        'language': LanguageEnumToJSON(value.language),
         'scaffold': value.scaffold,
         'artifact_name': value.artifact_name,
         'release_version_client': value.release_version_client,

@@ -26,6 +26,7 @@ class EligibilityCriterionSerializer(serializers.ModelSerializer):
 class EpisodeSerializer(serializers.ModelSerializer):
     eligibility_criteria = EligibilityCriterionSerializer(many=True)
     frozen = serializers.SerializerMethodField()
+    languages = serializers.SerializerMethodField()
 
     class Meta:
         model = Episode
@@ -35,7 +36,7 @@ class EpisodeSerializer(serializers.ModelSerializer):
             "blurb",
             "game_release",
             "game_archive",
-            "language",
+            "languages",
             "scaffold",
             "artifact_name",
             "release_version_client",
@@ -48,6 +49,16 @@ class EpisodeSerializer(serializers.ModelSerializer):
     @extend_schema_field(OpenApiTypes.BOOL)
     def get_frozen(self, obj):
         return obj.frozen()
+
+    @extend_schema_field(
+        {
+            "type": "array",
+            "items": {"type": "string", "enum": ["java8", "java21", "py3"]},
+        }
+    )
+    def get_languages(self, obj):
+        """Return list of supported language codes."""
+        return obj.get_supported_languages()
 
 
 @extend_schema_serializer(

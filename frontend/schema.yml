@@ -580,6 +580,18 @@ paths:
                 source_code:
                   type: string
                   format: binary
+                language:
+                  type: string
+                  enum:
+                  - java8
+                  - java21
+                  - py3
+                  description: The programming language of the submission
+              required:
+              - package
+              - description
+              - source_code
+              - language
       security:
       - jwtAuth: []
       responses:
@@ -2542,8 +2554,11 @@ components:
         game_archive:
           type: string
           format: date-time
-        language:
-          $ref: '#/components/schemas/LanguageEnum'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguagesEnum'
+          readOnly: true
         scaffold:
           type: string
           format: uri
@@ -2572,7 +2587,7 @@ components:
       - frozen
       - game_archive
       - game_release
-      - language
+      - languages
       - name_long
       - name_short
     GameMap:
@@ -2619,6 +2634,12 @@ components:
       - java21
       - py3
       type: string
+    LanguagesEnum:
+      type: string
+      enum:
+      - java8
+      - java21
+      - py3
     Match:
       type: object
       properties:
@@ -3162,11 +3183,16 @@ components:
         description:
           type: string
           maxLength: 128
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          description: The programming language of this submission.
       required:
       - accepted
       - created
       - episode
       - id
+      - language
       - logs
       - status
       - team
@@ -3612,6 +3638,11 @@ components:
         description:
           type: string
           readOnly: true
+        language:
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+          description: The programming language of this submission.
+          readOnly: true
         tournament:
           type: string
           readOnly: true
@@ -3621,6 +3652,7 @@ components:
       - description
       - episode
       - id
+      - language
       - logs
       - package
       - status

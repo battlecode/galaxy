@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { LanguageEnum } from './LanguageEnum';
+import {
+    LanguageEnumFromJSON,
+    LanguageEnumFromJSONTyped,
+    LanguageEnumToJSON,
+} from './LanguageEnum';
 import type { StatusBccEnum } from './StatusBccEnum';
 import {
     StatusBccEnumFromJSON,
@@ -100,6 +106,12 @@ export interface TournamentSubmission {
     readonly description: string;
     /**
      * 
+     * @type {LanguageEnum}
+     * @memberof TournamentSubmission
+     */
+    readonly language: LanguageEnum;
+    /**
+     * 
      * @type {string}
      * @memberof TournamentSubmission
      */
@@ -123,6 +135,7 @@ export function instanceOfTournamentSubmission(value: object): boolean {
     isInstance = isInstance && "accepted" in value;
     isInstance = isInstance && "_package" in value;
     isInstance = isInstance && "description" in value;
+    isInstance = isInstance && "language" in value;
     isInstance = isInstance && "tournament" in value;
 
     return isInstance;
@@ -150,6 +163,7 @@ export function TournamentSubmissionFromJSONTyped(json: any, ignoreDiscriminator
         'accepted': json['accepted'],
         '_package': json['package'],
         'description': json['description'],
+        'language': LanguageEnumFromJSON(json['language']),
         'tournament': json['tournament'],
     };
 }

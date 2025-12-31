@@ -25,7 +25,6 @@ from siarnaq.api.compete.models import (
 from siarnaq.api.compete.serializers import MatchSerializer
 from siarnaq.api.episodes.models import (
     Episode,
-    Language,
     Map,
     ReleaseStatus,
     Tournament,
@@ -78,14 +77,19 @@ class SubmissionViewSetTestCase(APITestCase):
     """Test suite for the Submissions API."""
 
     def setUp(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         self.e1 = Episode.objects.create(
             name_short="e1",
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
             submission_frozen=False,
-            language=Language.JAVA_8,
         )
+        java8, _ = ProgrammingLanguage.objects.get_or_create(
+            code="java8", defaults={"display_name": "Java 8"}
+        )
+        self.e1.languages.add(java8)
         self.user = User.objects.create_user(
             username="user1", email="user1@example.com"
         )
@@ -123,7 +127,12 @@ class SubmissionViewSetTestCase(APITestCase):
         with io.BytesIO(b"abcdefg") as f:
             response = self.client.post(
                 reverse("submission-list", kwargs={"episode_id": "e1"}),
-                {"package": "bot", "description": "New bot", "source_code": f},
+                {
+                    "package": "bot",
+                    "description": "New bot",
+                    "source_code": f,
+                    "language": "java8",
+                },
                 format="multipart",
             )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -146,7 +155,12 @@ class SubmissionViewSetTestCase(APITestCase):
         with io.BytesIO(b"abcdefg") as f:
             response = self.client.post(
                 reverse("submission-list", kwargs={"episode_id": "e1"}),
-                {"package": "bot", "description": "New bot", "source_code": f},
+                {
+                    "package": "bot",
+                    "description": "New bot",
+                    "source_code": f,
+                    "language": "java8",
+                },
                 format="multipart",
             )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -167,7 +181,12 @@ class SubmissionViewSetTestCase(APITestCase):
         with io.BytesIO(data) as f:
             response = self.client.post(
                 reverse("submission-list", kwargs={"episode_id": "e1"}),
-                {"package": "bot", "description": "New bot", "source_code": f},
+                {
+                    "package": "bot",
+                    "description": "New bot",
+                    "source_code": f,
+                    "language": "java8",
+                },
                 format="multipart",
             )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -192,7 +211,12 @@ class SubmissionViewSetTestCase(APITestCase):
         with io.BytesIO(b"abcdefg") as f:
             response = self.client.post(
                 reverse("submission-list", kwargs={"episode_id": "e1"}),
-                {"package": "bot", "description": "New bot", "source_code": f},
+                {
+                    "package": "bot",
+                    "description": "New bot",
+                    "source_code": f,
+                    "language": "java8",
+                },
                 format="multipart",
             )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -206,7 +230,12 @@ class SubmissionViewSetTestCase(APITestCase):
         with io.BytesIO(b"abcdefg") as f:
             response = self.client.post(
                 reverse("submission-list", kwargs={"episode_id": "e1"}),
-                {"package": "bot", "description": "New bot", "source_code": f},
+                {
+                    "package": "bot",
+                    "description": "New bot",
+                    "source_code": f,
+                    "language": "java8",
+                },
                 format="multipart",
             )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -216,7 +245,12 @@ class SubmissionViewSetTestCase(APITestCase):
         with io.BytesIO(b"abcdefg") as f:
             response = self.client.post(
                 reverse("submission-list", kwargs={"episode_id": "e1"}),
-                {"package": "bot", "description": "New bot", "source_code": f},
+                {
+                    "package": "bot",
+                    "description": "New bot",
+                    "source_code": f,
+                    "language": "java8",
+                },
                 format="multipart",
             )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -229,6 +263,9 @@ class SubmissionViewSetTestCase(APITestCase):
     # accepted: provided, blank
 
     def test_report_admin_was_final_now_valid(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
+        java8 = ProgrammingLanguage.objects.get(code="java8")
         s = Submission.objects.create(
             episode=self.e1,
             team=self.team,
@@ -236,6 +273,7 @@ class SubmissionViewSetTestCase(APITestCase):
             status=SaturnStatus.COMPLETED,
             logs="abc",
             accepted=False,
+            language=java8,
         )
         self.client.force_authenticate(self.admin)
         response = self.client.post(
@@ -253,6 +291,9 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertFalse(s.accepted)
 
     def test_report_admin_was_unfinal_now_valid_provided(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
+        java8 = ProgrammingLanguage.objects.get(code="java8")
         s = Submission.objects.create(
             episode=self.e1,
             team=self.team,
@@ -260,6 +301,7 @@ class SubmissionViewSetTestCase(APITestCase):
             status=SaturnStatus.RUNNING,
             logs="abc",
             accepted=False,
+            language=java8,
         )
         self.client.force_authenticate(self.admin)
         response = self.client.post(
@@ -277,6 +319,9 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertTrue(s.accepted)
 
     def test_report_admin_was_unfinal_now_valid_blank(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
+        java8 = ProgrammingLanguage.objects.get(code="java8")
         s = Submission.objects.create(
             episode=self.e1,
             team=self.team,
@@ -284,6 +329,7 @@ class SubmissionViewSetTestCase(APITestCase):
             status=SaturnStatus.QUEUED,
             logs="abc",
             accepted=False,
+            language=java8,
         )
         self.client.force_authenticate(self.admin)
         response = self.client.post(
@@ -298,6 +344,9 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertFalse(s.accepted)
 
     def test_report_admin_was_unfinal_now_invalid(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
+        java8 = ProgrammingLanguage.objects.get(code="java8")
         s = Submission.objects.create(
             episode=self.e1,
             team=self.team,
@@ -305,6 +354,7 @@ class SubmissionViewSetTestCase(APITestCase):
             status=SaturnStatus.RUNNING,
             logs="abc",
             accepted=False,
+            language=java8,
         )
         self.client.force_authenticate(self.admin)
         response = self.client.post(
@@ -319,6 +369,9 @@ class SubmissionViewSetTestCase(APITestCase):
         self.assertFalse(s.accepted)
 
     def test_report_not_admin(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
+        java8 = ProgrammingLanguage.objects.get(code="java8")
         s = Submission.objects.create(
             episode=self.e1,
             team=self.team,
@@ -326,6 +379,7 @@ class SubmissionViewSetTestCase(APITestCase):
             status=SaturnStatus.RUNNING,
             logs="abc",
             accepted=False,
+            language=java8,
         )
         self.client.force_authenticate(self.user)
         response = self.client.post(
@@ -347,13 +401,18 @@ class MatchSerializerTestCase(TestCase):
     """Test suite for the Match serializer."""
 
     def setUp(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         self.e1 = Episode.objects.create(
             name_short="e1",
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
-            language=Language.JAVA_8,
         )
+        java8, _ = ProgrammingLanguage.objects.get_or_create(
+            code="java8", defaults={"display_name": "Java 8"}
+        )
+        self.e1.languages.add(java8)
         self.map = Map.objects.create(episode=self.e1, name="map")
         tournament = Tournament.objects.create(
             name_short="t",
@@ -390,7 +449,7 @@ class MatchSerializerTestCase(TestCase):
             t.members.add(u)
             self.submissions.append(
                 Submission.objects.create(
-                    episode=self.e1, team=t, user=u, accepted=True
+                    episode=self.e1, team=t, user=u, accepted=True, language=java8
                 )
             )
             self.users.append(u)
@@ -967,13 +1026,18 @@ class MatchViewSetTestCase(APITestCase):
         return match
 
     def setUp(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         self.e1 = Episode.objects.create(
             name_short="e1",
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
-            language=Language.JAVA_8,
         )
+        java8, _ = ProgrammingLanguage.objects.get_or_create(
+            code="java8", defaults={"display_name": "Java 8"}
+        )
+        self.e1.languages.add(java8)
         self.map = Map.objects.create(episode=self.e1, name="map")
         public_tournament = Tournament.objects.create(
             name_short="t",
@@ -1032,7 +1096,7 @@ class MatchViewSetTestCase(APITestCase):
             t.members.add(u)
             self.submissions.append(
                 Submission.objects.create(
-                    episode=self.e1, team=t, user=u, accepted=True
+                    episode=self.e1, team=t, user=u, accepted=True, language=java8
                 )
             )
             self.users.append(u)
@@ -1227,22 +1291,28 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
     """Test suite for the Scrimmage Requests API."""
 
     def setUp(self):
+        from siarnaq.api.episodes.models import ProgrammingLanguage
+
         self.e1 = Episode.objects.create(
             name_short="e1",
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
             submission_frozen=False,
-            language=Language.JAVA_8,
         )
+        java8, _ = ProgrammingLanguage.objects.get_or_create(
+            code="java8", defaults={"display_name": "Java 8"}
+        )
+        self.e1.languages.add(java8)
+
         self.e2 = Episode.objects.create(
             name_short="e2",
             registration=timezone.now(),
             game_release=timezone.now(),
             game_archive=timezone.now(),
             submission_frozen=False,
-            language=Language.JAVA_8,
         )
+        self.e2.languages.add(java8)
         self.maps = []
         for i in range(5):
             self.maps.append(
@@ -1271,7 +1341,7 @@ class ScrimmageRequestViewSetTestCase(APITransactionTestCase):
             t.members.add(u)
             self.submissions.append(
                 Submission.objects.create(
-                    episode=self.e1, team=t, user=u, accepted=True
+                    episode=self.e1, team=t, user=u, accepted=True, language=java8
                 )
             )
             self.users.append(u)

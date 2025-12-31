@@ -8,6 +8,7 @@ from siarnaq.api.episodes.models import (
     EligibilityCriterion,
     Episode,
     Map,
+    ProgrammingLanguage,
     Tournament,
     TournamentRound,
 )
@@ -46,7 +47,7 @@ class EpisodeAdmin(admin.ModelAdmin):
                 "fields": (
                     "name_short",
                     "name_long",
-                    "language",
+                    "languages",
                     "blurb",
                     "eligibility_criteria",
                 ),
@@ -83,11 +84,12 @@ class EpisodeAdmin(admin.ModelAdmin):
             },
         ),
     )
-    filter_horizontal = ("eligibility_criteria",)
+    filter_horizontal = ("eligibility_criteria", "languages")
     inlines = [MapInline]
     list_display = (
         "name_short",
         "name_long",
+        "display_languages",
         "registration",
         "game_release",
         "game_archive",
@@ -95,6 +97,12 @@ class EpisodeAdmin(admin.ModelAdmin):
     ordering = ("-game_release",)
     search_fields = ("name_short", "name_long")
     search_help_text = "Search for a full or abbreviated name."
+
+    @admin.display(description="Languages")
+    def display_languages(self, obj):
+        """Display supported languages for the episode."""
+        langs = obj.languages.all()
+        return ", ".join(lang.display_name for lang in langs) if langs else "None"
 
 
 @admin.register(Map)
@@ -115,6 +123,14 @@ class EligibilityCriterionAdmin(admin.ModelAdmin):
     ordering = ("is_private", "title")
     search_fields = ("title",)
     search_help_text = "Search for a title."
+
+
+@admin.register(ProgrammingLanguage)
+class ProgrammingLanguageAdmin(admin.ModelAdmin):
+    fields = ("code", "display_name")
+    list_display = ("code", "display_name")
+    ordering = ("display_name",)
+    search_fields = ("code", "display_name")
 
 
 class TournamentRoundInline(admin.TabularInline):
