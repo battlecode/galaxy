@@ -126,6 +126,7 @@ dev-clean: ## Clean up Docker containers and images
 	@echo "✓ Cleanup complete"
 
 dev-docker-up: ## Start all Docker services and show logs
+	@# TODO: Add support for setting logging level
 	@# Generate run ID
 	$(eval RUN_ID := $(shell date +%Y%m%d_%H%M%S))
 	@echo "Starting run: $(RUN_ID)"
