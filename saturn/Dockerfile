@@ -13,15 +13,17 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /saturn -ldflags="-s -w" .
 # Link intermediate container for python
 FROM python:3.12-slim-bookworm as python
 
-FROM openjdk:21-jdk-slim-bookworm
+FROM eclipse-temurin:21-jdk
 
-# Setup
-RUN echo "deb http://deb.debian.org/debian unstable main" >> /etc/apt/sources.list && \
-    apt-get update
-
-# Install JDK8. The base image provides JDK21, but we still need JDK8 to
-# run matches with java8
-RUN apt-get install -y -t unstable openjdk-8-jdk
+# Setup - Install JDK8 (base image provides JDK21)
+# Add Ubuntu universe repository for openjdk-8
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:openjdk-r/ppa -y && \
+    apt-get update && \
+    apt-get install -y openjdk-8-jdk && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy Python executable, libraries, standard library, site-packages, include files, binary files, and Python path
 COPY --from=python /usr/local/bin/python3.12 /usr/local/bin/python3.12
