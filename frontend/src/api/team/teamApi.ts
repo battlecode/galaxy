@@ -105,6 +105,7 @@ export const updateTeamPartial = async ({
  * @param search The search query.
  * @param hasActiveSubmission Whether the team has an active submission.
  * @param eligibleFor A list of criteria, of which the team must be
+ * @param notEligibleFor A list of criteria, of which the team must not be
  * eligible for at least one.
  * @param page The page number.
  */
@@ -113,6 +114,7 @@ export const searchTeams = async ({
   search,
   hasActiveSubmission,
   eligibleFor,
+  notEligibleFor,
   page,
 }: TeamTListRequest): Promise<PaginatedTeamPublicList> =>
   await API.teamTList({
@@ -121,6 +123,7 @@ export const searchTeams = async ({
     search,
     hasActiveSubmission,
     eligibleFor,
+    notEligibleFor,
     page,
   });
 

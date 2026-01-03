@@ -10,14 +10,19 @@ import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import { useSearchTeams } from "../api/team/useTeam";
 import { useQueryClient } from "@tanstack/react-query";
 import SelectMultipleMenu from "components/elements/SelectMultipleMenu";
-import { useEpisodeInfo } from "api/episode/useEpisode";
+import SelectMenu from "components/elements/SelectMenu";
+import { useEpisodeInfo, useTournamentList } from "api/episode/useEpisode";
 import EligibilityIcon from "components/EligibilityIcon";
+import { getEligibilities } from "api/helpers";
 
 interface QueryParams {
   page: number;
   search: string;
-  eligibleFor: string[];
+  eligibleFor: string[]; // include list
+  notEligibleFor: string[]; // exclude list
 }
+
+const ALL_TOURNAMENTS = -1;
 
 const eligibleEqual = (eligible1: number[], eligible2: number[]): boolean =>
   eligible1.length === eligible2.length &&
@@ -35,15 +40,29 @@ const Rankings: React.FC = () => {
       page: parsePageParam("page", searchParams),
       search: searchParams.get("search") ?? "",
       eligibleFor: searchParams.getAll("eligibleFor"),
+      notEligibleFor: searchParams.getAll("notEligibleFor"),
     }),
     [searchParams],
   );
 
+  const [tournamentIdx, setTournament] = useState<number>(ALL_TOURNAMENTS);
+
+  // Include
   const [eligibleFor, setEligibleFor] = useState<number[]>(
     queryParams.eligibleFor.map((el) => parseInt(el)),
   );
 
+  // Exclude
+  const [notEligibleFor, setNotEligibleFor] = useState<number[]>(
+    queryParams.notEligibleFor.map((el) => parseInt(el)),
+  );
+
   const episode = useEpisodeInfo({ id: episodeId });
+
+  const tournamentList = useTournamentList({ episodeId }, queryClient);
+  const eligibilityCriteria = episode.data?.eligibility_criteria;
+  const selectedTournament = tournamentList.data?.results?.[tournamentIdx];
+
   const rankingsData = useSearchTeams(
     {
       episodeId,
@@ -52,6 +71,10 @@ const Rankings: React.FC = () => {
       eligibleFor:
         queryParams.eligibleFor.length > 0
           ? queryParams.eligibleFor.map((el) => parseInt(el))
+          : undefined,
+      notEligibleFor:
+        queryParams.notEligibleFor.length > 0
+          ? queryParams.notEligibleFor.map((el) => parseInt(el))
           : undefined,
     },
     queryClient,
@@ -70,16 +93,30 @@ const Rankings: React.FC = () => {
         !eligibleEqual(
           queryParams.eligibleFor.map((el) => parseInt(el)),
           eligibleFor,
+        ) ||
+        !eligibleEqual(
+          queryParams.notEligibleFor.map((el) => parseInt(el)),
+          notEligibleFor,
         ))
     ) {
       setSearchParams((prev) => ({
         ...getParamEntries(prev),
         search: searchText,
         eligibleFor: eligibleFor.map((el) => el.toFixed(0)),
+        notEligibleFor: notEligibleFor.map((el) => el.toFixed(0)),
         page: "1",
       }));
+
+      console.log("Updated searchParams:", {
+        search: searchText,
+        eligibleFor,
+        notEligibleFor,
+        page: "1",
+      });
     }
   }
+
+
 
   return (
     <div className="flex flex-col p-6">
@@ -101,32 +138,119 @@ const Rankings: React.FC = () => {
             className="w-80 sm:w-52 md:w-80 lg:w-96"
           />
 
+          {/* tournament select */}
+          <SelectMenu<number>
+            className="min-w-60 max-w-96"
+            disabled={episode.isLoading || rankingsData.isLoading || tournamentList.isLoading}
+            options={[
+              { value: ALL_TOURNAMENTS, label: "All tournaments" },
+              ...(tournamentList.data?.results?.map((t, i) => ({
+                value: i,
+                label: t.name_long,
+              })) ?? [])
+            ]}
+            placeholder="select tournament"
+            value={tournamentIdx}
+            onChange={setTournament}
+          />
+
+
+          {/* include drop down */}
           <SelectMultipleMenu<number>
             className="min-w-60 max-w-96"
-            disabled={episode.isLoading || rankingsData.isLoading}
+            disabled={
+              episode.isLoading ||
+              rankingsData.isLoading ||
+              tournamentList.isLoading
+            }
             options={
-              episode.data?.eligibility_criteria.map((el) => ({
-                value: el.id,
-                label: (
-                  <div
-                    key={el.id}
-                    className="justify-left flex w-full flex-1 flex-row items-center gap-4 overflow-hidden"
-                  >
-                    <div className="text-gray-800">{el.title}</div>
-                    <EligibilityIcon criterion={el} />
-                  </div>
-                ),
-              })) ?? []
+              eligibilityCriteria === undefined
+                ? []
+                : tournamentIdx === ALL_TOURNAMENTS || selectedTournament === undefined
+                  ? eligibilityCriteria.map((el) => ({
+                    value: el.id,
+                    label: (
+                      <div
+                        key={el.id}
+                        className="justify-left flex w-full flex-1 flex-row items-center gap-4 overflow-hidden"
+                      >
+                        <div className="text-gray-800">{el.title}</div>
+                        <EligibilityIcon criterion={el} />
+                      </div>
+                    ),
+                  }))
+                  : getEligibilities(
+                    eligibilityCriteria,
+                    selectedTournament.eligibility_includes ?? [],
+                  ).map((el) => ({
+                    value: el.id,
+                    label: (
+                      <div
+                        key={el.id}
+                        className="justify-left flex w-full flex-1 flex-row items-center gap-4 overflow-hidden"
+                      >
+                        <div className="text-gray-800">{el.title}</div>
+                        <EligibilityIcon criterion={el} />
+                      </div>
+                    ),
+                  }))
             }
             placeholder="Eligibility to include..."
             value={eligibleFor}
             onChange={setEligibleFor}
           />
 
+
+          {/* exclude drop down */}
+          <SelectMultipleMenu<number>
+            className="min-w-60 max-w-96"
+            disabled={
+              episode.isLoading ||
+              rankingsData.isLoading ||
+              tournamentList.isLoading
+            }
+            options={
+              eligibilityCriteria === undefined
+                ? []
+                : tournamentIdx === ALL_TOURNAMENTS || selectedTournament === undefined
+                  ? eligibilityCriteria.map((el) => ({
+                    value: el.id,
+                    label: (
+                      <div
+                        key={el.id}
+                        className="justify-left flex w-full flex-1 flex-row items-center gap-4 overflow-hidden"
+                      >
+                        <div className="text-gray-800">{el.title}</div>
+                        <EligibilityIcon criterion={el} />
+                      </div>
+                    ),
+                  }))
+                  : getEligibilities(
+                    eligibilityCriteria,
+                    selectedTournament.eligibility_excludes ?? [],
+                  ).map((el) => ({
+                    value: el.id,
+                    label: (
+                      <div
+                        key={el.id}
+                        className="justify-left flex w-full flex-1 flex-row items-center gap-4 overflow-hidden"
+                      >
+                        <div className="text-gray-800">{el.title}</div>
+                        <EligibilityIcon criterion={el} />
+                      </div>
+                    ),
+                  }))
+            }
+            placeholder="Eligibility to exclude..."
+            value={notEligibleFor}
+            onChange={setNotEligibleFor}
+          />
+
+
           <Button
             loading={
               rankingsData.isLoading &&
-              (searchText !== "" || eligibleFor.length > 0)
+              (searchText !== "" || eligibleFor.length > 0 || notEligibleFor.length > 0)
             }
             disabled={rankingsData.isLoading}
             label="Search!"
@@ -141,6 +265,7 @@ const Rankings: React.FC = () => {
       <RankingsTable
         data={rankingsData.data}
         eligibleFor={queryParams.eligibleFor}
+        notEligibleFor={queryParams.notEligibleFor}
         loading={rankingsData.isLoading}
         page={queryParams.page}
         handlePage={handlePage}

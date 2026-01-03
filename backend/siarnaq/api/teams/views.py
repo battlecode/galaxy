@@ -49,7 +49,19 @@ logger = structlog.get_logger(__name__)
             name="eligible_for",
             type=int,
             many=True,
-            description="Filter teams by a set of eligibility criteria ID",
+            description=(
+                "Filter teams by a set of eligibility criteria ID "
+                "that all team members must have"
+            ),
+        ),
+        OpenApiParameter(
+            name="not_eligible_for",
+            type=int,
+            many=True,
+            description=(
+                "Filter teams by a set of eligibility criteria ID "
+                "that no team member should have"
+            ),
         ),
     ]
 )

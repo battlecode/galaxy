@@ -72,6 +72,7 @@ export const useSearchTeams = (
     search,
     hasActiveSubmission,
     eligibleFor,
+    notEligibleFor,
     page,
   }: TeamTListRequest,
   queryClient: QueryClient,
@@ -82,11 +83,13 @@ export const useSearchTeams = (
       search,
       hasActiveSubmission,
       eligibleFor,
+      notEligibleFor,
       page,
     }),
+
     queryFn: async () =>
       await searchTeamsFactory.queryFn(
-        { episodeId, search, hasActiveSubmission, eligibleFor, page },
+        { episodeId, search, hasActiveSubmission, eligibleFor, notEligibleFor, page },
         queryClient,
         true,
       ),

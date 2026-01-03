@@ -88,6 +88,7 @@ export interface TeamTAvatarCreateRequest {
     episodeId: string;
     eligibleFor?: Array<number>;
     hasActiveSubmission?: boolean;
+    notEligibleFor?: Array<number>;
     avatar?: Blob;
 }
 
@@ -96,6 +97,7 @@ export interface TeamTCreateRequest {
     teamCreateRequest: TeamCreateRequest;
     eligibleFor?: Array<number>;
     hasActiveSubmission?: boolean;
+    notEligibleFor?: Array<number>;
 }
 
 export interface TeamTJoinCreateRequest {
@@ -103,18 +105,21 @@ export interface TeamTJoinCreateRequest {
     teamJoinRequest: TeamJoinRequest;
     eligibleFor?: Array<number>;
     hasActiveSubmission?: boolean;
+    notEligibleFor?: Array<number>;
 }
 
 export interface TeamTLeaveCreateRequest {
     episodeId: string;
     eligibleFor?: Array<number>;
     hasActiveSubmission?: boolean;
+    notEligibleFor?: Array<number>;
 }
 
 export interface TeamTListRequest {
     episodeId: string;
     eligibleFor?: Array<number>;
     hasActiveSubmission?: boolean;
+    notEligibleFor?: Array<number>;
     ordering?: string;
     page?: number;
     search?: string;
@@ -124,6 +129,7 @@ export interface TeamTMePartialUpdateRequest {
     episodeId: string;
     eligibleFor?: Array<number>;
     hasActiveSubmission?: boolean;
+    notEligibleFor?: Array<number>;
     patchedTeamPrivateRequest?: PatchedTeamPrivateRequest;
 }
 
@@ -131,12 +137,14 @@ export interface TeamTMeRetrieveRequest {
     episodeId: string;
     eligibleFor?: Array<number>;
     hasActiveSubmission?: boolean;
+    notEligibleFor?: Array<number>;
 }
 
 export interface TeamTMeUpdateRequest {
     episodeId: string;
     eligibleFor?: Array<number>;
     hasActiveSubmission?: boolean;
+    notEligibleFor?: Array<number>;
     teamPrivateRequest?: TeamPrivateRequest;
 }
 
@@ -145,6 +153,7 @@ export interface TeamTRetrieveRequest {
     id: string;
     eligibleFor?: Array<number>;
     hasActiveSubmission?: boolean;
+    notEligibleFor?: Array<number>;
 }
 
 /**
@@ -419,6 +428,10 @@ export class TeamApi extends runtime.BaseAPI {
             queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
         }
 
+        if (requestParameters.notEligibleFor) {
+            queryParameters['not_eligible_for'] = requestParameters.notEligibleFor;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -489,6 +502,10 @@ export class TeamApi extends runtime.BaseAPI {
             queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
         }
 
+        if (requestParameters.notEligibleFor) {
+            queryParameters['not_eligible_for'] = requestParameters.notEligibleFor;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
@@ -542,6 +559,10 @@ export class TeamApi extends runtime.BaseAPI {
             queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
         }
 
+        if (requestParameters.notEligibleFor) {
+            queryParameters['not_eligible_for'] = requestParameters.notEligibleFor;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
@@ -590,6 +611,10 @@ export class TeamApi extends runtime.BaseAPI {
             queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
         }
 
+        if (requestParameters.notEligibleFor) {
+            queryParameters['not_eligible_for'] = requestParameters.notEligibleFor;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -633,6 +658,10 @@ export class TeamApi extends runtime.BaseAPI {
 
         if (requestParameters.hasActiveSubmission !== undefined) {
             queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
+
+        if (requestParameters.notEligibleFor) {
+            queryParameters['not_eligible_for'] = requestParameters.notEligibleFor;
         }
 
         if (requestParameters.ordering !== undefined) {
@@ -693,6 +722,10 @@ export class TeamApi extends runtime.BaseAPI {
             queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
         }
 
+        if (requestParameters.notEligibleFor) {
+            queryParameters['not_eligible_for'] = requestParameters.notEligibleFor;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         headerParameters['Content-Type'] = 'application/json';
@@ -742,6 +775,10 @@ export class TeamApi extends runtime.BaseAPI {
             queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
         }
 
+        if (requestParameters.notEligibleFor) {
+            queryParameters['not_eligible_for'] = requestParameters.notEligibleFor;
+        }
+
         const headerParameters: runtime.HTTPHeaders = {};
 
         if (this.configuration && this.configuration.accessToken) {
@@ -786,6 +823,10 @@ export class TeamApi extends runtime.BaseAPI {
 
         if (requestParameters.hasActiveSubmission !== undefined) {
             queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
+
+        if (requestParameters.notEligibleFor) {
+            queryParameters['not_eligible_for'] = requestParameters.notEligibleFor;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -839,6 +880,10 @@ export class TeamApi extends runtime.BaseAPI {
 
         if (requestParameters.hasActiveSubmission !== undefined) {
             queryParameters['has_active_submission'] = requestParameters.hasActiveSubmission;
+        }
+
+        if (requestParameters.notEligibleFor) {
+            queryParameters['not_eligible_for'] = requestParameters.notEligibleFor;
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

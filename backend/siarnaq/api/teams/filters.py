@@ -39,18 +39,31 @@ class TeamActiveSubmissionFilter(filters.BaseFilterBackend):
 
 class TeamEligibilityFilter(filters.BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        if "eligible_for" not in request.query_params:
+        if (
+            "eligible_for" not in request.query_params
+            and "not_eligible_for" not in request.query_params
+        ):
             return queryset
 
         eligible_for_list = request.query_params.getlist("eligible_for")
+        not_eligible_for_list = request.query_params.getlist("not_eligible_for")
 
         # Filter teams that have all the specified eligible_for values
         # tricky query, this results in a join becasue eligible_for is a many to many
-        filtered_teams = (
-            queryset.filter(profile__eligible_for__in=eligible_for_list)
-            .annotate(eligible_count=Count("profile__eligible_for"))
-            .filter(eligible_count=len(eligible_for_list))
-        )
+        filtered_teams = queryset
+
+        if eligible_for_list:
+            filtered_teams = (
+                filtered_teams.filter(profile__eligible_for__in=eligible_for_list)
+                .annotate(eligible_count=Count("profile__eligible_for", distinct=True))
+                .filter(eligible_count=len(eligible_for_list))
+            )
+
+        if not_eligible_for_list:
+            filtered_teams = filtered_teams.exclude(
+                profile__eligible_for__in=not_eligible_for_list
+            )
+
         logger.info(
             "TeamEligibilityFilter",
             message="TeamEligibilityFilter Query Plan:",

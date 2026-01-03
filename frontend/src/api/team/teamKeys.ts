@@ -40,6 +40,7 @@ export const teamQueryKeys: TeamKeys = {
       search = "",
       hasActiveSubmission = false,
       eligibleFor = [],
+      notEligibleFor = [],
       page = 1,
     }: TeamTListRequest) =>
       [
@@ -48,6 +49,7 @@ export const teamQueryKeys: TeamKeys = {
         search,
         hasActiveSubmission,
         eligibleFor,
+        notEligibleFor,
         page,
       ] as const,
     // ["team", "search", { episodeId, search, page }] as const,

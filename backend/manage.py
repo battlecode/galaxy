@@ -7,7 +7,7 @@ import sys
 def main():
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "siarnaq.settings")
-    os.environ.setdefault("DJANGO_CONFIGURATION", "Local")
+    os.environ.setdefault("DJANGO_CONFIGURATION", "Staging")
     try:
         from configurations.management import execute_from_command_line
     except ImportError as exc:

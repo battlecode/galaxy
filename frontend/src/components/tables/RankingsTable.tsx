@@ -16,6 +16,7 @@ import ScrimmageAcceptRejectLabel from "components/ScrimmageAcceptRejectLabel";
 interface RankingsTableProps {
   data: Maybe<PaginatedTeamPublicList>;
   eligibleFor: string[];
+  notEligibleFor: string[];
   loading: boolean;
   page: number;
   handlePage: (page: number) => void;
@@ -24,6 +25,7 @@ interface RankingsTableProps {
 const RankingsTable: React.FC<RankingsTableProps> = ({
   data,
   eligibleFor,
+  notEligibleFor,
   loading,
   page,
   handlePage,
@@ -36,7 +38,9 @@ const RankingsTable: React.FC<RankingsTableProps> = ({
       data={data?.results ?? []}
       loading={loading}
       keyFromValue={(team) =>
-        team.id.toString() + eligibleFor.reduce((prev, curr) => prev + curr, "")
+        team.id.toString() +
+        eligibleFor.reduce((prev, curr) => prev + curr, "") +
+        notEligibleFor.reduce((prev, curr) => prev + curr, "")
       }
       bottomElement={
         <TableBottom
