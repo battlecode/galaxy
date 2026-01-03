@@ -1,0 +1,50 @@
+services:
+  pubsub-emulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: saturn-pubsub-dev
+    ports:
+      - "8514:8514"
+    volumes:
+      - ./:/development
+    networks:
+      - saturn-dev
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "./pubsubclient", "list-topics"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  saturn:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: saturn-dev
+    environment:
+      - PUBSUB_EMULATOR_HOST=pubsub-emulator:8514
+      - RUN_ID=${RUN_ID:-default}
+    volumes:
+      - ./:/development
+      - ${SCAFFOLD_DIR:-./scaffolds}:/scaffolds
+    command: >
+      -subscription=test
+      -project=mitbattlecode
+      -onsaturn=false
+      -secret=/development/secrets/secret.json
+      -scaffold=/scaffolds
+    depends_on:
+      pubsub-emulator:
+        condition: service_healthy
+    networks:
+      - saturn-dev
+
+networks:
+  saturn-dev:
+    driver: bridge
