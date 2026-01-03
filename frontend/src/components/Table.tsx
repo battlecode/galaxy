@@ -32,7 +32,7 @@ function Table<T>({
   const getKey = (data: T): string => uniqueId(keyFromValue(data));
 
   return (
-    <div className="pl-50 w-full rounded-lg shadow-md">
+    <div className="w-full min-w-0 overflow-hidden rounded-lg shadow-md">
       {/* MOBILE PAGINATION */}
       <div className="w-full rounded-t-lg border-b-2 border-cyan-700 bg-gray-50 md:hidden">
         {bottomElement}
@@ -85,12 +85,16 @@ function Table<T>({
       </div>
 
       {/* WIDESCREEN TABLE */}
-      <div className="hidden w-full md:flex md:flex-col">
+      <div className="hidden w-full overflow-x-auto md:flex md:flex-col">
         <table className="w-full border-collapse overflow-hidden rounded-t-lg text-left text-sm text-gray-500">
           <thead className="bg-cyan-700 font-bold text-white">
             <tr>
               {columns.map((col) => (
-                <th key={"header" + col.key} scope="col" className="px-8 py-3">
+                <th
+                  key={"header" + col.key}
+                  scope="col"
+                  className="whitespace-nowrap px-8 py-3"
+                >
                   {col.header}
                 </th>
               ))}
@@ -113,7 +117,7 @@ function Table<T>({
                     <td
                       key={"cell" + col.key + getKey(row)}
                       scope="row"
-                      className="text-ellipsis whitespace-normal px-8 py-3 font-medium text-gray-900"
+                      className="whitespace-nowrap px-8 py-3 font-medium text-gray-900"
                     >
                       {col.value(row)}
                     </td>

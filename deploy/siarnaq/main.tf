@@ -270,7 +270,7 @@ resource "google_cloudbuild_trigger" "this" {
     name  = "galaxy"
 
     push {
-      tag = "^siarnaq-backend-.*"
+      tag = var.trigger_tag_pattern
     }
   }
 

@@ -1,6 +1,9 @@
 import type React from "react";
 import { useMemo, useState } from "react";
-import { PageTitle } from "../components/elements/BattlecodeStyle";
+import {
+  PageTitle,
+  PageContainer,
+} from "../components/elements/BattlecodeStyle";
 import { useSearchParams } from "react-router-dom";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import Button from "../components/elements/Button";
@@ -62,7 +65,7 @@ const Queue: React.FC = () => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col overflow-auto p-6">
+    <PageContainer>
       <div className="justify-right mb-1 flex flex-row space-x-4">
         <PageTitle>Recent Queue</PageTitle>
         <Button
@@ -95,7 +98,7 @@ const Queue: React.FC = () => {
         page={queryParams.page}
         handlePage={handlePage}
       />
-    </div>
+    </PageContainer>
   );
 };
 

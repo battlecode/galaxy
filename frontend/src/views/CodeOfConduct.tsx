@@ -1,5 +1,6 @@
 import Markdown from "components/elements/Markdown";
 import SectionCard from "components/SectionCard";
+import { PageContainer } from "components/elements/BattlecodeStyle";
 
 const ENVIRONMENT = `
 Maintaining a safe and inclusive environment for competitors is a top priority for Battlecode.
@@ -31,7 +32,7 @@ Particularly, sharing bot code between teams falls under this clause, and is thu
 `;
 
 const CodeOfConduct: React.FC = () => (
-  <div className="flex h-full w-full flex-col overflow-y-auto p-6">
+  <PageContainer>
     <div className="flex flex-1 flex-col gap-8">
       <SectionCard title="Environment">
         <Markdown text={ENVIRONMENT} />
@@ -49,7 +50,7 @@ const CodeOfConduct: React.FC = () => (
         <Markdown text={ACADEMIC_MISCONDUCT} />
       </SectionCard>
     </div>
-  </div>
+  </PageContainer>
 );
 
 export default CodeOfConduct;

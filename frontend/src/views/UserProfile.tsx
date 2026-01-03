@@ -2,7 +2,7 @@ import type React from "react";
 import { useEpisodeId } from "contexts/EpisodeContext";
 import { Link, useParams } from "react-router-dom";
 import SectionCard from "components/SectionCard";
-import { PageTitle } from "components/elements/BattlecodeStyle";
+import { PageTitle, PageContainer } from "components/elements/BattlecodeStyle";
 import { useUserInfoById, useTeamsByUser } from "api/user/useUser";
 import { isNilOrEmptyStr } from "api/helpers";
 import PageNotFound from "./PageNotFound";
@@ -22,7 +22,7 @@ const UserProfile: React.FC = () => {
   }
 
   return (
-    <div className="p-6">
+    <PageContainer>
       <PageTitle>User Profile</PageTitle>
       <div className="flex flex-col gap-8 xl:flex-row">
         <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
@@ -87,7 +87,7 @@ const UserProfile: React.FC = () => {
           </SectionCard>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

@@ -107,3 +107,23 @@ variable "saturn_secrets" {
   description = "Secrets to inject into the Saturn secret manager"
   type        = map
 }
+
+variable "siarnaq_trigger_tag_pattern" {
+  description = "Regex pattern for git tags that trigger Siarnaq backend builds"
+  type        = string
+}
+
+variable "frontend_trigger_tag_pattern" {
+  description = "Regex pattern for git tags that trigger frontend builds"
+  type        = string
+}
+
+variable "titan_trigger_tag_pattern" {
+  description = "Regex pattern for git tags that trigger Titan builds"
+  type        = string
+}
+
+variable "saturn_trigger_tag_pattern" {
+  description = "Regex pattern for git tags that trigger Saturn builds"
+  type        = string
+}

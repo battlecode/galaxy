@@ -84,7 +84,7 @@ resource "google_cloudbuild_trigger" "frontend" {
     name  = "galaxy"
 
     push {
-      tag = "^siarnaq-frontend-.*"
+      tag = var.frontend_trigger_tag_pattern
     }
   }
 
@@ -156,6 +156,8 @@ module "siarnaq" {
   storage_public_name = google_storage_bucket.public.name
   storage_secure_name = google_storage_bucket.secure.name
   storage_ephemeral_name = google_storage_bucket.ephemeral.name
+
+  trigger_tag_pattern = var.siarnaq_trigger_tag_pattern
 }
 
 module "titan" {
@@ -169,6 +171,8 @@ module "titan" {
 
   image         = var.titan_image
   storage_names = [google_storage_bucket.public.name, google_storage_bucket.secure.name]
+
+  trigger_tag_pattern = var.titan_trigger_tag_pattern
 }
 
 resource "google_secret_manager_secret" "saturn" {
@@ -253,7 +257,7 @@ resource "google_cloudbuild_trigger" "saturn" {
     name  = "galaxy"
 
     push {
-      tag = "^saturn-.*"
+      tag = var.saturn_trigger_tag_pattern
     }
   }
 

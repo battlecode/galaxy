@@ -4,6 +4,7 @@ import { QuickStartPage } from "../content/ContentStruct";
 import { useEpisodeId } from "../contexts/EpisodeContext";
 import OptionalSectionCardMarkdown from "../components/OptionalSectionCardMarkdown";
 import NoContentFound from "./NoContentFound";
+import { PageContainer } from "components/elements/BattlecodeStyle";
 import { isNil } from "lodash";
 const QuickStart: React.FC = () => {
   const { episodeId } = useEpisodeId();
@@ -18,7 +19,7 @@ const QuickStart: React.FC = () => {
   }
 
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto p-6">
+    <PageContainer>
       <div className="flex flex-1 flex-col gap-8">
         <OptionalSectionCardMarkdown
           title={QuickStartPage.OVERVIEW}
@@ -45,7 +46,7 @@ const QuickStart: React.FC = () => {
           textRecord={currentQuickStartText}
         />
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

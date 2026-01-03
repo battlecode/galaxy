@@ -1,6 +1,9 @@
 import type React from "react";
 import { useState } from "react";
-import { PageTitle } from "../components/elements/BattlecodeStyle";
+import {
+  PageTitle,
+  PageContainer,
+} from "../components/elements/BattlecodeStyle";
 import Input from "../components/elements/Input";
 import TextArea from "../components/elements/TextArea";
 import { AuthStateEnum, useCurrentUser } from "../contexts/CurrentUserContext";
@@ -57,7 +60,7 @@ const Account: React.FC = () => {
   };
 
   return (
-    <div className="p-6">
+    <PageContainer>
       <PageTitle>User Settings</PageTitle>
       <div className="flex flex-1 flex-col gap-8 xl:max-w-4xl">
         <ProfileForm episodeId={episodeId} queryClient={queryClient} />
@@ -138,7 +141,7 @@ const Account: React.FC = () => {
       >
         {user.isSuccess && <UserChart userId={user.data.id} />}
       </SectionCard>
-    </div>
+    </PageContainer>
   );
 };
 

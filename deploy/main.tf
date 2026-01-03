@@ -55,6 +55,11 @@ module "production" {
   saturn_secrets        = var.saturn_secrets_production
   storage_releases_name = module.releases.storage_bucket_name
 
+  siarnaq_trigger_tag_pattern  = "^siarnaq-backend-.*"
+  frontend_trigger_tag_pattern = "^siarnaq-frontend-.*"
+  titan_trigger_tag_pattern    = "^titan-.*"
+  saturn_trigger_tag_pattern   = "^saturn-.*"
+
   depends_on = [null_resource.apis]
 }
 
@@ -87,6 +92,11 @@ module "staging" {
   max_execute_instances = 1
   saturn_secrets        = var.saturn_secrets_staging
   storage_releases_name = module.releases.storage_bucket_name
+
+  siarnaq_trigger_tag_pattern  = "^(staging-)?siarnaq-.*"
+  frontend_trigger_tag_pattern = "^(staging-)?frontend-.*"
+  titan_trigger_tag_pattern    = "^(staging-)?titan-.*"
+  saturn_trigger_tag_pattern   = "^(staging-)?saturn-.*"
 
   depends_on = [null_resource.apis]
 }
@@ -138,6 +148,22 @@ module "staging_network" {
   additional_buckets = {}
 }
 
+module "cpw" {
+  source      = "./cpw"
+  name        = "cpw"
+  gcp_project = var.gcp_project
+  gcp_region  = var.gcp_region
+  gcp_zone    = var.gcp_zone
+  labels      = merge(var.labels, {environment="production", component="cpw"})
+
+  # network_vpc_id      = module.production_network.vpc_id
+  subnetwork_ip_cidr  = "10.0.4.0/24"
+  secret_id           = "cpw-ssh-key"
+  machine_type        = "n2-standard-4" #4 vCPUs, 16GB RAM
+  image               = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
+  disk_size           = 50
+}
+
 data "google_dns_managed_zone" "this" {
   name = "battlecode-dns-zone"
 }
@@ -163,6 +189,7 @@ locals {
         subdomain = "www.",
         rrdatas   = ["battlecode.org."],
       },
+      module.cpw.dns_records
     ]
   )
 }

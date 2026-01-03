@@ -8,6 +8,7 @@ import SectionCard from "../components/SectionCard";
 import Tooltip from "../components/elements/Tooltip";
 import Collapse from "../components/elements/Collapse";
 import Icon from "../components/elements/Icon";
+import { PageContainer } from "components/elements/BattlecodeStyle";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
 import EligibilityIcon from "../components/EligibilityIcon";
 import TournamentResultsTable from "../components/tables/TournamentResultsTable";
@@ -26,7 +27,7 @@ const StyleToLabel: Record<StyleEnum, string> = {
   [StyleEnum.De]: "Double Elimination",
 };
 
-const TournamentPage: React.FC = () => {
+const Tournament: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
 
@@ -86,7 +87,7 @@ const TournamentPage: React.FC = () => {
   }, [tourneyData.data, episode]);
 
   return (
-    <div className="flex h-full w-full flex-col p-6">
+    <PageContainer>
       <div className="flex flex-1 flex-col gap-8">
         <h1>Tournament {tourneyData.data?.name_long ?? tournamentId}</h1>
         <SectionCard title="About" loading={tourneyData.isLoading}>
@@ -202,8 +203,8 @@ const TournamentPage: React.FC = () => {
           />
         </SectionCard>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 
-export default TournamentPage;
+export default Tournament;

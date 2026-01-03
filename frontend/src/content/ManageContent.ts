@@ -7,6 +7,7 @@ import type {
   PageKey,
 } from "./ContentStruct";
 
+import * as BC26 from "./bc26";
 import * as BC25JAVA from "./bc25java";
 import * as BC25PYTHON from "./bc25python";
 import * as BC24 from "./bc24";
@@ -15,8 +16,14 @@ import * as BC22 from "./bc22";
 
 const bcVersions: Record<
   string,
-  typeof BC25JAVA | typeof BC25PYTHON | typeof BC24 | typeof BC23 | typeof BC22
+  | typeof BC26
+  | typeof BC25JAVA
+  | typeof BC25PYTHON
+  | typeof BC24
+  | typeof BC23
+  | typeof BC22
 > = {
+  bc26: BC26,
   bc25java: BC25JAVA,
   bc25python: BC25PYTHON,
   bc24: BC24,

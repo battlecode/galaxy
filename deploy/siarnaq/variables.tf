@@ -77,3 +77,8 @@ variable "additional_secrets" {
   description = "Additional secrets to inject into the secret manager"
   type        = map
 }
+
+variable "trigger_tag_pattern" {
+  description = "Regex pattern for git tags that trigger builds"
+  type        = string
+}

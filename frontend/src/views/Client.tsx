@@ -5,6 +5,7 @@ import { useEpisodeId } from "contexts/EpisodeContext";
 import { useUserScrimmageList } from "api/compete/useCompete";
 import { useQueryClient } from "@tanstack/react-query";
 import SelectMenu from "components/elements/SelectMenu";
+import { PageContainer } from "components/elements/BattlecodeStyle";
 import { StatusBccEnum, type Match } from "api/_autogen";
 import MatchScore from "components/compete/MatchScore";
 import { dateTime } from "utils/dateTime";
@@ -73,7 +74,7 @@ const Client: React.FC = () => {
   }, [matches]);
 
   return (
-    <div className="flex h-full min-h-screen w-full flex-col gap-2 p-6">
+    <PageContainer className="min-h-screen gap-2">
       <div className="flex max-h-min w-full flex-1 flex-col items-center gap-4 md:flex-row md:gap-2">
         <SelectMenu
           loading={matches.isLoading || userTeam.isLoading}
@@ -102,7 +103,7 @@ const Client: React.FC = () => {
       </div>
 
       <ResponsiveIframe url={clientUrl ?? ""} className="flex flex-1" />
-    </div>
+    </PageContainer>
   );
 };
 
