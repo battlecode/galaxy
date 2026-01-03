@@ -19,9 +19,10 @@ func main() {
 		"subscribe <subscription-name>",
 	}
 	quickCommands := []string{
-		"compile: to send message in compile.json",
-		"execute: to send message in execute.json",
-		"sub: to recieve message",
+		"compile: to send message in configs/compile.json",
+		"execute: to send message in configs/execute.json",
+		"sub: to receive messages from subscription",
+		"list-topics: list all available topics",
 	}
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: ./pubsubclient <command> [args]")
@@ -52,13 +53,16 @@ func main() {
 
 	switch command {
 	case "compile":
-		publishJSONMessage(ctx, client, "testing-saturn", "/development/compile.json")
+		publishJSONMessage(ctx, client, "testing-saturn", "/development/configs/compile.json")
 
 	case "execute":
-		publishJSONMessage(ctx, client, "testing-saturn", "/development/execute.json")
+		publishJSONMessage(ctx, client, "testing-saturn", "/development/configs/execute.json")
 
 	case "sub":
 		subscribe(ctx, client, "test")
+
+	case "list-topics":
+		listTopics(ctx, client)
 
 	case "create-topic":
 		if len(os.Args) < 3 {
@@ -162,5 +166,20 @@ func subscribe(ctx context.Context, client *pubsub.Client, subscriptionName stri
 	})
 	if err != nil {
 		log.Fatalf("Failed to receive messages: %v", err)
+	}
+}
+
+func listTopics(ctx context.Context, client *pubsub.Client) {
+	it := client.Topics(ctx)
+	fmt.Println("Available topics:")
+	for {
+		topic, err := it.Next()
+		if err != nil {
+			if err.Error() == "no more items in iterator" {
+				break
+			}
+			log.Fatalf("Failed to list topics: %v", err)
+		}
+		fmt.Printf("  - %s\n", topic.ID())
 	}
 }
