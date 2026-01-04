@@ -350,6 +350,7 @@ class Base(Configuration):
 
     # Email Verification Configuration
     EMAIL_VERIFICATION_TOKEN_EXPIRY_TIME = 24  # Time in hours
+    EMAIL_VERIFICATION_REQUIRED = False
 
 
 class Local(Base):
