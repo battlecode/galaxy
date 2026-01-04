@@ -219,28 +219,30 @@ const ProfileForm: React.FC<{
               {...register("email", { required: FIELD_REQUIRED_ERROR_MSG })}
             />
             {/* Warning about email change and resend verification button */}
-            <div className="col-span-2">
-              <p className="text-xs text-gray-500">
-                Note: Changing your email will require re-verification.
-              </p>
-              {user.data?.email_verified === false && (
-                <div className="mt-2 flex items-center gap-2">
-                  <p className="text-xs text-yellow-700">
-                    Your email is not verified.
-                  </p>
-                  <Button
-                    label="Resend Verification Email"
-                    onClick={() => {
-                      resendEmailMutation.mutate(undefined);
-                    }}
-                    loading={resendEmailMutation.isPending}
-                    disabled={resendEmailMutation.isPending}
-                    variant="dark"
-                    className="text-xs"
-                  />
-                </div>
-              )}
-            </div>
+            {import.meta.env.VITE_EMAIL_VERIFICATION_ENABLED !== "false" && (
+              <div className="col-span-2">
+                <p className="text-xs text-gray-500">
+                  Note: Changing your email will require re-verification.
+                </p>
+                {user.data?.email_verified === false && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <p className="text-xs text-yellow-700">
+                      Your email is not verified.
+                    </p>
+                    <Button
+                      label="Resend Verification Email"
+                      onClick={() => {
+                        resendEmailMutation.mutate(undefined);
+                      }}
+                      loading={resendEmailMutation.isPending}
+                      disabled={resendEmailMutation.isPending}
+                      variant="dark"
+                      className="text-xs"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             <Input
               required

@@ -350,6 +350,7 @@ class Base(Configuration):
 
     # Email Verification Configuration
     EMAIL_VERIFICATION_TOKEN_EXPIRY_TIME = 24  # Time in hours
+    EMAIL_VERIFICATION_REQUIRED = True  # Set to False to disable verification checks
 
 
 class Local(Base):
@@ -383,6 +384,7 @@ class Local(Base):
     CORS_ALLOW_ALL_ORIGINS = True
 
     EMAIL_ENABLED = False
+    EMAIL_VERIFICATION_REQUIRED = False
     FRONTEND_ORIGIN = "http://localhost:3000"
 
     LOGGING: dict[str, Any] = {
