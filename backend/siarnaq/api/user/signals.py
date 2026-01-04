@@ -57,10 +57,12 @@ def send_email_verification_token_email(
     When an email verification token is created, send an email to the user.
     """
 
-    if not settings.EMAIL_ENABLED:
-        logger.warn(
-            "email_verification_disabled",
+    if not settings.EMAIL_ENABLED or not settings.EMAIL_VERIFICATION_ENABLED:
+        logger.info(
+            "email_verification_skipped",
             message="Email verification emails are disabled.",
+            user_id=email_verification_token.user.id,
+            email=email_verification_token.user.email,
         )
         return
 
