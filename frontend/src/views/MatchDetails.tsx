@@ -2,39 +2,55 @@ import type React from "react";
 
 import { NavLink, useParams } from "react-router-dom";
 
-import { useMatchInfo, useSubmissionInfo } from "api/compete/useCompete";
+import { useMatchInfo } from "api/compete/useCompete";
 import { useEpisodeId } from "contexts/EpisodeContext";
 
 import { PageTitle } from "components/elements/BattlecodeStyle";
 import SectionCard from "components/SectionCard";
 
-import type { Submission } from "api/_autogen";
+import type { Match, TeamPrivate } from "api/_autogen";
 import { useUserTeam } from "api/team/useTeam";
 import { isPresent } from "utils/utilTypes";
 import PageNotFound from "./PageNotFound";
-import type { UseQueryResult } from "@tanstack/react-query";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { dateTime } from "utils/dateTime";
+import { buildKey } from "api/helpers";
+import { submissionInfoFactory } from "api/compete/competeFactories";
 
-const MatchProfile: React.FC = () => {
+const MatchDetails: React.FC = () => {
   const { episodeId } = useEpisodeId();
   const { matchId } = useParams();
   const teamData = useUserTeam({ episodeId });
   const match = useMatchInfo({ episodeId, id: matchId ?? "" });
 
-  const getUserSubmission = (): UseQueryResult<Submission> | undefined => {
-    if (!isPresent(match.data?.participants) || !isPresent(teamData.data))
-      return undefined;
+  const getUserSubmissionId = (
+    match: UseQueryResult<Match>,
+    team: UseQueryResult<TeamPrivate>,
+  ): string => {
+    if (!isPresent(match.data?.participants) || !isPresent(team.data))
+      return "";
 
-    const id = match.data?.participants
-      .find((participant) => participant.team === teamData.data?.id)
-      ?.submission.toString();
-
-    if (!isPresent(id)) return undefined;
-
-    return useSubmissionInfo({ episodeId, id });
+    return (
+      match.data?.participants
+        .find((participant) => participant.team === team.data?.id)
+        ?.submission.toString() ?? ""
+    );
   };
 
-  const submission = getUserSubmission();
+  const id = getUserSubmissionId(match, teamData);
+
+  const submission = useQuery({
+    queryKey: buildKey(submissionInfoFactory.queryKey, {
+      episodeId,
+      id,
+    }),
+    queryFn: async () =>
+      await submissionInfoFactory.queryFn({
+        episodeId,
+        id,
+      }),
+    enabled: id.length !== 0,
+  });
 
   if (match.isError) {
     return <PageNotFound />;
@@ -42,7 +58,7 @@ const MatchProfile: React.FC = () => {
 
   return (
     <div className="p-6">
-      <PageTitle>Match Profile</PageTitle>
+      <PageTitle>Match Details</PageTitle>
       <div className="flex h-full w-full flex-col overflow-auto">
         <SectionCard title="Submission" loading={match.isLoading}>
           {isPresent(submission) && submission.isSuccess && (
@@ -80,4 +96,4 @@ const MatchProfile: React.FC = () => {
   );
 };
 
-export default MatchProfile;
+export default MatchDetails;

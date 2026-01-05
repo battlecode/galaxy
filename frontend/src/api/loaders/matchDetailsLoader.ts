@@ -4,7 +4,7 @@ import { safeEnsureQueryData } from "api/helpers";
 import type { LoaderFunction } from "react-router-dom";
 import { isPresent } from "utils/utilTypes";
 
-export const matchProfileLoader =
+export const matchDetailsLoader =
   (queryClient: QueryClient): LoaderFunction =>
   ({ params }) => {
     const { episodeId, id } = params;

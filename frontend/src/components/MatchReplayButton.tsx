@@ -32,10 +32,11 @@ const MatchReplayButton: React.FC<MatchReplayButtonProps> = ({
     <Button
       disabled={disabled || !isPresent(clientUrl)}
       label="Replay!"
-      onClick={() => {
+      onClick={(e) => {
         if (isPresent(clientUrl)) {
           window.open(clientUrl);
         }
+        e.stopPropagation();
       }}
     />
   );
