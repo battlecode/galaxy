@@ -59,20 +59,21 @@ import {
   tournamentMatchListFactory,
   tournamentSubsListFactory,
   userScrimmageListFactory,
-  ratingHistoryFactory, submissionInfoFactory
+  ratingHistoryFactory,
+  submissionInfoFactory,
 } from "./competeFactories";
 import { MILLIS_SECOND, SECONDS_MINUTE } from "utils/utilTypes";
 
 // ---------- QUERY HOOKS ---------- //
 const STATISTICS_WAIT_MINUTES = 5;
 
-export const useSubmissionInfo = (
-  { episodeId, id }: CompeteSubmissionRetrieveRequest,
-): UseQueryResult<Submission> =>
+export const useSubmissionInfo = ({
+  episodeId,
+  id,
+}: CompeteSubmissionRetrieveRequest): UseQueryResult<Submission> =>
   useQuery({
     queryKey: buildKey(submissionInfoFactory.queryKey, { episodeId, id }),
-    queryFn: async () =>
-      await submissionInfoFactory.queryFn({ episodeId, id })
+    queryFn: async () => await submissionInfoFactory.queryFn({ episodeId, id }),
   });
 
 /**
@@ -176,13 +177,13 @@ export const useTeamScrimmageList = (
       ),
   });
 
-export const useMatchInfo = (
-  { episodeId, id }: CompeteMatchRetrieveRequest,
-): UseQueryResult<Match> =>
+export const useMatchInfo = ({
+  episodeId,
+  id,
+}: CompeteMatchRetrieveRequest): UseQueryResult<Match> =>
   useQuery({
     queryKey: buildKey(matchInfoFactory.queryKey, { episodeId, id }),
-    queryFn: async () =>
-      await matchInfoFactory.queryFn({ episodeId, id }),
+    queryFn: async () => await matchInfoFactory.queryFn({ episodeId, id }),
   });
 
 /**

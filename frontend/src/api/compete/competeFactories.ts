@@ -16,7 +16,9 @@ import type {
   PaginatedScrimmageRequestList,
   PaginatedSubmissionList,
   TournamentSubmission,
-  ScrimmageRecord, CompeteSubmissionRetrieveRequest, Submission
+  ScrimmageRecord,
+  CompeteSubmissionRetrieveRequest,
+  Submission,
 } from "../_autogen";
 import type { PaginatedQueryFactory, QueryFactory } from "../apiTypes";
 import { competeQueryKeys } from "./competeKeys";
@@ -31,7 +33,8 @@ import {
   getSubmissionsList,
   getTournamentMatchesList,
   getUserScrimmagesInboxList,
-  getUserScrimmagesOutboxList, getSubmissionInfo
+  getUserScrimmagesOutboxList,
+  getSubmissionInfo,
 } from "./competeApi";
 import { prefetchNextPage } from "../helpers";
 
@@ -40,7 +43,8 @@ export const submissionInfoFactory: QueryFactory<
   Submission
 > = {
   queryKey: competeQueryKeys.subInfo,
-  queryFn: async ({ episodeId, id }) => await getSubmissionInfo({ episodeId, id }),
+  queryFn: async ({ episodeId, id }) =>
+    await getSubmissionInfo({ episodeId, id }),
 } as const;
 
 export const subsListFactory: PaginatedQueryFactory<

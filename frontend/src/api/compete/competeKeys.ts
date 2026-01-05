@@ -9,7 +9,8 @@ import type {
   CompeteRequestInboxListRequest,
   CompeteRequestOutboxListRequest,
   CompeteSubmissionListRequest,
-  CompeteSubmissionTournamentListRequest, CompeteSubmissionRetrieveRequest
+  CompeteSubmissionTournamentListRequest,
+  CompeteSubmissionRetrieveRequest,
 } from "../_autogen";
 import type { QueryKeyBuilder } from "../apiTypes";
 
