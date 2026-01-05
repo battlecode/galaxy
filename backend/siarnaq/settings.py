@@ -351,6 +351,7 @@ class Base(Configuration):
     # Email Verification Configuration
     EMAIL_VERIFICATION_TOKEN_EXPIRY_TIME = 24  # Time in hours
     EMAIL_VERIFICATION_REQUIRED = False
+    EMAIL_VERIFICATION_ENABLED = True
 
 
 class Local(Base):
@@ -544,6 +545,8 @@ class Production(Base):
 
     EMAIL_ENABLED = True
     FRONTEND_ORIGIN = "https://play.battlecode.org"
+    EMAIL_VERIFICATION_REQUIRED = True
+    EMAIL_VERIFICATION_ENABLED = True
 
     LOGGING: dict[str, Any] = {
         **_LOGGING_COMMON,
