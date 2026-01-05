@@ -1,8 +1,6 @@
 module github.com/battlecode/galaxy/saturn
 
-go 1.24.0
-
-toolchain go1.24.11
+go 1.25
 
 require (
 	cloud.google.com/go/pubsub v1.49.0
