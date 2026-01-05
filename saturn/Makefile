@@ -1,4 +1,4 @@
-.PHONY: dev-fetch-secret dev-build dev-compile dev-execute dev-shell dev-shell-saturn dev-clean help
+.PHONY: dev-fetch-secret dev-build dev-compile-py dev-compile-java dev-execute-py dev-execute-java dev-shell dev-shell-saturn dev-clean help
 .PHONY: dev-docker-up dev-docker-down dev-docker-logs dev-docker-rebuild dev-pubsub-interactive
 .PHONY: dev-list-runs dev-clean-runs dev-view-run
 
@@ -9,8 +9,10 @@ help: ## Show this help message
 	@echo '  make dev-fetch-secret       # Fetch secrets from GCP'
 	@echo '  make dev-build              # Build Docker images'
 	@echo '  make dev-docker-up          # Start all services (creates new run)'
-	@echo '  make dev-compile            # Test compilation'
-	@echo '  make dev-execute            # Test execution'
+	@echo '  make dev-compile-py         # Test Python compilation'
+	@echo '  make dev-compile-java       # Test Java compilation'
+	@echo '  make dev-execute-py         # Test Python execution'
+	@echo '  make dev-execute-java       # Test Java execution'
 	@echo '  make dev-pubsub-interactive # Interactive Pub/Sub client'
 	@echo ''
 	@echo 'Run Management:'
@@ -49,7 +51,9 @@ dev-build: ## Build all Docker images
 	@cd development && docker-compose build
 	@echo "✓ Docker images built"
 
-dev-compile: ## Send a compile message
+# Template for compile operations
+# Usage: $(call run-compile,language)
+define run-compile
 	@# Check if a run is active
 	@if [ ! -f development/runs/latest ]; then \
 		echo "Error: No active run found. Start services with 'make dev-docker-up' first."; \
@@ -60,12 +64,12 @@ dev-compile: ## Send a compile message
 	$(eval REQUEST_ID := $(shell date +%Y%m%d_%H%M%S))
 	@# Create request directory structure
 	@mkdir -p development/runs/$(RUN_ID)/requests/compile_$(REQUEST_ID)
-	@echo "Creating compile request: compile_$(REQUEST_ID)"
+	@echo "Creating compile request for $(1): compile_$(REQUEST_ID)"
 	@# Generate config from template
 	@sed \
 		-e 's|{{REPORT_PATH}}|/development/runs/$(RUN_ID)/requests/compile_$(REQUEST_ID)/report.txt|g' \
 		-e 's|{{BINARY_PATH}}|/development/runs/$(RUN_ID)/requests/compile_$(REQUEST_ID)/binary.zip|g' \
-		development/configs/compile.template.json \
+		development/configs/compile-$(1).template.json \
 		> development/runs/$(RUN_ID)/requests/compile_$(REQUEST_ID)/config.json
 	@echo "✓ Config generated: development/runs/$(RUN_ID)/requests/compile_$(REQUEST_ID)/config.json"
 	@# Send compile message with generated config
@@ -73,8 +77,11 @@ dev-compile: ## Send a compile message
 	@echo "✓ Compile message sent"
 	@echo "✓ Request ID: compile_$(REQUEST_ID)"
 	@echo "✓ Output directory: development/runs/$(RUN_ID)/requests/compile_$(REQUEST_ID)/"
+endef
 
-dev-execute: ## Send an execute message
+# Template for execute operations
+# Usage: $(call run-execute,language)
+define run-execute
 	@# Check if a run is active
 	@if [ ! -f development/runs/latest ]; then \
 		echo "Error: No active run found. Start services with 'make dev-docker-up' first."; \
@@ -85,12 +92,12 @@ dev-execute: ## Send an execute message
 	$(eval REQUEST_ID := $(shell date +%Y%m%d_%H%M%S))
 	@# Create request directory structure
 	@mkdir -p development/runs/$(RUN_ID)/requests/execute_$(REQUEST_ID)
-	@echo "Creating execute request: execute_$(REQUEST_ID)"
+	@echo "Creating execute request for $(1): execute_$(REQUEST_ID)"
 	@# Generate config from template
 	@sed \
 		-e 's|{{REPORT_PATH}}|/development/runs/$(RUN_ID)/requests/execute_$(REQUEST_ID)/report.txt|g' \
 		-e 's|{{REPLAY_PATH}}|/development/runs/$(RUN_ID)/requests/execute_$(REQUEST_ID)/replay.bc25java|g' \
-		development/configs/execute.template.json \
+		development/configs/execute-$(1).template.json \
 		> development/runs/$(RUN_ID)/requests/execute_$(REQUEST_ID)/config.json
 	@echo "✓ Config generated: development/runs/$(RUN_ID)/requests/execute_$(REQUEST_ID)/config.json"
 	@# Send execute message with generated config
@@ -98,6 +105,19 @@ dev-execute: ## Send an execute message
 	@echo "✓ Execute message sent"
 	@echo "✓ Request ID: execute_$(REQUEST_ID)"
 	@echo "✓ Output directory: development/runs/$(RUN_ID)/requests/execute_$(REQUEST_ID)/"
+endef
+
+dev-compile-py:
+	$(call run-compile,py3)
+
+dev-compile-java:
+	$(call run-compile,java21)
+
+dev-execute-py:
+	$(call run-execute,py3)
+
+dev-execute-java:
+	$(call run-execute,java21)
 
 dev-shell-pubsub: ## Open shell in Pub/Sub container
 	@docker exec -it saturn-pubsub-dev bash
