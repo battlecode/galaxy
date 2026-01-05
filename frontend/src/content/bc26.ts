@@ -10,9 +10,9 @@ export const QUICKSTART: Partial<Record<QuickStartPageKey, string>> = {
   Overview: `
 This is the Battlecode 2026 contest website, which will be your main hub for all Battlecode-related things for the duration of the contest. For a general overview of what Battlecode is, visit [our landing page](https://battlecode.org/).
 
-*Deep beneath the abandoned dorms of MIT, thanks to a student letting their failed final project loose on campus, a robotic rat society has formed. Like all developing societies, there is, of course, conflict. It is not chromatic, but it is dangerous. You have heard tales of many large, hungry robot cats (someone else’s failed project, probably) that are on the prowl for sustenance. As such, your society and a nearby society have formed an uneasy alliance.*
+*Deep beneath the abandoned dorms of MIT, thanks to a student letting their failed final project loose on campus, a robotic rat society has formed. Like all developing societies, there is, of course, conflict. It is not chromatic, but it is dangerous. You have heard tales of many large, hungry robot cats (someone else's failed project, probably) that are on the prowl for sustenance. As such, your society and a nearby society have formed an uneasy alliance.*
 
-*Before you begin dragging in enemy rats as sacrifices, you must remember the task you were born with: protect your mother, the big fat Rat King.*
+*Before you begin putting the cat to sleep, you must remember the task you were born with: protect your mother, the big fat rat king.*
 
 `,
   "Account and Team Creation": `
