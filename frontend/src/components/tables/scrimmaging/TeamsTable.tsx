@@ -45,12 +45,18 @@ const TeamsTable: React.FC<TeamsTableProps> = ({
   const canRequestTeam = useCallback(
     (team: TeamPublic) => {
       if (!episodeInfo.isSuccess || episodeInfo.data.frozen) return false;
+      if (!userTeam.isSuccess) return false;
+
+      const isNotLowerRanked =
+        (team.profile?.rating ?? Number.NEGATIVE_INFINITY) >=
+        (userTeam.data.profile?.rating ?? Number.POSITIVE_INFINITY);
 
       return (
-        team.profile?.auto_accept_reject_ranked !==
+        isNotLowerRanked &&
+        (team.profile?.auto_accept_reject_ranked !==
           ScrimmageRequestAcceptRejectEnum.R ||
-        team.profile.auto_accept_reject_unranked !==
-          ScrimmageRequestAcceptRejectEnum.R
+          team.profile.auto_accept_reject_unranked !==
+            ScrimmageRequestAcceptRejectEnum.R)
       );
     },
     [episodeInfo],
