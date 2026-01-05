@@ -400,6 +400,15 @@ Most interns receive full time offers to join the Amplitude team at the end of t
 
 If you are an international participant, please note that [US export regulations](https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/sanctioned-destinations) may restrict our ability to award prizes to students from certain countries.
     `,
+  "Tournament Format": `
+Each match within a tournament will consist of at least 3 games, each on a different map, and the team that wins the most games will advance.
+
+Scrimmage rankings will be used to determine seeds for all tournaments. Ties will be broken by Sprint tournament rankings.
+
+Tournaments will be in a double elimination format, with the exception of both Sprint Tournaments, which are single elimination. The Final Tournament will start with a blank slate (any losses from the Qualifying Tournament are reset).
+
+Even if you miss earlier tournaments, you can participate in later tournaments (except the Final Tournament). This includes the Qualifying Tournament — you can participate even if you miss every other tournament (your seed will be determined by your scrimmage rank).
+    `,
   "Eligibility Rules": `
 Anyone can write a bot, create a team, and participate in scrimmage matches/rankings. The Sprint Tournaments are open to everyone, but the other tournaments have stricter eligibility rules.
 
