@@ -28,6 +28,7 @@ var (
 	scaffoldRoot                *string = flag.String("scaffold", "/scaffolds", "the root directory for saving scaffolds")
 	parallelism                 *uint   = flag.Uint("parallel", 1, "the number of scaffolds to run in parallel")
 	onSaturn                    *bool   = flag.Bool("onsaturn", true, "run on saturn")
+	executionImage              *string = flag.String("execution-image", "", "the docker image to isolate compile/execution tasks")
 )
 
 func main() {
@@ -58,7 +59,7 @@ func main() {
 	)
 	for i = 0; i < *parallelism; i++ {
 		root := filepath.Join(*scaffoldRoot, strconv.FormatUint(uint64(i), 10))
-		multiplexer, err := run.NewScaffoldMultiplexer(root, secret, *onSaturn)
+		multiplexer, err := run.NewScaffoldMultiplexer(root, secret, *onSaturn, *executionImage)
 		if err != nil {
 			log.Ctx(ctx).Fatal().Err(err).Msg("Could not initialize scaffold multiplexer.")
 		}

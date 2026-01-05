@@ -21,7 +21,7 @@ type JavaScaffold struct {
 	javaEnv      []string
 }
 
-func NewJavaScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, javaPath string, onSaturn bool) (*JavaScaffold, error) {
+func NewJavaScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, javaPath string, onSaturn bool, executionImage string) (*JavaScaffold, error) {
 	s := new(JavaScaffold)
 	s.root = root
 	s.repo = repo
@@ -44,6 +44,7 @@ func NewJavaScaffold(ctx context.Context, episode saturn.Episode, repo *git.Repo
 	}
 	s.matchOutputs = make(map[*StepArguments]string)
 	s.onSaturn = onSaturn
+	s.executionImage = executionImage
 	return s, nil
 }
 
@@ -133,6 +134,7 @@ func (s *JavaScaffold) VerifySubmission() *Step {
 	return &Step{
 		Name: "Build source code",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
+			defer s.cleanupContainer(ctx)
 			pkg := arg.Details.(CompileRequest).Package
 			if pkg == "" {
 				log.Ctx(ctx).Debug().Msg("Package name must not be empty.")
@@ -140,7 +142,7 @@ func (s *JavaScaffold) VerifySubmission() *Step {
 					"accepted": false,
 				})
 			}
-			out, err := s.Scaffold.RunCommand(
+			out, err := s.Scaffold.RunIsolatedCommand(
 				ctx,
 				s.javaEnv,
 				"./gradlew",
@@ -175,7 +177,8 @@ func (s *JavaScaffold) RunMatch() *Step {
 	return &Step{
 		Name: "Run match",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
-			out, err := s.Scaffold.RunCommand(
+			defer s.cleanupContainer(ctx)
+			out, err := s.Scaffold.RunIsolatedCommand(
 				ctx,
 				s.javaEnv,
 				"./gradlew",
@@ -195,7 +198,7 @@ func (s *JavaScaffold) RunMatch() *Step {
 			)
 			log.Ctx(ctx).Debug().Msg(out)
 			if err != nil {
-				return fmt.Errorf("RunCommand: %v", err)
+				return fmt.Errorf("RunIsolatedCommand: %v", err)
 			}
 			s.matchOutputs[arg] = out
 			return nil

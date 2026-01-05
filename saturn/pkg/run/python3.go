@@ -21,7 +21,7 @@ type Python3Scaffold struct {
 
 var pyWinnerRegex = regexp.MustCompile(`(?m)^\[server\]\s*.*\(([AB])\) wins \(round [0-9]+\)$`)
 
-func NewPython3Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, pyVersion string, onSaturn bool) (*Python3Scaffold, error) {
+func NewPython3Scaffold(ctx context.Context, episode saturn.Episode, repo *git.Repository, root string, pyVersion string, onSaturn bool, executionImage string) (*Python3Scaffold, error) {
 	s := new(Python3Scaffold)
 	s.root = root
 	s.repo = repo
@@ -43,6 +43,7 @@ func NewPython3Scaffold(ctx context.Context, episode saturn.Episode, repo *git.R
 	}
 	s.matchOutputs = make(map[*StepArguments]string)
 	s.onSaturn = onSaturn
+	s.executionImage = executionImage
 	return s, nil
 }
 
@@ -119,6 +120,7 @@ func (s *Python3Scaffold) VerifySubmission() *Step {
 	return &Step{
 		Name: "Build source code",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
+			defer s.cleanupContainer(ctx)
 			pkg := arg.Details.(CompileRequest).Package
 			if pkg == "" {
 				log.Ctx(ctx).Debug().Msg("Package name must not be empty.")
@@ -126,7 +128,7 @@ func (s *Python3Scaffold) VerifySubmission() *Step {
 					"accepted": false,
 				})
 			}
-			out, err := s.Scaffold.RunCommand(
+			out, err := s.Scaffold.RunIsolatedCommand(
 				ctx,
 				[]string{},
 				s.pyVersion,
@@ -162,7 +164,7 @@ func (s *Python3Scaffold) RunMatch() *Step {
 	return &Step{
 		Name: "Run match",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
-			out, err := s.Scaffold.RunCommand(
+			out, err := s.Scaffold.RunIsolatedCommand(
 				ctx,
 				[]string{},
 				s.pyVersion,
@@ -183,7 +185,7 @@ func (s *Python3Scaffold) RunMatch() *Step {
 			)
 			log.Ctx(ctx).Debug().Msg(out)
 			if err != nil {
-				return fmt.Errorf("RunCommand: %v", err)
+				return fmt.Errorf("RunIsolatedCommand: %v", err)
 			}
 			s.matchOutputs[arg] = out
 			return nil
