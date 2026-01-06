@@ -11,6 +11,7 @@ import { useEpisodeId } from "contexts/EpisodeContext";
 import { useUserTeam } from "api/team/useTeam";
 import { useUserScrimmageList } from "api/compete/useCompete";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import MatchReplayButton from "components/MatchReplayButton";
 
 interface ScrimHistoryTableProps {
@@ -24,6 +25,7 @@ const ScrimHistoryTable: React.FC<ScrimHistoryTableProps> = ({
 }) => {
   const { episodeId } = useEpisodeId();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const episodeData = useEpisodeInfo({ id: episodeId });
   const userTeamData = useUserTeam({ episodeId });
   const scrimsData = useUserScrimmageList(
@@ -113,6 +115,9 @@ const ScrimHistoryTable: React.FC<ScrimHistoryTableProps> = ({
             value: (match) => dateTime(match.created).localFullString,
           },
         ]}
+        onRowClick={(match) => {
+          navigate(`/${episodeId}/match/${match.id.toString()}`);
+        }}
       />
     </Fragment>
   );

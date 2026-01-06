@@ -60,6 +60,8 @@ import CodeOfConduct from "views/CodeOfConduct";
 import Client from "views/Client";
 import AdminTournament from "views/AdminTournament";
 import { adminTournamentLoader } from "api/loaders/adminTournamentLoader";
+import { matchDetailsLoader } from "api/loaders/matchDetailsLoader";
+import MatchDetails from "views/MatchDetails";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -177,6 +179,11 @@ const router = createBrowserRouter([
           {
             path: "client",
             element: <Client />,
+          },
+          {
+            path: "match/:matchId",
+            element: <MatchDetails />,
+            loader: matchDetailsLoader(queryClient),
           },
         ],
       },

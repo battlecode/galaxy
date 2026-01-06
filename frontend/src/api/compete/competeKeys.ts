@@ -1,6 +1,7 @@
 import type {
   CompeteMatchHistoricalRatingTopNListRequest,
   CompeteMatchHistoricalRatingRetrieveRequest,
+  CompeteMatchRetrieveRequest,
   CompeteMatchListRequest,
   CompeteMatchScrimmageListRequest,
   CompeteMatchScrimmagingRecordRetrieveRequest,
@@ -9,12 +10,14 @@ import type {
   CompeteRequestOutboxListRequest,
   CompeteSubmissionListRequest,
   CompeteSubmissionTournamentListRequest,
+  CompeteSubmissionRetrieveRequest,
 } from "../_autogen";
 import type { QueryKeyBuilder } from "../apiTypes";
 
 interface CompeteKeys {
   // --- SUBMISSIONS --- //
   subBase: QueryKeyBuilder<{ episodeId: string }>;
+  subInfo: QueryKeyBuilder<CompeteSubmissionRetrieveRequest>;
   subList: QueryKeyBuilder<CompeteSubmissionListRequest>;
   tourneySubs: QueryKeyBuilder<CompeteSubmissionTournamentListRequest>;
   // --- SCRIMMAGES --- //
@@ -25,6 +28,7 @@ interface CompeteKeys {
   scrimsOtherList: QueryKeyBuilder<CompeteMatchScrimmageListRequest>;
   // --- MATCHES --- //
   matchBase: QueryKeyBuilder<{ episodeId: string }>;
+  matchInfo: QueryKeyBuilder<CompeteMatchRetrieveRequest>;
   matchList: QueryKeyBuilder<CompeteMatchListRequest>;
   tourneyMatchList: QueryKeyBuilder<CompeteMatchTournamentListRequest>;
   // --- PERFORMANCE --- //
@@ -41,6 +45,11 @@ export const competeQueryKeys: CompeteKeys = {
   subBase: {
     key: ({ episodeId }: { episodeId: string }) =>
       ["compete", episodeId, "submissions"] as const,
+  },
+
+  subInfo: {
+    key: ({ episodeId, id }: CompeteSubmissionRetrieveRequest) =>
+      [...competeQueryKeys.subBase.key({ episodeId }), "info", id] as const,
   },
 
   subList: {
@@ -101,6 +110,11 @@ export const competeQueryKeys: CompeteKeys = {
   matchBase: {
     key: ({ episodeId }: { episodeId: string }) =>
       ["compete", episodeId, "matches"] as const,
+  },
+
+  matchInfo: {
+    key: ({ episodeId, id }: CompeteMatchRetrieveRequest) =>
+      [...competeQueryKeys.matchBase.key({ episodeId }), "info", id] as const,
   },
 
   matchList: {

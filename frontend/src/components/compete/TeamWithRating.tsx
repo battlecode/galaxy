@@ -52,7 +52,13 @@ const TeamWithRating: React.FC<TeamWithRatingProps> = ({
 
   return (
     <>
-      <NavLink to={`/${episodeId}/team/${teamId}`} className="hover:underline">
+      <NavLink
+        to={`/${episodeId}/team/${teamId}`}
+        className="hover:underline"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
         {includeTeamName && <span>{teamName}</span>}
         {ratingComponent}
       </NavLink>

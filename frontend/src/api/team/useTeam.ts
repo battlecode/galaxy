@@ -35,7 +35,7 @@ import {
 import { buildKey } from "../helpers";
 import { userRatingHistoryFactory } from "api/compete/competeFactories";
 import { competeQueryKeys } from "api/compete/competeKeys";
-import { MILLIS_SECOND } from "utils/utilTypes";
+import { type Maybe, MILLIS_SECOND } from "utils/utilTypes";
 
 // ---------- QUERY HOOKS ---------- //
 const SEARCH_WAIT_SECONDS = 30;
@@ -129,14 +129,17 @@ export const useCreateTeam = (
 export const useJoinTeam = (
   { episodeId }: { episodeId: string },
   queryClient: QueryClient,
-): UseMutationResult<void, Error, TeamJoinRequest> =>
-  useMutation({
+): UseMutationResult<void, Error, TeamJoinRequest> => {
+  let err: Maybe<string> = undefined;
+  const getErr = (): string => err ?? "Error joining team.";
+
+  return useMutation({
     mutationKey: teamMutationKeys.join({ episodeId }),
     mutationFn: async (teamJoinRequest: TeamJoinRequest) => {
       await toast.promise(joinTeam({ episodeId, teamJoinRequest }), {
         loading: "Joining team...",
         success: "Joined team!",
-        error: "Error joining team.",
+        error: getErr,
       });
     },
     onSuccess: async () => {
@@ -153,7 +156,12 @@ export const useJoinTeam = (
         queryKey: competeQueryKeys.scrimBase.key({ episodeId }),
       });
     },
+    onError: (error) => {
+      err = `${error.name}: ${error.message}`;
+      console.log(err);
+    },
   });
+};
 
 /**
  * Leave the user's current team in a given episode.

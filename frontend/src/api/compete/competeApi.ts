@@ -4,6 +4,7 @@ import {
   type PaginatedSubmissionList,
   type PaginatedScrimmageRequestList,
   type PaginatedMatchList,
+  type CompeteSubmissionRetrieveRequest,
   type CompeteSubmissionCreateRequest,
   type CompeteSubmissionDownloadRetrieveRequest,
   type CompeteSubmissionListRequest,
@@ -14,6 +15,8 @@ import {
   type CompeteRequestOutboxListRequest,
   type CompeteRequestCreateRequest,
   type ScrimmageRequest,
+  type Match,
+  type CompeteMatchRetrieveRequest,
   type CompeteMatchScrimmageListRequest,
   type CompeteMatchTournamentListRequest,
   type CompeteMatchListRequest,
@@ -72,6 +75,12 @@ export const downloadSubmission = async ({
 
   await downloadFile(url, `battlecode_source_${id}.zip`);
 };
+
+export const getSubmissionInfo = async ({
+  episodeId,
+  id,
+}: CompeteSubmissionRetrieveRequest): Promise<Submission> =>
+  await API.competeSubmissionRetrieve({ episodeId, id });
 
 /**
  * Get a paginated list of all of the current user's team's submissions.
@@ -201,6 +210,15 @@ export const getTournamentMatchesList = async ({
     roundId,
     teamId,
     tournamentId,
+  });
+
+export const getMatchInfo = async ({
+  episodeId,
+  id,
+}: CompeteMatchRetrieveRequest): Promise<Match> =>
+  await API.competeMatchRetrieve({
+    episodeId,
+    id,
   });
 
 /**
