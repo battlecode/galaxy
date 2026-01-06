@@ -24,7 +24,7 @@ func NewGCSClient(ctx context.Context, onSaturn bool) (*GCSClient, error) {
 	if err != nil {
 		return nil, fmt.Errorf("storage.NewClient: %v", err)
 	}
-	return &GCSClient{client, false}, nil
+	return &GCSClient{client, onSaturn}, nil
 }
 
 func (c *GCSClient) GetFile(ctx context.Context, f FileSpecification, w io.Writer) error {
