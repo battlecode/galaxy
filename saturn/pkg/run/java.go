@@ -61,16 +61,11 @@ func (s *JavaScaffold) Prepare() *Step {
 				return fmt.Errorf("os.RemoveAll: %v", err)
 			}
 
-			// Make gradlew executable
-			_, err := s.Scaffold.RunCommand(ctx, []string{}, "chmod", "+x", "./gradlew")
-			if err != nil {
-				return fmt.Errorf("chmod gradlew: %v", err)
-			}
-
 			log.Ctx(ctx).Debug().Msg("Updating distribution.")
 			out, err := s.Scaffold.RunCommand(
 				ctx,
 				s.javaEnv,
+				"sh",
 				"./gradlew",
 				"update",
 				fmt.Sprintf("-PonSaturn=%t", s.onSaturn),
@@ -151,6 +146,7 @@ func (s *JavaScaffold) VerifySubmission() *Step {
 			out, err := s.Scaffold.RunIsolatedCommand(
 				ctx,
 				s.javaEnv,
+				"sh",
 				"./gradlew",
 				"verify",
 				fmt.Sprintf("-Pteam=%s", pkg),
@@ -187,6 +183,7 @@ func (s *JavaScaffold) RunMatch() *Step {
 			out, err := s.Scaffold.RunIsolatedCommand(
 				ctx,
 				s.javaEnv,
+				"sh",
 				"./gradlew",
 				"run",
 				fmt.Sprintf("-PonSaturn=%t", s.onSaturn),
