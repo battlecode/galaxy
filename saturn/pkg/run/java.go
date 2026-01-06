@@ -62,9 +62,9 @@ func (s *JavaScaffold) Prepare() *Step {
 			}
 
 			// Make gradlew executable
-			gradlewPath := filepath.Join(s.root, "gradlew")
-			if err := os.Chmod(gradlewPath, 0755); err != nil {
-				return fmt.Errorf("os.Chmod gradlew: %v", err)
+			_, err := s.Scaffold.RunCommand(ctx, []string{}, "chmod", "+x", "./gradlew")
+			if err != nil {
+				return fmt.Errorf("chmod gradlew: %v", err)
 			}
 
 			log.Ctx(ctx).Debug().Msg("Updating distribution.")
