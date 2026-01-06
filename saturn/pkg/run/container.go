@@ -90,20 +90,33 @@ func (d *DockerRuntime) CreateContainer(ctx context.Context, config *ContainerCo
 	}
 
 	mounts := make([]mount.Mount, 0, len(config.Mounts))
+	tmpfsMounts := make(map[string]string)
 	for _, m := range config.Mounts {
 		parts := strings.Split(m, ":")
 		if len(parts) < 2 {
 			return "", fmt.Errorf("invalid mount format: %s", m)
 		}
 
-		mountType := mount.TypeBind
+		// Handle tmpfs mounts
+		if parts[0] == "tmpfs" {
+			// Format: tmpfs:/path:options
+			path := parts[1]
+			opts := ""
+			if len(parts) >= 3 {
+				opts = parts[2]
+			}
+			tmpfsMounts[path] = opts
+			continue
+		}
+
+		// Handle bind mounts
 		readOnly := false
 		if len(parts) >= 3 && parts[2] == "ro" {
 			readOnly = true
 		}
 
 		mounts = append(mounts, mount.Mount{
-			Type:     mountType,
+			Type:     mount.TypeBind,
 			Source:   parts[0],
 			Target:   parts[1],
 			ReadOnly: readOnly,
@@ -135,9 +148,13 @@ func (d *DockerRuntime) CreateContainer(ctx context.Context, config *ContainerCo
 		CapAdd:  config.CapabilitiesToAdd,
 	}
 
-	if config.ReadOnlyRootFS {
-		hostConfig.Tmpfs = map[string]string{
-			"/tmp": "rw,noexec,nosuid,size=1g",
+	// Merge tmpfs mounts
+	if len(tmpfsMounts) > 0 || config.ReadOnlyRootFS {
+		if hostConfig.Tmpfs == nil {
+			hostConfig.Tmpfs = make(map[string]string)
+		}
+		for path, opts := range tmpfsMounts {
+			hostConfig.Tmpfs[path] = opts
 		}
 	}
 
