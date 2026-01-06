@@ -213,6 +213,8 @@ func (s *Scaffold) initContainer(ctx context.Context) error {
 		ReadOnlyRootFS: true,
 		Mounts: []string{
 			fmt.Sprintf("%s:/workspace:rw", scaffoldHostPath),
+			"tmpfs:/tmp:rw,noexec,nosuid,size=1g",                 // Writable temp directory
+			"tmpfs:/workspace/.gradle:rw,noexec,nosuid,size=512m", // Gradle cache
 		},
 		CapabilitiesToDrop: []string{"ALL"},
 		CapabilitiesToAdd:  []string{"CHOWN", "SETUID", "SETGID", "DAC_OVERRIDE"},

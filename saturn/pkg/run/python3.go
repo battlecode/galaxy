@@ -164,6 +164,7 @@ func (s *Python3Scaffold) RunMatch() *Step {
 	return &Step{
 		Name: "Run match",
 		Callable: func(ctx context.Context, arg *StepArguments) error {
+			defer s.cleanupContainer(ctx)
 			out, err := s.Scaffold.RunIsolatedCommand(
 				ctx,
 				[]string{},
