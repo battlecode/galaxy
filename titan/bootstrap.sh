@@ -10,8 +10,10 @@ sed -i 's/\/tmp\/clamd\.sock/\/run\/clamav\/clamd\.sock/' /etc/clamav/clamd.conf
 # We need to start the clamd daemon, and conveniently the image provides an init script
 # to do this. Less conveniently, that init script also ends with a blocking command to
 # "wait forever". So, let's drop that command and run everything else...
+# The new ClamAV 1.0 image uses 'exec tail -f "/dev/null"' at the end. Also, the script
+# uses tini in the shebang, so we need to change it to /bin/sh when piping.
 
-grep -v 'tail -f "/dev/null"' /init | sh
+sed -e 's|^#!/sbin/tini /bin/sh|#!/bin/sh|' -e '/exec tail -f.*\/dev\/null/d' -e '/tail -f.*\/dev\/null/d' /init | sh
 # Mischief managed. I am a terrible person.
 
 # Run the Titan server process.
