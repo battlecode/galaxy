@@ -61,6 +61,12 @@ func (s *JavaScaffold) Prepare() *Step {
 				return fmt.Errorf("os.RemoveAll: %v", err)
 			}
 
+			// Make gradlew executable
+			gradlewPath := filepath.Join(s.root, "gradlew")
+			if err := os.Chmod(gradlewPath, 0755); err != nil {
+				return fmt.Errorf("os.Chmod gradlew: %v", err)
+			}
+
 			log.Ctx(ctx).Debug().Msg("Updating distribution.")
 			out, err := s.Scaffold.RunCommand(
 				ctx,
