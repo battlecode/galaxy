@@ -28,7 +28,7 @@ var (
 	scaffoldRoot                *string = flag.String("scaffold", "/scaffolds", "the root directory for saving scaffolds")
 	parallelism                 *uint   = flag.Uint("parallel", 1, "the number of scaffolds to run in parallel")
 	onSaturn                    *bool   = flag.Bool("onsaturn", true, "run on saturn")
-	executionImage              *string = flag.String("execution-image", "", "the docker image to isolate compile/execution tasks")
+	executionImage              *string = flag.String("execution-image", os.Getenv("EXECUTION_IMAGE"), "the docker image to isolate compile/execution tasks")
 )
 
 func main() {

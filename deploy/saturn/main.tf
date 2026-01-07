@@ -86,7 +86,6 @@ module "container" {
       "-secret=${var.secret_id}",
       "-subscription=${google_pubsub_subscription.queue.name}",
       "-parallel=${var.parallelism}",
-      "-execution-image=${var.image}",
     ]
 
     # Environment variables for Docker-in-Docker path translation
@@ -98,6 +97,10 @@ module "container" {
       {
         name  = "SCAFFOLD_CONTAINER_PATH"
         value = "/scaffolds"
+      },
+      {
+        name = "EXECUTION_IMAGE"
+        value = "${var.image}"
       }
     ]
 

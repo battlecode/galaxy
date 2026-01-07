@@ -32,6 +32,7 @@ services:
       - RUN_ID=${RUN_ID:-default}
       - SCAFFOLD_HOST_PATH=${PWD}/${SCAFFOLD_DIR:-scaffolds}
       - SCAFFOLD_CONTAINER_PATH=/scaffolds
+      - EXECUTION_IMAGE=development-saturn
     volumes:
       - ./:/development
       - ${SCAFFOLD_DIR:-./scaffolds}:/scaffolds
@@ -43,7 +44,6 @@ services:
       -onsaturn=false
       -secret=/development/secrets/secret.json
       -scaffold=/scaffolds
-      -execution-image=development-saturn
     depends_on:
       pubsub-emulator:
         condition: service_healthy
