@@ -1,15 +1,15 @@
 {
   "episode": {
-    "name": "bc26",
+    "name": "bc25python",
     "language": "py3",
-    "scaffold": "https://github.com/battlecode/battlecode26-scaffold"
+    "scaffold": "https://github.com/battlecode/battlecode25-scaffold"
   },
   "metadata": {
     "report-url": "{{REPORT_PATH}}",
     "task-type": "execute"
   },
   "details": {
-    "maps": ["DefaultSmall", "DefaultMedium", "DefaultLarge"],
+    "maps": ["fix", "galaxy", "gridworld", "quack", "sierpinski"],
     "replay": {
       "bucket": "local",
       "name": "{{REPLAY_PATH}}"

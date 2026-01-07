@@ -1,8 +1,8 @@
 {
   "episode": {
-    "name": "bc25java",
+    "name": "bc26",
     "language": "java21",
-    "scaffold": "https://github.com/battlecode/battlecode25-scaffold"
+    "scaffold": "https://github.com/battlecode/battlecode26-scaffold"
   },
   "metadata": {
     "report-url": "{{REPORT_PATH}}",
