@@ -1,0 +1,23 @@
+{
+  "episode": {
+    "name": "bc26",
+    "language": "java21",
+    "scaffold": "https://github.com/battlecode/battlecode26-scaffold"
+  },
+  "metadata": {
+    "report-url": "{{REPORT_PATH}}",
+    "task-type": "compile"
+  },
+  "details": {
+    "source": {
+      "bucket": "local",
+      "name": "/development/test-data/source/java21.zip"
+    },
+    "binary": {
+      "bucket": "local",
+      "name": "{{BINARY_PATH}}"
+    },
+    "team-name": "test",
+    "package": "examplefuncsplayer"
+  }
+}

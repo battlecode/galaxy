@@ -30,9 +30,14 @@ services:
     environment:
       - PUBSUB_EMULATOR_HOST=pubsub-emulator:8514
       - RUN_ID=${RUN_ID:-default}
+      - SCAFFOLD_HOST_PATH=${PWD}/${SCAFFOLD_DIR:-scaffolds}
+      - SCAFFOLD_CONTAINER_PATH=/scaffolds
+      - EXECUTION_IMAGE=development-saturn
     volumes:
       - ./:/development
       - ${SCAFFOLD_DIR:-./scaffolds}:/scaffolds
+      # Mount Docker socket for containerized execution
+      - /var/run/docker.sock:/var/run/docker.sock
     command: >
       -subscription=test
       -project=mitbattlecode
