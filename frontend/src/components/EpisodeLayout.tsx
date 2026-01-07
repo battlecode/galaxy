@@ -55,8 +55,13 @@ const EpisodeLayout: React.FC = () => {
   };
 
   const { user } = useCurrentUser();
+  const emailVerificationEnabled =
+    import.meta.env.VITE_EMAIL_VERIFICATION_ENABLED !== "false";
   const showVerificationBanner =
-    user.isSuccess && !user.data.email_verified && !user.data.is_staff;
+    emailVerificationEnabled &&
+    user.isSuccess &&
+    !user.data.email_verified &&
+    !user.data.is_staff;
 
   return (
     <div className="h-full min-h-screen bg-gray-200/80">

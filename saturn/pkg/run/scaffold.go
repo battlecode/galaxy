@@ -136,14 +136,16 @@ func NewScaffold(ctx context.Context, episode saturn.Episode, repo *git.Reposito
 		scaffold = &s.Scaffold
 	case saturn.Java21:
 		// Modern java21 scaffolds store java in the 'java' subdirectory of the scaffold
-		javaRoot := filepath.Join(root, "java")
+		// javaRoot := filepath.Join(root, "java")
+		javaRoot := root
 		s, err := NewJavaScaffold(ctx, episode, repo, javaRoot, "/opt/java/openjdk", onSaturn, executionImage)
 		if err != nil {
 			return nil, fmt.Errorf("NewJavaScaffold (Java21): %v", err)
 		}
 		scaffold = &s.Scaffold
 	case saturn.Python3:
-		pyRoot := filepath.Join(root, "python")
+		// pyRoot := filepath.Join(root, "python")
+		pyRoot := root
 		s, err := NewPython3Scaffold(ctx, episode, repo, pyRoot, "python3.12", onSaturn, executionImage)
 		if err != nil {
 			return nil, fmt.Errorf("NewPython3Scaffold: %v", err)
