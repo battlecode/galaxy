@@ -18,14 +18,17 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { getParamEntries, parsePageParam } from "../utils/searchParamHelpers";
-import { LanguageEnum } from "api/_autogen";
+import type { LanguagesEnum } from "api/_autogen";
 import { PageTitle, PageContainer } from "components/elements/BattlecodeStyle";
 import { useCurrentUserInfo } from "api/user/useUser";
+import { getLanguageOptions } from "../utils/languageHelpers";
+import type { CompeteSubmissionCreateLanguageEnum } from "api/_autogen/apis/CompeteApi";
 
 interface SubmissionFormInput {
   file: FileList;
   packageName: string;
   description: string;
+  language: LanguagesEnum;
 }
 
 interface QueryParams {
@@ -125,8 +128,11 @@ const CodeSubmission: React.FC = () => {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isDirty },
   } = useForm<SubmissionFormInput>();
+
+  const selectedLanguage = watch("language");
 
   const onSubmit: SubmitHandler<SubmissionFormInput> = (data) => {
     if (uploadSub.isPending) return;
@@ -135,6 +141,7 @@ const CodeSubmission: React.FC = () => {
       _package: data.packageName,
       description: data.description,
       sourceCode: data.file[0],
+      language: data.language as unknown as CompeteSubmissionCreateLanguageEnum,
     });
     reset();
   };
@@ -151,10 +158,14 @@ const CodeSubmission: React.FC = () => {
       </p>
     );
 
-  if (episode.data.language === LanguageEnum.Py3) {
-    return (
-      <div>
-        <p>Submit your python code using the button below.</p>
+  const supportedLanguages = episode.data.languages;
+  const isPythonSelected = selectedLanguage === ("py3" as LanguagesEnum);
+  const isJavaSelected = !isPythonSelected;
+
+  return (
+    <div>
+      <p>Submit your code using the form below.</p>
+      {isPythonSelected && (
         <p>
           Create a{" "}
           <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
@@ -168,65 +179,8 @@ const CodeSubmission: React.FC = () => {
           </span>{" "}
           and any other code you have written, for example:
         </p>
-        <span className="w-full">
-          <p className="rounded-md border border-gray-400 bg-gray-100 px-4 py-3 font-mono">
-            {"submission.zip --> examplefuncsplayer --> bot.py, utils.py"}
-          </p>
-        </span>
-        <form
-          onSubmit={(e) => {
-            void handleSubmit(onSubmit)(e);
-          }}
-          className="mt-4 flex flex-col gap-4"
-        >
-          <div>
-            <FormLabel required label="Choose Submission File" />
-            <input
-              type="file"
-              accept=".zip"
-              required
-              {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
-            />
-          </div>
-          <div className="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-end">
-            <Input
-              className="w-full lg:w-1/3"
-              label="Package Name (i.e. examplefuncsplayer)"
-              required
-              errorMessage={errors.packageName?.message}
-              {...register("packageName", {
-                required: FIELD_REQUIRED_ERROR_MSG,
-              })}
-            />
-            <Input
-              className="w-full lg:w-2/3"
-              label="Description (for your reference)"
-              required
-              errorMessage={errors.description?.message}
-              {...register("description", {
-                required: FIELD_REQUIRED_ERROR_MSG,
-              })}
-            />
-          </div>
-          <Button
-            className={`max-w-sm ${
-              uploadSub.isPending || !isDirty
-                ? "disabled cursor-not-allowed"
-                : ""
-            }`}
-            variant="dark"
-            label="Submit"
-            type="submit"
-            loading={uploadSub.isPending}
-            disabled={uploadSub.isPending || !isDirty}
-          />
-        </form>
-      </div>
-    );
-  } else {
-    return (
-      <div>
-        <p>Submit your java code using the button below.</p>
+      )}
+      {isJavaSelected && (
         <p>
           Create a{" "}
           <span className="rounded-md bg-gray-200 px-1 py-0.5 font-mono">
@@ -240,6 +194,15 @@ const CodeSubmission: React.FC = () => {
           </span>{" "}
           and any other code you have written, for example:
         </p>
+      )}
+      {isPythonSelected && (
+        <span className="w-full">
+          <p className="rounded-md border border-gray-400 bg-gray-100 px-4 py-3 font-mono">
+            {"submission.zip --> examplefuncsplayer --> bot.py, utils.py"}
+          </p>
+        </span>
+      )}
+      {isJavaSelected && (
         <span className="w-full">
           <p className="rounded-md border border-gray-400 bg-gray-100 px-4 py-3 font-mono">
             {
@@ -247,57 +210,74 @@ const CodeSubmission: React.FC = () => {
             }
           </p>
         </span>
-        <form
-          onSubmit={(e) => {
-            void handleSubmit(onSubmit)(e);
-          }}
-          className="mt-4 flex flex-col gap-4"
-        >
-          <div>
-            <FormLabel required label="Choose Submission File" />
-            <input
-              type="file"
-              accept=".zip"
-              required
-              {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
-            />
-          </div>
-          <div className="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-end">
-            <Input
-              className="w-full lg:w-1/3"
-              label="Package Name (i.e. examplefuncsplayer)"
-              required
-              errorMessage={errors.packageName?.message}
-              {...register("packageName", {
-                required: FIELD_REQUIRED_ERROR_MSG,
-              })}
-            />
-            <Input
-              className="w-full lg:w-2/3"
-              label="Description (for your reference)"
-              required
-              errorMessage={errors.description?.message}
-              {...register("description", {
-                required: FIELD_REQUIRED_ERROR_MSG,
-              })}
-            />
-          </div>
-          <Button
-            className={`max-w-sm ${
-              uploadSub.isPending || !isDirty
-                ? "disabled cursor-not-allowed"
-                : ""
-            }`}
-            variant="dark"
-            label="Submit"
-            type="submit"
-            loading={uploadSub.isPending}
-            disabled={uploadSub.isPending || !isDirty}
+      )}
+      <form
+        onSubmit={(e) => {
+          void handleSubmit(onSubmit)(e);
+        }}
+        className="mt-4 flex flex-col gap-4"
+      >
+        <div>
+          <FormLabel required label="Programming Language" />
+          <select
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            required
+            {...register("language", { required: FIELD_REQUIRED_ERROR_MSG })}
+          >
+            <option value="">-- Select Language --</option>
+            {getLanguageOptions(supportedLanguages).map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          {errors.language != null && (
+            <p className="mt-1 text-sm text-red-600">{errors.language.message}</p>
+          )}
+        </div>
+        <div>
+          <FormLabel required label="Choose Submission File" />
+          <input
+            type="file"
+            accept=".zip"
+            required
+            {...register("file", { required: FIELD_REQUIRED_ERROR_MSG })}
           />
-        </form>
-      </div>
-    );
-  }
+        </div>
+        <div className="flex w-full flex-col items-start gap-4 lg:flex-row lg:items-end">
+          <Input
+            className="w-full lg:w-1/3"
+            label="Package Name (i.e. examplefuncsplayer)"
+            required
+            errorMessage={errors.packageName?.message}
+            {...register("packageName", {
+              required: FIELD_REQUIRED_ERROR_MSG,
+            })}
+          />
+          <Input
+            className="w-full lg:w-2/3"
+            label="Description (for your reference)"
+            required
+            errorMessage={errors.description?.message}
+            {...register("description", {
+              required: FIELD_REQUIRED_ERROR_MSG,
+            })}
+          />
+        </div>
+        <Button
+          className={`max-w-sm ${uploadSub.isPending || !isDirty
+            ? "disabled cursor-not-allowed"
+            : ""
+            }`}
+          variant="dark"
+          label="Submit"
+          type="submit"
+          loading={uploadSub.isPending}
+          disabled={uploadSub.isPending || !isDirty}
+        />
+      </form>
+    </div>
+  );
 };
 
 export default Submissions;

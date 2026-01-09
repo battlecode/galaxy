@@ -106,6 +106,7 @@ export default [
       "**/tsconfig.json",
       "**/vite-env.d.ts",
       "**/*.yml",
+      "**/build/**",
     ],
   },
 ];

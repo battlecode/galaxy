@@ -135,6 +135,14 @@ class Submission(SaturnInvocation):
     description = models.CharField(max_length=128, blank=True)
     """A human-readable message describing the submission."""
 
+    language = models.ForeignKey(
+        "episodes.ProgrammingLanguage",
+        on_delete=models.PROTECT,
+        related_name="submissions",
+        help_text="The programming language of this submission.",
+    )
+    """The programming language of this submission."""
+
     objects = SubmissionQuerySet.as_manager()
 
     def __str__(self):
@@ -615,7 +623,7 @@ class ScrimmageRequest(models.Model):
     objects = ScrimmageRequestQuerySet.as_manager()
 
     def __str__(self):
-        return f"{self.requested_by} \u27F9 {self.requested_to}"
+        return f"{self.requested_by} \u27f9 {self.requested_to}"
 
     def determine_is_alternating(self):
         """Determine whether the player order should be alternating."""

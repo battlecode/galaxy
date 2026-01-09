@@ -117,6 +117,7 @@ class SubmissionSerializer(serializers.ModelSerializer):
             "package",
             "description",
             "source_code",
+            "language",
         ]
         read_only_fields = [
             "id",
@@ -130,6 +131,40 @@ class SubmissionSerializer(serializers.ModelSerializer):
             "created",
             "accepted",
         ]
+
+    def validate_language(self, value):
+        """
+        Validate that the language is supported by the episode
+        and convert to ProgrammingLanguage instance.
+        """
+        from siarnaq.api.episodes.models import Episode, ProgrammingLanguage
+
+        # If value is already a ProgrammingLanguage instance, extract its code
+        if isinstance(value, ProgrammingLanguage):
+            language_code = value.code
+            language_obj = value
+        else:
+            # Value is a string language code
+            language_code = value
+            # Get the ProgrammingLanguage instance
+            try:
+                language_obj = ProgrammingLanguage.objects.get(code=language_code)
+            except ProgrammingLanguage.DoesNotExist:
+                raise serializers.ValidationError(
+                    f"Language '{language_code}' does not exist."
+                )
+
+        # Validate that the language is supported by the episode
+        episode_id = self.context.get("episode_id")
+        if episode_id:
+            episode = Episode.objects.get(pk=episode_id)
+            supported = episode.get_supported_languages()
+            if language_code not in supported:
+                raise serializers.ValidationError(
+                    f"Language '{language_code}' is not supported by this episode. "
+                    f"Supported languages: {', '.join(supported)}"
+                )
+        return language_obj
 
     def to_internal_value(self, data):
         ret = super().to_internal_value(data)
@@ -164,6 +199,7 @@ class TournamentSubmissionSerializer(SubmissionSerializer):
             "package",
             "description",
             "source_code",
+            "language",
             "tournament",
         ]
         read_only_fields = fields

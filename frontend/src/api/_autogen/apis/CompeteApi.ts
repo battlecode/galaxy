@@ -146,9 +146,10 @@ export interface CompeteRequestRejectCreateRequest {
 
 export interface CompeteSubmissionCreateRequest {
     episodeId: string;
-    _package?: string;
-    description?: string;
-    sourceCode?: Blob;
+    _package: string;
+    description: string;
+    sourceCode: Blob;
+    language: CompeteSubmissionCreateLanguageEnum;
 }
 
 export interface CompeteSubmissionDownloadRetrieveRequest {
@@ -885,6 +886,22 @@ export class CompeteApi extends runtime.BaseAPI {
             throw new runtime.RequiredError('episodeId','Required parameter requestParameters.episodeId was null or undefined when calling competeSubmissionCreate.');
         }
 
+        if (requestParameters._package === null || requestParameters._package === undefined) {
+            throw new runtime.RequiredError('_package','Required parameter requestParameters._package was null or undefined when calling competeSubmissionCreate.');
+        }
+
+        if (requestParameters.description === null || requestParameters.description === undefined) {
+            throw new runtime.RequiredError('description','Required parameter requestParameters.description was null or undefined when calling competeSubmissionCreate.');
+        }
+
+        if (requestParameters.sourceCode === null || requestParameters.sourceCode === undefined) {
+            throw new runtime.RequiredError('sourceCode','Required parameter requestParameters.sourceCode was null or undefined when calling competeSubmissionCreate.');
+        }
+
+        if (requestParameters.language === null || requestParameters.language === undefined) {
+            throw new runtime.RequiredError('language','Required parameter requestParameters.language was null or undefined when calling competeSubmissionCreate.');
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -923,6 +940,10 @@ export class CompeteApi extends runtime.BaseAPI {
 
         if (requestParameters.sourceCode !== undefined) {
             formParams.append('source_code', requestParameters.sourceCode as any);
+        }
+
+        if (requestParameters.language !== undefined) {
+            formParams.append('language', requestParameters.language as any);
         }
 
         const response = await this.request({
@@ -1156,4 +1177,14 @@ export class CompeteApi extends runtime.BaseAPI {
         return await response.value();
     }
 
+}
+
+/**
+  * @export
+  * @enum {string}
+  */
+export enum CompeteSubmissionCreateLanguageEnum {
+    Java8 = 'java8',
+    Java21 = 'java21',
+    Py3 = 'py3'
 }

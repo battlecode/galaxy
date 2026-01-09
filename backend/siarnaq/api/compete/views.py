@@ -151,7 +151,13 @@ class SubmissionViewSet(
                     "package": {"type": "string"},
                     "description": {"type": "string"},
                     "source_code": {"type": "string", "format": "binary"},
+                    "language": {
+                        "type": "string",
+                        "enum": ["java8", "java21", "py3"],
+                        "description": "The programming language of the submission",
+                    },
                 },
+                "required": ["package", "description", "source_code", "language"],
             }
         },
     )

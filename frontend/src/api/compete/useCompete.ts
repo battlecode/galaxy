@@ -289,6 +289,7 @@ export const useUploadSubmission = (
       _package,
       description,
       sourceCode,
+      language,
     }: CompeteSubmissionCreateRequest) => {
       const toastFn = async (): Promise<Submission> => {
         const result = await uploadSubmission({
@@ -296,6 +297,7 @@ export const useUploadSubmission = (
           _package,
           description,
           sourceCode,
+          language,
         });
 
         try {

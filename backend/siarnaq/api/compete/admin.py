@@ -61,6 +61,7 @@ class SubmissionAdmin(admin.ModelAdmin):
                     "accepted",
                     "package",
                     "description",
+                    "language",
                 )
             },
         ),
@@ -75,11 +76,12 @@ class SubmissionAdmin(admin.ModelAdmin):
         "pk",
         "team",
         "episode",
+        "language",
         "accepted",
         "status",
         "created",
     )
-    list_filter = ("episode", "accepted", "status")
+    list_filter = ("episode", "language", "accepted", "status")
     list_select_related = ("team", "episode")
     ordering = ("-pk",)
     raw_id_fields = ("team", "user")
@@ -88,7 +90,8 @@ class SubmissionAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         fields = super().get_readonly_fields(request, obj=obj)
         if obj is not None:
-            fields = ("episode",) + fields
+            # Once created, episode and language cannot be changed
+            fields = ("episode", "language") + fields
         return fields
 
     def has_delete_permission(self, request, obj=None):

@@ -13,6 +13,12 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { LanguageEnum } from './LanguageEnum';
+import {
+    LanguageEnumFromJSON,
+    LanguageEnumFromJSONTyped,
+    LanguageEnumToJSON,
+} from './LanguageEnum';
 import type { StatusBccEnum } from './StatusBccEnum';
 import {
     StatusBccEnumFromJSON,
@@ -98,6 +104,12 @@ export interface Submission {
      * @memberof Submission
      */
     description?: string;
+    /**
+     * 
+     * @type {LanguageEnum}
+     * @memberof Submission
+     */
+    language: LanguageEnum;
 }
 
 /**
@@ -115,6 +127,7 @@ export function instanceOfSubmission(value: object): boolean {
     isInstance = isInstance && "username" in value;
     isInstance = isInstance && "created" in value;
     isInstance = isInstance && "accepted" in value;
+    isInstance = isInstance && "language" in value;
 
     return isInstance;
 }
@@ -141,6 +154,7 @@ export function SubmissionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'accepted': json['accepted'],
         '_package': !exists(json, 'package') ? undefined : json['package'],
         'description': !exists(json, 'description') ? undefined : json['description'],
+        'language': LanguageEnumFromJSON(json['language']),
     };
 }
 
@@ -155,6 +169,7 @@ export function SubmissionToJSON(value?: Submission | null): any {
         
         'package': value._package,
         'description': value.description,
+        'language': LanguageEnumToJSON(value.language),
     };
 }
 
