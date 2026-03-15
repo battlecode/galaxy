@@ -161,6 +161,12 @@ resource "google_compute_autoscaler" "this" {
     max_replicas    = var.max_instances
     min_replicas    = var.min_instances
     cooldown_period = 60
+    scale_down_control {
+      max_scaled_down_replicas {
+         fixed =  1
+      }
+      time_window_sec =  600
+    }
 
     metric {
       name                       = "pubsub.googleapis.com/subscription/num_undelivered_messages"
