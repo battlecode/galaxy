@@ -5,6 +5,7 @@ import google.cloud.storage as storage
 import structlog
 from django.conf import settings
 from google.auth import impersonated_credentials
+from PIL import Image
 
 logger = structlog.get_logger(__name__)
 
@@ -104,8 +105,6 @@ def get_object(
 
 
 def upload_image(raw_image, image_path):
-    from PIL import Image
-
     img = Image.open(raw_image)
     img.thumbnail(settings.GCLOUD_MAX_AVATAR_SIZE)
 
