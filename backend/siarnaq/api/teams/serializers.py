@@ -1,9 +1,10 @@
 from django.db import transaction
+from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers, validators
 
-from siarnaq.api.episodes.models import Episode
+from siarnaq.api.episodes.models import Episode, Tournament
 from siarnaq.api.teams.models import ClassRequirement, Team, TeamProfile
 from siarnaq.api.user.serializers import UserPublicSerializer
 
@@ -98,6 +99,22 @@ class TeamProfilePrivateSerializer(TeamProfilePublicSerializer):
             instance, validated_data
         )
         if eligible_for is not None:
+            # Prevent changing eligibility while any tournament in the team's
+            # episode is currently in its submission freeze window. This avoids
+            # teams toggling eligibility while tournaments are finalizing
+            # which could affect tournament entries.
+            now = timezone.now()
+            episode = instance.team.episode
+            active_freeze = Tournament.objects.filter(
+                episode=episode,
+                submission_freeze__lte=now,
+                submission_unfreeze__gt=now,
+                is_public=True,
+            ).exists()
+            if active_freeze:
+                raise serializers.ValidationError(
+                    "Cannot change eligibility during tournament submission freeze."
+                )
             instance.eligible_for.set(eligible_for)
         return instance
 

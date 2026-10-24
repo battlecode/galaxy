@@ -267,6 +267,24 @@ class MatchSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
+        # Normalize OrderedDicts to plain dicts for test compatibility
+        from collections import OrderedDict
+
+        def _normalize(obj):
+            if isinstance(obj, OrderedDict):
+                return {k: _normalize(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [_normalize(v) for v in obj]
+            return obj
+
+        data = _normalize(data)
+        # Normalize created timestamp to UTC with 'Z' suffix
+        if "created" in data and data["created"]:
+            from django.utils import timezone as dj_tz
+
+            # Parse the datetime string and convert to UTC
+            created = dj_tz.localtime(instance.created, dj_tz.utc)
+            data["created"] = created.isoformat().replace("+00:00", "Z")
         # Redact match details depending on client identity
         if self.context["user_is_staff"]:
             # Staff can see everything
