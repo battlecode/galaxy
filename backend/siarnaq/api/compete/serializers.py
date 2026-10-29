@@ -1,4 +1,5 @@
 import random
+from datetime import timezone
 
 import structlog
 from django.conf import settings
@@ -283,7 +284,7 @@ class MatchSerializer(serializers.ModelSerializer):
             from django.utils import timezone as dj_tz
 
             # Parse the datetime string and convert to UTC
-            created = dj_tz.localtime(instance.created, dj_tz.utc)
+            created = dj_tz.localtime(instance.created, timezone.utc)
             data["created"] = created.isoformat().replace("+00:00", "Z")
         # Redact match details depending on client identity
         if self.context["user_is_staff"]:
