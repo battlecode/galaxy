@@ -121,10 +121,17 @@ resource "google_compute_instance_template" "this" {
   }
 
   metadata = {
-    gce-container-declaration = module.container.metadata_value
     google-logging-enabled    = true
     google-monitoring-enabled = true
     shutdown-script           = file("${path.module}/shutdown-script.sh")
+    startup-script            = templatefile("${path.module}/startup-script.sh", {
+      image        = jsonencode(var.image)
+      registry     = jsonencode(split("/", var.image)[0])
+      project      = jsonencode(var.gcp_project)
+      secret       = jsonencode(var.secret_id)
+      subscription = jsonencode(google_pubsub_subscription.queue.name)
+      parallelism  = jsonencode(var.parallelism)
+    })
   }
 
   lifecycle {
