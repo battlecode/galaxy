@@ -87,7 +87,53 @@ module "container" {
       "-subscription=${google_pubsub_subscription.queue.name}",
       "-parallel=${var.parallelism}",
     ]
+
+    # Environment variables for Docker-in-Docker path translation
+    env = [
+      {
+        name  = "SCAFFOLD_HOST_PATH"
+        value = "/var/lib/saturn/scaffolds"
+      },
+      {
+        name  = "SCAFFOLD_CONTAINER_PATH"
+        value = "/scaffolds"
+      },
+      {
+        name = "EXECUTION_IMAGE"
+        value = "${var.image}"
+      }
+    ]
+
+    # Mount Docker socket and scaffolds directory from host
+    volumeMounts = [
+      {
+        mountPath = "/var/run/docker.sock"
+        name      = "docker-socket"
+        readOnly  = false
+      },
+      {
+        mountPath = "/scaffolds"
+        name      = "scaffolds"
+        readOnly  = false
+      }
+    ]
   }
+
+  # Mount host Docker socket and scaffolds directory
+  volumes = [
+    {
+      name = "docker-socket"
+      hostPath = {
+        path = "/var/run/docker.sock"
+      }
+    },
+    {
+      name = "scaffolds"
+      hostPath = {
+        path = "/var/lib/saturn/scaffolds"
+      }
+    }
+  ]
 }
 
 resource "google_compute_instance_template" "this" {

@@ -1,0 +1,43 @@
+{
+  "episode": {
+    "name": "bc26",
+    "language": "py3",
+    "scaffold": "https://github.com/battlecode/battlecode26-scaffold"
+  },
+  "metadata": {
+    "report-url": "{{REPORT_PATH}}",
+    "task-type": "execute"
+  },
+  "details": {
+    "maps": ["DefaultSmall", "DefaultMedium", "DefaultLarge"],
+    "replay": {
+      "bucket": "local",
+      "name": "{{REPLAY_PATH}}"
+    },
+    "alternate-order": true,
+    "a": {
+      "source": {
+        "bucket": "local",
+        "name": "/development/test-data/source/py3.zip"
+      },
+      "binary": {
+        "bucket": "local",
+        "name": "/development/test-data/binary/py3.zip"
+      },
+      "team-name": "test1",
+      "package": "examplefuncsplayer"
+    },
+    "b": {
+      "source": {
+        "bucket": "local",
+        "name": "/development/test-data/source/py3.zip"
+      },
+      "binary": {
+        "bucket": "local",
+        "name": "/development/test-data/binary/py3.zip"
+      },
+      "team-name": "test2",
+      "package": "examplefuncsplayer"
+    }
+  }
+}

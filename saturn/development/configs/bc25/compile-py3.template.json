@@ -1,8 +1,8 @@
 {
   "episode": {
-    "name": "bc26",
-    "language": "java21",
-    "scaffold": "https://github.com/battlecode/battlecode26-scaffold"
+    "name": "bc25python",
+    "language": "py3",
+    "scaffold": "https://github.com/battlecode/battlecode25-scaffold"
   },
   "metadata": {
     "report-url": "{{REPORT_PATH}}",
@@ -11,7 +11,7 @@
   "details": {
     "source": {
       "bucket": "local",
-      "name": "/development/test-data/source/bc26-java21.zip"
+      "name": "/development/test-data/source/py3.zip"
     },
     "binary": {
       "bucket": "local",
